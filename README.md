@@ -7,4 +7,4 @@ Even from a small number of modules, an ensemble consisting of a vast array of d
 
 # The power of ensembles
 Ensemble models of disease spread typically outperforms individual models in terms of robust and accurate forecasts.
-With "dieasy", ensemble models are leveraged to support evidence-based decision-making and pandemic preparedness.
+With "diseasy", ensemble models are leveraged to support evidence-based decision-making and pandemic preparedness.
