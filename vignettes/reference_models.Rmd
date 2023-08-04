@@ -1,0 +1,68 @@
+---
+title: "Diseasy: reference models (g0, g1, b0, b1)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{reference_models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+devtools::load_all()
+
+# Attach namespaces with diseasystores
+installed.packages()[, 1] |>
+  purrr::keep(~ startsWith(., "diseasystore")) |>
+  purrr::walk(~ eval(parse(text = glue::glue("library({.})")))) # Thanks R, for being so difficult.
+```
+
+# Introduction
+We first initialize the `DiseasyObservables` module to use a `diseasystore` of our choice to get data from for our 
+models. In this example, we will use the Google COVID-19 Open Data repository. By setting the `case_definition` to 
+"Google COVID-19" in `DiseasyObservables`, the `diseasystore` called `DiseasystoreGoogleCovid19` will be used.
+This `diseasystore` might need some configuration depending on your setup:
+
+```{r diseasystore_configuration}
+# Options available to set:
+print(purrr::keep(names(options()), ~ startsWith(., "diseasystore.DiseasystoreGoogleCovid19")) |>
+        purrr::map(options) |>
+        purrr::pluck(1))
+
+# Configure a local SQLite DB to store the data in
+tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
+sqlite_path <- file.path(tmp_dir, "diseasystore_google_covid_19.sqlite")
+target_conn <- \() DBI::dbConnect(RSQLite::SQLite(), sqlite_path)
+options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
+```
+
+# Initializing models
+With the `diseasystore` configured, we load the observations module (`DiseasyObservables`) using the `DiseasystoreGoogleCovid19` back-end. 
+
+Next, we initialize the models `G0`, `G1`, `B0`, and `B1` using this observations module.
+
+```{r initialize_models}
+obs <- DiseasyObservables$new(case_definition = "Google COVID-19")
+obs$set_last_queryable_date(as.Date("2020-04-15")) # This controls the date of prediction
+
+models <- list(DiseasyModelG0, DiseasyModelG1) |> # , DiseasyModelB0, DiseasyModelB1) |>
+  purrr::map(~ .$new(obs = obs))
+```
+
+# Running the models and plotting the outcome
+To run the models, we use the function `get_results` which pulls model predictions of a given `observable` at a given
+`aggregation`. 
+
+To start, we run the models using a `aggregation` at the country level for a couple of `observables` (made available to us by the `diseasystore`) 
+```{r results_1}
+prediction_plotter(models, 
+                   observable = "n_hospital", 
+                   prediction_length = 21,  
+                   aggregation = rlang::quos(country_id))
+```
