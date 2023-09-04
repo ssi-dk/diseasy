@@ -93,7 +93,6 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
       # Finally, store the module
       private[[glue::glue(".{class(module)[1]}")]] <- module
 
-      return(self)
     }
 
   ),
