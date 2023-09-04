@@ -18,6 +18,7 @@ RoxygenNote: 7.2.3
 Language: en-GB
 Imports:
     checkmate,
+    digest,
     dplyr,
     glue,
     lgr,
