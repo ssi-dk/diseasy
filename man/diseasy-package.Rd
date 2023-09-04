@@ -4,11 +4,19 @@
 \name{diseasy-package}
 \alias{diseasy}
 \alias{diseasy-package}
-\title{diseasy: disease ensemble modelling made easy}
+\title{diseasy: Disease Ensemble Modelling Made Easy}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
 This package facilitates creation of an ensemble of models through modular construction and combinatorics.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ssi-dk/diseasy}
+  \item Report bugs at \url{https://github.com/ssi-dk/diseasy/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Rasmus Skytte Randløv \email{rske@ssi.dk} (\href{https://orcid.org/0000-0002-5860-3838}{ORCID})
