@@ -119,7 +119,7 @@ rd_.data <- function(type = "param") { # nolint: object_name_linter
 
 rd_describe <- "Prints a human readable report of the internal state of the module."
 
-rd_get_results_description() <- paste(
+rd_get_results_description <- paste(
   "The primary method used to request model results of a given observable at a given aggregation"
 )
 
