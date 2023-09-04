@@ -109,9 +109,14 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
           fmt <- glue::glue("({private$moduleowner}) {class(self)[1]}")
         }
 
-        purrr::map(private$lg$appenders,
-               ~ .$set_layout(lgr::LayoutGlue$new(
-                 fmt = paste0("{pad_right(colorize_levels(toupper(level_name)), 5)} [{timestamp}] ", fmt, ": {msg}"))))
+        purrr::map(
+          private$lg$appenders,
+          ~ .$set_layout(
+            lgr::LayoutGlue$new(
+              fmt = paste0("{pad_right(colorize_levels(toupper(level_name)), 5)} [{timestamp}] ", fmt, ": {msg}")
+            )
+          )
+        )
       }
 
       # Don't propagate to parent loggers
