@@ -15,15 +15,25 @@ License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Language: en-GB
 Imports:
     checkmate,
+    digest,
+    dplyr,
     glue,
+    lgr,
     purrr,
+    R6,
+    rlang,
     stringr
 Suggests:
+    DBI,
     knitr,
+    readr,
     rmarkdown,
-    spelling
-VignetteBuilder: knitr
+    RSQLite,
+    spelling,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy
 BugReports: https://github.com/ssi-dk/diseasy/issues
