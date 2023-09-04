@@ -102,7 +102,8 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
         # Iteratively map the public environment to hashes
         hash_list <-  public_env |>
           purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-          purrr::map_if(checkmate::test_function, ~ NULL) # All functions are skipped
+          purrr::map_if(checkmate::test_function,        # For functions, we hash their attributes
+                        ~ digest::digest(attributes(.)))
 
         # Add the class name to "salt" the hashes
         hash_list <- c(hash_list[!purrr::map_lgl(hash_list, is.null)], class = class(self)[1]) |>
