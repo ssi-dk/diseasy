@@ -181,10 +181,10 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       t0 <- 10.53276565
 
       # and the climate normal
-      climate_normal <- private$climate_normal("max_temp")
+      climate_normal <- private$climate_normal("max_temperature")
 
-      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temp) - t0)))^(-1)) / # nolint infix_spaces_linter
-                       (1 - (1 + exp(-b * (min(climate_normal$max_temp) - t0)))^(-1))   # nolint infix_spaces_linter identation_linter
+      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1)) / # nolint: infix_spaces_linter
+                       (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1))   # nolint: infix_spaces_linter
       max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale
 
       # Check parameters
@@ -206,7 +206,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       date_map <- \(date) lubridate::decimal_date(date) %% 1
 
       # Create a function that interpolates the max temperature across the year
-      beta_sweden_dk <- stats::approxfun(x = climate_normal$t, y = beta_sweden(climate_normal$max_temp))
+      beta_sweden_dk <- stats::approxfun(x = climate_normal$t, y = beta_sweden(climate_normal$max_temperature))
 
       # Determine the references
       reference_t     <- date_map(self$reference_date)
@@ -245,10 +245,10 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       t0 <- 11.41379040
 
       # and the climate normal
-      climate_normal <- private$climate_normal("max_temp")
+      climate_normal <- private$climate_normal("max_temperature")
 
-      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temp) - t0)))^(-1 / nu)) / # nolint infix_spaces_linter
-                       (1 - (1 + exp(-b * (min(climate_normal$max_temp) - t0)))^(-1 / nu))   # nolint infix_spaces_linter identation_linter
+      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1 / nu)) / # nolint: infix_spaces_linter
+                       (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1 / nu))   # nolint: infix_spaces_linter
       max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale
 
 
@@ -273,9 +273,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       # Select relevant metrics
       temperature_dk <- temperature |>
         dplyr::group_by(date) |>
-        dplyr::summarise(max_temp = max(max_temp, na.rm = TRUE), .groups = "drop") |>
-        dplyr::mutate(t = date - !!self$reference_date) |>
-        dplyr::collect()
+        dplyr::summarise(max_temperature = max(max_temperature, na.rm = TRUE), .groups = "drop") |>
 
       min_date <- min(temperature_dk$date)
       max_date <- max(temperature_dk$date)
@@ -289,11 +287,11 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       reference_t <- date_map(self$reference_date)
       if (dplyr::between(self$reference_date, min_date, max_date)) {
         reference_value <- stats::approx(x = temperature_dk$date,
-                                         y = beta_sweden_v2(temperature_dk$max_temp),
+                                         y = beta_sweden_v2(temperature_dk$max_temperature),
                                          xout = self$reference_date)$y
       } else {
         reference_value <- stats::approx(x = climate_normal$t,
-                                         y = beta_sweden_v2(climate_normal$max_temp),
+                                         y = beta_sweden_v2(climate_normal$max_temperature),
                                          xout = date_map(self$reference_date))$y
       }
 
@@ -301,18 +299,18 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       # Set the models
       private$.model_date <- \(date) ifelse(date <= max_date,
                                             stats::approx(x = temperature_dk$date,
-                                                          y = beta_sweden_v2(temperature_dk$max_temp),
+                                                          y = beta_sweden_v2(temperature_dk$max_temperature),
                                                           xout = date)$y,
                                             stats::approx(x = climate_normal$t,
-                                                          y = beta_sweden_v2(climate_normal$max_temp),
+                                                          y = beta_sweden_v2(climate_normal$max_temperature),
                                                           xout = date_map(date))$y) / reference_value
 
       private$.model_t    <- \(t)    ifelse(t <= max_t,
                                             stats::approx(x = temperature_dk$t,
-                                                          y = beta_sweden_v2(temperature_dk$max_temp),
+                                                          y = beta_sweden_v2(temperature_dk$max_temperature),
                                                           xout = t)$y,
                                             stats::approx(x = climate_normal$t,
-                                                          y = beta_sweden_v2(climate_normal$max_temp),
+                                                          y = beta_sweden_v2(climate_normal$max_temperature),
                                                           xout = (reference_t + t / 365) %% 1)$y) / reference_value
 
       attr(private$.model_date, "name")        <- "covid_season_v2"
@@ -434,15 +432,17 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
     #     "observable": the climate normal value of the observable at the corresponding decimal date
     #   The t, observable pair can then be used with stats::approxfun to interpolate to missing dates
     climate_normal = function(observable) {
-      checkmate::assert_choice(observable, c("max_temp"))
+      checkmate::assert_choice(observable, c("max_temperature"))
 
-      if (observable == "max_temp") {
+      if (observable == "max_temperature") {
         # maksimummiddeltemperatur Danmark
         # source: https://www.dmi.dk/vejrarkiv/normaler-danmark/
-        dk_climate_max_temp <- c(3.6, 3.7, 6.4, 11.2, 15.6, 18.5, 21.2, 21.2, 17.2, 12.3, 7.6, 4.7)
+        dk_climate_max_temperature <- c(3.6, 3.7, 6.4, 11.2, 15.6, 18.5, 21.2, 21.2, 17.2, 12.3, 7.6, 4.7)
 
         # Place the temperatures on a normalized scale across the year
-        dk_climate_max_temp <- c(purrr::pluck(dk_climate_max_temp, - 1), dk_climate_max_temp, dk_climate_max_temp[1])
+        dk_climate_max_temperature <- c(purrr::pluck(dk_climate_max_temperature, - 1),
+                                        dk_climate_max_temperature,
+                                        dk_climate_max_temperature[1])
 
         # Observations are for each month, assume centered in month
         t <- seq.Date(from = as.Date("0000-12-01"), to = as.Date("0002-01-01"), by = "1 month")
@@ -451,9 +451,9 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
         t <- as.numeric(lubridate::decimal_date(t + lubridate::days_in_month(t) / 2)) - 1
 
 
-        # nolint start commented_code_linter
         # NOTE: if the above data is ever updated, the cosine season model should be updated as well
-        # fit <- lm(dk_climate_max_temp ~ cos(2*pi*t) + sin(2*pi*t))
+        # nolint start: commented_code_linter
+        # fit <- lm(dk_climate_max_temperature ~ cos(2*pi*t) + sin(2*pi*t))
         # offset <- purrr::pluck(fit, "coefficients", 1) # Intercept
         # A      <- purrr::pluck(fit, "coefficients", 2) # cosine contribution
         # B      <- purrr::pluck(fit, "coefficients", 3) # sine   contribution
@@ -461,7 +461,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
         # scale  <- offset / (offset + sqrt(A^2 + B^2))  # Convert to percent wise scale
         # nolint end
 
-        out <- list(t, dk_climate_max_temp)
+        out <- list(t, dk_climate_max_temperature)
         names(out) <- c("t", observable)
         return(out)
       }
@@ -476,7 +476,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       if (!private$is_cached(hash)) {
 
         # Create the approximater that maps a scale to an a value
-        compute_scale <- \(a) 1 - f(a)(max(climate_normal$max_temp)) / f(a)(min(climate_normal$max_temp))
+        compute_scale <- \(a) 1 - f(a)(max(climate_normal$max_temperature)) / f(a)(min(climate_normal$max_temperature))
         a_max <- stats::uniroot(\(a) compute_scale(a) - max_scale, c(k, 10000))$root
         a_values <- pracma::logseq(k, a_max)
         scales <- purrr::map_dbl(a_values, compute_scale)
