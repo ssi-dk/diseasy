@@ -18,6 +18,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
       self$set_moduleowner(moduleowner)
     },
 
+
     #' @description
     #'   Changes the "ownership" of the module. Useful for logging
     #' @param moduleowner (`character`)\cr
@@ -83,9 +84,11 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
       # Look for active logger, if not found, create active logger
       # Each subclass gets its own logger
-      private$lg <- lgr::get_logger_glue(glue::glue_collapse(c("mgmodel",
-                                                               private$moduleowner, class(self)[1]),
-                                                             sep = "/"))
+      private$lg <- lgr::get_logger_glue(
+        glue::glue_collapse(
+          c("mgmodel",
+            private$moduleowner, class(self)[1]),
+          sep = "/"))
 
       # Check active appenders
       if (length(private$lg$appenders) == 0 && !testthat::is_testing()) {
@@ -223,5 +226,5 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
       }
       return(aggregation_chr)
     }
-  ),
+  )
 )
