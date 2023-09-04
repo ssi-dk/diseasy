@@ -1,5 +1,5 @@
 Package: diseasy
-Title: disease ensemble modelling made easy
+Title: Disease Ensemble Modelling Made Easy
 Version: 0.0.0.9000
 Authors@R: 
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
