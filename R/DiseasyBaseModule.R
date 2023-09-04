@@ -11,7 +11,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     #'   Creates a new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through derived classes.
     #' @param moduleowner (`character`)\cr
-    #'   The name of the moduleowner. Preferably, this should be the classname of the owner
+    #'   The name of the moduleowner. Used when logging.
     #' @return
     #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     initialize = function(moduleowner = class(self)[1]) {
@@ -20,9 +20,9 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
 
     #' @description
-    #'   Changes the "ownership" of the module. Useful for logging
+    #'   Changes the "ownership" of the module. Used when logging.
     #' @param moduleowner (`character`)\cr
-    #'   The name of the moduleowner. Preferably, this should be the classname of the owner
+    #'   The name of the moduleowner.
     #' @return `NULL`
     set_moduleowner = function(moduleowner) {
       checkmate::assert_character(moduleowner)
@@ -56,8 +56,18 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
         module$set_moduleowner(class(self)[1])
       }
 
-      # Check for modules without DiseasyObservables, that take DiseasyObservables as input but does not have it loaded
-      # Load a reference to observables module into these
+      # Within the `diseasy` framework, some modules includes instances of other modules.
+      # One such module instance that is used across modules is the `DiseasyObservables` since
+      # it is the main interface with data and many modules need data to run.
+      # Here, we check if this module instance has includes another instance of a module which uses
+      # the `DiseasyObservables`.
+      # If it does, we load recursively call `load_module` on the nested instance with clone = FALSE, but only
+      # if the nested module does not contain a loaded instance already.
+      # This way, this model instance has the `DiseasyObservables` instance loaded and any nested instances
+      # that needs the `DiseasyObservables` module uses the same as this (parent) instance.
+
+      # First we check if the given module is the `DiseasyObservables` module
+      # If it is, we load it into the nested instances
       modules_with_observables <- c("DiseasySeason")
       if (class(module)[1] == "DiseasyObservables") {
         modules_with_observables |>
@@ -69,7 +79,9 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
           })
       }
 
-      # ... And the other way around
+      # Then we check the reverse case:
+      # That is, we check if the given module requires `DiseasyObservables` and
+      # then load the existing `DiseasyObservables` into the given module before storing it
       if (class(module)[1] %in% modules_with_observables &&
             is.null(purrr::pluck(module, "observables")) &&
             !is.null(purrr::pluck(private, ".DiseasyObservables"))) {

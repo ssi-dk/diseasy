@@ -37,7 +37,7 @@ This module is typically not constructed directly but rather through derived cla
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{moduleowner}}{(\code{character})\cr
-The name of the moduleowner. Preferably, this should be the classname of the owner}
+The name of the moduleowner. Used when logging.}
 }
 \if{html}{\out{</div>}}
 }
@@ -49,7 +49,7 @@ A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 \if{html}{\out{<a id="method-DiseasyBaseModule-set_moduleowner"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyBaseModule-set_moduleowner}{}}}
 \subsection{Method \code{set_moduleowner()}}{
-Changes the "ownership" of the module. Useful for logging
+Changes the "ownership" of the module. Used when logging.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$set_moduleowner(moduleowner)}\if{html}{\out{</div>}}
 }
@@ -58,7 +58,7 @@ Changes the "ownership" of the module. Useful for logging
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{moduleowner}}{(\code{character})\cr
-The name of the moduleowner. Preferably, this should be the classname of the owner}
+The name of the moduleowner.}
 }
 \if{html}{\out{</div>}}
 }
