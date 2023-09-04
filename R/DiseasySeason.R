@@ -4,7 +4,7 @@
 #' @export
 DiseasySeason <- R6::R6Class( # nolint object_name_linter
   classname = "DiseasySeason",
-  inherit = DiseasyDBModule,
+  inherit = DiseasyBaseModule,
 
   public = list(
 
@@ -12,18 +12,27 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
     #'   Creates a new instance of the `DiseasySeason` [R6][R6::R6Class] class.
     #' @param reference_date (`Date`)\cr
     #'   Date the season modifier is computed relatively to.
+    #' @param observables (`R6::R6Class instance`)\cr
+    #'   A instance of `DiseasyObservables` are needed for some season models.
     #' @param ...
-    #'   parameters sent to `DiseasyDBModule` [R6][R6::R6Class] constructor.
+    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
     #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
     initialize = function(reference_date = NULL,
+                          observables = NULL,
                           ...) {
+
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_date(reference_date, null.ok = TRUE, add = coll)
+      checkmate::assert(checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE), add = coll)
+      checkmate::reportAssertions(coll)
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
 
       # Initialize based on input
       if (!is.null(reference_date)) self$set_reference_date(reference_date)
+      if (!is.null(observables))    self$load_module(observables)
 
       # Set constant season as the default
       self$use_constant_season()
@@ -259,7 +268,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       beta_sweden_v2 <- beta_sweden_v2(scale_map(scale))
 
       # Read data from DMI
-      temperature <- SCDB::get_table(private$conn, "mg.dmi", slice_ts = self$slice_ts)
+      temperature <- private$.DiseasyObservables$get_observation("max_temperature")
 
       # Select relevant metrics
       temperature_dk <- temperature |>
@@ -372,18 +381,20 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
 
     #' @field model_date (`function`)\cr
     #'   The model currently being used in the module (date of interest). Read-only.
-    model_date = function(value) {
-      if (missing(value)) {
-        return(private %.% .model_date)
-      } else {
-        private$read_only_error("model_date")
-      }
-    }
+
+    #' @field observables (`diseasy::DiseasyObservables`)\cr
+    #'   The local copy of an DiseasyObservables module. Read-only.
+    #' @seealso [diseasy::DiseasyObservables]
+    observables = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "observables",
+      expr = return(private %.% .DiseasyObservables))
   ),
 
   private = list(
 
     .reference_date = NULL,
+    .DiseasyObservables = NULL,
 
     # @param x (`numeric`)\cr
     #   The coordinate to evaluate at
