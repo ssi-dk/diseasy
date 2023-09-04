@@ -92,7 +92,7 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
     #'   Name of the season_model to use (calls the equivalent $use_<model_name>()).
     #' @param dots (`list`)\cr
     #'   Named list of arguments that will be passed at dot-ellipsis to the season model.
-    use_season_model = function(model_name, dots) {
+    use_season_model = function(model_name, dots = NULL) {
 
       # First parse the dot arguments
       dots_to_string <- ifelse(
