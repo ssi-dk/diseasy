@@ -14,15 +14,14 @@ Description: This package facilitates creation of an ensemble of models through 
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
+Imports:
+    checkmate,
+    glue,
+    purrr,
+    stringr
 Suggests: 
     knitr,
     rmarkdown,
     spelling
 VignetteBuilder: knitr
-URL: https://github.com/RasmusSkytte/diseasy,
-    https://rasmusskytte.github.io/diseasy/
-BugReports: https://github.com/RasmusSkytte/diseasy/issues
-Imports: 
-    lifecycle
-Language: en-GB
