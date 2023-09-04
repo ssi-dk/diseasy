@@ -33,6 +33,54 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
       # Provide information that the module is loaded / changed
       private$lg$info("Module loaded")
+    },
+
+
+    #' @description
+    #'   Loads a copy of the provided module into the module.
+    #' @param module (`R6::R6Class instance`)\cr
+    #'   This instance is cloned to the field with the same name as the class of the module
+    #' @param clone (`boolean`)\cr
+    #'   Toggle whether or not the module should be cloned when loading. Default TRUE.
+    #' @details
+    #'   The methods allows the setting of the internal module instances after the `DiseasyBaseModule` instance is created.
+    #' @return `NULL`
+    load_module = function(module, clone = TRUE) {
+
+      if (clone) {
+        # Create a clone of the module
+        module <- module$clone()
+
+        # Set the ownership of the module
+        module$set_moduleowner(class(self)[1])
+      }
+
+      # Check for modules without DiseasyObservables, that take DiseasyObservables as input but does not have it loaded
+      # Load a reference to observables module into these
+      modules_with_observables <- c("DiseasySeason")
+      if (class(module)[1] == "DiseasyObservables") {
+        modules_with_observables |>
+          purrr::map_chr(~ paste0(".", .)) |>
+          purrr::walk(~ {
+            if (!is.null(purrr::pluck(private, .)) && is.null(purrr::pluck(private, ., "observables"))) {
+              purrr::pluck(private, .)$load_module(module, clone = FALSE)
+            }
+          })
+      }
+
+      # ... And the other way around
+      if (class(module)[1] %in% modules_with_observables &&
+          is.null(purrr::pluck(module, "observables")) &&
+          !is.null(purrr::pluck(private, ".DiseasyObservables"))) {
+
+        module$load_module(purrr::pluck(private, ".DiseasyObservables"), clone = FALSE)
+      }
+
+
+      # Finally, store the module
+      private[[glue::glue(".{class(module)[1]}")]] <- module
+
+      return(self)
     }
 
   ),
