@@ -6,8 +6,11 @@
 \description{
 TODO
 }
-\section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyDBModule]{diseasy::DiseasyDBModule}} -> \code{season}
+\seealso{
+\link{DiseasyObservables}
+}
+\section{Super class}{
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasySeason}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
@@ -20,39 +23,42 @@ The model currently being used in the module (days past reference date). Read-on
 
 \item{\code{model_date}}{(\code{function})\cr
 The model currently being used in the module (date of interest). Read-only.}
+
+\item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
+The local copy of an DiseasyObservables module. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-season-new}{\code{DiseasySeason$new()}}
-\item \href{#method-season-set_reference_date}{\code{DiseasySeason$set_reference_date()}}
-\item \href{#method-season-set_scale}{\code{DiseasySeason$set_scale()}}
-\item \href{#method-season-use_season_model}{\code{DiseasySeason$use_season_model()}}
-\item \href{#method-season-use_constant_season}{\code{DiseasySeason$use_constant_season()}}
-\item \href{#method-season-use_cosine_season}{\code{DiseasySeason$use_cosine_season()}}
-\item \href{#method-season-use_covid_season_v1}{\code{DiseasySeason$use_covid_season_v1()}}
-\item \href{#method-season-use_covid_season_v2}{\code{DiseasySeason$use_covid_season_v2()}}
-\item \href{#method-season-describe}{\code{DiseasySeason$describe()}}
-\item \href{#method-season-clone}{\code{DiseasySeason$clone()}}
+\item \href{#method-DiseasySeason-new}{\code{DiseasySeason$new()}}
+\item \href{#method-DiseasySeason-set_reference_date}{\code{DiseasySeason$set_reference_date()}}
+\item \href{#method-DiseasySeason-set_scale}{\code{DiseasySeason$set_scale()}}
+\item \href{#method-DiseasySeason-use_season_model}{\code{DiseasySeason$use_season_model()}}
+\item \href{#method-DiseasySeason-use_constant_season}{\code{DiseasySeason$use_constant_season()}}
+\item \href{#method-DiseasySeason-use_cosine_season}{\code{DiseasySeason$use_cosine_season()}}
+\item \href{#method-DiseasySeason-use_covid_season_v1}{\code{DiseasySeason$use_covid_season_v1()}}
+\item \href{#method-DiseasySeason-use_covid_season_v2}{\code{DiseasySeason$use_covid_season_v2()}}
+\item \href{#method-DiseasySeason-describe}{\code{DiseasySeason$describe()}}
+\item \href{#method-DiseasySeason-clone}{\code{DiseasySeason$clone()}}
 }
 }
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyDBModule" data-id="set_slice_ts"><a href='../../diseasy/html/DiseasyDBModule.html#method-DiseasyDBModule-set_slice_ts'><code>diseasy::DiseasyDBModule$set_slice_ts()</code></a></span></li>
 </ul>
 </details>
 }}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-new"></a>}}
-\if{latex}{\out{\hypertarget{method-season-new}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of the \code{season} \link[R6:R6Class]{R6} class.
+Creates a new instance of the \code{DiseasySeason} \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$new(reference_date = NULL, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$new(reference_date = NULL, observables = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -61,19 +67,22 @@ Creates a new instance of the \code{season} \link[R6:R6Class]{R6} class.
 \item{\code{reference_date}}{(\code{Date})\cr
 Date the season modifier is computed relatively to.}
 
-\item{\code{...}}{parameters sent to \code{DiseasyDBModule} \link[R6:R6Class]{R6} constructor.}
+\item{\code{observables}}{(\verb{R6::R6Class instance})\cr
+A instance of \code{DiseasyObservables} are needed for some season models.}
+
+\item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new instance of the season \link[R6:R6Class]{R6} class.
+A new instance of the \code{DiseasySeason} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-set_reference_date"></a>}}
-\if{latex}{\out{\hypertarget{method-season-set_reference_date}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-set_reference_date"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-set_reference_date}{}}}
 \subsection{Method \code{set_reference_date()}}{
-Sets the reference_date for the season module.
+Sets the reference_date for the \code{DiseasySeason} module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$set_reference_date(reference_date)}\if{html}{\out{</div>}}
 }
@@ -88,8 +97,8 @@ Date the season modifier is computed relatively to.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-set_scale"></a>}}
-\if{latex}{\out{\hypertarget{method-season-set_scale}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-set_scale"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-set_scale}{}}}
 \subsection{Method \code{set_scale()}}{
 Sets the scale for the active season model.
 \subsection{Usage}{
@@ -106,12 +115,12 @@ The scale of the season effect (relative to climate normal).}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-use_season_model"></a>}}
-\if{latex}{\out{\hypertarget{method-season-use_season_model}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-use_season_model"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-use_season_model}{}}}
 \subsection{Method \code{use_season_model()}}{
-Sets the season module to use the specified season model.
+Sets the \code{DiseasySeason} module to use the specified season model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$use_season_model(model_name, dots)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$use_season_model(model_name, dots = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -126,8 +135,8 @@ Named list of arguments that will be passed at dot-ellipsis to the season model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-use_constant_season"></a>}}
-\if{latex}{\out{\hypertarget{method-season-use_constant_season}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-use_constant_season"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-use_constant_season}{}}}
 \subsection{Method \code{use_constant_season()}}{
 Sets the season module to use a constant value (1).
 \subsection{Usage}{
@@ -136,10 +145,10 @@ Sets the season module to use a constant value (1).
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-use_cosine_season"></a>}}
-\if{latex}{\out{\hypertarget{method-season-use_cosine_season}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-use_cosine_season"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-use_cosine_season}{}}}
 \subsection{Method \code{use_cosine_season()}}{
-Sets the season module to use a cosine model for season.
+Sets the \code{DiseasySeason} module to use a cosine model for season.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$use_cosine_season(peak = 20.09946, scale = 0.5726693)}\if{html}{\out{</div>}}
 }
@@ -157,10 +166,10 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-use_covid_season_v1"></a>}}
-\if{latex}{\out{\hypertarget{method-season-use_covid_season_v1}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-use_covid_season_v1"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-use_covid_season_v1}{}}}
 \subsection{Method \code{use_covid_season_v1()}}{
-Sets the season module to use the first version of the covid 19 season model
+Sets the \code{DiseasySeason} module to use the first version of the covid 19 season model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$use_covid_season_v1(scale = 0.4825524)}\if{html}{\out{</div>}}
 }
@@ -174,10 +183,10 @@ Sets the season module to use the first version of the covid 19 season model
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-use_covid_season_v2"></a>}}
-\if{latex}{\out{\hypertarget{method-season-use_covid_season_v2}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-use_covid_season_v2"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-use_covid_season_v2}{}}}
 \subsection{Method \code{use_covid_season_v2()}}{
-Sets the season module to use the second version of the covid 19 season model
+Sets the \code{DiseasySeason} module to use the second version of the covid 19 season model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$use_covid_season_v2(scale = 0.5042782)}\if{html}{\out{</div>}}
 }
@@ -191,8 +200,8 @@ Sets the season module to use the second version of the covid 19 season model
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-describe"></a>}}
-\if{latex}{\out{\hypertarget{method-season-describe}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-describe}{}}}
 \subsection{Method \code{describe()}}{
 Prints a human readable report of the internal state of the module.
 \subsection{Usage}{
@@ -201,8 +210,8 @@ Prints a human readable report of the internal state of the module.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-season-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-season-clone}{}}}
+\if{html}{\out{<a id="method-DiseasySeason-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
