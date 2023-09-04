@@ -20,7 +20,7 @@ DiseasyDBModule <- R6::R6Class(  # nolint: object_name_linter
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
     #' @return
     #'   A new instance of the `DiseasyDBModule` [R6][R6::R6Class] class.
-    #' @seealso [DiseasyBaseModule], [diseasystore::mg_get_connection]
+    #' @seealso [DiseasyBaseModule], [SCDB::get_connection]
     initialize = function(conn = NULL, slice_ts = NULL, ...) {
 
       checkmate::assert_class(conn, "DBIConnection", null.ok = TRUE)
@@ -30,9 +30,9 @@ DiseasyDBModule <- R6::R6Class(  # nolint: object_name_linter
 
       # Set the db connection
       if (is.null(conn)) {
-        private$conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
+        private$.conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
       } else {
-        private$conn <- conn # User provided
+        private$.conn <- conn # User provided
       }
 
       if (!is.null(slice_ts)) self$set_slice_ts(slice_ts)
@@ -44,7 +44,7 @@ DiseasyDBModule <- R6::R6Class(  # nolint: object_name_linter
     #'   Set the slice_ts to get data for
     #' @param slice_ts (`Date` or `character`)\cr
     #'   Date to slice the database on
-    #' @seealso [diseasystore::mg_get_table]
+    #' @seealso [SCDB::get_table]
     set_slice_ts = function(slice_ts) {
       checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE)
       private$.slice_ts <- slice_ts
@@ -59,16 +59,23 @@ DiseasyDBModule <- R6::R6Class(  # nolint: object_name_linter
     slice_ts = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "slice_ts",
-      expr = return(private %.% .slice_ts))
+      expr = return(private %.% .slice_ts)),
+
+
+    #' @field conn (`DBIConnection`)\cr
+    #' The connection to the database on. Read-only.
+    conn = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "conn",
+      expr = return(private %.% .conn))
   ),
 
   private = list(
     # @field (`character`) the timestamp the SCD-databses are sliced on
     .slice_ts = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
 
-    # @field (`PqConnection`) database connection object
-    conn = NULL
-
+    # @field (`DBIConnection`) database connection object
+    .conn = NULL
   ),
 )
 

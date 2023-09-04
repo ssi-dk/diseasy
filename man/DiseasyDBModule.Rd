@@ -7,9 +7,9 @@
 TODO
 }
 \seealso{
-\link{DiseasyBaseModule}, \link[diseasystore:mg_reexports]{diseasystore::mg_get_connection}
+\link{DiseasyBaseModule}, \link[SCDB:get_connection]{SCDB::get_connection}
 
-\link[diseasystore:mg_reexports]{diseasystore::mg_get_table}
+\link[SCDB:get_table]{SCDB::get_table}
 }
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyDBModule}
