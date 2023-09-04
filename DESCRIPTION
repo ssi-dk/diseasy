@@ -16,6 +16,8 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Language: en-GB
+Depends:
+    diseasystore
 Imports:
     checkmate,
     digest,

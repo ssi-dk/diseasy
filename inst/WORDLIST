@@ -4,8 +4,10 @@ combinatorial
 combinatorics
 
 DBIConnection
-dieasy
+diseasy
+diseasystore
 DiseasyBaseModule
+DiseasyObservables
 
 Engbo
 
@@ -15,7 +17,10 @@ moduleowner
 
 ORCID
 
+quos
+
 Rasmus
+rlang
 
 Skytte
 

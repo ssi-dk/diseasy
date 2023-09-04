@@ -71,10 +71,7 @@ DiseasyDBModule <- R6::R6Class(  # nolint: object_name_linter
   ),
 
   private = list(
-    # @field (`character`) the timestamp the SCD-databses are sliced on
     .slice_ts = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
-
-    # @field (`DBIConnection`) database connection object
     .conn = NULL
   ),
 )

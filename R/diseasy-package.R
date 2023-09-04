@@ -3,6 +3,7 @@
 
 #' @importFrom digest digest
 #' @importFrom dplyr as_label
+#' @import diseasystore
 #' @import lgr
 #' @importFrom lubridate today
 #' @import R6

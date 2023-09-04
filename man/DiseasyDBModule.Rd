@@ -19,6 +19,9 @@ TODO
 \describe{
 \item{\code{slice_ts}}{(\code{Date})\cr
 The timestamp to slice database on. Read-only.}
+
+\item{\code{conn}}{(\code{DBIConnection})\cr
+The connection to the database on. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
