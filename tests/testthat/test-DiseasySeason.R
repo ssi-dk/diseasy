@@ -92,11 +92,11 @@ test_that("use_cosine_season works", {
 
   # Malformed inputs
   expect_error(s$use_cosine_season(scale = NA), "May not be NA")
-  expect_error(s$use_cosine_season(scale = -1), "not >= 0")
+  expect_error(s$use_cosine_season(scale = -1), "not >= 0") # nolint: infix_spaces_linter
   expect_error(s$use_cosine_season(scale = 2), "not <= 1")
 
   expect_error(s$use_cosine_season(peak = NA), "May not be NA")
-  expect_error(s$use_cosine_season(peak = -1), "not >= 0")
+  expect_error(s$use_cosine_season(peak = -1), "not >= 0") # nolint: infix_spaces_linter
   expect_error(s$use_cosine_season(peak = 500), "not <= 365")
 
   rm(s)
