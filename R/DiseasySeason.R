@@ -3,19 +3,19 @@
 #' @description TODO
 #' @export
 DiseasySeason <- R6::R6Class( # nolint object_name_linter
-  classname = "season",
+  classname = "DiseasySeason",
   inherit = DiseasyDBModule,
 
   public = list(
 
     #' @description
-    #'   Creates a new instance of the `season` [R6][R6::R6Class] class.
+    #'   Creates a new instance of the `DiseasySeason` [R6][R6::R6Class] class.
     #' @param reference_date (`Date`)\cr
     #'   Date the season modifier is computed relatively to.
     #' @param ...
     #'   parameters sent to `DiseasyDBModule` [R6][R6::R6Class] constructor.
     #' @return
-    #'   A new instance of the season [R6][R6::R6Class] class.
+    #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
     initialize = function(reference_date = NULL,
                           ...) {
 
@@ -31,7 +31,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
     },
 
     #' @description
-    #'   Sets the reference_date for the season module.
+    #'   Sets the reference_date for the `DiseasySeason` module.
     #' @param reference_date (`Date`)\cr
     #'   Date the season modifier is computed relatively to.
     set_reference_date = function(reference_date) {
@@ -78,7 +78,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
 
 
     #' @description
-    #'   Sets the season module to use the specified season model.
+    #'   Sets the `DiseasySeason` module to use the specified season model.
     #' @param model_name
     #'   Name of the season_model to use (calls the equivalent $use_<model_name>()).
     #' @param dots (`list`)\cr
@@ -117,7 +117,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
 
 
     #' @description
-    #'   Sets the season module to use a cosine model for season.
+    #'   Sets the `DiseasySeason` module to use a cosine model for season.
     #' @param peak (`numeric`)\cr
     #'   Sets the period of maximal activity (days past new-year).
     #'   By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.
@@ -161,7 +161,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
 
 
     #' @description
-    #'   Sets the season module to use the first version of the covid 19 season model
+    #'   Sets the `DiseasySeason` module to use the first version of the covid 19 season model
     #' @param scale `r rd_scale()`
     use_covid_season_v1 = function(scale = 0.4825524) {
 
@@ -224,7 +224,7 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
 
 
     #' @description
-    #'   Sets the season module to use the second version of the covid 19 season model
+    #'   Sets the `DiseasySeason` module to use the second version of the covid 19 season model
     #' @param scale `r rd_scale()`
     use_covid_season_v2 = function(scale = 0.5042782) {
 
