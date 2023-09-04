@@ -1,7 +1,7 @@
 Package: diseasy
 Title: Disease Ensemble Modelling Made Easy
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-5860-3838")),
       person("Marcus Munch", "Gr\u00FCnewald", , "mmgr@ssi.dk", role = c("aut"),
@@ -20,8 +20,10 @@ Imports:
     glue,
     purrr,
     stringr
-Suggests: 
+Suggests:
     knitr,
     rmarkdown,
     spelling
 VignetteBuilder: knitr
+URL: https://github.com/ssi-dk/diseasy
+BugReports: https://github.com/ssi-dk/diseasy/issues

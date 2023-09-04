@@ -1,4 +1,5 @@
-# diseasy <img src="man/figures/logo.png" align="right" height="138" />
+# diseasy <a href="https://ssi-dk.github.io/diseasy/"><img src="man/figures/logo.png" align="right" height="138" alt="diseasy website" /></a>
+
 Leveraging combinatorial building for ensemble forecasting in disease modelling
 
 ## The power of combinations
