@@ -359,26 +359,27 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
 
     #' @field reference_date (`Date`)\cr
     #'   The reference date of the season models. Read-only.
-    reference_date = function(value) {
-      if (missing(value)) {
-        return(private %.% .reference_date)
-      } else {
-        private$read_only_error("reference_date")
-      }
-    },
+    reference_date = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "reference_date",
+      expr = return(private %.% .reference_date)),
+
 
     #' @field model_t (`function`)\cr
     #'   The model currently being used in the module (days past reference date). Read-only.
-    model_t = function(value) {
-      if (missing(value)) {
-        return(private %.% .model_t)
-      } else {
-        private$read_only_error("model_t")
-      }
-    },
+    model_t = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "model_t",
+      expr = return(private %.% .model_t)),
+
 
     #' @field model_date (`function`)\cr
     #'   The model currently being used in the module (date of interest). Read-only.
+    model_date = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "model_date",
+      expr = return(private %.% .model_date)),
+
 
     #' @field observables (`diseasy::DiseasyObservables`)\cr
     #'   The local copy of an DiseasyObservables module. Read-only.
