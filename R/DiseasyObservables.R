@@ -4,7 +4,7 @@
 #' @export
 DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
   classname = "DiseasyObservables",
-  inherit = DiseasyDBModule,
+  inherit = DiseasyBaseModule,
 
   public = list(
 
@@ -18,25 +18,42 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   Study period end (default values for get_observation).
     #' @param last_queryable_date (`Date`)\cr
     #'   Enforce a limit on data that can be pulled (not after this date).
+    #' @param conn (`DBIConnection`)\cr
+    #'   A database connection object (inherits from DBIConnection)
+    #' @param slice_ts (`Date` or `character`)\cr
+    #'   Date to slice the database on. See [diseasystore::mg_get_table()]
     #' @param ...
-    #'   parameters sent to `DiseasyDBModule` [R6][R6::R6Class] constructor.
+    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
-    #'   A new instance of the `DiseasyDBModule` [R6][R6::R6Class] class.
+    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+    #' @importFrom diseasystore `%.%`
     initialize = function(case_definition = NULL,
                           start_date = NULL,
                           end_date = NULL,
                           last_queryable_date = NULL,
+                          conn = NULL,
+                          slice_ts = NULL,
                           ...) {
 
-      # Pass further arguments to the DiseasyDBModule initializer
+      # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
 
+      # Set the db connection
+      if (is.null(conn)) {
+        private$conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
+      } else {
+        private$conn <- conn # User provided
+      }
+      checkmate::assert_class(private$conn, "DBIConnection")
+
       # Initialize based on input
+      if (!is.null(slice_ts))                         self$set_slice_ts(slice_ts)
       if (!is.null(case_definition))                  self$set_case_definition(case_definition)
       if (!is.null(last_queryable_date))              self$set_last_queryable_date(last_queryable_date)
       if (!is.null(start_date) || !is.null(end_date)) self$set_study_period(start_date, end_date)
 
     },
+
 
     #' @description
     #'   Set the case definition to get DiseasyObservables for.
@@ -92,6 +109,19 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       private$lg$info("Study period set from {self$start_date} to {self$end_date}")
     },
 
+
+    #' @description
+    #'   Set the slice_ts to get data for
+    #' @param slice_ts (`Date` or `character`)\cr
+    #'   Date to slice the database on
+    #' @seealso [diseasystore::mg_get_table]
+    set_slice_ts = function(slice_ts) {
+      checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE)
+      private$.slice_ts <- slice_ts
+      private$lg$info("slice_ts set to {self$slice_ts}")
+    },
+
+
     #' @description
     #'   Retrieve an "observable" in the data set corresponding to the set case_definition.\cr
     #'   By default, the internal values for start_date and end_date are used to return data,
@@ -112,7 +142,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @seealso [SCDB::get_table]
     get_observation = function(observable, aggregation = NULL,
                                start_date = self %.% start_date,
-                               end_date = self %.% end_date) {
+                               end_date   = self %.% end_date) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -205,7 +235,6 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       name = "start_date",
       expr = return(private %.% .start_date)),
 
-
     #' @field end_date (`Date`)\cr
     #'   The end date of the study period. Read-only.
     end_date = purrr::partial(
@@ -237,8 +266,25 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       name = "available_observables",
       expr = {
         if (is.null(private %.% .ds)) return(NULL)
-        return(purrr::keep(private %.% .ds %.% available_features, ~ startsWith(., "n_")))
-      })
+        return(purrr::keep(private %.% .ds %.% available_features, ~ startsWith(., "n_") | endsWith(., "_temp")))
+      }),
+
+
+    #' @field slice_ts (`Date`)\cr
+    #' The timestamp to slice database on. Read-only.
+    #' @importFrom diseasystore `%.%`
+    slice_ts = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "slice_ts",
+      expr = return(private %.% .slice_ts))
+
+
+    #' @field conn (`DBIConnection`)\cr
+    #' The connection to the database on. Read-only.
+    conn = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "conn",
+      expr = return(private %.% .conn))
   ),
 
   private = list(
@@ -246,6 +292,9 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     .start_date          = NULL,
     .end_date            = NULL,
     .last_queryable_date = NULL,
-    .ds                  = NULL
+    .ds                  = NULL,
+
+    .slice_ts = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
+    .conn = NULL
   )
 )
