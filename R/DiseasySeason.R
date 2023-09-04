@@ -2,7 +2,7 @@
 #'
 #' @description TODO
 #' @export
-DiseasySeason <- R6::R6Class( # nolint object_name_linter
+DiseasySeason <- R6::R6Class( # nolint: object_name_linter
   classname = "DiseasySeason",
   inherit = DiseasyBaseModule,
 
@@ -274,6 +274,10 @@ DiseasySeason <- R6::R6Class( # nolint object_name_linter
       temperature_dk <- temperature |>
         dplyr::group_by(date) |>
         dplyr::summarise(max_temperature = max(max_temperature, na.rm = TRUE), .groups = "drop") |>
+        dplyr::collect() |>
+        dplyr::mutate(date = zoo::as.Date(date),
+                      t = date - !!self$reference_date)
+
 
       min_date <- min(temperature_dk$date)
       max_date <- max(temperature_dk$date)
