@@ -6,7 +6,8 @@ installed.packages()[, 1] |>
   purrr::keep(~ startsWith(., "diseasystore")) |>
   purrr::walk(~ eval(parse(text = glue::glue("library({.})")))) # Thanks R, for being so difficult.
 
-
+# Determine the available diseasystore to test over
+case_defs <- diseasystore::available_diseasystores() |> stringr::str_remove_all("Diseasystore")
 
 # Create a connection to test on
 tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)

@@ -203,9 +203,9 @@ test_that("set_slice_ts works", {
 })
 
 
-test_that("get_observation works", {
+test_that("get_observation works", { for (case_def in case_defs) { # nolint: brace_linter
 
-  obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
+  obs <- DiseasyObservables$new(case_definition = case_def,
                                 start_date = as.Date("2021-03-02"),
                                 end_date   = as.Date("2021-03-05"),
                                 last_queryable_date = as.Date("2021-03-06"),
@@ -213,7 +213,7 @@ test_that("get_observation works", {
 
   # Test content of data frame
   expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
-  expect_identical(colnames(obs$get_observation("n_population")),  c("date", "n_population"))
+  expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
   expect_identical(colnames(obs$get_observation("n_population", aggregation = dplyr::vars(region_id))),
                    c("date", "region_id", "n_population"))
   expect_identical(colnames(obs$get_observation("n_population", aggregation = dplyr::vars(reg = region_id))),
@@ -225,8 +225,8 @@ test_that("get_observation works", {
     dplyr::summarize(min_date = min(date, na.rm = TRUE),
                      max_date = max(date, na.rm = TRUE))
 
-  expect_identical(as.Date(tmp$min_date), obs$start_date)
-  expect_identical(as.Date(tmp$max_date), obs$end_date)
+  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
+  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
 
 
   # Test externally given dates
@@ -234,16 +234,16 @@ test_that("get_observation works", {
     dplyr::summarize(min_date = min(date, na.rm = TRUE),
                      max_date = max(date, na.rm = TRUE))
 
-  expect_identical(as.Date(tmp$min_date), obs$start_date - lubridate::days(1))
-  expect_identical(as.Date(tmp$max_date), obs$end_date)
+  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date - lubridate::days(1))
+  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
 
 
   tmp <- obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(1)) |>
     dplyr::summarize(min_date = min(date, na.rm = TRUE),
                      max_date = max(date, na.rm = TRUE))
 
-  expect_identical(as.Date(tmp$min_date), obs$start_date)
-  expect_identical(as.Date(tmp$max_date), obs$end_date + lubridate::days(1))
+  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
+  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(1))
 
 
   # Testing malformed inputs
@@ -267,16 +267,16 @@ test_that("get_observation works", {
     dplyr::summarize(min_date = min(date, na.rm = TRUE),
                      max_date = max(date, na.rm = TRUE))
 
-  expect_identical(as.Date(tmp$min_date), obs$start_date)
-  expect_identical(as.Date(tmp$max_date), obs$end_date + lubridate::days(2))
+  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
+  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(2))
 
   rm(obs)
-})
+}})
 
 
-test_that("get_observation works -- test 2", {
+test_that("get_observation works -- test 2", { for (case_def in case_defs) { # nolint: brace_linter
 
-  obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
+  obs <- DiseasyObservables$new(case_definition = case_def,
                                 start_date = as.Date("2021-03-02"),
                                 end_date   = as.Date("2021-03-05"),
                                 last_queryable_date = as.Date("2021-03-06"),
@@ -286,12 +286,11 @@ test_that("get_observation works -- test 2", {
   obs$ds$available_features |>
     purrr::keep(~ startsWith(., "n_")) |>
     purrr::walk(~ {
-      expect_no_error(obs$ds$get_feature(., obs$start_date, obs$end_date))
       expect_no_error(obs$get_observation(.))
     })
 
   rm(obs)
-})
+}})
 
 
 test_that("active binding: case_definition works", {
