@@ -136,42 +136,43 @@ test_that("use_covid_season_v1 works", {
 
 })
 
-# Disabled for now. Uses implementation specific code.
-# Will be re-enabled once DiseasySeason is rewritten to use DiseasyObservable module
-# nolint start commented_code_linter
-# test_that("use_covid_season_v2 works", {
-#   conn <- test_conn()
-#
-#   # Creating an empty module
-#   s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"), conn = conn)
-#
-#   # Default scale
-#   s$use_covid_season_v2()
-#
-#   expect_identical(s$model_t(0), 1)
-#   expect_false(s$model_t(1) == 1)
-#
-#   expect_identical(s$model_date(as.Date("2022-01-01")), 1)
-#   expect_false(s$model_date(as.Date("2022-01-02")) == 1)
-#
-#
-#   # Custom scale
-#   s$use_covid_season_v2(scale = 0.35)
-#
-#   expect_identical(s$model_t(0), 1)
-#   expect_false(s$model_t(1) == 1)
-#
-#   expect_identical(s$model_date(as.Date("2022-01-01")), 1)
-#   expect_false(s$model_date(as.Date("2022-01-02")) == 1)
-#
-#
-#   # Malformed scale
-#   expect_error(s$use_covid_season_v2(scale = 0.99), "not <= 0.95")
-#
-#   rm(s)
-#   SCDB::close_connection(conn)
-# })
-# nolint end commented_code_linter
+
+test_that("use_covid_season_v2 works", { for (case_def in case_defs) {  # nolint: brace_linter
+
+  # We create an DiseasyObservables module for the season module
+  observables <- DiseasyObservables$new(case_definition = case_def,
+                                        start_date = as.Date("2022-01-01"),
+                                        end_date = as.Date("2022-01-15"))
+
+  # Creating an empty module
+  s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"),
+                         observables = observables)
+
+  # Default scale
+  s$use_covid_season_v2()
+
+  expect_identical(s$model_t(0), 1)
+  expect_false(s$model_t(1) == 1)
+
+  expect_identical(s$model_date(as.Date("2022-01-01")), 1)
+  expect_false(s$model_date(as.Date("2022-01-02")) == 1)
+
+
+  # Custom scale
+  s$use_covid_season_v2(scale = 0.35)
+
+  expect_identical(s$model_t(0), 1)
+  expect_false(s$model_t(1) == 1)
+
+  expect_identical(s$model_date(as.Date("2022-01-01")), 1)
+  expect_false(s$model_date(as.Date("2022-01-02")) == 1)
+
+
+  # Malformed scale
+  expect_error(s$use_covid_season_v2(scale = 0.99), "not <= 0.95")
+
+  rm(s, observables)
+}})
 
 
 test_that("set_reference_date (with model set) works", {
