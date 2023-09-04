@@ -26,7 +26,6 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
     #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
-    #' @importFrom diseasystore `%.%`
     initialize = function(case_definition = NULL,
                           start_date = NULL,
                           end_date = NULL,
@@ -272,7 +271,6 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
     #' @field slice_ts (`Date`)\cr
     #' The timestamp to slice database on. Read-only.
-    #' @importFrom diseasystore `%.%`
     slice_ts = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "slice_ts",
