@@ -21,7 +21,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @param conn (`DBIConnection`)\cr
     #'   A database connection object (inherits from DBIConnection)
     #' @param slice_ts (`Date` or `character`)\cr
-    #'   Date to slice the database on. See [diseasystore::mg_get_table()]
+    #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
@@ -40,11 +40,11 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
       # Set the db connection
       if (is.null(conn)) {
-        private$conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
+        private$.conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
       } else {
-        private$conn <- conn # User provided
+        private$.conn <- conn # User provided
       }
-      checkmate::assert_class(private$conn, "DBIConnection")
+      checkmate::assert_class(self %.% conn, "DBIConnection")
 
       # Initialize based on input
       if (!is.null(slice_ts))                         self$set_slice_ts(slice_ts)
@@ -114,7 +114,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   Set the slice_ts to get data for
     #' @param slice_ts (`Date` or `character`)\cr
     #'   Date to slice the database on
-    #' @seealso [diseasystore::mg_get_table]
+    #' @seealso [SCDB::get_table]
     set_slice_ts = function(slice_ts) {
       checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE)
       private$.slice_ts <- slice_ts
@@ -276,7 +276,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     slice_ts = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "slice_ts",
-      expr = return(private %.% .slice_ts))
+      expr = return(private %.% .slice_ts)),
 
 
     #' @field conn (`DBIConnection`)\cr

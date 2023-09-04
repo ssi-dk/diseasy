@@ -8,9 +8,11 @@ TODO
 }
 \seealso{
 \link[SCDB:get_table]{SCDB::get_table}
+
+\link[SCDB:get_table]{SCDB::get_table}
 }
-\section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyDBModule]{diseasy::DiseasyDBModule}} -> \code{DiseasyObservables}
+\section{Super class}{
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyObservables}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
@@ -32,6 +34,12 @@ The currently loaded diseasystore which provides the features. Read-only.}
 
 \item{\code{available_observables}}{(\code{character})\cr
 The currently available observables in the loaded diseasystore. Read-only.}
+
+\item{\code{slice_ts}}{(\code{Date})\cr
+The timestamp to slice database on. Read-only.}
+
+\item{\code{conn}}{(\code{DBIConnection})\cr
+The connection to the database on. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -42,6 +50,7 @@ The currently available observables in the loaded diseasystore. Read-only.}
 \item \href{#method-DiseasyObservables-set_case_definition}{\code{DiseasyObservables$set_case_definition()}}
 \item \href{#method-DiseasyObservables-set_last_queryable_date}{\code{DiseasyObservables$set_last_queryable_date()}}
 \item \href{#method-DiseasyObservables-set_study_period}{\code{DiseasyObservables$set_study_period()}}
+\item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
 \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
 \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
 \item \href{#method-DiseasyObservables-clone}{\code{DiseasyObservables$clone()}}
@@ -51,7 +60,6 @@ The currently available observables in the loaded diseasystore. Read-only.}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyDBModule" data-id="set_slice_ts"><a href='../../diseasy/html/DiseasyDBModule.html#method-DiseasyDBModule-set_slice_ts'><code>diseasy::DiseasyDBModule$set_slice_ts()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -66,6 +74,8 @@ Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} cl
   start_date = NULL,
   end_date = NULL,
   last_queryable_date = NULL,
+  conn = NULL,
+  slice_ts = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -85,12 +95,18 @@ Study period end (default values for get_observation).}
 \item{\code{last_queryable_date}}{(\code{Date})\cr
 Enforce a limit on data that can be pulled (not after this date).}
 
-\item{\code{...}}{parameters sent to \code{DiseasyDBModule} \link[R6:R6Class]{R6} constructor.}
+\item{\code{conn}}{(\code{DBIConnection})\cr
+A database connection object (inherits from DBIConnection)}
+
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
+Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}}
+
+\item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new instance of the \code{DiseasyDBModule} \link[R6:R6Class]{R6} class.
+A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}
@@ -147,6 +163,24 @@ Start date to get DiseasyObservables for (including).}
 
 \item{\code{end_date}}{(\code{Date})\cr
 End date to get DiseasyObservables for (including).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyObservables-set_slice_ts"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-set_slice_ts}{}}}
+\subsection{Method \code{set_slice_ts()}}{
+Set the slice_ts to get data for
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_slice_ts(slice_ts)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
+Date to slice the database on}
 }
 \if{html}{\out{</div>}}
 }

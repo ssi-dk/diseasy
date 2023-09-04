@@ -37,7 +37,8 @@ Suggests:
     RSQLite,
     SCDB,
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    zoo
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy
 BugReports: https://github.com/ssi-dk/diseasy/issues

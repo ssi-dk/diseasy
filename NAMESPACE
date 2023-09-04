@@ -2,7 +2,6 @@
 
 export("%.%")
 export(DiseasyBaseModule)
-export(DiseasyDBModule)
 export(DiseasyObservables)
 export(diseasyoption)
 import(R6)
