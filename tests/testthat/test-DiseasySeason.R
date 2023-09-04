@@ -243,3 +243,27 @@ test_that("set_scale works", {
   rm(s)
 
 })
+
+
+test_that("hash works", {
+
+  # Check the hash in a couple of cases
+  s1 <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))
+  s2 <- DiseasySeason$new(reference_date = as.Date("2022-01-02"))
+  expect_false(s1$hash == s2$hash)
+
+  s3 <- s1$clone()
+  s3$use_constant_season()
+  expect_true(s1$hash == s3$hash) # Constant season is the default, so this is fine
+
+  # But every other season should give error
+  s4 <- s1$clone()
+  s4$use_cosine_season()
+  expect_false(s1$hash == s4$hash)
+
+  s5 <- s1$clone()
+  s5$use_covid_season_v1()
+  expect_false(s1$hash == s5$hash)
+
+  rm(s1, s2, s3, s4, s5)
+})
