@@ -43,7 +43,8 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     #' @param clone (`boolean`)\cr
     #'   Toggle whether or not the module should be cloned when loading. Default TRUE.
     #' @details
-    #'   The methods allows the setting of the internal module instances after the `DiseasyBaseModule` instance is created.
+    #'   The methods allows the setting of the internal module instances after the `DiseasyBaseModule` instance is
+    #'   created.
     #' @return `NULL`
     load_module = function(module, clone = TRUE) {
 
@@ -70,8 +71,8 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
       # ... And the other way around
       if (class(module)[1] %in% modules_with_observables &&
-          is.null(purrr::pluck(module, "observables")) &&
-          !is.null(purrr::pluck(private, ".DiseasyObservables"))) {
+            is.null(purrr::pluck(module, "observables")) &&
+            !is.null(purrr::pluck(private, ".DiseasyObservables"))) {
 
         module$load_module(purrr::pluck(private, ".DiseasyObservables"), clone = FALSE)
       }
@@ -135,9 +136,10 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
       # Each subclass gets its own logger
       private$lg <- lgr::get_logger_glue(
         glue::glue_collapse(
-          c("mgmodel",
-            private$moduleowner, class(self)[1]),
-          sep = "/"))
+          c("mgmodel", private$moduleowner, class(self)[1]),
+          sep = "/"
+        )
+      )
 
       # Check active appenders
       if (length(private$lg$appenders) == 0 && !testthat::is_testing()) {

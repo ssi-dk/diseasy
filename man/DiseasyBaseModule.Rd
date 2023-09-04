@@ -19,6 +19,7 @@ Computes a hash value for the module. Useful for logging and caching. Read only.
 \itemize{
 \item \href{#method-DiseasyBaseModule-new}{\code{DiseasyBaseModule$new()}}
 \item \href{#method-DiseasyBaseModule-set_moduleowner}{\code{DiseasyBaseModule$set_moduleowner()}}
+\item \href{#method-DiseasyBaseModule-load_module}{\code{DiseasyBaseModule$load_module()}}
 \item \href{#method-DiseasyBaseModule-clone}{\code{DiseasyBaseModule$clone()}}
 }
 }
@@ -61,6 +62,35 @@ The name of the moduleowner. Preferably, this should be the classname of the own
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+\code{NULL}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyBaseModule-load_module"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyBaseModule-load_module}{}}}
+\subsection{Method \code{load_module()}}{
+Loads a copy of the provided module into the module.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$load_module(module, clone = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{module}}{(\verb{R6::R6Class instance})\cr
+This instance is cloned to the field with the same name as the class of the module}
+
+\item{\code{clone}}{(\code{boolean})\cr
+Toggle whether or not the module should be cloned when loading. Default TRUE.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The methods allows the setting of the internal module instances after the \code{DiseasyBaseModule} instance is
+created.
+}
+
 \subsection{Returns}{
 \code{NULL}
 }
