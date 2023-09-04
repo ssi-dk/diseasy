@@ -1,7 +1,7 @@
 Package: diseasy
 Title: disease ensemble modelling made easy
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-5860-3838")),
       person("Marcus Munch", "Gr\u00FCnewald", , "mmgr@ssi.dk", role = c("aut"),
@@ -15,13 +15,23 @@ License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Language: en-GB
 Imports:
     checkmate,
+    dplyr,
     glue,
+    lgr,
     purrr,
+    R6,
+    rlang,
     stringr
-Suggests: 
+Suggests:
+    DBI,
     knitr,
+    readr,
     rmarkdown,
-    spelling
-VignetteBuilder: knitr
+    RSQLite,
+    spelling,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr,
+
