@@ -30,7 +30,7 @@ DiseasyDBModule <- R6::R6Class(  # nolint: object_name_linter
 
       # Set the db connection
       if (is.null(conn)) {
-        private$conn <- (\() options() %.% diseasy.conn)() # Open a new connection to the DB
+        private$conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
       } else {
         private$conn <- conn # User provided
       }

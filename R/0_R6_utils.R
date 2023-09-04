@@ -63,6 +63,22 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
 }
 
 
+#' Parse a connection option/object
+#' @param conn (`function` or `DBIConnection`)
+#' @details
+#'   Evaluates given conn if is a function
+#' @noRd
+parse_conn <- function(conn) {
+  if (is.function(conn)) {
+    return(parse_conn(conn()))
+  } else if (inherits(conn, "DBIConnection")) {
+    return(conn)
+  } else {
+    stop("conn cannot be parsed to a DBIConnection")
+  }
+}
+
+
 #' Existence aware pick operator
 #' @param env (`object`)\cr
 #'   The object or environment to attempt to pick from
