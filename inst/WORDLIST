@@ -3,7 +3,9 @@ cloneable
 combinatorial
 combinatorics
 
+DBIConnection
 dieasy
+DiseasyBaseModule
 
 Engbo
 
@@ -16,3 +18,5 @@ ORCID
 Rasmus
 
 Skytte
+
+ts
