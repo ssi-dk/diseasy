@@ -42,6 +42,9 @@ test_that("initialize works", {
   expect_identical(obs$slice_ts, glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"))
   rm(obs)
 
+  # Test that conn can be given externally
+  expect_no_error(DiseasyObservables$new(conn = (options() %.% diseasy.conn)()))
+
   # Full initialization
   obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
                                 start_date = as.Date("2021-03-01"),
