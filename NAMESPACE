@@ -2,9 +2,11 @@
 
 export("%.%")
 export(DiseasyBaseModule)
+export(DiseasyDBModule)
 export(diseasyoption)
 import(R6)
 import(lgr)
 importFrom(digest,digest)
 importFrom(dplyr,as_label)
+importFrom(lubridate,today)
 importFrom(rlang,caller_env)

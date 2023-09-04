@@ -22,6 +22,7 @@ Imports:
     dplyr,
     glue,
     lgr,
+    lubridate,
     purrr,
     R6,
     rlang,
@@ -32,6 +33,7 @@ Suggests:
     readr,
     rmarkdown,
     RSQLite,
+    SCDB,
     spelling,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr,
