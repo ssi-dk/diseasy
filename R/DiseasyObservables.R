@@ -296,3 +296,9 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     .conn = NULL
   )
 )
+
+
+# Set default options for the package related to DiseasyObservables
+rlang::on_load({
+  options(diseasy.conn = "")
+})
