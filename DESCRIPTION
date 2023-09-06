@@ -16,12 +16,15 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Language: en-GB
+Depends:
+    diseasystore
 Imports:
     checkmate,
     digest,
     dplyr,
     glue,
     lgr,
+    lubridate,
     purrr,
     R6,
     rlang,
@@ -32,8 +35,10 @@ Suggests:
     readr,
     rmarkdown,
     RSQLite,
+    SCDB,
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    zoo
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy
 BugReports: https://github.com/ssi-dk/diseasy/issues

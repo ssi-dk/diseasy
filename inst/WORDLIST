@@ -3,7 +3,11 @@ cloneable
 combinatorial
 combinatorics
 
-dieasy
+DBIConnection
+diseasy
+diseasystore
+DiseasyBaseModule
+DiseasyObservables
 
 Engbo
 
@@ -13,6 +17,11 @@ moduleowner
 
 ORCID
 
+quos
+
 Rasmus
+rlang
 
 Skytte
+
+ts

@@ -51,6 +51,7 @@ jobs:
             any::testthat
             any::knitr
             any::rmarkdown
+            github::ssi-dk/diseasystore
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
