@@ -93,8 +93,22 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
       # Finally, store the module
       private[[glue::glue(".{class(module)[1]}")]] <- module
 
-    }
+      # ... and track if module was cloned
+      attr(private[[glue::glue(".{class(module)[1]}")]], "clone") <- clone
 
+    },
+
+
+    #' @description
+    #'   Handles the cleanup of the class
+    finalize = function() {
+      # Look for contained Diseasy* classes and call finalize on these
+      private |>
+        as.list() |>
+        purrr::keep(~ inherits(., "DiseasyBaseModule")) |>
+        purrr::discard(~ isTRUE(attr(., "clone"))) |>
+        purrr::walk(~ .$finalize())
+    }
   ),
 
   active = list(
