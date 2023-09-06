@@ -1,13 +1,19 @@
+antiphase
+
 classname
 cloneable
+CMD
+codecov
 combinatorial
 combinatorics
+covid
 
 DBIConnection
 diseasy
 diseasystore
 DiseasyBaseModule
 DiseasyObservables
+DMI
 
 Engbo
 
