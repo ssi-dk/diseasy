@@ -87,7 +87,7 @@ Either the classname or the object the option applies to.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Retrieve DiseasystoreGoogleCovid19 specific option for source conn</span></span></span>
 <span class="r-in"><span>  <span class="fu">diseasyoption</span><span class="op">(</span><span class="st">"source_conn"</span>, <span class="st">"DiseasystoreGoogleCovid19"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "https://storage.googleapis.com/covid19-open-data/v3/"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Try to retrieve specific option for source conn for a non existant / unconfigured diseasystore</span></span></span>
 <span class="r-in"><span>  <span class="fu">diseasyoption</span><span class="op">(</span><span class="st">"source_conn"</span>, <span class="st">"DiseasystoreNonExistent"</span><span class="op">)</span> <span class="co"># Returns default source_conn</span></span></span>
