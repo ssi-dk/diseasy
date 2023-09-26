@@ -213,6 +213,16 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       )
 
       printr(glue::glue("slice_date set to: {self$slice_date}"))
+    },
+
+
+    #' @description
+    #'   Handles the cleanup of the class
+    finalize = function() {
+
+      # Close the connection, then do rest of cleanup
+      if (DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
+      super$finalize()
     }
   ),
 
