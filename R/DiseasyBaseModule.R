@@ -145,33 +145,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     hash = purrr::partial(
       .f = active_binding,
       name = "hash",
-      expr = {
-        # Capture module environment (parent of this environment)
-        public_names <- ls(self) # public (fields and functions)
-        public_names <- public_names[public_names != "hash"] # avoid recursion
-        public_env <- public_names |>
-          purrr::map(~ {
-            # Some of the active bindings return informative errors when a module is
-            # not fully configured. This should not stop the hashing process, so we capture the
-            # errors and hash these instead
-            tryCatch(purrr::pluck(self, .), error = function(e) e)
-          })
-        names(public_env) <- public_names
-
-        # Iteratively map the public environment to hashes
-        hash_list <- hash_environment(public_env)
-
-        # Add the class name to "salt" the hashes
-        hash_list <- c(hash_list, class = class(self)[1])
-
-        # Reduce to single hash and return
-        hash <- withr::with_locale(
-          new = c("LC_COLLATE" = "C"), # Ensure consistent hashing
-          rlang::hash(hash_list[order(names(hash_list))])
-        )
-        return(hash)
-      }
-    )
+      expr = return(hash_module(self))) # nolint end
   ),
 
   private = list(
@@ -324,10 +298,6 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
 
     # Errors
-    read_only_error = function(field) {
-      stop(glue::glue("`${field}` is read only"), call. = FALSE)
-    },
-
     not_implemented_error = function(...) {
       stop("Not implemented: ", glue::glue_collapse(c(...), sep = " "), call. = FALSE)
     },

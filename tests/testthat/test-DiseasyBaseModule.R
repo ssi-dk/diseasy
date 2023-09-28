@@ -51,6 +51,50 @@ test_that("$hash works", {
 })
 
 
+test_that("hash_module() works", {
+
+  # Create a simple test setup
+  test <- R6::R6Class(
+    classname = "test",
+    inherit = DiseasyBaseModule,
+
+    public = list(
+      initialize = function() self$m <- nested$new(),
+      m = NULL, v = 2
+    )
+  )
+
+  nested <- R6::R6Class(
+    classname = "nested",
+    inherit = DiseasyBaseModule,
+    public = list("b" = 2)
+  )
+
+  # Creating an empty module
+  t <- test$new()
+
+  # Module hash and hash_module with no exclude should give the same
+  expect_equal(hash_module(t), t$hash)
+
+  # If we exclude the "v" variable, reduced hash should be different
+  hash_v_excluded <- hash_module(t, exclude = "v")
+  expect_false(hash_v_excluded == t$hash)
+
+  # If we exclude the nested "b" variable, reduced hash should be different
+  hash_b_excluded <- hash_module(t, exclude = "b")
+  expect_false(hash_b_excluded == t$hash)
+  expect_false(hash_b_excluded == hash_v_excluded)
+
+  # If we exclude both, reduced hash should be different
+  hash_v_b_excluded <- hash_module(t, exclude = c("v", "b"))
+  expect_false(hash_v_b_excluded == t$hash)
+  expect_false(hash_v_b_excluded == hash_v_excluded)
+  expect_false(hash_v_b_excluded == hash_b_excluded)
+
+  rm(t)
+})
+
+
 caches <- list("default" = NULL, "manual" = cachem::cache_disk(), "option" = cachem::cache_disk())
 for (cache_id in seq_along(caches)) {
 
@@ -109,11 +153,6 @@ test_that("errors work", {
   # Creating an empty module
   m <- DiseasyBaseModule$new()
   private <- m$.__enclos_env__$private
-
-  # Test the read_only_error
-  # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(private$read_only_error("test_field"), error = \(e) e),
-                   simpleError("`$test_field` is read only"))
 
   # Test the not_implemented_error
   expect_error(private$not_implemented_error("test1"),
