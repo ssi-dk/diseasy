@@ -43,8 +43,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       if (base_scenario == "dk_reference") {
         self$set_activity_units(dk_activity_units)
         self$change_activity(dk_reference_scenario)
-        work_risk <- aggregate(faWork ~ date, data = dk_reference_scenario, FUN = mean)
-        self$change_risk(date = work_risk$date, type = "work", risk = work_risk$faWork)
+        work_risk <- aggregate(social_distance_work ~ date, data = dk_reference_scenario, FUN = mean)
+        self$change_risk(date = work_risk$date, type = "work", risk = work_risk$social_distance_work)
         private$lg$info("Initialised 'dk_reference' scenario")
       }
 
@@ -63,9 +63,12 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       # Checking if all activity units contains "home", "work", "school" and "other":
       purrr::walk2(activity_units, names(activity_units),
-                   ~ if (!all(private$activity_types %in% names(.x))) {
+                   ~ {
+                     if (!all(private$activity_types %in% names(.x))) {
                        coll$push(glue::glue("Activity unit {.y} does not contain matrices for:",
-                                            "{setdiff(private$activity_types, names(.x))}"))})
+                                            "{setdiff(private$activity_types, names(.x))}"))
+                     }
+                   })
       checkmate::reportAssertions(coll)
 
 
@@ -222,7 +225,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         digest::digest()
       attr(private$.scenario_matrix, "secret_hash") <- active_activity_units_hash
 
-     },
+    },
 
     #' @description
     #' Sets the overall risk of types of activity
@@ -242,7 +245,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       checkmate::assert(
         checkmate::check_data_frame(date, col.names = c("date", "type", "risk")),
         checkmate::check_date(date, any.missing = FALSE),
-        add = coll)
+        add = coll
+      )
 
       if (is.data.frame(date) && is.na(type) && is.na(risk)) {
         type <- date$type
@@ -282,7 +286,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       new_scenario_matrix <- private$update_with_dates(input_matrix = private$.scenario_matrix,
                                                        input_dates = input_dates, first_col_value = 0)
       new_risk_matrix     <- private$update_with_dates(input_matrix = private$.risk_matrix,
-                                                   input_dates = input_dates, first_col_value = 1)
+                                                       input_dates = input_dates, first_col_value = 1)
 
       # Updating with input changes of activities
       # One date at a time - in chronological order
@@ -296,7 +300,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       private$.scenario_matrix  <- new_scenario_matrix
       private$.risk_matrix      <- new_risk_matrix
 
-     },
+    },
 
     #' @description
     #' Helper function to crop the scenario matrix in time
@@ -398,7 +402,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         }
 
         # Creating mapping for all ages to reference and provided age_groups
-        lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$prop), split = "-"), \(x) x[1]))
+        lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$prop), split = "[-+]"), \(x) x[1]))
         population <- data.frame(age = 0:(length(prop) - 1), prop = prop)
 
         population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
