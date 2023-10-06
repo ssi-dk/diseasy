@@ -178,10 +178,10 @@ test_that("get_scenario_openness works", {
 })
 
 
-test_that("contactdata: contact_matrices works", {
+test_that("contactdata: contact_basis works", {
 
   # Test contactdata contacts
-  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_matrices %.% DK)
+  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
 
   # dk_activity_units is available from package
   act$set_activity_units(dk_activity_units[1:10])
@@ -207,7 +207,7 @@ test_that("contactdata: contact_matrices works", {
 test_that("dk_reference scenario works", {
 
   ## Test dk_reference scenario
-  act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_matrices %.% DK)
+  act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis %.% DK)
   expect_identical(class(act$get_scenario_contacts(age_cuts_lower = c(0, 60))), "list")
   # More tests could be made ... but tested above. The length may change over time so mayby some particular dates.
 
@@ -227,36 +227,36 @@ test_that("set_contact_basis works", {
   hash_new_instance <- act$hash # Store new hash
 
   # Setting basis should change the hash
-  act$set_contact_basis(contact_matrices %.% DK)
+  act$set_contact_basis(contact_basis %.% DK)
 
-  hash_contact_matrices_loaded <- act$hash # Store new hash
-  expect_false(hash_new_instance == hash_contact_matrices_loaded) # With contact_basis loaded, hash should change
+  hash_contact_basis_loaded <- act$hash # Store new hash
+  expect_false(hash_new_instance == hash_contact_basis_loaded) # With contact_basis loaded, hash should change
 
 
   # Changing basis should give new hash
-  custom_basis <- contact_matrices %.% DK
+  custom_basis <- contact_basis %.% DK
   custom_basis$description <- "foo"
   act$set_contact_basis(custom_basis)
 
-  expect_false(act$hash == hash_contact_matrices_loaded)
+  expect_false(act$hash == hash_contact_basis_loaded)
 
   # Check malformed inputs
-  custom_basis <- contact_matrices %.% DK
+  custom_basis <- contact_basis %.% DK
   custom_basis$counts <- custom_basis$counts[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
                regexp = r"{missing.*elements.*\{'home'\}}")
 
-  custom_basis <- contact_matrices %.% DK
+  custom_basis <- contact_basis %.% DK
   custom_basis$prop <- custom_basis$prop[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
                regexp = "Must have length 1")
 
-  custom_basis <- contact_matrices %.% DK
+  custom_basis <- contact_basis %.% DK
   custom_basis$pop <- dplyr::select(custom_basis$pop, "prop")
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
                regexp = r"{extra.*elements.*\{'pop'\}}")
 
-  custom_basis <- contact_matrices %.% DK
+  custom_basis <- contact_basis %.% DK
   expect_error(act$set_contact_basis(custom_basis[-4]), class = "simpleError",
                regexp = r"{missing.*elements.*\{'description'\}}")
 

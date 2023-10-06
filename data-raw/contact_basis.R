@@ -1,0 +1,117 @@
+if (require(contactdata) && require(countrycode) && require(curl) && require(usethis)) {
+
+  # Get contact matrices for every country in the contactdata package
+  countries <- contactdata::list_countries()
+  country_codes <- purrr::map_chr(countries,
+                                  ~ countrycode::countrycode(.,  origin = "country.name", destination = "iso2c"))
+
+  # Get all individual matrices for each country
+  matrix_names <- c("home", "work", "school", "other")
+  counts_all <- countries |>
+    purrr::map(
+      \(country) {
+        counts <- matrix_names |>
+          purrr::map(\(matrix_name) contact_matrix(country, matrix_name))
+        names(counts) <- matrix_names
+
+        # Set the row and column names of the matrices according to our naming
+        counts <- purrr::map(counts, ~ {
+          rownames(.) <- colnames(.) <- diseasystore::age_labels((0:15) * 5)
+          return(.)
+        })
+
+        return(list(counts))
+      }
+    ) |>
+    purrr::reduce(append, .init = list())
+  names(counts_all) <- country_codes
+
+
+  # We get age population data like the contactdata package does using this source:
+  # https://www.census.gov/programs-surveys/international-programs/about/idb.html
+  # Terms of the data can be read here:
+  # https://www.census.gov/data/developers/about/terms-of-service.html
+
+  # Alternative data source is here:
+  # https://population.un.org/wpp/Download/Standard/Population/
+  idbzip <- "https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip"
+  curl::curl_fetch_disk(idbzip, file.path(tempdir(), "idbzip.zip"))
+  idb1yr <- readr::read_delim(unz(file.path(tempdir(), "idbzip.zip"), "idbsingleyear.txt"),
+                              delim = "|", show_col_types = FALSE)
+
+  # Get 1-year age-group data for Denmark
+  pop_ref_1yr <- idb1yr |>
+    dplyr::rename_with(tolower) |>
+    dplyr::filter(`#yr` == 2020) |>
+    dplyr::mutate("key_country" = stringr::str_sub(geo_id, -2, -1)) |>
+    dplyr::summarise(pop = sum(pop), .by = c("key_country", "age")) |>
+    dplyr::mutate(prop = pop / sum(pop), .by = "key_country")
+
+  # Project into 5-year age-groups
+  age_cuts <- (0:15) * 5
+  age_labels <- diseasystore::age_labels(age_cuts)
+
+  props <- pop_ref_1yr |>
+    dplyr::mutate(age_group = purrr::map_chr(pop_ref_1yr$age, ~ age_labels[max(which(age_cuts <= .))])) |>
+    dplyr::summarise(prop = sum(prop), .by = c("key_country", "age_group"))
+
+
+  # Describe the data
+  description <- "Contact matrices from the `contactdata` package and population data from the US Census Bureau"
+
+  # Export contact matrices where we also have population data
+  common_country_codes <- intersect(country_codes, pop_ref_1yr$key_country)
+  contact_basis <- common_country_codes |>
+    purrr::map(\(country_code) {
+      list(counts = purrr::pluck(counts_all, country_code),
+           prop = props |>
+             dplyr::filter(.data$key_country == country_code) |>
+             dplyr::select("age_group", "prop") |>
+             tibble::deframe(),
+           pop_ref_1yr = pop_ref_1yr |>
+             dplyr::filter(.data$key_country == country_code) |>
+             dplyr::select(!"key_country"),
+           description = description)
+    })
+  names(contact_basis) <- common_country_codes
+
+
+  # Transform the matrices from the contactdata package
+  contact_basis <- purrr::map(contact_basis, \(basis) {
+
+    # Store proportion as the vector w
+    w <- basis$prop
+
+    basis$counts <- purrr::map(basis$counts, \(x) {
+
+      # The Danish SEIR models are configured to use a scale of contact matrices.
+      # To make the definition of "contact" matrix more clear, lets start with the
+      # definitions from this paper:
+      # https://www.medrxiv.org/content/10.1101/2020.02.16.20023754v2.full.pdf
+
+      # m_ij the raw contact matrix elements from age group i to age group j
+      # c_ij the reciprocal contact matrix elements
+      # w_i  the proportion of persons that fall into age group i
+
+      # The Danish models are configured to use a symmetric, weighted set of
+      # contacts matrices where the elements are 0.5 * (c_ij * w_j + c_ji * w_i)
+
+      # Since the contactsdata package gives the number of contacts directly (in their
+      # framework, denoted as X_ij), we transform the reciprocal weighted symmetric versions
+
+      # First compute some intermediaries
+      # m_ij = t_ij / n_j   -- here t_ij is the total number of contacts and n_j is number of participants              # nolint start: commented_code_linter
+      # m_ij = X_ij / w_j
+      # c_ij = m_ij * w_i = X_ij * w_i / w_j                                                                            # nolint end: commented_code_linter
+      w_j <- outer(rep(1, length(w)), w)
+      c <- x * outer(w, w, FUN = "/")
+      return(0.5 * (c * w_j + t(c * w_j)))
+
+    })
+
+    return(basis)
+  })
+
+  # Store the data in the package
+  usethis::use_data(contact_basis, overwrite = TRUE)
+}
