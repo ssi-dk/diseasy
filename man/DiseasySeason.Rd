@@ -161,7 +161,7 @@ Sets the \code{DiseasySeason} module to use a cosine model for season.
 Sets the period of maximal activity (days past new-year).
 By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.}
 
-\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+\item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
 }
 \if{html}{\out{</div>}}
 }
@@ -178,7 +178,7 @@ Sets the \code{DiseasySeason} module to use the first version of the covid 19 se
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+\item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
 }
 \if{html}{\out{</div>}}
 }
@@ -195,7 +195,7 @@ Sets the \code{DiseasySeason} module to use the second version of the covid 19 s
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+\item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
 }
 \if{html}{\out{</div>}}
 }
