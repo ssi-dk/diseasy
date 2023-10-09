@@ -365,7 +365,7 @@ test_that("active binding: ds works", {
 
   # Try to set the ds
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$ds <- DiseasystoreGoogleCovid19$new(target_conn = m$conn), error = \(e) e),
+  expect_identical(tryCatch(m$ds <- DiseasystoreGoogleCovid19$new(target_conn = test_conn), error = \(e) e),
                    simpleError("`$ds` is read only"))
   expect_equal(m$ds, NULL)
 

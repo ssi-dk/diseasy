@@ -18,32 +18,28 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Study period end (default values for get_observation).
     #' @param last_queryable_date (`Date`)\cr
     #'   Enforce a limit on data that can be pulled (not after this date).
-    #' @param conn (`DBIConnection`)\cr
-    #'   A database connection object (inherits from DBIConnection)
+    #' @param conn
+    #'   A data base connection object or function that opens a data base connection.
+    #'   (passed to the `diseasystore`).
     #' @param slice_ts (`Date` or `character`)\cr
     #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
-    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+    #'   A new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
     initialize = function(case_definition = NULL,
                           start_date = NULL,
                           end_date = NULL,
                           last_queryable_date = NULL,
-                          conn = NULL,
+                          conn = diseasyoption("conn", "DiseasyObservables"),
                           slice_ts = NULL,
                           ...) {
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
 
-      # Set the db connection
-      if (is.null(conn)) {
-        private$.conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
-      } else {
-        private$.conn <- conn # User provided
-      }
-      checkmate::assert_class(self %.% conn, "DBIConnection")
+      # Store db connection
+      private$.conn <- conn
 
       # Initialize based on input
       if (!is.null(slice_ts))                         self$set_slice_ts(slice_ts)
@@ -71,7 +67,7 @@ DiseasyObservables <- R6::R6Class(                                              
       ds_case_definition <- diseasystore:::diseasystore_case_definition(case_definition)
       private$.ds <- get(ds_case_definition)$new(slice_ts = self %.% slice_ts,
                                                  verbose = !testthat::is_testing(),
-                                                 target_conn = self %.% conn)
+                                                 target_conn = parse_conn(self %.% conn))
 
       private$.case_definition <- private$.ds %.% case_definition # Use the human readable from the diseasystore
 
@@ -213,16 +209,6 @@ DiseasyObservables <- R6::R6Class(                                              
       )
 
       printr(glue::glue("slice_date set to: {self$slice_date}"))
-    },
-
-
-    #' @description
-    #'   Handles the clean-up of the class
-    finalize = function() {
-
-      # Close the connection, then do rest of clean-up
-      if (DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
-      super$finalize()
     }
   ),
 
