@@ -53,6 +53,7 @@ The connection to the database on. Read-only.}
 \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
 \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
 \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
+\item \href{#method-DiseasyObservables-finalize}{\code{DiseasyObservables$finalize()}}
 \item \href{#method-DiseasyObservables-clone}{\code{DiseasyObservables$clone()}}
 }
 }
@@ -233,6 +234,16 @@ Otherwise, the function fails and lists the available DiseasyObservables for the
 Prints a human readable report of the internal state of the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$describe()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyObservables-finalize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-finalize}{}}}
+\subsection{Method \code{finalize()}}{
+Handles the clean-up of the class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$finalize()}\if{html}{\out{</div>}}
 }
 
 }

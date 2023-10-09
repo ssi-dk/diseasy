@@ -217,10 +217,10 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
 
     #' @description
-    #'   Handles the cleanup of the class
+    #'   Handles the clean-up of the class
     finalize = function() {
 
-      # Close the connection, then do rest of cleanup
+      # Close the connection, then do rest of clean-up
       if (DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
       super$finalize()
     }

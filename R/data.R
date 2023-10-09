@@ -18,7 +18,7 @@
 #' The `diseasy` SEIR models are configured to use a symmetric, weighted set of
 #' contacts matrices where the elements are 0.5 * (c_ij * w_j + c_ji * w_i)
 #'
-#' Since the contactsdata package gives the number of contacts directly (in their
+#' Since the `contactdata` package gives the number of contacts directly (in their
 #' framework, denoted as X_ij), we transform to the above elements through these intermediaries: \cr
 #' m_ij = X_ij / w_j\cr
 #' c_ij = m_ij * w_i = X_ij * w_i / w_j\cr
@@ -31,26 +31,26 @@
 #'
 #' @name contact_matrices
 #' @docType data
-#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
+#' @author Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
 #' @author Lasse Engbo Christiansen \email{lsec@ssi.dk}
 #' @source
 #'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
 #'  U.S. Department of Commerce. Retrieved September 29, 2023, from https://data.census.gov/
 #' @source
-#'  Gruson H (2023). “contactdata: Social Contact Matrices for 152
-#'  Countries.” R package version 1.0.0,
+#'  Gruson H (2023). "contactdata: Social Contact Matrices for 152
+#'  Countries." R package version 1.0.0,
 #'  <https://CRAN.R-project.org/package=contactdata>.
 #' @source
-#'   Prem K, Cook AR, Jit M (2017). “Projecting social contact
+#'   Prem K, Cook AR, Jit M (2017). "Projecting social contact
 #'   matrices in 152 countries using contact surveys and demographic
-#'   data.” _PLoS Computational Biology_, *13*(9), e1005697.
+#'   data." _PLoS Computational Biology_, *13*(9), e1005697.
 #'   doi:10.1371/journal.pcbi.1005697
 #'   <https://doi.org/10.1371/journal.pcbi.1005697>.
 #' @source
 #'   Prem K, van Zandvoort K, Klepac P, Eggo RM, Davies NG, Group
-#'   CCW, Cook AR, Jit M (2021). “Projecting contact matrices in 177
+#'   CCW, Cook AR, Jit M (2021). "Projecting contact matrices in 177
 #'   geographical regions: An update and comparison with empirical
-#'   data for the COVID-19 era.” _PLoS Computational Biology_,
+#'   data for the COVID-19 era." _PLoS Computational Biology_,
 #'   *17*(7), e1009098. doi:10.1371/journal.pcbi.1009098
 #'   <https://doi.org/10.1371/journal.pcbi.1009098>.
 #' @keywords data
@@ -59,13 +59,13 @@ NULL
 
 #' dk_activity_units
 #'
-#' This data set contains the "units" of activity that was developed for the Danish COVID-19 moddeling efforts.
+#' This data set contains the "units" of activity that was developed for the Danish COVID-19 modelling efforts.
 #' Each "activity unit" specifies the amount of activity the for arenas: Home, Work, School, Other.
-#' By combining these units of activity, a complete, granular picture of the soceital activty is formed
+#' By combining these units of activity, a complete, granular picture of the societal activity is formed
 #' (see dk_reference_scenario for details).
 #'
-#' These units are developed to cover the proposed and realized scenarios of soceital restrictions during the COVID-19
-#' pandemic in Denmark. If other scenarios are to be tested, new "actiivty units" will (likely) have to be developed.
+#' These units are developed to cover the proposed and realized scenarios of societal restrictions during the COVID-19
+#' pandemic in Denmark. If other scenarios are to be tested, new "activity units" will (likely) have to be developed.
 #' We supply the script that generates these units with the package (see data-raw/dk-activity-units.R for details).
 #'
 #' @name dk_activity_units
@@ -74,7 +74,7 @@ NULL
 #' @author Carsten Kirkeby \email{ckir@sund.ku.dk}
 #' @author Frederik Plesner Lyngse \email{frederik.lyngse@sund.ku.dk}
 #' @author Adam Mielke \email{admi@dtu.dk}
-#' @author Rasmus Skytte Randløv \email{rske@dtu.dk}
+#' @author Rasmus Skytte Randl\\u00F8v \email{rske@dtu.dk}
 #' @keywords data
 NULL
 

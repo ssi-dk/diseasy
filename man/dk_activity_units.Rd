@@ -5,14 +5,14 @@
 \alias{dk_activity_units}
 \title{dk_activity_units}
 \description{
-This data set contains the "units" of activity that was developed for the Danish COVID-19 moddeling efforts.
+This data set contains the "units" of activity that was developed for the Danish COVID-19 modelling efforts.
 Each "activity unit" specifies the amount of activity the for arenas: Home, Work, School, Other.
-By combining these units of activity, a complete, granular picture of the soceital activty is formed
+By combining these units of activity, a complete, granular picture of the societal activity is formed
 (see dk_reference_scenario for details).
 }
 \details{
-These units are developed to cover the proposed and realized scenarios of soceital restrictions during the COVID-19
-pandemic in Denmark. If other scenarios are to be tested, new "actiivty units" will (likely) have to be developed.
+These units are developed to cover the proposed and realized scenarios of societal restrictions during the COVID-19
+pandemic in Denmark. If other scenarios are to be tested, new "activity units" will (likely) have to be developed.
 We supply the script that generates these units with the package (see data-raw/dk-activity-units.R for details).
 }
 \author{
@@ -24,6 +24,6 @@ Frederik Plesner Lyngse \email{frederik.lyngse@sund.ku.dk}
 
 Adam Mielke \email{admi@dtu.dk}
 
-Rasmus Skytte Randløv \email{rske@dtu.dk}
+Rasmus Skytte Randl\\u00F8v \email{rske@dtu.dk}
 }
 \keyword{data}
