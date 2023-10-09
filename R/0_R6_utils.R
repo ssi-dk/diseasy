@@ -51,7 +51,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
     class <- base::class(class)[1]
   }
 
-  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |> # nolint: object_usage_linter
+  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |>                                                     # nolint: object_usage_linter
     stringr::str_to_lower()
 
   list(class, NULL) |>

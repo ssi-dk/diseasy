@@ -203,7 +203,7 @@ test_that("set_slice_ts works", {
 })
 
 
-test_that("get_observation works", { for (case_def in case_defs) { # nolint: brace_linter
+test_that("get_observation works", { for (case_def in case_defs) {                                                      # nolint: brace_linter
 
   obs <- DiseasyObservables$new(case_definition = case_def,
                                 start_date = as.Date("2021-03-02"),
@@ -274,7 +274,7 @@ test_that("get_observation works", { for (case_def in case_defs) { # nolint: bra
 }})
 
 
-test_that("get_observation works -- test 2", { for (case_def in case_defs) { # nolint: brace_linter
+test_that("get_observation works -- test 2", { for (case_def in case_defs) {                                            # nolint: brace_linter
 
   obs <- DiseasyObservables$new(case_definition = case_def,
                                 start_date = as.Date("2021-03-02"),

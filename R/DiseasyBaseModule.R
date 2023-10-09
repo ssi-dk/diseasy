@@ -2,7 +2,7 @@
 #'
 #' @description TODO
 #' @export
-DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
+DiseasyBaseModule <- R6::R6Class(                                                                                       # nolint: object_name_linter
   classname = "DiseasyBaseModule",
 
   public = list(
@@ -116,7 +116,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     #' @field hash (`character`)\cr
     #' Computes a hash value for the module. Useful for logging and caching. Read only.
     hash = purrr::partial(
-      .f = active_binding, # nolint start: indentation_linter
+      .f = active_binding,                                                                                              # nolint start: indentation_linter
       name = "hash",
       expr = {
         # Capture module environment (parent of this environment)
@@ -137,7 +137,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
         # Reduce to single hash and return
         return(digest::digest(hash_list[order(names(hash_list))]))
-      }) # nolint end
+      })                                                                                                                # nolint end
   ),
 
   private = list(
