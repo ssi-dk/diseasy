@@ -23,7 +23,7 @@ jobs:
           use-public-rspm: true
 
       - name: Install dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
+        uses: r-lib/actions/setup-r-dependencies@v2, github::ssi-dk/diseasystore
         with:
           extra-packages: any::roxygen2, github::ssi-dk/diseasystore
           needs: roxygen2
