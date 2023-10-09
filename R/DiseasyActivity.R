@@ -1,8 +1,52 @@
 #' @title Activity handler
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasyActivity` module is responsible for handling the societal activity.
+#'   By providing a `contact_basis`, `activity_units` and a `scenario` to the module, the
+#'   module provides activity matrices throughout the scenario (with flexible age-groupings)
+#'   as well as the overall "activity" level in society.
+#'
+#'   The `contact_basis` contains information about:
+#'     - contact matrices (contact rates between age groups)
+#'     - population (size and proportion of population in age groups)
+#'
+#'   The `activity_units` projects restrictions into smaller "units" that are independently
+#'   "opened" or "closed". Opening (closing) a activity unit means the activity described in
+#'   the unit is (in)active.
+#'
+#'   The `scenario` contains information on when different `activity_units` are opened and closed
+#'
+#'   See vignette("diseasy-activity") for examples of use.
+#' @examples
+#'   # Activity module with Danish reference scenario
+#'   act <- DiseasyActivity$new(base_scenario = "dk_reference",
+#'                              activity_units = dk_activity_units,
+#'                              contact_basis = contact_basis %.% DK)
+#'
+#'   # Get contact matrices
+#'   contact_matrices <- act$get_scenario_activities()
+#'
+#'
+#'   # Configuring a custom scenario in another country (using Danish activity units)
+#'   scenario <- data.frame(date = as.Date(character(0)),
+#'                          opening = character(0),
+#'                          closing = character(0)) |>
+#'     dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",      closing = NA) |>
+#'     dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,              closing = "baseline") |>
+#'     dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020", closing = NA)
+#'
+#'   act$set_contact_basis(contact_basis %.% GB) # Use the "Great Britain" contact_basis
+#'   act$set_activity_units(dk_activity_units)
+#'   act$change_activity(scenario)
+#'
+#'   # Get societal "openness"
+#'   openness <- act$get_scenario_openness()
+#'
+#'   rm(act)
+#' @return
+#'   A new instance of the `DiseasyActivity` [R6][R6::R6Class] class.
 #' @export
-DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
+DiseasyActivity <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyActivity",
   inherit = DiseasyBaseModule,
 
@@ -12,10 +56,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' Creates a new instance of the `DiseasyActivity` [R6][R6::R6Class] class.
     #' @param base_scenario (`character(1)`)\cr
     #'   Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"
-    #' @param activity_units (`list`s of `list`s)\cr
-    #'   A nested list of all possible "units" of activity that can be opened or closed
-    #' @param contact_basis (`list()`)\cr
-    #'   TODO
+    #' @param activity_units `r rd_activity_units()`
+    #' @param contact_basis `r rd_contact_basis()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
     initialize = function(base_scenario = "closed", activity_units = NULL, contact_basis = NULL, ...) {
@@ -39,12 +81,24 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       lgr::without_logging(self$reset_scenario()) # Configure internal matrices to activity_unit dimensions
 
-      # TODO: add documentation here
+      # If the base_scenario is "dk_reference", we load a configured activity scenario into the module
       if (base_scenario == "dk_reference") {
+
+        # Use the Danish activity units
         self$set_activity_units(dk_activity_units)
+
+        # Use the Danish restrictions
         self$change_activity(dk_reference_scenario)
-        work_risk <- aggregate(social_distance_work ~ date, data = dk_reference_scenario, FUN = mean)
+
+        # TODO: Lasse, is this correct?
+        # TODO: wouldn't it be nice if this happened inside $change_activity?
+        # TODO: this way, the `dk_reference_scenario` could be loaded in a single function?
+        # The "social_distance_work" parameter varies across activity units. If several activity units are active
+        # on the same date, we compute the mean "social_distance_work" use this risk for all units on that date
+        # TODO: should this mean be weighted the "size" of the activity units?
+        work_risk <- stats::aggregate(social_distance_work ~ date, data = dk_reference_scenario, FUN = mean)
         self$change_risk(date = work_risk$date, type = "work", risk = work_risk$social_distance_work)
+
         private$lg$info("Initialised 'dk_reference' scenario")
       }
 
@@ -53,9 +107,20 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' @description
     #' Sets the list of all possible "units" of activity that can be opened or closed
     #' @details
-    #' Each element in the activity_units list should be a list with the following elements: #TODO
-    #' @param activity_units (`list(list())`)\cr
-    #'   A nested list of all possible "units" of activity that can be opened or closed
+    #' Each element in the activity_units list should be a list with the following elements:
+    #' * activity: a programmatic short hand for activity (character, snake_case),
+    #' * label: a human readable label for activity (character),
+    #' * home:   numeric/vector with number(s) in \[0, 1\]
+    #' * work:   numeric/vector with number(s) in \[0, 1\]
+    #' * school: numeric/vector with number(s) in \[0, 1\]
+    #' * other:  numeric/vector with number(s) in \[0, 1\]
+    #' * risk:   numeric/vector with number(s) in \[0, 1\]
+    #'
+    #' If a single number is provider, the number is applied across all age-groups
+    #' If a vector is provided, the vector must match the number of age groups in the contact_basis
+    #' @param activity_units `r rd_activity_units()`
+    #' @seealso [dk_activity_units]
+    #' @return `r rd_side_effects`
     set_activity_units = function(activity_units) {
 
       coll <- checkmate::makeAssertCollection()
@@ -88,17 +153,9 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' @description
     #' Sets the contact matrix basis the activity is computed from
     #' @details
-    #' #TODO
-    #' @param contact_basis (`list(list())`)\cr
-    #'   A nested list with all the needed information for the contact_basis\cr
-    #'   * `counts` contains the age stratified contact counts across the arenas of the basis
-    #'      (e.g. "work", "home", "school", "other")\cr
-    #'   * `prop` #TODO\cr
-    #'   * `pop_ref_1yr` contains a `data.frame` with the columns\cr
-    #'     * `age` (`integer()`) 1-year age group\cr
-    #'     * `pop` (`numeric()`) size of population in age group\cr
-    #'     * `prop` (`numeric()`) proportion of total population in age group\cr
-    #'   * `description` contains information about the source of the contact basis
+    #' Loads the given `contact_basis` into the module
+    #' @param contact_basis `r rd_contact_basis()`
+    #' @return `r rd_side_effects`
     set_contact_basis = function(contact_basis) {
 
       # Input checks
@@ -144,8 +201,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' @param closing (`character()`)\cr
     #'   Names of activities to close on given date.
     #'   Omitted if `data.frame` is given to date argument
-    #' @return
-    #' Nothing
+    #' @return `r rd_side_effects`
     change_activity = function(date, opening = NA, closing = NA) {
 
       # Sanitize inputs
@@ -166,7 +222,6 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         coll$push(glue::glue("These units are not in the list of activity units: {toString(missing_activity_units)}"))
       }
 
-      # End checks
       checkmate::reportAssertions(coll)
 
 
@@ -195,7 +250,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         if (length(to_open) > 0) {
           # First a check
           if (any(new_scenario_matrix[to_open, col_id] == private$upper_activity_level)) {
-            stop(paste("Some of", paste(to_open, collapse = ", "), "are already open"))
+            stop(paste("\nSome of", toString(to_open), "are already open!"))
           }
           new_state <- new_scenario_matrix[to_open, col_id] + 1
           new_scenario_matrix[to_open, col_id:ncol(new_scenario_matrix)] <- new_state
@@ -205,7 +260,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         if (length(to_close) > 0) {
           # First a check
           if (any(new_scenario_matrix[to_close, col_id] == (private$upper_activity_level - 1))) {
-            stop(paste("Some of", paste(to_close, collapse = ", "), "are already closed"))
+            stop(paste("\nSome of", toString(to_close), "are already closed!"))
           }
           new_state <- new_scenario_matrix[to_close, col_id] - 1
           new_scenario_matrix[to_close, col_id:ncol(new_scenario_matrix)] <- new_state
@@ -235,9 +290,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #'   Name of activity type to change. Must be in "work", "school", "home" and "other"
     #' @param risk
     #'   Relative risk for the given type from the given date
-    #' @return
-    #' Nothing
-    change_risk = function(date, type = NA, risk = NA) {
+    #' @return `r rd_side_effects`
+    change_risk = function(date, type = NULL, risk = NULL) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -258,7 +312,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         coll$push("scenario_matrix not set. Invoke change_activity() first.")
       }
       checkmate::assert_character(type, pattern = "(work)|(school)|(home)|(other)", any.missing = FALSE, add = coll)
-      checkmate::assert_numeric(risk, lower = 0, add = coll)
+      checkmate::assert_numeric(risk, lower = 0, add = coll) # TODO: upper is 1, right?
 
       # Check if units are available in the loaded activity units
       wrong_types <- setdiff(unique(na.omit(type)), private$activity_types)
@@ -266,7 +320,6 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         coll$push(glue::glue("These types are not activity types: {toString(wrong_types)}"))
       }
 
-      # End checks
       checkmate::reportAssertions(coll)
 
       # Structure inputs
@@ -302,14 +355,14 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
     },
 
+
     #' @description
     #' Helper function to crop the scenario matrix in time
     #' @param first_date (`Date`)\cr
     #'   New first date in scenario. The column for the lasted prior date will be new first column
     #' @param last_date (`Date`)\cr
     #'   All columns after this date are deleted
-    #' @return
-    #' Nothing
+    #' @return `r rd_side_effects`
     crop_scenario = function(first_date = NULL, last_date = NULL) {
 
       # Input checks
@@ -335,12 +388,14 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       }
     },
 
+
     #' @description
-    #'   Return `list` with opened/closed activities on dates where there are changes.
-    #' @return `list` with opened/closed activities on dates where there are changes.
+    #'   Return `list` containing the opened and closed activity units on dates where there are changes.
+    #' @return `list` with opened/closed activities.
     get_scenario_activities = function() {
       return(apply(private$.scenario_matrix, 2, \(x) private$activity_units_labels[x != 0]))
     },
+
 
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
@@ -351,7 +406,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       openness <- lapply(list_active, private$add_activities)
 
       # Apply .risk_matrix
-      for (dd in seq_along(openness)) { #looping over dates
+      # TODO: is this not already applied through "add_activities"?
+      for (dd in seq_along(openness)) { # looping over dates
         for (tt in private$activity_types) {
           openness[[dd]][[tt]] <- openness[[dd]][[tt]] * private$.risk_matrix[tt, dd]
         }
@@ -362,6 +418,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       }
       return(openness)
     },
+
 
     #' @description
     #'   Return contacts  for all age groups and activities on all dates.
@@ -382,11 +439,10 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       checkmate::assert_class(self$contact_basis, "list", add = coll)
       checkmate::reportAssertions(coll)
 
-      openness <- self$get_scenario_openness()
+      contacts <- openness <- self$get_scenario_openness()
 
-      contacts <- openness
       # Apply .risk_matrix
-      for (dd in seq_along(openness)) { #looping over dates
+      for (dd in seq_along(openness)) { # looping over dates
         for (tt in private$activity_types) {
           # TODO: genWeight
           contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
@@ -394,7 +450,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       }
 
       if (!is.null(age_cuts_lower)) {
-        # Using UK population if new population is not given
+        # Using default population if new population is not given
         if (is.null(population_1yr)) {
           prop <- self$contact_basis$pop_ref_1yr$prop
         } else {
@@ -449,15 +505,20 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     },
 
     #' @description
-    #' Rescale from contacts to rates per individual to fractional population.
-    #'
-    #' @param input Matrix or (nested) list(s) to be rescaled.
-    #' @param pop Population vector. Is normalized within.
+    #'   Re-scale from contacts to rates per individual to fractional population.
+    #' @param input (`matrix array` or `list`(`matrix array`))\cr
+    #'   Counts to be re-scaled.
+    #' @param pop (`numeric`)\cr
+    #'   Population vector to weight contacts by.
+    #'   Must use same age_groups as the contact matrix input.
     #' @return
-    #' Returns an object with the same structure as the input
-    rescale_counts2rates = function(input, pop) {
-      if ("list" %in% class(input)) {
-        return(purrr::map(input, .f = \(xx) self$rescale_counts2rates(input = xx, pop = pop)))
+    #'   Returns an object with the same structure as the input
+    rescale_counts_to_rates = function(input, pop) {
+
+      # If input is a list, Iteratively apply function to list elements
+      if (checkmate::test_class(input, "list")) {
+        checkmate::assert_class(input[[1]], "matrix")
+        return(purrr::map(input, .f = \(xx) self$rescale_counts_to_rates(input = xx, pop = pop)))
       }
 
       # Input checks
@@ -472,7 +533,9 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     },
 
     #' @description
-    #' TODO
+    #' Resets the scenario in the module.
+    #' NOTE: Called automatically when setting/changing activity units.
+    #' @return `r rd_side_effects`
     reset_scenario = function() {
       private$.scenario_matrix <- matrix(0, nrow = length(private$activity_units_labels), ncol = 0,
                                          dimnames = list(private$activity_units_labels, NULL))
@@ -494,18 +557,24 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' @field scenario_matrix (`matrix`)\cr
     #'   A reduced view of the internal state of restrictions (showing only used activity units). Read-only.
     scenario_matrix = function(value) {
+
       if (missing(value)) {
+
         if (any(private %.% .scenario_matrix != 0)) {
+
           # We filter out rows without any 1's (these activity units are not active)
           out <- private$.scenario_matrix[rowSums(private$.scenario_matrix != 0) > 0, ]
+
           # We then order the activity_units by first occurrence, tie-broken by the name of the activity_unit
           index <- apply(out, 1, \(x) which(x != 0)[1])
           out <- out[order(index, rownames(out)), ]
           attr(out, "secret_hash") <- attr(private$.scenario_matrix, "secret_hash") # Copy the "secret hash"
           return(out)
+
         } else {
           return(NULL)
         }
+
       } else {
         private$read_only_error("scenario_matrix")
       }
@@ -514,45 +583,75 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' @field risk_matrix (`matrix`)\cr
     #'   A reduced view of the internal state of overall risk multipliers. Read-only.
     risk_matrix = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "risk_matrix",
       expr = return(private %.% .risk_matrix)),
 
 
-    #' @field contact_basis (`matrix`)\cr
-    #'   The basis of contacts between age groups used to compute activity. Read-only.
+    #' @field contact_basis `r rd_contact_basis("field")`
     contact_basis = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "contact_basis",
       expr = return(private %.% .contact_basis))
   ),
 
   private = list(
-    direction = NA, # 'opening' or 'closing'
-    upper_activity_level = NA, # 1 for 'opening' and 0 for 'closing'
 
-    # @field scenario
-    # list along 'scenario_dates' of lists.
-    # Each element is a list of open and a list of closed activity units from the corresponding date
-    scenario = list(),
+    # @field direction (`character(1)`)\cr
+    # The "direction" of the changes to activity
+    # The direction can be either "opening" or "closing"
+    # If "opening", the activity units are added to a fully closed starting point
+    # If "closing", the activity units are subtracted from a fully open starting point
+    # TODO: Lasse, can you confirm?
+    direction = NULL,
 
-    activity_units = list(),
+    # @field upper_activity_level (`numeric(1)`)\cr
+    # The upper level of activity. Used as a safe guard to ensure the combination of
+    # activity units does not exceed (drop below) the maximum (minimum) activity associated
+    # with the fully open (closed) starting point.
+    # Takes a value 1 when direction is "opening" and 0 when direction is "closing"
+    # TODO: Lasse, can you confirm?
+    upper_activity_level = NULL,
+
+    # @field activity_units (`list`)\cr
+    # The list of available `activity_units` in the module.
+    # See ?dk_activity_modules for details
+    activity_units = NULL,
+
+    # @field activity_units_labels (`character`)\cr
+    # The names (labels) of available `activity_units` in the module.
+    # See ?dk_activity_modules for details
     activity_units_labels = NULL,
 
+    # @field .scenario_matrix
+    # Internal representation of the changes to activity (opening and closing) of activity units
     .scenario_matrix = NULL,
 
-    .risk_matrix = NULL, # a row for each activity type
+    # @field .risk_matrix
+    # Internal representation of the changes to risk associated with the activity units
+    .risk_matrix = NULL,
 
-    n_age_groups = NA,
+    # @field n_age_groups
+    # The (highest) number of age_groups defined in the `activity_units`
+    n_age_groups = NULL,
 
-    # Parameters for contact_basis
-    .contact_basis = list(counts = NULL, # list of matrices of number of contacts per individual per day ('m')
-                          prop = NULL, # Vector of population per age group in 'counts'
-                          pop = NULL,
-                          description = NULL),
+    # @field .contact_basis (`data.frame`)\cr
+    # The contact_basis used to project the activity units in
+    # Must have columns "counts", "prop", "pop_ref_1yr", "description"
+    .contact_basis = NULL,
 
+    # @field activity_types (`character`)\cr
+    # The names of the four types/arenas of activity in the contact matrices
     activity_types = c("home", "work", "school", "other"),
 
+    # Risk-weighted activity
+    # @description
+    #   This function computes the risk-weighted activity of the given activities across
+    #   the `activity_types`
+    # @param activities (`character`)\cr
+    #   A vector of activities to add together
+    # @return
+    #   A list of depth two: value[[type]][[age_group_activity]]
     add_activities = function(x) {
       tmp_units <- private$activity_units[x] # List of units to add
       obj <- list()
@@ -561,10 +660,13 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         for (i in seq_along(tmp_units)) {
           obj[[type]] <- obj[[type]] + tmp_units[[i]][[type]] * tmp_units[[i]][["risk"]]
         }
+        names(obj[[type]]) <- private$activity_types
       }
       return(obj)
-    }, # EndOf: function
+    },
 
+
+    # TODO: what does this function do?
     update_with_dates = function(input_matrix, input_dates, first_col_value) {
       # Create or extend scenario_matrix' et al. if needed
       out <- input_matrix
@@ -593,12 +695,15 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         }
       }
       return(out)
-    }, # EndOf: function
+    },
+
 
     # Generate symmetric weight matrix based on diagonal.
-    # Ensures that you can add so that when the diagonal is one then the rest is as well
+    # @description
+    #   Ensures that you can add so that when the diagonal is one then the rest is as well
     #   it is done by adding contacts to and from a given age group to those that are younger
-    # (In Danish this could be labelled as "sildebensparket")
+    #   (In Danish this could be labelled as "sildebensparket")
+    # @param dw vector to transform
     vector_to_matrix = function(dw) {
       n <- length(dw)
       if (n == 1) return(dw)
