@@ -92,11 +92,11 @@ test_that("use_cosine_season works", {
 
   # Malformed inputs
   expect_error(s$use_cosine_season(scale = NA), "May not be NA")
-  expect_error(s$use_cosine_season(scale = -1), "not >= 0") # nolint: infix_spaces_linter
+  expect_error(s$use_cosine_season(scale = -1), "not >= 0")                                                             # nolint: infix_spaces_linter
   expect_error(s$use_cosine_season(scale = 2), "not <= 1")
 
   expect_error(s$use_cosine_season(peak = NA), "May not be NA")
-  expect_error(s$use_cosine_season(peak = -1), "not >= 0") # nolint: infix_spaces_linter
+  expect_error(s$use_cosine_season(peak = -1), "not >= 0")                                                              # nolint: infix_spaces_linter
   expect_error(s$use_cosine_season(peak = 500), "not <= 365")
 
   rm(s)
@@ -137,7 +137,7 @@ test_that("use_covid_season_v1 works", {
 })
 
 
-test_that("use_covid_season_v2 works", { for (case_def in case_defs) {  # nolint: brace_linter
+test_that("use_covid_season_v2 works", { for (case_def in case_defs) {                                                  # nolint: brace_linter
 
   # We create an DiseasyObservables module for the season module
   observables <- DiseasyObservables$new(case_definition = case_def,

@@ -2,7 +2,7 @@
 #'
 #' @description TODO
 #' @export
-DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
+DiseasyObservables <- R6::R6Class(                                                                                      # nolint: object_name_linter
   classname = "DiseasyObservables",
   inherit = DiseasyBaseModule,
 
@@ -217,10 +217,10 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
 
     #' @description
-    #'   Handles the cleanup of the class
+    #'   Handles the clean-up of the class
     finalize = function() {
 
-      # Close the connection, then do rest of cleanup
+      # Close the connection, then do rest of clean-up
       if (DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
       super$finalize()
     }
@@ -232,7 +232,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field case_definition (`character`)\cr
     #'   The set case_definition to get DiseasyObservables for. Read-only.
     case_definition = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "case_definition",
       expr = return(private %.% .case_definition)),
 
@@ -240,14 +240,14 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field start_date (`Date`)\cr
     #'   The start date of the study period. Read-only.
     start_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "start_date",
       expr = return(private %.% .start_date)),
 
     #' @field end_date (`Date`)\cr
     #'   The end date of the study period. Read-only.
     end_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "end_date",
       expr = return(private %.% .end_date)),
 
@@ -255,7 +255,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field last_queryable_date (`Date`)\cr
     #'   The latest date that can be queried. Read-only.
     last_queryable_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "last_queryable_date",
       expr = return(private %.% .last_queryable_date)),
 
@@ -263,7 +263,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field ds (`Diseasystore*`)\cr
     #'   The currently loaded diseasystore which provides the features. Read-only.
     ds = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "ds",
       expr = return(private %.% .ds)),
 
@@ -271,7 +271,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field available_observables (`character`)\cr
     #'   The currently available observables in the loaded diseasystore. Read-only.
     available_observables = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "available_observables",
       expr = {
         if (is.null(private %.% .ds)) return(NULL)
@@ -282,7 +282,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field slice_ts (`Date`)\cr
     #' The timestamp to slice database on. Read-only.
     slice_ts = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "slice_ts",
       expr = return(private %.% .slice_ts)),
 
@@ -290,7 +290,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field conn (`DBIConnection`)\cr
     #' The connection to the database on. Read-only.
     conn = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "conn",
       expr = return(private %.% .conn))
   ),
