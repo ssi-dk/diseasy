@@ -239,6 +239,21 @@ test_that("cloning works", {
 })
 
 
+test_that("get_training_data works", { for (case_def in case_defs) {                                                    # nolint: brace_linter
+
+  # Creating an empty module
+  obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
+                                last_queryable_date = as.Date("2021-01-01"))
+  m <- DiseasyModel$new(observables = obs)
+
+  # Test the get_results
+  observable <- purrr::pluck(obs$available_observables, 1)
+  expect_no_error(training_data <- m$get_training_data(observable))
+  expect_named(training_data, expected = c("date", observable, "t"))
+
+}})
+
+
 test_that("get_results gives error", {
 
   # Creating an empty module
@@ -311,13 +326,13 @@ test_that("active binding: parameters works", {
   m <- DiseasyModel$new()
 
   # Retrieve the parameters
-  expect_equal(m$parameters, NULL)
+  expect_equal(m$parameters, list("training_length" = 0))
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),
                    simpleError("`$parameters` is read only"))
-  expect_equal(m$parameters, NULL)
+  expect_equal(m$parameters, list("training_length" = 0))
 
   rm(m)
 })

@@ -158,7 +158,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasyActivity    = NULL,
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
-    .parameters  = NULL,
+    .parameters         = list("training_length" = 0),
 
     # @param label (`character`)\cr
     #   A human readable label for the model instance

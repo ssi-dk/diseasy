@@ -17,9 +17,9 @@ if (file.exists(sqlite_path)) {
   stopifnot("Could not delete SQLite DB before tests" = file.remove(sqlite_path))
 }
 test_conn <- \() DBI::dbConnect(RSQLite::SQLite(), sqlite_path)
-options(diseasy.conn = test_conn)
+options("diseasy.conn" = test_conn)
 
-# Then we download the first n rows of the google data set of interest
+# Then we download the first n rows of the Google data set of interest
 remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 purrr::walk(google_files, ~ {
