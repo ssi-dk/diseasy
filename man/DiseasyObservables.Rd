@@ -16,6 +16,7 @@ TODO
 
   # See available observables
   print(obs$available_observables)
+  print(obs$available_aggregations)
 
   # Get data for one observable
   obs$get_observation("n_hospital",
@@ -52,6 +53,9 @@ The currently loaded diseasystore which provides the features. Read-only.}
 
 \item{\code{available_observables}}{(\code{character})\cr
 The currently available observables in the loaded diseasystore. Read-only.}
+
+\item{\code{available_aggregations}}{(\code{character})\cr
+The currently available aggregations in the loaded diseasystore. Read-only.}
 
 \item{\code{slice_ts}}{(\code{Date})\cr
 The timestamp to slice database on. Read-only.}
