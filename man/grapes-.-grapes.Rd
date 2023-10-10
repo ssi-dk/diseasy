@@ -19,3 +19,14 @@ Error if the \code{field} does not exist in \code{env}, otherwise it returns \co
 \description{
 Existence aware pick operator
 }
+\examples{
+ t <- list(a = 1, b = 2)
+
+ t$a       # 1
+ t \%.\% a   # 1
+
+ t$c # NULL
+ \dontrun{
+ t \%.\% c # ERROR a not found in t
+ }
+}
