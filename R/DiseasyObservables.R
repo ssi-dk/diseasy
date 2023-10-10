@@ -67,7 +67,7 @@ DiseasyObservables <- R6::R6Class(                                              
       ds_case_definition <- diseasystore:::diseasystore_case_definition(case_definition)
       private$.ds <- get(ds_case_definition)$new(slice_ts = self %.% slice_ts,
                                                  verbose = !testthat::is_testing(),
-                                                 target_conn = parse_conn(self %.% conn))
+                                                 target_conn = self %.% conn)
 
       private$.case_definition <- private$.ds %.% case_definition # Use the human readable from the diseasystore
 
