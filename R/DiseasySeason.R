@@ -1,6 +1,21 @@
 #' @title Season handler
 #'
 #' @description TODO
+#' @examples
+#'   # Season module with an constant season
+#'   s1 <- DiseasySeason$new()
+#'
+#'   x <- 0:365
+#'   plot(x, purrr::map_dbl(x, s1$model_t))
+#'
+#'   # Season module with an consine season
+#'   s2 <- DiseasySeason$new(reference_date = Sys.Date())
+#'   s2$use_cosine_season()
+#'   plot(x, purrr::map_dbl(x, s2$model_t))
+#'
+#'   rm(s1, s2)
+#' @return
+#'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
 #' @export
 DiseasySeason <- R6::R6Class( # nolint: object_name_linter
   classname = "DiseasySeason",
@@ -16,8 +31,6 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
     #'   A instance of `DiseasyObservables` are needed for some season models.
     #' @param ...
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    #' @return
-    #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
     initialize = function(reference_date = NULL,
                           observables = NULL,
                           ...) {
