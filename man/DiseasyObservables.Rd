@@ -198,7 +198,7 @@ The results are cached for faster retrieval at subsequent calls.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$get_observation(
   observable,
-  aggregation = NULL,
+  stratification = NULL,
   start_date = self \%.\% start_date,
   end_date = self \%.\% end_date
 )}\if{html}{\out{</div>}}
@@ -210,9 +210,9 @@ The results are cached for faster retrieval at subsequent calls.
 \item{\code{observable}}{(\code{character})\cr
 The requested observable. Should follow the pattern 'n_*'.}
 
-\item{\code{aggregation}}{(\code{list}(\code{quosures}))\cr
-Default \code{NULL}. If given, expressions in aggregation evaluated to give the aggregation level.\cr
-Use rlang::quos(...) to specify aggregation.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr
+Default \code{NULL}. If given, expressions in stratification evaluated to give the stratification level.\cr
+Use rlang::quos(...) to specify stratification.}
 
 \item{\code{start_date}}{(\code{Date})\cr
 Start date to get DiseasyObservables for (including).}
@@ -223,7 +223,7 @@ End date to get DiseasyObservables for (including).}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-If the observable is found, the function returns the corresponding data at the aggregation level.\cr
+If the observable is found, the function returns the corresponding data at the stratification level.\cr
 Otherwise, the function fails and lists the available DiseasyObservables for the case_definition.
 }
 }

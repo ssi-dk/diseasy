@@ -128,18 +128,18 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   The results are cached for faster retrieval at subsequent calls.
     #' @param observable (`character`)\cr
     #'   The requested observable. Should follow the pattern 'n_*'.
-    #' @param aggregation (`list`(`quosures`))\cr
-    #'   Default `NULL`. If given, expressions in aggregation evaluated to give the aggregation level.\cr
-    #'   Use rlang::quos(...) to specify aggregation.
+    #' @param stratification (`list`(`quosures`))\cr
+    #'   Default `NULL`. If given, expressions in stratification evaluated to give the stratification level.\cr
+    #'   Use rlang::quos(...) to specify stratification.
     #' @param start_date (`Date`)\cr
     #'   Start date to get DiseasyObservables for (including).
     #' @param end_date (`Date`)\cr
     #'   End date to get DiseasyObservables for (including).
     #' @return
-    #'   If the observable is found, the function returns the corresponding data at the aggregation level.\cr
+    #'   If the observable is found, the function returns the corresponding data at the stratification level.\cr
     #'   Otherwise, the function fails and lists the available DiseasyObservables for the case_definition.
     #' @seealso [SCDB::get_table]
-    get_observation = function(observable, aggregation = NULL,
+    get_observation = function(observable, stratification = NULL,
                                start_date = self %.% start_date,
                                end_date   = self %.% end_date) {
 
@@ -163,9 +163,9 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
-        # Join observable features with the aggregation features
+        # Join observable features with the stratification features
         data <- self$ds$key_join_features(observable = observable,
-                                          aggregation = aggregation,
+                                          stratification = stratification,
                                           start_date = start_date,
                                           end_date = end_date)
 
@@ -175,7 +175,8 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
       # Write to the log
       private$lg$info("Gettting {observable} from {start_date} to {end_date}",
-                      ifelse(is.null(aggregation), "", " at aggregation: {private$aggregation_to_string(aggregation)}"),
+                      ifelse(is.null(stratification), "",
+                             " at stratification: {private$stratification_to_string(stratification)}"),
                       " (hash: {hash})")
 
       # Return

@@ -214,14 +214,14 @@ test_that("get_observation works", { for (case_def in case_defs) { # nolint: bra
   # Test content of data frame
   expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
   expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
-  expect_identical(colnames(obs$get_observation("n_population", aggregation = dplyr::vars(region_id))),
+  expect_identical(colnames(obs$get_observation("n_population", stratification = dplyr::vars(region_id))),
                    c("date", "region_id", "n_population"))
-  expect_identical(colnames(obs$get_observation("n_population", aggregation = dplyr::vars(reg = region_id))),
+  expect_identical(colnames(obs$get_observation("n_population", stratification = dplyr::vars(reg = region_id))),
                    c("date", "reg", "n_population"))
 
 
   # Test bounding of dates
-  tmp <- obs$get_observation("n_population", aggregation = dplyr::vars(region_id)) |>
+  tmp <- obs$get_observation("n_population", stratification = dplyr::vars(region_id)) |>
     dplyr::summarize(min_date = min(date, na.rm = TRUE),
                      max_date = max(date, na.rm = TRUE))
 
