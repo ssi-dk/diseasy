@@ -41,6 +41,9 @@ The model currently being used in the module (days past reference date). Read-on
 \item{\code{model_date}}{(\code{function})\cr
 The model currently being used in the module (date of interest). Read-only.}
 
+\item{\code{available_season_models}}{(\code{character})\cr
+The list of available season models}
+
 \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
 The local copy of an DiseasyObservables module. Read-only.}
 }
@@ -52,10 +55,15 @@ The local copy of an DiseasyObservables module. Read-only.}
 \item \href{#method-DiseasySeason-new}{\code{DiseasySeason$new()}}
 \item \href{#method-DiseasySeason-set_reference_date}{\code{DiseasySeason$set_reference_date()}}
 \item \href{#method-DiseasySeason-set_scale}{\code{DiseasySeason$set_scale()}}
+\item \href{#method-DiseasySeason-get_season_model}{\code{DiseasySeason$get_season_model()}}
 \item \href{#method-DiseasySeason-use_season_model}{\code{DiseasySeason$use_season_model()}}
+\item \href{#method-DiseasySeason-get_constant_season}{\code{DiseasySeason$get_constant_season()}}
 \item \href{#method-DiseasySeason-use_constant_season}{\code{DiseasySeason$use_constant_season()}}
+\item \href{#method-DiseasySeason-get_cosine_season}{\code{DiseasySeason$get_cosine_season()}}
 \item \href{#method-DiseasySeason-use_cosine_season}{\code{DiseasySeason$use_cosine_season()}}
+\item \href{#method-DiseasySeason-get_covid_season_v1}{\code{DiseasySeason$get_covid_season_v1()}}
 \item \href{#method-DiseasySeason-use_covid_season_v1}{\code{DiseasySeason$use_covid_season_v1()}}
+\item \href{#method-DiseasySeason-get_covid_season_v2}{\code{DiseasySeason$get_covid_season_v2()}}
 \item \href{#method-DiseasySeason-use_covid_season_v2}{\code{DiseasySeason$use_covid_season_v2()}}
 \item \href{#method-DiseasySeason-describe}{\code{DiseasySeason$describe()}}
 \item \href{#method-DiseasySeason-clone}{\code{DiseasySeason$clone()}}
@@ -130,6 +138,26 @@ The scale of the season effect (relative to climate normal).}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasySeason-get_season_model"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-get_season_model}{}}}
+\subsection{Method \code{get_season_model()}}{
+Retrieves the specified season model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$get_season_model(model_name, dots = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{model_name}}{Name of the season_model to use (calls the equivalent $get_<model_name>()).}
+
+\item{\code{dots}}{(\code{list})\cr
+Named list of arguments that will be passed at dot-ellipsis to the season model.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasySeason-use_season_model"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasySeason-use_season_model}{}}}
 \subsection{Method \code{use_season_model()}}{
@@ -150,6 +178,16 @@ Named list of arguments that will be passed at dot-ellipsis to the season model.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasySeason-get_constant_season"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-get_constant_season}{}}}
+\subsection{Method \code{get_constant_season()}}{
+Retrieves the season model with a constant value (1).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$get_constant_season()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasySeason-use_constant_season"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasySeason-use_constant_season}{}}}
 \subsection{Method \code{use_constant_season()}}{
@@ -158,6 +196,27 @@ Sets the season module to use a constant value (1).
 \if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$use_constant_season()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasySeason-get_cosine_season"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-get_cosine_season}{}}}
+\subsection{Method \code{get_cosine_season()}}{
+Retrieves the season model with a cosine relationship.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$get_cosine_season(peak = 20.09946, scale = 0.5726693)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{peak}}{(\code{numeric})\cr
+Sets the period of maximal activity (days past new-year).
+By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.}
+
+\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasySeason-use_cosine_season"></a>}}
@@ -181,6 +240,23 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasySeason-get_covid_season_v1"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-get_covid_season_v1}{}}}
+\subsection{Method \code{get_covid_season_v1()}}{
+Retrieves the first version of the COVID-19 season model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$get_covid_season_v1(scale = 0.4825524)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasySeason-use_covid_season_v1"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasySeason-use_covid_season_v1}{}}}
 \subsection{Method \code{use_covid_season_v1()}}{
@@ -198,10 +274,27 @@ Sets the \code{DiseasySeason} module to use the first version of the covid 19 se
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasySeason-get_covid_season_v2"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-get_covid_season_v2}{}}}
+\subsection{Method \code{get_covid_season_v2()}}{
+Retrieves the second version of the COVID-19 season model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$get_covid_season_v2(scale = 0.5042782)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasySeason-use_covid_season_v2"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasySeason-use_covid_season_v2}{}}}
 \subsection{Method \code{use_covid_season_v2()}}{
-Sets the \code{DiseasySeason} module to use the second version of the covid 19 season model
+Sets the \code{DiseasySeason} module to use the second version of the COVID-19 season model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$use_covid_season_v2(scale = 0.5042782)}\if{html}{\out{</div>}}
 }
