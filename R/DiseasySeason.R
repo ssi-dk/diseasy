@@ -1,6 +1,14 @@
-#' @title Season handler
+#' @title Diseasy' season handler
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasySeason` module is responsible for implementing various models for the season dependency of the diseases.
+#'   The module implements a number season models with different functional forms.
+#'   Models for season are either extracted from the module through `get_*` functions or the module is configured to
+#'   use these models internally through `use_*` functions whereafter the model can be accessed through `$model_t()` and
+#'   `$model_date()`.
+#'   Each season model has varying number of parameters. See documentation for each for details.
+#'
+#'   See the vignette("DiseasySeason") for examples of use.
 #' @examples
 #'   # Season module with an constant season
 #'   s1 <- DiseasySeason$new()

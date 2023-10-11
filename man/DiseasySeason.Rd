@@ -2,12 +2,17 @@
 % Please edit documentation in R/DiseasySeason.R
 \name{DiseasySeason}
 \alias{DiseasySeason}
-\title{Season handler}
+\title{Diseasy' season handler}
 \value{
 A new instance of the \code{DiseasySeason} \link[R6:R6Class]{R6} class.
 }
 \description{
-TODO
+The \code{DiseasySeason} module is responsible for implementing various models for the season dependency of the diseases.
+The module implements a number season models with different functional forms.
+Models for season are either extracted from the module through \verb{get_*} functions or the module is configured to
+use these models internally through \verb{use_*} functions whereafter the model can be accessed through \verb{$model_t()} and
+\verb{$model_date()}.
+Each season model has varying number of parameters. See documentation for each for details.
 }
 \examples{
   # Season module with an constant season
