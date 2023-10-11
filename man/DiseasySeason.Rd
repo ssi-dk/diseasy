@@ -7,11 +7,12 @@
 A new instance of the \code{DiseasySeason} \link[R6:R6Class]{R6} class.
 }
 \description{
-The \code{DiseasySeason} module is responsible for implementing various models for the season dependency of the diseases.
+The \code{DiseasySeason} module is responsible for implementing various models for the seasonal dependency of the
+diseases.
 The module implements a number season models with different functional forms.
 Models for season are either extracted from the module through \verb{get_*} functions or the module is configured to
-use these models internally through \verb{use_*} functions whereafter the model can be accessed through \verb{$model_t()} and
-\verb{$model_date()}.
+use these models internally through \verb{use_*} functions whereafter the model can be accessed through \verb{$model_t()}
+and \verb{$model_date()}.
 Each season model has varying number of parameters. See documentation for each for details.
 
 See the vignette("diseasy-season") for examples of use.
@@ -220,7 +221,7 @@ Retrieves the season model with a cosine relationship.
 Sets the period of maximal activity (days past new-year).
 By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.}
 
-\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+\item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
 }
 \if{html}{\out{</div>}}
 }
@@ -258,7 +259,7 @@ Retrieves the first version of the COVID-19 season model.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+\item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
 }
 \if{html}{\out{</div>}}
 }
@@ -292,7 +293,7 @@ Retrieves the second version of the COVID-19 season model.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scale}}{scale (\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period}
+\item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
 }
 \if{html}{\out{</div>}}
 }

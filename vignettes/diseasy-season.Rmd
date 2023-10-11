@@ -44,7 +44,7 @@ plot(t, purrr::map_dbl(t, s$model_t),
      type = "l", lwd = 2,
      xlab = "Days past reference date",
      ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = 'i', yaxs = 'i')
+     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
 ```
 
 ```{r plot_constant_season_date}
@@ -53,7 +53,7 @@ plot(d, purrr::map_dbl(d, s$model_date),
      type = "l", lwd = 2,
      xlab = "",
      ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = 'i', yaxs = 'i')
+     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
 ```
 
 To use the other models for season, the module provides functions of the form `$use_*_season()`.
@@ -69,7 +69,7 @@ plot(d, purrr::map_dbl(d, s$model_date),
      type = "l", lwd = 2,
      xlab = "",
      ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = 'i', yaxs = 'i')
+     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
 ```
 
 Note that all models, other than `constant_season` has a `scale` parameter.
@@ -84,8 +84,7 @@ plot(d, purrr::map_dbl(d, s$model_date),
      type = "l", lwd = 2,
      xlab = "",
      ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = 'i', yaxs = 'i')
-
+     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
 ```
 
 The models may have additional parameters that control their shape. See the documentation of the module to learn more about the specific models.

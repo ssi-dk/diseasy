@@ -1,11 +1,12 @@
 #' @title Diseasy' season handler
 #'
 #' @description
-#'   The `DiseasySeason` module is responsible for implementing various models for the season dependency of the diseases.
+#'   The `DiseasySeason` module is responsible for implementing various models for the seasonal dependency of the
+#'   diseases.
 #'   The module implements a number season models with different functional forms.
 #'   Models for season are either extracted from the module through `get_*` functions or the module is configured to
-#'   use these models internally through `use_*` functions whereafter the model can be accessed through `$model_t()` and
-#'   `$model_date()`.
+#'   use these models internally through `use_*` functions whereafter the model can be accessed through `$model_t()`
+#'   and `$model_date()`.
 #'   Each season model has varying number of parameters. See documentation for each for details.
 #'
 #'   See the vignette("diseasy-season") for examples of use.
@@ -157,8 +158,9 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
       attr(model_date, "name")        <- "constant_season"
       attr(model_date, "description") <- paste(sep = "\n",
-                                                     "Constant (no) seasonality model.",
-                                                     "Risk of infection constant through year")
+        "Constant (no) seasonality model.",
+        "Risk of infection constant through year"
+      )
 
       attr(model_t, "name")         <- attr(model_date, "name")
       attr(model_t, "description")  <- attr(model_date, "description")
@@ -216,9 +218,10 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
       # Set the attributes
       attr(model_date, "name")        <- "cosine_season"
       attr(model_date, "description") <- paste(sep = "\n",
-                                                        "Simple seasonality model.",
-                                                        "Risk of infection highest at the `peak` days after new year")
-      attr(model_date, "dots")       <- list(scale = scale)
+        "Simple seasonality model.",
+        "Risk of infection highest at the `peak` days after new year"
+      )
+      attr(model_date, "dots")        <- list(scale = scale)
 
       attr(model_t, "name")         <- attr(model_date, "name")
       attr(model_t, "description")  <- attr(model_date, "description")
@@ -442,18 +445,17 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
     },
 
 
-
     #' @description `r rd_describe`
     describe = function() {
       printr("# Season model ###############################################")
-      if (is.null(private$.model_date)) {
+      if (is.null(self$model_t)) {
         printr("Season model not yet set")
       } else {
-        printr(glue::glue("Season model: {attr(private$.model_date, 'name')}"))
-        printr(glue::glue("{attr(private$.model_date, 'description')}"))
-        if (!is.null(attr(private$.model_date, "dots"))) {
+        printr(glue::glue("Season model: {attr(self$model_t, 'name')}"))
+        printr(glue::glue("{attr(self$model_t, 'description')}"))
+        if (!is.null(attr(self$model_t, "dots"))) {
           printr("Parameters: ",
-                 stringr::str_extract(toString(list(attr(private$.model_date, "dots"))), r"{(?<=list\().*(?=\))}"))
+                 stringr::str_extract(toString(list(attr(self$model_t, "dots"))), r"{(?<=list\().*(?=\))}"))
         }
 
       }
