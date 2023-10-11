@@ -8,7 +8,7 @@
 #'   `$model_date()`.
 #'   Each season model has varying number of parameters. See documentation for each for details.
 #'
-#'   See the vignette("DiseasySeason") for examples of use.
+#'   See the vignette("diseasy-season") for examples of use.
 #' @examples
 #'   # Season module with an constant season
 #'   s1 <- DiseasySeason$new()
