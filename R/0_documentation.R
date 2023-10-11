@@ -7,9 +7,9 @@ rd_aggregation <- function(type = "param") {
 }
 
 
-rd_case_definition <- function(type = "param") {
+rd_diseasystore <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("case_definition (`character`)\\cr",
+  paste("diseasystore (`character`)\\cr",
         "A character string that controls which feature store to get data from.",
         ifelse(type == "field", " Read only.", ""))
 }

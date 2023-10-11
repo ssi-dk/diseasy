@@ -10,7 +10,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
     #' @description
     #'   Creates a new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
-    #' @param case_definition (`character`)\cr
+    #' @param diseasystore (`character`)\cr
     #'   A character string that controls which feature store to get data from.
     #' @param start_date (`Date`)\cr
     #'   Study period start (default values for get_observation).
@@ -26,7 +26,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
     #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
-    initialize = function(case_definition = NULL,
+    initialize = function(diseasystore = NULL,
                           start_date = NULL,
                           end_date = NULL,
                           last_queryable_date = NULL,
@@ -47,7 +47,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
       # Initialize based on input
       if (!is.null(slice_ts))                         self$set_slice_ts(slice_ts)
-      if (!is.null(case_definition))                  self$set_case_definition(case_definition)
+      if (!is.null(diseasystore))                     self$set_diseasystore(diseasystore)
       if (!is.null(last_queryable_date))              self$set_last_queryable_date(last_queryable_date)
       if (!is.null(start_date) || !is.null(end_date)) self$set_study_period(start_date, end_date)
 
@@ -56,26 +56,26 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
     #' @description
     #'   Set the case definition to get DiseasyObservables for.
-    #' @param case_definition (`character`)\cr
+    #' @param diseasystore (`character`)\cr
     #'   Text label of the disease to get DiseasyObservables for.\cr
     #'   Must match case definition implemented in `featurestore` package.
-    set_case_definition = function(case_definition) {
+    set_diseasystore = function(diseasystore) {
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_character(case_definition, add = coll)
-      if (!diseasystore::diseasystore_exists(case_definition)) {
-        coll$push(glue::glue("{diseasystore::diseasystore_case_definition(case_definition)} not found!"))
+      checkmate::assert_character(diseasystore, add = coll)
+      if (!diseasystore::diseasystore_exists(diseasystore)) {
+        coll$push(glue::glue("{diseasystore::to_diseasystore_case(diseasystore)} not found!"))
       }
       checkmate::reportAssertions(coll)
 
       # Load and configure the feature store
-      ds_case_definition <- diseasystore:::diseasystore_case_definition(case_definition)
-      private$.ds <- get(ds_case_definition)$new(slice_ts = self %.% slice_ts,
-                                                 verbose = !testthat::is_testing(),
-                                                 target_conn = self %.% conn)
+      ds <- diseasystore:::get_diseasystore(diseasystore)
+      private$.ds <- ds$new(slice_ts = self %.% slice_ts,
+                            verbose = !testthat::is_testing(),
+                            target_conn = self %.% conn)
 
-      private$.case_definition <- private$.ds %.% case_definition # Use the human readable from the diseasystore
+      private$.diseasystore <- private$.ds %.% label # Use the human readable from the diseasystore
 
-      private$lg$info("Case definition set to {self$case_definition} ({private$.ds$case_definition})")
+      private$lg$info("Case definition set to {self$diseasystore} ({private$.ds$diseasystore})")
     },
 
     #' @description
@@ -122,7 +122,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
 
     #' @description
-    #'   Retrieve an "observable" in the data set corresponding to the set case_definition.\cr
+    #'   Retrieve an "observable" in the data set corresponding to the set diseasystore.\cr
     #'   By default, the internal values for start_date and end_date are used to return data,
     #'   but these can be overwritten.\cr
     #'   The results are cached for faster retrieval at subsequent calls.
@@ -137,7 +137,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   End date to get DiseasyObservables for (including).
     #' @return
     #'   If the observable is found, the function returns the corresponding data at the aggregation level.\cr
-    #'   Otherwise, the function fails and lists the available DiseasyObservables for the case_definition.
+    #'   Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
     #' @seealso [SCDB::get_table]
     get_observation = function(observable, aggregation = NULL,
                                start_date = self %.% start_date,
@@ -146,7 +146,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       # Input checks
       coll <- checkmate::makeAssertCollection()
       if (is.null(self$ds)) {
-        coll$push("Diseasystore not initialized. call `$set_case_definition` before getting observations")
+        coll$push("Diseasystore not initialized. call `$set_diseasystore` before getting observations")
         checkmate::reportAssertions(coll)
       }
       if (is.null(start_date) || is.null(end_date)) {
@@ -190,9 +190,9 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
       printr(
         ifelse(
-          is.null(self$case_definition),
-          glue::glue("Case defination is not set"),
-          glue::glue("Data interface for disease: {self$case_definition}")
+          is.null(self$diseasystore),
+          glue::glue("diseasystore is not set"),
+          glue::glue("diseasystore set to: {self$diseasystore}")
         )
       )
 
@@ -229,12 +229,12 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
   # Make active bindings to the private variables
   active = list(
 
-    #' @field case_definition (`character`)\cr
-    #'   The set case_definition to get DiseasyObservables for. Read-only.
-    case_definition = purrr::partial(
+    #' @field diseasystore (`character`)\cr
+    #'   The set diseasystore to get DiseasyObservables for. Read-only.
+    diseasystore = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
-      name = "case_definition",
-      expr = return(private %.% .case_definition)),
+      name = "diseasystore",
+      expr = return(private %.% .diseasystore)),
 
 
     #' @field start_date (`Date`)\cr
@@ -296,7 +296,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
   ),
 
   private = list(
-    .case_definition     = NULL,
+    .diseasystore         = NULL,
     .start_date          = NULL,
     .end_date            = NULL,
     .last_queryable_date = NULL,
