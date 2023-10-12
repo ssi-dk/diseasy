@@ -100,7 +100,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
 
     #' @description
-    #'   Handles the cleanup of the class
+    #'   Handles the clean-up of the class
     finalize = function() {
       # Look for contained Diseasy* classes and call finalize on these
       private |>
