@@ -74,6 +74,7 @@ Computes a hash value for the module. Useful for logging and caching. Read only.
 <ul><li><p><a href="#method-DiseasyBaseModule-new"><code>DiseasyBaseModule$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyBaseModule-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></p></li>
 <li><p><a href="#method-DiseasyBaseModule-load_module"><code>DiseasyBaseModule$load_module()</code></a></p></li>
+<li><p><a href="#method-DiseasyBaseModule-finalize"><code>DiseasyBaseModule$finalize()</code></a></p></li>
 <li><p><a href="#method-DiseasyBaseModule-clone"><code>DiseasyBaseModule$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-DiseasyBaseModule-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -150,10 +151,18 @@ created.</p>
 <p><code>NULL</code></p>
 </div>
 
+</div><p></p><hr><a id="method-DiseasyBaseModule-finalize"></a><div class="section">
+<h3 id="method-finalize-">Method <code>finalize()</code><a class="anchor" aria-label="anchor" href="#method-finalize-"></a></h3>
+<p>Handles the clean-up of the class</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyBaseModule</span><span class="op">$</span><span class="fu">finalize</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-DiseasyBaseModule-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyBaseModule</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
