@@ -40,7 +40,10 @@ Computes a hash value for the module. Useful for logging and caching. Read only.
 Creates a new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 This module is typically not constructed directly but rather through derived classes.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$new(moduleowner = class(self)[1])}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$new(
+  moduleowner = class(self)[1],
+  logging = diseasyoption("logging", self)
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -48,6 +51,9 @@ This module is typically not constructed directly but rather through derived cla
 \describe{
 \item{\code{moduleowner}}{(\code{character})\cr
 The name of the moduleowner. Used when logging.}
+
+\item{\code{logging}}{(\code{boolean})\cr
+Should logging be enabled?}
 }
 \if{html}{\out{</div>}}
 }
