@@ -2,12 +2,17 @@
 % Please edit documentation in R/DiseasyObservables.R
 \name{DiseasyObservables}
 \alias{DiseasyObservables}
-\title{Observable handler}
+\title{Diseasy' observables handler}
 \value{
 A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 \description{
-TODO
+The \code{DiseasyObservables} module is responsible for interfacing with the available \code{diseasystores} and provide
+disease data to the models.
+The module primarily acts as a convenience wrapper around the \code{diseasystores}. The observables and stratifications
+will therefore depend on the data made available by the diseasystores.
+
+See vignette("diseasy-observables")
 }
 \examples{
   # Create observables module using the Google COVID-19 data
@@ -26,6 +31,8 @@ TODO
   rm(obs)
 }
 \seealso{
+\link{diseasystore}
+
 \link[SCDB:get_table]{SCDB::get_table}
 
 \link[SCDB:get_table]{SCDB::get_table}
@@ -122,9 +129,12 @@ A database connection object (inherits from DBIConnection)}
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
 Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}}
 
-\item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
+\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}

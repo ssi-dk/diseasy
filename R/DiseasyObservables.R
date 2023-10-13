@@ -1,6 +1,12 @@
-#' @title Observable handler
+#' @title Diseasy' observables handler
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasyObservables` module is responsible for interfacing with the available `diseasystores` and provide
+#'   disease data to the models.
+#'   The module primarily acts as a convenience wrapper around the `diseasystores`. The observables and stratifications
+#'   will therefore depend on the data made available by the diseasystores.
+#'
+#'   See vignette("diseasy-observables")
 #' @examples
 #'   # Create observables module using the Google COVID-19 data
 #'   obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
@@ -40,7 +46,9 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @param slice_ts (`Date` or `character`)\cr
     #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
-    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
+    #' @return
+    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     initialize = function(case_definition = NULL,
                           start_date = NULL,
                           end_date = NULL,
@@ -334,5 +342,5 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
 # Set default options for the package related to DiseasyObservables
 rlang::on_load({
-  options(diseasy.conn = "")
+  options("diseasy.conn" = "")
 })
