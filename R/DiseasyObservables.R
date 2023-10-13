@@ -73,19 +73,28 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   Set the case definition to get DiseasyObservables for.
     #' @param case_definition (`character`)\cr
     #'   Text label of the disease to get DiseasyObservables for.\cr
-    #'   Must match case definition implemented in `featurestore` package.
-    set_case_definition = function(case_definition) {
+    #'   Must match case definition implemented in `diseasystore` package.
+    #' @param verbose
+    #'   Should the `diseasystore` use verbose outputs?
+    #' @seealso [diseasystore]
+    set_case_definition = function(case_definition, verbose = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(case_definition, add = coll)
       if (!diseasystore::diseasystore_exists(case_definition)) {
         coll$push(glue::glue("{diseasystore::diseasystore_case_definition(case_definition)} not found!"))
       }
+      checkmate::assert_logical(verbose, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
-      # Load and configure the feature store
+      # Determine the diseasystore to load
       ds_case_definition <- diseasystore:::diseasystore_case_definition(case_definition)
+
+      # Determine the verbosity
+      if (is.null(verbose)) verbose <- diseasyoption("verbose", ds_case_definition)
+
+      # Load and configure the feature store
       private$.ds <- get(ds_case_definition)$new(slice_ts = self %.% slice_ts,
-                                                 verbose = !testthat::is_testing(),
+                                                 verbose = verbose,
                                                  target_conn = self %.% conn)
 
       private$.case_definition <- private$.ds %.% case_definition # Use the human readable from the diseasystore

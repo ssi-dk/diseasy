@@ -133,7 +133,7 @@ Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()
 \subsection{Method \code{set_case_definition()}}{
 Set the case definition to get DiseasyObservables for.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_case_definition(case_definition)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_case_definition(case_definition, verbose = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -141,7 +141,9 @@ Set the case definition to get DiseasyObservables for.
 \describe{
 \item{\code{case_definition}}{(\code{character})\cr
 Text label of the disease to get DiseasyObservables for.\cr
-Must match case definition implemented in \code{featurestore} package.}
+Must match case definition implemented in \code{diseasystore} package.}
+
+\item{\code{verbose}}{Should the \code{diseasystore} use verbose outputs?}
 }
 \if{html}{\out{</div>}}
 }
