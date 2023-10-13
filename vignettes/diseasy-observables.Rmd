@@ -1,0 +1,101 @@
+---
+title: "DiseasyObservables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyObservables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+options("tibble.print_min" = 5)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r download, include = FALSE}
+# Download the first n rows of the Google data set of interest
+tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
+remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
+google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
+
+purrr::walk(google_files, \(file_name) {
+  paste0(remote_conn, file_name) |>
+    readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+    readr::write_csv(file.path(tmp_dir, file_name))
+})
+options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir)
+options("diseasystore.DiseasystoreGoogleCovid19.verbose" = FALSE)
+options("diseasy.logging" = FALSE)
+```
+
+# Introduction
+The `DiseasyObservables` module is the module responsible for providing disease data to the models.
+The module is primarily a wrapper around `diseasystores` which means the available data will depend on the specific
+`diseasystore` being used.
+
+# Configuring the module
+The module needs some configuration to be initialized. Some of these can be set through options.
+Primarily, we need to specify the `diseasystore`
+```{r initialization}
+obs <- DiseasyObservables$new(
+  conn = DBI::dbConnect(RSQLite::SQLite())
+)
+# NOTE: Alternatively we could set options("diseasy.conn" = ...)
+
+obs$set_case_definition(case_definition = "Google COVID-19")
+```
+
+To see the data that comes with underlying `diseasystore` we can query the module.
+```{r available_observables}
+obs$available_observables
+```
+
+```{r available_aggregations}
+setdiff(obs$ds$available_features, obs$available_observables)
+```
+
+To check the current status of the module, the `$describe()` method can be used:
+```{r describe}
+obs$describe()
+```
+
+# Getting observations
+We can query the model to gives the data for a given observable in a given time frame:
+```{r example_1}
+obs$get_observation(observable = "n_population",
+                    start_date = as.Date("2020-03-01"),
+                    end_date = as.Date("2020-05-01"))
+
+# NOTE: "target_conn" is a SQLite data base which has "numeric" as the "date" type.
+# NOTE: The population here is not stratified, so covers all countries in the Google data
+```
+
+If we want to stratify our data, we supply the aggregation argument.
+This argument is designed to be flexible, but it means they need to be wrapped in `rlang::quos()`.
+We will see below, why that is.
+```{r example_2}
+obs$get_observation(observable = "n_hospital",
+                    aggregation = rlang::quos(age_group),
+                    start_date = as.Date("2020-03-01"),
+                    end_date = as.Date("2020-05-01"))
+```
+
+Since the aggregation is flexible, we can programmatically stratify:
+```{r example_3}
+obs$get_observation(observable = "n_hospital",
+                    aggregation = rlang::quos(young_age_groups =
+                                                age_group %in% c("00-09", "10-19")),
+                    start_date = as.Date("2020-03-01"),
+                    end_date = as.Date("2020-05-01"))
+
+# NOTE: "target_conn" is a SQLite data base which has "numeric" as the "boolean" type.
+```
+
