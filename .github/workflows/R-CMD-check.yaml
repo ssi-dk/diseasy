@@ -40,7 +40,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, github::ssi-dk/diseasystore, github::r-dbi/RSQLite
+          extra-packages: any::rcmdcheck, github::ssi-dk/diseasystore
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
