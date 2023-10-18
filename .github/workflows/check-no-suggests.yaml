@@ -52,6 +52,7 @@ jobs:
             any::knitr
             any::rmarkdown
             github::ssi-dk/diseasystore
+            github::r-dbi/RSQLite
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
