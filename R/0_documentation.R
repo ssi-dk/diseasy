@@ -96,7 +96,7 @@ rd_start_date <- function(type = "param") {
 rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
-        "Date to slice the database on (used if source_conn is a database).",
+        "Date or timestamp (parseable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
         ifelse(type == "field", " Read only.", ""))
 }
 
