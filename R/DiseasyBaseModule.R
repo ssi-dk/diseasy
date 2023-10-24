@@ -1,6 +1,13 @@
 #' @title Base module for the framework
 #'
 #' @description TODO
+#' @examples
+#'   # Normally, you would not want to create this module directly, but it is possible.
+#'   base_module <- DiseasyBaseModule$new()
+#'
+#'   rm(base_module)
+#' @return
+#'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
 DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
   classname = "DiseasyBaseModule",
@@ -12,8 +19,6 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     #'   This module is typically not constructed directly but rather through derived classes.
     #' @param moduleowner (`character`)\cr
     #'   The name of the moduleowner. Used when logging.
-    #' @return
-    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     initialize = function(moduleowner = class(self)[1]) {
       self$set_moduleowner(moduleowner)
     },
