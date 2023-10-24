@@ -57,6 +57,14 @@
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A new instance of the <code>DiseasyBaseModule</code></p>
+<p></p>
+<p><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
+    </div>
+    <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
     <p></p><div class="r6-active-bindings"><dl><dt><code>hash</code></dt>
 <dd><p>(<code>character</code>)<br>
@@ -93,10 +101,6 @@ The name of the moduleowner. Used when logging.</p></dd>
 
 </dl><p></p></div>
 </div>
-<div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>A new instance of the <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
-</div>
 
 </div><p></p><hr><a id="method-DiseasyBaseModule-set_moduleowner"></a><div class="section">
 <h3 id="method-set-moduleowner-">Method <code>set_moduleowner()</code><a class="anchor" aria-label="anchor" href="#method-set-moduleowner-"></a></h3>
@@ -115,7 +119,7 @@ The name of the moduleowner.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p><code>NULL</code></p>
 </div>
 
@@ -147,7 +151,7 @@ created.</p>
 </div>
 
 <div class="section">
-<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p><code>NULL</code></p>
 </div>
 
@@ -179,6 +183,15 @@ created.</p>
 
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="co"># Normally, you would not want to create this module directly, but it is possible.</span></span></span>
+<span class="r-in"><span>  <span class="va">base_module</span> <span class="op">&lt;-</span> <span class="va">DiseasyBaseModule</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:25.07705] DiseasyBaseModule: Module loaded</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">base_module</span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

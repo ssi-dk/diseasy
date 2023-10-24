@@ -57,6 +57,14 @@
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A new instance of the <code>DiseasyBaseModule</code></p>
+<p></p>
+<p><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="https://rdrr.io/pkg/SCDB/man/get_table.html" class="external-link">SCDB::get_table</a></p>
 <p><a href="https://rdrr.io/pkg/SCDB/man/get_table.html" class="external-link">SCDB::get_table</a></p></div>
@@ -179,10 +187,6 @@ Date to slice the database on. See <code><a href="https://rdrr.io/pkg/SCDB/man/g
 
 </dl><p></p></div>
 </div>
-<div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>A new instance of the <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
-</div>
 
 </div><p></p><hr><a id="method-DiseasyObservables-set_case_definition"></a><div class="section">
 <h3 id="method-set-case-definition-">Method <code>set_case_definition()</code><a class="anchor" aria-label="anchor" href="#method-set-case-definition-"></a></h3>
@@ -299,7 +303,7 @@ End date to get DiseasyObservables for (including).</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>If the observable is found, the function returns the corresponding data at the aggregation level.<br>
 Otherwise, the function fails and lists the available DiseasyObservables for the case_definition.</p>
 </div>
@@ -340,6 +344,28 @@ Otherwise, the function fails and lists the available DiseasyObservables for the
 
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="co"># Create observables module using the Google COVID-19 data</span></span></span>
+<span class="r-in"><span>  <span class="va">obs</span> <span class="op">&lt;-</span> <span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>case_definition <span class="op">=</span> <span class="st">"Google COVID-19"</span>,</span></span>
+<span class="r-in"><span>                                conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:25.580395] DiseasyObservables: Module loaded</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:25.90927] DiseasyObservables: Case definition set to Google COVID-19 (Google COVID-19)</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># See available observables</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">obs</span><span class="op">$</span><span class="va">available_observables</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "n_population" "n_hospital"   "n_deaths"     "n_positive"   "n_icu"       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "n_ventilator"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Get data for one observable</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">obs</span><span class="op">$</span><span class="fu">get_observation</span><span class="op">(</span><span class="st">"n_hospital"</span>,</span></span>
+<span class="r-in"><span>                      start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-01"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-05"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">obs</span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

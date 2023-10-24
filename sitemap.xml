@@ -31,10 +31,10 @@
     <loc>https://rasmusskytte.github.io/diseasy/reference/DiseasySeason.html</loc>
   </url>
   <url>
-    <loc>https://rasmusskytte.github.io/diseasy/reference/active_binding.html</loc>
+    <loc>https://rasmusskytte.github.io/diseasy/reference/diseasy-package.html</loc>
   </url>
   <url>
-    <loc>https://rasmusskytte.github.io/diseasy/reference/diseasy-package.html</loc>
+    <loc>https://rasmusskytte.github.io/diseasy/reference/diseasy_linters.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasy/reference/diseasyoption.html</loc>
@@ -44,11 +44,5 @@
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasy/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasy/reference/printr.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasy/reference/read_only_error.html</loc>
   </url>
 </urlset>

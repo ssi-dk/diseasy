@@ -57,6 +57,14 @@
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A new instance of the <code>DiseasySeason</code></p>
+<p></p>
+<p><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="DiseasyObservables.html">DiseasyObservables</a></p></div>
     </div>
@@ -131,10 +139,6 @@ A instance of <code>DiseasyObservables</code> are needed for some season models.
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>A new instance of the <code>DiseasySeason</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
 </div><p></p><hr><a id="method-DiseasySeason-set_reference_date"></a><div class="section">
@@ -216,7 +220,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 
 
 <dt><code>scale</code></dt>
-<dd><p>scale (<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period</p></dd>
+<dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
 
 
 </dl><p></p></div>
@@ -232,7 +236,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 <div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>scale</code></dt>
-<dd><p>scale (<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period</p></dd>
+<dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
 
 
 </dl><p></p></div>
@@ -248,7 +252,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 <div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>scale</code></dt>
-<dd><p>scale (<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period</p></dd>
+<dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
 
 
 </dl><p></p></div>
@@ -282,6 +286,30 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="co"># Season module with an constant season</span></span></span>
+<span class="r-in"><span>  <span class="va">s1</span> <span class="op">&lt;-</span> <span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:27.513983] DiseasySeason: Module loaded</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:27.515669] DiseasySeason: Using constant_season model</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">0</span><span class="op">:</span><span class="fl">365</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_dbl</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">s1</span><span class="op">$</span><span class="va">model_t</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="DiseasySeason-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Season module with an consine season</span></span></span>
+<span class="r-in"><span>  <span class="va">s2</span> <span class="op">&lt;-</span> <span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>reference_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:27.558622] DiseasySeason: Module loaded</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:27.560766] DiseasySeason: Setting reference_date as 2023-10-24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:27.562276] DiseasySeason: Using constant_season model</span>
+<span class="r-in"><span>  <span class="va">s2</span><span class="op">$</span><span class="fu">use_cosine_season</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-10-24 07:40:27.56646] DiseasySeason: Using cosine_season model</span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_dbl</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">s2</span><span class="op">$</span><span class="va">model_t</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="DiseasySeason-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">s1</span>, <span class="va">s2</span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
