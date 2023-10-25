@@ -563,11 +563,11 @@ DiseasyActivity <- R6::R6Class(                                                 
         if (any(private %.% .scenario_matrix != 0)) {
 
           # We filter out rows without any 1's (these activity units are not active)
-          out <- private$.scenario_matrix[rowSums(private$.scenario_matrix != 0) > 0, ]
+          out <- private$.scenario_matrix[rowSums(private$.scenario_matrix != 0) > 0, , drop = FALSE] # Keep data type
 
           # We then order the activity_units by first occurrence, tie-broken by the name of the activity_unit
           index <- apply(out, 1, \(x) which(x != 0)[1])
-          out <- out[order(index, rownames(out)), ]
+          out <- out[order(index, rownames(out)), , drop = FALSE] # Keep data type
           attr(out, "secret_hash") <- attr(private$.scenario_matrix, "secret_hash") # Copy the "secret hash"
           return(out)
 
@@ -683,7 +683,7 @@ DiseasyActivity <- R6::R6Class(                                                 
                             dimnames = list(rownames(input_matrix), new_dates)))
 
         # Reordering columns to chronological order
-        out <- out[, order(colnames(out))]
+        out <- out[, order(colnames(out)), drop = FALSE] # Force R to maintain the data type when reordering...
 
         # Determine the column index of the new columns
         to_update <- match(as.character(new_dates), colnames(out))

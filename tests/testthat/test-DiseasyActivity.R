@@ -45,7 +45,21 @@ test_that("$change_activity works with different ways of initializing", {
   dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
   act$set_activity_units(dk_activity_units_subset)
 
-  # Set a scenario
+
+
+
+  # Set a scenario with a single activity
+  scenario_0 <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
+    dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline", closing = NA)
+  act$change_activity(scenario_0)
+  hash_scenario_0_loaded <- act$hash
+
+  expect_false(hash_new_instance == hash_scenario_0_loaded) # hash should change now that a scenario is defined
+  act$reset_scenario()
+
+
+
+  # Set a scenario with several activities
   scenario_1 <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
     dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",                         closing = NA) |>
     dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,                                 closing = "baseline") |>
