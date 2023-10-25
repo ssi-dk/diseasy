@@ -217,7 +217,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_date(input_dates, add = coll)
 
       # Check if units are available in the loaded activity units
-      missing_activity_units <- setdiff(na.omit(c(input$opening, input$closing)), private$activity_units_labels)
+      missing_activity_units <- setdiff(stats::na.omit(c(input$opening, input$closing)), private$activity_units_labels)
       if (length(missing_activity_units) > 0) {
         coll$push(glue::glue("These units are not in the list of activity units: {toString(missing_activity_units)}"))
       }
@@ -242,8 +242,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       # One date at a time - in chronological order
       for (dd in input_dates) {
         sub <- input[input$date == dd, ]
-        to_open  <- na.omit(sub$opening)
-        to_close <- na.omit(sub$closing)
+        to_open  <- stats::na.omit(sub$opening)
+        to_close <- stats::na.omit(sub$closing)
         col_id <- match(dd, colnames(new_scenario_matrix))
 
         # Opening
@@ -315,7 +315,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_numeric(risk, lower = 0, add = coll) # TODO: upper is 1, right?
 
       # Check if units are available in the loaded activity units
-      wrong_types <- setdiff(unique(na.omit(type)), private$activity_types)
+      wrong_types <- setdiff(unique(stats::na.omit(type)), private$activity_types)
       if (length(wrong_types) > 0) {
         coll$push(glue::glue("These types are not activity types: {toString(wrong_types)}"))
       }
