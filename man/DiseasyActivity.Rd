@@ -35,7 +35,6 @@ The basis of contacts between age groups used to compute activity. Read-only.}
 \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
 \item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
 \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
-\item \href{#method-DiseasyActivity-weighted_contact_types}{\code{DiseasyActivity$weighted_contact_types()}}
 \item \href{#method-DiseasyActivity-rescale_counts2rates}{\code{DiseasyActivity$rescale_counts2rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
@@ -247,11 +246,12 @@ Returns a list with depth of two: value[\link{date}][\link{type}]
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_contacts"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_contacts}{}}}
 \subsection{Method \code{get_scenario_contacts()}}{
-Return contacts  for all age groups and activities on all dates.
+Return contacts for across age groups and activities on all dates.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_contacts(
   age_cuts_lower = NULL,
-  population_1yr = NULL
+  population_1yr = NULL,
+  weights = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -263,33 +263,14 @@ vector of ages defining the lower bound for each age group. (Optional)}
 
 \item{\code{population_1yr}}{(\code{numeric})\cr
 vector of population counts in 1-year age groups.}
+
+\item{\code{weights}}{(\code{numeric(4)})\cr
+vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Returns a \code{list} with depth of two: value[\link{date}][\link{type}]
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-weighted_contact_types"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-weighted_contact_types}{}}}
-\subsection{Method \code{weighted_contact_types()}}{
-Aggregate the four types of contacts on all dates.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$weighted_contact_types(input, weight = rep(1, 4))}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{input}}{Two level list to be aggregated. Aggregation is done for the second level.}
-
-\item{\code{weight}}{Weights for the four types of contacts. Defaults to rep(1, 4).}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns a list with depth of one: value[\link{date}]
+If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
 }
 }
 \if{html}{\out{<hr>}}
