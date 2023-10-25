@@ -283,9 +283,9 @@ test_that("dk_reference scenario works", {
   # More tests could be made ... but tested above. The length may change over time so mayby some particular dates.
 
   ## Test weighted contact types. Most meaningful for contact matrices
-  tmp_list <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
-  tmp_list_out <- act$weighted_contact_types(tmp_list)
-  expect_identical(length(tmp_list), length(tmp_list_out))
+  tmp_list          <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
+  tmp_list_weighted <- act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1))
+  expect_identical(length(tmp_list), length(tmp_list_weighted))
 
   rm(act)
 })

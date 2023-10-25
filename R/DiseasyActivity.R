@@ -424,21 +424,24 @@ DiseasyActivity <- R6::R6Class(                                                 
 
 
     #' @description
-    #'   Return contacts  for all age groups and activities on all dates.
+    #'   Return contacts for across age groups and activities on all dates.
     #' @param age_cuts_lower (`numeric`)\cr
     #'   vector of ages defining the lower bound for each age group. (Optional)
     #' @param population_1yr (`numeric`)\cr
     #'   vector of population counts in 1-year age groups.
+    #' @param weight (`numeric(4)`)\cr
+    #'   vector of weights for the four types of contacts. If NULL (default), no weighting is done.
     #' @return
-    #'   Returns a `list` with depth of two: value[[date]][[type]]
-    get_scenario_contacts = function(age_cuts_lower = NULL, population_1yr = NULL) {
+    #'   If no weights are supplied, a `list()` of depth of two: value[[date]][[type]] is returned.
+    #    If weights are supplied, a `list()` of depth one: value[[date]] is returned
+    get_scenario_contacts = function(age_cuts_lower = NULL, population_1yr = NULL, weights = NULL) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
                                 lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_numeric(population_1yr, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, add = coll)
+      checkmate::assert_numeric(population_1yr, any.missing = FALSE, null.ok = TRUE, lower = 0, add = coll)
+      checkmate::assert_numeric(weights, any.missing = FALSE, null.ok = TRUE, len = 4, add = coll)
       checkmate::assert_class(self$contact_basis, "list", add = coll)
       checkmate::reportAssertions(coll)
 
@@ -484,27 +487,15 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # TODO: Consider if prop_out is needed
 
+      # If weights are supplied, we reduce the dimension of the output
+      if (checkmate::test_numeric(weights, len = 4)) {
+        contacts <- purrr::map(
+          contacts,
+          .f = \(xx) purrr:::reduce(purrr::map2(.x = xx, .y = weights, .f = `*`), .f =  `+`)
+        )
+      }
+
       return(contacts)
-    },
-
-    #' @description
-    #' Aggregate the four types of contacts on all dates.
-    #'
-    #' @param input Two level list to be aggregated. Aggregation is done for the second level.
-    #' @param weight Weights for the four types of contacts. Defaults to rep(1, 4).
-    #' @return
-    #' Returns a list with depth of one: value[[date]]
-    weighted_contact_types = function(input, weight = rep(1, 4)) {
-
-      # Input checks
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_class(input, "list", add  = coll)
-      checkmate::assert_class(input[[1]], "list", add = coll)
-      checkmate::assert_numeric(weight, len = 4, any.missing = FALSE, add = coll)
-      checkmate::reportAssertions(coll)
-
-      out <- purrr::map(input, .f = \(xx) purrr:::reduce(purrr::map2(.x = xx, .y = weight, .f = `*`), .f =  `+`))
-      return(out)
     },
 
     #' @description
