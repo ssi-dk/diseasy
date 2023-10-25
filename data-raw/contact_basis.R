@@ -113,5 +113,6 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   })
 
   # Store the data in the package
+  attr(contact_basis, "creation_datetime") <- Sys.time()
   usethis::use_data(contact_basis, overwrite = TRUE)
 }
