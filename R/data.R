@@ -36,7 +36,7 @@
 #' @source
 #'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
 #'  U.S. Department of Commerce. Retrieved
-#'  `r format(file.info(file.path("data", "contact_basis.rda"))$ctime, "%B %d, %Y")`,
+#'  `r format(attr(contact_basis, "creation_date"), "%B %d, %Y")`,
 #'  from https://data.census.gov/
 #' @source
 #'  Gruson H (2023). "contactdata: Social Contact Matrices for 152
