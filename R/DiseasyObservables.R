@@ -14,6 +14,7 @@
 #'
 #'   # See available observables
 #'   print(obs$available_observables)
+#'   print(obs$available_aggregations)
 #'
 #'   # Get data for one observable
 #'   \dontrun{
@@ -308,6 +309,17 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       expr = {
         if (is.null(private %.% .ds)) return(NULL)
         return(purrr::keep(private %.% .ds %.% available_features, ~ startsWith(., "n_") | endsWith(., "_temp")))
+      }),
+
+
+    #' @field available_aggregations (`character`)\cr
+    #'   The currently available aggregations in the loaded diseasystore. Read-only.
+    available_aggregations = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "available_aggregations",
+      expr = {
+        if (is.null(private %.% .ds)) return(NULL)
+        return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
       }),
 
 

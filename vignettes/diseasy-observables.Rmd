@@ -59,7 +59,7 @@ obs$available_observables
 ```
 
 ```{r available_aggregations}
-setdiff(obs$ds$available_features, obs$available_observables)
+obs$available_aggregations
 ```
 
 To check the current status of the module, the `$describe()` method can be used:
