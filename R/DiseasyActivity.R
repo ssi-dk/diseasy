@@ -424,13 +424,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       # TODO: Consider if prop_out is needed
 
-      # If weights are supplied, we reduce the dimension of the output
-      if (checkmate::test_numeric(weights, len = 4)) {
-        contacts <- purrr::map(
-          contacts,
-          .f = \(xx) purrr:::reduce(purrr::map2(.x = xx, .y = weights, .f = `*`), .f =  `+`)
-        )
-      }
+      # Weight if weights are given
+      contacts <- private$weight_activities(contacts, weights)
 
       return(contacts)
     },
@@ -594,7 +589,26 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         w[i, (1:i)] <- w[(1:i), i] <- dw[i]
       }
       return(w)
-    }
+    },
 
+
+    # Weight of nested 4-vectors
+    # @description
+    #   The function takes a nested list of 4-vectors that should be weighted together according to the weights
+    #   argument. Each element in the list is multiplied by the associated weight before being summed together.
+    # @param obj
+    #   object to perform weighting on
+    # @param weights `r rd_activity_weights`
+    weight_activities = function(obj, weights) {
+
+      # Early return if no weights are given
+      if (!checkmate::test_numeric(weights, len = 4)) {
+        return(obj)
+      }
+
+      out <- purrr::map(obj, .f = \(xx) purrr:::reduce(purrr::map2(.x = xx, .y = weights, .f = `*`), .f =  `+`))
+
+      return(out)
+    }
   )
 )
