@@ -335,7 +335,10 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #'   Return `list` with opened/closed activities on dates where there are changes.
     #' @return `list` with opened/closed activities on dates where there are changes.
     get_scenario_activities = function() {
-      return(apply(private$.scenario_matrix, 2, \(x) private$activity_units_labels[x != 0]))
+      activities <- as.data.frame(private$.scenario_matrix) |>
+        purrr::map(~ private$activity_units_labels[. != 0])
+
+      return(activities)
     },
 
     #' @description
