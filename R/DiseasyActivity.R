@@ -567,17 +567,38 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
     activity_types = c("home", "work", "school", "other"),
 
-    add_activities = function(x) {
-      tmp_units <- private$activity_units[x] # List of units to add
-      obj <- list()
-      for (type in private$activity_types) {
-        obj[[type]] <- rep(0, private$n_age_groups)
-        for (i in seq_along(tmp_units)) {
-          obj[[type]] <- obj[[type]] + tmp_units[[i]][[type]] * tmp_units[[i]][["risk"]]
+    # Risk-weighted activity
+    # @description
+    #   This function computes the risk-weighted activity of the given activities across
+    #   the `activity_types`
+    # @param activities (`character`)\cr
+    #   A vector of activities to add together
+    # @return
+    #   A list of depth two: value[[type]][[age_group_activity]]
+    add_activities = function(activities) {
+
+      # Extract the relevant activity units
+      activity_unit_subset <- private$activity_units[activities]
+
+      # For each activity type, we
+      # 1) multiply by activity by the associated risk
+      # 2) sum the risk-weighted activities stratified by age-group
+      # 3) set human readable names for the age_groups
+      # (Activity is expressed in 5-year age groups, we name our activity vector accordingly)
+      risk_weighted_activity <- purrr::map(
+        private$activity_types,
+        \(type) {
+          activity_unit_subset |>
+            purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
+            purrr::reduce(`+`, .init = rep(0, private$n_age_groups)) |> # each age_group starts with 0 activity
+            stats::setNames(diseasystore::age_labels(seq(from = 0, by = 5, length.out = private$n_age_groups)))
         }
-      }
-      return(obj)
-    }, # EndOf: function
+      )
+
+      names(risk_weighted_activity) <- private$activity_types
+      return(risk_weighted_activity)
+    },
+
 
     update_with_dates = function(input_matrix, input_dates, first_col_value) {
       # Create or extend scenario_matrix' et al. if needed
