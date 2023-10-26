@@ -181,3 +181,20 @@ rd_training_length <- paste(
 
 
 rd_side_effects <- "NULL (called for side effects)"
+
+
+
+rd_age_cuts_lower <- paste(
+  "(`numeric`)\\cr",
+  "vector of ages defining the lower bound for each age group. (Optional)"
+)
+
+rd_population_1yr <- paste(
+  "(`numeric`)\\cr",
+  "vector of population counts in 1-year age groups."
+)
+
+rd_activity_weights <- paste(
+  "(`numeric(4)`)\\cr",
+  "vector of weights for the four types of contacts. If NULL (default), no weighting is done."
+)
