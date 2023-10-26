@@ -367,8 +367,14 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
           t() |>          # To get the right dimensions
           as.data.frame() # To enable the mapping below
 
+        # Get the population proportion in the new age groups
+        population <- private$map_population(age_cuts_lower, population_1yr)
+        prop <- aggregate(prop ~ age_group_ref, data = population, FUN = sum)$prop
+
+        # Weight the population transformation matrix by the population proportion
+        p <- p * prop
+
         # Get the nested vectors, then compute the weighted average using `p` as weights
-        # TODO: shouldn't this be population averaged?
         openness <- openness |>
           purrr::map(
             ~ purrr::map(
@@ -591,10 +597,39 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
     # Compute the population proportion matrix
     # @description
-    #   The function provides the populaiton proprtion matrix `p` used to poject age_groups
+    #   The function provides the population proportion matrix `p` used to project age_groups
     # @param age_cuts_lower `r rd_age_cuts_lower`
     # @param population_1yr `r rd_population_1yr`
     population_transform_matrix = function(age_cuts_lower = NULL, population_1yr = NULL) {
+
+      # Early return if no projection is requested
+      if (is.null(age_cuts_lower)) {
+        return(obj)
+      }
+
+      # Compute proportion of population in new and old age_groups
+      population <- private$map_population(age_cuts_lower, population_1yr)
+
+      # Calculating transformation matrix
+      tt <- merge(aggregate(prop ~ age_group_ref + age_group_out, data = population, FUN = sum),
+                  aggregate(prop ~ age_group_ref,                 data = population, FUN = sum),
+                  by = "age_group_ref")
+      tt$prop <- tt$prop.x / tt$prop.y
+      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = prop)))
+
+      # Label the matrix
+      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$prop))
+
+      return(p)
+    },
+
+
+    # Map population between age groups
+    # @description
+    #   The function computes the proportion of population in the new and old age groups
+    # @param age_cuts_lower `r rd_age_cuts_lower`
+    # @param population_1yr `r rd_population_1yr`
+    map_population = function(age_cuts_lower, population_1yr) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -602,11 +637,6 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
                                 lower = 0, unique = TRUE, add = coll)
       checkmate::assert_numeric(population_1yr, any.missing = FALSE, null.ok = TRUE, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
-
-      # Early return if no projection is requested
-      if (is.null(age_cuts_lower)) {
-        return(obj)
-      }
 
       # Using default population if new population is not given
       if (is.null(population_1yr)) {
@@ -622,20 +652,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
       population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
 
-
-      # Calculating transformation matrix
-      tt <- merge(aggregate(prop ~ age_group_ref + age_group_out, data = population, FUN = sum),
-                  aggregate(prop ~ age_group_ref,                 data = population, FUN = sum),
-                  by = "age_group_ref")
-      tt$prop <- tt$prop.x / tt$prop.y
-      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = prop)))
-
-      # Label the matrix
-      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$prop))
-
-      return(p)
+      return(population)
     },
-
 
     # Weight of nested 4-vectors
     # @description
