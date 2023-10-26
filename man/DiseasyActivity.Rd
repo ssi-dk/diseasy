@@ -235,9 +235,24 @@ Return \code{list} with opened/closed activities on dates where there are change
 \subsection{Method \code{get_scenario_openness()}}{
 Return openness [0 ; 1] for all age groups and activities on all dates.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_openness()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_openness(
+  age_cuts_lower = NULL,
+  population_1yr = NULL,
+  weights = NULL
+)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
+
+\item{\code{population_1yr}}{(\code{numeric})\cr vector of population counts in 1-year age groups.}
+
+\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 Returns a list with depth of two: value[\link{date}][\link{type}]
 }
@@ -258,14 +273,11 @@ Return contacts for across age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr
-vector of ages defining the lower bound for each age group. (Optional)}
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
 
-\item{\code{population_1yr}}{(\code{numeric})\cr
-vector of population counts in 1-year age groups.}
+\item{\code{population_1yr}}{(\code{numeric})\cr vector of population counts in 1-year age groups.}
 
-\item{\code{weights}}{(\code{numeric(4)})\cr
-vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
+\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
 }
 \if{html}{\out{</div>}}
 }
