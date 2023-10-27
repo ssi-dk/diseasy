@@ -55,10 +55,6 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
     dplyr::mutate(age_group = purrr::map_chr(pop_ref_1yr$age, ~ age_labels[max(which(age_cuts <= .))])) |>
     dplyr::summarise(prop = sum(prop), .by = c("key_country", "age_group"))
 
-
-  # Describe the data
-  description <- "Contact matrices from the `contactdata` package and population data from the US Census Bureau"
-
   # Export contact matrices where we also have population data
   common_country_codes <- intersect(country_codes, pop_ref_1yr$key_country)
   contact_basis <- common_country_codes |>
@@ -71,7 +67,8 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
            pop_ref_1yr = pop_ref_1yr |>
              dplyr::filter(.data$key_country == country_code) |>
              dplyr::select(!"key_country"),
-           description = description)
+           description = glue::glue("Contact matrices for {country_code} from the `contactdata` package ",
+                                    "and population data for {country_code} from the US Census Bureau."))
     })
   names(contact_basis) <- common_country_codes
 
