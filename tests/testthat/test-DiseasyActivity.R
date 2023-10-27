@@ -81,11 +81,12 @@ test_that("$change_activity works with different ways of initializing", {
   ref_scenario["lockdown_2020", "2020-03-12"] <- 1
   ref_scenario["lockdown_2020", "2020-04-15"] <- 1
   ref_scenario["secondary_education_phase_1_2020", "2020-04-15"] <- 1
-  ref_scenario <- ref_scenario[rowSums(ref_scenario) > 0, ]
+  ref_scenario <- data.frame(ref_scenario[rowSums(ref_scenario) > 0, ], check.names = FALSE)
   secret_hash <- dk_activity_units_subset[c("baseline", "lockdown_2020", "secondary_education_phase_1_2020")] |>
     purrr::map_chr(digest::digest) |>
     digest::digest()
   attr(ref_scenario, "secret_hash") <- secret_hash
+
 
   scenario_matrix <- act$scenario_matrix
   expect_identical(ref_scenario, scenario_matrix)
@@ -102,9 +103,9 @@ test_that("$change_activity works with different ways of initializing", {
 
   act$set_activity_units(tmp_activity_units)
   act$change_activity(scenario_1)
-  expect_false(identical(ref_scenario, act$scenario_matrix))
-  expect_setequal(ref_scenario, act$scenario_matrix)
-  expect_false(hash_scenario_1_loaded == act$hash) # hash should now be different since the activity units have changed
+  expect_false(identical(act$scenario_matrix, ref_scenario))
+  expect_identical(as.matrix(act$scenario_matrix), as.matrix(ref_scenario)) # The matrix it-self should be the same
+  expect_false(act$hash == hash_scenario_1_loaded) # hash should now be different since the activity units have changed
 
 
 
