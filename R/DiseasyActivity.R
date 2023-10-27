@@ -509,7 +509,13 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
           # We then order the activity_units by first occurrence, tie-broken by the name of the activity_unit
           index <- apply(out, 1, \(x) which(x != 0)[1])
           out <- out[order(index, rownames(out)), ]
-          attr(out, "secret_hash") <- attr(private$.scenario_matrix, "secret_hash") # Copy the "secret hash"
+
+          # Prevent attributes from printing by converting to data.frame
+          out <- data.frame(out, check.names = FALSE)
+
+          # Copy the "secret hash"
+          attr(out, "secret_hash") <- attr(private$.scenario_matrix, "secret_hash")
+
           return(out)
         } else {
           return(NULL)
