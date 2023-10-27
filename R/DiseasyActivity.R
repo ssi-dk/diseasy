@@ -480,8 +480,20 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
     #' @description `r rd_describe`
     describe = function() {
-      print(self$scenario_matrix)
-      print(private$contact_basis_description)
+      printr("# DiseasyActivity ############################################")
+      if (is.null(self$scenario_matrix)) {
+        printr("Scenario: Activity scenario not yet set")
+      } else {
+        printr("Scenario: Oveview")
+        print(self$scenario_matrix)
+        cat("\n")
+      }
+
+      if (is.null(self$contact_basis)) {
+        printr("Contact basis: not yet set")
+      } else {
+        printr("Contact basis: ", self$contact_basis$description, max_width = 100)
+      }
     }
 
   ),
