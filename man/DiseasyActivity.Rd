@@ -340,7 +340,7 @@ If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][
 \subsection{Method \code{rescale_counts_to_rates()}}{
 Rescale from contacts to rates per individual to fractional population.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, pop)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, pop = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -348,7 +348,10 @@ Rescale from contacts to rates per individual to fractional population.
 \describe{
 \item{\code{input}}{Matrix or (nested) list(s) to be rescaled.}
 
-\item{\code{pop}}{Population vector. Is normalized within.}
+\item{\code{pop}}{(\code{numeric})\cr
+Population vector to weight contacts by.
+Must use same age_groups as the contact matrix input.
+if NULL (default), \code{pop} is computed from the loaded \code{contact_basis}}
 }
 \if{html}{\out{</div>}}
 }

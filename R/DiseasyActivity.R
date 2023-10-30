@@ -503,9 +503,10 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param pop (`numeric`)\cr
     #'   Population vector to weight contacts by.
     #'   Must use same age_groups as the contact matrix input.
+    #'   if NULL (default), `pop` is computed from the loaded `contact_basis`
     #' @return
     #'   Returns an object with the same structure as the input
-    rescale_counts_to_rates = function(input, pop) {
+    rescale_counts_to_rates = function(input, pop = NULL) {
 
       # If input is a list, Iteratively apply function to list elements
       if (checkmate::test_class(input, "list")) {
@@ -516,8 +517,25 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Input checks
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_class(input, "matrix", add = coll)
-      checkmate::assert_numeric(pop, add = coll)
+      checkmate::assert(
+        checkmate::check_numeric(pop),
+        checkmate::check_class(self$contact_basis, "list"),
+        add = coll
+      )
       checkmate::reportAssertions(coll)
+
+      if (is.null(pop)) {
+        # Determine age_groups of input
+        age_cuts <- rownames(input) |>
+          purrr::map_dbl(~ as.numeric(stringr::str_extract(., r"{^\d*(?=[+-])}")))
+
+        # Compute pop vector in these age groups
+        pop <- self$contact_basis$pop_ref_1yr |>
+          dplyr::group_by("age_group" = cut(.data$age, age_cuts)) |>
+          dplyr::summarise("prop" = sum(.data$prop)) |>
+          dplyr::arrange("age_group") |>
+          dplyr::pull("prop")
+      }
 
       pop <- pop / sum(pop)
       out <- input / outer(pop, pop, "*")
