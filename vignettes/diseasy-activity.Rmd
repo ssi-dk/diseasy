@@ -128,7 +128,7 @@ act$get_scenario_activities()
 For these examples, we reduce the activity scenario to just a single activity:
 ```{r interfacing_reset_scenario}
 act$reset_scenario()
-act$change_activity(date = as.Date("2020-03-11"), opening = "lockdown_2020")
+act$change_activity(date = as.Date("2020-03-11"), opening = "baseline")
 ```
 
 With the activity scenario loaded, we query the module in different ways to get contact metrics from the module for the
@@ -137,32 +137,17 @@ scenario.
 ## Contact matrices
 Several disease models uses contact matrices to structure the populations.
 
-The `DiseasyActivity` module is designed around using counts of contacts for these matrices.
-This way, the matrices can be dynamically expressed in various age groups according to the needs of the models.
-
-To retrieve contact matrices from the module, we use the `$get_scenario_contacts()` method:
+To retrieve the contact matrices from the module, we use the `$get_scenario_contacts()` method:
 ```{r scenario_contacts}
 # We can project the matrices into custom age-groups by providing the "age_cuts_lower" argument
 act$get_scenario_contacts(age_cuts_lower = c(0, 60))
 ```
-
 The `DiseasyActivity` module provides separate matrices for the four arenas: "home", "school", "work", and "other".
 These matrices can be combined by supplying a `weights` argument to the `$get_scenario_contacts()` method.
 
 ```{r scenario_contacts_weighted}
-contact_counts <- act$get_scenario_contacts(age_cuts_lower = c(0, 20, 40, 60, 80), weights = c(1, 1, 1, 1))
-print(contact_counts)
+act$get_scenario_contacts(age_cuts_lower = c(0, 20, 40, 60, 80), weights = c(1, 1, 1, 1))
 ```
-
-If we want to convert the contact matrices to rates rather than counts, we can use the `$rescale_counts_to_rates()`
-method.
-
-By default, the methods uses the population in the loaded `contact_basis` to compute the population in the age groups of the contact matrix. Custom populations can be supplied through the `pop` argument.
-
-```{r scenario_contacts_rates}
-act$rescale_counts_to_rates(contact_counts)
-```
-
 
 ## Societal openness
 A simpler metric for societal activity is the degree of "openness", i.e. degree to which their activity is limited
@@ -195,7 +180,3 @@ act$scenario_matrix
 ```{r inspect_risk_matrix}
 act$risk_matrix
 ```
-
-
-# Not yet covered!
-rescale_counts_to_rates
