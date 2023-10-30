@@ -39,8 +39,8 @@
 #'   act$set_activity_units(dk_activity_units)
 #'   act$change_activity(scenario)
 #'
-#'   # Get societal "openness"
-#'   openness <- act$get_scenario_openness()
+#'   # Get societal "freedom"
+#'   freedom <- act$get_scenario_freedom()
 #'
 #'   rm(act)
 #' @return
@@ -401,27 +401,27 @@ DiseasyActivity <- R6::R6Class(                                                 
 
 
     #' @description
-    #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
+    #'   Return freedom \[0 ; 1\] for all age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param population_1yr `r rd_population_1yr`
     #' @param weights `r rd_activity_weights`
     #' @return
     #'   Returns a list with depth of two: value[[date]][[type]]
-    get_scenario_openness = function(age_cuts_lower = NULL, population_1yr = NULL, weights = NULL) {
+    get_scenario_freedom = function(age_cuts_lower = NULL, population_1yr = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()
-      openness <- lapply(scenario_activities, private$add_activities)
+      freedom <- lapply(scenario_activities, private$add_activities)
 
       # Apply .risk_matrix
       # TODO: is this not already applied through "add_activities"?
-      for (dd in seq_along(openness)) { # looping over dates
+      for (dd in seq_along(freedom)) { # looping over dates
         for (tt in private$activity_types) {
-          openness[[dd]][[tt]] <- openness[[dd]][[tt]] * private$.risk_matrix[tt, dd]
+          freedom[[dd]][[tt]] <- freedom[[dd]][[tt]] * private$.risk_matrix[tt, dd]
         }
       }
 
       if (private$direction == "closing") {
-        openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
+        freedom <- lapply(freedom, \(x) lapply(x, \(y) 1 - y))
       }
 
       # Project into new age_groups if given
@@ -438,7 +438,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         p <- p * prop
 
         # Get the nested vectors, then compute the weighted average using `p` as weights
-        openness <- openness |>
+        freedom <- freedom |>
           purrr::map(
             ~ purrr::map(
               .,
@@ -451,9 +451,9 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       # Weight if weights are given
-      openness <- private$weight_activities(openness, weights / sum(weights)) # weighted average
+      freedom <- private$weight_activities(freedom, weights / sum(weights)) # weighted average
 
-      return(openness)
+      return(freedom)
     },
 
 
@@ -472,13 +472,13 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_class(self$contact_basis, "list", add = coll)
       checkmate::reportAssertions(coll)
 
-      contacts <- openness <- self$get_scenario_openness()
+      contacts <- freedom <- self$get_scenario_freedom()
 
       # Apply .risk_matrix
-      for (dd in seq_along(openness)) { # looping over dates
+      for (dd in seq_along(freedom)) { # looping over dates
         for (tt in private$activity_types) {
           # TODO: genWeight
-          contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
+          contacts[[dd]][[tt]] <- private$vector_to_matrix(freedom[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
         }
       }
 

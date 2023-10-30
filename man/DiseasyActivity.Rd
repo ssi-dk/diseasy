@@ -46,8 +46,8 @@ See vignette("diseasy-activity") for examples of use.
   act$set_activity_units(dk_activity_units)
   act$change_activity(scenario)
 
-  # Get societal "openness"
-  openness <- act$get_scenario_openness()
+  # Get societal "freedom"
+  freedom <- act$get_scenario_freedom()
 
   rm(act)
 }
@@ -80,7 +80,7 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-change_risk}{\code{DiseasyActivity$change_risk()}}
 \item \href{#method-DiseasyActivity-crop_scenario}{\code{DiseasyActivity$crop_scenario()}}
 \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
-\item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
+\item \href{#method-DiseasyActivity-get_scenario_freedom}{\code{DiseasyActivity$get_scenario_freedom()}}
 \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
 \item \href{#method-DiseasyActivity-rescale_counts_to_rates}{\code{DiseasyActivity$rescale_counts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
@@ -221,7 +221,7 @@ NULL (called for side effects)
 \subsection{Method \code{change_risk()}}{
 Sets the overall risk of types of activity
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$change_risk(date, type = NA, risk = NA)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$change_risk(date, type = NULL, risk = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -279,12 +279,12 @@ Return \code{list} containing the opened and closed activity units on dates wher
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-get_scenario_openness"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_openness}{}}}
-\subsection{Method \code{get_scenario_openness()}}{
-Return openness [0 ; 1] for all age groups and activities on all dates.
+\if{html}{\out{<a id="method-DiseasyActivity-get_scenario_freedom"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_freedom}{}}}
+\subsection{Method \code{get_scenario_freedom()}}{
+Return freedom [0 ; 1] for all age groups and activities on all dates.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_openness(
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_freedom(
   age_cuts_lower = NULL,
   population_1yr = NULL,
   weights = NULL
@@ -338,7 +338,7 @@ If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][
 \if{html}{\out{<a id="method-DiseasyActivity-rescale_counts_to_rates"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_counts_to_rates}{}}}
 \subsection{Method \code{rescale_counts_to_rates()}}{
-Rescale from contacts to rates per individual to fractional population.
+Re-scale from contacts to rates per individual to fractional population.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, pop = NULL)}\if{html}{\out{</div>}}
 }
@@ -346,7 +346,8 @@ Rescale from contacts to rates per individual to fractional population.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{input}}{Matrix or (nested) list(s) to be rescaled.}
+\item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
+Counts to be re-scaled.}
 
 \item{\code{pop}}{(\code{numeric})\cr
 Population vector to weight contacts by.

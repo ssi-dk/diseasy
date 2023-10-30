@@ -230,9 +230,9 @@ test_that("$change_risk works", {
 })
 
 
-test_that("get_scenario_openness works", {
+test_that("get_scenario_freedom works", {
 
-  # Test openness
+  # Test freedom
   act <- DiseasyActivity$new(base_scenario = "closed")
   dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
   act$set_activity_units(dk_activity_units_subset)
@@ -241,9 +241,9 @@ test_that("get_scenario_openness works", {
                       opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
                       closing      = c(NA,           "baseline",      NA))
 
-  expect_identical(length(act$get_scenario_openness()), 3L) # 3 dates in scenario
-  expect_identical(length(act$get_scenario_openness()[[1]]), 4L) # 4 elements
-  expect_true(all(unlist(lapply(act$get_scenario_openness(), \(x) sapply(x, length))) == 16))
+  expect_identical(length(act$get_scenario_freedom()), 3L) # 3 dates in scenario
+  expect_identical(length(act$get_scenario_freedom()[[1]]), 4L) # 4 elements
+  expect_true(all(unlist(lapply(act$get_scenario_freedom(), \(x) sapply(x, length))) == 16))
   #TODO: Test if risks are applied
 
   rm(act)
@@ -263,7 +263,7 @@ test_that("contactdata: contact_basis works", {
                       closing      = c(NA,           "baseline",         NA))
 
   # Repeating a previous to see that methods are available
-  expect_identical(length(act$get_scenario_openness()), 3L) # 3 dates in scenario
+  expect_identical(length(act$get_scenario_freedom()), 3L) # 3 dates in scenario
 
   # Checking dimension
   expect_identical(dim(act$get_scenario_contacts()[[1]][[1]]), c(16L, 16L))
