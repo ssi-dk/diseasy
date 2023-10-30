@@ -10,7 +10,7 @@ test_that("$set_activity_units works", {
   dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
   expect_no_error(act$set_activity_units(dk_activity_units_subset))
 
-  expect_identical(hash_new_instance, act$hash) # hash should not change just because new activity units are loaded
+  expect_identical(act$hash, hash_new_instance) # hash should not change just because new activity units are loaded
 
   expect_identical(act$.__enclos_env__$private$activity_units, dk_activity_units_subset)
 
@@ -108,8 +108,8 @@ test_that("$change_activity works with different ways of initializing", {
                            opening      = c("basis", "ned2020", "UngUdd.f1.2020"),
                            closing      = c(NA,      "basis",   NA))
   act$change_activity(scenario_2)
-  expect_identical(ref_scenario, act$scenario_matrix)
-  expect_identical(hash_scenario_1_loaded, act$hash) # hash should be the same as before
+  expect_identical(act$scenario_matrix, ref_scenario)
+  expect_identical(act$hash, hash_scenario_1_loaded) # hash should be the same as before
 
 
 
@@ -131,8 +131,8 @@ test_that("$change_activity works with different ways of initializing", {
   # (Since the 10th activity unit is never used in the scenario)
   act$set_activity_units(dk_activity_units_subset[1:9])
   act$change_activity(scenario_1)
-  expect_identical(ref_scenario, act$scenario_matrix)
-  expect_identical(hash_scenario_1_loaded, act$hash) # hash should be the same as before
+  expect_identical(act$scenario_matrix, ref_scenario)
+  expect_identical(act$hash, hash_scenario_1_loaded) # hash should be the same as before
 
   rm(act)
 })
@@ -206,8 +206,8 @@ test_that("$change_activity fails with malformed inputs", {
 
   # hash should be different now that the risks are different
   hash_new_risks <- act$hash
-  expect_false(hash_new_instance == hash_new_risks)
-  expect_false(hash_scenario_1_loaded == hash_new_risks)
+  expect_false(hash_new_risks == hash_new_instance)
+  expect_false(hash_new_risks == hash_scenario_1_loaded)
 
 
   # `$change_risk` fails when wrong type is given
