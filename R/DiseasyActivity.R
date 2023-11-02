@@ -788,7 +788,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #   The function computes the proportion of population in the new and old age groups
     # @param age_cuts_lower `r rd_age_cuts_lower`
     # @param population_1yr `r rd_population_1yr`
-    map_population = function(age_cuts_lower, population_1yr) {
+    map_population = function(age_cuts_lower, population_1yr = NULL) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
