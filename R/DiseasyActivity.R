@@ -478,7 +478,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       for (dd in seq_along(freedom)) { # looping over dates
         for (tt in private$activity_types) {
           # TODO: genWeight
-          contacts[[dd]][[tt]] <- private$vector_to_matrix(freedom[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
+          contacts[[dd]][[tt]] <- private$vector_to_herringbone(freedom[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
         }
       }
 
@@ -741,9 +741,9 @@ DiseasyActivity <- R6::R6Class(                                                 
     # @description
     #   Ensures that you can add so that when the diagonal is one then the rest is as well
     #   it is done by adding contacts to and from a given age group to those that are younger
-    #   (In Danish this could be labelled as "sildebensparket")
+    #   (In Danish this could be labelled as "sildebensparket" - or "herringbone pattern")
     # @param dw vector to transform
-    vector_to_matrix = function(dw) {
+    vector_to_herringbone = function(dw) {
       n <- length(dw)
       if (n == 1) return(dw)
       w <- diag(dw)
