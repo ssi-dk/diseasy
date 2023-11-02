@@ -310,7 +310,7 @@ Returns a list with depth of two: value[\link{date}][\link{type}]
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_contacts"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_contacts}{}}}
 \subsection{Method \code{get_scenario_contacts()}}{
-Return contacts for across age groups and activities on all dates.
+Return the per capita contact rates stratified by age group across activities on all dates.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_contacts(
   age_cuts_lower = NULL,

@@ -458,7 +458,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
 
     #' @description
-    #'   Return contacts for across age groups and activities on all dates.
+    #'   Compute the contact matrices stratified by age group across activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param population_1yr `r rd_population_1yr`
     #' @param weights `r rd_activity_weights`
@@ -469,16 +469,18 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_class(self$contact_basis, "list", add = coll)
+      checkmate::assert_class(self$contact_basis, "list", add = coll)  # Ensure contact_basis is loaded
       checkmate::reportAssertions(coll)
 
-      contacts <- freedom <- self$get_scenario_freedom()
+      # Get the per age_group level of freedom (number between 0 and 1)
+      scenario_contacts <- freedom <- self$get_scenario_freedom()
 
       # Apply .risk_matrix
-      for (dd in seq_along(freedom)) { # looping over dates
+      for (dd in seq_along(freedom)) { # looping over changes in restrictions within scenario
         for (tt in private$activity_types) {
           # TODO: genWeight
-          contacts[[dd]][[tt]] <- private$vector_to_herringbone(freedom[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
+          scenario_contacts[[dd]][[tt]] <- private$vector_to_herringbone(freedom[[dd]][[tt]]) *
+            self$contact_basis$contacts[[tt]]
         }
       }
 
@@ -486,14 +488,14 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (!is.null(age_cuts_lower)) {
         p <- private$population_transform_matrix(age_cuts_lower, population_1yr)
 
-        contacts <- lapply(contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
+        scenario_contacts <- lapply(scenario_contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
         # TODO: Consider if prop_out is needed
       }
 
       # Weight if weights are given
-      contacts <- private$weight_activities(contacts, weights)
+      scenario_contacts <- private$weight_activities(scenario_contacts, weights)
 
-      return(contacts)
+      return(scenario_contacts)
     },
 
     #' @description
