@@ -314,22 +314,22 @@ test_that("set_contact_basis works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis %.% DK
-  custom_basis$counts <- custom_basis$counts[-1]
+  custom_basis$contacts <- custom_basis$contacts[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
                regexp = r"{missing.*elements.*\{'home'\}}")
 
   custom_basis <- contact_basis %.% DK
-  custom_basis$prop <- custom_basis$prop[-1]
+  custom_basis$proportion <- custom_basis$proportion[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = "* have length 1")
+               regexp = "* length 16")
 
   custom_basis <- contact_basis %.% DK
-  custom_basis$pop <- dplyr::select(custom_basis$pop, "prop")
+  custom_basis$invalid_field <- "some_value"
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = r"{extra.*elements.*\{'pop'\}}")
+               regexp = r"{extra.*elements.*\{'invalid_field'\}}")
 
   custom_basis <- contact_basis %.% DK
-  expect_error(act$set_contact_basis(custom_basis[-4]), class = "simpleError",
+  expect_error(act$set_contact_basis(custom_basis[-5]), class = "simpleError",
                regexp = r"{missing.*elements.*\{'description'\}}")
 
   rm(act)

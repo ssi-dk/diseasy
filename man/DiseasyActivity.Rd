@@ -66,7 +66,7 @@ A reduced view of the internal state of restrictions (showing only used activity
 \item{\code{risk_matrix}}{(\code{matrix})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in 5-year age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{per_capita_rates} contains the age stratified contact counts per capita across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -119,7 +119,7 @@ Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"}
 
 \item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in 5-year age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{per_capita_rates} contains the age stratified contact counts per capita across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
 }
@@ -174,7 +174,7 @@ Sets the contact matrix basis the activity is computed from
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in 5-year age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{per_capita_rates} contains the age stratified contact counts per capita across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 }
 \if{html}{\out{</div>}}
 }
@@ -340,7 +340,7 @@ If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][
 \subsection{Method \code{rescale_counts_to_rates()}}{
 Re-scale from contacts to rates per individual to fractional population.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, pop = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, population = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -349,10 +349,10 @@ Re-scale from contacts to rates per individual to fractional population.
 \item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
 Counts to be re-scaled.}
 
-\item{\code{pop}}{(\code{numeric})\cr
+\item{\code{population}}{(\code{numeric})\cr
 Population vector to weight contacts by.
 Must use same age_groups as the contact matrix input.
-if NULL (default), \code{pop} is computed from the loaded \code{contact_basis}}
+if NULL (default), \code{population} is computed from the loaded \code{contact_basis}}
 }
 \if{html}{\out{</div>}}
 }
