@@ -9,7 +9,8 @@ Authors@R:
       person("Lasse Engbo", "Christiansen", , "lsec@ssi.dk", role = c("aut"),
              comment = c(ORCID = "0000-0001-5019-1931")),
       person("Kaare", "Gr\u00E6sb\u00F8ll", , "kagr@ssi.dk", role = c("aut"),
-             comment = c(ORCID = "0000-0002-6258-8212")))
+             comment = c(ORCID = "0000-0002-6258-8212")),
+      person("Statens Serum Institut, SSI", role = c("cph", "fnd")))
 Description: This package facilitates creation of an ensemble of models through modular construction and combinatorics.
 License: GPL-3
 Encoding: UTF-8
