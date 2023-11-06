@@ -42,7 +42,7 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   # Get 1-year age-group data for everywhere
   demography <- idb1yr |>
     dplyr::rename_with(tolower) |>
-    dplyr::filter(.data$`#yr` == 2020) |>
+    dplyr::filter(.data$`#yr` == 2020, .data$sex == 0) |>
     dplyr::mutate("key_country" = stringr::str_sub(.data$geo_id, -2, -1)) |>
     dplyr::summarise("population" = sum(.data$pop), .by = c("key_country", "age")) |>
     dplyr::mutate("proportion" = .data$population / sum(.data$population), .by = "key_country")
