@@ -66,7 +66,7 @@ A reduced view of the internal state of restrictions (showing only used activity
 \item{\code{risk_matrix}}{(\code{matrix})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{per_capita_rates} contains the age stratified contact counts per capita across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{contacts} contains the age stratified contact matrices across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -82,7 +82,6 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
 \item \href{#method-DiseasyActivity-get_scenario_freedom}{\code{DiseasyActivity$get_scenario_freedom()}}
 \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
-\item \href{#method-DiseasyActivity-rescale_counts_to_rates}{\code{DiseasyActivity$rescale_counts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
 \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
@@ -119,7 +118,7 @@ Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"}
 
 \item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{per_capita_rates} contains the age stratified contact counts per capita across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{contacts} contains the age stratified contact matrices across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
 }
@@ -174,7 +173,7 @@ Sets the contact matrix basis the activity is computed from
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{per_capita_rates} contains the age stratified contact counts per capita across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{contacts} contains the age stratified contact matrices across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in 5-year age-groups\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 }
 \if{html}{\out{</div>}}
 }
@@ -310,7 +309,7 @@ Returns a list with depth of two: value[\link{date}][\link{type}]
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_contacts"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_contacts}{}}}
 \subsection{Method \code{get_scenario_contacts()}}{
-Return the per capita contact rates stratified by age group across activities on all dates.
+Compute the contact matrices stratified by age group across activities on all dates.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_contacts(
   age_cuts_lower = NULL,
@@ -332,32 +331,6 @@ Return the per capita contact rates stratified by age group across activities on
 }
 \subsection{Returns}{
 If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-rescale_counts_to_rates"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_counts_to_rates}{}}}
-\subsection{Method \code{rescale_counts_to_rates()}}{
-Re-scale from contacts to rates per individual to fractional population.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, population = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
-Counts to be re-scaled.}
-
-\item{\code{population}}{(\code{numeric})\cr
-Population vector to weight contacts by.
-Must use same age_groups as the contact matrix input.
-if NULL (default), \code{population} is computed from the loaded \code{contact_basis}}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns an object with the same structure as the input
 }
 }
 \if{html}{\out{<hr>}}

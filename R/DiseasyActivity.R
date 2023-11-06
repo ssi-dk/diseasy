@@ -495,8 +495,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       for (dd in seq_along(freedom)) { # looping over changes in restrictions within scenario
         for (tt in private$activity_types) {
           # TODO: genWeight
-          contacts[[dd]][[tt]] <- private$vector_to_herringbone(freedom[[dd]][[tt]]) *
-            self$contact_basis$per_capita_rates[[tt]]
+          scenario_contacts[[dd]][[tt]] <- private$vector_to_herringbone(freedom[[dd]][[tt]]) *
+            self$contact_basis$contacts[[tt]]
         }
       }
 
@@ -522,7 +522,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         N_i <- self$contact_basis$population                                                                            # nolint: object_name_linter
         N_i <- outer(N_i, rep(1, length(N_i))) # Store as a column matrix with N_i repeated                             # nolint: object_name_linter
 
-        # For each contact matrix, m, in the scernario, we perform the transformation
+        # For each contact matrix, m, in the scenario, we perform the transformation
         # (p %*% (m * N_i) %*% t(p)) / N_n                                                                              # nolint: commented_code_linter
         # The elements of this matrix has the following form:
         # (m_{i  ,j} * N_i     + m_{i,  j+1} * N_i     + ... + m_{i,  j+k} * N_i +
