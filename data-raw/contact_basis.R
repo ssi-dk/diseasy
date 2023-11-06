@@ -42,7 +42,7 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   # Get 1-year age-group data for Denmark
   pop_ref_1yr <- idb1yr |>
     dplyr::rename_with(tolower) |>
-    dplyr::filter(`#yr` == 2020) |>
+    dplyr::filter(`#yr` == 2020, .data$sex == 0) |>
     dplyr::mutate("key_country" = stringr::str_sub(geo_id, -2, -1)) |>
     dplyr::summarise(pop = sum(pop), .by = c("key_country", "age")) |>
     dplyr::mutate(prop = pop / sum(pop), .by = "key_country")
