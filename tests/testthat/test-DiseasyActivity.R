@@ -7,15 +7,15 @@ test_that("change_activity works", {
   hash_new_instance <- act$hash
 
   # Load first 10 elements of activity units into the module
-  mg_activity_units_subset <- mg_activity_units[1:10] # mg_activity_units is available from package
-  act$set_activity_units(mg_activity_units_subset)
+  dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
+  act$set_activity_units(dk_activity_units_subset)
 
   expect_identical(hash_new_instance, act$hash) # hash should not change just because new activity units are loaded
 
   # Try to load ill-defined activity units
-  mg_activity_units_error <- mg_activity_units_subset
-  mg_activity_units_error$basis$work <- NULL
-  expect_error(act$set_activity_units(mg_activity_units_error),
+  dk_activity_units_error <- dk_activity_units_subset
+  dk_activity_units_error$basis$work <- NULL
+  expect_error(act$set_activity_units(dk_activity_units_error),
                class = "simpleError",
                regexp = "basis.*work")
 
@@ -32,8 +32,8 @@ test_that("change_activity works", {
   # Check scenario matrix is correctly configured
   ref_scenario <- matrix(0,
                          ncol = 3,
-                         nrow = length(mg_activity_units_subset),
-                         dimnames = list(names(mg_activity_units_subset), as.character(unique(scenario_1$date))))
+                         nrow = length(dk_activity_units_subset),
+                         dimnames = list(names(dk_activity_units_subset), as.character(unique(scenario_1$date))))
   ref_scenario["basis", "2020-01-01"] <- 1
   ref_scenario["basis", "2020-03-12"] <- 0
   ref_scenario["ned2020", "2020-03-12"] <- 1
@@ -41,7 +41,7 @@ test_that("change_activity works", {
   ref_scenario["UngUdd.f1.2020", "2020-04-15"] <- 1
   ref_scenario <- ref_scenario[rowSums(ref_scenario) > 0, ]
   attr(ref_scenario, "secret_hash") <- purrr::map_chr(
-    mg_activity_units_subset[c("basis", "ned2020", "UngUdd.f1.2020")],
+    dk_activity_units_subset[c("basis", "ned2020", "UngUdd.f1.2020")],
     digest::digest) |> digest::digest()
 
   scenario_matrix <- act$scenario_matrix
@@ -70,7 +70,7 @@ test_that("change_activity works", {
 
   # If we load only the first 9 activity units and the same scenario, we should
   # still get the same scenario matrix and same hash
-  act$set_activity_units(mg_activity_units_subset[1:9])
+  act$set_activity_units(dk_activity_units_subset[1:9])
   act$change_activity(scenario_1)
   expect_identical(ref_scenario, act$scenario_matrix)
   expect_identical(hash_scenario_1_loaded, act$hash) # hash should be the same as before
@@ -92,7 +92,7 @@ test_that("change_activity works", {
                              closing      = c(NA,      "basis",   NA))
 
   # if we change one of the activity units, the hash should not give the same
-  tmp_activity_units <- mg_activity_units_subset
+  tmp_activity_units <- dk_activity_units_subset
   names(tmp_activity_units) <- c(names(tmp_activity_units[1:3]),
                                  names(tmp_activity_units[10]),
                                  names(tmp_activity_units[5:9]),
@@ -105,7 +105,7 @@ test_that("change_activity works", {
 
 
   # Now we try to load a scenario that will not validate
-  act$set_activity_units(mg_activity_units_subset)
+  act$set_activity_units(dk_activity_units_subset)
   act$change_activity(scenario_1)
   fail_scenario_1 <- data.frame(date = as.Date(c("2020-05-01",  "2020-05-01",   "2020-06-01",    "2020-06-01")),
                                 opening      = c("LibErv.2020", "Praksis.2020", "Domstole.2020", "PrivArb.f1.2020"),
@@ -145,8 +145,8 @@ test_that("change_activity works", {
 
   # Test openness
   act <- DiseasyActivity$new(base_scenario = "closed")
-  mg_activity_units_subset <- mg_activity_units[1:10] # mg_activity_units is available from package
-  act$set_activity_units(mg_activity_units_subset)
+  dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
+  act$set_activity_units(dk_activity_units_subset)
 
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12", "2020-04-15")),
                       opening      = c("basis", "ned2020", "UngUdd.f1.2020"),
@@ -161,8 +161,8 @@ test_that("change_activity works", {
 
   # Test BBC contacts
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = bbc_contagion)
-  # mg_activity_units is available from package
-  act$set_activity_units(mg_activity_units[1:10])
+  # dk_activity_units is available from package
+  act$set_activity_units(dk_activity_units[1:10])
 
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12", "2020-04-15")),
                       opening      = c("basis", "ned2020", "UngUdd.f1.2020"),

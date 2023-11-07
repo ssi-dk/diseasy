@@ -41,9 +41,9 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       # TODO: add documentation here
       if (base_scenario == "dk_reference") {
-        self$set_activity_units(mg_activity_units)
-        self$change_activity(mg_reference_scenario)
-        work_risk <- aggregate(faWork ~ date, data = mg_reference_scenario, FUN = mean)
+        self$set_activity_units(dk_activity_units)
+        self$change_activity(dk_reference_scenario)
+        work_risk <- aggregate(faWork ~ date, data = dk_reference_scenario, FUN = mean)
         self$change_risk(date = work_risk$date, type = "work", risk = work_risk$faWork)
         private$lg$info("Initialised 'dk_reference' scenario")
       }
