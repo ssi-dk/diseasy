@@ -11,8 +11,10 @@ covid
 DBIConnection
 diseasy
 diseasystore
+diseasystores
 DiseasyBaseModule
 DiseasyObservables
+DiseasySeason
 DMI
 
 Engbo
