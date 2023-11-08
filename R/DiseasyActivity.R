@@ -43,8 +43,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       if (base_scenario == "dk_reference") {
         self$set_activity_units(dk_activity_units)
         self$change_activity(dk_reference_scenario)
-        work_risk <- aggregate(faWork ~ date, data = dk_reference_scenario, FUN = mean)
-        self$change_risk(date = work_risk$date, type = "work", risk = work_risk$faWork)
+        work_risk <- aggregate(social_distance_work ~ date, data = dk_reference_scenario, FUN = mean)
+        self$change_risk(date = work_risk$date, type = "work", risk = work_risk$social_distance_work)
         private$lg$info("Initialised 'dk_reference' scenario")
       }
 
@@ -63,9 +63,12 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       # Checking if all activity units contains "home", "work", "school" and "other":
       purrr::walk2(activity_units, names(activity_units),
-                   ~ if (!all(private$activity_types %in% names(.x))) {
+                   ~ {
+                     if (!all(private$activity_types %in% names(.x))) {
                        coll$push(glue::glue("Activity unit {.y} does not contain matrices for:",
-                                            "{setdiff(private$activity_types, names(.x))}"))})
+                                            "{setdiff(private$activity_types, names(.x))}"))
+                     }
+                   })
       checkmate::reportAssertions(coll)
 
 
@@ -222,7 +225,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
         digest::digest()
       attr(private$.scenario_matrix, "secret_hash") <- active_activity_units_hash
 
-     },
+    },
 
     #' @description
     #' Sets the overall risk of types of activity
@@ -242,7 +245,8 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       checkmate::assert(
         checkmate::check_data_frame(date, col.names = c("date", "type", "risk")),
         checkmate::check_date(date, any.missing = FALSE),
-        add = coll)
+        add = coll
+      )
 
       if (is.data.frame(date) && is.na(type) && is.na(risk)) {
         type <- date$type
@@ -282,7 +286,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       new_scenario_matrix <- private$update_with_dates(input_matrix = private$.scenario_matrix,
                                                        input_dates = input_dates, first_col_value = 0)
       new_risk_matrix     <- private$update_with_dates(input_matrix = private$.risk_matrix,
-                                                   input_dates = input_dates, first_col_value = 1)
+                                                       input_dates = input_dates, first_col_value = 1)
 
       # Updating with input changes of activities
       # One date at a time - in chronological order
@@ -296,7 +300,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       private$.scenario_matrix  <- new_scenario_matrix
       private$.risk_matrix      <- new_risk_matrix
 
-     },
+    },
 
     #' @description
     #' Helper function to crop the scenario matrix in time
@@ -335,7 +339,10 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #'   Return `list` with opened/closed activities on dates where there are changes.
     #' @return `list` with opened/closed activities on dates where there are changes.
     get_scenario_activities = function() {
-      return(apply(private$.scenario_matrix, 2, \(x) private$activity_units_labels[x != 0]))
+      activities <- as.data.frame(private$.scenario_matrix) |>
+        purrr::map(~ private$activity_units_labels[. != 0])
+
+      return(activities)
     },
 
     #' @description
@@ -482,10 +489,11 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       if (missing(value)) {
         if (any(private %.% .scenario_matrix != 0)) {
           # We filter out rows without any 1's (these activity units are not active)
-          out <- private$.scenario_matrix[rowSums(private$.scenario_matrix != 0) > 0, ]
+          out <- private$.scenario_matrix[rowSums(private$.scenario_matrix != 0) > 0, , drop = FALSE] # Keep data type
+
           # We then order the activity_units by first occurrence, tie-broken by the name of the activity_unit
           index <- apply(out, 1, \(x) which(x != 0)[1])
-          out <- out[order(index, rownames(out)), ]
+          out <- out[order(index, rownames(out)), , drop = FALSE] # Keep data type
           attr(out, "secret_hash") <- attr(private$.scenario_matrix, "secret_hash") # Copy the "secret hash"
           return(out)
         } else {
@@ -566,7 +574,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
                             dimnames = list(rownames(input_matrix), new_dates)))
 
         # Reordering columns to chronological order
-        out <- out[, order(colnames(out))]
+        out <- out[, order(colnames(out)), drop = FALSE] # Force R to maintain the data type when reordering...
 
         # Determine the column index of the new columns
         to_update <- match(as.character(new_dates), colnames(out))
