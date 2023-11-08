@@ -1557,49 +1557,49 @@ dk_activity_units <- dk_activity_units |>
 ################################## #
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "home_225",
+    activity = "home_22_5pp",
     label = "Home + 22.5%", home = 0.225, work = 0, school = 0, other = 0, risk = 1
   )
 
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "home_25",
+    activity = "home_25pp",
     label = "Home + 25%", home = 0.25, work = 0, school = 0, other = 0, risk = 1
   )
 
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "home_275",
+    activity = "home_27_5pp",
     label = "Home + 27.5%", home = 0.275, work = 0, school = 0, other = 0, risk = 1
   )
 
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "home_35",
+    activity = "home_35pp",
     label = "Home + 35%", home = 0.35, work = 0, school = 0, other = 0, risk = 1
   )
 
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "home_05",
+    activity = "home_05pp",
     label = "Home + 5%", home = 0.05, work = 0, school = 0, other = 0, risk = 1
   )
 
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "home_10",
+    activity = "home_10pp",
     label = "Home + 10%", home = 0.10, work = 0, school = 0, other = 0, risk = 1
   )
 
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "home_15",
+    activity = "home_15pp",
     label = "Home + 15%", home = 0.15, work = 0, school = 0, other = 0, risk = 1
   )
 
 dk_activity_units <- dk_activity_units |>
   add_activity(
-    activity = "other_10",
+    activity = "other_10pp",
     label = "Other + 10%", home = 0, work = 0, school = 0, other = 0.10, risk = 1
   ) # Mentality change around Feb 1, 2022
 
