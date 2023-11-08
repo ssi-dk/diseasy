@@ -39,7 +39,7 @@ By default, the module initializes with no activity scenario, and produces empty
 act$get_scenario_freedom()
 ```
 
-To use the module, we must define the activity scenario. In the example below, we use configure the module to use
+To use the module, we must define the activity scenario. In the example below, we configure the module to use
 Danish activity units and the "contact basis" for Denmark (i.e basic contact matrices and population information).
 
 NOTE: the given contact basis uses counts of contacts between individuals rather than rates.
