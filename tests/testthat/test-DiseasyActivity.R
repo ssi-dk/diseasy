@@ -1,4 +1,39 @@
-test_that("change_activity works", {
+test_that("$set_activity_units works", {
+
+  # Create a new instance of the activity module
+  act <- DiseasyActivity$new()
+
+  # Store the current hash
+  hash_new_instance <- act$hash
+
+  # Load first 10 elements of activity units into the module
+  dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
+  expect_no_error(act$set_activity_units(dk_activity_units_subset))
+
+  expect_identical(act$hash, hash_new_instance) # hash should not change just because new activity units are loaded
+
+  expect_identical(act$.__enclos_env__$private$activity_units, dk_activity_units_subset)
+
+  rm(act)
+})
+
+
+test_that("$set_activity_units fails when loading malformed activity units", {
+
+  # Create a new instance of the activity module
+  act <- DiseasyActivity$new()
+
+  dk_activity_units_error <- dk_activity_units[1:10]
+  dk_activity_units_error$baseline$work <- NULL
+  expect_error(act$set_activity_units(dk_activity_units_error),
+               class = "simpleError",
+               regexp = "baseline.*work")
+
+  rm(act)
+})
+
+
+test_that("$change_activity works with different ways of initializing", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -25,11 +60,11 @@ test_that("change_activity works", {
                            opening      = c("basis",  NA,      "ned2020", "UngUdd.f1.2020"),
                            closing      = c(NA,       "basis", NA,        NA))
   act$change_activity(scenario_1)
+  hash_scenario_1_loaded <- act$hash
 
-  expect_false(hash_new_instance == act$hash) # hash should change now that a scenario is defined
-  hash_scenario_1_loaded <- act$hash # Store new hash
+  expect_false(hash_new_instance == hash_scenario_1_loaded) # hash should change now that a scenario is defined
 
-  # Check scenario matrix is correctly configured
+  # Check scenario matrix is correctly configured inside the module
   ref_scenario <- matrix(0,
                          ncol = 3,
                          nrow = length(dk_activity_units_subset),
@@ -47,14 +82,37 @@ test_that("change_activity works", {
   scenario_matrix <- act$scenario_matrix
   expect_identical(ref_scenario, scenario_matrix)
 
+
+
+
+  # if we change one of the activity units, the hash should not give the same value
+  tmp_activity_units <- dk_activity_units_subset
+  names(tmp_activity_units) <- c(names(tmp_activity_units[1:3]),
+                                 names(tmp_activity_units[10]),
+                                 names(tmp_activity_units[5:9]),
+                                 names(tmp_activity_units[4]))
+
+  act$set_activity_units(tmp_activity_units)
+  act$change_activity(scenario_1)
+  expect_false(identical(ref_scenario, act$scenario_matrix))
+  expect_setequal(ref_scenario, act$scenario_matrix)
+  expect_false(hash_scenario_1_loaded == act$hash) # hash should now be different since the activity units have changed
+
+
+
+
   # Try another way of defining the same scenario:
+  # The scenario is the same, but written more compactly
   act$reset_scenario() # resets the scenario matrix
   scenario_2 <- data.frame(date = as.Date(c("2020-01-01", "2020-03-12", "2020-04-15")),
                            opening      = c("basis", "ned2020", "UngUdd.f1.2020"),
                            closing      = c(NA,      "basis",   NA))
   act$change_activity(scenario_2)
-  expect_identical(ref_scenario, act$scenario_matrix)
-  expect_identical(hash_scenario_1_loaded, act$hash) # hash should be the same as before
+  expect_identical(act$scenario_matrix, ref_scenario)
+  expect_identical(act$hash, hash_scenario_1_loaded) # hash should be the same as before
+
+
+
 
 
   # And without a data.frame as input
@@ -70,10 +128,24 @@ test_that("change_activity works", {
 
   # If we load only the first 9 activity units and the same scenario, we should
   # still get the same scenario matrix and same hash
+  # (Since the 10th activity unit is never used in the scenario)
   act$set_activity_units(dk_activity_units_subset[1:9])
   act$change_activity(scenario_1)
-  expect_identical(ref_scenario, act$scenario_matrix)
-  expect_identical(hash_scenario_1_loaded, act$hash) # hash should be the same as before
+  expect_identical(act$scenario_matrix, ref_scenario)
+  expect_identical(act$hash, hash_scenario_1_loaded) # hash should be the same as before
+
+  rm(act)
+})
+
+
+test_that("$change_activity fails with malformed inputs", {
+
+  # Create a new instance of the activity module
+  act <- DiseasyActivity$new()
+
+  # Load first 10 elements of activity units into the module
+  dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
+  act$set_activity_units(dk_activity_units_subset)
 
 
   # Test that changing activity fails when a missing activity unit is requested
@@ -132,14 +204,24 @@ test_that("change_activity works", {
   # Now adjusting risks
   act$change_risk(date = as.Date("2020-03-12"), type = c("work", "school"), risk = c(0.5, 0.8))
 
-  # Wrong type
+  # hash should be different now that the risks are different
+  hash_new_risks <- act$hash
+  expect_false(hash_new_risks == hash_new_instance)
+  expect_false(hash_new_risks == hash_scenario_1_loaded)
+
+
+  # `$change_risk` fails when wrong type is given
   expect_error(act$change_risk(date = as.Date("2020-03-15"), type = c("workers"), risk = c(0.5)),
                class = "simpleError",
                regexp = "workers")
+  expect_identical(act$hash, hash_new_risks)
 
+
+  # And works again with new properly formed risks
   act$change_risk(date = as.Date("2020-06-12"), type = c("work", "school"), risk = c(0.7, 0.9))
 
   expect_identical(colnames(act$risk_matrix), colnames(act$scenario_matrix))
+  expect_false(act$hash == hash_new_risks)
 
   rm(act)
 
@@ -223,7 +305,7 @@ test_that("set_contact_basis works", {
   custom_basis <- bbc_contagion
   custom_basis$prop <- custom_basis$prop[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = "Must have length 1")
+               regexp = "* have length 1")
 
   custom_basis <- bbc_contagion
   custom_basis$pop <- dplyr::select(custom_basis$pop, 'prop')
