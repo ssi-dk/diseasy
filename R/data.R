@@ -62,7 +62,7 @@ NULL
 #' dk_activity_units
 #'
 #' This data set contains the "units" of activity that was developed for the Danish COVID-19 modelling efforts.
-#' Each "activity unit" specifies the amount of activity the for arenas: Home, Work, School, Other.
+#' Each "activity unit" specifies the amount of activity for the four arenas: Home, Work, School, Other.
 #' By combining these units of activity, a complete, granular picture of the societal activity is formed
 #' (see dk_reference_scenario for details).
 #'
