@@ -1,5 +1,10 @@
 if (require(contactdata) && require(countrycode) && require(curl) && require(usethis)) {
 
+  # We express all contact data by default in 16 5-year age groups
+  # (the default age groups of the `contactdata` package)
+  age_cuts <- (0:15) * 5
+  age_labels <- diseasystore::age_labels(age_cuts)
+  
   # Get contact matrices for every country in the contactdata package
   countries <- contactdata::list_countries()
   country_codes <- purrr::map_chr(countries,
@@ -16,7 +21,7 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
 
         # Set the row and column names of the matrices according to our naming
         counts <- purrr::map(counts, ~ {
-          rownames(.) <- colnames(.) <- diseasystore::age_labels((0:15) * 5)
+          rownames(.) <- colnames(.) <- age_labels
           return(.)
         })
 
@@ -39,18 +44,17 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   idb1yr <- readr::read_delim(unz(file.path(tempdir(), "idbzip.zip"), "idbsingleyear.txt"),
                               delim = "|", show_col_types = FALSE)
 
-  # Get 1-year age-group data for Denmark
+  # Get 1-year age-group data for all countries in the data set
+  # We use population data from 2020 to match the study year of `contactdata`s contact matrices
+  # US Census data uses their "GEO_ID" as geograpical identifier. In this case, we only need the
+  # country code (last two characters of GEO_ID)
   pop_ref_1yr <- idb1yr |>
     dplyr::rename_with(tolower) |>
-    dplyr::filter(`#yr` == 2020, .data$sex == 0) |>
-    dplyr::mutate("key_country" = stringr::str_sub(geo_id, -2, -1)) |>
-    dplyr::summarise(pop = sum(pop), .by = c("key_country", "age")) |>
+    dplyr::filter(`#yr` == 2020, .data$sex == 0) |> 
+    dplyr::transmute("key_country" = stringr::str_sub(geo_id, -2, -1), .data$age, .data$pop) |>
     dplyr::mutate(prop = pop / sum(pop), .by = "key_country")
 
-  # Project into 5-year age-groups
-  age_cuts <- (0:15) * 5
-  age_labels <- diseasystore::age_labels(age_cuts)
-
+  # Project into the 5-year age-groups
   props <- pop_ref_1yr |>
     dplyr::mutate(age_group = purrr::map_chr(pop_ref_1yr$age, ~ age_labels[max(which(age_cuts <= .))])) |>
     dplyr::summarise(prop = sum(prop), .by = c("key_country", "age_group"))
