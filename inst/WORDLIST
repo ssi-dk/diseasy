@@ -12,6 +12,7 @@ DBIConnection
 diseasy
 diseasystore
 diseasystores
+DiseasyActivity
 DiseasyBaseModule
 DiseasyObservables
 DiseasySeason
