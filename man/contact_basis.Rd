@@ -42,7 +42,7 @@ https://www.medrxiv.org/content/10.1101/2020.02.16.20023754v2.full.pdf
 
 m_ij the raw contact matrix elements from age group i to age group j\cr
 c_ij the reciprocal contact matrix elements\cr
-w_i  the proportion of persons that fall into age group i\cr
+w_i  the proportion of population that fall into age group i\cr
 
 The \code{diseasy} SEIR models are configured to use a symmetric, weighted set of
 contacts matrices where the elements are 0.5 * (c_ij * w_j + c_ji * w_i)
