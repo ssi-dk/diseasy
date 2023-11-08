@@ -9,8 +9,6 @@ test_that("change_activity works", {
   # Load first 10 elements of activity units into the module
   dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
   act$set_activity_units(dk_activity_units_subset)
-  dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
-  act$set_activity_units(dk_activity_units_subset)
 
   expect_identical(hash_new_instance, act$hash) # hash should not change just because new activity units are loaded
 
