@@ -605,12 +605,12 @@ DiseasyActivity <- R6::R6Class(                                                 
     upper_activity_level = NULL,
 
     # @field activity_units (`list`)\cr
-    #   The list of available `activity_units` in the module.
+    #   The list of loaded `activity_units` in the module.
     #   See ?dk_activity_modules for details
     activity_units = NULL,
 
     # @field activity_units_labels (`character`)\cr
-    #   The names (labels) of available `activity_units` in the module.
+    #   The names (labels) of loaded `activity_units` in the module.
     #   See ?dk_activity_modules for details
     activity_units_labels = NULL,
 
