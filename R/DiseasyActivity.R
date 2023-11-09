@@ -708,19 +708,26 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     # Generate symmetric weight matrix based on diagonal.
     # @description
-    #   Ensures that you can add so that when the diagonal is one then the rest is as well
-    #   it is done by adding contacts to and from a given age group to those that are younger
-    #   (In Danish this could be labelled as "sildebensparket")
-    # @param dw (`numeric()`)\cr
+    #   The function takes the values of the supplied vector and structures the values like "herringbone flooring".
+    #   If the given vector is v = (v1, v2, v3)
+    #   The generated "herringbone" matrix has elements
+    #   [v1 v2 v3]
+    #   [v2 v2 v3]
+    #   [v3 v3 v3]
+    #
+    #   This structure is used when constructing contact matrices from age-stratified restrictions.
+    #   The "herringbone" matrix ensures that you can add so that when the diagonal is one then the rest is as well
+    #   it is done by adding contacts to and from a given age group to those that are younger.
+    # @param vector (`numeric()`)\cr
     #   Vector to transform
-    vector_to_matrix = function(dw) {
-      n <- length(dw)
-      if (n == 1) return(dw)
-      w <- diag(dw)
+    vector_to_matrix = function(vector) {
+      n <- length(vector)
+      if (n == 1) return(vector)
+      h <- diag(vector)
       for (i in 1:n) {
-        w[i, (1:i)] <- w[(1:i), i] <- dw[i]
+        h[i, (1:i)] <- h[(1:i), i] <- vector[i]
       }
-      return(w)
+      return(h)
     }
 
   )
