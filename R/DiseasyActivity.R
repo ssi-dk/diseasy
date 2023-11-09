@@ -397,11 +397,10 @@ DiseasyActivity <- R6::R6Class(                                                 
       list_active <- self$get_scenario_activities()
       openness <- lapply(list_active, private$add_activities)
 
-      # Apply .risk_matrix
-      # TODO: is this not already applied through "add_activities"?
+      # Apply the time-varying risks stored in risk_matrix
       for (dd in seq_along(openness)) { # looping over dates
         for (tt in private$activity_types) {
-          openness[[dd]][[tt]] <- openness[[dd]][[tt]] * private$.risk_matrix[tt, dd]
+          openness[[dd]][[tt]] <- openness[[dd]][[tt]] * self$risk_matrix[tt, dd]
         }
       }
 
