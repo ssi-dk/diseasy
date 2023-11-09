@@ -16,9 +16,9 @@ The \code{contact_basis} contains information about:
 - contact matrices (contact rates between age groups)
 - population (size and proportion of population in age groups)
 
-The \code{activity_units} projects restrictions into smaller "units" that are independently
-"opened" or "closed". Opening (closing) a activity unit means the activity described in
-the unit is (in)active.
+The \code{activity_units} projects restrictions, guidelines and other changes in activity into smaller "units" that are
+independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
+(in)active.
 
 The \code{scenario} contains information on when different \code{activity_units} are opened and closed
 
@@ -66,7 +66,7 @@ A reduced view of the internal state of restrictions (showing only used activity
 \item{\code{risk_matrix}}{(\code{matrix})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in 5-year age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -120,7 +120,7 @@ Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"}
 
 \item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in 5-year age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
 }
@@ -175,7 +175,7 @@ Sets the contact matrix basis the activity is computed from
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in 5-year age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 }
 \if{html}{\out{</div>}}
 }
