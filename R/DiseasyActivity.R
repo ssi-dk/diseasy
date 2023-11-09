@@ -90,12 +90,8 @@ DiseasyActivity <- R6::R6Class(                                                 
         # Use the Danish restrictions
         self$change_activity(dk_reference_scenario)
 
-        # TODO: Lasse, is this correct?
-        # TODO: wouldn't it be nice if this happened inside $change_activity?
-        # TODO: this way, the `dk_reference_scenario` could be loaded in a single function?
         # The "social_distance_work" parameter varies across activity units. If several activity units are active
         # on the same date, we compute the mean "social_distance_work" use this risk for all units on that date
-        # TODO: should this mean be weighted the "size" of the activity units?
         work_risk <- stats::aggregate(social_distance_work ~ date, data = dk_reference_scenario, FUN = mean)
         self$change_risk(date = work_risk$date, type = "work", risk = work_risk$social_distance_work)
 
