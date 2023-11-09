@@ -304,7 +304,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         coll$push("scenario_matrix not set. Invoke change_activity() first.")
       }
       checkmate::assert_character(type, pattern = "(work)|(school)|(home)|(other)", any.missing = FALSE, add = coll)
-      checkmate::assert_numeric(risk, lower = 0, add = coll) # TODO: upper is 1, right?
+      checkmate::assert_numeric(risk, lower = 0, add = coll)
 
       # Check if units are available in the loaded activity units
       wrong_types <- setdiff(unique(stats::na.omit(type)), private$activity_types)
