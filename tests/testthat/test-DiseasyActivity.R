@@ -327,17 +327,17 @@ test_that("set_contact_basis works", {
                regexp = r"{missing.*elements.*\{'home'\}}")
 
   custom_basis <- contact_basis %.% DK
-  custom_basis$prop <- custom_basis$prop[-1]
+  custom_basis$proportion <- custom_basis$proportion[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = "* have length 1")
+               regexp = "* has length 15")
 
   custom_basis <- contact_basis %.% DK
-  custom_basis$pop <- dplyr::select(custom_basis$pop, "prop")
+  custom_basis$extra_element <- "some string"
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = r"{extra.*elements.*\{'pop'\}}")
+               regexp = r"{extra.*elements.*\{'extra_element'\}}")
 
   custom_basis <- contact_basis %.% DK
-  expect_error(act$set_contact_basis(custom_basis[-4]), class = "simpleError",
+  expect_error(act$set_contact_basis(custom_basis[-5]), class = "simpleError",
                regexp = r"{missing.*elements.*\{'description'\}}")
 
   rm(act)

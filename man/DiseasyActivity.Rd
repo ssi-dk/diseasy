@@ -121,12 +121,12 @@ A nested list with all the needed information for the contact_basis\cr
 \itemize{
 \item \code{counts} contains the age stratified contact counts across the arenas of the basis
 (e.g. "work", "home", "school", "other")\cr
-\item \code{prop} #TODO\cr
-\item \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr
+\item \code{proportion} #TODO\cr
+\item \code{demography} contains a \code{data.frame} with the columns\cr
 \itemize{
 \item \code{age} (\code{integer()}) 1-year age group\cr
-\item \code{pop} (\code{numeric()}) size of population in age group\cr
-\item \code{prop} (\code{numeric()}) proportion of total population in age group\cr
+\item \code{population} (\code{numeric()}) size of population in age group\cr
+\item \code{proportion} (\code{numeric()}) proportion of total population in age group\cr
 }
 \item \code{description} contains information about the source of the contact basis
 }}
@@ -298,7 +298,7 @@ Returns a list with depth of one: value[\link{date}]
 \subsection{Method \code{rescale_counts2rates()}}{
 Rescale from contacts to rates per individual to fractional population.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts2rates(input, pop)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts2rates(input, population)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -306,7 +306,7 @@ Rescale from contacts to rates per individual to fractional population.
 \describe{
 \item{\code{input}}{Matrix or (nested) list(s) to be rescaled.}
 
-\item{\code{pop}}{Population vector. Is normalized within.}
+\item{\code{population}}{Population vector. Is normalized within.}
 }
 \if{html}{\out{</div>}}
 }
