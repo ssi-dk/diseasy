@@ -1,10 +1,10 @@
-if (require(contactdata) && require(countrycode) && require(curl) && require(usethis)) {
+if (require(contactdata) && require(countrycode) && require(curl) && require(usethis) && require(tibble)) {
 
   # We express all contact data by default in 16 5-year age groups
   # (the default age groups of the `contactdata` package)
   age_cuts <- (0:15) * 5
   age_labels <- diseasystore::age_labels(age_cuts)
-  
+
   # Get contact matrices for every country in the contactdata package
   countries <- contactdata::list_countries()
   country_codes <- purrr::map_chr(countries,
@@ -48,31 +48,34 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   # We use population data from 2020 to match the study year of `contactdata`s contact matrices
   # US Census data uses their "GEO_ID" as geograpical identifier. In this case, we only need the
   # country code (last two characters of GEO_ID)
-  pop_ref_1yr <- idb1yr |>
+  demography <- idb1yr |>
     dplyr::rename_with(tolower) |>
-    dplyr::filter(`#yr` == 2020, .data$sex == 0) |> 
-    dplyr::transmute("key_country" = stringr::str_sub(geo_id, -2, -1), .data$age, .data$pop) |>
-    dplyr::mutate(prop = pop / sum(pop), .by = "key_country")
+    dplyr::filter(`#yr` == 2020, .data$sex == 0) |>
+    dplyr::transmute("key_country" = stringr::str_sub(geo_id, -2, -1),
+                     .data$age,
+                     "population" = .data$pop,
+                     "proportion" = .data$pop / sum(.data$pop))
 
-  # Project into the 5-year age-groups
-  props <- pop_ref_1yr |>
-    dplyr::mutate(age_group = purrr::map_chr(pop_ref_1yr$age, ~ age_labels[max(which(age_cuts <= .))])) |>
-    dplyr::summarise(prop = sum(prop), .by = c("key_country", "age_group"))
+  # Project into 5-year age-groups
+  populations <- demography |>
+    dplyr::mutate(age_group = purrr::map_chr(demography$age, ~ age_labels[max(which(age_cuts <= .))])) |>
+    dplyr::summarise(population = sum(population), .by = c("key_country", "age_group"))
 
   # Export contact matrices where we also have population data
-  common_country_codes <- intersect(country_codes, pop_ref_1yr$key_country)
+  common_country_codes <- intersect(country_codes, demography$key_country)
   contact_basis <- common_country_codes |>
     purrr::map(\(country_code) {
-      list(counts = purrr::pluck(counts_all, country_code),
-           prop = props |>
-             dplyr::filter(.data$key_country == country_code) |>
-             dplyr::select("age_group", "prop") |>
-             tibble::deframe(),
-           pop_ref_1yr = pop_ref_1yr |>
-             dplyr::filter(.data$key_country == country_code) |>
-             dplyr::select(!"key_country"),
-           description = glue::glue("Contact matrices for {country_code} from the `contactdata` package ",
-                                    "and population data for {country_code} from the US Census Bureau."))
+      tibble::lst(counts = purrr::pluck(counts_all, country_code),
+                  population = populations |>
+                    dplyr::filter(.data$key_country == country_code) |>
+                    dplyr::select("age_group", "population") |>
+                    tibble::deframe(),
+                  proportion = population / sum(population),
+                  demography = demography |>
+                    dplyr::filter(.data$key_country == country_code) |>
+                    dplyr::select(!"key_country"),
+                  description = glue::glue("Contact matrices for {country_code} from the `contactdata` package ",
+                                           "and population data for {country_code} from the US Census Bureau."))
     })
   names(contact_basis) <- common_country_codes
 
@@ -81,7 +84,10 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   contact_basis <- purrr::map(contact_basis, \(basis) {
 
     # Store proportion as the vector w
-    w <- basis$prop
+    w <- basis$demography |>                                                                                            # nolint: object_name_linter
+      dplyr::mutate(age_group = cut(age, c(age_cuts, Inf), right = FALSE, labels = age_labels)) |>
+      dplyr::summarise(proportion = sum(proportion), .by = "age_group") |>
+      tibble::deframe()
 
     basis$counts <- purrr::map(basis$counts, \(x) {
 
