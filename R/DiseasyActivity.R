@@ -10,9 +10,9 @@
 #'     - contact matrices (contact rates between age groups)
 #'     - population (size and proportion of population in age groups)
 #'
-#'   The `activity_units` projects restrictions into smaller "units" that are independently
-#'   "opened" or "closed". Opening (closing) a activity unit means the activity described in
-#'   the unit is (in)active.
+#'   The `activity_units` projects restrictions, guidelines and other changes in activity into smaller "units" that are
+#'   independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
+#'   (in)active.
 #'
 #'   The `scenario` contains information on when different `activity_units` are opened and closed
 #'
