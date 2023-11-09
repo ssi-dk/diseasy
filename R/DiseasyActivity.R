@@ -635,11 +635,10 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     # Risk-weighted activity
     # @description
-    #   This function computes the risk-weighted activity of the given activities across
-    #   the `activity_types`
-    # @param activities (`character`)\cr
+    #   This function computes the risk-weighted activity of the given activities across the `activity_types`
+    # @param activities (`character()`)\cr
     #   A vector of activities to add together
-    # @return
+    # @return (`list()`)\cr
     #   A list of depth two: value[[type]][[age_group_activity]]
     add_activities = function(x) {
       tmp_units <- private$activity_units[x] # List of units to add
@@ -649,7 +648,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         for (i in seq_along(tmp_units)) {
           obj[[type]] <- obj[[type]] + tmp_units[[i]][[type]] * tmp_units[[i]][["risk"]]
         }
-        names(obj[[type]]) <- private$activity_types
+        names(obj[[type]]) <- names(contact_basis$proportion)
       }
       return(obj)
     },
