@@ -670,12 +670,11 @@ DiseasyActivity <- R6::R6Class(                                                 
     #   (i.e. the change to the activity scenario is before any current activity changes).
     #   In this case, `first_col_value` is inserted in the first column of the updated matrix.
     #   All other insertions of dates into the matrix uses the value of the column immediately before (to the left).
-    #
-    # @param input_matrix `matrix` `array`\cr
+    # @param input_matrix (`matrix` `array`)\cr
     #   The matrix representation to extend (either scenario_matrix or risk_matrix)
-    # @param input_dates `Date`\cr
+    # @param input_dates (`Date`)\cr
     #   A vector of dates with changes
-    # @param first_col_value `numeric(1)`\cr
+    # @param first_col_value (`numeric(1)`)\cr
     #   The basic value of the matrix representation
     #
     # @return A matrix with updated or extended columns based on the provided dates.
