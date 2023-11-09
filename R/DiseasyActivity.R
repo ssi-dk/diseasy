@@ -593,7 +593,6 @@ DiseasyActivity <- R6::R6Class(                                                 
     # The direction can be either "opening" or "closing"
     # If "opening", the activity units are added to a fully closed starting point
     # If "closing", the activity units are subtracted from a fully open starting point
-    # TODO: Lasse, can you confirm?
     direction = NULL,
 
     # @field upper_activity_level (`numeric(1)`)\cr
@@ -601,7 +600,6 @@ DiseasyActivity <- R6::R6Class(                                                 
     # activity units does not exceed (drop below) the maximum (minimum) activity associated
     # with the fully open (closed) starting point.
     # Takes a value 1 when direction is "opening" and 0 when direction is "closing"
-    # TODO: Lasse, can you confirm?
     upper_activity_level = NULL,
 
     # @field activity_units (`list`)\cr
