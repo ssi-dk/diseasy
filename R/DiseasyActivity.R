@@ -331,7 +331,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       new_scenario_matrix <- private$update_with_dates(input_matrix = private$.scenario_matrix,
                                                        input_dates = input_dates, first_col_value = 0)
       new_risk_matrix     <- private$update_with_dates(input_matrix = private$.risk_matrix,
-                                                   input_dates = input_dates, first_col_value = 1)
+                                                       input_dates = input_dates, first_col_value = 1)
 
       # Updating with input changes of activities
       # One date at a time - in chronological order
@@ -658,7 +658,27 @@ DiseasyActivity <- R6::R6Class(                                                 
     },
 
 
-    # TODO: what does this function do?
+    # Extend activity matrix with new dates
+    # @description
+    #   This function takes an matrix representation of the activity scenario (`scenario_matrix` or `risk_matrix`)
+    #   and a vector of dates where changes in the activity scenario should occur.
+    #
+    #   The function then extends the matrix with these dates if they are not already present in the matrx.
+    #
+    #   This extension uses the argument `first_col_value` to perform the extension of the matrix.
+    #   This value is used when date given in input_dates earlier than those already in the matrix.
+    #   (i.e. the change to the activity scenario is before any current activity changes).
+    #   In this case, `first_col_value` is inserted in the first column of the updated matrix.
+    #   All other insertions of dates into the matrix uses the value of the column immediately before (to the left).
+    #
+    # @param input_matrix `matrix` `array`\cr
+    #   The matrix representation to extend (either scenario_matrix or risk_matrix)
+    # @param input_dates `Date`\cr
+    #   A vector of dates with changes
+    # @param first_col_value `numeric(1)`\cr
+    #   The basic value of the matrix representation
+    #
+    # @return A matrix with updated or extended columns based on the provided dates.
     update_with_dates = function(input_matrix, input_dates, first_col_value) {
       # Create or extend scenario_matrix' et al. if needed
       out <- input_matrix
