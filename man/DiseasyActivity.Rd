@@ -60,10 +60,10 @@ See vignette("diseasy-activity") for examples of use.
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{scenario_matrix}}{(\code{matrix})\cr
+\item{\code{scenario_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of restrictions (showing only used activity units). Read-only.}
 
-\item{\code{risk_matrix}}{(\code{matrix})\cr
+\item{\code{risk_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
 \item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-groups\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
@@ -228,13 +228,15 @@ Sets the overall risk of types of activity
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{date}}{Vector of dates when risk changes.
+\item{\code{date}}{(\code{Date()})\cr
+Dates where risk changes.
 The first argument can also be a data.frame with columns "date", "type" and "risk"}
 
-\item{\code{type}}{(\code{character})\cr
+\item{\code{type}}{(\code{character(1)})\cr
 Name of activity type to change. Must be in "work", "school", "home" and "other"}
 
-\item{\code{risk}}{Relative risk for the given type from the given date}
+\item{\code{risk}}{(\code{numeric(1)})\cr
+Relative risk for the given type from the given date}
 }
 \if{html}{\out{</div>}}
 }
@@ -254,10 +256,10 @@ Helper function to crop the scenario matrix in time
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{first_date}}{(\code{Date})\cr
+\item{\code{first_date}}{(\code{Date(1)})\cr
 New first date in scenario. The column for the lasted prior date will be new first column}
 
-\item{\code{last_date}}{(\code{Date})\cr
+\item{\code{last_date}}{(\code{Date(1)})\cr
 All columns after this date are deleted}
 }
 \if{html}{\out{</div>}}
@@ -270,13 +272,14 @@ NULL (called for side effects)
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_activities"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_activities}{}}}
 \subsection{Method \code{get_scenario_activities()}}{
-Return \code{list} containing the opened and closed activity units on dates where there are changes.
+Return \code{list} containing the active activity units on dates where there are changes.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_activities()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-\code{list} with opened/closed activities.
+(\code{list})\cr
+The activity units active in the sceanrio.
 }
 }
 \if{html}{\out{<hr>}}
@@ -289,6 +292,7 @@ Return openness [0 ; 1] for all age groups and activities on all dates.
 }
 
 \subsection{Returns}{
+(\code{list()})\cr
 Returns a list with depth of two: value[\link{date}][\link{type}]
 }
 }
@@ -307,10 +311,10 @@ Return contacts  for all age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr
+\item{\code{age_cuts_lower}}{(\code{numeric()})\cr
 vector of ages defining the lower bound for each age group. (Optional)}
 
-\item{\code{population_1yr}}{(\code{numeric})\cr
+\item{\code{population_1yr}}{(\code{numeric()})\cr
 vector of population counts in 1-year age groups.}
 }
 \if{html}{\out{</div>}}
