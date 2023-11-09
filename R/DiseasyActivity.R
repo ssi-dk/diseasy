@@ -434,10 +434,14 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       contacts <- openness <- self$get_scenario_openness()
 
-      # Apply .risk_matrix
+      # Apply the age-stratified restrictions to the age-stratified contact matrices
       for (dd in seq_along(openness)) { # looping over dates
         for (tt in private$activity_types) {
-          # TODO: genWeight
+          # The openness (i.e. the degree to which each age-group has their contacts restricted) are converted to a
+          # "herringbone" pattern and multiplied elementwise to the baseline contact matrices.
+          # By converting to the "herringbone" pattern, the age-stratified restrictions are applied to elements of the
+          # contact matrices relating to the individual age-groups
+          # (i.e. restictions to activity of age-group i is applied to ...)
           contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
         }
       }
@@ -713,10 +717,6 @@ DiseasyActivity <- R6::R6Class(                                                 
     #   [v1 v2 v3]
     #   [v2 v2 v3]
     #   [v3 v3 v3]
-    #
-    #   This structure is used when constructing contact matrices from age-stratified restrictions.
-    #   The "herringbone" matrix ensures that you can add so that when the diagonal is one then the rest is as well
-    #   it is done by adding contacts to and from a given age group to those that are younger.
     # @param vector (`numeric()`)\cr
     #   Vector to transform
     vector_to_matrix = function(vector) {
