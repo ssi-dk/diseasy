@@ -126,6 +126,9 @@ Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-set_diseasystore"></a>}}
