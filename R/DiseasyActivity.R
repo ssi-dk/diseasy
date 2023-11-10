@@ -479,8 +479,6 @@ DiseasyActivity <- R6::R6Class(                                                 
         contacts <- lapply(contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
       }
 
-      # TODO: Consider if prop_out is needed
-
       return(contacts)
     },
 
