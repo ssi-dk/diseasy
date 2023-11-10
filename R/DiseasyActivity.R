@@ -69,13 +69,28 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
                                             "{setdiff(private$activity_types, names(.x))}"))
                      }
                    })
+
+      # - Check for consistency of the number of age groups in the activity_units
+      # Find all implied n_age_groups larger than 1
+      n_age_groups <- purrr::map(dk_activity_units, ~ purrr::map_dbl(., length)) |>
+        purrr::reduce(c) |>
+        unique() |>
+        purrr::keep(~ . > 1)
+
+      # There should be one unique number of age groups
+      checkmate::assert_number(n_age_groups, add = coll)
+
+      # - Compare number of age groups with currently loaded data
+      # activity_units may contain only scalar information with out issues.
+      # If it does, we don't need to match the number of age groups
+      if (!is.null(private$n_age_groups) && n_age_groups > 1) {
+        checkmate::assert_true(n_age_groups == private$n_age_groups, add = coll)
+      }
+
       checkmate::reportAssertions(coll)
 
-
-      # TODO: have a n_age_group setter that gives error if mismatch?
-      private$n_age_groups <- max(sapply(activity_units, \(x) max(sapply(x, length))))
-      # TODO: Transfer age groups
-
+      # Add to module
+      if (is.null(private$n_age_groups) && n_age_groups > 1) private$n_age_groups <- n_age_groups
       private$activity_units        <- activity_units
       private$activity_units_labels <- names(activity_units)
       private$lg$info("activity_units loaded (hash: {digest::digest(activity_units)})")
@@ -115,12 +130,19 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "counts")), private$activity_types, add = coll)
       checkmate::assert_matrix(purrr::pluck(contact_basis, "counts", 1), min.rows = 1, min.cols = 1, add = coll)
 
-      n_age_groups <- purrr::pluck(contact_basis, "counts", 1, dim, 1) # Get dimensions of matrix
+      # - Check for consistency of the number of age groups in the contact matrices
+      # All matrices should be square matrices with of the same dimensions
+      n_age_groups <- purrr::pluck(contact_basis, "counts", 1, dim, 1) # Get first dimensions of the first matrix
       purrr::walk(
         purrr::pluck(contact_basis, "counts"),
         ~ checkmate::assert_matrix(., ncols = n_age_groups, nrows = n_age_groups, add = coll)
       )
 
+      # - Compare number of age groups with currently loaded data
+      # if private$n_age_groups is NULL, no data with age groups is currently loaded
+      if (!is.null(private$n_age_groups)) {
+        checkmate::assert_true(n_age_groups == private$n_age_groups, add = coll)
+      }
 
       # Checks on contact_basis population
       checkmate::assert_numeric(purrr::pluck(contact_basis, "population"), len = n_age_groups, lower = 0, add = coll)
@@ -144,6 +166,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       # Add to module
       private$.contact_basis <- contact_basis
+      if (is.null(private$n_age_groups)) private$n_age_groups <- n_age_groups
     },
 
 
@@ -578,7 +601,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
     .risk_matrix = NULL, # a row for each activity type
 
-    n_age_groups = NA,
+    n_age_groups = NULL,
 
     # Must have columns "contacts", "population", "proportion", "demography", "description"
     .contact_basis = NULL,
