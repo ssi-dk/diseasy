@@ -3,8 +3,17 @@
 \name{DiseasyBaseModule}
 \alias{DiseasyBaseModule}
 \title{Base module for the framework}
+\value{
+A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
+}
 \description{
 TODO
+}
+\examples{
+  # Normally, you would not want to create this module directly, but it is possible.
+  base_module <- DiseasyBaseModule$new()
+
+  rm(base_module)
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
@@ -41,9 +50,6 @@ This module is typically not constructed directly but rather through derived cla
 The name of the moduleowner. Used when logging.}
 }
 \if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}

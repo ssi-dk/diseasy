@@ -24,6 +24,7 @@ Imports:
     dplyr,
     glue,
     lgr,
+    lintr,
     lubridate,
     pracma,
     purrr,
@@ -32,6 +33,7 @@ Imports:
     stringr
 Suggests:
     DBI,
+    devtools,
     knitr,
     readr,
     rmarkdown,

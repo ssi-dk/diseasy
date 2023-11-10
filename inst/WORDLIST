@@ -11,13 +11,16 @@ covid
 DBIConnection
 diseasy
 diseasystore
+diseasystores
 DiseasyBaseModule
 DiseasyObservables
+DiseasySeason
 DMI
 
 Engbo
 
 Lasse
+linters
 
 moduleowner
 

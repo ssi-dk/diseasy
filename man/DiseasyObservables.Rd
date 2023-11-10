@@ -3,8 +3,27 @@
 \name{DiseasyObservables}
 \alias{DiseasyObservables}
 \title{Observable handler}
+\value{
+A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
+}
 \description{
 TODO
+}
+\examples{
+  # Create observables module using the Google COVID-19 data
+  obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
+                                conn = DBI::dbConnect(RSQLite::SQLite()))
+
+  # See available observables
+  print(obs$available_observables)
+
+  # Get data for one observable
+  \dontrun{
+  obs$get_observation("n_hospital",
+                      start_date = as.Date("2020-03-01"),
+                      end_date = as.Date("2020-03-05"))
+  }
+  rm(obs)
 }
 \seealso{
 \link[SCDB:get_table]{SCDB::get_table}
@@ -106,9 +125,6 @@ Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()
 \item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}

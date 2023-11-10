@@ -11,13 +11,13 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Steps to reproduce the behavior:
+Steps to reproduce the behaviour:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
-**Expected behavior**
+**Expected behaviour**
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
@@ -28,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
 # paste output within this block for formatting
 ```
 
-* [ ] I have checked that the bug is not already described in [open issues](https://github.com/ssi-dk/SCDB/issues?q=is%3Aopen)
+* [ ] I have checked that the bug is not already described in [open issues](https://github.com/ssi-dk/diseasy/issues?q=is%3Aopen)
 
 **Additional context**
 Add any other context about the problem here.
