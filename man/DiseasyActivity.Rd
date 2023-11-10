@@ -152,7 +152,7 @@ Each element in the activity_units list should be a list with the following elem
 \item work:   numeric/vector with number(s) in [0, 1]
 \item school: numeric/vector with number(s) in [0, 1]
 \item other:  numeric/vector with number(s) in [0, 1]
-\item risk:   numeric/vector with number(s) in [0, 1]
+\item risk:   number in [0, Inf]
 }
 
 If a single number is provider, the number is applied across all age-groups

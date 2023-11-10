@@ -110,7 +110,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   * work:   numeric/vector with number(s) in \[0, 1\]
     #'   * school: numeric/vector with number(s) in \[0, 1\]
     #'   * other:  numeric/vector with number(s) in \[0, 1\]
-    #'   * risk:   numeric/vector with number(s) in \[0, 1\]
+    #'   * risk:   number in \[0, Inf\]
     #'
     #'   If a single number is provider, the number is applied across all age-groups
     #'   If a vector is provided, the vector must match the number of age groups in the contact_basis
