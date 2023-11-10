@@ -261,8 +261,6 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       }
 
-      # TODO: validate new_scenario_matrix?
-
       # New scenario matrix now created, and can be set
       private$.scenario_matrix  <- new_scenario_matrix
       private$.risk_matrix      <- new_risk_matrix
