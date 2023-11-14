@@ -78,12 +78,12 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(case_definition, add = coll)
       if (!diseasystore::diseasystore_exists(case_definition)) {
-        coll$push(glue::glue("{diseasystore::diseasystore_case_definition(case_definition)} not found!"))
+        coll$push(glue::glue("{diseasystore::to_diseasystore_case(case_definition)} not found!"))
       }
       checkmate::reportAssertions(coll)
 
       # Load and configure the feature store
-      ds_case_definition <- diseasystore:::diseasystore_case_definition(case_definition)
+      ds_case_definition <- diseasystore:::to_diseasystore_case(case_definition)
       private$.ds <- get(ds_case_definition)$new(slice_ts = self %.% slice_ts,
                                                  verbose = !testthat::is_testing(),
                                                  target_conn = self %.% conn)
