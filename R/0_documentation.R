@@ -7,7 +7,7 @@ rd_stratification <- function(type = "param") {
 }
 
 
-rd_case_definition <- function(type = "param") {
+rd_diseasystore <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",

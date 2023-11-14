@@ -2,7 +2,7 @@ test_that("initialize works", {
 
   # Creating an empty module
   obs <- DiseasyObservables$new()
-  expect_null(obs$case_definition)
+  expect_null(obs$diseasystore)
   expect_null(obs$start_date)
   expect_null(obs$end_date)
   expect_null(obs$last_queryable_date)
@@ -10,8 +10,8 @@ test_that("initialize works", {
   rm(obs)
 
   # Perturbations of the initializer inputs
-  obs <- DiseasyObservables$new(case_definition = "Google COVID-19")
-  expect_identical(obs$case_definition, "Google COVID-19")
+  obs <- DiseasyObservables$new(diseasystore = "Google COVID-19")
+  expect_identical(obs$diseasystore, "Google COVID-19")
   expect_null(obs$start_date)
   expect_null(obs$end_date)
   expect_null(obs$last_queryable_date)
@@ -19,7 +19,7 @@ test_that("initialize works", {
   rm(obs)
 
   obs <- DiseasyObservables$new(start_date = as.Date("2021-03-01"), end_date = as.Date("2021-03-03"))
-  expect_null(obs$case_definition)
+  expect_null(obs$diseasystore)
   expect_identical(obs$start_date, as.Date("2021-03-01"))
   expect_identical(obs$end_date, as.Date("2021-03-03"))
   expect_null(obs$last_queryable_date)
@@ -27,7 +27,7 @@ test_that("initialize works", {
   rm(obs)
 
   obs <- DiseasyObservables$new(slice_ts = "2021-03-01 09:00:00")
-  expect_null(obs$case_definition)
+  expect_null(obs$diseasystore)
   expect_null(obs$start_date)
   expect_null(obs$end_date)
   expect_null(obs$last_queryable_date)
@@ -35,7 +35,7 @@ test_that("initialize works", {
   rm(obs)
 
   obs <- DiseasyObservables$new(last_queryable_date = as.Date("2021-03-03"))
-  expect_null(obs$case_definition)
+  expect_null(obs$diseasystore)
   expect_null(obs$start_date)
   expect_null(obs$end_date)
   expect_identical(obs$last_queryable_date, as.Date("2021-03-03"))
@@ -46,12 +46,12 @@ test_that("initialize works", {
   expect_no_error(DiseasyObservables$new(conn = (options() %.% diseasy.conn)()))
 
   # Full initialization
-  obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
+  obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
                                 start_date = as.Date("2021-03-01"),
                                 end_date   = as.Date("2021-03-03"),
                                 last_queryable_date = as.Date("2021-03-03"),
                                 slice_ts = "2022-07-01 09:00:00")
-  expect_identical(obs$case_definition, "Google COVID-19")
+  expect_identical(obs$diseasystore, "Google COVID-19")
   expect_identical(obs$start_date, as.Date("2021-03-01"))
   expect_identical(obs$end_date, as.Date("2021-03-03"))
   expect_identical(obs$last_queryable_date, as.Date("2021-03-03"))
@@ -61,29 +61,29 @@ test_that("initialize works", {
 })
 
 
-test_that("set_case_definition works", {
+test_that("set_diseasystore works", {
 
   # Creating an empty module
   obs <- DiseasyObservables$new()
 
   # Testing differing inputs
-  obs$set_case_definition(case_definition = "Google COVID-19")
-  expect_identical(obs$case_definition, "Google COVID-19")
+  obs$set_diseasystore(diseasystore = "Google COVID-19")
+  expect_identical(obs$diseasystore, "Google COVID-19")
   hash1 <- obs$hash
 
   # Having poor spelling should not be a problem (to a degree)
-  obs$set_case_definition(case_definition = "Google Covid 19")
-  expect_identical(obs$case_definition, "Google COVID-19")
+  obs$set_diseasystore(diseasystore = "Google Covid 19")
+  expect_identical(obs$diseasystore, "Google COVID-19")
   expect_identical(obs$hash, hash1)
 
   # Testing malformed inputs
-  expect_error(obs$set_case_definition("Google COVID-20"),
+  expect_error(obs$set_diseasystore("Google COVID-20"),
                class = "simpleError", regexp = "DiseasystoreGoogleCovid20 not found!")
-  expect_identical(obs$case_definition, "Google COVID-19")
+  expect_identical(obs$diseasystore, "Google COVID-19")
 
-  expect_error(obs$set_case_definition(NA_character_),
+  expect_error(obs$set_diseasystore(NA_character_),
                class = "simpleError", regexp = "DiseasystoreNA not found!")
-  expect_identical(obs$case_definition, "Google COVID-19")
+  expect_identical(obs$diseasystore, "Google COVID-19")
   rm(obs)
 })
 
@@ -205,7 +205,7 @@ test_that("set_slice_ts works", {
 
 test_that("get_observation works", { for (case_def in case_defs) { # nolint: brace_linter
 
-  obs <- DiseasyObservables$new(case_definition = case_def,
+  obs <- DiseasyObservables$new(diseasystore = case_def,
                                 start_date = as.Date("2021-03-02"),
                                 end_date   = as.Date("2021-03-05"),
                                 last_queryable_date = as.Date("2021-03-06"),
@@ -276,7 +276,7 @@ test_that("get_observation works", { for (case_def in case_defs) { # nolint: bra
 
 test_that("get_observation works -- test 2", { for (case_def in case_defs) { # nolint: brace_linter
 
-  obs <- DiseasyObservables$new(case_definition = case_def,
+  obs <- DiseasyObservables$new(diseasystore = case_def,
                                 start_date = as.Date("2021-03-02"),
                                 end_date   = as.Date("2021-03-05"),
                                 last_queryable_date = as.Date("2021-03-06"),
@@ -293,17 +293,17 @@ test_that("get_observation works -- test 2", { for (case_def in case_defs) { # n
 }})
 
 
-test_that("active binding: case_definition works", {
+test_that("active binding: diseasystore works", {
   m <- DiseasyObservables$new()
 
-  # Retrieve the case_definition
-  expect_equal(m$case_definition, NULL)
+  # Retrieve the diseasystore
+  expect_equal(m$diseasystore, NULL)
 
-  # Try to set the case_definition
+  # Try to set the diseasystore
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$case_definition <- "test", error = \(e) e),
-                   simpleError("`$case_definition` is read only"))
-  expect_equal(m$case_definition, NULL)
+  expect_identical(tryCatch(m$diseasystore <- "test", error = \(e) e),
+                   simpleError("`$diseasystore` is read only"))
+  expect_equal(m$diseasystore, NULL)
 
   rm(m)
 })

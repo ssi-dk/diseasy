@@ -184,7 +184,7 @@ test_that("use_covid_season_v1 works", {
 test_that("use_covid_season_v2 works", { for (case_def in case_defs) {  # nolint: brace_linter
 
   # We create an DiseasyObservables module for the season module
-  observables <- DiseasyObservables$new(case_definition = case_def,
+  observables <- DiseasyObservables$new(diseasystore = case_def,
                                         start_date = as.Date("2022-01-01"),
                                         end_date = as.Date("2022-01-15"))
 
