@@ -1,6 +1,23 @@
 #' @title Observable handler
 #'
 #' @description TODO
+#' @examples
+#'   # Create observables module using the Google COVID-19 data
+#'   obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
+#'                                 conn = DBI::dbConnect(RSQLite::SQLite()))
+#'
+#'   # See available observables
+#'   print(obs$available_observables)
+#'
+#'   # Get data for one observable
+#'   \dontrun{
+#'   obs$get_observation("n_hospital",
+#'                       start_date = as.Date("2020-03-01"),
+#'                       end_date = as.Date("2020-03-05"))
+#'   }
+#'   rm(obs)
+#' @return
+#'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
 DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
   classname = "DiseasyObservables",
@@ -24,8 +41,6 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    #' @return
-    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     initialize = function(case_definition = NULL,
                           start_date = NULL,
                           end_date = NULL,
@@ -39,7 +54,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
       # Set the db connection
       if (is.null(conn)) {
-        private$.conn <- parse_conn(options() %.% diseasy.conn) # Open a new connection to the DB
+        private$.conn <- parse_diseasyconn(options() %.% diseasy.conn) # Open a new connection to the DB
       } else {
         private$.conn <- conn # User provided
       }
