@@ -644,6 +644,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
                                 lower = 0, unique = TRUE, add = coll)
       checkmate::assert_numeric(population_1yr, any.missing = FALSE, null.ok = TRUE, lower = 0, add = coll)
+      checkmate::assert_character(names(self$contact_basis$prop), add = coll)
       checkmate::reportAssertions(coll)
 
       # Using default population if new population is not given
