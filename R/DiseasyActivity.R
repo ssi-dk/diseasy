@@ -81,7 +81,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       checkmate::assert_number(n_age_groups, add = coll)
 
       # - Compare number of age groups with currently loaded data
-      # activity_units may contain only scalar information with out issues.
+      # activity_units may contain only scalar information without issues.
       # If it does, we don't need to match the number of age groups
       if (!is.null(private$n_age_groups) && n_age_groups > 1) {
         checkmate::assert_true(n_age_groups == private$n_age_groups, add = coll)
