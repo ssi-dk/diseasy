@@ -351,7 +351,7 @@ Returns a list with depth of one: value[\link{date}]
 \subsection{Method \code{rescale_counts_to_rates()}}{
 Re-scale from contacts to rates per individual to fractional population.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, pop)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, population)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -360,7 +360,7 @@ Re-scale from contacts to rates per individual to fractional population.
 \item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
 Counts to be re-scaled.}
 
-\item{\code{pop}}{(\code{numeric})\cr
+\item{\code{population}}{(\code{numeric})\cr
 Population vector to weight contacts by.
 Must use same age_groups as the contact matrix input.}
 }
