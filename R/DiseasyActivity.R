@@ -89,7 +89,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       checkmate::reportAssertions(coll)
 
-      # Add to module
+      # Store the number of age groups
       if (is.null(private$n_age_groups) && n_age_groups > 1) private$n_age_groups <- n_age_groups
       private$activity_units        <- activity_units
       private$activity_units_labels <- names(activity_units)
