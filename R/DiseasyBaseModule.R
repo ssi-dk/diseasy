@@ -1,6 +1,6 @@
 #' @title Base module for the framework
 #'
-#' @description TODO
+#' @description TODOs
 #' @examples
 #'   # Normally, you would not want to create this module directly, but it is possible.
 #'   base_module <- DiseasyBaseModule$new()
