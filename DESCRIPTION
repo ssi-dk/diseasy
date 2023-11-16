@@ -42,6 +42,7 @@ Suggests:
     spelling,
     testthat (>= 3.0.0),
     zoo
+Remotes: ssi-dk/diseasystore
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy
 BugReports: https://github.com/ssi-dk/diseasy/issues
