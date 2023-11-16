@@ -7,7 +7,7 @@
 A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 \description{
-TODO
+TODOs
 }
 \examples{
   # Normally, you would not want to create this module directly, but it is possible.
