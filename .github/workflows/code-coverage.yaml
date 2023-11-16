@@ -10,3 +10,4 @@ jobs:
     uses: ssi-dk/AEF-DDF/.github/workflows/code-coverage.yaml@workflows
     with:
       schema_creation: '"CREATE SCHEMA test_ds;"'
+      repository: ${{ github.repository }}
