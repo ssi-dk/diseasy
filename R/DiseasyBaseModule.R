@@ -7,7 +7,7 @@
 #'
 #'   rm(base_module)
 #' @return
-#'  a A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+#'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
 DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
   classname = "DiseasyBaseModule",
