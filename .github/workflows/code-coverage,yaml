@@ -1,0 +1,12 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+
+name: Check code coverage
+
+jobs:
+  code-coverage:
+    uses: ssi-dk/AEF-DDF/.github/workflows/code-coverage.yaml@workflows
+    with:
+      schema_creation: '"CREATE SCHEMA test_ds;"'
