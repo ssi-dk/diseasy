@@ -18,6 +18,7 @@ jobs:
       # We pass information about the triggering event
       event_name: ${{ github.event_name }}
       run_id: ${{ github.run_id }}
+      main_branches: 'main,master,new_workflows'
 
       # code-coverage creates data bases for the tests. Here you can specify the schemas you need for the workflow
       schema_creation: '"CREATE SCHEMA test_ds;"'
