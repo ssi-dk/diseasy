@@ -2,19 +2,18 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branch: [main, master]
   pull_request:
-    branch: [main, master]
   release:
-    types: [published]
   workflow_dispatch:
+
+name: Run all workflows
 
 jobs:
 
   # We call the reuseable workflow that triggers all AEF-DDF workflows
   run-all-AEF-DFF-workflows:
     name: ⚙️ Run all AEF-DDF workflows
-    uses: ssi-dk/AEF-DDF/.github/workflows/workflow_dispatcher.yaml@main
+    uses: ssi-dk/AEF-DDF/.github/workflows/workflow_dispatcher.yaml@workflows
     with:
       # We pass information about the triggering event
       event_name: ${{ github.event_name }}
