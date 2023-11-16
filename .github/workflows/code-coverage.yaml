@@ -7,10 +7,7 @@ name: Check code coverage
 
 jobs:
   code-coverage:
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: ssi-dk/AEF-DDF/.github/workflows/code-coverage.yaml@main
-        with:
-          schema_creation: '"CREATE SCHEMA test_ds;"'
-          repository: ${{ github.repository }}
+    uses: ssi-dk/AEF-DDF/.github/workflows/code-coverage.yaml@main
+    with:
+      schema_creation: '"CREATE SCHEMA test_ds;"'
+      repository: ${{ github.repository }}
