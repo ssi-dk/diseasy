@@ -1,4 +1,5 @@
-if (require(contactdata) && require(countrycode) && require(curl) && require(usethis) && require(tibble)) {
+if (require(contactdata) && require(countrycode) && require(curl) && require(usethis) && require(tibble) &&
+      require(diseasystore)) {
 
   # We express all contact data by default in 16 5-year age groups
   # (the default age groups of the `contactdata` package)
