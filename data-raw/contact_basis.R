@@ -47,7 +47,7 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
 
   # Get 1-year age-group data for all countries in the data set
   # We use population data from 2020 to match the study year of `contactdata`s contact matrices
-  # US Census data uses their "GEO_ID" as geograpical identifier. In this case, we only need the
+  # US Census data uses their "GEO_ID" as geographical identifier. In this case, we only need the
   # country code (last two characters of GEO_ID)
   demography <- idb1yr |>
     dplyr::rename_with(tolower) |>
@@ -104,7 +104,7 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
       # The Danish models are configured to use a symmetric, weighted set of
       # contacts matrices where the elements are 0.5 * (c_ij * w_j + c_ji * w_i)
 
-      # Since the contactsdata package gives the number of contacts directly (in their
+      # Since the contactdata package gives the number of contacts directly (in their
       # framework, denoted as X_ij), we transform the reciprocal weighted symmetric versions
 
       # First compute some intermediaries
