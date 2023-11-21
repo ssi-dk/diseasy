@@ -99,7 +99,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       ds <- diseasystore:::get_diseasystore(diseasystore)
 
       # Determine the verbosity
-      if (is.null(verbose)) verbose <- diseasyoption("verbose", ds_case_definition)
+      if (is.null(verbose)) verbose <- purrr::pluck(diseasyoption("verbose", ds), .default = FALSE)
 
       # Load and configure the feature store
       private$.ds <- ds$new(slice_ts = self %.% slice_ts,
