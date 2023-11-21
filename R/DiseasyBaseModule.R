@@ -1,6 +1,24 @@
-#' @title Base module for the framework
+#' @title Diseasy' basic module
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasyBaseModule` module implements common functionality that all modules have available.
+#'   Most notably, the base module facilitates:
+#'   * logging:
+#'     A `lgr` logger is configured when making any module that inherits from the base module.
+#'     This logger is stored in `private$lg`.
+#'   * hashing:
+#'     The active binding `self$hash` hashes the values of public fields to provide a way to uniquely identify the
+#'     configuration of modules.
+#'     Care must be taken to ensure that information that makes modules distinct are also stored in public fields.
+#'     That is, if an important property is stored only as a private field, the hash will not change.
+#'     Module-specific tests should be written to ensure hash changes as expected.
+#'   * caching:
+#'     The methods `private$cache()`, `private$get_hash()` `private$is_cached(hash)` implements a simple caching system
+#'     whereby the results of method calls can be cached to improve the performance of the modules.
+#'   * module loading:
+#'     Modules instances are sometimes loaded into other modules. The `private$load_module(module)` method provides the
+#'     functionality to handle this loading (including cloning of the module and passing of the new module to
+#'     already-loaded modules)
 #' @examples
 #'   # Normally, you would not want to create this module directly, but it is possible.
 #'   base_module <- DiseasyBaseModule$new()
@@ -9,6 +27,7 @@
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
+#' @seealso [lgr][lgr::lgr]
 DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
   classname = "DiseasyBaseModule",
 
@@ -155,7 +174,6 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     #   Stores the "moduleowner" as given by set_moduleowner()
     moduleowner = NULL,
 
-    # TODO: move this to set_moduleowner? No need to have it as a separate function
     # @description
     #   Updates the logger (should be called when modelowner changes).
     #   This adjusts the logging format to include the modelowner in parentheses
