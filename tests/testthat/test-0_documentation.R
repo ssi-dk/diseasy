@@ -1,5 +1,5 @@
 test_that("rd_templates works", {
-  pkg_objects <- ls(base::getNamespace("diseasystore"))
+  pkg_objects <- ls(base::getNamespace("diseasy"))
   rd_objects <- purrr::keep(pkg_objects, ~ startsWith(., "rd_"))
 
   rd_funs <- rd_objects[purrr::map_lgl(rd_objects, ~ rlang::is_function(get(.)))]

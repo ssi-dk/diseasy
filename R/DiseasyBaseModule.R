@@ -282,30 +282,32 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     },
 
     # Common logging
-    report_get_results = function(observable, aggregation, prediction_length, hash) {
-      private$lg$info("Providing prediction of {observable}",
-                      ifelse(is.null(aggregation), "", " at aggregation: {private$aggregation_to_string(aggregation)}"),
-                      " for a period of {prediction_length} days",
-                      " (hash: {hash})")
+    report_get_results = function(observable, stratification, prediction_length, hash) {
+      private$lg$info(
+        "Providing prediction of {observable}",
+        ifelse(is.null(stratification), "", " at stratification: {private$stratification_to_string(stratification)}"),
+        " for a period of {prediction_length} days",
+        " (hash: {hash})"
+      )
     },
 
 
 
     # @description
     #   Converts an aggreagtion to human readable form
-    # @param aggregation (`list`(`quosure`))\cr
+    # @param stratification (`list`(`quosure`))\cr
     #   An quosure passed as aggregator
     # @return (`character`)\cr
-    #   A comma separated character string of the different aggregation levels
-    aggregation_to_string = function(aggregation) {
-      if (is.null(aggregation)) {
-        aggregation_chr <- NA_character_
+    #   A comma separated character string of the different stratification levels
+    stratification_to_string = function(stratification) {
+      if (is.null(stratification)) {
+        stratification_chr <- NA_character_
       } else {
-        aggregation_chr <- purrr::map2(names(aggregation), purrr::map(aggregation, dplyr::as_label),
-                                       ~ ifelse(.x == "", .y, glue::glue_collapse(c(.x, .y), sep = " = "))) |>
+        stratification_chr <- purrr::map2(names(stratification), purrr::map(stratification, dplyr::as_label),
+                                          ~ ifelse(.x == "", .y, glue::glue_collapse(c(.x, .y), sep = " = "))) |>
           toString()
       }
-      return(aggregation_chr)
+      return(stratification_chr)
     }
   )
 )

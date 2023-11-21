@@ -11,7 +11,7 @@ TODO
 }
 \examples{
   # Create observables module using the Google COVID-19 data
-  obs <- DiseasyObservables$new(case_definition = "Google COVID-19",
+  obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
                                 conn = DBI::dbConnect(RSQLite::SQLite()))
 
   # See available observables
@@ -36,8 +36,8 @@ TODO
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{case_definition}}{(\code{character})\cr
-The set case_definition to get DiseasyObservables for. Read-only.}
+\item{\code{diseasystore}}{(\code{character})\cr
+The set diseasystore to get DiseasyObservables for. Read-only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
 The start date of the study period. Read-only.}
@@ -66,7 +66,7 @@ The connection to the database on. Read-only.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiseasyObservables-new}{\code{DiseasyObservables$new()}}
-\item \href{#method-DiseasyObservables-set_case_definition}{\code{DiseasyObservables$set_case_definition()}}
+\item \href{#method-DiseasyObservables-set_diseasystore}{\code{DiseasyObservables$set_diseasystore()}}
 \item \href{#method-DiseasyObservables-set_last_queryable_date}{\code{DiseasyObservables$set_last_queryable_date()}}
 \item \href{#method-DiseasyObservables-set_study_period}{\code{DiseasyObservables$set_study_period()}}
 \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
@@ -91,7 +91,7 @@ The connection to the database on. Read-only.}
 Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$new(
-  case_definition = NULL,
+  diseasystore = NULL,
   start_date = NULL,
   end_date = NULL,
   last_queryable_date = NULL,
@@ -104,7 +104,7 @@ Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} cl
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{case_definition}}{(\code{character})\cr
+\item{\code{diseasystore}}{(\code{character})\cr
 A character string that controls which feature store to get data from.}
 
 \item{\code{start_date}}{(\code{Date})\cr
@@ -126,20 +126,23 @@ Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyObservables-set_case_definition"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyObservables-set_case_definition}{}}}
-\subsection{Method \code{set_case_definition()}}{
+\if{html}{\out{<a id="method-DiseasyObservables-set_diseasystore"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-set_diseasystore}{}}}
+\subsection{Method \code{set_diseasystore()}}{
 Set the case definition to get DiseasyObservables for.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_case_definition(case_definition)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_diseasystore(diseasystore)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{case_definition}}{(\code{character})\cr
+\item{\code{diseasystore}}{(\code{character})\cr
 Text label of the disease to get DiseasyObservables for.\cr
 Must match case definition implemented in \code{featurestore} package.}
 }
@@ -207,14 +210,14 @@ Date to slice the database on}
 \if{html}{\out{<a id="method-DiseasyObservables-get_observation"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-get_observation}{}}}
 \subsection{Method \code{get_observation()}}{
-Retrieve an "observable" in the data set corresponding to the set case_definition.\cr
+Retrieve an "observable" in the data set corresponding to the set diseasystore.\cr
 By default, the internal values for start_date and end_date are used to return data,
 but these can be overwritten.\cr
 The results are cached for faster retrieval at subsequent calls.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$get_observation(
   observable,
-  aggregation = NULL,
+  stratification = NULL,
   start_date = self \%.\% start_date,
   end_date = self \%.\% end_date
 )}\if{html}{\out{</div>}}
@@ -226,9 +229,9 @@ The results are cached for faster retrieval at subsequent calls.
 \item{\code{observable}}{(\code{character})\cr
 The requested observable. Should follow the pattern 'n_*'.}
 
-\item{\code{aggregation}}{(\code{list}(\code{quosures}))\cr
-Default \code{NULL}. If given, expressions in aggregation evaluated to give the aggregation level.\cr
-Use rlang::quos(...) to specify aggregation.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr
+Default \code{NULL}. If given, expressions in stratification evaluated to give the stratification level.\cr
+Use rlang::quos(...) to specify stratification.}
 
 \item{\code{start_date}}{(\code{Date})\cr
 Start date to get DiseasyObservables for (including).}
@@ -239,8 +242,8 @@ End date to get DiseasyObservables for (including).}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-If the observable is found, the function returns the corresponding data at the aggregation level.\cr
-Otherwise, the function fails and lists the available DiseasyObservables for the case_definition.
+If the observable is found, the function returns the corresponding data at the stratification level.\cr
+Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
 }
 }
 \if{html}{\out{<hr>}}
