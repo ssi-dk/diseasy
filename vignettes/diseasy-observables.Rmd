@@ -53,7 +53,7 @@ obs <- DiseasyObservables$new(
 obs$set_case_definition(case_definition = "Google COVID-19")
 ```
 
-To see the data that comes with underlying `diseasystore` we can query the module.
+To see the data that comes with the underlying `diseasystore` we can query the module.
 ```{r available_observables}
 obs$available_observables
 ```
@@ -68,7 +68,7 @@ obs$describe()
 ```
 
 # Getting observations
-We can query the model to gives the data for a given observable in a given time frame:
+We can query the model to give the data for a given observable in a given time frame:
 ```{r example_1}
 obs$get_observation(observable = "n_population",
                     start_date = as.Date("2020-03-01"),
