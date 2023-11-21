@@ -1,13 +1,13 @@
-rd_aggregation <- function(type = "param") {
+rd_stratification <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`list`(`quosures`))\\cr",
         "Default NULL.",
-        "If given, expressions in aggregation evaluated to give the aggregation level.",
+        "If given, expressions in stratification evaluated to give the stratification level.",
         ifelse(type == "field", " Read only.", ""))
 }
 
 
-rd_case_definition <- function(type = "param") {
+rd_diseasystore <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",
@@ -120,12 +120,12 @@ rd_.data <- function(type = "param") {                                          
 rd_describe <- "Prints a human readable report of the internal state of the module."
 
 rd_get_results_description <- paste(
-  "The primary method used to request model results of a given observable at a given aggregation."
+  "The primary method used to request model results of a given observable at a given stratification"
 )
 
 rd_get_results_return <- paste(
-  "A `tibble` [tibble::tibble] with predictions at the level specified by aggregation level.",
-  "In addition to aggregation columns, the output has the columns:\\cr",
+  "A `tibble` [tibble::tibble] with predictions at the level specified by stratification level.",
+  "In addition to stratification columns, the output has the columns:\\cr",
   "  date (`Date`) specifying the date of the prediction\\cr",
   "  realization_id (`character`) giving a unique id for each realization in the ensemble\\cr",
   "  model (`character`) the name (classname) of the model used to provide the prediction."
