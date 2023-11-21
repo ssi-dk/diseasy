@@ -348,11 +348,10 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
-    #' @param population_1yr `r rd_population_1yr`
     #' @param weights `r rd_activity_weights`
     #' @return
     #'   Returns a list with depth of two: value[[date]][[type]]
-    get_scenario_openness = function(age_cuts_lower = NULL, population_1yr = NULL, weights = NULL) {
+    get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()
       openness <- lapply(scenario_activities, private$add_activities)
@@ -370,12 +369,12 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       # Project into new age_groups if given
       if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower, population_1yr) |>
+        p <- private$population_transform_matrix(age_cuts_lower) |>
           t() |>          # To get the right dimensions
           as.data.frame() # To enable the mapping below
 
         # Get the population proportion in the new age groups
-        population <- private$map_population(age_cuts_lower, population_1yr)
+        population <- private$map_population(age_cuts_lower)
         prop <- aggregate(prop ~ age_group_ref, data = population, FUN = sum)$prop
 
         # Weight the population transformation matrix by the population proportion
@@ -403,12 +402,11 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     #' @description
     #'   Return contacts for across age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
-    #' @param population_1yr `r rd_population_1yr`
     #' @param weights `r rd_activity_weights`
     #' @return
     #'   If no weights are supplied, a `list()` of depth of two: value[[date]][[type]] is returned.
     #    If weights are supplied, a `list()` of depth one: value[[date]] is returned
-    get_scenario_contacts = function(age_cuts_lower = NULL, population_1yr = NULL, weights = NULL) {
+    get_scenario_contacts = function(age_cuts_lower = NULL, weights = NULL) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -428,7 +426,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
 
       # Project into new age_groups if given
       if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower, population_1yr)
+        p <- private$population_transform_matrix(age_cuts_lower)
 
         contacts <- lapply(contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
         # TODO: Consider if prop_out is needed
@@ -607,8 +605,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     # @description
     #   The function provides the population proportion matrix `p` used to project age_groups
     # @param age_cuts_lower `r rd_age_cuts_lower`
-    # @param population_1yr `r rd_population_1yr`
-    population_transform_matrix = function(age_cuts_lower = NULL, population_1yr = NULL) {
+    population_transform_matrix = function(age_cuts_lower = NULL) {
 
       # Early return if no projection is requested
       if (is.null(age_cuts_lower)) {
@@ -616,7 +613,7 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
       }
 
       # Compute proportion of population in new and old age_groups
-      population <- private$map_population(age_cuts_lower, population_1yr)
+      population <- private$map_population(age_cuts_lower)
 
       # Calculating transformation matrix
       tt <- merge(aggregate(prop ~ age_group_ref + age_group_out, data = population, FUN = sum),
@@ -636,23 +633,17 @@ DiseasyActivity <- R6::R6Class( # nolint: object_name_linter
     # @description
     #   The function computes the proportion of population in the new and old age groups
     # @param age_cuts_lower `r rd_age_cuts_lower`
-    # @param population_1yr `r rd_population_1yr`
-    map_population = function(age_cuts_lower, population_1yr = NULL) {
+    map_population = function(age_cuts_lower) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
                                 lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_numeric(population_1yr, any.missing = FALSE, null.ok = TRUE, lower = 0, add = coll)
       checkmate::assert_character(names(self$contact_basis$prop), add = coll)
       checkmate::reportAssertions(coll)
 
-      # Using default population if new population is not given
-      if (is.null(population_1yr)) {
-        prop <- self$contact_basis$pop_ref_1yr$prop
-      } else {
-        prop <- population_1yr / sum(population_1yr)
-      }
+      # Using default population from contact_basis
+      prop <- self$contact_basis$pop_ref_1yr$prop
 
       # Creating mapping for all ages to reference and provided age_groups
       lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$prop), split = "[-+]"), \(x) x[1]))
