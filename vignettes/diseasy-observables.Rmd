@@ -50,7 +50,7 @@ obs <- DiseasyObservables$new(
 )
 # NOTE: Alternatively we could set options("diseasy.conn" = ...)
 
-obs$set_case_definition(case_definition = "Google COVID-19")
+obs$set_diseasystore(diseasystore = "Google COVID-19")
 ```
 
 To see the data that comes with the underlying `diseasystore` we can query the module.
