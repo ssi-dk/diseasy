@@ -10,7 +10,7 @@
 #'     The active binding `self$hash` hashes the values of public fields to provide a way to uniquely identify the
 #'     configuration of modules.
 #'     Care must be taken to ensure that information that makes modules distinct are also stored in public fields.
-#'     That is, if a important property is stored only as private field, the hash will not change.
+#'     That is, if an important property is stored only as a private field, the hash will not change.
 #'     Module-specific tests should be written to ensure hash changes as expected.
 #'   * caching:
 #'     The methods `private$cache()`, `private$get_hash()` `private$is_cached(hash)` implements a simple caching system
