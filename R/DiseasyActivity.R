@@ -110,7 +110,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   * work:   numeric/vector with number(s) in \[0, 1\]
     #'   * school: numeric/vector with number(s) in \[0, 1\]
     #'   * other:  numeric/vector with number(s) in \[0, 1\]
-    #'   * risk:   number in \[0, Inf\]
+    #'   * risk:   numeric greater than zero
     #'
     #'   If a single number is provider, the number is applied across all age-groups
     #'   If a vector is provided, the vector must match the number of age groups in the contact_basis
@@ -287,7 +287,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         digest::digest()
       attr(private$.scenario_matrix, "secret_hash") <- active_activity_units_hash
 
-    },
+     },
 
     #' @description
     #'   Sets the overall risk of types of activity
@@ -361,7 +361,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       private$.scenario_matrix  <- new_scenario_matrix
       private$.risk_matrix      <- new_risk_matrix
 
-    },
+     },
 
 
     #' @description
@@ -455,14 +455,15 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Apply the age-stratified restrictions to the age-stratified contact matrices
       for (dd in seq_along(openness)) { # looping over dates
         for (tt in private$activity_types) {
-          # The openness (i.e. the degree to which each age-group has their contacts restricted) are converted to a
-          # "herringbone" pattern and multiplied elementwise to the baseline contact matrices.
-          # By converting to the "herringbone" pattern, the age-stratified activity reductions are applied using an
-          # assumption that reductions are absolute. e.g. if a person has their activity restricted by 50% then their
-          # contacts are also restricted by 50 %.
-          # In contrast, one could assume that reductions are multiplicative in nature. e.g. if age-group i is
-          # restricted by 50 % and age-group j is restricted by 10 %, then contacts between age-groups i and j would be
-          # reduced by 1 - 0.5 * 0.9 = 55 %.
+          # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a vector to a
+          # "herringbone" pattern matrix and multiplied elementwise to the baseline contact matrices.
+          # The choice of the "herringbone" pattern, is historical and ensures that openness matrices are additive. 
+          # It means the order of adding activities and expanding from vector to matrix is commutative. 
+          # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular age-group 
+          # are applied for contacts from and to all younger age-groups.
+          # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
+          # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
+          # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are non-commutative.
           contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
         }
       }
@@ -568,7 +569,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         printr("Scenario: Activity scenario not yet set")
       } else {
         printr("Scenario: Oveview")
-        print(self$scenario_matrix)
+      print(self$scenario_matrix)
         cat("\n")
       }
 
@@ -698,7 +699,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
             purrr::reduce(`+`, .init = rep(0, private$n_age_groups)) |> # each age_group starts with 0 activity
             stats::setNames(names(contact_basis$proportion))
-        }
+      }
       )
 
       names(risk_weighted_activity) <- private$activity_types
