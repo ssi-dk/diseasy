@@ -21,7 +21,7 @@ See vignette("diseasy-observables")
 
   # See available observables
   print(obs$available_observables)
-  print(obs$available_aggregations)
+  print(obs$available_stratifications)
 
   # Get data for one observable
   \dontrun{
@@ -62,8 +62,8 @@ The currently loaded diseasystore which provides the features. Read-only.}
 \item{\code{available_observables}}{(\code{character})\cr
 The currently available observables in the loaded diseasystore. Read-only.}
 
-\item{\code{available_aggregations}}{(\code{character})\cr
-The currently available aggregations in the loaded diseasystore. Read-only.}
+\item{\code{available_stratifications}}{(\code{character})\cr
+The currently available stratifications in the loaded diseasystore. Read-only.}
 
 \item{\code{slice_ts}}{(\code{Date})\cr
 The timestamp to slice database on. Read-only.}

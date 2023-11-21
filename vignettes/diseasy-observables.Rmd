@@ -58,8 +58,8 @@ To see the data that comes with the underlying `diseasystore` we can query the m
 obs$available_observables
 ```
 
-```{r available_aggregations}
-obs$available_aggregations
+```{r available_stratifications}
+obs$available_stratifications
 ```
 
 To check the current status of the module, the `$describe()` method can be used:
@@ -78,20 +78,20 @@ obs$get_observation(observable = "n_population",
 # NOTE: The population here is not stratified, so covers all countries in the Google data
 ```
 
-If we want to stratify our data, we supply the aggregation argument.
+If we want to stratify our data, we supply the stratification argument.
 This argument is designed to be flexible, but it means they need to be wrapped in `rlang::quos()`.
 We will see below, why that is.
 ```{r example_2}
 obs$get_observation(observable = "n_hospital",
-                    aggregation = rlang::quos(age_group),
+                    stratification = rlang::quos(age_group),
                     start_date = as.Date("2020-03-01"),
                     end_date = as.Date("2020-05-01"))
 ```
 
-Since the aggregation is flexible, we can programmatically stratify:
+Since the stratification is flexible, we can programmatically stratify:
 ```{r example_3}
 obs$get_observation(observable = "n_hospital",
-                    aggregation = rlang::quos(young_age_groups =
+                    stratification = rlang::quos(young_age_groups =
                                                 age_group %in% c("00-09", "10-19")),
                     start_date = as.Date("2020-03-01"),
                     end_date = as.Date("2020-05-01"))
