@@ -111,9 +111,9 @@ that some models require the parameter <code>reference_date</code> to be
 set which can be done during initialization of the module.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>reference_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-01"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; INFO  [2023-11-07 09:59:38.696598] DiseasySeason: Module loaded</span></span>
-<span><span class="co">#&gt; INFO  [2023-11-07 09:59:38.842826] DiseasySeason: Setting reference_date as 2020-03-01</span></span>
-<span><span class="co">#&gt; INFO  [2023-11-07 09:59:38.854043] DiseasySeason: Using constant_season model</span></span></code></pre></div>
+<span><span class="co">#&gt; INFO  [2023-11-21 07:52:09.275113] DiseasySeason: Module loaded</span></span>
+<span><span class="co">#&gt; INFO  [2023-11-21 07:52:09.380314] DiseasySeason: Setting reference_date as 2020-03-01</span></span>
+<span><span class="co">#&gt; INFO  [2023-11-21 07:52:09.387495] DiseasySeason: Using constant_season model</span></span></code></pre></div>
 <p>To see the season models that comes with the module we can query the
 module.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -155,7 +155,7 @@ module to use a cosine season instead we can use
 <code>$use_cosine_season()</code></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s</span><span class="op">$</span><span class="fu">use_cosine_season</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; INFO  [2023-11-07 09:59:39.46392] DiseasySeason: Using cosine_season model</span></span></code></pre></div>
+<span><span class="co">#&gt; INFO  [2023-11-21 07:52:09.828993] DiseasySeason: Using cosine_season model</span></span></code></pre></div>
 <p>Once re-configured the models stored in <code>$model_t</code> and
 <code>$model_date</code> change to the new model:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
