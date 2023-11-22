@@ -92,7 +92,7 @@ Since the stratification is flexible, we can programmatically stratify:
 ```{r example_3}
 obs$get_observation(observable = "n_hospital",
                     stratification = rlang::quos(young_age_groups =
-                                                age_group %in% c("00-09", "10-19")),
+                                                   age_group %in% c("00-09", "10-19")),
                     start_date = as.Date("2020-03-01"),
                     end_date = as.Date("2020-05-01"))
 
