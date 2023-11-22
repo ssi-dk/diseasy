@@ -8,7 +8,7 @@ hashing:
 The active binding self$hash hashes the values of public fields to provide a way to uniquely identify the
 configuration of modules.
 Care must be taken to ensure that information that makes modules distinct are also stored in public fields.
-That is, if a important property is stored only as private field, the hash will not change.
+That is, if an important property is stored only as a private field, the hash will not change.
 Module-specific tests should be written to ensure hash changes as expected.
 caching:
 The methods private$cache(), private$get_hash() private$is_cached(hash) implements a simple caching system
@@ -27,7 +27,7 @@ hashing:
 The active binding self$hash hashes the values of public fields to provide a way to uniquely identify the
 configuration of modules.
 Care must be taken to ensure that information that makes modules distinct are also stored in public fields.
-That is, if a important property is stored only as private field, the hash will not change.
+That is, if an important property is stored only as a private field, the hash will not change.
 Module-specific tests should be written to ensure hash changes as expected.
 caching:
 The methods private$cache(), private$get_hash() private$is_cached(hash) implements a simple caching system
@@ -62,6 +62,7 @@ already-loaded modules)
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/diseasy-observables.html">DiseasyObservables</a>
     <a class="dropdown-item" href="../articles/diseasy-season.html">DiseasySeason</a>
     <a class="dropdown-item" href="../articles/quick-start.html">Quick start</a>
   </div>
@@ -99,7 +100,7 @@ This logger is stored in <code>private$lg</code>.</p></li>
 The active binding <code>self$hash</code> hashes the values of public fields to provide a way to uniquely identify the
 configuration of modules.
 Care must be taken to ensure that information that makes modules distinct are also stored in public fields.
-That is, if a important property is stored only as private field, the hash will not change.
+That is, if an important property is stored only as a private field, the hash will not change.
 Module-specific tests should be written to ensure hash changes as expected.</p></li>
 <li><p>caching:
 The methods <code>private$cache()</code>, <code>private$get_hash()</code> <code>private$is_cached(hash)</code> implements a simple caching system
@@ -148,7 +149,10 @@ Computes a hash value for the module. Useful for logging and caching. Read only.
 <p>Creates a new instance of the <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.
 This module is typically not constructed directly but rather through derived classes.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyBaseModule.html">DiseasyBaseModule</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>moduleowner <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">self</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyBaseModule.html">DiseasyBaseModule</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  moduleowner <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">self</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  logging <span class="op">=</span> <span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"logging"</span>, <span class="va">self</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -156,6 +160,11 @@ This module is typically not constructed directly but rather through derived cla
 <p></p><div class="arguments"><dl><dt><code>moduleowner</code></dt>
 <dd><p>(<code>character</code>)<br>
 The name of the moduleowner. Used when logging.</p></dd>
+
+
+<dt><code>logging</code></dt>
+<dd><p>(<code>boolean</code>)<br>
+Should logging be enabled?</p></dd>
 
 
 </dl><p></p></div>
@@ -246,7 +255,6 @@ created.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="co"># Normally, you would not want to create this module directly, but it is possible.</span></span></span>
 <span class="r-in"><span>  <span class="va">base_module</span> <span class="op">&lt;-</span> <span class="va">DiseasyBaseModule</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO  [2023-11-21 13:20:11.586091] DiseasyBaseModule: Module loaded</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">base_module</span><span class="op">)</span></span></span>
 </code></pre></div>
