@@ -100,17 +100,17 @@ test_that("errors work", {
 })
 
 
-test_that("aggregation_to_string works", {
+test_that("stratification_to_string works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()
   private <- m$.__enclos_env__$private
 
-  # Test the aggregation_to_string with empty input
-  expect_equal(private$aggregation_to_string(NULL), NA_character_)
+  # Test the stratification_to_string with empty input
+  expect_equal(private$stratification_to_string(NULL), NA_character_)
 
-  # Test the aggregation_to_string with a couple of permutations
-  expect_equal(private$aggregation_to_string(rlang::quos(test = a + b, test_id)),
+  # Test the stratification_to_string with a couple of permutations
+  expect_equal(private$stratification_to_string(rlang::quos(test = a + b, test_id)),
                "test = a + b, test_id")
 
   rm(m)

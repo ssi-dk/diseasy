@@ -1,6 +1,15 @@
-#' @title Season handler
+#' @title Diseasy' season handler
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasySeason` module is responsible for implementing various models for the seasonal dependency of the
+#'   diseases.
+#'   The module implements a number season models with different functional forms.
+#'   Models for season are either extracted from the module through `get_*` functions or the module is configured to
+#'   use these models internally through `use_*` functions whereafter the model can be accessed through `$model_t()`
+#'   and `$model_date()`.
+#'   Each season model has varying number of parameters. See documentation for each for details.
+#'
+#'   See the vignette("diseasy-season") for examples of use.
 #' @examples
 #'   # Season module with an constant season
 #'   s1 <- DiseasySeason$new()
@@ -100,12 +109,34 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
 
     #' @description
+    #'   Retrieves the specified season model.
+    #' @param model_name
+    #'   Name of the season_model to use (calls the equivalent $get_<model_name>()).
+    #' @param dots (`list`)\cr
+    #'   Named list of arguments that will be passed at dot-ellipsis to the season model.
+    get_season_model = function(model_name, dots = NULL) {
+
+      checkmate::assert_choice(model_name, self$available_season_models)
+
+      # First parse the dot arguments
+      dots_to_string <- ifelse(
+        is.null(dots), "", glue::glue_collapse(purrr::map2(dots, names(dots), ~ glue::glue("{.y} = {.x}")), sep = ", ")
+      )
+
+      # Then retrieve the requested model
+      return(eval(parse(text = glue::glue("self$get_{model_name}({dots_to_string})"))))
+
+    },
+
+    #' @description
     #'   Sets the `DiseasySeason` module to use the specified season model.
     #' @param model_name
     #'   Name of the season_model to use (calls the equivalent $use_<model_name>()).
     #' @param dots (`list`)\cr
     #'   Named list of arguments that will be passed at dot-ellipsis to the season model.
     use_season_model = function(model_name, dots = NULL) {
+
+      checkmate::assert_choice(model_name, self$available_season_models)
 
       # First parse the dot arguments
       dots_to_string <- ifelse(
@@ -114,37 +145,54 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
       # Then reset the model
       eval(parse(text = glue::glue("self$use_{model_name}({dots_to_string})")))
+
     },
 
+
+    #' @description
+    #'   Retrieves the season model with a constant value (1).
+    get_constant_season = function() {
+
+      model_date <- \(date) 1
+      model_t    <- \(t)    1
+
+      attr(model_date, "name")        <- "constant_season"
+      attr(model_date, "description") <- paste(sep = "\n",
+        "Constant (no) seasonality model.",
+        "Risk of infection constant through year"
+      )
+
+      attr(model_t, "name")         <- attr(model_date, "name")
+      attr(model_t, "description")  <- attr(model_date, "description")
+
+
+      return(list("model_t" = model_t, "model_date" = model_date))
+
+    },
 
     #' @description
     #'   Sets the season module to use a constant value (1).
     use_constant_season = function() {
 
       # Set the models
-      private$.model_date <- \(date) 1
-      private$.model_t    <- \(t)    1
+      models <- self$get_constant_season()
 
-      attr(private$.model_date, "name")        <- "constant_season"
-      attr(private$.model_date, "description") <- paste(sep = "\n",
-                                                        "Constant (no) seasonality model.",
-                                                        "Risk of infection constant through year")
-
-      attr(private$.model_t, "name")         <- attr(private$.model_date, "name")
-      attr(private$.model_t, "description")  <- attr(private$.model_date, "description")
+      private$.model_t    <- models %.% model_t
+      private$.model_date <- models %.% model_date
 
       # Logging
       private$lg$info("Using constant_season model")
+
     },
 
 
     #' @description
-    #'   Sets the `DiseasySeason` module to use a cosine model for season.
+    #'   Retrieves the season model with a cosine relationship.
     #' @param peak (`numeric`)\cr
     #'   Sets the period of maximal activity (days past new-year).
     #'   By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.
     #' @param scale `r rd_scale()`
-    use_cosine_season = function(peak = 20.09946, scale = 0.5726693) {
+    get_cosine_season = function(peak = 20.09946, scale = 0.5726693) {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -163,29 +211,49 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
       reference_t     <- date_map(self$reference_date)
       reference_value <- cosine_season(reference_t)
 
+      # Define the models
+      model_date <- \(date) cosine_season(date_map(date)) / reference_value
+      model_t    <- \(t)    cosine_season(reference_t + t / 365) / reference_value
+
+      # Set the attributes
+      attr(model_date, "name")        <- "cosine_season"
+      attr(model_date, "description") <- paste(sep = "\n",
+        "Simple seasonality model.",
+        "Risk of infection highest at the `peak` days after new year"
+      )
+      attr(model_date, "dots")        <- list(scale = scale)
+
+      attr(model_t, "name")         <- attr(model_date, "name")
+      attr(model_t, "description")  <- attr(model_date, "description")
+      attr(model_t, "dots")         <- attr(model_date, "dots")
+
+      return(list("model_t" = model_t, "model_date" = model_date))
+    },
+
+    #' @description
+    #'   Sets the `DiseasySeason` module to use a cosine model for season.
+    #' @param peak (`numeric`)\cr
+    #'   Sets the period of maximal activity (days past new-year).
+    #'   By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.
+    #' @param scale `r rd_scale()`
+    use_cosine_season = function(peak = 20.09946, scale = 0.5726693) {
+
       # Set the models
-      private$.model_date <- \(date) cosine_season(date_map(date)) / reference_value
-      private$.model_t    <- \(t)    cosine_season(reference_t + t / 365) / reference_value
+      models <- self$get_cosine_season(peak = peak, scale = scale)
 
-      attr(private$.model_date, "name")        <- "cosine_season"
-      attr(private$.model_date, "description") <- paste(sep = "\n",
-                                                        "Simple seasonality model.",
-                                                        "Risk of infection highest at the `peak` days after new year")
-      attr(private$.model_date, "dots")       <- list(scale = scale)
-
-      attr(private$.model_t, "name")         <- attr(private$.model_date, "name")
-      attr(private$.model_t, "description")  <- attr(private$.model_date, "description")
-      attr(private$.model_t, "dots")         <- attr(private$.model_date, "dots")
+      private$.model_t    <- models %.% model_t
+      private$.model_date <- models %.% model_date
 
       # Logging
       private$lg$info("Using cosine_season model")
+
     },
 
 
     #' @description
-    #'   Sets the `DiseasySeason` module to use the first version of the covid 19 season model
+    #'   Retrieves the first version of the COVID-19 season model.
     #' @param scale `r rd_scale()`
-    use_covid_season_v1 = function(scale = 0.4825524) {
+    get_covid_season_v1 = function(scale = 0.4825524) {
 
       # Determine what the max_scale can be
       # For that we need the parameters of the season model fit
@@ -226,29 +294,44 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
       reference_value <- beta_sweden_dk(date_map(self$reference_date))
 
       # Set the models
-      private$.model_date <- \(date) beta_sweden_dk(date_map(date)) / reference_value
-      private$.model_t    <- \(t)    beta_sweden_dk((reference_t + t / 365) %% 1) / reference_value
+      model_date <- \(date) beta_sweden_dk(date_map(date)) / reference_value
+      model_t    <- \(t)    beta_sweden_dk((reference_t + t / 365) %% 1) / reference_value
 
-      attr(private$.model_date, "name")        <- "covid_season_v1"
-      attr(private$.model_date, "description") <- paste(sep = "\n",
+      attr(model_date, "name")        <- "covid_season_v1"
+      attr(model_date, "description") <- paste(sep = "\n",
         "Seasonality model for covid based on the development in Sweden 2021.",
         "Uses the DMI climate normal of the maximum daily tempearture."
       )
-      attr(private$.model_date, "dots")       <- list(scale = scale)
+      attr(model_date, "dots")       <- list(scale = scale)
 
-      attr(private$.model_t, "name")         <- attr(private$.model_date, "name")
-      attr(private$.model_t, "description")  <- attr(private$.model_date, "description")
-      attr(private$.model_t, "dots")         <- attr(private$.model_date, "dots")
+      attr(model_t, "name")         <- attr(model_date, "name")
+      attr(model_t, "description")  <- attr(model_date, "description")
+      attr(model_t, "dots")         <- attr(model_date, "dots")
+
+      return(list("model_t" = model_t, "model_date" = model_date))
+    },
+
+    #' @description
+    #'   Sets the `DiseasySeason` module to use the first version of the covid 19 season model
+    #' @param scale `r rd_scale()`
+    use_covid_season_v1 = function(scale = 0.4825524) {
+
+      # Set the models
+      models <- self$get_covid_season_v1(scale = scale)
+
+      private$.model_t    <- models %.% model_t
+      private$.model_date <- models %.% model_date
 
       # Logging
       private$lg$info("Using covid_season_v1 model")
+
     },
 
 
     #' @description
-    #'   Sets the `DiseasySeason` module to use the second version of the covid 19 season model
+    #'   Retrieves the second version of the COVID-19 season model.
     #' @param scale `r rd_scale()`
-    use_covid_season_v2 = function(scale = 0.5042782) {
+    get_covid_season_v2 = function(scale = 0.5042782) {
 
       # Determine what the max_scale can be
       # For that we need the parameters of the season model fit
@@ -314,51 +397,65 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
 
       # Set the models
-      private$.model_date <- \(date) ifelse(date <= max_date,
-                                            stats::approx(x = temperature_dk$date,
-                                                          y = beta_sweden_v2(temperature_dk$max_temperature),
-                                                          xout = date)$y,
-                                            stats::approx(x = climate_normal$t,
-                                                          y = beta_sweden_v2(climate_normal$max_temperature),
-                                                          xout = date_map(date))$y) / reference_value
+      model_date <- \(date) ifelse(date <= max_date,
+                                   stats::approx(x = temperature_dk$date,
+                                                 y = beta_sweden_v2(temperature_dk$max_temperature),
+                                                 xout = date)$y,
+                                   stats::approx(x = climate_normal$t,
+                                                 y = beta_sweden_v2(climate_normal$max_temperature),
+                                                 xout = date_map(date))$y) / reference_value
 
-      private$.model_t    <- \(t)    ifelse(t <= max_t,
-                                            stats::approx(x = temperature_dk$t,
-                                                          y = beta_sweden_v2(temperature_dk$max_temperature),
-                                                          xout = t)$y,
-                                            stats::approx(x = climate_normal$t,
-                                                          y = beta_sweden_v2(climate_normal$max_temperature),
-                                                          xout = (reference_t + t / 365) %% 1)$y) / reference_value
+      model_t    <- \(t)    ifelse(t <= max_t,
+                                   stats::approx(x = temperature_dk$t,
+                                                 y = beta_sweden_v2(temperature_dk$max_temperature),
+                                                 xout = t)$y,
+                                   stats::approx(x = climate_normal$t,
+                                                 y = beta_sweden_v2(climate_normal$max_temperature),
+                                                 xout = (reference_t + t / 365) %% 1)$y) / reference_value
 
-      attr(private$.model_date, "name")        <- "covid_season_v2"
-      attr(private$.model_date, "description") <- paste(sep = "\n",
+      attr(model_date, "name")        <- "covid_season_v2"
+      attr(model_date, "description") <- paste(sep = "\n",
         "Seasonality model for covid based on the development in Sweden 2021",
         "Uses the DMI data for observed the maximum daily tempearture",
         "and extends first with prognoses and then with the climate normal."
       )
-      attr(private$.model_date, "dots")       <- list(scale = scale)
+      attr(model_date, "dots")       <- list(scale = scale)
 
-      attr(private$.model_t, "name")         <- attr(private$.model_date, "name")
-      attr(private$.model_t, "description")  <- attr(private$.model_date, "description")
-      attr(private$.model_t, "dots")         <- attr(private$.model_date, "dots")
+      attr(model_t, "name")         <- attr(model_date, "name")
+      attr(model_t, "description")  <- attr(model_date, "description")
+      attr(model_t, "dots")         <- attr(model_date, "dots")
+
+      return(list("model_t" = model_t, "model_date" = model_date))
+    },
+
+    #' @description
+    #'   Sets the `DiseasySeason` module to use the second version of the COVID-19 season model
+    #' @param scale `r rd_scale()`
+    use_covid_season_v2 = function(scale = 0.5042782) {
+
+      # Set the models
+      models <- self$get_covid_season_v2(scale = scale)
+
+      private$.model_t    <- models %.% model_t
+      private$.model_date <- models %.% model_date
 
       # Logging
       private$lg$info("Using covid_season_v2 model")
-    },
 
+    },
 
 
     #' @description `r rd_describe`
     describe = function() {
       printr("# Season model ###############################################")
-      if (is.null(private$.model_date)) {
+      if (is.null(self$model_t)) {
         printr("Season model not yet set")
       } else {
-        printr(glue::glue("Season model: {attr(private$.model_date, 'name')}"))
-        printr(glue::glue("{attr(private$.model_date, 'description')}"))
-        if (!is.null(attr(private$.model_date, "dots"))) {
+        printr(glue::glue("Season model: {attr(self$model_t, 'name')}"))
+        printr(glue::glue("{attr(self$model_t, 'description')}"))
+        if (!is.null(attr(self$model_t, "dots"))) {
           printr("Parameters: ",
-                 stringr::str_extract(toString(list(attr(private$.model_date, "dots"))), r"{(?<=list\().*(?=\))}"))
+                 stringr::str_extract(toString(list(attr(self$model_t, "dots"))), r"{(?<=list\().*(?=\))}"))
         }
 
       }
@@ -396,6 +493,19 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
       .f = active_binding, # nolint: indentation_linter
       name = "model_date",
       expr = return(private %.% .model_date)),
+
+
+    #' @field available_season_models (`character`)\cr
+    #'   The list of available season models
+    available_season_models = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "available_season_models",
+      expr = {
+        models <- purrr::keep(ls(self), ~ startsWith(., "use_")) |>
+          purrr::map_chr(~ stringr::str_extract(., r"{(?<=use_).*}")) |>
+          purrr::discard(~ . == "season_model") # Filter out the generic setter
+        return(models)
+      }),
 
 
     #' @field observables (`diseasy::DiseasyObservables`)\cr
