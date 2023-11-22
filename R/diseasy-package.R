@@ -20,7 +20,8 @@ NULL
 #' @export
 diseasy_code_linters <- function() {
   linters <- list(
-    non_ascii_linter()
+    non_ascii_linter(),
+    todo_linter()
   )
 
   return(linters)
