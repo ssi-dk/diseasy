@@ -17,7 +17,7 @@ This logger is stored in \code{private$lg}.
 The active binding \code{self$hash} hashes the values of public fields to provide a way to uniquely identify the
 configuration of modules.
 Care must be taken to ensure that information that makes modules distinct are also stored in public fields.
-That is, if a important property is stored only as private field, the hash will not change.
+That is, if an important property is stored only as a private field, the hash will not change.
 Module-specific tests should be written to ensure hash changes as expected.
 \item caching:
 The methods \code{private$cache()}, \code{private$get_hash()} \code{private$is_cached(hash)} implements a simple caching system
@@ -62,7 +62,10 @@ Computes a hash value for the module. Useful for logging and caching. Read only.
 Creates a new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 This module is typically not constructed directly but rather through derived classes.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$new(moduleowner = class(self)[1])}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$new(
+  moduleowner = class(self)[1],
+  logging = diseasyoption("logging", self)
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -70,6 +73,9 @@ This module is typically not constructed directly but rather through derived cla
 \describe{
 \item{\code{moduleowner}}{(\code{character})\cr
 The name of the moduleowner. Used when logging.}
+
+\item{\code{logging}}{(\code{boolean})\cr
+Should logging be enabled?}
 }
 \if{html}{\out{</div>}}
 }

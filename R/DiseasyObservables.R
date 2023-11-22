@@ -1,6 +1,12 @@
-#' @title Observable handler
+#' @title Diseasy' observables handler
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasyObservables` module is responsible for interfacing with the available `diseasystores` and provide
+#'   disease data to the models.
+#'   The module primarily acts as a convenience wrapper around the `diseasystores`. The observables and stratifications
+#'   will therefore depend on the data made available by the diseasystores.
+#'
+#'   See vignette("diseasy-observables")
 #' @examples
 #'   # Create observables module using the Google COVID-19 data
 #'   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
@@ -8,6 +14,7 @@
 #'
 #'   # See available observables
 #'   print(obs$available_observables)
+#'   print(obs$available_stratifications)
 #'
 #'   # Get data for one observable
 #'   \dontrun{
@@ -40,7 +47,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @param slice_ts (`Date` or `character`)\cr
     #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
-    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
     #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     initialize = function(diseasystore = NULL,
@@ -75,19 +82,28 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #'   Set the case definition to get DiseasyObservables for.
     #' @param diseasystore (`character`)\cr
     #'   Text label of the disease to get DiseasyObservables for.\cr
-    #'   Must match case definition implemented in `featurestore` package.
-    set_diseasystore = function(diseasystore) {
+    #'   Must match case definition implemented in `diseasystore` package.
+    #' @param verbose
+    #'   Should the `diseasystore` use verbose outputs?
+    #' @seealso [diseasystore]
+    set_diseasystore = function(diseasystore, verbose = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(diseasystore, add = coll)
       if (!diseasystore::diseasystore_exists(diseasystore)) {
         coll$push(glue::glue("{diseasystore::to_diseasystore_case(diseasystore)} not found!"))
       }
+      checkmate::assert_logical(verbose, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
-      # Load and configure the feature store
+      # Determine the diseasystore to load
       ds <- diseasystore:::get_diseasystore(diseasystore)
+
+      # Determine the verbosity
+      if (is.null(verbose)) verbose <- purrr::pluck(diseasyoption("verbose", ds), .default = FALSE)
+
+      # Load and configure the feature store
       private$.ds <- ds$new(slice_ts = self %.% slice_ts,
-                            verbose = !testthat::is_testing(),
+                            verbose = verbose,
                             target_conn = self %.% conn)
 
       private$.diseasystore <- private$.ds %.% label # Use the human readable from the diseasystore
@@ -297,6 +313,17 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       }),
 
 
+    #' @field available_stratifications (`character`)\cr
+    #'   The currently available stratifications in the loaded diseasystore. Read-only.
+    available_stratifications = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "available_stratifications",
+      expr = {
+        if (is.null(private %.% .ds)) return(NULL)
+        return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
+      }),
+
+
     #' @field slice_ts (`Date`)\cr
     #' The timestamp to slice database on. Read-only.
     slice_ts = purrr::partial(
@@ -328,5 +355,5 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
 
 # Set default options for the package related to DiseasyObservables
 rlang::on_load({
-  options(diseasy.conn = "")
+  options("diseasy.conn" = "")
 })

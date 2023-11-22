@@ -38,7 +38,12 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     #'   This module is typically not constructed directly but rather through derived classes.
     #' @param moduleowner (`character`)\cr
     #'   The name of the moduleowner. Used when logging.
-    initialize = function(moduleowner = class(self)[1]) {
+    #' @param logging (`boolean`)\cr
+    #'   Should logging be enabled?
+    initialize = function(moduleowner = class(self)[1],
+                          logging = diseasyoption("logging", self)) {
+
+      private$logging <- logging
       self$set_moduleowner(moduleowner)
     },
 
@@ -169,6 +174,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     # @field lg (`lgr::LoggerGlue`)\cr
     #   Contains the logging module
     lg = NULL,
+    logging = NULL,
 
     # @field moduleowner (`moduleowner`)\cr
     #   Stores the "moduleowner" as given by set_moduleowner()
@@ -189,8 +195,11 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
         )
       )
 
-      # Check active appenders
-      if (length(private$lg$appenders) == 0 && !testthat::is_testing()) {
+      # Disable logging if needed
+      if (isFALSE(private$logging)) {
+        private$lg$set_appenders(list())
+
+      } else if (length(private$lg$appenders) == 0 && !testthat::is_testing()) {
 
         # Appenders
         appenders <- list(cons = lgr::AppenderConsole$new())
@@ -329,3 +338,8 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     }
   )
 )
+
+# Set default options for the package related to DiseasyObservables
+rlang::on_load({
+  options("diseasy.logging" = FALSE)
+})

@@ -2,12 +2,17 @@
 % Please edit documentation in R/DiseasyObservables.R
 \name{DiseasyObservables}
 \alias{DiseasyObservables}
-\title{Observable handler}
+\title{Diseasy' observables handler}
 \value{
 A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 \description{
-TODO
+The \code{DiseasyObservables} module is responsible for interfacing with the available \code{diseasystores} and provide
+disease data to the models.
+The module primarily acts as a convenience wrapper around the \code{diseasystores}. The observables and stratifications
+will therefore depend on the data made available by the diseasystores.
+
+See vignette("diseasy-observables")
 }
 \examples{
   # Create observables module using the Google COVID-19 data
@@ -16,6 +21,7 @@ TODO
 
   # See available observables
   print(obs$available_observables)
+  print(obs$available_stratifications)
 
   # Get data for one observable
   \dontrun{
@@ -26,6 +32,8 @@ TODO
   rm(obs)
 }
 \seealso{
+\link{diseasystore}
+
 \link[SCDB:get_table]{SCDB::get_table}
 
 \link[SCDB:get_table]{SCDB::get_table}
@@ -53,6 +61,9 @@ The currently loaded diseasystore which provides the features. Read-only.}
 
 \item{\code{available_observables}}{(\code{character})\cr
 The currently available observables in the loaded diseasystore. Read-only.}
+
+\item{\code{available_stratifications}}{(\code{character})\cr
+The currently available stratifications in the loaded diseasystore. Read-only.}
 
 \item{\code{slice_ts}}{(\code{Date})\cr
 The timestamp to slice database on. Read-only.}
@@ -122,7 +133,7 @@ A database connection object (inherits from DBIConnection)}
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
 Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}}
 
-\item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
+\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }
@@ -136,7 +147,7 @@ A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 \subsection{Method \code{set_diseasystore()}}{
 Set the case definition to get DiseasyObservables for.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_diseasystore(diseasystore)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_diseasystore(diseasystore, verbose = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -144,7 +155,9 @@ Set the case definition to get DiseasyObservables for.
 \describe{
 \item{\code{diseasystore}}{(\code{character})\cr
 Text label of the disease to get DiseasyObservables for.\cr
-Must match case definition implemented in \code{featurestore} package.}
+Must match case definition implemented in \code{diseasystore} package.}
+
+\item{\code{verbose}}{Should the \code{diseasystore} use verbose outputs?}
 }
 \if{html}{\out{</div>}}
 }
