@@ -295,8 +295,6 @@ Return openness [0 ; 1] for all age groups and activities on all dates.
 \describe{
 \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
 
-\item{\code{population_1yr}}{(\code{numeric})\cr vector of population counts in 1-year age groups.}
-
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
 }
 \if{html}{\out{</div>}}
@@ -319,8 +317,6 @@ Return contacts for across age groups and activities on all dates.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
-
-\item{\code{population_1yr}}{(\code{numeric})\cr vector of population counts in 1-year age groups.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
 }
