@@ -36,7 +36,7 @@ act <- DiseasyActivity$new()
 By default, the module initializes with no activity scenario, and produces empty outputs.
 (See [the interfacing section](#interfacing) for ways to get metrics from the module)
 ```{r null_scenario}
-act$get_scenario_freedom()
+act$get_scenario_openness()
 ```
 
 To use the module, we must define the activity scenario. In the example below, we configure the module to use
@@ -154,13 +154,13 @@ A simpler metric for societal activity is the degree of "openness", i.e. degree 
 relative to an open society.
 
 This value ranges from 1 (normal activity) to 0 (no activity).
-```{r scenario_freedom}
-act$get_scenario_freedom()
+```{r scenario_openness}
+act$get_scenario_openness()
 ```
 
-The degree of freedom can be queried similarly to the contact matrices:
-```{r scenario_freedom_weighted}
-act$get_scenario_freedom(age_cuts_lower = c(0, 20, 40, 60, 80), weights = c(1, 1, 1, 1))
+The degree of openness can be queried similarly to the contact matrices:
+```{r scenario_openness_weighted}
+act$get_scenario_openness(age_cuts_lower = c(0, 20, 40, 60, 80), weights = c(1, 1, 1, 1))
 ```
 
 
