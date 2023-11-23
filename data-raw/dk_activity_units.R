@@ -1610,7 +1610,7 @@ dk_activity_units <- dk_activity_units |>
 
 # Convert to data.frame and then into nested lists
 df_to_list <- function(df, name_col = NULL) {
-  out <- split(dplyr::select(df, !tidyselect::any_of(name_col)), seq(nrow(df)))
+  out <- split(dplyr::select(df, !tidyselect::any_of(name_col)), seq_len(nrow(df)))
   if (!is.null(name_col)) names(out) <- dplyr::pull(df, {{ name_col }})
   return(out)
 }

@@ -1,3 +1,11 @@
+rd_activity_units <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`list(list())`)\\cr",
+        "A nested list of all possible 'units' of activity that can be opened or closed.",
+        ifelse(type == "field", " Read only.", ""))
+}
+
+
 rd_aggregation <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`list`(`quosures`))\\cr",
@@ -11,6 +19,22 @@ rd_case_definition <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",
+        ifelse(type == "field", " Read only.", ""))
+}
+
+
+rd_contact_basis <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`list(list())`)\\cr",
+        "A nested list with all the needed information for the contact_basis\\cr",
+        "* `counts` contains the age stratified contact counts across the arenas of the basis",
+        "  (e.g. 'work', 'home', 'school', 'other')\\cr",
+        "* `prop` contains a list of the proportion of population in each age-group\\cr",
+        "* `pop_ref_1yr` contains a `data.frame` with the columns\\cr",
+        "  * `age` (`integer()`) 1-year age group\\cr",
+        "  * `pop` (`numeric()`) size of population in age group\\cr",
+        "  * `prop` (`numeric()`) proportion of total population in age group\\cr",
+        "* `description` contains information about the source of the contact basis.",
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -162,7 +186,12 @@ rd_side_effects <- "NULL (called for side effects)"
 
 rd_age_cuts_lower <- paste(
   "(`numeric`)\\cr",
-  "vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used."
+  "vector of ages defining the lower bound for each age group. (Optional)"
+)
+
+rd_population_1yr <- paste(
+  "(`numeric`)\\cr",
+  "vector of population counts in 1-year age groups."
 )
 
 rd_activity_weights <- paste(

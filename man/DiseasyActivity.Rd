@@ -3,8 +3,56 @@
 \name{DiseasyActivity}
 \alias{DiseasyActivity}
 \title{Activity handler}
+\value{
+A new instance of the \code{DiseasyActivity} \link[R6:R6Class]{R6} class.
+}
 \description{
-TODO
+The \code{DiseasyActivity} module is responsible for handling the societal activity.
+By providing a \code{contact_basis}, \code{activity_units} and a \code{scenario} to the module, the
+module provides activity matrices throughout the scenario (with flexible age-groupings)
+as well as the overall "activity" level in society.
+
+The \code{contact_basis} contains information about:
+- contact matrices (contact rates between age groups)
+- population (size and proportion of population in age groups)
+
+The \code{activity_units} projects restrictions, guidelines and other changes in activity into smaller "units" that are
+independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
+(in)active.
+
+The \code{scenario} contains information on when different \code{activity_units} are opened and closed
+
+See vignette("diseasy-activity") for examples of use.
+}
+\examples{
+  # Activity module with Danish reference scenario
+  act <- DiseasyActivity$new(base_scenario = "dk_reference",
+                             activity_units = dk_activity_units,
+                             contact_basis = contact_basis \%.\% DK)
+
+  # Get contact matrices
+  contact_matrices <- act$get_scenario_activities()
+
+
+  # Configuring a custom scenario in another country (using Danish activity units)
+  scenario <- data.frame(date = as.Date(character(0)),
+                         opening = character(0),
+                         closing = character(0)) |>
+    dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",      closing = NA) |>
+    dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,              closing = "baseline") |>
+    dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020", closing = NA)
+
+  act$set_contact_basis(contact_basis \%.\% GB) # Use the "Great Britain" contact_basis
+  act$set_activity_units(dk_activity_units)
+  act$change_activity(scenario)
+
+  # Get societal "openness"
+  openness <- act$get_scenario_openness()
+
+  rm(act)
+}
+\seealso{
+\link{dk_activity_units}
 }
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyActivity}
@@ -12,14 +60,13 @@ TODO
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{scenario_matrix}}{(\code{matrix})\cr
+\item{\code{scenario_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of restrictions (showing only used activity units). Read-only.}
 
-\item{\code{risk_matrix}}{(\code{matrix})\cr
+\item{\code{risk_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
-\item{\code{contact_basis}}{(\code{matrix})\cr
-The basis of contacts between age groups used to compute activity. Read-only.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-group\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -35,7 +82,7 @@ The basis of contacts between age groups used to compute activity. Read-only.}
 \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
 \item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
 \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
-\item \href{#method-DiseasyActivity-rescale_counts2rates}{\code{DiseasyActivity$rescale_counts2rates()}}
+\item \href{#method-DiseasyActivity-rescale_counts_to_rates}{\code{DiseasyActivity$rescale_counts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
 \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
@@ -70,11 +117,9 @@ Creates a new instance of the \code{DiseasyActivity} \link[R6:R6Class]{R6} class
 \item{\code{base_scenario}}{(\code{character(1)})\cr
 Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"}
 
-\item{\code{activity_units}}{(\code{list}s of \code{list}s)\cr
-A nested list of all possible "units" of activity that can be opened or closed}
+\item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
 
-\item{\code{contact_basis}}{(\code{list()})\cr
-TODO}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-group\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
 }
@@ -93,15 +138,29 @@ Sets the list of all possible "units" of activity that can be opened or closed
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{activity_units}}{(\code{list(list())})\cr
-A nested list of all possible "units" of activity that can be opened or closed}
+\item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Each element in the activity_units list should be a list with the following elements: #TODO
+Each element in the activity_units list should be a list with the following elements:
+\itemize{
+\item activity: a programmatic short hand for activity (character, snake_case),
+\item label: a human readable label for activity (character),
+\item home:   numeric/vector with number(s) in [0, 1]
+\item work:   numeric/vector with number(s) in [0, 1]
+\item school: numeric/vector with number(s) in [0, 1]
+\item other:  numeric/vector with number(s) in [0, 1]
+\item risk:   numeric greater than zero
 }
 
+If a single number is provider, the number is applied across all age-groups
+If a vector is provided, the vector must match the number of age groups in the contact_basis
+}
+
+\subsection{Returns}{
+NULL (called for side effects)
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-set_contact_basis"></a>}}
@@ -115,27 +174,17 @@ Sets the contact matrix basis the activity is computed from
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{contact_basis}}{(\code{list(list())})\cr
-A nested list with all the needed information for the contact_basis\cr
-\itemize{
-\item \code{counts} contains the age stratified contact counts across the arenas of the basis
-(e.g. "work", "home", "school", "other")\cr
-\item \code{prop} #TODO\cr
-\item \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr
-\itemize{
-\item \code{age} (\code{integer()}) 1-year age group\cr
-\item \code{pop} (\code{numeric()}) size of population in age group\cr
-\item \code{prop} (\code{numeric()}) proportion of total population in age group\cr
-}
-\item \code{description} contains information about the source of the contact basis
-}}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-group\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-#TODO
+Loads the given \code{contact_basis} into the module
 }
 
+\subsection{Returns}{
+NULL (called for side effects)
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-change_activity"></a>}}
@@ -163,7 +212,7 @@ Omitted if \code{data.frame} is given to date argument}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Nothing
+NULL (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
@@ -172,24 +221,26 @@ Nothing
 \subsection{Method \code{change_risk()}}{
 Sets the overall risk of types of activity
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$change_risk(date, type = NA, risk = NA)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$change_risk(date, type = NULL, risk = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{date}}{Vector of dates when risk changes.
+\item{\code{date}}{(\code{Date()})\cr
+Dates where risk changes.
 The first argument can also be a data.frame with columns "date", "type" and "risk"}
 
-\item{\code{type}}{(\code{character})\cr
+\item{\code{type}}{(\code{character(1)})\cr
 Name of activity type to change. Must be in "work", "school", "home" and "other"}
 
-\item{\code{risk}}{Relative risk for the given type from the given date}
+\item{\code{risk}}{(\code{numeric(1)})\cr
+Relative risk for the given type from the given date}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Nothing
+NULL (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
@@ -204,29 +255,30 @@ Helper function to crop the scenario matrix in time
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{first_date}}{(\code{Date})\cr
+\item{\code{first_date}}{(\code{Date(1)})\cr
 New first date in scenario. The column for the lasted prior date will be new first column}
 
-\item{\code{last_date}}{(\code{Date})\cr
+\item{\code{last_date}}{(\code{Date(1)})\cr
 All columns after this date are deleted}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Nothing
+NULL (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_activities"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_activities}{}}}
 \subsection{Method \code{get_scenario_activities()}}{
-Return \code{list} with opened/closed activities on dates where there are changes.
+Return \code{list} containing the active activity units on dates where there are changes.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_activities()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-\code{list} with opened/closed activities on dates where there are changes.
+(\code{list})\cr
+The activity units active in the sceanrio.
 }
 }
 \if{html}{\out{<hr>}}
@@ -241,13 +293,16 @@ Return openness [0 ; 1] for all age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
+
+\item{\code{population_1yr}}{(\code{numeric})\cr vector of population counts in 1-year age groups.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
+(\code{list()})\cr
 Returns a list with depth of two: value[\link{date}][\link{type}]
 }
 }
@@ -263,7 +318,9 @@ Return contacts for across age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
+
+\item{\code{population_1yr}}{(\code{numeric})\cr vector of population counts in 1-year age groups.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
 }
@@ -274,20 +331,23 @@ If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-rescale_counts2rates"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_counts2rates}{}}}
-\subsection{Method \code{rescale_counts2rates()}}{
-Rescale from contacts to rates per individual to fractional population.
+\if{html}{\out{<a id="method-DiseasyActivity-rescale_counts_to_rates"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_counts_to_rates}{}}}
+\subsection{Method \code{rescale_counts_to_rates()}}{
+Re-scale from contacts to rates per individual to fractional population.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts2rates(input, pop)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, population)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{input}}{Matrix or (nested) list(s) to be rescaled.}
+\item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
+Counts to be re-scaled.}
 
-\item{\code{pop}}{Population vector. Is normalized within.}
+\item{\code{population}}{(\code{numeric})\cr
+Population vector to weight contacts by.
+Must use same age_groups as the contact matrix input.}
 }
 \if{html}{\out{</div>}}
 }
@@ -299,11 +359,15 @@ Returns an object with the same structure as the input
 \if{html}{\out{<a id="method-DiseasyActivity-reset_scenario"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-reset_scenario}{}}}
 \subsection{Method \code{reset_scenario()}}{
-TODO
+Resets the scenario in the module.
+NOTE: Called automatically when setting/changing activity units.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$reset_scenario()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+NULL (called for side effects)
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-describe"></a>}}
