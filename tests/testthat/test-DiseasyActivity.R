@@ -241,7 +241,7 @@ test_that("$change_activity fails with malformed inputs", {
 test_that("get_scenario_openness works", {
 
   # Test openness
-  act <- DiseasyActivity$new(base_scenario = "closed")
+  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
   dk_activity_units_subset <- dk_activity_units[1:10] # dk_activity_units is available from package
   act$set_activity_units(dk_activity_units_subset)
 
@@ -250,9 +250,13 @@ test_that("get_scenario_openness works", {
                       closing      = c(NA,           "baseline",      NA))
 
   expect_identical(length(act$get_scenario_openness()), 3L) # 3 dates in scenario
-  expect_identical(length(act$get_scenario_openness()[[1]]), 4L) # 4 elements
+  expect_identical(length(act$get_scenario_openness()[[1]]), 4L) # 4 arenas
   expect_true(all(unlist(lapply(act$get_scenario_openness(), \(x) sapply(x, length))) == 16))
   #TODO: Test if risks are applied
+
+  # Test with different age cuts
+  expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0, 60)), 1, 1, length), 2L) # 2 age groups
+  expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0)), 1, 1, length), 1L) # 1 (no) age groups
 
   rm(act)
 })
@@ -292,9 +296,9 @@ test_that("dk_reference scenario works", {
   # More tests could be made ... but tested above. The length may change over time so mayby some particular dates.
 
   ## Test weighted contact types. Most meaningful for contact matrices
-  tmp_list <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
-  tmp_list_out <- act$weighted_contact_types(tmp_list)
-  expect_identical(length(tmp_list), length(tmp_list_out))
+  tmp_list          <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
+  tmp_list_weighted <- act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1))
+  expect_identical(length(tmp_list), length(tmp_list_weighted))
 
   rm(act)
 })
