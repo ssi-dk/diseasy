@@ -175,19 +175,19 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Check structure of contact_basis
       checkmate::assert_list(contact_basis, add = coll)
       checkmate::assert_set_equal(names(contact_basis),
-                                  c("counts", "population", "proportion", "demography", "description"),
+                                  c("contacts", "population", "proportion", "demography", "description"),
                                   add = coll)
 
-      # Checks on contact_basis counts
-      checkmate::assert_list(purrr::pluck(contact_basis, "counts"), min.len = 1, add = coll)
-      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "counts")), private$activity_types, add = coll)
-      checkmate::assert_matrix(purrr::pluck(contact_basis, "counts", 1), min.rows = 1, min.cols = 1, add = coll)
+      # Checks on contact_basis contacts
+      checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
+      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "contacts")), private$activity_types, add = coll)
+      checkmate::assert_matrix(purrr::pluck(contact_basis, "contacts", 1), min.rows = 1, min.cols = 1, add = coll)
 
       # - Check for consistency of the number of age groups in the contact matrices
       # All matrices should be square matrices with of the same dimensions
-      n_age_groups <- purrr::pluck(contact_basis, "counts", 1, dim, 1) # Get first dimensions of the first matrix
+      n_age_groups <- purrr::pluck(contact_basis, "contacts", 1, dim, 1) # Get first dimensions of the first matrix
       purrr::walk(
-        purrr::pluck(contact_basis, "counts"),
+        purrr::pluck(contact_basis, "contacts"),
         ~ checkmate::assert_matrix(., ncols = n_age_groups, nrows = n_age_groups, add = coll)
       )
 
@@ -210,8 +210,8 @@ DiseasyActivity <- R6::R6Class(                                                 
                                   c("age", "population", "proportion"), add = coll)
 
       # Check for dimension mismatch
-      checkmate::assert_number(unique(c(nrow(purrr::pluck(contact_basis, "counts", 1)),
-                                        ncol(purrr::pluck(contact_basis, "counts", 1)),
+      checkmate::assert_number(unique(c(nrow(purrr::pluck(contact_basis, "contacts", 1)),
+                                        ncol(purrr::pluck(contact_basis, "contacts", 1)),
                                         length(purrr::pluck(contact_basis, "proportion")))), add = coll)
 
       # End checks
@@ -310,7 +310,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         digest::digest()
       attr(private$.scenario_matrix, "secret_hash") <- active_activity_units_hash
 
-     },
+    },
 
     #' @description
     #'   Sets the overall risk of types of activity
@@ -384,7 +384,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       private$.scenario_matrix  <- new_scenario_matrix
       private$.risk_matrix      <- new_risk_matrix
 
-     },
+    },
 
 
     #' @description
@@ -498,10 +498,12 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
+      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
+                                lower = 0, unique = TRUE, add = coll)
       checkmate::assert_class(self$contact_basis, "list", add = coll)
       checkmate::reportAssertions(coll)
 
-      contacts <- openness <- self$get_scenario_openness()
+      scenario_contacts <- openness <- self$get_scenario_openness()
 
       # Apply the age-stratified restrictions to the age-stratified contact matrices
       for (dd in seq_along(openness)) { # looping over dates
@@ -515,7 +517,8 @@ DiseasyActivity <- R6::R6Class(                                                 
           # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
           # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
           # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are non-commutative.
-          contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
+          scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
+            self$contact_basis$contacts[[tt]]
         }
       }
 
@@ -523,13 +526,38 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (!is.null(age_cuts_lower)) {
         p <- private$population_transform_matrix(age_cuts_lower)
 
-        contacts <- lapply(contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
+        # To perform the projection, we need the number of persons in the new and old age groups
+        # Determine the population in the new age groups
+        population <- self$contact_basis$demography |>
+          dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
+          dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
+          dplyr::pull("population")
+        N <- outer(population, rep(1, length(population))) # Store as a column matrix with N repeated                   # nolint: object_name_linter
+
+        # Determine the population in the old age groups
+        N_i <- self$contact_basis$population                                                                            # nolint: object_name_linter
+        N_i <- outer(N_i, rep(1, length(N_i))) # Store as a column matrix with N_i repeated                             # nolint: object_name_linter
+
+        # For each contact matrix, m, in the scenario, we perform the transformation
+        # (p %*% (m * N_i) %*% t(p)) / N_n                                                                              # nolint: commented_code_linter
+        # The elements of this matrix has the following form:
+        # (m_{i  ,j} * N_i     + m_{i,  j+1} * N_i     + ... + m_{i,  j+k} * N_i +
+        #  m_{i+1,j} * N_{i+1} + m_{i+1,j+1} * N_{i+1} + ... + m_{i+1,j+k} * N_{i+1} +
+        # ... +
+        #  m_{i+k,j} * N_{i+k} + m_{i+k,j+1} * N_{i+k} + ... + m_{i+1,j+k} * N_{i+k}) /
+        # (N_i + N_{i+1} + ... N_{i+k})
+        # Where k is the number of basis age_groups being aggregated
+        # (NB: the above is only if the new age groups are just aggregations of the old (i.e p has only 0 and 1 values)
+        # if there is a split, the fractional values in p enter in the above equations.
+        scenario_contacts <- scenario_contacts |>
+          lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_i) %*% t(p)) / N))
+
       }
 
       # Weight if weights are given
-      contacts <- private$weight_activities(contacts, weights)
+      scenario_contacts <- private$weight_activities(scenario_contacts, weights)
 
-      return(contacts)
+      return(scenario_contacts)
     },
 
 
@@ -581,7 +609,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         printr("Scenario: Activity scenario not yet set")
       } else {
         printr("Scenario: Overview")
-      print(self$scenario_matrix)
+        print(self$scenario_matrix)
         cat("\n")
       }
 
@@ -711,7 +739,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
             purrr::reduce(`+`, .init = rep(0, private$n_age_groups)) |> # each age_group starts with 0 activity
             stats::setNames(names(contact_basis$proportion))
-      }
+        }
       )
 
       names(risk_weighted_activity) <- private$activity_types
