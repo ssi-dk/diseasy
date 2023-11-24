@@ -356,8 +356,9 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
       # fitted params hfitMaxTbfgsgl5pop2spr2 - E 3.5 days
       # see details - fitted to spring in Sweden
-      beta_sweden_v2 <- \(a) purrr::partial(private$generalized_logistic_function,
-                                            a = a, k = k, b = b, nu = nu, x0 = t0)
+      beta_sweden_v2 <- \(a) {
+        purrr::partial(private$generalized_logistic_function, a = a, k = k, b = b, nu = nu, x0 = t0)
+      }
 
       # Use the scale helper to determine what value of a gives the correct scale for beta_sweden
       scale_map <- private$scale_helper_glf(beta_sweden_v2, k, climate_normal, max_scale)
@@ -397,21 +398,32 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
 
       # Set the models
-      model_date <- \(date) ifelse(date <= max_date,
-                                   stats::approx(x = temperature_dk$date,
-                                                 y = beta_sweden_v2(temperature_dk$max_temperature),
-                                                 xout = date)$y,
-                                   stats::approx(x = climate_normal$t,
-                                                 y = beta_sweden_v2(climate_normal$max_temperature),
-                                                 xout = date_map(date))$y) / reference_value
+      model_date <- function(date) {
+        if (date <= max_date) {
+          approximation <- stats::approx(x = temperature_dk$date,
+                                         y = beta_sweden_v2(temperature_dk$max_temperature),
+                                         xout = date)$y
+        } else {
+          approximation <- stats::approx(x = climate_normal$t,
+                                         y = beta_sweden_v2(climate_normal$max_temperature),
+                                         xout = date_map(date))$y
+        }
+        return(approximation / reference_value)
+      }
 
-      model_t    <- \(t)    ifelse(t <= max_t,
-                                   stats::approx(x = temperature_dk$t,
-                                                 y = beta_sweden_v2(temperature_dk$max_temperature),
-                                                 xout = t)$y,
-                                   stats::approx(x = climate_normal$t,
-                                                 y = beta_sweden_v2(climate_normal$max_temperature),
-                                                 xout = (reference_t + t / 365) %% 1)$y) / reference_value
+      model_t <- function(t) {
+        if (t <= max_t) {
+          approximation <- stats::approx(x = temperature_dk$t,
+                                         y = beta_sweden_v2(temperature_dk$max_temperature),
+                                         xout = t)$y
+        } else {
+          approximation <- stats::approx(x = climate_normal$t,
+                                         y = beta_sweden_v2(climate_normal$max_temperature),
+                                         xout = (reference_t + t / 365) %% 1)$y
+        }
+        return(approximation / reference_value)
+      }
+
 
       attr(model_date, "name")        <- "covid_season_v2"
       attr(model_date, "description") <- paste(sep = "\n",
