@@ -462,10 +462,10 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Get the population proportion in the new age groups
         population <- private$map_population(age_cuts_lower)
-        prop <- aggregate(prop ~ age_group_ref, data = population, FUN = sum)$prop
+        proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
 
         # Weight the population transformation matrix by the population proportion
-        p <- p * prop
+        p <- p * proportion
 
         # Get the nested vectors, then compute the weighted average using `p` as weights
         openness <- openness |>
@@ -807,14 +807,14 @@ DiseasyActivity <- R6::R6Class(                                                 
       population <- private$map_population(age_cuts_lower)
 
       # Calculating transformation matrix
-      tt <- merge(aggregate(prop ~ age_group_ref + age_group_out, data = population, FUN = sum),
-                  aggregate(prop ~ age_group_ref,                 data = population, FUN = sum),
+      tt <- merge(aggregate(proportion ~ age_group_ref + age_group_out, data = population, FUN = sum),
+                  aggregate(proportion ~ age_group_ref,                 data = population, FUN = sum),
                   by = "age_group_ref")
-      tt$prop <- tt$prop.x / tt$prop.y
-      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = prop)))
+      tt$proportion <- tt$proportion.x / tt$proportion.y
+      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = proportion)))
 
       # Label the matrix
-      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$prop))
+      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$proportion))
 
       return(p)
     },
@@ -830,15 +830,15 @@ DiseasyActivity <- R6::R6Class(                                                 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
                                 lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_character(names(self$contact_basis$prop), add = coll)
+      checkmate::assert_character(names(self$contact_basis$proportion), add = coll)
       checkmate::reportAssertions(coll)
 
       # Using default population from contact_basis
-      prop <- self$contact_basis$pop_ref_1yr$prop
+      proportion <- self$contact_basis$demography$proportion
 
       # Creating mapping for all ages to reference and provided age_groups
-      lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$prop), split = "[-+]"), \(x) x[1]))
-      population <- data.frame(age = 0:(length(prop) - 1), prop = prop)
+      lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$proportion), split = "[-+]"), \(x) x[1]))
+      population <- data.frame(age = 0:(length(proportion) - 1), proportion = proportion)
 
       population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
       population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
