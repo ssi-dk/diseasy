@@ -186,12 +186,7 @@ rd_side_effects <- "NULL (called for side effects)"
 
 rd_age_cuts_lower <- paste(
   "(`numeric`)\\cr",
-  "vector of ages defining the lower bound for each age group. (Optional)"
-)
-
-rd_population_1yr <- paste(
-  "(`numeric`)\\cr",
-  "vector of population counts in 1-year age groups."
+  "vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used."
 )
 
 rd_activity_weights <- paste(
