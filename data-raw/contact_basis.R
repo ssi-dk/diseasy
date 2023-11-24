@@ -66,17 +66,24 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   common_country_codes <- intersect(country_codes, demography$key_country)
   contact_basis <- common_country_codes |>
     purrr::map(\(country_code) {
-      tibble::lst(counts = purrr::pluck(counts_all, country_code),
-                  population = populations |>
-                    dplyr::filter(.data$key_country == country_code) |>
-                    dplyr::select("age_group", "population") |>
-                    tibble::deframe(),
-                  proportion = population / sum(population),
-                  demography = demography |>
-                    dplyr::filter(.data$key_country == country_code) |>
-                    dplyr::select(!"key_country"),
-                  description = glue::glue("Contact matrices for {country_code} from the `contactdata` package ",
-                                           "and population data for {country_code} from the US Census Bureau."))
+      tibble::lst(
+        counts = purrr::pluck(counts_all, country_code),
+        population = populations |>
+          dplyr::filter(.data$key_country == country_code) |>
+          dplyr::select("age_group", "population") |>
+          tibble::deframe(),
+        proportion = population / sum(population),
+        demography = demography |>
+          dplyr::filter(.data$key_country == country_code) |>
+          dplyr::select(!"key_country"),
+        description = glue::glue(
+          "Contact matrices for ",
+          "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
+          "from the `contactdata` package and population data for ",
+          "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
+          "from the US Census Bureau."
+        )
+      )
     })
   names(contact_basis) <- common_country_codes
 
