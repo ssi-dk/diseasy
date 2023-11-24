@@ -435,7 +435,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
-    #' @param weights `r rd_activity_weights`
+    #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value[[date]][[type]]
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
@@ -481,7 +481,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       # Weight if weights are given
-      openness <- private$weight_activities(openness, weights / sum(weights)) # weighted average
+      # normalise so openness is between 0 and 1
+      openness <- private$weight_activities(openness, weights, normalise = TRUE)
 
       return(openness)
     },
@@ -527,7 +528,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       # Weight if weights are given
-      contacts <- private$weight_activities(contacts, weights)
+      contacts <- private$weight_activities(contacts, weights, normalise = FALSE)
 
       return(contacts)
     },
@@ -849,15 +850,38 @@ DiseasyActivity <- R6::R6Class(                                                 
     # @description
     #   The function takes a nested list of 4-vectors that should be weighted together according to the weights
     #   argument. Each element in the list is multiplied by the associated weight before being summed together.
-    # @param obj
-    #   object to perform weighting on
+    # @param obj `list`(`list`( `numeric()` or `matrix` `array` ))\cr
+    #   Nested object to perform weighting on.
     # @param weights `r rd_activity_weights`
-    weight_activities = function(obj, weights) {
+    # @param normalise (`logical`)\cr
+    #   Should the weights be normalised before applying?
+    weight_activities = function(obj, weights, normalise = FALSE) {
 
-      # Early return if no weights are given
-      if (!checkmate::test_numeric(weights, len = 4)) {
+      # Early return
+      # .. if no object is given
+      if (is.null(obj)) {
         return(obj)
       }
+
+      # .. if no weights are given
+      if (is.null(weights)) {
+        return(obj)
+      }
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_class(obj, "list", add = coll)
+      checkmate::assert_class(obj[[1]], "list", add = coll)
+      checkmate::assert(
+        checkmate::check_class(obj[[1]][[1]], "numeric"),
+        checkmate::check_class(obj[[1]][[1]], "matrix"),
+        add = coll
+      )
+      checkmate::assert_numeric(weights, len = 4, null.ok = TRUE, add = coll)
+      checkmate::assert_logical(normalise, add = coll)
+      checkmate::reportAssertions(coll)
+
+      if (normalise) weights <- weights / sum(weights)
 
       out <- purrr::map(obj, .f = \(xx) purrr:::reduce(purrr::map2(.x = xx, .y = weights, .f = `*`), .f =  `+`))
 
