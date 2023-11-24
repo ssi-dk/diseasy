@@ -6,8 +6,6 @@
 \alias{diseasy-package}
 \title{diseasy: Disease Ensemble Modelling Made Easy}
 \description{
-\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
-
 This package facilitates creation of an ensemble of models through modular construction and combinatorics.
 }
 \seealso{
@@ -26,6 +24,11 @@ Authors:
   \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID})
   \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID})
   \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Statens Serum Institut, SSI [copyright holder, funder]
 }
 
 }

@@ -1,4 +1,21 @@
+#' The custom linters of `diseasy`
+#'
 #' @name diseasy_linters
+#' @examples
+#'   diseasy_code_linters()
+#' @return A list of linters
+#' @export
+diseasy_code_linters <- function() {
+  linters <- list(
+    non_ascii_linter(),
+    todo_linter()
+  )
+
+  return(linters)
+}
+
+
+#' @rdname diseasy_linters
 #' @importFrom rlang .data
 non_ascii_linter <- function() {
   general_msg <- paste("Code should not contain non-ASCII characters")
@@ -43,19 +60,7 @@ non_ascii_linter <- function() {
 }
 
 
-#' @rdname diseasy_linters                                                                                              # nolint start: todo_linter
-#' @examples
-# will produce lints
-#' lint(
-#'   text = "# todo: xxx",
-#'   linters = todo_linter()
-#' )
-#'
-#' # okay
-#'   text = "xxx",
-#'   linters = todo_linter()
-#' )
-#'
+#' @rdname diseasy_linters
 todo_linter <- function() {
   general_msg <- paste("`TODO` statements should not be kept in code base:")
 
@@ -76,7 +81,7 @@ todo_linter <- function() {
         ~ dplyr::mutate(as.data.frame(.x), line_number = .y)
       ) |>
         purrr::reduce(rbind) |>
-        dplyr::filter(!is.na(start))
+        dplyr::filter(!is.na(.data$start))
 
       purrr::pmap(
         todo_info,
@@ -94,4 +99,4 @@ todo_linter <- function() {
       )
     }
   )
-}                                                                                                                       # nolint end
+}
