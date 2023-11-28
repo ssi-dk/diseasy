@@ -713,7 +713,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           activity_unit_subset |>
             purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
             purrr::reduce(`+`, .init = rep(0, private$n_age_groups)) |> # each age_group starts with 0 activity
-            stats::setNames(names(contact_basis$proportion))
+            stats::setNames(names(self$contact_basis$proportion))
       }
       )
 
