@@ -133,7 +133,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # - Check for consistency of the number of age groups in the activity_units
       # Find all implied n_age_groups larger than 1
-      n_age_groups <- purrr::map(dk_activity_units, ~ purrr::map_dbl(., length)) |>
+      n_age_groups <- purrr::map(activity_units, ~ purrr::map_dbl(., length)) |>
         purrr::reduce(c) |>
         unique() |>
         purrr::keep(~ . > 1)
