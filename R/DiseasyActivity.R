@@ -532,11 +532,11 @@ DiseasyActivity <- R6::R6Class(                                                 
           dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
           dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
           dplyr::pull("population")
-        N <- outer(population, rep(1, length(population))) # Store as a column matrix with N repeated                   # nolint: object_name_linter
+        N <- outer(population, rep(1, length(population))) # Store as a matrix with N repeated as columns               # nolint: object_name_linter
 
         # Determine the population in the old age groups
         N_i <- self$contact_basis$population                                                                            # nolint: object_name_linter
-        N_i <- outer(N_i, rep(1, length(N_i))) # Store as a column matrix with N_i repeated                             # nolint: object_name_linter
+        N_i <- outer(N_i, rep(1, length(N_i))) # Store as a matrix with N_i repeated repeated as columns                # nolint: object_name_linter
 
         # For each contact matrix, m, in the scenario, we perform the transformation
         # (p %*% (m * N_i) %*% t(p)) / N_n                                                                              # nolint: commented_code_linter
