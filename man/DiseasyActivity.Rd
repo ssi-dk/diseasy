@@ -66,7 +66,7 @@ A reduced view of the internal state of restrictions (showing only used activity
 \item{\code{risk_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-group\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -119,7 +119,7 @@ Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"}
 
 \item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-group\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
 }
@@ -174,7 +174,7 @@ Sets the contact matrix basis the activity is computed from
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{prop} contains a list of the proportion of population in each age-group\cr * \code{pop_ref_1yr} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{pop} (\code{numeric()}) size of population in age group\cr   * \code{prop} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
 }
 \if{html}{\out{</div>}}
 }
@@ -278,7 +278,7 @@ Return \code{list} containing the active activity units on dates where there are
 
 \subsection{Returns}{
 (\code{list})\cr
-The activity units active in the sceanrio.
+The activity units active in the scenario.
 }
 }
 \if{html}{\out{<hr>}}
@@ -293,9 +293,9 @@ Return openness [0 ; 1] for all age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
 
-\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
+\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done. The weights are normalized before applying.}
 }
 \if{html}{\out{</div>}}
 }
@@ -308,7 +308,7 @@ Returns a list with depth of two: value[\link{date}][\link{type}]
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_contacts"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_contacts}{}}}
 \subsection{Method \code{get_scenario_contacts()}}{
-Return contacts for across age groups and activities on all dates.
+Return contacts across age groups and activities on all dates.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_contacts(age_cuts_lower = NULL, weights = NULL)}\if{html}{\out{</div>}}
 }
@@ -316,7 +316,7 @@ Return contacts for across age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. (Optional)}
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
 }
@@ -324,6 +324,7 @@ Return contacts for across age groups and activities on all dates.
 }
 \subsection{Returns}{
 If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
+Rescale contact matrices to population contact rates
 }
 }
 \if{html}{\out{<hr>}}

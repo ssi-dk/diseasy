@@ -133,7 +133,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # - Check for consistency of the number of age groups in the activity_units
       # Find all implied n_age_groups larger than 1
-      n_age_groups <- purrr::map(dk_activity_units, ~ purrr::map_dbl(., length)) |>
+      n_age_groups <- purrr::map(activity_units, ~ purrr::map_dbl(., length)) |>
         purrr::reduce(c) |>
         unique() |>
         purrr::keep(~ . > 1)
@@ -423,7 +423,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @description
     #'   Return `list` containing the active activity units on dates where there are changes.
     #' @return (`list`)\cr
-    #'   The activity units active in the sceanrio.
+    #'   The activity units active in the scenario.
     get_scenario_activities = function() {
       activities <- as.data.frame(private$.scenario_matrix) |>
         purrr::map(~ private$activity_units_labels[. != 0])
@@ -435,7 +435,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
-    #' @param weights `r rd_activity_weights`
+    #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value[[date]][[type]]
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
@@ -462,10 +462,10 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Get the population proportion in the new age groups
         population <- private$map_population(age_cuts_lower)
-        prop <- aggregate(prop ~ age_group_ref, data = population, FUN = sum)$prop
+        proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
 
         # Weight the population transformation matrix by the population proportion
-        p <- p * prop
+        p <- p * proportion
 
         # Get the nested vectors, then compute the weighted average using `p` as weights
         openness <- openness |>
@@ -481,14 +481,15 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       # Weight if weights are given
-      openness <- private$weight_activities(openness, weights / sum(weights)) # weighted average
+      # normalise so openness is between 0 and 1
+      openness <- private$weight_activities(openness, weights, normalise = TRUE)
 
       return(openness)
     },
 
 
     #' @description
-    #'   Return contacts for across age groups and activities on all dates.
+    #'   Return contacts across age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param weights `r rd_activity_weights`
     #' @return
@@ -508,15 +509,16 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Apply the age-stratified restrictions to the age-stratified contact matrices
       for (dd in seq_along(openness)) { # looping over dates
         for (tt in private$activity_types) {
-          # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a vector to a
-          # "herringbone" pattern matrix and multiplied elementwise to the baseline contact matrices.
+          # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a vector
+          # to a "herringbone" pattern matrix and multiplied element-wise to the baseline contact matrices.
           # The choice of the "herringbone" pattern, is historical and ensures that openness matrices are additive.
           # It means the order of adding activities and expanding from vector to matrix is commutative.
-          # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular age-group
-          # are applied for contacts from and to all younger age-groups.
+          # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular
+          # age-group are applied for contacts from and to all younger age-groups.
           # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
           # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
-          # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are non-commutative.
+          # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
+          # non-commutative.
           scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
             self$contact_basis$contacts[[tt]]
         }
@@ -560,7 +562,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(scenario_contacts)
     },
 
-
+    #' Rescale contact matrices to population contact rates
+    #'
     #' @description
     #'   Re-scale from contacts to rates per individual to fractional population.
     #' @param input (`matrix array` or `list`(`matrix array`))\cr
@@ -738,7 +741,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           activity_unit_subset |>
             purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
             purrr::reduce(`+`, .init = rep(0, private$n_age_groups)) |> # each age_group starts with 0 activity
-            stats::setNames(names(contact_basis$proportion))
+            stats::setNames(names(self$contact_basis$proportion))
         }
       )
 
@@ -834,14 +837,14 @@ DiseasyActivity <- R6::R6Class(                                                 
       population <- private$map_population(age_cuts_lower)
 
       # Calculating transformation matrix
-      tt <- merge(aggregate(prop ~ age_group_ref + age_group_out, data = population, FUN = sum),
-                  aggregate(prop ~ age_group_ref,                 data = population, FUN = sum),
+      tt <- merge(aggregate(proportion ~ age_group_ref + age_group_out, data = population, FUN = sum),
+                  aggregate(proportion ~ age_group_ref,                 data = population, FUN = sum),
                   by = "age_group_ref")
-      tt$prop <- tt$prop.x / tt$prop.y
-      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = prop)))
+      tt$proportion <- tt$proportion.x / tt$proportion.y
+      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = proportion)))
 
       # Label the matrix
-      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$prop))
+      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$proportion))
 
       return(p)
     },
@@ -857,15 +860,15 @@ DiseasyActivity <- R6::R6Class(                                                 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
                                 lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_character(names(self$contact_basis$prop), add = coll)
+      checkmate::assert_character(names(self$contact_basis$proportion), add = coll)
       checkmate::reportAssertions(coll)
 
       # Using default population from contact_basis
-      prop <- self$contact_basis$pop_ref_1yr$prop
+      proportion <- self$contact_basis$demography$proportion
 
       # Creating mapping for all ages to reference and provided age_groups
-      lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$prop), split = "[-+]"), \(x) x[1]))
-      population <- data.frame(age = 0:(length(prop) - 1), prop = prop)
+      lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$proportion), split = "[-+]"), \(x) x[1]))
+      population <- data.frame(age = 0:(length(proportion) - 1), proportion = proportion)
 
       population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
       population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
@@ -877,15 +880,38 @@ DiseasyActivity <- R6::R6Class(                                                 
     # @description
     #   The function takes a nested list of 4-vectors that should be weighted together according to the weights
     #   argument. Each element in the list is multiplied by the associated weight before being summed together.
-    # @param obj
-    #   object to perform weighting on
+    # @param obj `list`(`list`( `numeric()` or `matrix` `array` ))\cr
+    #   Nested object to perform weighting on.
     # @param weights `r rd_activity_weights`
-    weight_activities = function(obj, weights) {
+    # @param normalise (`logical`)\cr
+    #   Should the weights be normalised before applying?
+    weight_activities = function(obj, weights, normalise = FALSE) {
 
-      # Early return if no weights are given
-      if (!checkmate::test_numeric(weights, len = 4)) {
+      # Early return
+      # .. if no object is given
+      if (is.null(obj)) {
         return(obj)
       }
+
+      # .. if no weights are given
+      if (is.null(weights)) {
+        return(obj)
+      }
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_class(obj, "list", add = coll)
+      checkmate::assert_class(obj[[1]], "list", add = coll)
+      checkmate::assert(
+        checkmate::check_class(obj[[1]][[1]], "numeric"),
+        checkmate::check_class(obj[[1]][[1]], "matrix"),
+        add = coll
+      )
+      checkmate::assert_numeric(weights, len = 4, null.ok = TRUE, add = coll)
+      checkmate::assert_logical(normalise, add = coll)
+      checkmate::reportAssertions(coll)
+
+      if (normalise) weights <- weights / sum(weights)
 
       out <- purrr::map(obj, .f = \(xx) purrr:::reduce(purrr::map2(.x = xx, .y = weights, .f = `*`), .f =  `+`))
 
