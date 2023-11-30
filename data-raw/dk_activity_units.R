@@ -67,7 +67,7 @@ dk_activity_units <- dk_activity_units |>
     label = "Lockdown on 11/3",
     home = 0.45,
     work = rep(c(0.45, 1), c(13, 3)),
-    school = 1,
+    school = 0,
     other = rep(c(0.2, 0.1), c(14, 2)), risk = 1
   )
 
@@ -194,7 +194,7 @@ dk_activity_units <- dk_activity_units |>
     home = 0.05,
     work = (rep(c(0, 31161 / work_force, 0), c(5, 8, 3))), # OBS
     school = (c(0, 0, 0.6, 0.2, rep(0.212, 9), 0, 0, 0)),
-    other = (rep(c(0, 0.05, 0), c(2, 1, 13))),
+    other = (rep(c(0, 0.10, 0.03, 0), c(2, 1, 1, 12))),
     risk = 1
   )
 
@@ -809,7 +809,7 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
                     c(3, 1, 9, 3))),
       other = 0.025 * 0.07,
       risk = 1
-    )
+    ) # FAST
 
   dk_activity_units <- dk_activity_units |>
     add_activity(
@@ -875,8 +875,8 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
       school = (0.025 * rep(c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+ years old,
                             c(3, 1, 9, 3))),    # also reduced among children to adults
       other = 0.025 * 0.03,
-      risk = risk_test_school
-    )
+      risk = 1
+    ) # FAST
 
   dk_activity_units <- dk_activity_units |>
     add_activity(
@@ -922,6 +922,9 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
 
 } # EndOf: risk_test_school
 options(OutDec = ".") # Reset the decimal separator
+
+# The above loop introduces duplicated rows. Remove those here (when risk is always 1)
+dk_activity_units <- dk_activity_units |> dplyr::distinct()
 
 
 dk_activity_units <- dk_activity_units |>
