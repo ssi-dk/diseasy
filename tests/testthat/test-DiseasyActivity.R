@@ -164,13 +164,13 @@ test_that("$change_activity fails with malformed inputs", {
   act$set_activity_units(dk_activity_units_subset)
 
   # Test that changing activity fails when a missing activity unit is requested
-  tmp_scenario <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
+  malformed_scenario <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
     dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",                         closing = NA) |>
     dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,                                 closing = "baseline") |>
     dplyr::add_row(date = as.Date("2020-03-12"), opening = "non_existing_activity_unit",       closing = NA) |>
     dplyr::add_row(date = as.Date("2020-04-15"), opening = "secondary_education_phase_1_2020", closing = NA)
 
-  expect_error(act$change_activity(tmp_scenario),
+  expect_error(act$change_activity(malformed_scenario),
                class = "simpleError",
                regexp = "non_existing_activity_unit")
   expect_identical(act$scenario_matrix, NULL) # Check the state is unchanged
