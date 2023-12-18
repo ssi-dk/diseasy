@@ -19,9 +19,9 @@ library(diseasy)
 ```
 
 ```{r options, include = FALSE}
-options("digits" = 2)
-options("tibble.print_min" = 5)
-options("diseasy.logging" = FALSE)
+withr::local_options("digits" = 2)
+withr::local_options("tibble.print_min" = 5)
+withr::local_options("diseasy.logging" = FALSE)
 ```
 
 # Introduction
