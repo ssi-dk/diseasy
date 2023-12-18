@@ -181,7 +181,7 @@ non_ascii_linter <- function() {
 #'
 #' @importFrom rlang .data
 param_and_field_linter <- function() {
-  general_msg <- r"{@param and @field should first specify variable type (e.g. '(`character`)'') followed by '\cr'}"
+  general_msg <- "@param and @field should follow mlr3 format."
 
   lintr::Linter(
     function(source_expression) {
@@ -193,7 +193,7 @@ param_and_field_linter <- function() {
 
       # Find all @param and @field lines. All other lines become NA
       detection_info <- source_expression$file_lines |>
-        stringr::str_extract(r"{(?=@(param|field)).*}")
+        stringr::str_extract(r"{#' ?@(param|field).*}")
 
       # Convert to tibble and determine line number
       detection_info <- tibble::tibble(
@@ -204,17 +204,27 @@ param_and_field_linter <- function() {
       # Remove non param/field lines and determine the type
       detection_info <- detection_info |>
         dplyr::filter(!is.na(.data$rd_line)) |>
-        dplyr::mutate(rd_type = stringr::str_extract(.data$rd_line, r"{@param|@field}"))
+        dplyr::mutate(rd_type = stringr::str_extract(.data$rd_line, r"{@(param|field)}"))
+
+      # Remove triple-dot-ellipsis params
+      detection_info <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, "@param +\\.{3}"))
+
+      # Remove auto-generated documentation
+      detection_info <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, r"{@(param|field) +\w+ +`r }"))
+
+
 
       # Look for malformed tags
       missing_backticks <- detection_info |>
         dplyr::filter(!stringr::str_detect(.data$rd_line, stringr::fixed("`")))
 
       missing_cr <- detection_info |>
-        dplyr::filter(!stringr::str_detect(.data$rd_line, stringr::fixed(r"{\\cr}")))
+        dplyr::filter(!stringr::str_detect(.data$rd_line, stringr::fixed(r"{\cr}")))
 
       # report issues
-      purrr::pmap(
+      backtick_lints <- purrr::pmap(
         missing_backticks,
         \(rd_line, line_number, rd_type) {
           lintr::Lint(
@@ -227,7 +237,7 @@ param_and_field_linter <- function() {
         }
       )
 
-      purrr::pmap(
+      cr_lints <- purrr::pmap(
         missing_cr,
         \(rd_line, line_number, rd_type) {
           lintr::Lint(
@@ -239,6 +249,8 @@ param_and_field_linter <- function() {
           )
         }
       )
+
+      return(c(backtick_lints, cr_lints))
     }
   )
 }
