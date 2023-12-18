@@ -157,7 +157,8 @@ Retrieves the specified season model.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{model_name}}{Name of the season_model to use (calls the equivalent $get_<model_name>()).}
+\item{\code{model_name}}{(\code{character})\cr
+Name of the season_model to use (calls the equivalent $get_<model_name>()).}
 
 \item{\code{dots}}{(\code{list})\cr
 Named list of arguments that will be passed at dot-ellipsis to the season model.}
@@ -177,7 +178,8 @@ Sets the \code{DiseasySeason} module to use the specified season model.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{model_name}}{Name of the season_model to use (calls the equivalent $use_<model_name>()).}
+\item{\code{model_name}}{(\code{character})\cr
+Name of the season_model to use (calls the equivalent $use_<model_name>()).}
 
 \item{\code{dots}}{(\code{list})\cr
 Named list of arguments that will be passed at dot-ellipsis to the season model.}

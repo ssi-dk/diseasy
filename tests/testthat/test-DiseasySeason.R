@@ -47,7 +47,7 @@ test_that("get/use_season_model works with known model", {
 
   s <- DiseasySeason$new(reference_date = Sys.Date())
 
-  expect_no_error(models <- s$get_season_model("cosine_season"))
+  models <- expect_no_error(s$get_season_model("cosine_season"))
   expect_equal(models$model_t,    s$get_cosine_season()$model_t)
   expect_equal(models$model_date, s$get_cosine_season()$model_date)
 
@@ -276,7 +276,7 @@ test_that("set_scale works", {
   s$use_cosine_season(scale = 0.5)
   expect_identical(s$model_t(0), 1)
   expect_false(s$model_t(100) == 1)
-  expect_true(s$model_t(100) < s_100)
+  expect_lt(s$model_t(100), s_100)
 
   # Setting scale back to 0.35
   s$set_scale(scale = 0.35)
@@ -303,7 +303,7 @@ test_that("hash works", {
 
   s3 <- s1$clone()
   s3$use_constant_season()
-  expect_true(s1$hash == s3$hash) # Constant season is the default, so this is fine
+  expect_identical(s3$hash, s1$hash) # Constant season is the default, so this is fine
 
   # But every other season should give error
   s4 <- s1$clone()
@@ -322,13 +322,13 @@ test_that("active binding: reference_date works", {
   s <- DiseasySeason$new()
 
   # Retrieve the reference_date
-  expect_equal(s$reference_date, NULL)
+  expect_null(s$reference_date)
 
   # Try to set the reference_date
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$reference_date <- Sys.Date(), error = \(e) e),
+  expect_identical(tryCatch(s$reference_date <- Sys.Date(), error = \(e) e),                                            # nolint: implicit_assignment_linter
                    simpleError("`$reference_date` is read only"))
-  expect_equal(s$reference_date, NULL)
+  expect_null(s$reference_date)
 
   rm(s)
 })
@@ -342,7 +342,7 @@ test_that("active binding: model_t works", {
 
   # Try to set the model_t
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$model_t <- \(t) t, error = \(e) e),
+  expect_identical(tryCatch(s$model_t <- \(t) t, error = \(e) e),                                                       # nolint: implicit_assignment_linter
                    simpleError("`$model_t` is read only"))
   expect_equal(s$model_t, s$get_season_model("constant_season")$model_t)
 
@@ -358,7 +358,7 @@ test_that("active binding: model_date works", {
 
   # Try to set the model_date
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$model_date <- \(date) date, error = \(e) e),
+  expect_identical(tryCatch(s$model_date <- \(date) date, error = \(e) e),                                              # nolint: implicit_assignment_linter
                    simpleError("`$model_date` is read only"))
   expect_equal(s$model_date, s$get_season_model("constant_season")$model_date)
 
@@ -376,7 +376,7 @@ test_that("active binding: available_season_models works", {
 
   # Try to set the available_season_models
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$available_season_models <- c("unknown_season_model"), error = \(e) e),
+  expect_identical(tryCatch(s$available_season_models <- "unknown_season_model", error = \(e) e),                    # nolint: implicit_assignment_linter
                    simpleError("`$available_season_models` is read only"))
   expect_equal(s$available_season_models, expected_season_models)
 

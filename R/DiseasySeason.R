@@ -26,7 +26,7 @@
 #' @return
 #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
 #' @export
-DiseasySeason <- R6::R6Class( # nolint: object_name_linter
+DiseasySeason <- R6::R6Class(                                                                                           # nolint: object_name_linter
   classname = "DiseasySeason",
   inherit = DiseasyBaseModule,
 
@@ -110,7 +110,7 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
     #' @description
     #'   Retrieves the specified season model.
-    #' @param model_name
+    #' @param model_name (`character`)\cr
     #'   Name of the season_model to use (calls the equivalent $get_<model_name>()).
     #' @param dots (`list`)\cr
     #'   Named list of arguments that will be passed at dot-ellipsis to the season model.
@@ -130,7 +130,7 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
     #' @description
     #'   Sets the `DiseasySeason` module to use the specified season model.
-    #' @param model_name
+    #' @param model_name (`character`)\cr
     #'   Name of the season_model to use (calls the equivalent $use_<model_name>()).
     #' @param dots (`list`)\cr
     #'   Named list of arguments that will be passed at dot-ellipsis to the season model.
@@ -264,8 +264,8 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
       # and the climate normal
       climate_normal <- private$climate_normal("max_temperature")
 
-      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1)) / # nolint: infix_spaces_linter
-                       (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1))   # nolint: infix_spaces_linter
+      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1)) /                          # nolint: infix_spaces_linter
+                       (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1))                            # nolint: infix_spaces_linter, indentation_linter
       max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale
 
       # Check parameters
@@ -343,8 +343,8 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
       # and the climate normal
       climate_normal <- private$climate_normal("max_temperature")
 
-      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1 / nu)) / # nolint: infix_spaces_linter
-                       (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1 / nu))   # nolint: infix_spaces_linter
+      max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1 / nu)) /                     # nolint: infix_spaces_linter
+                       (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1 / nu))                       # nolint: infix_spaces_linter, indentation_linter
       max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale
 
 
@@ -486,47 +486,52 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
     #' @field reference_date (`Date`)\cr
     #'   The reference date of the season models. Read-only.
     reference_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "reference_date",
-      expr = return(private %.% .reference_date)),
+      expr = return(private %.% .reference_date)
+    ),
 
 
     #' @field model_t (`function`)\cr
     #'   The model currently being used in the module (days past reference date). Read-only.
     model_t = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "model_t",
-      expr = return(private %.% .model_t)),
+      expr = return(private %.% .model_t)
+    ),
 
 
     #' @field model_date (`function`)\cr
     #'   The model currently being used in the module (date of interest). Read-only.
     model_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "model_date",
-      expr = return(private %.% .model_date)),
+      expr = return(private %.% .model_date)
+    ),
 
 
     #' @field available_season_models (`character`)\cr
     #'   The list of available season models
     available_season_models = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "available_season_models",
       expr = {
         models <- purrr::keep(ls(self), ~ startsWith(., "use_")) |>
           purrr::map_chr(~ stringr::str_extract(., r"{(?<=use_).*}")) |>
           purrr::discard(~ . == "season_model") # Filter out the generic setter
         return(models)
-      }),
+      }
+    ),
 
 
     #' @field observables (`diseasy::DiseasyObservables`)\cr
     #'   The local copy of an DiseasyObservables module. Read-only.
     #' @seealso [diseasy::DiseasyObservables]
     observables = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "observables",
-      expr = return(private %.% .DiseasyObservables))
+      expr = return(private %.% .DiseasyObservables)
+    )
   ),
 
   private = list(
@@ -572,7 +577,7 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
     #     "observable": the climate normal value of the observable at the corresponding decimal date
     #   The t, observable pair can then be used with stats::approxfun to interpolate to missing dates
     climate_normal = function(observable) {
-      checkmate::assert_choice(observable, c("max_temperature"))
+      checkmate::assert_choice(observable, "max_temperature")
 
       if (observable == "max_temperature") {
         # maksimummiddeltemperatur Danmark
@@ -592,14 +597,14 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
 
         # NOTE: if the above data is ever updated, the cosine season model should be updated as well
-        # nolint start: commented_code_linter
+        #                                                                                                               nolint start: commented_code_linter
         # fit <- lm(dk_climate_max_temperature ~ cos(2*pi*t) + sin(2*pi*t))
         # offset <- purrr::pluck(fit, "coefficients", 1) # Intercept
         # A      <- purrr::pluck(fit, "coefficients", 2) # cosine contribution
         # B      <- purrr::pluck(fit, "coefficients", 3) # sine   contribution
         # peak   <- (atan2(B, A) + pi) / (2 * pi) * 365  # Offset phase by pi (high temp. -> low risk / vice versa)
         # scale  <- offset / (offset + sqrt(A^2 + B^2))  # Convert to percent wise scale
-        # nolint end
+        #                                                                                                               nolint end
 
         out <- list(t, dk_climate_max_temperature)
         names(out) <- c("t", observable)
@@ -635,5 +640,5 @@ DiseasySeason <- R6::R6Class( # nolint: object_name_linter
 
     .model_t = NULL,
     .model_date = NULL
-  ),
+  )
 )

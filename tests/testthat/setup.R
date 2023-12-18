@@ -7,10 +7,10 @@ installed.packages()[, 1] |>
   purrr::walk(~ eval(parse(text = glue::glue("library({.})")))) # Thanks R, for being so difficult.
 
 # Determine the available diseasystore to test over
-case_defs <- diseasystore::available_diseasystores() |> stringr::str_remove_all("Diseasystore")
+case_defs <- diseasystore::available_diseasystores() |> stringr::str_remove_all(stringr::fixed("Diseasystore"))
 
 # Create a connection to test on
-tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
+tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
 sqlite_path <- file.path(tmp_dir, "diseasy.sqlite")
 if (file.exists(sqlite_path)) {
   closeAllConnections()
@@ -23,7 +23,7 @@ options(diseasy.conn = test_conn)
 remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 purrr::walk(google_files, ~ {
-  readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |> # nolint: indentation_linter
+  readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
     readr::write_csv(file.path(tmp_dir, .))
 })
 

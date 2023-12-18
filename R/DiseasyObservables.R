@@ -26,7 +26,7 @@
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
-DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
+DiseasyObservables <- R6::R6Class(                                                                                      # nolint: object_name_linter
   classname = "DiseasyObservables",
   inherit = DiseasyBaseModule,
 
@@ -83,7 +83,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @param diseasystore (`character`)\cr
     #'   Text label of the disease to get DiseasyObservables for.\cr
     #'   Must match case definition implemented in `diseasystore` package.
-    #' @param verbose
+    #' @param verbose (`logical`)\cr
     #'   Should the `diseasystore` use verbose outputs?
     #' @seealso [diseasystore]
     set_diseasystore = function(diseasystore, verbose = NULL) {
@@ -96,7 +96,7 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
       checkmate::reportAssertions(coll)
 
       # Determine the diseasystore to load
-      ds <- diseasystore:::get_diseasystore(diseasystore)
+      ds <- diseasystore::get_diseasystore(diseasystore)
 
       # Determine the verbosity
       if (is.null(verbose)) verbose <- purrr::pluck(diseasyoption("verbose", ds), .default = FALSE)
@@ -266,78 +266,87 @@ DiseasyObservables <- R6::R6Class( # nolint: object_name_linter
     #' @field diseasystore (`character`)\cr
     #'   The set diseasystore to get DiseasyObservables for. Read-only.
     diseasystore = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "diseasystore",
-      expr = return(private %.% .diseasystore)),
+      expr = return(private %.% .diseasystore)
+    ),
 
 
     #' @field start_date (`Date`)\cr
     #'   The start date of the study period. Read-only.
     start_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "start_date",
-      expr = return(private %.% .start_date)),
+      expr = return(private %.% .start_date)
+    ),
 
     #' @field end_date (`Date`)\cr
     #'   The end date of the study period. Read-only.
     end_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "end_date",
-      expr = return(private %.% .end_date)),
+      expr = return(private %.% .end_date)
+    ),
 
 
     #' @field last_queryable_date (`Date`)\cr
     #'   The latest date that can be queried. Read-only.
     last_queryable_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "last_queryable_date",
-      expr = return(private %.% .last_queryable_date)),
+      expr = return(private %.% .last_queryable_date)
+    ),
 
 
     #' @field ds (`Diseasystore*`)\cr
     #'   The currently loaded diseasystore which provides the features. Read-only.
     ds = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "ds",
-      expr = return(private %.% .ds)),
+      expr = return(private %.% .ds)
+    ),
 
 
     #' @field available_observables (`character`)\cr
     #'   The currently available observables in the loaded diseasystore. Read-only.
     available_observables = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "available_observables",
       expr = {
         if (is.null(private %.% .ds)) return(NULL)
         return(purrr::keep(private %.% .ds %.% available_features, ~ startsWith(., "n_") | endsWith(., "_temp")))
-      }),
+      }
+    ),
 
 
     #' @field available_stratifications (`character`)\cr
     #'   The currently available stratifications in the loaded diseasystore. Read-only.
     available_stratifications = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "available_stratifications",
       expr = {
         if (is.null(private %.% .ds)) return(NULL)
         return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
-      }),
+      }
+    ),
 
 
     #' @field slice_ts (`Date`)\cr
     #' The timestamp to slice database on. Read-only.
     slice_ts = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "slice_ts",
-      expr = return(private %.% .slice_ts)),
+      expr = return(private %.% .slice_ts)
+    ),
 
 
     #' @field conn (`DBIConnection`)\cr
     #' The connection to the database on. Read-only.
     conn = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,
       name = "conn",
-      expr = return(private %.% .conn))
+      expr = return(private %.% .conn)
+    )
   ),
 
   private = list(

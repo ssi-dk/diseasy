@@ -297,13 +297,13 @@ test_that("active binding: diseasystore works", {
   m <- DiseasyObservables$new()
 
   # Retrieve the diseasystore
-  expect_equal(m$diseasystore, NULL)
+  expect_null(m$diseasystore)
 
   # Try to set the diseasystore
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$diseasystore <- "test", error = \(e) e),
+  expect_identical(tryCatch(m$diseasystore <- "test", error = \(e) e),                                                  # nolint: implicit_assignment_linter
                    simpleError("`$diseasystore` is read only"))
-  expect_equal(m$diseasystore, NULL)
+  expect_null(m$diseasystore)
 
   rm(m)
 })
@@ -313,13 +313,13 @@ test_that("active binding: start_date works", {
   m <- DiseasyObservables$new()
 
   # Retrieve the start_date
-  expect_equal(m$start_date, NULL)
+  expect_null(m$start_date)
 
   # Try to set the start_date
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$start_date <- Sys.Date(), error = \(e) e),
+  expect_identical(tryCatch(m$start_date <- Sys.Date(), error = \(e) e),                                                # nolint: implicit_assignment_linter
                    simpleError("`$start_date` is read only"))
-  expect_equal(m$start_date, NULL)
+  expect_null(m$start_date)
 
   rm(m)
 })
@@ -329,13 +329,13 @@ test_that("active binding: end_date works", {
   m <- DiseasyObservables$new()
 
   # Retrieve the end_date
-  expect_equal(m$end_date, NULL)
+  expect_null(m$end_date)
 
   # Try to set the end_date
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$end_date <- Sys.Date(), error = \(e) e),
+  expect_identical(tryCatch(m$end_date <- Sys.Date(), error = \(e) e),                                                  # nolint: implicit_assignment_linter
                    simpleError("`$end_date` is read only"))
-  expect_equal(m$end_date, NULL)
+  expect_null(m$end_date)
 
   rm(m)
 })
@@ -345,13 +345,13 @@ test_that("active binding: last_queryable_date works", {
   m <- DiseasyObservables$new()
 
   # Retrieve the last_queryable_date
-  expect_equal(m$last_queryable_date, NULL)
+  expect_null(m$last_queryable_date)
 
   # Try to set the last_queryable_date
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$last_queryable_date <- Sys.Date(), error = \(e) e),
+  expect_identical(tryCatch(m$last_queryable_date <- Sys.Date(), error = \(e) e),                                       # nolint: implicit_assignment_linter
                    simpleError("`$last_queryable_date` is read only"))
-  expect_equal(m$last_queryable_date, NULL)
+  expect_null(m$last_queryable_date)
 
   rm(m)
 })
@@ -361,13 +361,13 @@ test_that("active binding: ds works", {
   m <- DiseasyObservables$new()
 
   # Retrieve the ds
-  expect_equal(m$ds, NULL)
+  expect_null(m$ds)
 
   # Try to set the ds
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$ds <- DiseasystoreGoogleCovid19$new(target_conn = m$conn), error = \(e) e),
+  expect_identical(tryCatch(m$ds <- DiseasystoreGoogleCovid19$new(target_conn = m$conn), error = \(e) e),               # nolint: implicit_assignment_linter
                    simpleError("`$ds` is read only"))
-  expect_equal(m$ds, NULL)
+  expect_null(m$ds)
 
   rm(m)
 })
@@ -377,13 +377,13 @@ test_that("active binding: available_observables works", {
   m <- DiseasyObservables$new()
 
   # Retrieve the available_observables
-  expect_equal(m$available_observables, NULL)
+  expect_null(m$available_observables)
 
   # Try to set the available_observables
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$available_observables <- "test", error = \(e) e),
+  expect_identical(tryCatch(m$available_observables <- "test", error = \(e) e),                                         # nolint: implicit_assignment_linter
                    simpleError("`$available_observables` is read only"))
-  expect_equal(m$available_observables, NULL)
+  expect_null(m$available_observables)
 
   rm(m)
 })

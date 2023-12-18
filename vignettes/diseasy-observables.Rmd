@@ -22,7 +22,7 @@ library(diseasy)
 
 ```{r download, include = FALSE}
 # Download the first n rows of the Google data set of interest
-tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
+tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
 remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 

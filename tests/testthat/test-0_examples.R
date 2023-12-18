@@ -9,7 +9,7 @@ test_that(r"{.Rd files have \examples}", {
   # folder structures during testing, so we need to account for these differences
 
   # Platform independent regex search to find root folder
-  path_regex <- stringr::str_replace(r"{(.*\/\w*(.Rcheck)?)\/.*(?=\/testthat)}", "/", .Platform$file.sep)
+  path_regex <- stringr::str_replace(r"{(.*\/\w*(.Rcheck)?)\/.*(?=\/testthat)}", stringr::fixed("/"), .Platform$file.sep)
   pkg_path <- stringr::str_extract(getwd(), path_regex, group = 1)
 
   # If path contains .Rcheck, we need to add the package name to the path
@@ -50,7 +50,7 @@ test_that(r"{.Rd files have \examples}", {
 
   # Check renaming
   for (rd_id in seq_along(rd_files)) {
-    has_example <- any(stringr::str_detect(rd_files[[rd_id]], r"{\\example}"))
+    has_example <- any(stringr::str_detect(rd_files[[rd_id]], stringr::fixed(r"{\\example}")))
     expect_true(has_example, label = paste("File:", names(rd_files)[[rd_id]]))
   }
 })
