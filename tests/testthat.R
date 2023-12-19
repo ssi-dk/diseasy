@@ -7,6 +7,5 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(diseasy)
 
 test_check("diseasy")

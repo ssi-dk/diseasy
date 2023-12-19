@@ -50,7 +50,7 @@ test_that(r"{.Rd files have \examples}", {
 
   # Check renaming
   for (rd_id in seq_along(rd_files)) {
-    has_example <- any(stringr::str_detect(rd_files[[rd_id]], stringr::fixed(r"{\\example}")))
+    has_example <- any(stringr::str_detect(rd_files[[rd_id]], stringr::fixed(r"{\example}")))
     expect_true(has_example, label = paste("File:", names(rd_files)[[rd_id]]))
   }
 })
