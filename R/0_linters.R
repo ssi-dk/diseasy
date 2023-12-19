@@ -177,7 +177,7 @@ non_ascii_linter <- function() {
 
 #' @name diseasy_linters
 #' @description
-#' param_and_field_linter: Check that R6 params and fields have a unit-type and carriage return
+#' param_and_field_linter: Check that R6 @param and @field tags have a unit-type and carriage return
 #'
 #' @importFrom rlang .data
 param_and_field_linter <- function() {
@@ -195,8 +195,8 @@ param_and_field_linter <- function() {
       detection_info <- source_expression$file_lines |>
         stringr::str_extract(r"{#' ?@(param|field).*}")
 
-      # Convert to tibble and determine line number
-      detection_info <- tibble::tibble(
+      # Convert to data.frame and determine line number
+      detection_info <- data.frame(
         rd_line = detection_info,
         line_number = seq_along(detection_info)
       )
