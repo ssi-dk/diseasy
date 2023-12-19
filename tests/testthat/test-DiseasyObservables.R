@@ -203,94 +203,98 @@ test_that("set_slice_ts works", {
 })
 
 
-test_that("get_observation works", { for (case_def in case_defs) { # nolint: brace_linter
+test_that("get_observation works", {
+  for (case_def in case_defs) {
 
-  obs <- DiseasyObservables$new(diseasystore = case_def,
-                                start_date = as.Date("2021-03-02"),
-                                end_date   = as.Date("2021-03-05"),
-                                last_queryable_date = as.Date("2021-03-06"),
-                                slice_ts = "2023-02-01 09:00:00")
+    obs <- DiseasyObservables$new(diseasystore = case_def,
+                                  start_date = as.Date("2021-03-02"),
+                                  end_date   = as.Date("2021-03-05"),
+                                  last_queryable_date = as.Date("2021-03-06"),
+                                  slice_ts = "2023-02-01 09:00:00")
 
-  # Test content of data frame
-  expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
-  expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
-  expect_identical(colnames(obs$get_observation("n_population", stratification = dplyr::vars(region_id))),
-                   c("date", "region_id", "n_population"))
-  expect_identical(colnames(obs$get_observation("n_population", stratification = dplyr::vars(reg = region_id))),
-                   c("date", "reg", "n_population"))
-
-
-  # Test bounding of dates
-  tmp <- obs$get_observation("n_population", stratification = dplyr::vars(region_id)) |>
-    dplyr::summarize(min_date = min(date, na.rm = TRUE),
-                     max_date = max(date, na.rm = TRUE))
-
-  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
-  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
+    # Test content of data frame
+    expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
+    expect_identical(colnames(obs$get_observation("n_population")), c("date", "n_population"))
+    expect_identical(colnames(obs$get_observation("n_population", stratification = dplyr::vars(region_id))),
+                     c("date", "region_id", "n_population"))
+    expect_identical(colnames(obs$get_observation("n_population", stratification = dplyr::vars(reg = region_id))),
+                     c("date", "reg", "n_population"))
 
 
-  # Test externally given dates
-  tmp <- obs$get_observation("n_population", start_date = obs$start_date - lubridate::days(1)) |>
-    dplyr::summarize(min_date = min(date, na.rm = TRUE),
-                     max_date = max(date, na.rm = TRUE))
+    # Test bounding of dates
+    tmp <- obs$get_observation("n_population", stratification = dplyr::vars(region_id)) |>
+      dplyr::summarize(min_date = min(date, na.rm = TRUE),
+                       max_date = max(date, na.rm = TRUE))
 
-  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date - lubridate::days(1))
-  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
-
-
-  tmp <- obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(1)) |>
-    dplyr::summarize(min_date = min(date, na.rm = TRUE),
-                     max_date = max(date, na.rm = TRUE))
-
-  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
-  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(1))
+    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
+    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
 
 
-  # Testing malformed inputs
-  expect_error(
-    obs$get_observation("n_population", start_date = as.Date(NA)),
-    class = "simpleError", regexp = "Contains missing values"
-  )
-  expect_error(
-    obs$get_observation("n_population", end_date = as.Date(NA)),
-    class = "simpleError", regexp = "Contains missing values"
-  )
-  expect_error(
-    obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(2)),
-    class = "simpleError", regexp = "Date must be <= 2021-03-06"
-  )
+    # Test externally given dates
+    tmp <- obs$get_observation("n_population", start_date = obs$start_date - lubridate::days(1)) |>
+      dplyr::summarize(min_date = min(date, na.rm = TRUE),
+                       max_date = max(date, na.rm = TRUE))
+
+    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date - lubridate::days(1))
+    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
 
 
-  # Testing release of lock
-  obs$set_last_queryable_date(NULL)
-  tmp <- obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(2)) |>
-    dplyr::summarize(min_date = min(date, na.rm = TRUE),
-                     max_date = max(date, na.rm = TRUE))
+    tmp <- obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(1)) |>
+      dplyr::summarize(min_date = min(date, na.rm = TRUE),
+                       max_date = max(date, na.rm = TRUE))
 
-  expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
-  expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(2))
-
-  rm(obs)
-}})
+    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
+    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(1))
 
 
-test_that("get_observation works -- test 2", { for (case_def in case_defs) { # nolint: brace_linter
+    # Testing malformed inputs
+    expect_error(
+      obs$get_observation("n_population", start_date = as.Date(NA)),
+      class = "simpleError", regexp = "Contains missing values"
+    )
+    expect_error(
+      obs$get_observation("n_population", end_date = as.Date(NA)),
+      class = "simpleError", regexp = "Contains missing values"
+    )
+    expect_error(
+      obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(2)),
+      class = "simpleError", regexp = "Date must be <= 2021-03-06"
+    )
 
-  obs <- DiseasyObservables$new(diseasystore = case_def,
-                                start_date = as.Date("2021-03-02"),
-                                end_date   = as.Date("2021-03-05"),
-                                last_queryable_date = as.Date("2021-03-06"),
-                                slice_ts = "2023-02-01 09:00:00")
 
-  # Try to get each observable
-  obs$ds$available_features |>
-    purrr::keep(~ startsWith(., "n_")) |>
-    purrr::walk(~ {
-      expect_no_error(obs$get_observation(.))
-    })
+    # Testing release of lock
+    obs$set_last_queryable_date(NULL)
+    tmp <- obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(2)) |>
+      dplyr::summarize(min_date = min(date, na.rm = TRUE),
+                       max_date = max(date, na.rm = TRUE))
 
-  rm(obs)
-}})
+    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
+    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(2))
+
+    rm(obs)
+  }
+})
+
+
+test_that("get_observation works -- test 2", {
+  for (case_def in case_defs) {
+
+    obs <- DiseasyObservables$new(diseasystore = case_def,
+                                  start_date = as.Date("2021-03-02"),
+                                  end_date   = as.Date("2021-03-05"),
+                                  last_queryable_date = as.Date("2021-03-06"),
+                                  slice_ts = "2023-02-01 09:00:00")
+
+    # Try to get each observable
+    obs$ds$available_features |>
+      purrr::keep(~ startsWith(., "n_")) |>
+      purrr::walk(~ {
+        expect_no_error(obs$get_observation(.))
+      })
+
+    rm(obs)
+  }
+})
 
 
 test_that("active binding: diseasystore works", {

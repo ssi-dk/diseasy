@@ -597,14 +597,14 @@ DiseasySeason <- R6::R6Class(                                                   
 
 
         # NOTE: if the above data is ever updated, the cosine season model should be updated as well
-        #                                                                                                               nolint start: commented_code_linter
+        #                                                                                                               # nolint start: commented_code_linter
         # fit <- lm(dk_climate_max_temperature ~ cos(2*pi*t) + sin(2*pi*t))
         # offset <- purrr::pluck(fit, "coefficients", 1) # Intercept
         # A      <- purrr::pluck(fit, "coefficients", 2) # cosine contribution
         # B      <- purrr::pluck(fit, "coefficients", 3) # sine   contribution
         # peak   <- (atan2(B, A) + pi) / (2 * pi) * 365  # Offset phase by pi (high temp. -> low risk / vice versa)
         # scale  <- offset / (offset + sqrt(A^2 + B^2))  # Convert to percent wise scale
-        #                                                                                                               nolint end
+        #                                                                                                               # nolint end
 
         out <- list(t, dk_climate_max_temperature)
         names(out) <- c("t", observable)

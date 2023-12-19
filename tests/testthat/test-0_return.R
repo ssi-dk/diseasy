@@ -8,12 +8,8 @@ test_that(r"{.Rd files have \Value}", {
   # Note that `devtools::test()`, `devtools::check()` and GitHub workflows all have different
   # folder structures during testing, so we need to account for these differences
 
-  # Platform independent regex search to find root folder
-  path_regex <- stringr::str_replace(r"{(.*\/\w*(.Rcheck)?)\/.*(?=\/testthat)}", stringr::fixed("/"), .Platform$file.sep)
-  pkg_path <- stringr::str_extract(getwd(), path_regex, group = 1)
-
-  # If path contains .Rcheck, we need to add the package name to the path
-  pkg_path <- stringr::str_replace(pkg_path, r"{(\w*)(\.Rcheck)}", paste0("\\1\\2", .Platform$file.sep, "\\1"))
+  # Look for the source of .Rd files
+  pkg_path <- base::system.file("", package = "diseasy")
 
   # Look for the source of .Rd files
   help_dir <- file.path(pkg_path, "help")

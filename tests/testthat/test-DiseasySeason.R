@@ -132,11 +132,11 @@ test_that("get/use_cosine_season works", {
 
   # Malformed inputs
   expect_error(s$use_cosine_season(scale = NA), "May not be NA")
-  expect_error(s$use_cosine_season(scale = -1), "not >= 0") # nolint: infix_spaces_linter
+  expect_error(s$use_cosine_season(scale = -1), "not >= 0")                                                             # nolint: infix_spaces_linter
   expect_error(s$use_cosine_season(scale = 2), "not <= 1")
 
   expect_error(s$use_cosine_season(peak = NA), "May not be NA")
-  expect_error(s$use_cosine_season(peak = -1), "not >= 0") # nolint: infix_spaces_linter
+  expect_error(s$use_cosine_season(peak = -1), "not >= 0")                                                              # nolint: infix_spaces_linter
   expect_error(s$use_cosine_season(peak = 500), "not <= 365")
 
   rm(s)
@@ -181,47 +181,49 @@ test_that("use_covid_season_v1 works", {
 })
 
 
-test_that("use_covid_season_v2 works", { for (case_def in case_defs) {  # nolint: brace_linter
+test_that("use_covid_season_v2 works", {
+  for (case_def in case_defs) {
 
-  # We create an DiseasyObservables module for the season module
-  observables <- DiseasyObservables$new(diseasystore = case_def,
-                                        start_date = as.Date("2022-01-01"),
-                                        end_date = as.Date("2022-01-15"))
+    # We create an DiseasyObservables module for the season module
+    observables <- DiseasyObservables$new(diseasystore = case_def,
+                                          start_date = as.Date("2022-01-01"),
+                                          end_date = as.Date("2022-01-15"))
 
-  # Creating an empty module
-  s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"),
-                         observables = observables)
+    # Creating an empty module
+    s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"),
+                           observables = observables)
 
-  # Default scale
-  models <- s$get_covid_season_v1()
-  s$use_covid_season_v1()
+    # Default scale
+    models <- s$get_covid_season_v1()
+    s$use_covid_season_v1()
 
-  expect_equal(s$model_t,    models$model_t)
-  expect_equal(s$model_date, models$model_date)
-  s$use_covid_season_v2()
+    expect_equal(s$model_t,    models$model_t)
+    expect_equal(s$model_date, models$model_date)
+    s$use_covid_season_v2()
 
-  expect_identical(s$model_t(0), 1)
-  expect_false(s$model_t(1) == 1)
+    expect_identical(s$model_t(0), 1)
+    expect_false(s$model_t(1) == 1)
 
-  expect_identical(s$model_date(as.Date("2022-01-01")), 1)
-  expect_false(s$model_date(as.Date("2022-01-02")) == 1)
-
-
-  # Custom scale
-  s$use_covid_season_v2(scale = 0.35)
-
-  expect_identical(s$model_t(0), 1)
-  expect_false(s$model_t(1) == 1)
-
-  expect_identical(s$model_date(as.Date("2022-01-01")), 1)
-  expect_false(s$model_date(as.Date("2022-01-02")) == 1)
+    expect_identical(s$model_date(as.Date("2022-01-01")), 1)
+    expect_false(s$model_date(as.Date("2022-01-02")) == 1)
 
 
-  # Malformed scale
-  expect_error(s$use_covid_season_v2(scale = 0.99), "not <= 0.95")
+    # Custom scale
+    s$use_covid_season_v2(scale = 0.35)
 
-  rm(s, observables)
-}})
+    expect_identical(s$model_t(0), 1)
+    expect_false(s$model_t(1) == 1)
+
+    expect_identical(s$model_date(as.Date("2022-01-01")), 1)
+    expect_false(s$model_date(as.Date("2022-01-02")) == 1)
+
+
+    # Malformed scale
+    expect_error(s$use_covid_season_v2(scale = 0.99), "not <= 0.95")
+
+    rm(s, observables)
+  }
+})
 
 
 test_that("set_reference_date (with model set) works", {
@@ -376,7 +378,7 @@ test_that("active binding: available_season_models works", {
 
   # Try to set the available_season_models
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$available_season_models <- "unknown_season_model", error = \(e) e),                    # nolint: implicit_assignment_linter
+  expect_identical(tryCatch(s$available_season_models <- "unknown_season_model", error = \(e) e),                       # nolint: implicit_assignment_linter
                    simpleError("`$available_season_models` is read only"))
   expect_equal(s$available_season_models, expected_season_models)
 
