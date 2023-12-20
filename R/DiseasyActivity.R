@@ -310,7 +310,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         digest::digest()
       attr(private$.scenario_matrix, "secret_hash") <- active_activity_units_hash
 
-     },
+    },
 
     #' @description
     #'   Sets the overall risk of types of activity
@@ -384,7 +384,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       private$.scenario_matrix  <- new_scenario_matrix
       private$.risk_matrix      <- new_risk_matrix
 
-     },
+    },
 
 
     #' @description
@@ -584,7 +584,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         printr("Scenario: Activity scenario not yet set")
       } else {
         printr("Scenario: Overview")
-      print(self$scenario_matrix)
+        print(self$scenario_matrix)
         cat("\n")
       }
 
@@ -714,7 +714,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
             purrr::reduce(`+`, .init = rep(0, private$n_age_groups)) |> # each age_group starts with 0 activity
             stats::setNames(names(self$contact_basis$proportion))
-      }
+        }
       )
 
       names(risk_weighted_activity) <- private$activity_types
