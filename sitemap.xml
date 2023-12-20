@@ -7,6 +7,9 @@
     <loc>https://rasmusskytte.github.io/diseasy/PULL_REQUEST_TEMPLATE.html</loc>
   </url>
   <url>
+    <loc>https://rasmusskytte.github.io/diseasy/articles/diseasy-activity.html</loc>
+  </url>
+  <url>
     <loc>https://rasmusskytte.github.io/diseasy/articles/diseasy-observables.html</loc>
   </url>
   <url>
@@ -28,6 +31,9 @@
     <loc>https://rasmusskytte.github.io/diseasy/news/index.html</loc>
   </url>
   <url>
+    <loc>https://rasmusskytte.github.io/diseasy/reference/DiseasyActivity.html</loc>
+  </url>
+  <url>
     <loc>https://rasmusskytte.github.io/diseasy/reference/DiseasyBaseModule.html</loc>
   </url>
   <url>
@@ -37,6 +43,9 @@
     <loc>https://rasmusskytte.github.io/diseasy/reference/DiseasySeason.html</loc>
   </url>
   <url>
+    <loc>https://rasmusskytte.github.io/diseasy/reference/contact_basis.html</loc>
+  </url>
+  <url>
     <loc>https://rasmusskytte.github.io/diseasy/reference/diseasy-package.html</loc>
   </url>
   <url>
@@ -44,6 +53,12 @@
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasy/reference/diseasyoption.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasy/reference/dk_activity_units.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasy/reference/dk_reference_scenario.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasy/reference/grapes-.-grapes.html</loc>

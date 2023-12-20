@@ -47,6 +47,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/diseasy-activity.html">DiseasyActivity</a>
     <a class="dropdown-item" href="articles/diseasy-observables.html">DiseasyObservables</a>
     <a class="dropdown-item" href="articles/diseasy-season.html">DiseasySeason</a>
     <a class="dropdown-item" href="articles/quick-start.html">Quick start</a>
@@ -78,8 +79,14 @@
 <div class="page-header"><h1 id="diseasy-">diseasy <a href="https://ssi-dk.github.io/diseasy/" class="external-link"><img src="reference/figures/logo.png" align="right" height="138" alt="diseasy website"></a>
 <a class="anchor" aria-label="anchor" href="#diseasy-"></a>
 </h1></div>
-<p><a href="https://CRAN.R-project.org/package=diseasy" class="external-link"><img src="https://www.r-pkg.org/badges/version/diseasy" alt="CRAN status"></a> <a href="https://github.com/ssi-dk/diseasy/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ssi-dk/diseasy/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://codecov.io/gh/ssi-dk/diseasy" class="external-link"><img src="https://codecov.io/gh/ssi-dk/diseasy/graph/badge.svg?token=7RRVVVHOWR" alt="codecov"></a></p>
+<!-- badges: start -->
+
+<!-- badges: end -->
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
 <p>Leveraging combinatorial building for ensemble forecasting in disease modelling</p>
+</div>
 <div class="section level2">
 <h2 id="the-power-of-combinations">The power of combinations<a class="anchor" aria-label="anchor" href="#the-power-of-combinations"></a>
 </h2>
@@ -93,10 +100,18 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of <code>diseasy</code> from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ssi-dk/diseasy"</span><span class="op">)</span>  <span class="co"># Use "ssi-dk/diseasy@*release" to install the latest release version</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Install diseasy from CRAN:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"diseasy"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Alternatively, install the development version from github:</span></span>
+<span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ssi-dk/diseasy"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p>For basic usage examples, see <code>vignette("basic_principles")</code>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -134,7 +149,14 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://CRAN.R-project.org/package=diseasy" class="external-link"><img src="https://www.r-pkg.org/badges/version/diseasy" alt="CRAN status"></a></li>
+<li><a href="https://github.com/ssi-dk/diseasy/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ssi-dk/diseasy/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://codecov.io/gh/ssi-dk/diseasy" class="external-link"><img src="https://codecov.io/gh/ssi-dk/diseasy/graph/badge.svg?token=7RRVVVHOWR" alt="codecov"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
