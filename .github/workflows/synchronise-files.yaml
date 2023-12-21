@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - sync_diseasyverse_files
+      - main
   workflow_dispatch:
 
 jobs:
