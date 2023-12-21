@@ -1,0 +1,32 @@
+ssi-dk/diseasystore:
+  - .github/workflows/synchronise-files.yaml
+  - .github/sync.yaml
+
+  - R/0_linters.R
+  - tests/testthat/test-0_linters.R
+
+  - R/0_R6_utils.R
+  - tests/testthat/test-0_R6_utils.R
+
+  - R/0_documentation.R
+  - tests/testthat/test-0_documentation.R
+
+  - tests/testthat/test-0_return.R
+  - tests/testthat/test-0_examples.R
+
+
+ssi-dk/diseasy:
+  - .github/workflows/synchronise-files.yaml
+  - .github/sync.yaml
+
+  - R/0_linters.R
+  - tests/testthat/test-0_linters.R
+
+  - R/0_R6_utils.R
+  - tests/testthat/test-0_R6_utils.R
+
+  - R/0_documentation.R
+  - tests/testthat/test-0_documentation.R
+
+  - tests/testthat/test-0_return.R
+  - tests/testthat/test-0_examples.R
