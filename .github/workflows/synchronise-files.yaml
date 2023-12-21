@@ -19,4 +19,3 @@ jobs:
           CONFIG_PATH: .github/sync.yaml
           COMMIT_PREFIX: "chore: "
           PR_BODY: Automatically synchronise files between diseasyverse repositories
-          DRY_RUN: true
