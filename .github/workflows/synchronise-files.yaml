@@ -15,7 +15,7 @@ jobs:
       - name: Run GitHub File Sync
         uses: BetaHuhn/repo-file-sync-action@v1
         with:
-          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
           CONFIG_PATH: .github/sync.yaml
           COMMIT_PREFIX: "chore: sync"
           PR_BODY: Automatically synchronise files between diseasyverse repositories
