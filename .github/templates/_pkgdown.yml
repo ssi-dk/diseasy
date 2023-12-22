@@ -1,4 +1,4 @@
-url: https://ssi-dk.github.io/diseasy/
+url: https://ssi-dk.github.io/{{ repo.name }}/
 template:
   bootstrap: 5
 
