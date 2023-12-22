@@ -10,21 +10,3 @@
 #' @import R6
 #' @importFrom rlang caller_env
 NULL
-
-
-#' The custom linters of `diseasy`
-#' @rdname diseasy_linters
-#' @examples
-#'   diseasy_code_linters()
-#' @return A list of linters
-#' @export
-diseasy_code_linters <- function() {
-  linters <- list(
-    nolint_position_linter(120),
-    nolint_line_length_linter(120),
-    non_ascii_linter(),
-    param_and_field_linter()
-  )
-
-  return(linters)
-}
