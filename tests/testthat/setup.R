@@ -28,5 +28,7 @@ purrr::walk(google_files, ~ {
 })
 
 # Set the diseasystores to use the testing schemas
+target_schema_1 <- "test_ds"
+target_schema_2 <- "not_test_ds"
 options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir)
-options("diseasystore.target_schema" = "test_ds")
+options("diseasystore.target_schema" = "target_schema_1")
