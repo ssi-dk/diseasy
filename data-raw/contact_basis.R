@@ -1,5 +1,5 @@
-if (require(contactdata) && require(countrycode) && require(curl) && require(usethis) && require(tibble) &&             # nolint: cyclocomp_linter
-      require(diseasystore)) {
+if (requireNameSpace(contactdata) && requireNameSpace(countrycode) && requireNameSpace(curl) &&
+      requireNameSpace(usethis) && requireNameSpace(tibble) && requireNameSpace(diseasystore)) {
 
   # We express all contact data by default in 16 5-year age groups
   # (the default age groups of the `contactdata` package)

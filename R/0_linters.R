@@ -261,7 +261,8 @@ param_and_field_linter <- function() {
 #' @description
 #' nolint_position_linter: Ensure `nolint:` statements occur after the character limit
 #'
-#' @param length maximum line length allowed. Default is 80L (Hollerith limit).
+#' @param length (`numeric`)\cr
+#'  Maximum line length allowed. Default is 80L (Hollerith limit).
 #' @returns A list of `lintr::Lint`
 #' @examples
 #' ## nolint_position_linter
@@ -328,7 +329,8 @@ nolint_position_linter <- function(length = 80L) {
 #' @description
 #' nolint_line_length_linter: Ensure lines adhere to a given character limit, ignoring `nolint` statements
 #'
-#' @param length maximum line length allowed. Default is 80L (Hollerith limit).
+#' @param length (`numeric`)\cr
+#'  Maximum line length allowed. Default is 80L (Hollerith limit)..
 #' @examples
 #' ## nolint_line_length_linter
 #' # will produce lints
