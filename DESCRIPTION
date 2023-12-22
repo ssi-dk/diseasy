@@ -46,6 +46,7 @@ Suggests:
     SCDB,
     spelling,
     testthat (>= 3.0.0),
+    withr,
     zoo
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy
