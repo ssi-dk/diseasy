@@ -9,7 +9,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     outputs:
-      abort: ${{ steps.pr_detect.outputs.abort }}
+      abort: ${{ steps.pr_detect.outputs.abort || github.ref_name != 'main'}}
     steps:
       - name: Detect PR on current branch
         if: github.event_name == 'push'
