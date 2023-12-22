@@ -9,7 +9,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     outputs:
-      abort: ${{ steps.pr_detect.outputs.abort || github.ref_name != 'main'}}
+      abort: ${{ steps.pr_detect.outputs.abort }}
     steps:
       - name: Detect PR on current branch
         if: github.event_name == 'push'
@@ -25,7 +25,7 @@ jobs:
   run-all-AEF-DFF-workflows:
     name: ⚙️ Dispatch
     needs: context
-    if: needs.context.outputs.abort != 'true'
+    if: needs.context.outputs.abort != 'true' || github.ref_name == 'main'
     uses: ssi-dk/AEF-DDF/.github/workflows/workflow-dispatcher.yaml@workflows
     with:
       # We pass information about the triggering event
