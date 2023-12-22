@@ -3,7 +3,7 @@ on: [push, pull_request, release, workflow_dispatch]
 name: CI tests
 jobs:
 
-  detect-pr:
+  context:
     name: ⚙️ Context
     runs-on: ubuntu-latest
     env:
@@ -24,8 +24,8 @@ jobs:
   # We call the reusable workflow that triggers all AEF-DDF workflows
   run-all-AEF-DFF-workflows:
     name: ⚙️ Dispatch
-    needs: detect-pr
-    if: needs.pr_detect.outputs.abort != 'true'
+    needs: context
+    if: needs.context.outputs.abort != 'true'
     uses: ssi-dk/AEF-DDF/.github/workflows/workflow-dispatcher.yaml@workflows
     with:
       # We pass information about the triggering event
