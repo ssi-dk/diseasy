@@ -240,7 +240,7 @@ test_that("get_scenario_openness works", {
 
   expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
   expect_length(act$get_scenario_openness()[[1]], 4L) # 4 arenas
-  expect_true(all(unlist(lapply(act$get_scenario_openness(), lengths(x))) == 16))
+  expect_true(all(unlist(lapply(act$get_scenario_openness(), lengths)) == 16))
 
   # Test with different age cuts
   expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0, 60)), 1, 1, length), 2L) # 2 age groups

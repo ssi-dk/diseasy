@@ -40,7 +40,7 @@ test_field_in_documentation <- function(field) {
   rd_files <- rd_files[!stringr::str_detect(names(rd_files), "-package.[Rr][Dd]$")]
 
   # Skip the "data" files
-  rd_files <- purrr::discard(rd_files, ~ any(stringr::str_detect(., stringr::fixed(r"{\\keyword\{data\}}"))))           # nolint: absolute_path_linter
+  rd_files <- purrr::discard(rd_files, ~ any(stringr::str_detect(., stringr::fixed(r"{\keyword{data}}"))))              # nolint: absolute_path_linter
 
   # Check renaming
   for (rd_id in seq_along(rd_files)) {
