@@ -1,0 +1,19 @@
+on: [push, pull_request, release, workflow_dispatch]
+
+name: CI tests
+jobs:
+
+  # We call the reusable workflow that triggers all AEF-DDF workflows
+  run-all-AEF-DFF-workflows:
+    if: github.event_name != 'push' || (github.event_name == 'push' && github.base_ref == '')
+    name: ⚙️ Dispatch
+    uses: ssi-dk/AEF-DDF/.github/workflows/workflow-dispatcher.yaml@workflows
+    with:
+      # We pass information about the triggering event
+      event_name: ${{ github.event_name }}
+      run_id: ${{ github.run_id }}
+      main_branches: main
+
+      # code-coverage creates data bases for the tests. Here you can specify the schemas you need for the workflow
+      schemas: test_ds,not_test_ds
+    secrets: inherit

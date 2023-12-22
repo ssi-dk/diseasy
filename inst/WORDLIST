@@ -1,76 +1,71 @@
-antiphase
-AR
+backends
+bitemporal
 
-CCW
 classname
 cloneable
 CMD
 codecov
-combinatorial
-combinatorics
-contactdata
+conn
+COVID
 covid
+colname
 
+db
+dbi
 DBIConnection
+DBIDriver
+dbplyr
 diseasy
 diseasystore
+DiseasystoreBase
+DiseasystoreGoogleCovid
 diseasystores
-DiseasyActivity
-DiseasyBaseModule
-DiseasyObservables
-DiseasySeason
-dk
-DMI
-doi
+dplyr
+ds
+dtplyr
 
-Eggo
 Engbo
 
-gov
-Gruson
+fn
+fns
+FeatureHandler
+FeatureHandlers
 
-ij
 Institut
 
-ji
-Jit
-
-Klepac
-Kirkeby
-
 Lasse
+linter
 linters
-Lyngse
+lintr
 
-medrxiv
-Mielke
-moduleowner
+tbl
+Telkamp
+tibble
+tidyselect
+TODOs
+ts
 
-normalise
+md
 
+nolint
+nrow
+
+OO
 ORCID
-org
 
-pcbi
-Plesner
-PLoS
+parsable
+PascalCase
+POSIXct
+pid
 
-quos
-
+R's
 Rasmus
-Randl
-rlang
-RM
+regex
+rm
 
-SEIR
+SCDB
+Schou
 Skytte
 SSI
 Statens
-
-ts
-
-u
-
-www
-
-Zandvoort
+sql

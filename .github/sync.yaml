@@ -1,32 +1,39 @@
+group:
+  repos: |
+    ssi-dk/diseasystore
+    ssi-dk/diseasy
+  files:
+    - .github/workflows
+    - .github/sync.yaml
+    - .github/PULL_REQUEST_TEMPLATE/pull_request_template.md
+
+    - .lintr
+    - _pkgdown.yml
+
+    - inst/WORDLIST
+
+    - R/0_linters.R
+    - tests/testthat/test-0_linters.R
+
+    - R/0_R6_utils.R
+    - tests/testthat/test-0_R6_utils.R
+
+    - R/0_documentation.R
+    - tests/testthat/test-0_documentation.R
+
+    - tests/testthat/test-0_rd_files.R
+
+
 ssi-dk/diseasystore:
-  - .github/workflows/synchronise-files.yaml
-  - .github/sync.yaml
-
-  - R/0_linters.R
-  - tests/testthat/test-0_linters.R
-
-  - R/0_R6_utils.R
-  - tests/testthat/test-0_R6_utils.R
-
-  - R/0_documentation.R
-  - tests/testthat/test-0_documentation.R
-
-  - tests/testthat/test-0_return.R
-  - tests/testthat/test-0_examples.R
-
+  - source: .github/templates/bug_report.md
+    dest: .github/ISSUE_TEMPLATE/bug_report.md
+    template:
+      repo:
+        name: "diseasystore"
 
 ssi-dk/diseasy:
-  - .github/workflows/synchronise-files.yaml
-  - .github/sync.yaml
-
-  - R/0_linters.R
-  - tests/testthat/test-0_linters.R
-
-  - R/0_R6_utils.R
-  - tests/testthat/test-0_R6_utils.R
-
-  - R/0_documentation.R
-  - tests/testthat/test-0_documentation.R
-
-  - tests/testthat/test-0_return.R
-  - tests/testthat/test-0_examples.R
+  - source: .github/templates/bug_report.md
+    dest: .github/ISSUE_TEMPLATE/bug_report.md
+    template:
+      repo:
+        name: "diseasy"
