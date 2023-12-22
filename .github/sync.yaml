@@ -6,7 +6,7 @@ group:
     - .github/workflows
     - .github/templates
     - .github/sync.yaml
-    - .github/PULL_REQUEST_TEMPLATE/pull_request_template.md
+    - .github/PULL_REQUEST_TEMPLATE.md
 
     - .lintr
 
