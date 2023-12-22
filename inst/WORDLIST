@@ -1,3 +1,8 @@
+antiphase
+AR
+
+CCW
+
 backends
 bitemporal
 
@@ -5,7 +10,10 @@ classname
 cloneable
 CMD
 codecov
+combinatorial
+combinatorics
 conn
+contactdata
 COVID
 covid
 colname
@@ -20,23 +28,81 @@ diseasystore
 DiseasystoreBase
 DiseasystoreGoogleCovid
 diseasystores
+DiseasyActivity
+DiseasyBaseModule
+DiseasyObservables
+DiseasySeason
+dk
+DMI
+doi
 dplyr
 ds
 dtplyr
 
+Eggo
 Engbo
+
+gov
+Gruson
+
+ij
+Institut
 
 fn
 fns
 FeatureHandler
 FeatureHandlers
 
-Institut
+ji
+Jit
+
+Klepac
+Kirkeby
 
 Lasse
 linter
 linters
 lintr
+Lyngse
+
+md
+medrxiv
+Mielke
+moduleowner
+
+nolint
+normalise
+nrow
+
+OO
+ORCID
+org
+
+parsable
+PascalCase
+pcbi
+Plesner
+PLoS
+POSIXct
+pid
+
+quos
+
+R's
+Randl
+Rasmus
+regex
+rlang
+RM
+rm
+
+SCDB
+Schou
+SEIR
+Skytte
+SSI
+Statens
+sql
 
 tbl
 Telkamp
@@ -45,27 +111,8 @@ tidyselect
 TODOs
 ts
 
-md
+u
 
-nolint
-nrow
+www
 
-OO
-ORCID
-
-parsable
-PascalCase
-POSIXct
-pid
-
-R's
-Rasmus
-regex
-rm
-
-SCDB
-Schou
-Skytte
-SSI
-Statens
-sql
+Zandvoort
