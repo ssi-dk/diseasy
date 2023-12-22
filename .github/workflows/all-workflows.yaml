@@ -1,15 +1,13 @@
-on:
-  push:
-  pull_request:
-    types: [opened, reopened]
-  release:
-  workflow_dispatch:
+on: [push, pull_request, release, workflow_dispatch]
 
 name: CI tests
 jobs:
 
   # We call the reusable workflow that triggers all AEF-DDF workflows
   run-all-AEF-DFF-workflows:
+    concurrency:
+      group: all_workflows
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     name: ⚙️ Dispatch
     uses: ssi-dk/AEF-DDF/.github/workflows/workflow-dispatcher.yaml@workflows
     with:
