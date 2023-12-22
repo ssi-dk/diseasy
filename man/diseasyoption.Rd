@@ -26,6 +26,6 @@ Helper function to get option
   # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
   diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 
-  # Try to retrieve specific option for source conn for a non existant / unconfigured diseasystore
+  # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 }

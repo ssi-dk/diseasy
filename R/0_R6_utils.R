@@ -56,7 +56,7 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
             stringr::str_replace(., paste0("(?<=^.{", split_width - 1, "})(\\w*) "), "\\1\n")
           }
         ) |>
-        stringr::str_split("\n") |>
+        stringr::str_split(stringr::fixed("\n")) |>
         purrr::reduce(c)
 
       segment_lengths <- purrr::map_dbl(split_string, ~ length(stringr::str_split_1(., " ")))
@@ -84,7 +84,7 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 #'   # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
 #'   diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 #'
-#'   # Try to retrieve specific option for source conn for a non existant / unconfigured diseasystore
+#'   # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
 #'   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 #' @export
 diseasyoption <- function(option, class = "DiseasystoreBase") {
@@ -93,7 +93,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
     class <- base::class(class)[1]
   }
 
-  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |> # nolint: object_usage_linter
+  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |>                                                     # nolint: object_usage_linter
     stringr::str_to_lower()
 
   list(class, NULL) |>
@@ -101,7 +101,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
     purrr::map(getOption) |>
     purrr::map(unlist) |>
     purrr::keep(purrr::negate(is.null)) |>
-    purrr::discard(~ is.character(.) && . == "") |>
+    purrr::discard(~ identical(., "")) |>
     purrr::pluck(1)
 }
 
@@ -127,7 +127,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   if (is.null(conn)) {
     return(conn)
   } else if (is.function(conn)) {
-    tryCatch(conn <- conn(),
+    tryCatch(conn <- conn(),                                                                                            # nolint: implicit_assignment_linter
              error = \(e) stop("`conn` could not be parsed!"))
     return(conn)
   } else if (type == "target_conn" && inherits(conn, "DBIConnection")) {
@@ -154,9 +154,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #'  t %.% a   # 1
 #'
 #'  t$c # NULL
-#'  \dontrun{
-#'  t %.% c # ERROR a not found in t
-#'  }
+#'  try(t %.% c) # Gives error since "c" does not exist in "t"
 #' @export
 `%.%` <- function(env, field) {
   field_name <- as.character(substitute(field))

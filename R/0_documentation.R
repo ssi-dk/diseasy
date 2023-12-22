@@ -15,7 +15,7 @@ rd_stratification <- function(type = "param") {
 }
 
 
-rd_diseasystore <- function(type = "param") {
+rd_diseasystore_label <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",
@@ -77,7 +77,7 @@ rd_scale <- function(type = "param") {
 
 rd_source_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("source_conn\\cr",
+  paste("(`DBIConnection` or `file path`)\\cr",
         "Used to specify where data is located.",
         ifelse(type == "field", " Read only.", ""),
         "Can be `DBIConnection` or file path depending on the `diseasystore`.")
@@ -120,7 +120,7 @@ rd_start_date <- function(type = "param") {
 rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
-        "Date or timestamp (parseable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
+        "Date or timestamp (parsable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -135,8 +135,8 @@ rd_end_date <- function(type = "param") {
 
 rd_.data <- function(type = "param") {                                                                                  # nolint: object_name_linter
   checkmate::assert_choice(type, c("param", "field"))
-  paste(".data\\cr",
-        "The data object on which to perform the operation.",
+  paste("(`any`)\\cr",
+        "The data object to perform the operation on.",
         ifelse(type == "field", " Read only.", ""))
 }
 
