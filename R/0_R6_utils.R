@@ -22,52 +22,26 @@ read_only_error <- function(field) {
 
 #' cat printing with default new line
 #' @param ...
-#'   The normal input to cat
+#'   The normal input to cat.
 #' @param file
-#'   Path of an output file to append the output to
+#'   Path of an output file to append the output to.
 #' @param sep (`character`)\cr
-#'   The separator given to cat
+#'   If multiple arguments are supplied to ..., the separator is used to collapse the arguments.
 #' @param max_width (`numeric`)\cr
 #'   The maximum number of characters to print before inserting a newline.
 #'   NULL (default) does not break up lines.
 #' @noRd
 printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
-  sink(file = file, split = TRUE, append = TRUE, type = "output")
+  withr::local_output_sink(new = file, split = TRUE, append = TRUE)
 
   print_string <- paste(..., sep = sep)
 
-  # If a width limit is set, we iteratively determine the words that exceed the limit and
-  # insert a newline
+  # If a width limit is set, we iteratively determine the words that exceed the limit and insert a newline
   if (!is.null(max_width)) {
-
-    # Get the current state of the string
-    split_string <- stringr::str_split_1(print_string, "\n")
-    segment_lengths <- purrr::map_dbl(split_string, ~ length(stringr::str_split_1(., " ")))
-
-    # While segments contain more than one word and is longer than max_width, split these segments
-    while (any(nchar(split_string) > max_width & segment_lengths > 1)) {
-      split_string <- split_string |>
-        purrr::map_if(
-          ~ nchar(.) > max_width,
-          ~ {
-            break_locations <- stringr::str_locate_all(., " |$")[[1]][, 1]
-            split_width <- break_locations[max(which((break_locations - 1) < max_width))]
-
-            stringr::str_replace(., paste0("(?<=^.{", split_width - 1, "})(\\w*) "), "\\1\n")
-          }
-        ) |>
-        stringr::str_split(stringr::fixed("\n")) |>
-        purrr::reduce(c)
-
-      segment_lengths <- purrr::map_dbl(split_string, ~ length(stringr::str_split_1(., " ")))
-    }
-
-    # Collapse segments with the newline
-    print_string <- paste(split_string, collapse = "\n")
+    print_string <- stringr::str_wrap(print_string, width = max_width)
   }
 
-  cat(print_string, "\n", sep = sep)
-  sink()
+  cat(print_string, "\n", sep = "")
 }
 
 
@@ -137,32 +111,4 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   } else {
     stop("`conn` could not be parsed!")
   }
-}
-
-
-#' Existence aware pick operator
-#' @param env (`object`)\cr
-#'   The object or environment to attempt to pick from
-#' @param field (`character`)\cr
-#'   The name of the field to pick from `env`
-#' @return
-#'   Error if the `field` does not exist in `env`, otherwise it returns `field`
-#' @examples
-#'  t <- list(a = 1, b = 2)
-#'
-#'  t$a       # 1
-#'  t %.% a   # 1
-#'
-#'  t$c # NULL
-#'  try(t %.% c) # Gives error since "c" does not exist in "t"
-#' @export
-`%.%` <- function(env, field) {
-  field_name <- as.character(substitute(field))
-  env_name <- as.character(substitute(env))
-
-  if (is.environment(env)) env <- as.list(env, all.names = TRUE)
-  if (!(field_name %in% names(env))) {
-    stop(field_name, " not found in ", env_name)
-  }
-  return(purrr::pluck(env, field_name))
 }
