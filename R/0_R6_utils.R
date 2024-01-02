@@ -26,9 +26,9 @@ read_only_error <- function(field) {
 
 #' cat printing with default new line
 #' @param ...
-#'   The normal input to cat
+#'   The normal input to cat.
 #' @param file (`character`)\cr
-#'   Path of an output file to append the output to
+#'   Path of an output file to append the output to.
 #' @param sep (`character`)\cr
 #'   If multiple arguments are supplied to ..., the separator is used to collapse the arguments.
 #' @param max_width (`numeric`)\cr
