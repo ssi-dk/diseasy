@@ -1,38 +1,63 @@
-test_that("printr works", {
-
-  # Check that printr works without file printing
+test_that("printr: printing to console works", {
   # 1)
-  checkmate::expect_character(capture.output(printr("test string")),               pattern = r"{test string}")
+  checkmate::expect_character(capture.output(printr("test string")),               pattern = r"{^test string$}")
+
   # 2)
-  checkmate::expect_character(capture.output(printr("test1", "test2")),            pattern = r"{test1test2}")
+  checkmate::expect_character(capture.output(printr("test1", "test2")),            pattern = r"{^test1test2$}")
+
   # 3)
-  checkmate::expect_character(capture.output(printr("test1", "test2", sep = " ")), pattern = r"{test1 test2}")
+  checkmate::expect_character(capture.output(printr("test1", "test2", sep = " ")), pattern = r"{^test1 test2$}")
+
+  # 4)
+  checkmate::expect_character(capture.output(printr("test1", "test2", sep = "-")), pattern = r"{^test1-test2$}")
+})
+
+
+test_that("printr: printing to file works", {
 
   # Check that printr works with file printing
-  test_file <- tempfile()
 
   # 1)
+  test_file <- withr::local_tempfile()
   checkmate::expect_character(capture.output(printr("test string",    file = test_file)),
                               pattern = r"{test string}")
   checkmate::expect_character(readLines(test_file),
                               pattern = r"{test string}")
-  file.remove(test_file)
 
 
   # 2)
+  test_file <- withr::local_tempfile()
   checkmate::expect_character(capture.output(printr("test1", "test2", file = test_file)),
                               pattern = r"{test1test2}")
   checkmate::expect_character(readLines(test_file),
                               pattern = r"{test1test2}")
-  file.remove(test_file)
 
 
   # 3)
+  test_file <- withr::local_tempfile()
   checkmate::expect_character(capture.output(printr("test1", "test2", file = test_file, sep = " ")),
                               pattern = r"{test1 test2}")
   checkmate::expect_character(readLines(test_file),
                               pattern = r"{test1 test2}")
-  file.remove(test_file)
+
+})
+
+
+test_that("printr: printing to console works with max_width", {
+  expect_identical(
+    capture.output(printr("test1, test2, test3", max_width = 5)),
+    c("test1,", "test2,", "test3")
+  )
+
+  expect_identical(
+    capture.output(printr("test1, test2, test3", max_width = 15)),
+    c("test1, test2,", "test3")
+  )
+
+  expect_identical(
+    capture.output(printr("test1, test2, test3", max_width = 25)),
+    "test1, test2, test3"
+  )
 })
 
 
@@ -55,33 +80,6 @@ test_that("diseasyoption works", {
 
   rm(ds)
   invisible(gc())
-})
-
-
-test_that("%.% works", {
-
-  d <- list(a = 2, b = 3, .c = 4)
-
-  expect_identical(d %.% a, 2)
-  expect_identical(d %.% b, 3)
-  expect_identical(d %.% .c, 4)
-  expect_error(d %.% d, "d not found in d")
-
-
-  d <- c(a = 2, b = 3, .c = 4)
-
-  expect_identical(d %.% a, 2)
-  expect_identical(d %.% b, 3)
-  expect_identical(d %.% .c, 4)
-  expect_error(d %.% d, "d not found in d")
-
-
-  d <- R6::R6Class(public = list(a = 2, b = 3, .c = 4))$new()
-
-  expect_identical(d %.% a, 2)
-  expect_identical(d %.% b, 3)
-  expect_identical(d %.% .c, 4)
-  expect_error(d %.% d, "d not found in d")
 })
 
 
