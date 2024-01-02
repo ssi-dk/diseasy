@@ -2,11 +2,13 @@ on:
   push:
     branches:
       - main
+      - rc-*
   workflow_dispatch:
 
-name: 🔄 Sync diseasyverse files
+name: Sync
 jobs:
   sync:
+    name: 🔄 Synchronise diseasyverse files
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
