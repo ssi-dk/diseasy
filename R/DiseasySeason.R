@@ -587,7 +587,7 @@ DiseasySeason <- R6::R6Class(                                                   
       checkmate::assert_choice(observable, "max_temperature")
 
       if (observable == "max_temperature") {
-        # maksimummiddeltemperatur Danmark
+        # Maximum average temperature in Danmark
         # source: https://www.dmi.dk/vejrarkiv/normaler-danmark/
         dk_climate_max_temperature <- c(3.6, 3.7, 6.4, 11.2, 15.6, 18.5, 21.2, 21.2, 17.2, 12.3, 7.6, 4.7)
 
@@ -628,7 +628,7 @@ DiseasySeason <- R6::R6Class(                                                   
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
-        # Create the approximater that maps a scale to an a value
+        # Create the approximation function that maps a scale to an a value
         compute_scale <- \(a) 1 - f(a)(max(climate_normal$max_temperature)) / f(a)(min(climate_normal$max_temperature))
         a_max <- stats::uniroot(\(a) compute_scale(a) - max_scale, c(k, 10000))$root
         a_values <- pracma::logseq(k, a_max)

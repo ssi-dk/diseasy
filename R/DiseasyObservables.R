@@ -24,7 +24,7 @@
 #'   }
 #'   rm(obs)
 #' @return
-#'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+#'   A new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
 DiseasyObservables <- R6::R6Class(                                                                                      # nolint: object_name_linter
@@ -49,8 +49,6 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    #' @return
-    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     initialize = function(diseasystore = NULL,
                           start_date = NULL,
                           end_date = NULL,
