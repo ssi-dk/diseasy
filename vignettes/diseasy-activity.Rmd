@@ -18,10 +18,15 @@ knitr::opts_chunk$set(
 library(diseasy)
 ```
 
-```{r options, include = FALSE}
-withr::local_options("digits" = 2)
-withr::local_options("tibble.print_min" = 5)
-withr::local_options("diseasy.logging" = FALSE)
+```{r hidden_options, include = FALSE}
+if (rlang::is_installed("withr")) {
+  withr::local_options("digits" = 2)
+  withr::local_options("tibble.print_min" = 5)
+  withr::local_options("diseasystore.verbose" = FALSE)
+  withr::local_options("diseasy.logging" = FALSE)
+} else {
+  opts <- options("digits" = 2, "tibble.print_min" = 5, "diseasystore.verbose" = FALSE, "diseasy.logging" = FALSE)
+}
 ```
 
 # Introduction
@@ -179,4 +184,12 @@ act$scenario_matrix
 
 ```{r inspect_risk_matrix}
 act$risk_matrix
+```
+
+```{r cleanup, include = FALSE}
+rm(act)
+gc()
+if (!rlang::is_installed("withr")) {
+  options(opts)
+}
 ```

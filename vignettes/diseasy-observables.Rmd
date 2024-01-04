@@ -12,28 +12,64 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+```
 
-withr::local_options("tibble.print_min" = 5)
+```{r hidden_options, include = FALSE}
+if (rlang::is_installed("withr")) {
+  withr::local_options("tibble.print_min" = 5)
+  withr::local_options("diseasystore.verbose" = FALSE)
+} else {
+  opts <- options("tibble.print_min" = 5, "diseasystore.verbose" = FALSE)
+}
+
+# We have a "hard" dependency for RSQLite to render parts of this vignette
+suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 ```{r setup}
 library(diseasy)
 ```
 
-```{r download, include = FALSE}
-# Download the first n rows of the Google data set of interest
-tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
-remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
+```{r download_data_hidden, include = FALSE}
+# The files we need are stored remotely in Google's API
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
+remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 
-purrr::walk(google_files, \(file_name) {
-  paste0(remote_conn, file_name) |>
-    readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-    readr::write_csv(file.path(tmp_dir, file_name))
-})
-options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir)
-options("diseasystore.DiseasystoreGoogleCovid19.verbose" = FALSE)
-options("diseasy.logging" = FALSE)
+# In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
+# This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
+local_conns <- c("vignette_data", file.path(tempdir(), "vignette_data"))
+local_conn <- purrr::detect(local_conns, checkmate::test_directory_exists, .default = local_conns[2])
+
+if (rlang::is_installed("withr")) {
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
+} else {
+  opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn,
+                          "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000))
+}
+
+# Check that the files are available
+vignette_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
+
+# If they aren't, we download some of the Google COVID-19 data for this vignette
+if (vignette_data_missing) {
+
+  # Ensure download folder exists
+  if (!checkmate::test_directory_exists(local_conn)) dir.create(local_conn)
+
+  # Then we download the first n rows of each data set of interest
+  purrr::discard(google_files, ~ file.exists(file.path(local_conn, .))) |>
+    purrr::walk(\(file) {
+      paste0(remote_conn, file) |>
+        readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+        readr::write_csv(file.path(local_conn, file))
+    })
+}
+
+# Check that the files are available after attempting to download
+if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))) {
+  stop("DiseasystoreGoogleCovid19: vignette data not available and could not be downloaded")
+}
 ```
 
 # Introduction
@@ -44,13 +80,18 @@ The module is primarily a wrapper around `diseasystores` which means the availab
 # Configuring the module
 The module needs some configuration to be initialized. Some of these can be set through options.
 Primarily, we need to specify the `diseasystore`
-```{r initialization}
-obs <- DiseasyObservables$new(
-  conn = DBI::dbConnect(RSQLite::SQLite())
-)
+```{r initialization, eval = suggests_available}
+obs <- DiseasyObservables$new(conn = DBI::dbConnect(RSQLite::SQLite()))
 # NOTE: Alternatively we could set options("diseasy.conn" = ...)
 
 obs$set_diseasystore(diseasystore = "Google COVID-19")
+```
+
+```{r initialization_hidden, include = FALSE}
+if (!suggests_available) {
+  obs <- DiseasyObservables$new(conn = dbplyr::simulate_dbi())
+  obs$set_diseasystore(diseasystore = "Google COVID-19")
+}
 ```
 
 To see the data that comes with the underlying `diseasystore` we can query the module.
@@ -69,7 +110,7 @@ obs$describe()
 
 # Getting observations
 We can query the model to give the data for a given observable in a given time frame:
-```{r example_1}
+```{r example_1, eval = suggests_available}
 obs$get_observation(observable = "n_population",
                     start_date = as.Date("2020-03-01"),
                     end_date = as.Date("2020-05-01"))
@@ -81,7 +122,7 @@ obs$get_observation(observable = "n_population",
 If we want to stratify our data, we supply the stratification argument.
 This argument is designed to be flexible, but it means they need to be wrapped in `rlang::quos()`.
 We will see below, why that is.
-```{r example_2}
+```{r example_2, eval = suggests_available}
 obs$get_observation(observable = "n_hospital",
                     stratification = rlang::quos(age_group),
                     start_date = as.Date("2020-03-01"),
@@ -89,7 +130,7 @@ obs$get_observation(observable = "n_hospital",
 ```
 
 Since the stratification is flexible, we can programmatically stratify:
-```{r example_3}
+```{r example_3, eval = suggests_available}
 obs$get_observation(observable = "n_hospital",
                     stratification = rlang::quos(young_age_groups =
                                                    age_group %in% c("00-09", "10-19")),
@@ -99,3 +140,10 @@ obs$get_observation(observable = "n_hospital",
 # NOTE: "target_conn" is a SQLite data base which has "numeric" as the "boolean" type.
 ```
 
+```{r cleanup, include = FALSE}
+rm(obs)
+gc()
+if (!rlang::is_installed("withr")) {
+  options(opts)
+}
+```
