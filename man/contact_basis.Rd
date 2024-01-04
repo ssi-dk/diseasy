@@ -17,15 +17,13 @@ Countries." R package version 1.0.0,
 Prem K, Cook AR, Jit M (2017). "Projecting social contact
 matrices in 152 countries using contact surveys and demographic
 data." \emph{PLoS Computational Biology}, \emph{13}(9), e1005697.
-doi:10.1371/journal.pcbi.1005697
-\url{https://doi.org/10.1371/journal.pcbi.1005697}.
+\doi{10.1371/journal.pcbi.1005697}.
 
 Prem K, van Zandvoort K, Klepac P, Eggo RM, Davies NG, Group
 CCW, Cook AR, Jit M (2021). "Projecting contact matrices in 177
 geographical regions: An update and comparison with empirical
 data for the COVID-19 era." \emph{PLoS Computational Biology},
-\emph{17}(7), e1009098. doi:10.1371/journal.pcbi.1009098
-\url{https://doi.org/10.1371/journal.pcbi.1009098}.
+\emph{17}(7), e1009098. \doi{doi:10.1371/journal.pcbi.1009098}.
 }
 \description{
 This data set contains contact matrices and population data for 176 geographical regions.
