@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Modules, models and tools to create ensembles of disease models through modular construction and combinatorics. Using the data pipeline provided by the 'diseasystore' package, 'diseasy' enables ensembles of disease models to be run across multiple diseases.
+Modules, models and tools to create ensembles of disease models through modular construction and combinatorics. Using the data pipeline provided by the 'diseasystore' package, 'diseasy' enables ensembles of disease models to be run across multiple diseases. By using the global activity matrices from the 'contactdata' package, the models can run on almost all countries.
 }
 \seealso{
 Useful links:
