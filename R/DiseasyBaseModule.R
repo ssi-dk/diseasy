@@ -28,7 +28,7 @@
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
 #' @seealso [lgr][lgr::lgr]
-DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
+DiseasyBaseModule <- R6::R6Class(                                                                                       # nolint: object_name_linter
   classname = "DiseasyBaseModule",
 
   public = list(
@@ -97,7 +97,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
       # First we check if the given module is the `DiseasyObservables` module
       # If it is, we load it into the nested instances
-      modules_with_observables <- c("DiseasySeason")
+      modules_with_observables <- "DiseasySeason"
       if (class(module)[1] == "DiseasyObservables") {
         modules_with_observables |>
           purrr::map_chr(~ paste0(".", .)) |>
@@ -145,7 +145,7 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
     #' @field hash (`character`)\cr
     #' Computes a hash value for the module. Useful for logging and caching. Read only.
     hash = purrr::partial(
-      .f = active_binding, # nolint start: indentation_linter
+      .f = active_binding,
       name = "hash",
       expr = {
         # Capture module environment (parent of this environment)
@@ -166,7 +166,8 @@ DiseasyBaseModule <- R6::R6Class( # nolint: object_name_linter
 
         # Reduce to single hash and return
         return(digest::digest(hash_list[order(names(hash_list))]))
-      }) # nolint end
+      }
+    )
   ),
 
   private = list(

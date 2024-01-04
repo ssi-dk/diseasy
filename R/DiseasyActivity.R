@@ -74,7 +74,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Initialize based on input
       private$lg$info("base_scenario set as {base_scenario}")
       private$direction <- ifelse(base_scenario %in% c("closed", "dk_reference"), "opening", "closing")
-      private$upper_activity_level <- ifelse(private$direction == "opening", 1, 0)
+      private$upper_activity_level <- as.numeric(private$direction == "opening")
 
       if (!is.null(activity_units)) self$set_activity_units(activity_units = activity_units)
       if (!is.null(contact_basis))  self$set_contact_basis(contact_basis = contact_basis)
@@ -133,7 +133,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # - Check for consistency of the number of age groups in the activity_units
       # Find all implied n_age_groups larger than 1
-      n_age_groups <- purrr::map(activity_units, ~ purrr::map_dbl(., length)) |>
+      n_age_groups <- purrr::map(activity_units, lengths) |>
         purrr::reduce(c) |>
         unique() |>
         purrr::keep(~ . > 1)
@@ -282,7 +282,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         if (length(to_open) > 0) {
           # First a check
           if (any(new_scenario_matrix[to_open, col_id] == private$upper_activity_level)) {
-            stop(paste("\nSome of", toString(to_open), "are already open!"))
+            stop("\nSome of ", toString(to_open), " are already open!")
           }
           new_state <- new_scenario_matrix[to_open, col_id] + 1
           new_scenario_matrix[to_open, col_id:ncol(new_scenario_matrix)] <- new_state
@@ -292,7 +292,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         if (length(to_close) > 0) {
           # First a check
           if (any(new_scenario_matrix[to_close, col_id] == (private$upper_activity_level - 1))) {
-            stop(paste("\nSome of", toString(to_close), "are already closed!"))
+            stop("\nSome of ", toString(to_close), " are already closed!")
           }
           new_state <- new_scenario_matrix[to_close, col_id] - 1
           new_scenario_matrix[to_close, col_id:ncol(new_scenario_matrix)] <- new_state
@@ -403,19 +403,15 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::reportAssertions(coll)
 
 
-      if (!is.null(first_date)) {
-        if (any(as.Date(colnames(private$.scenario_matrix)) < first_date)) {
-          col_id <- max(which(as.Date(colnames(private$.scenario_matrix)) <= first_date)) # First column to keep
-          colnames(private$.scenario_matrix)[col_id] <- as.character(first_date)
-          private$.scenario_matrix <- private$.scenario_matrix[, col_id : ncol(private$.scenario_matrix)]
-        }
+      if (!is.null(first_date) && any(as.Date(colnames(private$.scenario_matrix)) < first_date)) {
+        col_id <- max(which(as.Date(colnames(private$.scenario_matrix)) <= first_date)) # First column to keep
+        colnames(private$.scenario_matrix)[col_id] <- as.character(first_date)
+        private$.scenario_matrix <- private$.scenario_matrix[, col_id : ncol(private$.scenario_matrix)]
       }
 
-      if (!is.null(last_date)) {
-        if (any(as.Date(colnames(private$.scenario_matrix)) > last_date)) {
-          col_id <- min(which(as.Date(colnames(private$.scenario_matrix)) > last_date)) # First column to delete
-          private$.scenario_matrix <- private$.scenario_matrix[, 1 : (col_id - 1)]
-        }
+      if (!is.null(last_date) && any(as.Date(colnames(private$.scenario_matrix)) > last_date)) {
+        col_id <- min(which(as.Date(colnames(private$.scenario_matrix)) > last_date)) # First column to delete
+        private$.scenario_matrix <- private$.scenario_matrix[, 1 : (col_id - 1)]
       }
     },
 
@@ -885,7 +881,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       if (normalise) weights <- weights / sum(weights)
 
-      out <- purrr::map(obj, .f = \(xx) purrr:::reduce(purrr::map2(.x = xx, .y = weights, .f = `*`), .f =  `+`))
+      out <- purrr::map(obj, .f = \(xx) purrr::reduce(purrr::map2(.x = xx, .y = weights, .f = `*`), .f =  `+`))
 
       return(out)
     }

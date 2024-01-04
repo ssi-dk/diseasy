@@ -20,7 +20,9 @@ test_field_in_documentation <- function(field) {
     rd_envir <- new.env()
     lazyLoad(stringr::str_remove(rdx_file, ".rdx$"), envir = rd_envir)
     rd_names <- ls(rd_envir)
-    rd_files <- purrr::map(rd_names, ~ as.character(eval(purrr::pluck(rd_envir, .))))
+    rd_files <- rd_names |>
+      purrr::map(~ as.character(eval(purrr::pluck(rd_envir, .)))) |>
+      purrr::map_chr(~ paste(., collapse = ""))
     names(rd_files) <- paste0(rd_names, ".Rd")
 
   } else if (checkmate::test_directory_exists(man_dir)) {
@@ -38,6 +40,9 @@ test_field_in_documentation <- function(field) {
 
   # Skip the "*-package.Rd" file
   rd_files <- rd_files[!stringr::str_detect(names(rd_files), "-package.[Rr][Dd]$")]
+
+  # Skip the "data" files
+  rd_files <- purrr::discard(rd_files, ~ any(stringr::str_detect(., r"{\\+keyword\\?\{data\\?\}}")))                    # nolint: absolute_path_linter
 
   # Check renaming
   for (rd_id in seq_along(rd_files)) {

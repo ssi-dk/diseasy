@@ -42,16 +42,16 @@ dtplyr
 Eggo
 Engbo
 
+fn
+fns
+FeatureHandler
+FeatureHandlers
+
 gov
 Gruson
 
 ij
 Institut
-
-fn
-fns
-FeatureHandler
-FeatureHandlers
 
 ji
 Jit
@@ -85,6 +85,8 @@ Plesner
 PLoS
 POSIXct
 pid
+
+param
 
 quos
 

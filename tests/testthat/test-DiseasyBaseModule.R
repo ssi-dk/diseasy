@@ -43,7 +43,7 @@ test_that("hash works", {
 
   # Try to set the hash
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$hash <- "test", error = \(e) e),
+  expect_identical(tryCatch(m$hash <- "test", error = \(e) e),                                                          # nolint: implicit_assignment_linter
                    simpleError("`$hash` is read only"))
   expect_equal(m$hash, hash_new_instance)
 
