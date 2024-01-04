@@ -54,6 +54,7 @@ Suggests:
     contactdata,
     countrycode,
     DBI,
+    dbplyr,
     devtools,
     knitr,
     readr,
