@@ -24,7 +24,10 @@ Authors@R:
              role = "ctb",
              comment = c(ORCID = "0000-0002-6258-8212")),
       person("Statens Serum Institut, SSI", role = c("cph", "fnd")))
-Description: This package facilitates creation of an ensemble of models through modular construction and combinatorics.
+Description:
+  Modules, models and tools to create ensembles of disease models through modular construction and combinatorics.
+  Using the data pipeline provided by the 'diseasystore' package, 'diseasy' enables ensembles of disease models to
+  be run across multiple diseases.
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
