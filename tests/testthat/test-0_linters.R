@@ -37,3 +37,14 @@ test_that("non_ascii_linter works", {
   lintr::expect_lint("xxx", NULL, non_ascii_linter())
   lintr::expect_lint("abc", NULL, non_ascii_linter())
 })
+
+
+test_that("param_and_field_linter works", {
+  lintr::expect_lint("#' @param test (type)\\cr",  list("line_number" = 1, "type" = "style"), param_and_field_linter()) # nolint start: param_and_field_linter
+  lintr::expect_lint("#' @field test (type)\\cr",  list("line_number" = 1, "type" = "style"), param_and_field_linter())
+  lintr::expect_lint("#' @param test (`type`)",    list("line_number" = 1, "type" = "style"), param_and_field_linter())
+  lintr::expect_lint("#' @field test (`type`)",    list("line_number" = 1, "type" = "style"), param_and_field_linter()) # nolint end
+
+  lintr::expect_lint("#' @param test (`type`)\\cr", NULL, param_and_field_linter())
+  lintr::expect_lint("#' @field test (`type`)\\cr", NULL, param_and_field_linter())
+})

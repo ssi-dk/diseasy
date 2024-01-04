@@ -173,7 +173,7 @@ test_that("$change_activity fails with malformed inputs", {
   expect_error(act$change_activity(malformed_scenario),
                class = "simpleError",
                regexp = "non_existing_activity_unit")
-  expect_identical(act$scenario_matrix, NULL) # Check the state is unchanged
+  expect_null(act$scenario_matrix) # Check the state is unchanged
 
 
   rm(act)
@@ -208,7 +208,7 @@ test_that("$change_risk works", {
 
 
   # `$change_risk` fails when wrong type is given
-  expect_error(act$change_risk(date = as.Date("2020-03-15"), type = c("workers"), risk = c(0.5)),
+  expect_error(act$change_risk(date = as.Date("2020-03-15"), type = "workers", risk = 0.5),
                class = "simpleError",
                regexp = "workers")
   expect_identical(act$hash, hash_new_risks)
@@ -238,14 +238,13 @@ test_that("get_scenario_openness works", {
                       opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
                       closing      = c(NA,           "baseline",      NA))
 
-  expect_identical(length(act$get_scenario_openness()), 3L) # 3 dates in scenario
-  expect_identical(length(act$get_scenario_openness()[[1]]), 4L) # 4 arenas
-  expect_true(all(unlist(lapply(act$get_scenario_openness(), \(x) sapply(x, length))) == 16))
-  #TODO: Test if risks are applied
+  expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
+  expect_length(act$get_scenario_openness()[[1]], 4L) # 4 arenas
+  expect_true(all(unlist(lapply(act$get_scenario_openness(), lengths)) == 16))
 
   # Test with different age cuts
   expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0, 60)), 1, 1, length), 2L) # 2 age groups
-  expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0)), 1, 1, length), 1L) # 1 (no) age groups
+  expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = 0), 1, 1, length), 1L) # 1 (no) age groups
 
   rm(act)
 })
@@ -262,14 +261,14 @@ test_that("contactdata: contact_basis works", {
                       closing      = c(NA,           "baseline",         NA))
 
   # Repeating a previous to see that methods are available
-  expect_identical(length(act$get_scenario_openness()), 3L) # 3 dates in scenario
+  expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
 
   # Checking dimension
   expect_identical(dim(act$get_scenario_contacts()[[1]][[1]]), c(16L, 16L))
 
   # Check dimensions with other age groups
   expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = c(0, 60))[[1]][[1]]), c(2L, 2L))
-  expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = c(0))[[1]][[1]]), c(1L, 1L))
+  expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = 0)[[1]][[1]]), c(1L, 1L))
 
   rm(act)
 })
@@ -279,13 +278,13 @@ test_that("dk_reference scenario works", {
 
   ## Test dk_reference scenario
   act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis %.% DK)
-  expect_identical(class(act$get_scenario_contacts(age_cuts_lower = c(0, 60))), "list")
+  checkmate::expect_class(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), "list")
   # More tests could be made ... but tested above. The length may change over time so mayby some particular dates.
 
   ## Test weighted contact types. Most meaningful for contact matrices
   tmp_list          <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
   tmp_list_weighted <- act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1))
-  expect_identical(length(tmp_list), length(tmp_list_weighted))
+  expect_length(tmp_list, length(tmp_list_weighted))
 
   rm(act)
 })

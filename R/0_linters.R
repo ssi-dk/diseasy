@@ -11,7 +11,8 @@ diseasy_code_linters <- function() {
   linters <- list(
     nolint_position_linter(120),
     nolint_line_length_linter(120),
-    non_ascii_linter()
+    non_ascii_linter(),
+    param_and_field_linter()
   )
 
   return(linters)
@@ -22,7 +23,8 @@ diseasy_code_linters <- function() {
 #' @description
 #' nolint_position_linter: Ensure `nolint:` statements occur after the character limit
 #'
-#' @param length maximum line length allowed. Default is 80L (Hollerith limit).
+#' @param length (`numeric`)\cr
+#'  Maximum line length allowed. Default is 80L (Hollerith limit).
 #' @returns A list of `lintr::Lint`
 #' @examples
 #' ## nolint_position_linter
@@ -89,7 +91,8 @@ nolint_position_linter <- function(length = 80L) {
 #' @description
 #' nolint_line_length_linter: Ensure lines adhere to a given character limit, ignoring `nolint` statements
 #'
-#' @param length maximum line length allowed. Default is 80L (Hollerith limit).
+#' @param length (`numeric`)\cr
+#'  Maximum line length allowed. Default is 80L (Hollerith limit)..
 #' @examples
 #' ## nolint_line_length_linter
 #' # will produce lints
@@ -197,6 +200,101 @@ non_ascii_linter <- function() {
           )
         }
       )
+    }
+  )
+}
+
+
+#' @name diseasy_linters
+#' @description
+#' param_and_field_linter: Ensure R6 @param and @field tags have a unit-type and carriage return
+#'
+#' @examples
+#' ## param_and_field_linter
+#' # will produce lints
+#' lintr::lint(
+#'   text = "#' @param test",                                                                                           # nolint: param_and_field_linter
+#'   linters = param_and_field_linter()
+#' )
+#'
+#' # okay
+#' lintr::lint(
+#'   text = "#' @param (`numeric()`)\cr",
+#'   linters = param_and_field_linter()
+#' )
+#' @importFrom rlang .data
+#' @noRd
+param_and_field_linter <- function() {
+  general_msg <- "@param and @field should follow mlr3 format."
+
+  lintr::Linter(
+    function(source_expression) {
+
+      # Only go over complete file
+      if (!lintr::is_lint_level(source_expression, "file")) {
+        return(list())
+      }
+
+      # Find all @param and @field lines. All other lines become NA
+      detection_info <- source_expression$file_lines |>
+        stringr::str_extract(r"{#' ?@(param|field).*}")
+
+      # Convert to data.frame and determine line number
+      detection_info <- data.frame(
+        rd_line = detection_info,
+        line_number = seq_along(detection_info)
+      )
+
+      # Remove non param/field lines and determine the type
+      detection_info <- detection_info |>
+        dplyr::filter(!is.na(.data$rd_line)) |>
+        dplyr::mutate(rd_type = stringr::str_extract(.data$rd_line, r"{@(param|field)}"))
+
+      # Remove triple-dot-ellipsis params
+      detection_info <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, "@param +\\.{3}"))
+
+      # Remove auto-generated documentation
+      detection_info <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, r"{@(param|field) +\w+ +`r }"))
+
+
+
+      # Look for malformed tags
+      missing_backticks <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, stringr::fixed("`")))
+
+      missing_cr <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, stringr::fixed(r"{\cr}")))
+
+      # report issues
+      backtick_lints <- purrr::pmap(
+        missing_backticks,
+        \(rd_line, line_number, rd_type) {
+          lintr::Lint(
+            filename = source_expression$filename,
+            line_number = line_number,
+            type = "style",
+            message = glue::glue("{general_msg} {rd_type} type not declared (rd-tag is missing backticks ` )"),
+            line = source_expression$file_lines[line_number]
+          )
+        }
+      )
+
+      cr_lints <- purrr::pmap(
+        missing_cr,
+        \(rd_line, line_number, rd_type) {
+          lintr::Lint(
+            filename = source_expression$filename,
+            line_number = line_number,
+            type = "style",
+            message = glue::glue("{general_msg} {rd_type} is missing a carriage return (\\cr) after type-declaration"),
+            line = source_expression$file_lines[line_number]
+          )
+        }
+      )
+
+      return(c(backtick_lints, cr_lints))
     }
   )
 }

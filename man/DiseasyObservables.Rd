@@ -157,7 +157,8 @@ Set the case definition to get DiseasyObservables for.
 Text label of the disease to get DiseasyObservables for.\cr
 Must match case definition implemented in \code{diseasystore} package.}
 
-\item{\code{verbose}}{Should the \code{diseasystore} use verbose outputs?}
+\item{\code{verbose}}{(\code{logical})\cr
+Should the \code{diseasystore} use verbose outputs?}
 }
 \if{html}{\out{</div>}}
 }

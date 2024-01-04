@@ -1,7 +1,10 @@
 #' Helper function to generate active bindings that are read_only
-#' @param value The value attempted to be set
-#' @param expr  The expression to execute when called
-#' @param name  The name of the active binding
+#' @param value (`any`)\cr
+#'   The value attempted to be set
+#' @param expr (`R expression`)\cr
+#'   The expression to execute when called
+#' @param name (`character`)\cr
+#'   The name of the active binding
 #' @noRd
 active_binding <- function(value, expr, name) {
   if (missing(value)) {
@@ -13,7 +16,8 @@ active_binding <- function(value, expr, name) {
 
 
 #' Helper function to produce a "read only" error
-#' @param field The name of the field that is read only
+#' @param field (`character`)\cr
+#'   The name of the field that is read only
 #' @noRd
 read_only_error <- function(field) {
   stop(glue::glue("`${field}` is read only"), call. = FALSE)
@@ -23,7 +27,7 @@ read_only_error <- function(field) {
 #' cat printing with default new line
 #' @param ...
 #'   The normal input to cat.
-#' @param file
+#' @param file (`character`)\cr
 #'   Path of an output file to append the output to.
 #' @param sep (`character`)\cr
 #'   If multiple arguments are supplied to ..., the separator is used to collapse the arguments.
@@ -81,11 +85,15 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
 
 
 #' Parse a connection option/object
-#' @param conn (`function` or `DBIConnection` or `character`)
+#' @param conn (`function` or `DBIConnection` or `character`)\cr
+#'   The "connection" to parse.
 #' @param type (`character`)\cr
 #'   Either "source_conn" or "target_conn"
 #' @details
-#'   Evaluates given conn if is a function
+#'   This function takes a flexible connection `conn` and parses it.
+#'   If type is "target_conn", the output must be `DBIConnection`.
+#'   If type is "source_conn", the output must be `DBIConnection` or `character`.
+#'   If a `function` to conn, it will be evaluated and its output evaulated against above rules.
 #' @noRd
 parse_diseasyconn <- function(conn, type = "source_conn") {
   coll <- checkmate::makeAssertCollection()
@@ -101,8 +109,10 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   if (is.null(conn)) {
     return(conn)
   } else if (is.function(conn)) {
-    tryCatch(conn <- conn(),                                                                                            # nolint: implicit_assignment_linter
-             error = \(e) stop("`conn` could not be parsed!"))
+    conn <- tryCatch(
+      conn(),
+      error = \(e) stop("`conn` could not be parsed!")
+    )
     return(conn)
   } else if (type == "target_conn" && inherits(conn, "DBIConnection")) {
     return(conn)

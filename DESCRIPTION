@@ -35,6 +35,8 @@ Imports:
     rlang,
     stringr
 Suggests:
+    contactdata,
+    countrycode,
     DBI,
     devtools,
     knitr,
