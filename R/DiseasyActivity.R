@@ -46,6 +46,7 @@
 #' @return
 #'   A new instance of the `DiseasyActivity` [R6][R6::R6Class] class.
 #' @export
+#' @importFrom R6 R6Class
 DiseasyActivity <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyActivity",
   inherit = DiseasyBaseModule,
@@ -60,6 +61,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param contact_basis `r rd_contact_basis()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
+    #' @importFrom lgr without_logging
     initialize = function(base_scenario = "closed", activity_units = NULL, contact_basis = NULL, ...) {
 
       coll <- checkmate::makeAssertCollection()
@@ -234,6 +236,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   Names of activities to close on given date.
     #'   Omitted if `data.frame` is given to date argument
     #' @return `r rd_side_effects`
+    #' @importFrom digest digest
     change_activity = function(date, opening = NA, closing = NA) {
 
       # Sanitize inputs
