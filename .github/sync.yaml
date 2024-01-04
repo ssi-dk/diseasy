@@ -37,7 +37,7 @@ ssi-dk/diseasystore:
       repo:
         name: "diseasystore"
 
-  - source: .github/README.Rmd
+  - source: .github/README_body.Rmd
     dest: README.Rmd
     template:
       repo:
@@ -57,7 +57,7 @@ ssi-dk/diseasy:
       repo:
         name: "diseasy"
 
-  - source: .github/README.Rmd
+  - source: .github/README_body.Rmd
     dest: README.Rmd
     template:
       repo:
