@@ -38,4 +38,4 @@ devtools::install_github("ssi-dk/{{ repo.name }}")
 ```
 
 ## Usage
-For basic usage examples, see `vignette("quick-start")`.
+For basic usage examples, see `vignette("{{ repo.name }}")`.

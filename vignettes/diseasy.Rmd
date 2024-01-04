@@ -1,0 +1,105 @@
+---
+title: "Quick start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r hidden_options, include = FALSE}
+if (rlang::is_installed("withr")) {
+  withr::local_options("diseasystore.verbose" = FALSE)
+} else {
+  opts <- options("diseasystore.verbose" = FALSE)
+}
+
+# We have a "hard" dependency for RSQLite to render parts of this vignette
+suggests_available <- rlang::is_installed("RSQLite")
+```
+
+# Overview
+The `diseasy` package is large in scope as it aims to provide the infrastructure to easily create a large ensemble of
+disease models. 
+
+This building of disease models is achieved via a modular design philosophy. To that end, we have a number of
+"functional" modules that feed into "model" modules.
+
+## Functional modules
+The functional modules are smaller modules meant for defined purposes. These modules are "atomic" and form the building
+blocks of the ensembles. 
+
+The currently available functional modules are:
+
+```{r vignette_string, echo = FALSE}
+functional_modules <- ls("package:diseasy") |>
+  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(Base|Model))"))
+vignette_string <- paste0("\`vignette(\"", functional_modules, "\")\`", collapse = ", ")
+```
+
+```{r available_functional_modules}
+ls("package:diseasy") |>
+  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(BaseModule|Model.*))"))
+```
+
+Each functional module is restricted to covering a single functionality for use in the models
+(and sometimes for other functional modules).
+
+For example, `DiseasySeason` defines a number of models for the season dependency of the disease.
+This module has a single defined purpose (modelling the effect of season) but it provides a number of different models
+of describing possible season dependencies:
+
+```{r available_season_models}
+s <- DiseasySeason$new()
+s$available_season_models
+```
+
+As we will see later, these different models for season dependency will be used to construct the ensembles. 
+
+Each of these season models have similar functional signatures (i.e. the function calls to the models are similar).
+This way, when we create a disease model, we can use the module to implement different models for season dependency in
+the disease models easily.
+
+The other modules have other functionality they implement.
+For example, the module `DiseasyObservables` is responsible for providing data to the models and modules. 
+For `DiseasySeason`, this means that some models of season dependency can use real-world data, such as temperature, in
+the season models.
+
+
+The use of these modules is varied and each module comes with their own vignette describing their usage:
+`r vignette_string`.
+
+
+## Model modules
+As stated above, the functional modules provide functionality for the disease models.
+
+The currently available model modules are:
+```{r available_model_modules}
+ls("package:diseasy", pattern = "DiseasyModel.+")
+```
+
+Presently, no models are included in the package. These will come in the following releases.
+
+```{r models_now_available, include = FALSE}
+# If the model are now included, please continue the writing of this vignette
+stopifnot(identical(ls("package:diseasy", pattern = "DiseasyModel.+"), character(0)))
+```
+
+```{r cleanup, include = FALSE}
+rm(ds)
+gc()
+if (!rlang::is_installed("withr")) {
+  options(opts)
+}
+```
