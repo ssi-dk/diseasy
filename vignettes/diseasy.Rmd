@@ -24,21 +24,18 @@ if (rlang::is_installed("withr")) {
 } else {
   opts <- options("diseasystore.verbose" = FALSE)
 }
-
-# We have a "hard" dependency for RSQLite to render parts of this vignette
-suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 # Overview
 The `diseasy` package is large in scope as it aims to provide the infrastructure to easily create a large ensemble of
-disease models. 
+disease models.
 
 This building of disease models is achieved via a modular design philosophy. To that end, we have a number of
 "functional" modules that feed into "model" modules.
 
 ## Functional modules
 The functional modules are smaller modules meant for defined purposes. These modules are "atomic" and form the building
-blocks of the ensembles. 
+blocks of the ensembles.
 
 The currently available functional modules are:
 
@@ -65,14 +62,14 @@ s <- DiseasySeason$new()
 s$available_season_models
 ```
 
-As we will see later, these different models for season dependency will be used to construct the ensembles. 
+As we will see later, these different models for season dependency will be used to construct the ensembles.
 
 Each of these season models have similar functional signatures (i.e. the function calls to the models are similar).
 This way, when we create a disease model, we can use the module to implement different models for season dependency in
 the disease models easily.
 
 The other modules have other functionality they implement.
-For example, the module `DiseasyObservables` is responsible for providing data to the models and modules. 
+For example, the module `DiseasyObservables` is responsible for providing data to the models and modules.
 For `DiseasySeason`, this means that some models of season dependency can use real-world data, such as temperature, in
 the season models.
 
@@ -97,7 +94,7 @@ stopifnot(identical(ls("package:diseasy", pattern = "DiseasyModel.+"), character
 ```
 
 ```{r cleanup, include = FALSE}
-rm(ds)
+rm(s)
 gc()
 if (!rlang::is_installed("withr")) {
   options(opts)
