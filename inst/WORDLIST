@@ -40,6 +40,7 @@ ds
 dtplyr
 
 Eggo
+endblock
 Engbo
 
 fn
@@ -47,6 +48,7 @@ fns
 FeatureHandler
 FeatureHandlers
 
+github
 gov
 Gruson
 
@@ -95,8 +97,9 @@ Randl
 Rasmus
 regex
 rlang
-RM
 rm
+RM
+Rmd
 
 SCDB
 Schou

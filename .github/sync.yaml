@@ -37,12 +37,6 @@ ssi-dk/diseasystore:
       repo:
         name: "diseasystore"
 
-  - source: .github/README_body.Rmd
-    dest: README.Rmd
-    template:
-      repo:
-        name: "diseasystore"
-
 
 ssi-dk/diseasy:
   - source: .github/templates/_pkgdown.yml
@@ -53,12 +47,6 @@ ssi-dk/diseasy:
 
   - source: .github/templates/bug_report.md
     dest: .github/ISSUE_TEMPLATE/bug_report.md
-    template:
-      repo:
-        name: "diseasy"
-
-  - source: .github/README_body.Rmd
-    dest: README.Rmd
     template:
       repo:
         name: "diseasy"
