@@ -28,6 +28,7 @@
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
 #' @seealso [lgr][lgr::lgr]
+#' @importFrom R6 R6Class
 DiseasyBaseModule <- R6::R6Class(                                                                                       # nolint: object_name_linter
   classname = "DiseasyBaseModule",
 
@@ -185,6 +186,8 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #   Updates the logger (should be called when modelowner changes).
     #   This adjusts the logging format to include the modelowner in parentheses
     # @return `NULL`
+    #' @importFrom lubridate today
+    #' @importFrom lgr get_logger_glue AppenderConsole AppenderFile LayoutGlue
     update_logger = function() {
 
       # Look for active logger, if not found, create active logger
