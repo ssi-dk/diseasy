@@ -14,13 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-# diseasy <a href="https://ssi-dk.github.io/{{ repo.name }}/"><img src="man/figures/logo.png" align="right" height="138" alt="{{ repo.name }} website" /></a>
+# diseasy <a href="https://ssi-dk.github.io/{{ repo_name }}/"><img src="man/figures/logo.png" align="right" height="138" alt="{{ repo_name }} website" /></a>
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version/{{ repo.name }})](https://CRAN.R-project.org/package={{ repo.name }})
-[![CI tests](https://github.com/ssi-dk/{{ repo.name }}/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/{{ repo.name }}/actions/workflows/all-workflows.yaml)
-[![codecov](https://codecov.io/gh/ssi-dk/{{ repo.name }}/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ssi-dk/{{ repo.name }})
+[![CRAN status](https://www.r-pkg.org/badges/version/{{ repo_name }})](https://CRAN.R-project.org/package={{ repo_name }})
+[![CI tests](https://github.com/ssi-dk/{{ repo_name }}/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/{{ repo_name }}/actions/workflows/all-workflows.yaml)
+[![codecov](https://codecov.io/gh/ssi-dk/{{ repo_name }}/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ssi-dk/{{ repo_name }})
 
 <!-- badges: end -->
 
@@ -29,13 +29,13 @@ knitr::opts_chunk$set(
 
 ## Installation
 ```{r, eval = FALSE}
-# Install {{ repo.name }} from CRAN:
-install.packages("{{ repo.name }}")
+# Install {{ repo_name }} from CRAN:
+install.packages("{{ repo_name }}")
 
 # Alternatively, install the development version from github:
 # install.packages("devtools")
-devtools::install_github("ssi-dk/{{ repo.name }}")
+devtools::install_github("ssi-dk/{{ repo_name }}")
 ```
 
 ## Usage
-For basic usage examples, see `vignette("{{ repo.name }}")`.
+For basic usage examples, see `vignette("{{ repo_name }}")`.
