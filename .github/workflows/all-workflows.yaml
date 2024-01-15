@@ -7,16 +7,16 @@ jobs:
     name: ⚙️ Context
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ github.token }}
+      GH_TOKEN: $
     outputs:
-      abort: ${{ steps.pr_detect.outputs.abort }}
+      abort: $
     steps:
       - name: Detect PR on current branch
         if: github.event_name == 'push'
         id: pr_detect
         run: |
           pr_branches=$(gh pr list --json headRefName --repo $GITHUB_REPOSITORY)
-          if [[ $(echo "$pr_branches" | jq -r --arg GITHUB_REF '.[].headRefName | select(. == $GITHUB_REF)') ]]; then
+          if [[ $(echo "$pr_branches" | jq -r --arg GITHUB_REF_NAME $GITHUB_REF_NAME '.[].headRefName | select(. == $GITHUB_REF_NAME)') ]]; then
             echo "This push is associated with a pull request. Skipping the job."
             echo "abort=true" >> "$GITHUB_OUTPUT"
           fi
@@ -25,13 +25,12 @@ jobs:
   run-all-AEF-DFF-workflows:
     name: ⚙️ Dispatch
     needs: context
-    if: needs.context.outputs.abort != 'true' || github.ref_name == 'main'
+    if: needs.context.outputs.abort != 'true' || contains('main,master', github.ref_name)
     uses: ssi-dk/AEF-DDF/.github/workflows/workflow-dispatcher.yaml@main
     with:
       # We pass information about the triggering event
-      event_name: ${{ github.event_name }}
-      run_id: ${{ github.run_id }}
-      main_branches: main
+      event_name: $
+      run_id: $
 
       # code-coverage creates data bases for the tests. Here you can specify the schemas you need for the workflow
       schemas: test_ds,not_test_ds
