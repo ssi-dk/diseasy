@@ -256,7 +256,7 @@ param_and_field_linter <- function() {
 
       # Remove auto-generated documentation
       detection_info <- detection_info |>
-        dplyr::filter(!stringr::str_detect(.data$rd_line, r"{@(param|field) +\w+ +`r }"))
+        dplyr::filter(!stringr::str_detect(.data$rd_line, r"{@(param|field) +[\.\w]+ +`r }"))
 
 
 
