@@ -52,7 +52,12 @@
 #'   CCW, Cook AR, Jit M (2021). "Projecting contact matrices in 177
 #'   geographical regions: An update and comparison with empirical
 #'   data for the COVID-19 era." _PLoS Computational Biology_,
-#'   *17*(7), e1009098. \doi{doi:10.1371/journal.pcbi.1009098}.
+#'   *17*(7), e1009098. \doi{10.1371/journal.pcbi.1009098}.
+#' @source
+#'   Arel-Bundock V, Enevoldsen N, Yetman C (2018).
+#'   "countrycode: An R package to convert country names and country codes."
+#'   _Journal of Open Source Software_, *3*(28), 848.
+#    \doi{10.21105/joss.00848}.
 #' @keywords data
 NULL
 

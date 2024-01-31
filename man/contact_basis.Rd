@@ -23,7 +23,11 @@ Prem K, van Zandvoort K, Klepac P, Eggo RM, Davies NG, Group
 CCW, Cook AR, Jit M (2021). "Projecting contact matrices in 177
 geographical regions: An update and comparison with empirical
 data for the COVID-19 era." \emph{PLoS Computational Biology},
-\emph{17}(7), e1009098. \doi{doi:10.1371/journal.pcbi.1009098}.
+\emph{17}(7), e1009098. \doi{10.1371/journal.pcbi.1009098}.
+
+Arel-Bundock V, Enevoldsen N, Yetman C (2018).
+"countrycode: An R package to convert country names and country codes."
+\emph{Journal of Open Source Software}, \emph{3}(28), 848.
 }
 \description{
 This data set contains contact matrices and population data for 176 geographical regions.
