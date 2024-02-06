@@ -2,11 +2,38 @@
 % Please edit documentation in R/DiseasyModel.R
 \name{DiseasyModel}
 \alias{DiseasyModel}
-\title{Meta module for the models}
+\title{Diseasy's basic model module}
+\value{
+A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
+}
 \description{
-TODO
+The \code{DiseasyModel} module implements common functionality that all models have available beyond that provided by
+\code{DiseasyBaseModule}.
+Most notably, the model module facilitates:
+\itemize{
+\item Module interfaces:
+The module contains the functional modules via its active bindings:
+\itemize{
+\item \verb{$activity}: \code{DiseasyActivity}
+\item \verb{$observables}: \code{DiseasyObservables}
+\item \verb{$season}: \code{DiseasySeason}
+Configured instances of these modules can be provided during initialisation. If not, default instances are
+created.
+}
+\item Model interface:
+The module defines the functions \verb{$get_results()}, \verb{$get_training_data()} and the \verb{$parameters} binding.
+These functions define the "API" of the models and ensure the models can take part in the ensemble.
+}
+}
+\examples{
+  # Normally, you would not want to create this module directly, but it is possible.
+  Model_module <- DiseasyModel$new()
+
+  rm(Model_module)
 }
 \seealso{
+\link[lgr:lgr-package]{lgr}
+
 \link{DiseasyObservables}
 
 \link{DiseasyActivity}
@@ -75,7 +102,7 @@ This module is typically not constructed directly but rather through \verb{Disea
 \item{\code{activity, observables, season}}{(\code{boolean} or \verb{R6::R6Class instance})\cr
 If a boolean is given, it dictates whether to load a new instance module of this class\cr
 If an instance of the module is provided instead, this instance is cloned to the new \code{DiseasyModel} instance\cr
-Default is FALSE.}
+Default is \code{FALSE}.}
 
 \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance}
@@ -98,13 +125,13 @@ A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
 \if{html}{\out{<a id="method-DiseasyModel-get_results"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModel-get_results}{}}}
 \subsection{Method \code{get_results()}}{
-The primary method used to request model results of a given observable at a given aggregation.
+The primary method used to request model results of a given observable at a given stratification
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_results(
   observable,
   prediction_length,
   quantiles = NULL,
-  aggregation = NULL
+  stratification = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -117,12 +144,12 @@ The primary method used to request model results of a given observable at a give
 
 \item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr Default NULL. If given, results are returned at the quantiles given.}
 
-\item{\code{aggregation}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in aggregation evaluated to give the aggregation level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in stratification evaluated to give the stratification level.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by aggregation level. In addition to aggregation columns, the output has the columns:\cr   date (\code{Date}) specifying the date of the prediction\cr   realization_id (\code{character}) giving a unique id for each realization in the ensemble\cr   model (\code{character}) the name (classname) of the model used to provide the prediction.
+A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr   date (\code{Date}) specifying the date of the prediction\cr   realization_id (\code{character}) giving a unique id for each realization in the ensemble\cr   model (\code{character}) the name (classname) of the model used to provide the prediction.
 }
 }
 \if{html}{\out{<hr>}}
@@ -132,7 +159,7 @@ A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the lev
 A method that returns training data for the models based on the model value of \code{training_length} and
 the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_training_data(observable, aggregation = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_training_data(observable, stratification = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -140,7 +167,7 @@ the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \describe{
 \item{\code{observable}}{(\code{character})\cr The observable to provide prediction for. Must match observable in \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
 
-\item{\code{aggregation}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in aggregation evaluated to give the aggregation level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in stratification evaluated to give the stratification level.}
 }
 \if{html}{\out{</div>}}
 }

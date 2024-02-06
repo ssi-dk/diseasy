@@ -22,6 +22,7 @@
 #' @return
 #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
 #' @export
+#' @seealso [lgr][lgr::lgr]
 DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter
   classname = "DiseasyModel",
   inherit = DiseasyBaseModule,
@@ -94,13 +95,13 @@ DiseasyModel <- R6::R6Class(                                                    
     # Roxygen has only limited support for R6 docs currently, so we need to do some tricks for the documentation
     # of get_results
     #' @description `r rd_get_results_description`
-    #' @param observable `r rd_observable`
-    #' @param prediction_length `r rd_prediction_length`
-    #' @param quantiles `r rd_quantiles`
-    #' @param aggregation `r rd_aggregation`
+    #' @param observable `r rd_observable()`
+    #' @param prediction_length `r rd_prediction_length()`
+    #' @param quantiles `r rd_quantiles()`
+    #' @param stratification `r rd_stratification()`
     #' @return `r rd_get_results_return`
     #' @seealso `r rd_get_results_seealso`
-    get_results = function(observable, prediction_length, quantiles = NULL, aggregation = NULL) {
+    get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
       private$not_implemented_error("Each model must implement their own `get_results` methods")
     },
 
@@ -108,10 +109,10 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   A method that returns training data for the models based on the model value of `training_length` and
     #'   the `last_queryable_date` of the `DiseasyObservables` module.
-    #' @param observable `r rd_observable`
-    #' @param aggregation `r rd_aggregation`
+    #' @param observable `r rd_observable()`
+    #' @param stratification `r rd_stratification()`
     #' @return The output of `DiseasyObservables$get_observation` constrained to the training period.
-    get_training_data = function(observable, aggregation = NULL) {
+    get_training_data = function(observable, stratification = NULL) {
 
       # Input validation
       coll <- checkmate::makeAssertCollection()
@@ -120,11 +121,11 @@ DiseasyModel <- R6::R6Class(                                                    
       checkmate::assert_date(self$observables$last_queryable_date, add = coll)
       checkmate::reportAssertions(coll)
 
-      # Get the observable at the aggregation level
+      # Get the observable at the stratification level
       start_date <- self$observables$last_queryable_date - lubridate::days(self$parameters$training_length)
       end_date   <- self$observables$last_queryable_date # Only within the training period
 
-      data <- self$observables$get_observation(observable, aggregation, start_date, end_date) |>
+      data <- self$observables$get_observation(observable, stratification, start_date, end_date) |>
         dplyr::mutate(t = lubridate::interval(max(zoo::as.Date(date)), zoo::as.Date(date)) / lubridate::days(1))
 
       return(data)
@@ -184,14 +185,14 @@ DiseasyModel <- R6::R6Class(                                                    
     #   A human readable label for the model instance
     label = NULL,
 
-    model_cannot_predict = function(observable = NULL, aggregation = NULL) {
+    model_cannot_predict = function(observable = NULL, stratification = NULL) {
       coll <- checkmate::makeAssertCollection()
       if (!is.null(observable)) {
         coll$push(glue::glue("Model not configured to predict for observable: {observable}"))
       }
-      if (!is.null(aggregation)) {
-        coll$push(glue::glue("Model not configured to predict at aggregation: ",
-                             "{private$aggregation_to_string(aggregation)}"))
+      if (!is.null(stratification)) {
+        coll$push(glue::glue("Model not configured to predict at stratification: ",
+                             "{private$stratification_to_string(stratification)}"))
       }
       checkmate::reportAssertions(coll)
     }
