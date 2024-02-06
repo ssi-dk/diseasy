@@ -2,11 +2,38 @@
 % Please edit documentation in R/DiseasyModel.R
 \name{DiseasyModel}
 \alias{DiseasyModel}
-\title{Meta module for the models}
+\title{Diseasy's basic model module}
+\value{
+A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
+}
 \description{
-TODO
+The \code{DiseasyModel} module implements common functionality that all models have available beyond that provided by
+\code{DiseasyBaseModule}.
+Most notably, the model module facilitates:
+\itemize{
+\item Module interfaces:
+The module contains the functional modules via its active bindings:
+\itemize{
+\item \verb{$activity}: \code{DiseasyActivity}
+\item \verb{$observables}: \code{DiseasyObservables}
+\item \verb{$season}: \code{DiseasySeason}
+Configured instances of these modules can be provided during initialisation. If not, unconfigured instances are
+created.
+}
+\item Model interface:
+The module defines the functions \verb{$get_results()}, \verb{$get_training_data()} and the \verb{$parameters} binding.
+These functions define the "API" of the models and ensure the models can take part in the ensemble.
+}
+}
+\examples{
+  # Normally, you would not want to create this module directly, but it is possible.
+  Model_module <- DiseasyModel$new()
+
+  rm(Model_module)
 }
 \seealso{
+\link[lgr:lgr-package]{lgr}
+
 \link{DiseasyObservables}
 
 \link{DiseasyActivity}
@@ -98,7 +125,7 @@ A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
 \if{html}{\out{<a id="method-DiseasyModel-get_results"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModel-get_results}{}}}
 \subsection{Method \code{get_results()}}{
-The primary method used to request model results of a given observable at a given aggregation.
+The primary method used to request model results of a given observable at a given stratification
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_results(
   observable,
@@ -122,7 +149,7 @@ The primary method used to request model results of a given observable at a give
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by aggregation level. In addition to aggregation columns, the output has the columns:\cr   date (\code{Date}) specifying the date of the prediction\cr   realization_id (\code{character}) giving a unique id for each realization in the ensemble\cr   model (\code{character}) the name (classname) of the model used to provide the prediction.
+A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr   date (\code{Date}) specifying the date of the prediction\cr   realization_id (\code{character}) giving a unique id for each realization in the ensemble\cr   model (\code{character}) the name (classname) of the model used to provide the prediction.
 }
 }
 \if{html}{\out{<hr>}}

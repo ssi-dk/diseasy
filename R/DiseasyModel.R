@@ -1,7 +1,28 @@
-#' @title Meta module for the models
+#' @title Diseasy's basic model module
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasyModel` module implements common functionality that all models have available beyond that provided by
+#'   `DiseasyBaseModule`.
+#'   Most notably, the model module facilitates:
+#'   * Module interfaces:
+#'     The module contains the functional modules via its active bindings:
+#'     * `$activity`: `DiseasyActivity`
+#'     * `$observables`: `DiseasyObservables`
+#'     * `$season`: `DiseasySeason`
+#'     Configured instances of these modules can be provided during initialisation. If not, unconfigured instances are
+#'     created.
+#'   * Model interface:
+#'     The module defines the functions `$get_results()`, `$get_training_data()` and the `$parameters` binding.
+#'     These functions define the "API" of the models and ensure the models can take part in the ensemble.
+#' @examples
+#'   # Normally, you would not want to create this module directly, but it is possible.
+#'   Model_module <- DiseasyModel$new()
+#'
+#'   rm(Model_module)
+#' @return
+#'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
 #' @export
+#' @seealso [lgr][lgr::lgr]
 DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter
   classname = "DiseasyModel",
   inherit = DiseasyBaseModule,
