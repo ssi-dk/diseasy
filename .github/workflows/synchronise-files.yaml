@@ -20,4 +20,5 @@ jobs:
           CONFIG_PATH: .github/sync.yaml
           COMMIT_PREFIX: "chore: "
           PR_BODY: Automatically synchronise files between diseasyverse repositories
+          ASSIGNEES: RasmusSkytte
           COMMIT_EACH_FILE: false

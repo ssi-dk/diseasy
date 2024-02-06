@@ -1,4 +1,4 @@
-#' @title Diseasy' observables handler
+#' @title Diseasy's observables handler
 #'
 #' @description
 #'   The `DiseasyObservables` module is responsible for interfacing with the available `diseasystores` and provide
@@ -24,8 +24,9 @@
 #'   }
 #'   rm(obs)
 #' @return
-#'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+#'   A new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
 #' @export
+#' @importFrom R6 R6Class
 DiseasyObservables <- R6::R6Class(                                                                                      # nolint: object_name_linter
   classname = "DiseasyObservables",
   inherit = DiseasyBaseModule,
@@ -48,8 +49,6 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    #' @return
-    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
     initialize = function(diseasystore = NULL,
                           start_date = NULL,
                           end_date = NULL,
@@ -86,6 +85,7 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @param verbose (`logical`)\cr
     #'   Should the `diseasystore` use verbose outputs?
     #' @seealso [diseasystore]
+    #' @importFrom diseasystore diseasystore_exists get_diseasystore
     set_diseasystore = function(diseasystore, verbose = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(diseasystore, add = coll)
@@ -356,6 +356,7 @@ DiseasyObservables <- R6::R6Class(                                              
     .last_queryable_date = NULL,
     .ds                  = NULL,
 
+    #' @importFrom lubridate today
     .slice_ts = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
     .conn = NULL
   )

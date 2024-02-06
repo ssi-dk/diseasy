@@ -1,5 +1,8 @@
 antiphase
 AR
+Arel
+
+Bundock
 
 CCW
 
@@ -14,6 +17,7 @@ combinatorial
 combinatorics
 conn
 contactdata
+countrycode
 COVID
 covid
 colname
@@ -32,6 +36,7 @@ DiseasyActivity
 DiseasyBaseModule
 DiseasyObservables
 DiseasySeason
+Diseasy's
 dk
 DMI
 doi
@@ -41,6 +46,7 @@ dtplyr
 
 Eggo
 endblock
+Enevoldsen
 Engbo
 
 fn
@@ -62,6 +68,7 @@ Klepac
 Kirkeby
 
 Lasse
+lgr
 linter
 linters
 lintr
@@ -119,5 +126,7 @@ ts
 u
 
 www
+
+Yetman
 
 Zandvoort

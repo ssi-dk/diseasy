@@ -1,4 +1,4 @@
-#' @title Diseasy' season handler
+#' @title Diseasy's season handler
 #'
 #' @description
 #'   The `DiseasySeason` module is responsible for implementing various models for the seasonal dependency of the
@@ -26,6 +26,7 @@
 #' @return
 #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
 #' @export
+#' @importFrom R6 R6Class
 DiseasySeason <- R6::R6Class(                                                                                           # nolint: object_name_linter
   classname = "DiseasySeason",
   inherit = DiseasyBaseModule,
@@ -65,6 +66,7 @@ DiseasySeason <- R6::R6Class(                                                   
     #'   Sets the reference_date for the `DiseasySeason` module.
     #' @param reference_date (`Date`)\cr
     #'   Date the season modifier is computed relatively to.
+    #' @importFrom lgr without_logging
     set_reference_date = function(reference_date) {
       checkmate::assert_date(reference_date, any.missing = FALSE)
 
@@ -85,6 +87,7 @@ DiseasySeason <- R6::R6Class(                                                   
     #'   Sets the scale for the active season model.
     #' @param scale (`numeric`)\cr
     #'   The scale of the season effect (relative to climate normal).
+    #' @importFrom lgr without_logging
     set_scale = function(scale) {
       checkmate::assert_number(scale)
 
@@ -192,6 +195,7 @@ DiseasySeason <- R6::R6Class(                                                   
     #'   Sets the period of maximal activity (days past new-year).
     #'   By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.
     #' @param scale `r rd_scale()`
+    #' @importFrom lubridate decimal_date
     get_cosine_season = function(peak = 20.09946, scale = 0.5726693) {
 
       # Check parameters
@@ -253,6 +257,7 @@ DiseasySeason <- R6::R6Class(                                                   
     #' @description
     #'   Retrieves the first version of the COVID-19 season model.
     #' @param scale `r rd_scale()`
+    #' @importFrom lubridate decimal_date
     get_covid_season_v1 = function(scale = 0.4825524) {
 
       # Determine what the max_scale can be
@@ -331,6 +336,7 @@ DiseasySeason <- R6::R6Class(                                                   
     #' @description
     #'   Retrieves the second version of the COVID-19 season model.
     #' @param scale `r rd_scale()`
+    #' @importFrom lubridate decimal_date
     get_covid_season_v2 = function(scale = 0.5042782) {
 
       # Determine what the max_scale can be
@@ -576,11 +582,12 @@ DiseasySeason <- R6::R6Class(                                                   
     #     "t": the decimal dates of the year where observations is located (should expand beyond the interval [0, 1])
     #     "observable": the climate normal value of the observable at the corresponding decimal date
     #   The t, observable pair can then be used with stats::approxfun to interpolate to missing dates
+    #' @importFrom lubridate decimal_date days_in_month
     climate_normal = function(observable) {
       checkmate::assert_choice(observable, "max_temperature")
 
       if (observable == "max_temperature") {
-        # maksimummiddeltemperatur Danmark
+        # Maximum average temperature in Danmark
         # source: https://www.dmi.dk/vejrarkiv/normaler-danmark/
         dk_climate_max_temperature <- c(3.6, 3.7, 6.4, 11.2, 15.6, 18.5, 21.2, 21.2, 17.2, 12.3, 7.6, 4.7)
 
@@ -614,13 +621,14 @@ DiseasySeason <- R6::R6Class(                                                   
 
 
     # We can now rescale the "a" parameter to achieve the desired "scale" of the season model
+    #' @importFrom pracma logseq
     scale_helper_glf = function(f, k, climate_normal, max_scale) {
 
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
-        # Create the approximater that maps a scale to an a value
+        # Create the approximation function that maps a scale to an a value
         compute_scale <- \(a) 1 - f(a)(max(climate_normal$max_temperature)) / f(a)(min(climate_normal$max_temperature))
         a_max <- stats::uniroot(\(a) compute_scale(a) - max_scale, c(k, 10000))$root
         a_values <- pracma::logseq(k, a_max)
