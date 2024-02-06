@@ -1,4 +1,4 @@
-#' @title Diseasy' observables handler
+#' @title Diseasy's observables handler
 #'
 #' @description
 #'   The `DiseasyObservables` module is responsible for interfacing with the available `diseasystores` and provide

@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasyObservables.R
 \name{DiseasyObservables}
 \alias{DiseasyObservables}
-\title{Diseasy' observables handler}
+\title{Diseasy's observables handler}
 \value{
 A new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
 }
