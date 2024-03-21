@@ -2,22 +2,25 @@
 % Please edit documentation in R/0_R6_utils.R
 \name{diseasyoption}
 \alias{diseasyoption}
-\title{Helper function to get option}
+\title{Helper function to get options related to diseasy}
 \usage{
-diseasyoption(option, class = "DiseasystoreBase")
+diseasyoption(option, class = "DiseasystoreBase", .default = NULL)
 }
 \arguments{
-\item{option}{(\code{character})\cr
-Name of the option to get}
+\item{option}{(\code{character(1)})\cr
+Name of the option to get.}
 
-\item{class}{(\code{character} or \verb{R6::R6class Diseasy* instance})\cr
+\item{class}{(\code{character(1)} or \verb{R6::R6class Diseasy* instance})\cr
 Either the classname or the object the option applies to.}
+
+\item{.default}{(\code{any})\cr
+The default value to return if no option is set.}
 }
 \value{
 The most specific option within the diseasy framework for the given option and class
 }
 \description{
-Helper function to get option
+Helper function to get options related to diseasy
 }
 \examples{
   # Retrieve default option for source conn
@@ -28,4 +31,7 @@ Helper function to get option
 
   # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
+
+  # Try to retrieve specific non-existent option
+  diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this")
 }
