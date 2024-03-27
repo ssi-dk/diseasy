@@ -45,6 +45,7 @@
 #'   rm(act)
 #' @return
 #'   A new instance of the `DiseasyActivity` [R6][R6::R6Class] class.
+#' @importFrom Matrix sparseMatrix
 #' @export
 DiseasyActivity <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyActivity",
