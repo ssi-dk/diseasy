@@ -15,7 +15,7 @@ Description: This package facilitates creation of an ensemble of models through 
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.1
 Language: en-GB
 LazyData: TRUE
 Depends:
@@ -29,6 +29,7 @@ Imports:
     lgr,
     lintr,
     lubridate,
+    Matrix,
     pracma,
     purrr,
     R6,
@@ -39,6 +40,8 @@ Suggests:
     countrycode,
     DBI,
     devtools,
+    duckdb,
+    jsonlite,
     knitr,
     readr,
     rmarkdown,
@@ -46,6 +49,7 @@ Suggests:
     SCDB,
     spelling,
     testthat (>= 3.0.0),
+    tibble,
     withr,
     zoo
 VignetteBuilder: knitr,
