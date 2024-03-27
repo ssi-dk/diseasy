@@ -175,6 +175,13 @@ rd_get_results_return <- paste(
 
 rd_get_results_seealso <- "[diseasy::DiseasyObservables]"
 
+
+rd_aggregation <- paste(
+  "(`list`(`quosures`))\\cr",
+  "Default NULL.",
+  "If given, expressions in aggregation evaluated to give the aggregation level."
+)
+
 rd_observable <- paste(
   "(`character`)\\cr",
   "The observable to provide prediction for. Must match observable in `DiseasyObservables` [R6][R6::R6Class] class."
