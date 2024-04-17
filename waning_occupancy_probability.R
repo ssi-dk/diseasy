@@ -11,7 +11,7 @@
 #' @examples
 #'  occupancy_probability(0.1, 3, seq(0, 50))
 #'  occupancy_probability(c(0.1, 0.2), 3, seq(0, 50))
-occupancy_probability <- function(rate, K, t) {
+occupancy_probability <- function(rate, K, t) {                                                                         # nolint: object_name_linter
   coll <- checkmate::makeAssertCollection()
   checkmate::assert(
     checkmate::check_number(rate),
@@ -27,7 +27,7 @@ occupancy_probability <- function(rate, K, t) {
 
     # If a scalar rate is given, the problem reduces to the Erlang-distribution
     prob_lt_k <- purrr::map(1:(K - 1), \(k) {
-      pgamma(t, shape = k, rate = lambda, lower.tail = FALSE)
+      pgamma(t, shape = k, rate = rate, lower.tail = FALSE)
     })
 
   } else {
@@ -87,8 +87,8 @@ occupancy_probability <- function(rate, K, t) {
 # Plot the basis functions
 tau <- 50 / 3
 t <- seq(0, 5 * tau, by = 1)
-K = 6
-lambda = K / (3* tau)
+K <- 6                                                                                                                  # nolint: object_name_linter
+lambda <- K / (3 * tau)
 
 # Using the Erlang distributions directly
 prob_k <- occupancy_probability(lambda, K, t)
@@ -105,7 +105,7 @@ purrr::walk(prob_k[2:K], ~ lines(t, .x))
 # Using different rates
 rate <- rev(seq(K - 1)) # Use decreasing rates
 rate <- rate * sum(1 / rate) / (K / lambda) # Normalize so total waiting time is equal between problems
-# sum(1 / rate) == k / lambda
+# This way: sum(1 / rate) == k / lambda                                                                                 # nolint: commented_code_linter
 prob_k <- occupancy_probability(rate, K, t)
 plot(t, prob_k[[1]], type = "l", ylim = c(0, 1), ylab = "Occupancy probability", main = "Decreasing transition rates")
 purrr::walk(prob_k[2:K], ~ lines(t, .x))
