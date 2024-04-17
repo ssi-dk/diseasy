@@ -26,43 +26,14 @@ occupancy_probability <- function(rate, K, t) {                                 
   if (length(rate) == 1) {
 
     # If a scalar rate is given, the problem reduces to the Erlang-distribution
-    prob_lt_k <- purrr::map(1:(K - 1), \(k) {
-      pgamma(t, shape = k, rate = rate, lower.tail = FALSE)
-    })
+    prob_lt_k <- purrr::map(1:(K - 1), \(k) pgamma(t, shape = k, rate = rate, lower.tail = FALSE))
 
   } else {
     # We can compute the waiting time distributions (hypoexponential distributions)
     # https://en.wikipedia.org/wiki/Hypoexponential_distribution
 
-    phypo <- function(t, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {
-
-      # For the first compartment, the problem is simply an exponential distribution
-      if (shape == 1) {
-        return(pexp(t, rate, lower.tail = FALSE))
-      }
-
-      # For the remaining compartments, we need to compute the hypoexponential distribution using the matrix method
-
-      # Bi-diagnonal matrix of rates
-      theta <- rbind(cbind(rep(0, shape - 1), diag(rate[1:(shape - 1)], nrow = shape - 1)), rep(0, shape)) - diag(rate)
-
-      # Initial state (all in first compartment)
-      alpha <- c(1, rep(0, shape - 1))
-
-      # Ones vector
-      ones <- matrix(rep(1, shape))
-
-      # Compute the upper tail of the cumulative distribution function
-      p <- purrr::map_dbl(t, \(t) as.numeric(alpha %*% Matrix::expm(t * theta) %*% ones))
-
-      # Convert to lower tail if needed
-      if (lower.tail) p <- 1 - p
-
-      return(p)
-    }
-
     # Retrieve each of the hypoexponential distributions
-    prob_lt_k <- purrr::map(seq_along(rate), \(k) phypo(t, shape = k, rate = rate[1:k], lower.tail = FALSE))
+    prob_lt_k <- purrr::map(1:(K - 1), \(k) phypo(t, shape = k, rate = rate[1:k], lower.tail = FALSE))
 
   }
 
