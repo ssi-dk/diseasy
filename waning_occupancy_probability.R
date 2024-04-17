@@ -53,15 +53,10 @@ occupancy_probability <- function(rate, K, t) {                                 
       ones <- matrix(rep(1, shape))
 
       # Compute the upper tail of the cumulative distribution function
-      p <- purrr::map_dbl(
-        t,
-        \(t) as.numeric(alpha[1:shape] %*% Matrix::expm(t * theta[1:shape, 1:shape]) %*% ones[1:shape])
-      )
+      p <- purrr::map_dbl(t, \(t) as.numeric(alpha %*% Matrix::expm(t * theta) %*% ones))
 
       # Convert to lower tail if needed
-      if (lower.tail) {
-        p <- 1 - p
-      }
+      if (lower.tail) p <- 1 - p
 
       return(p)
     }
