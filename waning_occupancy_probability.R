@@ -18,9 +18,14 @@ occupancy_probability <- function(rate, K, t) {                                 
     checkmate::check_numeric(rate, lower = 0, any.missing = FALSE, len = K - 1),
     add = coll
   )
-  checkmate::assert_number(K, lower = 2, add = coll)
+  checkmate::assert_number(K, lower = 1, add = coll)
   checkmate::assert_numeric(t, lower = 0, add = coll)
   checkmate::reportAssertions(coll)
+
+  # Handle the special case with K = 1
+  if (K == 1) {
+    return(list(rep(1, length(t))))
+  }
 
   # Compute the probability of less than K events over time
   if (length(rate) == 1) {
@@ -39,10 +44,14 @@ occupancy_probability <- function(rate, K, t) {                                 
 
   # Compute the probability of occupying states k over time from the waiting time distributions
   # i.e. the difference of the cumulative distribution function for between states
-  prob_k <- purrr::map(2:(K - 1), \(k) {
-    prob_lt_k[[k]] - prob_lt_k[[k - 1]]
-  })
-  prob_k <- c(prob_lt_k[1], prob_k)
+  if (K == 2) {
+    prob_k <- prob_lt_k[1]
+  } else {
+    prob_k <- purrr::map(2:(K - 1), \(k) {
+      prob_lt_k[[k]] - prob_lt_k[[k - 1]]
+    })
+    prob_k <- c(prob_lt_k[1], prob_k)
+  }
 
   # Add absorbing state
   prob_k <- c(prob_k, list(1 - purrr::reduce(prob_k, `+`)))
