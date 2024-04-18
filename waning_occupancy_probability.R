@@ -15,7 +15,7 @@ occupancy_probability <- function(rate, K, t) {                                 
   coll <- checkmate::makeAssertCollection()
   checkmate::assert(
     checkmate::check_number(rate),
-    checkmate::check_numeric(rate, lower = 0, any.missing = FALSE, len = K - 1),
+    checkmate::check_numeric(rate, lower = -1e14, any.missing = FALSE, len = K - 1),
     add = coll
   )
   checkmate::assert_number(K, lower = 1, add = coll)
