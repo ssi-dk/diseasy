@@ -4,7 +4,7 @@ source("waning_occupancy_probability.R")
 
 # Using same rate
 tau <- 50 / 3 # Average time spend in each compartment
-t <- seq(0, 5 * tau, by = 1) 
+t <- seq(0, 5 * tau, by = 1)
 K <- 10                                                                                                                  # nolint: object_name_linter
 lambda <- K / (3 * tau) # Rate of transition between compartments
 
@@ -23,8 +23,8 @@ create_params <- function(K, rate) {
 params_selected <- create_params(K,rate)
 
 # Functions to be optimized for
-sigmoid_function <- \(t)  exp(-(t - 20)/4) / (1 + exp(-(t - 20)/4))
-exponential_function <- \(t) exp(-t/10)
+sigmoid_function <- \(t)  exp(-(t - 20) / 4) / (1 + exp(-(t - 20) / 4))
+exponential_function <- \(t) exp(-t / 10)
 
 # The target function we want to approximate our data to
 target_function <- function(f_type, time_points) {
@@ -35,19 +35,22 @@ function_type <- sigmoid_function
 
 ### Object function
 obj_function <- function(K, t, params, f_type) {
-  
   gamma_values <- params[1:K]
-  rate <- params[(K+1):length(params)]
-  
+  if (K == 1) {
+    rate <- numeric(0)
+  } else {
+    rate <- params[(K + 1):length(params)]
+  }
+
   # Call occupancy probability function
   prk_df <- occupancy_probability(rate, K, t)
   prk_matrix <<- do.call(cbind, prk_df)
   
   # Target function to approximate for
-  target <<- target_function(f_type, t)
+  target <- target_function(f_type, t)
   
   # Element-wise multiplication - add gamma_values to corresponding K-compartments and row sum
-  approx_matrix <<- prk_matrix %*% cumprod(gamma_values)
+  approx_matrix <- prk_matrix %*% cumprod(gamma_values)
     
   # Finds diff from approximation and target function
   result <- sum((approx_matrix - target)^2)
@@ -86,7 +89,7 @@ lines(t, target)
 
 #### K vs. values from obj. function (Elbow method)
 
-K_seq = seq(from = 3, to = 10, by = 1)
+K_seq = seq(from = 1, to = 10, by = 1)
 
 objective_values <- function(K_seq, f_type, diff_rate) {
   
@@ -98,7 +101,7 @@ objective_values <- function(K_seq, f_type, diff_rate) {
     lambda <- .x / (3 * tau)
     
     if (diff_rate == "True") {
-      rate <- rev(seq_len(.x - 1))
+      rate <- seq(from = .x - 1, to = 1, length.out = .x - 1)
       rate <- rate * sum(1 / rate) / (.x / lambda)
     } else {
       rate = lambda
@@ -127,5 +130,8 @@ ggplot2::ggplot() +
   ggplot2::geom_line(data = test_diff, aes(x = K, y = value), color = "red") +
   ggplot2::geom_line(data = test_fixed, aes(x = K, y = value), color = "green") +
   ggplot2::scale_x_continuous(breaks = seq(1, max(test$K), by = 1)) +
-  ggplot2::labs(x = "K", y = "Obj. function value")
+  #ggplot2::xlim(2,max(test$K)) +
+  #ggplot2::ylim(0,3) +
+  ggplot2::labs(x = "K", y = "Obj. function value") +
+  ggplot2::theme_minimal()
 
