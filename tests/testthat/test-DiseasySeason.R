@@ -182,6 +182,8 @@ test_that("use_covid_season_v1 works", {
 
 
 test_that("use_covid_season_v2 works", {
+  skip_if_not_installed("RSQLite")
+
   for (case_def in case_defs) {
 
     # We create an DiseasyObservables module for the season module

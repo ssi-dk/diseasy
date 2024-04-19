@@ -1,4 +1,5 @@
 test_that("initialize works", {
+  skip_if_not_installed("RSQLite")
 
   # Creating an empty module
   obs <- DiseasyObservables$new()
@@ -62,6 +63,7 @@ test_that("initialize works", {
 
 
 test_that("set_diseasystore works", {
+  skip_if_not_installed("RSQLite")
 
   # Creating an empty module
   obs <- DiseasyObservables$new()
@@ -89,6 +91,7 @@ test_that("set_diseasystore works", {
 
 
 test_that("set_study_period works", {
+  skip_if_not_installed("RSQLite")
 
   obs <- DiseasyObservables$new()
   obs$set_study_period(start_date = as.Date("2021-03-01"),
@@ -143,6 +146,7 @@ test_that("set_study_period works", {
 
 
 test_that("set_last_queryable_date works", {
+  skip_if_not_installed("RSQLite")
 
   obs <- DiseasyObservables$new()
   obs$set_last_queryable_date(last_queryable_date = as.Date("2021-03-01"))
@@ -177,6 +181,7 @@ test_that("set_last_queryable_date works", {
 
 
 test_that("set_slice_ts works", {
+  skip_if_not_installed("RSQLite")
 
   obs <- DiseasyObservables$new()
   obs$set_slice_ts(slice_ts = "2021-03-01 09:00:00")
@@ -204,6 +209,8 @@ test_that("set_slice_ts works", {
 
 
 test_that("get_observation works", {
+  skip_if_not_installed("RSQLite")
+
   for (case_def in case_defs) {
 
     obs <- DiseasyObservables$new(diseasystore = case_def,
@@ -277,6 +284,8 @@ test_that("get_observation works", {
 
 
 test_that("get_observation works -- test 2", {
+  skip_if_not_installed("RSQLite")
+
   for (case_def in case_defs) {
 
     obs <- DiseasyObservables$new(diseasystore = case_def,
@@ -298,6 +307,8 @@ test_that("get_observation works -- test 2", {
 
 
 test_that("active binding: diseasystore works", {
+  skip_if_not_installed("RSQLite")
+
   m <- DiseasyObservables$new()
 
   # Retrieve the diseasystore
@@ -314,6 +325,8 @@ test_that("active binding: diseasystore works", {
 
 
 test_that("active binding: start_date works", {
+  skip_if_not_installed("RSQLite")
+
   m <- DiseasyObservables$new()
 
   # Retrieve the start_date
@@ -330,6 +343,8 @@ test_that("active binding: start_date works", {
 
 
 test_that("active binding: end_date works", {
+  skip_if_not_installed("RSQLite")
+
   m <- DiseasyObservables$new()
 
   # Retrieve the end_date
@@ -346,6 +361,8 @@ test_that("active binding: end_date works", {
 
 
 test_that("active binding: last_queryable_date works", {
+  skip_if_not_installed("RSQLite")
+
   m <- DiseasyObservables$new()
 
   # Retrieve the last_queryable_date
@@ -362,6 +379,8 @@ test_that("active binding: last_queryable_date works", {
 
 
 test_that("active binding: ds works", {
+  skip_if_not_installed("RSQLite")
+
   m <- DiseasyObservables$new()
 
   # Retrieve the ds
@@ -378,6 +397,8 @@ test_that("active binding: ds works", {
 
 
 test_that("active binding: available_observables works", {
+  skip_if_not_installed("RSQLite")
+
   m <- DiseasyObservables$new()
 
   # Retrieve the available_observables
