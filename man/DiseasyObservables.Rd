@@ -15,6 +15,7 @@ will therefore depend on the data made available by the diseasystores.
 See vignette("diseasy-observables")
 }
 \examples{
+\dontshow{if (rlang::is_installed("RSQLite")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   # Create observables module using the Google COVID-19 data
   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
                                 conn = DBI::dbConnect(RSQLite::SQLite()))
@@ -30,6 +31,7 @@ See vignette("diseasy-observables")
                       end_date = as.Date("2020-03-05"))
   }
   rm(obs)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link{diseasystore}
