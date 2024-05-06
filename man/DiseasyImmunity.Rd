@@ -20,6 +20,9 @@ A new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class.
 \describe{
 \item{\code{available_waning_models}}{(\code{character})\cr
 The list of available waning models}
+
+\item{\code{model}}{(\code{function})\cr
+The model currently being used in the module. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -29,7 +32,11 @@ The list of available waning models}
 \item \href{#method-DiseasyImmunity-new}{\code{DiseasyImmunity$new()}}
 \item \href{#method-DiseasyImmunity-set_time_scale}{\code{DiseasyImmunity$set_time_scale()}}
 \item \href{#method-DiseasyImmunity-use_waning_model}{\code{DiseasyImmunity$use_waning_model()}}
+\item \href{#method-DiseasyImmunity-use_no_waning}{\code{DiseasyImmunity$use_no_waning()}}
 \item \href{#method-DiseasyImmunity-use_exponential_waning}{\code{DiseasyImmunity$use_exponential_waning()}}
+\item \href{#method-DiseasyImmunity-use_sigmoidal_waning}{\code{DiseasyImmunity$use_sigmoidal_waning()}}
+\item \href{#method-DiseasyImmunity-use_linear_waning}{\code{DiseasyImmunity$use_linear_waning()}}
+\item \href{#method-DiseasyImmunity-use_heaviside_waning}{\code{DiseasyImmunity$use_heaviside_waning()}}
 \item \href{#method-DiseasyImmunity-clone}{\code{DiseasyImmunity$clone()}}
 }
 }
@@ -99,6 +106,16 @@ Named list of arguments that will be passed at dot-ellipsis to the waning model.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyImmunity-use_no_waning"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-use_no_waning}{}}}
+\subsection{Method \code{use_no_waning()}}{
+Retrieves the waning model with a constant value (1).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$use_no_waning()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-use_exponential_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-use_exponential_waning}{}}}
 \subsection{Method \code{use_exponential_waning()}}{
@@ -110,7 +127,67 @@ Sets the \code{DiseasyImmunity} module to use an exponential model for waning.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_scale}}{(\code{numeric})\cr}
+\item{\code{time_scale}}{\verb{r rd_time_scale()}
+By default, it is set to 20}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyImmunity-use_sigmoidal_waning"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-use_sigmoidal_waning}{}}}
+\subsection{Method \code{use_sigmoidal_waning()}}{
+Sets the \code{DiseasyImmunity} module to use a sigmoidal model for waning.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$use_sigmoidal_waning(time_scale = 20, shape = 6)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{time_scale}}{\verb{r rd_time_scale()}
+By default, it is set to 20}
+
+\item{\code{shape}}{(\code{numeric})\cr
+Determines the steepness of the waning curve in the sigmoidal waning model.
+Higher values of \code{shape} result in a steeper curve, leading to a more rapid decline in immunity.
+By default, it is set to 6.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyImmunity-use_linear_waning"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-use_linear_waning}{}}}
+\subsection{Method \code{use_linear_waning()}}{
+Sets the \code{DiseasyImmunity} module to use a linear model for waning.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$use_linear_waning(time_scale = 20)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{time_scale}}{\verb{r rd_time_scale()}
+By default, it is set to 20}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyImmunity-use_heaviside_waning"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-use_heaviside_waning}{}}}
+\subsection{Method \code{use_heaviside_waning()}}{
+Sets the \code{DiseasyImmunity} module to use a heaviside model for waning.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$use_heaviside_waning(time_scale = 20)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{time_scale}}{\verb{r rd_time_scale()}
+By default, it is set to 20}
 }
 \if{html}{\out{</div>}}
 }
