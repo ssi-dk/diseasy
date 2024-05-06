@@ -27,7 +27,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set no waning as the default
       self$use_no_waning()
-
     },
 
     #' @description
@@ -36,6 +35,24 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'    The time_scale determines the rate of decay in the model.
     set_time_scale = function(time_scale) {
       checkmate::assert_number(time_scale)
+
+      # Reset the season model if already set
+      if (!is.null(private$.model)) {
+
+        # Retrieve current settings of model
+        dots <- attr(private$.model, "dots")
+
+        # Give error if time_scale not used in model
+        if (!("time_scale" %in% names(dots))) {
+          stop(attr(private$.model, "dots"), "does not use time_scale argument")
+        }
+
+        # Set new scale
+        dots$time_scale <- time_scale
+        lgr::without_logging(
+          self$use_waning_model(attr(private$.model, "name"), dots)
+        )
+      }
     },
 
     #' @description
@@ -59,15 +76,137 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to use an exponential model for waning.
-    #' @param time_scale (`numeric`)\cr
-    use_exponential_waning = function(time_scale = 20) {
+    #'   Retrieves the waning model with a constant value (1).
+    use_no_waning = function() {
+
+      model   <- \(t)    1
+
+      attr(model, "name")        <- "no_waning"
 
       # Set the model
-      private$.model <- \(t) exp(-t / (time_scale * log(2)))
+      private$.model <- model
+
+      # Logging
+      private$lg$info("Using no waning model")
+
+      return("model" = model)
+
+    },
+
+    #' @description
+    #'   Sets the `DiseasyImmunity` module to use an exponential model for waning.
+    #' @param time_scale `r rd_time_scale()`
+    #'   By default, it is set to 20
+    use_exponential_waning = function(time_scale = 20) {
+
+      # Check parameters
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_number(time_scale, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Create the waning function
+      model <- \(t) exp(-t / (time_scale * log(2)))
+
+      # Set the attributes
+      attr(model, "name")        <- "exponential_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale)
+
+      # Set the model
+      private$.model <- model
 
       # Logging
       private$lg$info("Using exponential waning model")
+
+      return("model" = model)
+
+    },
+
+    #' @description
+    #'   Sets the `DiseasyImmunity` module to use a sigmoidal model for waning.
+    #' @param time_scale `r rd_time_scale()`
+    #'   By default, it is set to 20
+    #' @param shape (`numeric`)\cr
+    #'   Determines the steepness of the waning curve in the sigmoidal waning model.
+    #'   Higher values of `shape` result in a steeper curve, leading to a more rapid decline in immunity.
+    #'   By default, it is set to 6.
+    use_sigmoidal_waning = function(time_scale = 20, shape = 6) {
+
+      # Check parameters
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_number(shape, add = coll)
+      checkmate::assert_number(time_scale, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Set the model
+      model <- \(t) exp(-(t - time_scale) / shape) / (1 + exp(-(t - time_scale) / shape))
+
+      # Set the attributes
+      attr(model, "name")        <- "sigmoidal_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale, shape = shape)
+
+      # Set the model
+      private$.model <- model
+
+      # Logging
+      private$lg$info("Using sigmoidal waning model")
+
+      return("model" = model)
+
+    },
+
+    #' @description
+    #'   Sets the `DiseasyImmunity` module to use a linear model for waning.
+    #' @param time_scale `r rd_time_scale()`
+    #'   By default, it is set to 20
+    use_linear_waning = function(time_scale = 20) {
+
+      # Check parameters
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_number(time_scale, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Set the model
+      model <- \(t) max(1 - 0.5 / time_scale * t, 0)
+
+      # Set the attributes
+      attr(model, "name")        <- "linear_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale)
+
+      # Set the model
+      private$.model <- model
+
+      # Logging
+      private$lg$info("Using linear waning model")
+
+      return("model" = model)
+
+    },
+
+    #' @description
+    #'   Sets the `DiseasyImmunity` module to use a heaviside model for waning.
+    #' @param time_scale `r rd_time_scale()`
+    #'   By default, it is set to 20
+    use_heaviside_waning = function(time_scale = 20) {
+
+      # Check parameters
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_number(time_scale, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Set the model
+      model <- \(t) ifelse(t < time_scale, 1, 0)
+
+      # Set the attributes
+      attr(model, "name")        <- "heaviside_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale)
+
+      # Set the model
+      private$.model <- model
+
+      # Logging
+      private$lg$info("Using heaviside waning model")
+
+      return("model" = model)
 
     }
 
@@ -86,7 +225,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
           purrr::discard(~ . == "waning_model") # Filter out the generic setter
         return(models)
       }
+    ),
+    #' @field model (`function`)\cr
+    #'   The model currently being used in the module. Read-only.
+    model = purrr::partial(
+      .f = active_binding,
+      name = "model",
+      expr = return(private %.% .model)
     )
+  ),
+
+  private = list(
+    .model = NULL
   )
 )
 
@@ -116,7 +266,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 # Begge måder skal gerne virke (se DiseasySeason for eksempel)
 
 
-# Det vil være en god ide at stjæle "$use_season_model("model")" fra DiseasySeason og lave en tilsvarende 
+# Det vil være en god ide at stjæle "$use_season_model("model")" fra DiseasySeason og lave en tilsvarende
 # "$use_waning_model("model")" her. Så kan vi meget nemmere interagere med modulet programatisk.
 
 
@@ -127,14 +277,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
 # Så er spørgsmålet, skal dette gemme raterne i modulet?
 # Altså, skal der være en private$.approximated_rates ?
 # Eller skal funktionen bare returnere det fittede rater?
-# En fordel ved at gemme dem, er at vi kan inkludere dem i et plot metode ($plot()) så det er nemmere at 
+# En fordel ved at gemme dem, er at vi kan inkludere dem i et plot metode ($plot()) så det er nemmere at
 # inspicere modulets konfiguration.
 # Nå raterne gemmes som en liste, skal vi lige blive enige om formatet.
 # Rasmus foreslår at bruge en navngiven liste af vektorer.
-# Fx. 
+# Fx.
 # list(rates = c(d1, d2, d3, .. dn-1), infection_risk = c(g1, g2, g3, ..., gn))
 # Altså, at vi altid har "rates" først, og derefter en navngivet liste med de resterende fits.
-# Navnenne på det resterende kan så matche de navne der gives med "$use_costom_waning()". 
+# Navnenne på det resterende kan så matche de navne der gives med "$use_costom_waning()".
 # Vores $use_* funktioner har i denne analogi så navnet "infection_risk" .
 # Altså, hvis man først kalder $use_costum_waning(list(infection_risk = \(t) exp(-t / 20), hospitalisation_risk = \(t) exp(-t/30)*0.8 + 0.2))))
 # så får man outputtet

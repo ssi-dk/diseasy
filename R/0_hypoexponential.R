@@ -30,7 +30,7 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
 
 #' @rdname HypoDist
-phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {
+phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {                                              # nolint: object_name_linter
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
@@ -48,7 +48,7 @@ phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {
 
 
 #' @rdname HypoDist
-qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {
+qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {                                              # nolint: object_name_linter
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
