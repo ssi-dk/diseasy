@@ -2,6 +2,7 @@
 
 export(DiseasyActivity)
 export(DiseasyBaseModule)
+export(DiseasyImmunity)
 export(DiseasyModel)
 export(DiseasyObservables)
 export(DiseasySeason)

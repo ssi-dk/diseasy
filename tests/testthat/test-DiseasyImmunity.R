@@ -1,27 +1,35 @@
 test_that("initialize works", {
 
   # Creating an empty module
-  s <- DiseasyImmunity$new()
-  rm(s)
+  im <- DiseasyImmunity$new()
+
+  expect_equal(im$model, im$use_no_waning())
+
+  rm(im)
 })
 
-test_that("Available waning models", {
+test_that("Available waning models equals 5", {
 
   # Creating an empty module
-  s <- DiseasyImmunity$new()
+  im <- DiseasyImmunity$new()
 
-  s$available_season_models
+  expect_length(im$available_waning_models, 5)
 
-  rm(s)
+  rm(im)
 })
 
-test_that("Exponential waning model", {
+test_that("use_waning_models works with known model", {
 
-  # Creating an empty module
-  s <- DiseasyImmunity$new()
+  im1 <- DiseasyImmunity$new()
+  im2 <- DiseasyImmunity$new()
 
-  t <- 0:80
-  plot(t, purrr::map_dbl(t, s$model))
+  im1$use_exponential_waning()
+  im2$use_waning_model("exponential_waning")
 
-  rm(s)
+  expect_equal(im1, im2)
+
+  im2$use_waning_model("sigmoidal_waning")
+  expect_false(identical(im1, im2))
+
+  rm(im1, im2)
 })
