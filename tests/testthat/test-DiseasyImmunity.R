@@ -8,12 +8,12 @@ test_that("initialize works", {
   rm(im)
 })
 
-test_that("Available waning models equals 5", {
+test_that("Available waning models equals 6", {
 
   # Creating an empty module
   im <- DiseasyImmunity$new()
 
-  expect_length(im$available_waning_models, 5)
+  expect_length(im$available_waning_models, 6)
 
   rm(im)
 })
