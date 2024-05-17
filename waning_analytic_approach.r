@@ -4,7 +4,8 @@ source("waning_occupancy_probability.R")
 
 # Using same rate
 tau <- 50 / 3 # Average time spend in each compartment
-t <- seq(0, 5 * tau, by = 1)
+#t <- seq(0, 5 * tau, by = 1)
+t <- seq(0, 40 * tau, by = 1)
 K <- 10                                                                                                                  # nolint: object_name_linter
 lambda <- K / (3 * tau) # Rate of transition between compartments
 
@@ -27,8 +28,8 @@ params_selected <- create_params(K,rate)
 sigmoid_function <- \(t) exp(-(t - 40) / 6) / (1 + exp(-(t - 40) / 6))
 #sigmoid_function <- \(t) exp(-(t - 30) / (4*30/20)) / (1 + exp(-(t - 30) / (4*30/20)))
 #sigmoid_function <- \(t) exp(-(t - 20) / 4) / (1 + exp(-(t - 20) / 4))
-exponential_function <- \(t) exp(-t / 40 * log(2))
-#exponential_function <- \(t) exp(-t / 20)
+exponential_function <- \(t) exp(-t / 60 * log(2))
+hosp_exponential_function <- \(t) exp(-t / 150 * log(2))
 linear_function <- \(t) max(1 - 0.5/40 * t, 0)
 #heaviside_function <- \(t) 0.5 + 0.5 * tanh(-0.09 * t)
 heaviside_function <- \(t) ifelse(t < 40, 1, 0)
@@ -39,19 +40,16 @@ target_function <- function(f_type, time_points) {
 }
 
 #function_type <- \(t) sigmoid_function(t) * (1-0.2) + 0.2
-function_type <- sigmoid_function
+function_type <- exponential_function
 
 
 get_params <- function(K, params, f_type) {
   #params <- 1 + 0.5 * params / (1 + abs(params)) # through sigmoidal function to ensure values between 0-1
   params <- 0.5 * (1 + params / (1 + abs(params))) # through sigmoidal function to ensure values between 0-1
   #params <- exp(-params) / (1 + exp(-params))
-  #print(params)
   gamma_values <- c(cumprod(params[1:K-1]), f_type(Inf))
   #rate <- max(params[-(1:K-1)], 1e-4)
   rate <- params[-(1:K-1)]
-  print(gamma_values)
-  print(rate)
   return(list(gamma_values = c(gamma_values), rate = c(rate)))
 }
 
@@ -149,7 +147,7 @@ opt_both <- objective_values(K_seq, function_type, diff_param = "all")
 test_all <- rbind(opt_fixed_rate|> dplyr::mutate(Model = "Approach 1 - Free gammas, fixed optimized rate"),
                   opt_fixed_gammas |> dplyr::mutate(Model = "Approach 2 - Decreasing gamma (fixed), free rate"),
                   opt_both |> dplyr::mutate(Model = "Approach 3 - Free gamma and rate"))
-                  
+
 library(ggplot2)
 ggplot2::ggplot(test_all |> dplyr::filter(K>1), aes(x = K, y = value, color = Model)) +
   ggplot2::geom_line(linewidth=1) +
