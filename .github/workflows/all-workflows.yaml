@@ -15,6 +15,9 @@ jobs:
         if: github.event_name == 'push'
         id: pr_detect
         run: |
+          # If a new pull_request have just been created, we need to give the GitHub API some time to detect it.
+          sleep(30)
+
           pr_branches=$(gh pr list --json headRefName --repo $GITHUB_REPOSITORY)
           if [[ $(echo "$pr_branches" | jq -r --arg GITHUB_REF_NAME $GITHUB_REF_NAME '.[].headRefName | select(. == $GITHUB_REF_NAME)') ]]; then
             echo "This push is associated with a pull request. Skipping the job."
