@@ -21,7 +21,7 @@ test_that("initialize works", {
 })
 
 
-test_that("set_reference_date works", {
+test_that("$set_reference_date() works", {
 
   # Creating an empty module
   s <- DiseasySeason$new()
@@ -43,7 +43,7 @@ test_that("set_reference_date works", {
 })
 
 
-test_that("get/use_season_model works with known model", {
+test_that("$get- and $use_season_model() works with known model", {
 
   s <- DiseasySeason$new(reference_date = Sys.Date())
 
@@ -60,7 +60,7 @@ test_that("get/use_season_model works with known model", {
 })
 
 
-test_that("get/use_season_model fails with unknown model", {
+test_that("$get- and $use_season_model() fails with unknown model", {
 
   s <- DiseasySeason$new()
 
@@ -72,7 +72,7 @@ test_that("get/use_season_model fails with unknown model", {
 })
 
 
-test_that("get/use_constant_season works", {
+test_that("$get- and $use_constant_season() works", {
 
   # Creating an empty module
   s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))
@@ -102,7 +102,7 @@ test_that("get/use_constant_season works", {
 })
 
 
-test_that("get/use_cosine_season works", {
+test_that("$get- and $use_cosine_season() works", {
 
   # Creating an empty module
   s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))
@@ -144,7 +144,7 @@ test_that("get/use_cosine_season works", {
 })
 
 
-test_that("use_covid_season_v1 works", {
+test_that("$use_covid_season_v1() works", {
 
   # Creating an empty module
   s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))
@@ -181,7 +181,7 @@ test_that("use_covid_season_v1 works", {
 })
 
 
-test_that("use_covid_season_v2 works", {
+test_that("$use_covid_season_v2() works", {
   skip_if_not_installed("RSQLite")
 
   for (case_def in case_defs) {
@@ -228,7 +228,7 @@ test_that("use_covid_season_v2 works", {
 })
 
 
-test_that("set_reference_date (with model set) works", {
+test_that("$set_reference_date() (with model set) works", {
 
   # Creating an empty module
   s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))
@@ -264,7 +264,7 @@ test_that("set_reference_date (with model set) works", {
 })
 
 
-test_that("set_scale works", {
+test_that("$set_scale() works", {
 
   # Creating an empty module
   s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))
@@ -298,7 +298,7 @@ test_that("set_scale works", {
 })
 
 
-test_that("hash works", {
+test_that("$hash works", {
 
   # Check the hash in a couple of cases
   s1 <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))

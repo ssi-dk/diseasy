@@ -13,7 +13,7 @@ test_that("initialize works", {
 })
 
 
-test_that("set_moduleowner works", {
+test_that("$set_moduleowner() works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()
@@ -31,7 +31,7 @@ test_that("set_moduleowner works", {
 })
 
 
-test_that("hash works", {
+test_that("$hash works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()
@@ -51,7 +51,7 @@ test_that("hash works", {
 })
 
 
-test_that("cache works", {
+test_that("$cache works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()
@@ -100,7 +100,7 @@ test_that("errors work", {
 })
 
 
-test_that("stratification_to_string works", {
+test_that("$stratification_to_string() works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()

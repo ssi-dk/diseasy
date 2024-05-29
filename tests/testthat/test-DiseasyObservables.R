@@ -62,7 +62,7 @@ test_that("initialize works", {
 })
 
 
-test_that("set_diseasystore works", {
+test_that("$set_diseasystore() works", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty module
@@ -90,7 +90,7 @@ test_that("set_diseasystore works", {
 })
 
 
-test_that("set_study_period works", {
+test_that("$set_study_period() works", {
   skip_if_not_installed("RSQLite")
 
   obs <- DiseasyObservables$new()
@@ -145,7 +145,7 @@ test_that("set_study_period works", {
 })
 
 
-test_that("set_last_queryable_date works", {
+test_that("$set_last_queryable_date() works", {
   skip_if_not_installed("RSQLite")
 
   obs <- DiseasyObservables$new()
@@ -180,7 +180,7 @@ test_that("set_last_queryable_date works", {
 })
 
 
-test_that("set_slice_ts works", {
+test_that("$set_slice_ts() works", {
   skip_if_not_installed("RSQLite")
 
   obs <- DiseasyObservables$new()
@@ -208,7 +208,7 @@ test_that("set_slice_ts works", {
 })
 
 
-test_that("get_observation works", {
+test_that("$get_observation() works", {
   skip_if_not_installed("RSQLite")
 
   for (case_def in case_defs) {
@@ -283,7 +283,7 @@ test_that("get_observation works", {
 })
 
 
-test_that("get_observation works -- test 2", {
+test_that("$get_observation() works -- test 2", {
   skip_if_not_installed("RSQLite")
 
   for (case_def in case_defs) {
