@@ -2,7 +2,7 @@ test_that("initialize works", {
 
   # Creating an empty module
   s <- DiseasySeason$new()
-  expect_null(s$reference_date)
+  expect_null(s %.% reference_date)
   rm(s)
 
   # Perturbations of the initializer inputs
@@ -326,13 +326,13 @@ test_that("active binding: reference_date works", {
   s <- DiseasySeason$new()
 
   # Retrieve the reference_date
-  expect_null(s$reference_date)
+  expect_null(s %.% reference_date)
 
   # Try to set the reference_date
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(s$reference_date <- Sys.Date(), error = \(e) e),                                            # nolint: implicit_assignment_linter
                    simpleError("`$reference_date` is read only"))
-  expect_null(s$reference_date)
+  expect_null(s %.% reference_date)
 
   rm(s)
 })

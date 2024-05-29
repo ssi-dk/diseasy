@@ -173,7 +173,7 @@ test_that("$change_activity fails with malformed inputs", {
   expect_error(act$change_activity(malformed_scenario),
                class = "simpleError",
                regexp = "non_existing_activity_unit")
-  expect_null(act$scenario_matrix) # Check the state is unchanged
+  expect_null(act %.% scenario_matrix) # Check the state is unchanged
 
 
   rm(act)
