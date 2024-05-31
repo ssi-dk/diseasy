@@ -49,11 +49,13 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 }
 
 
-#' Helper function to get option
-#' @param option (`character`)\cr
-#'   Name of the option to get
-#' @param class (`character` or `R6::R6class Diseasy* instance`)\cr
+#' Helper function to get options related to diseasy
+#' @param option (`character(1)`)\cr
+#'   Name of the option to get.
+#' @param class (`character(1)` or `R6::R6class Diseasy* instance`)\cr
 #'   Either the classname or the object the option applies to.
+#' @param .default (`any`)\cr
+#'   The default value to return if no option is set.
 #' @return The most specific option within the diseasy framework for the given option and class
 #' @examples
 #'   # Retrieve default option for source conn
@@ -64,8 +66,11 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 #'
 #'   # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
 #'   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
+#'
+#'   # Try to retrieve specific non-existent option
+#'   diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this")
 #' @export
-diseasyoption <- function(option, class = "DiseasystoreBase") {
+diseasyoption <- function(option, class = "DiseasystoreBase", .default = NULL) {
 
   if (!is.character(class)) {
     class <- base::class(class)[1]
@@ -74,13 +79,15 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
   base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |>                                                     # nolint: object_usage_linter
     stringr::str_to_lower()
 
-  list(class, NULL) |>
+  option <- list(class, NULL) |>
     purrr::map(~ paste(c(base_class, .x, option), collapse = ".")) |>
     purrr::map(getOption) |>
     purrr::map(unlist) |>
-    purrr::keep(purrr::negate(is.null)) |>
+    purrr::discard(is.null) |>
     purrr::discard(~ identical(., "")) |>
-    purrr::pluck(1)
+    purrr::pluck(1, .default = .default)
+
+  return(option)
 }
 
 
