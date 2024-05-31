@@ -54,9 +54,18 @@ test_that("$load_module() works", {
   m$load_module(obs)
   checkmate::expect_class(m %.% season, "DiseasySeason")
   checkmate::expect_class(m %.% season %.% observables, "DiseasyObservables")
-  expect_identical(m %.% season %.% observables, obs)
+  expect_identical(m %.% season %.% observables, m %.% observables) # Observables should be propagated to Season module
+
+  # We also check that a clone has been made, and that changes to obs after loading does not change m
+  expect_false(identical(m %.% observables, obs))
+  expect_identical(m %.% observables %.% hash, obs %.% hash)
+  obs$set_slice_ts(today())
+
+  expect_false(identical(m %.% observables, obs))
+  expect_false(identical(m %.% observables %.% hash, obs %.% hash))
 
   rm(m)
+
 
   #.. and the other way around
   m <- DiseasyModel$new(observables = TRUE)
@@ -256,13 +265,13 @@ test_that("active binding: activity works", {
   m <- DiseasyModel$new()
 
   # Retrieve the activity
-  expect_NULL(m %.% activity)
+  expect_null(m %.% activity)
 
   # Try to set activity through the binding
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(m$activity <- DiseasyActivity$new(), error = \(e) e),
                    simpleError("`$activity` is read only"))
-  expect_NULL(m %.% activity)
+  expect_null(m %.% activity)
 
   rm(m)
 })
