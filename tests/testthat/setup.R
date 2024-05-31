@@ -7,7 +7,13 @@ installed.packages()[, 1] |>
   purrr::walk(~ eval(parse(text = glue::glue("library({.})")))) # Thanks R, for being so difficult.
 
 # Determine the available diseasystore to test over
-case_defs <- diseasystore::available_diseasystores() |> stringr::str_remove_all(stringr::fixed("Diseasystore"))
+# NOTE: More diseasystores are available, but we need new features on diseasystore to dynamically test these in diseasy
+# Specifically, we need to be able to query the min and max dates where data is available in the diseasystore.
+# https://github.com/ssi-dk/diseasystore/issues/135
+# And we need to dynamically be able to discriminate between observables and stratifications:
+# https://github.com/ssi-dk/diseasystore/issues/89
+# Once these features are added, we should be able to adapt the tests to test over all available diseasystores.
+case_defs <- "GoogleCovid19"
 
 # Create a connection to test on
 tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
