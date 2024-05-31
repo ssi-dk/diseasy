@@ -161,6 +161,7 @@ rd_.data <- function(type = "param") {                                          
 
 rd_describe <- "Prints a human readable report of the internal state of the module."
 
+
 rd_get_results_description <- paste(
   "The primary method used to request model results of a given observable at a given stratification"
 )
@@ -173,33 +174,11 @@ rd_get_results_return <- paste(
   "  model (`character`) the name (classname) of the model used to provide the prediction."
 )
 
+
 rd_get_results_seealso <- "[diseasy::DiseasyObservables]"
-
-rd_observable <- paste(
-  "(`character`)\\cr",
-  "The observable to provide prediction for. Must match observable in `DiseasyObservables` [R6][R6::R6Class] class."
-)
-
-rd_prediction_length <- paste(
-  "(`numeric`)\\cr",
-  "The number of days to predict.",
-  "The prediction start is defined by `last_queryable_date` of the `DiseasyObservables` [R6][R6::R6Class] class."
-)
-
-rd_quantiles <- paste(
-  "(`list`(`numeric`))\\cr",
-  "Default NULL.",
-  "If given, results are returned at the quantiles given."
-)
-
-rd_training_length <- paste(
-  "(`numeric`)\\cr",
-  "The number of days that should be included in the training of the model."
-)
 
 
 rd_side_effects <- "NULL (called for side effects)"
-
 
 
 rd_age_cuts_lower <- paste(
