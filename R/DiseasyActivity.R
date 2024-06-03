@@ -655,21 +655,21 @@ DiseasyActivity <- R6::R6Class(                                                 
     #   The upper level of activity. Used as a safe guard to ensure the combination of
     #   activity units does not exceed (drop below) the maximum (minimum) activity associated
     #   with the fully open (closed) starting point.
-    #   Takes a value 1 when direction is "opening" and 0 when direction is "closing"
+    #   Takes a value 1 when direction is "opening" and 0 when direction is "closing".
     upper_activity_level = NULL,
 
     # @field activity_units (`list`)\cr
     #   The list of loaded `activity_units` in the module.
-    #   See ?dk_activity_modules for details
+    #   See ?dk_activity_modules for details.
     activity_units = NULL,
 
     # @field activity_units_labels (`character`)\cr
     #   The names (labels) of loaded `activity_units` in the module.
-    #   See ?dk_activity_modules for details
+    #   See ?dk_activity_modules for details.
     activity_units_labels = NULL,
 
     # @field .scenario_matrix (`matrix` `array`)
-    #   Internal representation of the changes to activity (opening and closing) of activity units
+    #   Internal representation of the changes to activity (opening and closing) of activity units.
     .scenario_matrix = NULL,
 
     # @field risk_matrix (`matrix` `array`)\cr
@@ -677,21 +677,21 @@ DiseasyActivity <- R6::R6Class(                                                 
     .risk_matrix = NULL,
 
     # @field n_age_groups (numeric(1))\cr
-    #   The (highest) number of age_groups defined in the `activity_units`
+    #   The (highest) number of age_groups defined in the `activity_units`.
     n_age_groups = NULL,
 
-    # @field contact_basis `r rd_contact_basis("field")`
+    # @field contact_basis `r rd_contact_basis("field")`.
     .contact_basis = NULL,
 
     # @field activity_types (`character`)\cr
-    #   The names of the four types/arenas of activity in the contact matrices
+    #   The names of the four types/arenas of activity in the contact matrices.
     activity_types = c("home", "work", "school", "other"),
 
     # Risk-weighted activity
     # @description
-    #   This function computes the risk-weighted activity of the given activities across the `activity_types`
+    #   This function computes the risk-weighted activity of the given activities across the `activity_types`.
     # @param activities (`character()`)\cr
-    #   A vector of activities to add together
+    #   A vector of activities to add together.
     # @return (`list()`)\cr
     #   A list of depth two: value[[type]][[age_group_activity]]
     add_activities = function(activities) {
@@ -703,7 +703,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       # 1) multiply by activity by the associated risk
       # 2) sum the risk-weighted activities stratified by age-group
       # 3) set human readable names for the age_groups
-      # (Activity is expressed in 5-year age groups, we name our activity vector accordingly)
+      # (Activity is expressed in 5-year age groups, we name our activity vector accordingly).
       risk_weighted_activity <- purrr::map(
         private$activity_types,
         \(type) {
@@ -724,7 +724,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #   This function takes an matrix representation of the activity scenario (`scenario_matrix` or `risk_matrix`)
     #   and a vector of dates where changes in the activity scenario should occur.
     #
-    #   The function then extends the matrix with these dates if they are not already present in the matrx.
+    #   The function then extends the matrix with these dates if they are not already present in the matrix.
     #
     #   This extension uses the argument `first_col_value` to perform the extension of the matrix.
     #   This value is used when date given in input_dates earlier than those already in the matrix.
@@ -773,13 +773,12 @@ DiseasyActivity <- R6::R6Class(                                                 
     # Generate symmetric weight matrix based on diagonal.
     # @description
     #   The function takes the values of the supplied vector and structures the values like "herringbone flooring".
-    #   If the given vector is v = (v1, v2, v3)
-    #   The generated "herringbone" matrix has elements
+    #   If the given vector is v = (v1, v2, v3) the generated "herringbone" matrix has elements:
     #   [v1 v2 v3]
     #   [v2 v2 v3]
     #   [v3 v3 v3]
     # @param vector (`numeric()`)\cr
-    #   Vector to transform
+    #   Vector to transform.
     vector_to_matrix = function(vector) {
       n <- length(vector)
       if (n == 1) return(vector)
@@ -793,7 +792,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     # Compute the population proportion matrix
     # @description
-    #   The function provides the population proportion matrix `p` used to project age_groups
+    #   The function provides the population proportion matrix `p` used to project age_groups.
     # @param age_cuts_lower `r rd_age_cuts_lower`
     population_transform_matrix = function(age_cuts_lower = NULL) {
 
@@ -821,7 +820,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     # Map population between age groups
     # @description
-    #   The function computes the proportion of population in the new and old age groups
+    #   The function computes the proportion of population in the new and old age groups.
     # @param age_cuts_lower `r rd_age_cuts_lower`
     map_population = function(age_cuts_lower) {
 

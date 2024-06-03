@@ -120,7 +120,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # First parse the dot arguments
       dots_to_string <- ifelse(
-        is.null(dots), "", glue::glue_collapse(purrr::map2(dots, names(dots), ~ glue::glue("{.y} = {.x}")), sep = ", ")
+        is.null(dots), "", glue::glue_collapse(purrr::imap(dots, ~ glue::glue("{.y} = {.x}")), sep = ", ")
       )
 
       # Then retrieve the requested model
@@ -140,7 +140,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # First parse the dot arguments
       dots_to_string <- ifelse(
-        is.null(dots), "", glue::glue_collapse(purrr::map2(dots, names(dots), ~ glue::glue("{.y} = {.x}")), sep = ", ")
+        is.null(dots), "", glue::glue_collapse(purrr::imap(dots, ~ glue::glue("{.y} = {.x}")), sep = ", ")
       )
 
       # Then reset the model

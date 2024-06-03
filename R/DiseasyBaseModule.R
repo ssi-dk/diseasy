@@ -331,8 +331,8 @@ DiseasyBaseModule <- R6::R6Class(                                               
       if (is.null(stratification)) {
         stratification_chr <- NA_character_
       } else {
-        stratification_chr <- purrr::map2(names(stratification), purrr::map(stratification, dplyr::as_label),
-                                          ~ ifelse(.x == "", .y, glue::glue_collapse(c(.x, .y), sep = " = "))) |>
+        stratification_chr <- purrr::imap(purrr::map(stratification, dplyr::as_label),
+                                          ~ ifelse(.y == "", .x, glue::glue_collapse(c(.y, .x), sep = " = "))) |>
           toString()
       }
       return(stratification_chr)
