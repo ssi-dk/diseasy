@@ -102,8 +102,8 @@ purrr::keep(names(DiseasyModel$private_fields), ~ startsWith(., ".Diseasy")) |>
     paste0(
       "- `$", stringr::str_to_lower(.), "`",
       ": `{Diseasy", ., "}`"
-      )
-    ) |>
+    )
+  ) |>
   cat(sep = "\n")
 ```
 

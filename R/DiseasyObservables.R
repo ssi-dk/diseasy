@@ -149,7 +149,9 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @seealso [SCDB::get_table]
     set_slice_ts = function(slice_ts) {
       checkmate::assert(
-        checkmate::check_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE),
+        checkmate::check_character(
+          slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE
+        ),
         checkmate::check_date(slice_ts, any.missing = FALSE)
       )
       private$.slice_ts <- slice_ts

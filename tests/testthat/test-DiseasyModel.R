@@ -269,7 +269,7 @@ test_that("active binding: activity works", {
 
   # Try to set activity through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$activity <- DiseasyActivity$new(), error = \(e) e),
+  expect_identical(tryCatch(m$activity <- DiseasyActivity$new(), error = \(e) e),                                       # nolint: implicit_assignment_linter
                    simpleError("`$activity` is read only"))
   expect_null(m %.% activity)
 
@@ -287,7 +287,7 @@ test_that("active binding: observables works", {
 
   # Try to set observables through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$observables <- DiseasyObservables$new(), error = \(e) e),
+  expect_identical(tryCatch(m$observables <- DiseasyObservables$new(), error = \(e) e),                                 # nolint: implicit_assignment_linter
                    simpleError("`$observables` is read only"))
   expect_null(m %.% observables)
 
@@ -305,7 +305,7 @@ test_that("active binding: season works", {
 
   # Try to set season through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$season <- DiseasySeason$new(), error = \(e) e),
+  expect_identical(tryCatch(m$season <- DiseasySeason$new(), error = \(e) e),                                           # nolint: implicit_assignment_linter
                    simpleError("`$season` is read only"))
   expect_null(m %.% season)
 
@@ -323,7 +323,7 @@ test_that("active binding: parameters works", {
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),
+  expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),                                            # nolint: implicit_assignment_linter
                    simpleError("`$parameters` is read only"))
   expect_null(m %.% parameters)
 

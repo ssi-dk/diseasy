@@ -187,7 +187,7 @@ test_that("$set_slice_ts() works", {
   obs$set_slice_ts(slice_ts = "2021-03-01 09:00:00")
   expect_identical(obs$slice_ts, "2021-03-01 09:00:00")
 
-  obs$set_slice_ts(slice_ts = as.Date("2021-03-01") )
+  obs$set_slice_ts(slice_ts = as.Date("2021-03-01"))
   expect_identical(obs$slice_ts, as.Date("2021-03-01"))
 
 
