@@ -67,8 +67,8 @@ The currently available observables in the loaded diseasystore. Read-only.}
 \item{\code{available_stratifications}}{(\code{character})\cr
 The currently available stratifications in the loaded diseasystore. Read-only.}
 
-\item{\code{slice_ts}}{(\code{Date})\cr
-The timestamp to slice database on. Read-only.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
+Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}. Read-only.}
 
 \item{\code{conn}}{(\code{DBIConnection})\cr
 The connection to the database on. Read-only.}

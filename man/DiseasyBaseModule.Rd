@@ -122,8 +122,7 @@ Toggle whether or not the module should be cloned when loading. Default TRUE.}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-The methods allows the setting of the internal module instances after the \code{DiseasyBaseModule} instance is
-created.
+The methods allows the setting of the internal module instances after the instance is created.
 }
 
 \subsection{Returns}{
