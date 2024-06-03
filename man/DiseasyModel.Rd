@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasyModel.R
 \name{DiseasyModel}
 \alias{DiseasyModel}
-\title{Diseasy's basic model module}
+\title{Base module for diseasy model templates}
 \value{
 A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
 }

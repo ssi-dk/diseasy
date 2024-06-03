@@ -1,4 +1,4 @@
-#' @title Diseasy's basic model module
+#' @title Base module for diseasy model templates
 #'
 #' @description
 #'   The `DiseasyModel` module implements common functionality that all models have available beyond that provided by

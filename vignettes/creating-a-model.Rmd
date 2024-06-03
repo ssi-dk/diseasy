@@ -51,7 +51,7 @@ $$
 $$
 
 When developing this model traditionally, we would choose some functional form for the seasonal forcing `s(t)`,
-e.g. a sinosodial relationship:
+e.g. a sinusoidal relationship:
 $$
 s(t) = A \cdot \cos(kt+\phi)
 $$
@@ -66,7 +66,7 @@ This way, we can configure different instances of `DiseasySeason` using the whol
 functional forms of seasonal forcing:
 
 * No seasonal forcing ($s(t) = 1$)
-* Sinosodial forcing
+* Sinusoidal forcing
 * Temperature dependent forcing
 * Other plausible seasonal forcing forms
 
@@ -125,7 +125,7 @@ results from the model. For example, the user my request results at the country 
 The helper method `$get_training_data()` will then provide the training data for the observable at the requested level.
 This data will contain one record for each time point in the training period, with columns for the date of the
 observation, the values of the different (optional) stratification, and the value of the observable on the date, and
-finally, an interger counter for the day relative to the end of the training period.
+finally, an integer counter for the day relative to the end of the training period.
 
 ## Model-user interface
 Beyond providing access to the functional modules, `DiseasyModel` defines how the user will interface with the model.
