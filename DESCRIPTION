@@ -38,6 +38,7 @@ Imports:
 Suggests:
     contactdata,
     countrycode,
+    curl,
     DBI,
     devtools,
     duckdb,
