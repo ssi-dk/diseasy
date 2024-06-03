@@ -118,7 +118,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   } else if (is.function(conn)) {
     conn <- tryCatch(
       conn(),
-      error = \(e) stop("`conn` could not be parsed!")
+      error = \(e) stop(glue::glue("`conn` could not be parsed! ({e$message})"))
     )
     return(conn)
   } else if (type == "target_conn" && inherits(conn, "DBIConnection")) {
