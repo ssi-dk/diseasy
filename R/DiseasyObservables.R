@@ -25,6 +25,7 @@
 #'   rm(obs)
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+#' @keywords functional-module
 #' @export
 DiseasyObservables <- R6::R6Class(                                                                                      # nolint: object_name_linter
   classname = "DiseasyObservables",

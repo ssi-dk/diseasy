@@ -34,6 +34,7 @@ See the vignette("diseasy-season") for examples of use.
 \seealso{
 \link{DiseasyObservables}
 }
+\keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasySeason}
 }

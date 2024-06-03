@@ -40,6 +40,7 @@ See vignette("diseasy-observables")
 
 \link[SCDB:get_table]{SCDB::get_table}
 }
+\keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyObservables}
 }

@@ -25,6 +25,7 @@
 #'   rm(s1, s2)
 #' @return
 #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
+#' @keywords functional-module
 #' @export
 DiseasySeason <- R6::R6Class(                                                                                           # nolint: object_name_linter
   classname = "DiseasySeason",
