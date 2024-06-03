@@ -31,29 +31,29 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the halfing time for the waning of the model.
-    #' @param time_halving (`numeric`)\cr
-    #'    The time_halving determines the time it takes to reach half of the "protection", between 0 and 1, so 0.5.
-    set_time_halving = function(time_halving) {
-      checkmate::assert_number(time_halving)
-
-      # Reset the season model if already set
-      if (!is.null(private$.model)) {
-
-        # Retrieve current settings of model
-        dots <- attr(private$.model, "dots")
-
-        # Give error if time_halving not used in model
-        if (!("time_halving" %in% names(dots))) {
-          stop(attr(private$.model, "dots"), "does not use time_halving argument")
+    #'   Sets the characteristic time scale for the waning of the model.
+    #' @param time_scales (`list`)\cr
+    #'    A named list of target and new time_scale (can be multiple)
+    #'    An exmaple could be; list(infection = 60)
+    set_time_scales = function(time_scales = NULL) {
+      checkmate::assert_list(time_scales)
+      checkmate::assert_subset(names(time_scales), names(private$.model))
+      # Set the new time_scale
+      invisible(purrr::imap(time_scales, ~ {
+        # Check if the model has a time_scale attribute
+        dots <- attr(private$.model[[.y]], "dots")
+        if (!("time_scale" %in% names(dots))) {
+          stop(attr(private$.model[[.y]], "dots"), " does not use time_scale argument")
         }
+        # Update the time_scale for the model
+        rlang::fn_env(private$.model[[.y]])$time_scale <- .x
+        attr(private$.model[[.y]], "dots") <- list(time_scale = .x)
+      }))
 
-        # Set new scale
-        dots$time_halving <- time_halving
-        lgr::without_logging(
-          self$use_waning_model(attr(private$.model, "name"), dots)
-        )
-      }
+      # Logging
+      private$lg$info("Changing time_scale in {paste(names(time_scales), collapse = ', ')} model(s)")
+
+      return(private$.model)
     },
 
     #' @description
@@ -98,24 +98,25 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set an exponential model for waning.
-    #' @param time_halving `r rd_time_halving()`
+    #' @param time_scale `r rd_time_scale()`
     #'   By default, it is set to 20
     #' @param target (`character`)\cr
     #'   The target of the waning model (f.x. infection, hospitalisation, death).
     #'   By default, it is set to "infection".
-    set_exponential_waning = function(time_halving = 20, target = "infection") {
+    set_exponential_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_double(time_halving, lower = 1e-15, add = coll)
+      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
       checkmate::assert_character(target, add = coll)
       checkmate::reportAssertions(coll)
 
       # Create the waning function
-      model <- eval(parse(text = paste("\\(t) exp(-t /", time_halving, "* log(2))")))
+      model <- \(t) exp(-t / (time_scale * log(2)))
 
       # Set the attributes
       attr(model, "name")        <- "exponential_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -128,7 +129,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set a sigmoidal model for waning.
-    #' @param time_halving `r rd_time_halving()`
+    #' @param time_scale `r rd_time_scale()`
     #'   By default, it is set to 20
     #' @param shape (`numeric`)\cr
     #'   Determines the steepness of the waning curve in the sigmoidal waning model.
@@ -137,20 +138,21 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param target (`character`)\cr
     #'   The target of the waning model (f.x. infection, hospitalisation, death).
     #'   By default, it is set to "infection".
-    set_sigmoidal_waning = function(time_halving = 20, shape = 6, target = "infection") {
+    set_sigmoidal_waning = function(time_scale = 20, shape = 6, target = "infection") {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_double(shape, lower = 1e-15, add = coll)
-      checkmate::assert_double(time_halving, lower = 1e-15, add = coll)
+      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
       checkmate::assert_character(target, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
-      model <- eval(parse(text = paste("\\(t) exp(-(t - ", time_halving, ") / ", shape, ") / (1 + exp(-(t - ", time_halving, ") /", shape, "))")))
+      model <- \(t) exp(-(t - time_scale) / shape) / (1 + exp(-(t - time_scale) / shape))
 
       # Set the attributes
       attr(model, "name")        <- "sigmoidal_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale, shape = shape)
 
       # Set the model
       private$.model[[target]] <- model
@@ -163,24 +165,25 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set a linear model for waning.
-    #' @param time_halving `r rd_time_halving()`
+    #' @param time_scale `r rd_time_scale()`
     #'   By default, it is set to 20
     #' @param target (`character`)\cr
     #'   The target of the waning model (f.x. infection, hospitalisation, death).
     #'   By default, it is set to "infection".
-    set_linear_waning = function(time_halving = 20, target = "infection") {
+    set_linear_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_double(time_halving, lower = 1e-15, add = coll)
+      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
       checkmate::assert_character(target, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
-      model <- eval(parse(text = paste("\\(t) max(1 - 0.5 /", time_halving, "* t, 0)")))
+      model <- \(t) max(1 - 0.5 / time_scale * t, 0)
 
       # Set the attributes
       attr(model, "name")        <- "linear_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -193,24 +196,25 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set a heaviside model for waning.
-    #' @param time_halving `r rd_time_halving()`
+    #' @param time_scale `r rd_time_scale()`
     #'   By default, it is set to 20
     #' @param target (`character`)\cr
     #'   The target of the waning model (f.x. infection, hospitalisation, death).
     #'   By default, it is set to "infection".
-    set_heaviside_waning = function(time_halving = 20, target = "infection") {
+    set_heaviside_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_double(time_halving, lower = 1e-15, add = coll)
+      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
       checkmate::assert_character(target, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
-      model <- eval(parse(text = paste("\\(t) ifelse(t <", time_halving, ", 1, 0)")))
+      model <- \(t) ifelse(t < time_scale, 1, 0)
 
       # Set the attributes
       attr(model, "name")        <- "heaviside_waning"
+      attr(model, "dots")        <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -224,14 +228,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set a custom waning function.
     #' @param custom_function (`function`)\cr
-    #'   Set a custom waning function in following format: \(t) exp(-t)
+    #'   Set a custom waning function in following format: \(t)
+    #' @param time_scale `r rd_time_scale()`
+    #'   By default, it is set to 20
     #' @param target (`character`)\cr
     #'   The target of the waning model (f.x. infection, hospitalisation, death).
     #'   By default, it is set to "infection".
     #' @param name
     #'   Set the name of the custom waning function
     #'   By default, it is set to "custom_waning"
-    set_custom_waning = function(custom_function, target = "infection", name = "custom_waning") {
+    set_custom_waning = function(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time_scale)), time_scale = 20, target = "infection", name = "custom_waning") {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(custom_function, add = coll)
@@ -243,6 +249,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name")        <- name
+      attr(model, "dots")        <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -254,8 +261,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to use costum waning function(s).
-    #'   The function uses the models set by the user or by default the no waning infection model.
+    #'   The function creates N compartments for the models and does a phase-type distribution based on the
+    #'   time scales, resulting in the probability to be in each compartment.
+    #'   The models are then optimized to find the best fitting rates going out and between the compartments.
     #' @param approach (`str` or `numeric`)\cr
     #'   Specifies the approach to be used from the available approaches.
     #'   It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
@@ -274,19 +282,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
         approach_init <- private$approach_functions[[match.arg(approach)]]
       }
 
-      # Calculate time_halvings for all functions
-      time_halving <- purrr::map(private$.model, ~ {
-        # Evaluate function value = 0.5
-        time_halving_eq <- \(t) .x(t) - 0.5
-        time_halving <- stats::uniroot(time_halving_eq, interval = c(0, 1000))$root
-      })
-      # Extract median time_halving
-      time_halving <- stats::median(unlist(time_halving))
-      delta <- N / (2 * time_halving)
+      # Extract median time_scale
+      time_scale <- stats::median(unlist(private$get_time_scale()))
+      delta <- N / (3 * time_scale)
+
       # Get params and initiation for each model
       init_all <- purrr::map(private$.model, ~ {
-        init_all <- approach_init(N, delta, .x, private$get_params)
+        init_all <- approach_init(N, delta, .x)
       })
+
+      # Extract the parameter scaling helper
+      rescale_params <- init_all[[1]]$rescale_params
+
       # Extract optimisation parameters
       optim_par <- init_all[[1]]$optim_par
       delta <- init_all[[1]]$init_par$delta
@@ -294,27 +301,35 @@ DiseasyImmunity <- R6::R6Class(                                                 
       init_par <- list(gamma = gamma, delta = delta)
       to_optim <- unname(unlist(init_par[optim_par]))
       non_optim <- unname(unlist(init_par[-match(optim_par, names(init_par))]))
+
       # Objective function
-      obj_function <- function(N, params, models) {
+      obj_function <- function(N, optim_par, models) {
+
         results <- 0
         for (i in seq_along(models)) {
-          params_model <- c(params[(1:N) + (i - 1) * N], params[-(1:(N * length(models)))])
-          # Sidste gamma (f_taget(inf)) skal optimeres i modellen ellers bliver den divergent
-          # Burde også være fint nok for approach 2 da sidste punkt som sådan altid er 0?
+          # Extract the parameter subset corresponding to the ith model
+          params_model <- c(optim_par[(1:N) + (i - 1) * N], optim_par[-(1:(N * length(models)))])
+          # Scale the relevant parameters through a sigmoidal function to ensure values between 0-1.
+          # After scaling, the parameters are passed through "cumprod" to ensure monotonically decreasing values
+          # (For the relevant approaches)
+          # Finally, we impute the parameters with the fixed f(Inf) value for the last compartment
+          params_model <- rescale_params(params_model, models[[i]](Inf))
           approx <- private$get_approximation(N, params_model)
           integrate_sum <- private$get_integration(approx, models[[i]])
           results <- results + integrate_sum
-          return(results)
         }
+        return(results)
       }
-      
-      print(c(non_optim, to_optim))
-      result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model))
-      print(result)
+      result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
+      params <- c(non_optim, result$par)
 
-
+      # Scale optimised parameters
+      private$.rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
+        params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
+        rescale_params(params_model, .x(Inf))
+      }) |>
+        stats::setNames(names(private$.model))
     }
-
   ),
 
   # Make active bindings to the private variables
@@ -360,39 +375,49 @@ DiseasyImmunity <- R6::R6Class(                                                 
   private = list(
     .model = NULL,
     .rates = NULL,
-    get_params = function(N, delta, target) {
-      # Create strings for rates in correct length
-      gamma <- 1 - seq(N) / N
-      params <- c(gamma, delta)
-      # Through sigmoidal function to ensure values between 0-1
-      params <- 0.5 * (1 + params / (1 + abs(params))) # Skal det kun være gamma der køres igennem denne funktion?
-      # Set the last gamma to the "last" point of the target function
-      gamma <- c(cumprod(params[1:N - 1]), target(Inf))
-      delta <- params[-(1:N)]
-      return(list(gamma = gamma, delta = delta))
+    get_time_scale = function() {
+      # Returns a list of all time scales with their model target
+      purrr::map(private$.model, ~ rlang::fn_env(.x)$time_scale)
     },
     approach_functions = list(
-      rate_equal = function(N, delta, f_target, get_params) {
+      rate_equal = function(N, delta, f_target) {
         optim_par <- c("gamma", "delta")
-        init_par <- get_params(N, delta, f_target)
-        return(list(optim_par = optim_par, init_par = init_par))
+        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = delta)
+        rescale_params <- function(p, gamma_N) {
+          N <- length(p) - 1 # Infer N
+          p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmodial transform all parameters
+          p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monoticity and fixed end-point
+          return(p)
+        }
+        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
       },
-      gamma_fixed_step = function(N, delta, f_target, get_params) {
+      gamma_fixed_step = function(N, delta, f_target) {
         optim_par <- "delta"
-        init_par <- list(gamma = c(1 - seq(N) / N), delta = c(rep(delta, N - 1)))
-        return(list(optim_par = optim_par, init_par = init_par))
+        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
+        rescale_params <- function(p, gamma_N) {
+          N <- (length(p) + 1) / 2 # Infer N
+          p <- c(p[1:N] * (1 - gamma_N) + gamma_N,  0.5 * (1 + p[-(1:N)] / (1 + abs(p[-(1:N)])))) # Ensure monoticity, fixed end-point, and Sigmodial transform the delta parameters
+          print(p)
+
+          return(p)
+        }
+        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
       },
-      all_free = function(N, delta, f_target, get_params) {
+      all_free = function(N, delta, f_target) {
         optim_par <- c("gamma", "delta")
-        init_par <- get_params(N, rep(delta, N - 1), f_target)
-        return(list(optim_par = optim_par, init_par = init_par))
+        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
+        rescale_params <- function(p, gamma_N) {
+          N <- (length(p) + 1) / 2 # Infer N
+          p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmodial transform all parameters
+          p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monoticity and fixed end-point
+          return(p)
+        }
+        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
       }
     ),
     get_approximation = function(N, params) {
       gamma <- params[1:N]
       delta <- params[-(1:N)]
-      print(gamma)
-      print(delta)
       approx <- \(t) do.call(cbind, occupancy_probability(delta, N, t)) %*% gamma
     },
     get_integration = function(approx, f_target) {
@@ -401,6 +426,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Numerically integrate the differences
       result <- stats::integrate(integrand, lower = 0, upper = Inf)$value
+    },
+    plot = function() {
+
     }
   )
 )
@@ -416,7 +444,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 # Et DiseasyImmunity modul skal som udgangspunkt bare have ingen waning (konstant beskyttelse)
 
 
-# Familie af use_*_funktioner ligesom i DiseasySeason (enkel parameter - time_halving - der hvor den er halv (tau ændres))
+# Familie af use_*_funktioner ligesom i DiseasySeason (enkel parameter - time_scale - der hvor den er halv (tau ændres))
 # Dette kunne så gemme funktionen i et privat field (fx $.model)
 # Eg. private$.model <- \(t) exp(-t / (tau * log(2)))
 
@@ -486,3 +514,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
 # Hvis det er en liste skal den så kunne håndtere dem også.
 # Alternativt, skal der laves en fancy implementering (fx med purrr) som er ligeglad om det en liste af 1 element eller en liste af flere.
 
+
+#' @exportS3method
+plot.DiseasyImmunity <- function(obj) obj$plot()
