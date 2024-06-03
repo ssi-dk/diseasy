@@ -76,6 +76,13 @@ rd_scale <- function(type = "param") {
         ifelse(type == "field", "Read only.", ""))
 }
 
+rd_time_scale <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`numeric`)\\cr",
+        "Sets the time_scale of the waning (immunity) model.",
+        "The time_scale is the number of days before half of the immunity has waned",
+        ifelse(type == "field", " Read only.", ""))
+}
 
 rd_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
