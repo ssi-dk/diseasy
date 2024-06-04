@@ -1,4 +1,5 @@
 test_that("initialize works", {
+  skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
   m <- DiseasyModel$new()
@@ -39,6 +40,7 @@ test_that("initialize works", {
 
 
 test_that("$load_module() works", {
+  skip_if_not_installed("RSQLite")
 
   # Check that observable is loaded into objects that can take it
   # We first create and load a module that uses "DiseasyObservables" internally but we do not provide it to the module
@@ -83,6 +85,7 @@ test_that("$load_module() works", {
 
 
 test_that("$hash works", {
+  skip_if_not_installed("RSQLite")
 
   # Test hash generation works as expected
 
@@ -159,6 +162,7 @@ test_that("$hash works", {
 
 
 test_that("cloning works", {
+  skip_if_not_installed("RSQLite")
 
   # Creating modules for the model module
   act <- DiseasyActivity$new()
@@ -278,6 +282,7 @@ test_that("active binding: activity works", {
 
 
 test_that("active binding: observables works", {
+  skip_if_not_installed("RSQLite")
 
   # Creating an empty module
   m <- DiseasyModel$new()
