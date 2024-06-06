@@ -2898,7 +2898,7 @@
     {
       "ref": "rlang",
       "package": "rlang",
-      "version": "1.1.3",
+      "version": "1.1.4",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2911,10 +2911,10 @@
         "RemoteRef": "rlang",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.1.3"
+        "RemoteSha": "1.1.4"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rlang_1.1.3.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rlang_1.1.3.tar.gz",
+      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rlang_1.1.4.tar.gz"],
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rlang_1.1.4.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,

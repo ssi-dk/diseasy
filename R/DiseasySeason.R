@@ -221,7 +221,7 @@ DiseasySeason <- R6::R6Class(                                                   
         "Simple seasonality model.",
         "Risk of infection highest at the `peak` days after new year"
       )
-      attr(model_date, "dots")        <- list(scale = scale)
+      attr(model_date, "dots")        <- list(scale = scale, peak = peak)
 
       attr(model_t, "name")         <- attr(model_date, "name")
       attr(model_t, "description")  <- attr(model_date, "description")
