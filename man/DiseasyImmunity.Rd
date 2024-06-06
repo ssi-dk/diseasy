@@ -44,7 +44,7 @@ The list of available approaches}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiseasyImmunity-new}{\code{DiseasyImmunity$new()}}
-\item \href{#method-DiseasyImmunity-set_time_halving}{\code{DiseasyImmunity$set_time_halving()}}
+\item \href{#method-DiseasyImmunity-set_time_scales}{\code{DiseasyImmunity$set_time_scales()}}
 \item \href{#method-DiseasyImmunity-set_waning_model}{\code{DiseasyImmunity$set_waning_model()}}
 \item \href{#method-DiseasyImmunity-set_no_waning}{\code{DiseasyImmunity$set_no_waning()}}
 \item \href{#method-DiseasyImmunity-set_exponential_waning}{\code{DiseasyImmunity$set_exponential_waning()}}
@@ -83,19 +83,20 @@ Creates a new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyImmunity-set_time_halving"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_time_halving}{}}}
-\subsection{Method \code{set_time_halving()}}{
-Sets the halfing time for the waning of the model.
+\if{html}{\out{<a id="method-DiseasyImmunity-set_time_scales"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_time_scales}{}}}
+\subsection{Method \code{set_time_scales()}}{
+Sets the characteristic time scale for the waning of the model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_time_halving(time_halving)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_time_scales(time_scales = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_halving}}{(\code{numeric})\cr
-The time_halving determines the time it takes to reach half of the "protection", between 0 and 1, so 0.5.}
+\item{\code{time_scales}}{(\code{list})\cr
+A named list of target and new time_scale (can be multiple)
+An exmaple could be; list(infection = 60)}
 }
 \if{html}{\out{</div>}}
 }
@@ -146,13 +147,13 @@ By default, it is set to "infection".}
 \subsection{Method \code{set_exponential_waning()}}{
 Sets the \code{DiseasyImmunity} module to set an exponential model for waning.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_exponential_waning(time_halving = 20, target = "infection")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_exponential_waning(time_scale = 20, target = "infection")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_halving}}{\verb{r rd_time_halving()}
+\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
 By default, it is set to 20}
 
 \item{\code{target}}{(\code{character})\cr
@@ -169,7 +170,7 @@ By default, it is set to "infection".}
 Sets the \code{DiseasyImmunity} module to set a sigmoidal model for waning.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_sigmoidal_waning(
-  time_halving = 20,
+  time_scale = 20,
   shape = 6,
   target = "infection"
 )}\if{html}{\out{</div>}}
@@ -178,7 +179,7 @@ Sets the \code{DiseasyImmunity} module to set a sigmoidal model for waning.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_halving}}{\verb{r rd_time_halving()}
+\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
 By default, it is set to 20}
 
 \item{\code{shape}}{(\code{numeric})\cr
@@ -199,13 +200,13 @@ By default, it is set to "infection".}
 \subsection{Method \code{set_linear_waning()}}{
 Sets the \code{DiseasyImmunity} module to set a linear model for waning.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_linear_waning(time_halving = 20, target = "infection")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_linear_waning(time_scale = 20, target = "infection")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_halving}}{\verb{r rd_time_halving()}
+\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
 By default, it is set to 20}
 
 \item{\code{target}}{(\code{character})\cr
@@ -221,13 +222,13 @@ By default, it is set to "infection".}
 \subsection{Method \code{set_heaviside_waning()}}{
 Sets the \code{DiseasyImmunity} module to set a heaviside model for waning.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_heaviside_waning(time_halving = 20, target = "infection")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_heaviside_waning(time_scale = 20, target = "infection")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_halving}}{\verb{r rd_time_halving()}
+\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
 By default, it is set to 20}
 
 \item{\code{target}}{(\code{character})\cr
@@ -244,7 +245,8 @@ By default, it is set to "infection".}
 Sets the \code{DiseasyImmunity} module to set a custom waning function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_custom_waning(
-  custom_function,
+  custom_function = function(t) 1/(1 + exp((t - time_scale)/time_scale)),
+  time_scale = 20,
   target = "infection",
   name = "custom_waning"
 )}\if{html}{\out{</div>}}
@@ -254,7 +256,10 @@ Sets the \code{DiseasyImmunity} module to set a custom waning function.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{custom_function}}{(\code{function})\cr
-Set a custom waning function in following format: \(t) exp(-t)}
+Set a custom waning function in following format: \(t)}
+
+\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
+By default, it is set to 20}
 
 \item{\code{target}}{(\code{character})\cr
 The target of the waning model (f.x. infection, hospitalisation, death).
@@ -270,8 +275,9 @@ By default, it is set to "custom_waning"}
 \if{html}{\out{<a id="method-DiseasyImmunity-approximate_compartmental"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-approximate_compartmental}{}}}
 \subsection{Method \code{approximate_compartmental()}}{
-Sets the \code{DiseasyImmunity} module to use costum waning function(s).
-The function uses the models set by the user or by default the no waning infection model.
+The function creates N compartments for the models and does a phase-type distribution based on the
+time scales, resulting in the probability to be in each compartment.
+The models are then optimized to find the best fitting rates going out and between the compartments.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
   approach = c("rate_equal", "gamma_fixed_step", "all_free"),

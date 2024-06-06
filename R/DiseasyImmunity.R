@@ -39,7 +39,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_list(time_scales)
       checkmate::assert_subset(names(time_scales), names(private$.model))
       # Set the new time_scale
-      invisible(purrr::imap(time_scales, ~ {
+      purrr::iwalk(time_scales, ~ {
         # Check if the model has a time_scale attribute
         dots <- attr(private$.model[[.y]], "dots")
         if (!("time_scale" %in% names(dots))) {
@@ -48,7 +48,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Update the time_scale for the model
         rlang::fn_env(private$.model[[.y]])$time_scale <- .x
         attr(private$.model[[.y]], "dots") <- list(time_scale = .x)
-      }))
+      })
 
       # Logging
       private$lg$info("Changing time_scale in {paste(names(time_scales), collapse = ', ')} model(s)")
@@ -276,59 +276,120 @@ DiseasyImmunity <- R6::R6Class(                                                 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_number(N, lower = 1, add = coll)
       checkmate::reportAssertions(coll)
-      if (is.numeric(approach)) {
+
+      # Look in the cache for data
+      hash <- private$get_hash()
+      if (!private$is_cached(hash)) {
+
+              if (is.numeric(approach)) {
         approach_init <- private$approach_functions[[approach]]
       } else if (is.character(approach)) {
         approach_init <- private$approach_functions[[match.arg(approach)]]
       }
 
-      # Extract median time_scale
-      time_scale <- stats::median(unlist(private$get_time_scale()))
-      delta <- N / (3 * time_scale)
+        # Extract median time_scale
+        time_scale <- stats::median(unlist(private$get_time_scale()))
+        delta <- N / (3 * time_scale)
 
-      # Get params and initiation for each model
-      init_all <- purrr::map(private$.model, ~ {
-        init_all <- approach_init(N, delta, .x)
-      })
+        # Get params and initiation for each model
+        init_all <- purrr::map(private$.model, ~ {
+          init_all <- approach_init(N, delta, .x)
+        })
 
-      # Extract the parameter scaling helper
-      rescale_params <- init_all[[1]]$rescale_params
+        # Extract the parameter scaling helper
+        rescale_params <- init_all[[1]]$rescale_params
 
-      # Extract optimisation parameters
-      optim_par <- init_all[[1]]$optim_par
-      delta <- init_all[[1]]$init_par$delta
-      gamma <- purrr::map(init_all, ~ purrr::pluck(.x, "init_par", "gamma"))
-      init_par <- list(gamma = gamma, delta = delta)
-      to_optim <- unname(unlist(init_par[optim_par]))
-      non_optim <- unname(unlist(init_par[-match(optim_par, names(init_par))]))
+        # Extract optimisation parameters
+        optim_par <- init_all[[1]]$optim_par
+        delta <- init_all[[1]]$init_par$delta
+        gamma <- purrr::map(init_all, ~ purrr::pluck(.x, "init_par", "gamma"))
+        init_par <- list(gamma = gamma, delta = delta)
+        to_optim <- unname(unlist(init_par[optim_par]))
+        non_optim <- unname(unlist(init_par[-match(optim_par, names(init_par))]))
 
-      # Objective function
-      obj_function <- function(N, optim_par, models) {
+        # Objective function
+        obj_function <- function(N, optim_par, models) {
 
-        results <- 0
-        for (i in seq_along(models)) {
-          # Extract the parameter subset corresponding to the ith model
-          params_model <- c(optim_par[(1:N) + (i - 1) * N], optim_par[-(1:(N * length(models)))])
-          # Scale the relevant parameters through a sigmoidal function to ensure values between 0-1.
-          # After scaling, the parameters are passed through "cumprod" to ensure monotonically decreasing values
-          # (For the relevant approaches)
-          # Finally, we impute the parameters with the fixed f(Inf) value for the last compartment
-          params_model <- rescale_params(params_model, models[[i]](Inf))
-          approx <- private$get_approximation(N, params_model)
-          integrate_sum <- private$get_integration(approx, models[[i]])
-          results <- results + integrate_sum
+          results <- 0
+          for (i in seq_along(models)) {
+            # Extract the parameter subset corresponding to the ith model
+            params_model <- c(optim_par[(1:N) + (i - 1) * N], optim_par[-(1:(N * length(models)))])
+            # Scale the relevant parameters through a sigmoidal function to ensure values between 0-1.
+            # After scaling, the parameters are passed through "cumprod" to ensure monotonically decreasing values
+            # (For the relevant approaches)
+            # Finally, we impute the parameters with the fixed f(Inf) value for the last compartment
+            params_model <- rescale_params(params_model, models[[i]](Inf))
+            approx <- private$get_approximation(N, params_model)
+            integrate_sum <- private$get_integration(approx, models[[i]])
+            results <- results + integrate_sum
+          }
+          return(results)
         }
-        return(results)
-      }
-      result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
-      params <- c(non_optim, result$par)
+        result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
+        params <- c(non_optim, result$par)
 
-      # Scale optimised parameters
-      private$.rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
-        params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
-        rescale_params(params_model, .x(Inf))
-      }) |>
-        stats::setNames(names(private$.model))
+        # Scale optimised parameters
+        private$.rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
+          params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
+          params_model <- rescale_params(params_model, .x(Inf))
+          if (length(params_model) != (N * 2) - 1) { # Ensure length of delta always is N-1 in rate output
+            params_model <- c(params_model[1:N], rep(params_model[-(N:1)], (N - 1)))
+          }
+          return(params_model)
+        }) |>
+          stats::setNames(names(private$.model))
+
+        # Store in cache
+        private$cache(hash, private$.rates)
+      }
+
+      # Write to the log
+      private$lg$info("Setting approximated rates to target function(s)")
+
+      # Return
+      return(private$cache(hash))
+    },
+
+    #' @description
+    #' A function to plot all models in the instance
+    #' If approximate_compartmental has ben run the approximations will also be plottet
+    plot = function(t_max = NULL) {
+      # Set t_max if nothing is given
+      if (is.null(t_max)) t_max <- 3 * stats::median(unlist(private$get_time_scale()))
+      t <- seq(from = 0, to = t_max, length.out = 100)
+      # Create an empty plot
+      par(mar = c(5, 4, 4, 12) + 0.1) # Adds extra space on the right
+      plot(t, type = "n", xlab = "Time", ylab = "Gamma", main = "Waning functions", ylim = c(0, 1))
+      # Create palette with different colors to use in plot
+      pcolors <- palette()
+      # Plot lines for each model
+      purrr::walk2(private$.model, seq_along(private$.model), ~ {
+        lines(t, purrr::map_dbl(t, .x), col = pcolors[1 + .y])
+      })
+      # If rates have been approximated add them to the plot
+      if (!is.null(private$.rates)) {
+        purrr::walk2(private$.rates, seq_along(private$.model), ~ {
+          N <- (length(.x) + 1) / 2
+          lines(t, purrr::map_dbl(t, private$get_approximation(N, .x)), col = pcolors[1 + .y], lty = "dashed")
+
+          # Get legend labels for models and approximation
+          combined_legend <- c(names(private$.model), paste("app.", names(private$.rates)))
+
+          # Specify line types for models and approximation
+          combined_lty <- c(rep("solid", length(private$.model)), rep("dashed", length(private$.rates)))
+
+          # Combined legend (models and approximation)
+          legend("topright", legend = combined_legend, col = c(purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
+                                                               purrr::map_chr(seq_along(private$.rates), ~ pcolors[1 + .x])),
+                 lty = combined_lty, inset = c(-0.9, 0), bty = "n", xpd = TRUE, cex = 0.8)
+        })
+      } else {
+        # Only legend for models
+        legend("topright", legend = names(private$.model), col = purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
+               lty = 1, inset = c(-0.7, 0), bty = "n", xpd = TRUE, cex = 0.8)
+      }
+      # Write to the log
+      private$lg$info("Plotting all models in the current instance, with approximations if available")
     }
   ),
 
@@ -397,8 +458,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
         rescale_params <- function(p, gamma_N) {
           N <- (length(p) + 1) / 2 # Infer N
           p <- c(p[1:N] * (1 - gamma_N) + gamma_N,  0.5 * (1 + p[-(1:N)] / (1 + abs(p[-(1:N)])))) # Ensure monoticity, fixed end-point, and Sigmodial transform the delta parameters
-          print(p)
-
           return(p)
         }
         return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
@@ -426,9 +485,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Numerically integrate the differences
       result <- stats::integrate(integrand, lower = 0, upper = Inf)$value
-    },
-    plot = function() {
-
     }
   )
 )
@@ -515,5 +571,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
 # Alternativt, skal der laves en fancy implementering (fx med purrr) som er ligeglad om det en liste af 1 element eller en liste af flere.
 
 
-#' @exportS3method
+#' @inherit base::plot
+#' @export
 plot.DiseasyImmunity <- function(obj) obj$plot()
