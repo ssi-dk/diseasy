@@ -62,17 +62,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Name of the waning_model to use (calls the equivalent $use_<model_name>()).
     #' @param dots (`list`)\cr
     #'   Named list of arguments that will be passed at dot-ellipsis to the waning model.
-    set_waning_model = function(model_name, dots = NULL) {
-
-      checkmate::assert_choice(model_name, self$available_waning_models)
-
-      # First parse the dot arguments
-      dots_to_string <- ifelse(
-        is.null(dots), "", glue::glue_collapse(purrr::map2(dots, names(dots), ~ glue::glue("{.y} = {.x}")), sep = ", ")
+    set_waning_model = function(model_name, target = "infection", ...) {
+      checkmate::assert(
+        checkmate::check_choice(model_name, self$available_waning_models),
+        checkmate::check_function(model_name)
       )
-
-      # Then reset the model
-      eval(parse(text = glue::glue("self$set_{model_name}({dots_to_string})")))
+      # Then set the model
+      if (checkmate::test_function(model_name)) {
+        self$set_custom_waning(custom_function = model_name, target = target, ...)
+      } else {
+        self[[glue::glue("set_{model_name}")]](target = target, ...)
+      }
     },
 
     #' @description
@@ -271,34 +271,28 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param N (`numeric`)\cr
     #'   Number of compartments to be used in the model.
     #'   By default, it is set to 5
-    approximate_compartmental = function(approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = 5) {
+    approximate_compartmental = function(approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_number(N, lower = 1, add = coll)
       checkmate::reportAssertions(coll)
-
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
-
-              if (is.numeric(approach)) {
-        approach_init <- private$approach_functions[[approach]]
-      } else if (is.character(approach)) {
-        approach_init <- private$approach_functions[[match.arg(approach)]]
-      }
-
+        if (is.numeric(approach)) {
+          approach_init <- private$approach_functions[[approach]]
+        } else if (is.character(approach)) {
+          approach_init <- private$approach_functions[[match.arg(approach)]]
+        }
         # Extract median time_scale
         time_scale <- stats::median(unlist(private$get_time_scale()))
         delta <- N / (3 * time_scale)
-
         # Get params and initiation for each model
         init_all <- purrr::map(private$.model, ~ {
           init_all <- approach_init(N, delta, .x)
         })
-
         # Extract the parameter scaling helper
         rescale_params <- init_all[[1]]$rescale_params
-
         # Extract optimisation parameters
         optim_par <- init_all[[1]]$optim_par
         delta <- init_all[[1]]$init_par$delta
@@ -309,7 +303,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # Objective function
         obj_function <- function(N, optim_par, models) {
-
           results <- 0
           for (i in seq_along(models)) {
             # Extract the parameter subset corresponding to the ith model
@@ -329,7 +322,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         params <- c(non_optim, result$par)
 
         # Scale optimised parameters
-        private$.rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
+        rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
           params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
           params_model <- rescale_params(params_model, .x(Inf))
           if (length(params_model) != (N * 2) - 1) { # Ensure length of delta always is N-1 in rate output
@@ -338,28 +331,39 @@ DiseasyImmunity <- R6::R6Class(                                                 
           return(params_model)
         }) |>
           stats::setNames(names(private$.model))
-
         # Store in cache
-        private$cache(hash, private$.rates)
+        private$cache(hash, rates)
       }
-
       # Write to the log
       private$lg$info("Setting approximated rates to target function(s)")
-
       # Return
       return(private$cache(hash))
     },
 
     #' @description
     #' A function to plot all models in the instance
-    #' If approximate_compartmental has ben run the approximations will also be plottet
-    plot = function(t_max = NULL) {
+    #' If desired to additionally plot the approximations, supply the approach and number of compartments (N)
+    #' @param t_max (`numeric`)\cr
+    #'  The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.
+    #' @param approach (`str` or `numeric`)\cr
+    #'   Specifies the approach to be used from the available approaches.
+    #'   It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
+    #'   or as a numeric value representing the approach index 1, 2, or 3.
+    #' @param N (`numeric`)\cr
+    #'   Number of compartments to be used in the model.
+    #'   By default, it is set to 5
+    plot = function(t_max = NULL, approach = NULL, N = NULL) {
+      checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
+      rates <- NULL
+      if (!is.null(approach) && !is.null(N)) {
+        rates <- self$approximate_compartmental(approach, N)
+      }
       # Set t_max if nothing is given
       if (is.null(t_max)) t_max <- 3 * stats::median(unlist(private$get_time_scale()))
       t <- seq(from = 0, to = t_max, length.out = 100)
       # Create an empty plot
       par(mar = c(5, 4, 4, 12) + 0.1) # Adds extra space on the right
-      plot(t, type = "n", xlab = "Time", ylab = "Gamma", main = "Waning functions", ylim = c(0, 1))
+      plot(t, type = "n", xlab = "Time", ylab = "Gamma", main = "Waning functions", ylim = c(0, 1), xlim = c(0, t_max))
       # Create palette with different colors to use in plot
       pcolors <- palette()
       # Plot lines for each model
@@ -367,20 +371,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
         lines(t, purrr::map_dbl(t, .x), col = pcolors[1 + .y])
       })
       # If rates have been approximated add them to the plot
-      if (!is.null(private$.rates)) {
-        purrr::walk2(private$.rates, seq_along(private$.model), ~ {
+      if (!is.null(rates)) {
+        purrr::walk2(rates, seq_along(private$.model), ~ {
           N <- (length(.x) + 1) / 2
           lines(t, purrr::map_dbl(t, private$get_approximation(N, .x)), col = pcolors[1 + .y], lty = "dashed")
 
           # Get legend labels for models and approximation
-          combined_legend <- c(names(private$.model), paste("app.", names(private$.rates)))
+          combined_legend <- c(names(private$.model), paste("app.", names(rates)))
 
           # Specify line types for models and approximation
-          combined_lty <- c(rep("solid", length(private$.model)), rep("dashed", length(private$.rates)))
+          combined_lty <- c(rep("solid", length(private$.model)), rep("dashed", length(rates)))
 
           # Combined legend (models and approximation)
           legend("topright", legend = combined_legend, col = c(purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
-                                                               purrr::map_chr(seq_along(private$.rates), ~ pcolors[1 + .x])),
+                                                               purrr::map_chr(seq_along(rates), ~ pcolors[1 + .x])),
                  lty = combined_lty, inset = c(-0.9, 0), bty = "n", xpd = TRUE, cex = 0.8)
         })
       } else {
@@ -401,9 +405,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
       .f = active_binding,
       name = "available_waning_models",
       expr = {
-        models <- purrr::keep(ls(self), ~ startsWith(., "use_")) |>
-          purrr::map_chr(~ stringr::str_extract(., r"{(?<=use_).*}")) |>
-          purrr::discard(~ . == "waning_model") # Filter out the generic setter
+        models <- purrr::keep(ls(self), ~ startsWith(., "set_")) |>
+          purrr::map_chr(~ stringr::str_extract(., r"{(?<=set_).*}")) |>
+          purrr::discard(~ . == "waning_model" | . == "time_scales") # Filter out the generic setter and time_scales
         return(models)
       }
     ),
@@ -573,4 +577,4 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 #' @inherit base::plot
 #' @export
-plot.DiseasyImmunity <- function(obj) obj$plot()
+plot.DiseasyImmunity <- function(obj, ...) obj$plot(...)
