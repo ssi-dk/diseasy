@@ -1,0 +1,72 @@
+---
+title: "DiseasyImmunity"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyImmunity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r options, include = FALSE}
+options("digits" = 2)
+options("tibble.print_min" = 5)
+options("diseasy.logging" = FALSE)
+```
+
+# Introduction
+The `DiseasyImmunity` is the module responsible for the implementation of different models for the waning of immunity towards the disease.
+
+# Configuring the module
+The module is initialized without setting any parameters.
+```{r initialization}
+im <- DiseasyImmunity$new()
+```
+
+# Inspecting the module
+By default, the module initializes with the `no_waning()` model.
+Aditionally it initializes with infection as target, meaning that the model describes the waning of immunity towards infection.
+
+To check which model is set and for which target use the code below, this will always be updated when adding or editing a model.
+The model instance is a named list, whereas the names are the targets which contain the functions for the models.
+```{r model}
+im$model
+```
+
+To see the waning models that come with the module we can query the module.
+```{r available_models}
+s$available_waning_models
+```
+
+# Setting
+All models are dependent on a characteristic time scale, which is the time up until when the immunity is significantly waning.
+The models are also dependent on a target which is what the immunity is waning towards.
+Following shows an example on how to set the exponential waning model.
+In this example the time scale is set to 20 and the target is set to infection.
+```{r setting the models}
+im$set_exponential_waning(time_scale = 20, target = "infection")
+```
+Besides the available functions, it is also possible to make a custom waning function.
+The input to the custom waning function is custom_function, time_scale, target and name.
+Below there is an example of how to create a custom waning function.
+```{r custom waning function}
+im$set_custom_waning(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time_scale)), time_scale = 20, target = "infection", name = "custom_waning")
+```
+
+It is also possible to the characteristic time scale after defining the model.
+To do this it is necessary to state which target it is desired to change.
+This should be done as a named list.
+An example of how to change the time scale for a given target is described.
+```{r setting the time scale}
+im$time_scale(list(infection = 30))
+```
