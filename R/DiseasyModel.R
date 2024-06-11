@@ -36,6 +36,8 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   If a boolean is given, it dictates whether to load a new instance module of this class\cr
     #'   If an instance of the module is provided instead, this instance is cloned to the new `DiseasyModel` instance\cr
     #'   Default is `FALSE`.
+    #' @param parmeters (`named list()`)\cr
+    #'   List of parameters to set for the model during initialization.
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance
     #' @param ...
@@ -49,19 +51,35 @@ DiseasyModel <- R6::R6Class(                                                    
     initialize = function(activity    = FALSE,
                           observables = FALSE,
                           season      = FALSE,
+                          parameters  = NULL,
                           label       = NULL,
                           ...) {
 
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert(checkmate::check_logical(activity, null.ok = TRUE),
-                        checkmate::check_class(activity, "DiseasyActivity", null.ok = TRUE),
-                        add = coll)
-      checkmate::assert(checkmate::check_logical(observables, null.ok = TRUE),
-                        checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE),
-                        add = coll)
-      checkmate::assert(checkmate::check_logical(season, null.ok = TRUE),
-                        checkmate::check_class(season, "DiseasySeason", null.ok = TRUE),
-                        add = coll)
+      checkmate::assert(
+        checkmate::check_logical(activity, null.ok = TRUE),
+        checkmate::check_class(activity, "DiseasyActivity", null.ok = TRUE),
+        add = coll
+      )
+      checkmate::assert(
+        checkmate::check_logical(observables, null.ok = TRUE),
+        checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE),
+        add = coll
+      )
+      checkmate::assert(
+        checkmate::check_logical(season, null.ok = TRUE),
+        checkmate::check_class(season, "DiseasySeason", null.ok = TRUE),
+        add = coll
+      )
+      checkmate::assert_list(parameters, null.ok = TRUE, add = coll)
+      if (!is.null(parameters)) {
+        checkmate::assert_names(
+          names(parameters),
+          subset.of = names(self %.% parameters),
+          type = "unique",
+          add = coll
+        )
+      }
       checkmate::assert_character(label, len = 1, any.missing = FALSE, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -86,6 +104,13 @@ DiseasyModel <- R6::R6Class(                                                    
       } else if (inherits(season, "DiseasySeason")) {
         self$load_module(season)
       }
+
+
+      # Update the existing private$parameters with the new parameters -- overwriting the existing ones
+      if (!is.null(parameters)) {
+        private$.parameters <- modifyList(private$.parameters, parameters, keep.null = TRUE)
+      }
+
 
       # Set the label for the model
       private$label <- label
@@ -179,7 +204,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasyActivity    = NULL,
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
-    .parameters  = NULL,
+    .parameters = NULL,
 
     # @param label (`character`)\cr
     #   A human readable label for the model instance
