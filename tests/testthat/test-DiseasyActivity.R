@@ -363,7 +363,8 @@ test_that("$get_scenario_contacts() works no scenario", {
               dimnames = list(age_labels, age_labels)
             )
           ),
-        4),
+          4
+        ),
         act$.__enclos_env__$private$activity_types
       )
     )
@@ -405,7 +406,7 @@ test_that("$get_scenario_contacts() works with given scenario", {
   expect_true(all(unlist(lapply(act$get_scenario_contacts(), lengths)) == 16 * 16))
 
   # Test with different age cuts
-  expect_identical(purrr::pluck(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), 1, 1, length), 2L * 2L) # 2 age groups
+  expect_identical(purrr::pluck(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), 1, 1, length), 2L * 2L)
   expect_identical(purrr::pluck(act$get_scenario_contacts(age_cuts_lower = 0), 1, 1, length), 1L) # 1 (no) age groups
 
   rm(act)

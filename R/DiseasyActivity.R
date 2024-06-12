@@ -553,15 +553,15 @@ DiseasyActivity <- R6::R6Class(                                                 
         # Apply the age-stratified restrictions to the age-stratified contact matrices
         for (dd in seq_along(openness)) { # looping over dates
           for (tt in private$activity_types) {
-            # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a vector
-            # to a "herringbone" pattern matrix and multiplied element-wise to the baseline contact matrices.
+            # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a
+            # vector to a "herringbone" pattern matrix and multiplied element-wise to the baseline contact matrices.
             # The choice of the "herringbone" pattern, is historical and ensures that openness matrices are additive.
             # It means the order of adding activities and expanding from vector to matrix is commutative.
             # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular
             # age-group are applied for contacts from and to all younger age-groups.
             # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
-            # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
-            # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
+            # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would
+            # be reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
             # non-commutative.
             contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
           }
