@@ -235,17 +235,18 @@ test_that("$get_scenario_openness() works with default parameters", {
         rep(list(c("0+" = 1)), 4),
         act$.__enclos_env__$private$activity_types
       )
-    )
+    ) |>
+      stats::setNames("1970-01-01")
   )
 
   expect_identical(
     act$get_scenario_openness(weights = c(1, 1, 1, 1)),
-    list(c("0+" = 1))
+    list("1970-01-01" = c("0+" = 1))
   )
 
   expect_identical(
     act$get_scenario_openness(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list(c("00-59" = 1, "60+" = 1))
+    list("1970-01-01" = c("00-59" = 1, "60+" = 1))
   )
 
   rm(act)
@@ -270,17 +271,18 @@ test_that("$get_scenario_openness() works with no scenario", {
         rep(list(stats::setNames(rep(1, length(age_labels)), age_labels)), 4),
         act$.__enclos_env__$private$activity_types
       )
-    )
+    ) |>
+      stats::setNames("1970-01-01")
   )
 
   expect_identical(
     act$get_scenario_openness(weights = c(1, 1, 1, 1)),
-    list(stats::setNames(rep(1, length(age_labels)), age_labels))
+    list("1970-01-01" = stats::setNames(rep(1, length(age_labels)), age_labels))
   )
 
   expect_identical(
     act$get_scenario_openness(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list(c("00-59" = 1, "60+" = 1))
+    list("1970-01-01" = c("00-59" = 1, "60+" = 1))
   )
 
   rm(act)
@@ -323,17 +325,18 @@ test_that("$get_scenario_contacts() works with default parameters", {
         rep(list(matrix(0.25, dimnames = list("0+", "0+"))), 4),
         act$.__enclos_env__$private$activity_types
       )
-    )
+    ) |>
+      stats::setNames("1970-01-01")
   )
 
   expect_identical(
     act$get_scenario_contacts(weights = c(1, 1, 1, 1)),
-    list(matrix(1, dimnames = list("0+", "0+")))
+    list("1970-01-01" = matrix(1, dimnames = list("0+", "0+")))
   )
 
   expect_identical(
     act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list(matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
+    list("1970-01-01" = matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
   )
 
   rm(act)
@@ -367,7 +370,8 @@ test_that("$get_scenario_contacts() works no scenario", {
         ),
         act$.__enclos_env__$private$activity_types
       )
-    )
+    ) |>
+      stats::setNames("1970-01-01")
   )
 
   expect_identical(
@@ -378,12 +382,13 @@ test_that("$get_scenario_contacts() works no scenario", {
         ncol = length(age_labels),
         dimnames = list(age_labels, age_labels)
       )
-    )
+    ) |>
+      stats::setNames("1970-01-01")
   )
 
   expect_identical(
     act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list(matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
+    list("1970-01-01" = matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
   )
 
   rm(act)
