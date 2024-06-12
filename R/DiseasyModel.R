@@ -32,7 +32,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes
-    #' @param activity,observables,season (`boolean` or `R6::R6Class instance`)\cr
+    #' @param activity,observables,season,variant (`boolean` or `R6::R6Class instance`)\cr
     #'   If a boolean is given, it dictates whether to load a new instance module of this class\cr
     #'   If an instance of the module is provided instead, this instance is cloned to the new `DiseasyModel` instance\cr
     #'   Default is `FALSE`.
@@ -51,6 +51,7 @@ DiseasyModel <- R6::R6Class(                                                    
     initialize = function(activity    = FALSE,
                           observables = FALSE,
                           season      = FALSE,
+                          variant     = FALSE,
                           parameters  = NULL,
                           label       = NULL,
                           ...) {
@@ -71,6 +72,11 @@ DiseasyModel <- R6::R6Class(                                                    
         checkmate::check_class(season, "DiseasySeason", null.ok = TRUE),
         add = coll
       )
+      checkmate::assert(
+        checkmate::check_logical(variant, null.ok = TRUE),
+        checkmate::check_class(variant, "DiseasyVariant", null.ok = TRUE),
+        add = coll
+      )
       checkmate::assert_list(parameters, null.ok = TRUE, add = coll)
       if (!is.null(parameters)) {
         checkmate::assert_names(
@@ -80,6 +86,9 @@ DiseasyModel <- R6::R6Class(                                                    
           add = coll
         )
       }
+      checkmate::assert(checkmate::check_logical(variant, null.ok = TRUE),
+                        checkmate::check_class(variant, "DiseasyVariant", null.ok = TRUE),
+                        add = coll)
       checkmate::assert_character(label, len = 1, any.missing = FALSE, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -103,6 +112,12 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(DiseasySeason$new())
       } else if (inherits(season, "DiseasySeason")) {
         self$load_module(season)
+      }
+
+      if (isTRUE(variant)) {
+        self$load_module(DiseasyVariant$new())
+      } else if (inherits(variant, "DiseasyVariant")) {
+        self$load_module(variant)
       }
 
 
@@ -180,7 +195,7 @@ DiseasyModel <- R6::R6Class(                                                    
       expr = return(private %.% .DiseasyObservables)),
 
 
-    #' @field season (`diseasy::season`)\cr
+    #' @field season (`diseasy::DiseasySeason`)\cr
     #'   The local copy of an season module. Read-only.
     #' @seealso [diseasy::DiseasySeason]
     #' @importFrom diseasystore `%.%`
@@ -188,6 +203,16 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "season",
       expr = return(private %.% .DiseasySeason)),
+
+
+    #' @field variant (`diseasy::.DiseasyVariant`)\cr
+    #'   The local copy of an variant module. Read-only.
+    #' @seealso [diseasy::.DiseasyVariant]
+    #' @importFrom diseasystore `%.%`
+    variant = purrr::partial(
+      .f = active_binding,                                                                                              # nolint: indentation_linter
+      name = "variant",
+      expr = return(private %.% .DiseasyVariant)),
 
 
     #' @field parameters (`list()`)\cr
@@ -204,6 +229,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasyActivity    = NULL,
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
+    .DiseasyVariant     = NULL,
     .parameters = NULL,
 
     # @param label (`character`)\cr
