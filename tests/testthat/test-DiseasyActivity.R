@@ -28,8 +28,6 @@ secret_hash <- dk_activity_units_subset[c("baseline", "lockdown_2020", "secondar
 attr(ref_scenario_1, "secret_hash") <- secret_hash
 
 
-
-
 test_that("$set_activity_units() works", {
 
   # Create a new instance of the activity module
@@ -224,14 +222,76 @@ test_that("$change_risk()'s secret_hash works", {
 })
 
 
-test_that("$get_scenario_openness() works", {
+test_that("$get_scenario_openness() works with default parameters", {
 
-  # Test openness
+  # Test openness with default parameters
+  act <- DiseasyActivity$new()
+
+  # With no scenario, we should get a default openness of 1 and no age-groups
+  expect_identical(
+    act$get_scenario_openness(),
+    list(
+      stats::setNames(
+        rep(list(c("0+" = 1)), 4),
+        act$.__enclos_env__$private$activity_types
+      )
+    )
+  )
+
+  expect_identical(
+    act$get_scenario_openness(weights = c(1, 1, 1, 1)),
+    list(c("0+" = 1))
+  )
+
+  expect_identical(
+    act$get_scenario_openness(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
+    list(c("00-59" = 1, "60+" = 1))
+  )
+
+  rm(act)
+})
+
+
+test_that("$get_scenario_openness() works with no scenario", {
+
+  # Test openness with given contact basis
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+
+  # With no scenario, we should get a default openness of 1
+  # but since we have the contact_basis loaded, we should get the age information by default
+  # (inferred from the contact_basis)
+
+  age_labels <- names(contact_basis %.% DK %.% population)
+
+  expect_identical(
+    act$get_scenario_openness(),
+    list(
+      stats::setNames(
+        rep(list(stats::setNames(rep(1, length(age_labels)), age_labels)), 4),
+        act$.__enclos_env__$private$activity_types
+      )
+    )
+  )
+
+  expect_identical(
+    act$get_scenario_openness(weights = c(1, 1, 1, 1)),
+    list(stats::setNames(rep(1, length(age_labels)), age_labels))
+  )
+
+  expect_identical(
+    act$get_scenario_openness(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
+    list(c("00-59" = 1, "60+" = 1))
+  )
+
+  rm(act)
+})
+
+
+test_that("$get_scenario_openness() works with given scenario", {
+
+  # Create a new instance of the activity module
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
   act$set_activity_units(dk_activity_units_subset)
-
-  # With no scenario, we should get a empty list
-  expect_identical(act$get_scenario_openness(), stats::setNames(list(), character(0)))
 
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
@@ -245,6 +305,108 @@ test_that("$get_scenario_openness() works", {
   # Test with different age cuts
   expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0, 60)), 1, 1, length), 2L) # 2 age groups
   expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = 0), 1, 1, length), 1L) # 1 (no) age groups
+
+  rm(act)
+})
+
+
+test_that("$get_scenario_contacts() works with default parameters", {
+
+  # Test openness with default parameters
+  act <- DiseasyActivity$new()
+
+  # With no scenario and no contact_basis, all contact matrices are assumed to be 1
+  expect_identical(
+    act$get_scenario_contacts(),
+    list(
+      stats::setNames(
+        rep(list(matrix(0.25, dimnames = list("0+", "0+"))), 4),
+        act$.__enclos_env__$private$activity_types
+      )
+    )
+  )
+
+  expect_identical(
+    act$get_scenario_contacts(weights = c(1, 1, 1, 1)),
+    list(matrix(1, dimnames = list("0+", "0+")))
+  )
+
+  expect_identical(
+    act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
+    list(matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
+  )
+
+  rm(act)
+})
+
+
+test_that("$get_scenario_contacts() works no scenario", {
+
+  # Test openness with given contact basis
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+
+  # With no scenario, we should get a default openness of 1
+  # but since we have the contact_basis loaded, we should get the age information by default
+  # (inferred from the contact_basis)
+
+  age_labels <- names(contact_basis %.% DK %.% population)
+
+  expect_identical(
+    act$get_scenario_contacts(),
+    list(
+      stats::setNames(
+        rep(
+          list(
+            matrix(
+              rep(0.25 / length(age_labels), length(age_labels) * length(age_labels)),
+              ncol = length(age_labels),
+              dimnames = list(age_labels, age_labels)
+            )
+          ),
+        4),
+        act$.__enclos_env__$private$activity_types
+      )
+    )
+  )
+
+  expect_identical(
+    act$get_scenario_contacts(weights = c(1, 1, 1, 1)),
+    list(
+      matrix(
+        rep(1 / length(age_labels), length(age_labels) * length(age_labels)),
+        ncol = length(age_labels),
+        dimnames = list(age_labels, age_labels)
+      )
+    )
+  )
+
+  expect_identical(
+    act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
+    list(matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
+  )
+
+  rm(act)
+})
+
+
+test_that("$get_scenario_contacts() works with given scenario", {
+
+  # Create a new instance of the activity module
+  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
+  act$set_activity_units(dk_activity_units_subset)
+
+  # Now we load a scenario
+  act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
+                      opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
+                      closing      = c(NA,           "baseline",      NA))
+
+  expect_length(act$get_scenario_contacts(), 3L) # 3 dates in scenario
+  expect_length(act$get_scenario_contacts()[[1]], 4L) # 4 arenas
+  expect_true(all(unlist(lapply(act$get_scenario_contacts(), lengths)) == 16 * 16))
+
+  # Test with different age cuts
+  expect_identical(purrr::pluck(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), 1, 1, length), 2L * 2L) # 2 age groups
+  expect_identical(purrr::pluck(act$get_scenario_contacts(age_cuts_lower = 0), 1, 1, length), 1L) # 1 (no) age groups
 
   rm(act)
 })

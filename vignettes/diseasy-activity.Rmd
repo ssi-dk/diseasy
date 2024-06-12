@@ -33,7 +33,7 @@ The module can be initialized without setting any parameters.
 act <- DiseasyActivity$new()
 ```
 
-By default, the module initializes with no activity scenario, and produces empty outputs.
+By default, the module initializes with no activity scenario, and produces non-informative outputs.
 (See [the interfacing section](#interfacing) for ways to get metrics from the module)
 ```{r null_scenario}
 act$get_scenario_openness()

@@ -14,7 +14,11 @@
 #'   independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
 #'   (in)active.
 #'
-#'   The `scenario` contains information on when different `activity_units` are opened and closed
+#'   The `scenario` contains information on when different `activity_units` are opened and closed.
+#'
+#'   If no scenario is provided, the module will provide non-informative activity information:
+#'     - Openness is always 1
+#'     - Contact matrices are uniform and the largest eigenvalue of their sum is always 1
 #'
 #'   See vignette("diseasy-activity") for examples of use.
 #' @examples
@@ -438,43 +442,64 @@ DiseasyActivity <- R6::R6Class(                                                 
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()
-      openness <- lapply(scenario_activities, private$add_activities)
 
-      # Apply the time-varying risks stored in risk_matrix
-      for (dd in seq_along(openness)) { # looping over dates
-        for (tt in private$activity_types) {
-          openness[[dd]][[tt]] <- openness[[dd]][[tt]] * self$risk_matrix[tt, dd]
+      # If no scenario is defined, we provide non-informative openness
+      if (length(scenario_activities) == 0) {
+
+        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
+        age_labels <- age_cuts_lower |>
+          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = 0) |>
+          diseasystore::age_labels()
+
+
+        openness <- rep(1, length(age_labels)) |>    # All age groups are fully open
+          stats::setNames(age_labels) |>
+          list() |>
+          rep(length(private$activity_types)) |>     # ... across all arenas
+          stats::setNames(private$activity_types) |>
+          list()                                     # ... and nested to match output format
+
+      } else { # otherwise, we compute the openness from the scenario
+
+        openness <- lapply(scenario_activities, private$add_activities)
+
+        # Apply the time-varying risks stored in risk_matrix
+        for (dd in seq_along(openness)) { # looping over dates
+          for (tt in private$activity_types) {
+            openness[[dd]][[tt]] <- openness[[dd]][[tt]] * self$risk_matrix[tt, dd]
+          }
         }
-      }
 
-      if (private$direction == "closing") {
-        openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
-      }
+        if (private$direction == "closing") {
+          openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
+        }
 
-      # Project into new age_groups if given
-      if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower) |>
-          t() |>          # To get the right dimensions
-          as.data.frame() # To enable the mapping below
+        # Project into new age_groups if given
+        if (!is.null(age_cuts_lower)) {
+          p <- private$population_transform_matrix(age_cuts_lower) |>
+            t() |>          # To get the right dimensions
+            as.data.frame() # To enable the mapping below
 
-        # Get the population proportion in the new age groups
-        population <- private$map_population(age_cuts_lower)
-        proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
+          # Get the population proportion in the new age groups
+          population <- private$map_population(age_cuts_lower)
+          proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
 
-        # Weight the population transformation matrix by the population proportion
-        p <- p * proportion
+          # Weight the population transformation matrix by the population proportion
+          p <- p * proportion
 
-        # Get the nested vectors, then compute the weighted average using `p` as weights
-        openness <- openness |>
-          purrr::map(
-            ~ purrr::map(
-              .,
-              ~ {
-                purrr::map2_dbl(as.data.frame(.), p, \(v, w) sum(v * w / sum(w))) |>
-                  stats::setNames(names(p))
-              }
+          # Get the nested vectors, then compute the weighted average using `p` as weights
+          openness <- openness |>
+            purrr::map(
+              ~ purrr::map(
+                .,
+                ~ {
+                  purrr::map2_dbl(as.data.frame(.), p, \(v, w) sum(v * w / sum(w))) |>
+                    stats::setNames(names(p))
+                }
+              )
             )
-          )
+        }
       }
 
       # Weight if weights are given
@@ -496,33 +521,58 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_class(self$contact_basis, "list", add = coll)
+      checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       contacts <- openness <- self$get_scenario_openness()
 
-      # Apply the age-stratified restrictions to the age-stratified contact matrices
-      for (dd in seq_along(openness)) { # looping over dates
-        for (tt in private$activity_types) {
-          # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a vector
-          # to a "herringbone" pattern matrix and multiplied element-wise to the baseline contact matrices.
-          # The choice of the "herringbone" pattern, is historical and ensures that openness matrices are additive.
-          # It means the order of adding activities and expanding from vector to matrix is commutative.
-          # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular
-          # age-group are applied for contacts from and to all younger age-groups.
-          # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
-          # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
-          # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
-          # non-commutative.
-          contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
+      # If no scenario is defined, we provide non-informative contact matrices
+      if (length(self$get_scenario_activities()) == 0) {
+
+        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
+        age_labels <- age_cuts_lower |>
+          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = 0) |>
+          diseasystore::age_labels()
+
+        contacts <- matrix(
+          rep(
+            1 / (length(age_labels) * length(private$activity_types)), # Contacts are uniform across all age groups
+            length(age_labels) * length(age_labels)
+          ),
+          ncol = length(age_labels),
+          dimnames = list(age_labels, age_labels)
+        ) |>
+          list() |>
+          rep(length(private$activity_types)) |>     # ... across all arenas
+          stats::setNames(private$activity_types) |>
+          list()                                     # ... and nested to match output format
+
+      } else { # otherwise, we compute the contact matrices from the scenario
+
+        # Apply the age-stratified restrictions to the age-stratified contact matrices
+        for (dd in seq_along(openness)) { # looping over dates
+          for (tt in private$activity_types) {
+            # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a vector
+            # to a "herringbone" pattern matrix and multiplied element-wise to the baseline contact matrices.
+            # The choice of the "herringbone" pattern, is historical and ensures that openness matrices are additive.
+            # It means the order of adding activities and expanding from vector to matrix is commutative.
+            # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular
+            # age-group are applied for contacts from and to all younger age-groups.
+            # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
+            # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
+            # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
+            # non-commutative.
+            contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
+          }
         }
-      }
 
-      # Project into new age_groups if given
-      if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower)
+        # Project into new age_groups if given
+        if (!is.null(age_cuts_lower)) {
+          p <- private$population_transform_matrix(age_cuts_lower)
 
-        contacts <- lapply(contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
+          contacts <- lapply(contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
+        }
       }
 
       # Weight if weights are given
