@@ -14,7 +14,11 @@
 #'   independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
 #'   (in)active.
 #'
-#'   The `scenario` contains information on when different `activity_units` are opened and closed
+#'   The `scenario` contains information on when different `activity_units` are opened and closed.
+#'
+#'   If no scenario is provided, the module will provide non-informative activity information:
+#'     - Openness is always 1
+#'     - Contact matrices are uniform and the largest eigenvalue of their sum is always 1
 #'
 #'   See vignette("diseasy-activity") for examples of use.
 #' @examples
@@ -439,43 +443,64 @@ DiseasyActivity <- R6::R6Class(                                                 
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()
-      openness <- lapply(scenario_activities, private$add_activities)
 
-      # Apply the time-varying risks stored in risk_matrix
-      for (dd in seq_along(openness)) { # looping over dates
-        for (tt in private$activity_types) {
-          openness[[dd]][[tt]] <- openness[[dd]][[tt]] * self$risk_matrix[tt, dd]
+      # If no scenario is defined, we provide non-informative openness
+      if (length(scenario_activities) == 0) {
+
+        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
+        age_labels <- age_cuts_lower |>
+          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = 0) |>
+          diseasystore::age_labels()
+
+
+        openness <- rep(1, length(age_labels)) |>    # All age groups are fully open
+          stats::setNames(age_labels) |>
+          list() |>
+          rep(length(private$activity_types)) |>     # ... across all arenas
+          stats::setNames(private$activity_types) |>
+          list()                                     # ... and nested to match output format
+
+      } else { # otherwise, we compute the openness from the scenario
+
+        openness <- lapply(scenario_activities, private$add_activities)
+
+        # Apply the time-varying risks stored in risk_matrix
+        for (dd in seq_along(openness)) { # looping over dates
+          for (tt in private$activity_types) {
+            openness[[dd]][[tt]] <- openness[[dd]][[tt]] * self$risk_matrix[tt, dd]
+          }
         }
-      }
 
-      if (private$direction == "closing") {
-        openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
-      }
+        if (private$direction == "closing") {
+          openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
+        }
 
-      # Project into new age_groups if given
-      if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower) |>
-          t() |>          # To get the right dimensions
-          as.data.frame() # To enable the mapping below
+        # Project into new age_groups if given
+        if (!is.null(age_cuts_lower)) {
+          p <- private$population_transform_matrix(age_cuts_lower) |>
+            t() |>          # To get the right dimensions
+            as.data.frame() # To enable the mapping below
 
-        # Get the population proportion in the new age groups
-        population <- private$map_population(age_cuts_lower)
-        proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
+          # Get the population proportion in the new age groups
+          population <- private$map_population(age_cuts_lower)
+          proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
 
-        # Weight the population transformation matrix by the population proportion
-        p <- p * proportion
+          # Weight the population transformation matrix by the population proportion
+          p <- p * proportion
 
-        # Get the nested vectors, then compute the weighted average using `p` as weights
-        openness <- openness |>
-          purrr::map(
-            ~ purrr::map(
-              .,
-              ~ {
-                purrr::map2_dbl(as.data.frame(.), p, \(v, w) sum(v * w / sum(w))) |>
-                  stats::setNames(names(p))
-              }
+          # Get the nested vectors, then compute the weighted average using `p` as weights
+          openness <- openness |>
+            purrr::map(
+              ~ purrr::map(
+                .,
+                ~ {
+                  purrr::map2_dbl(as.data.frame(.), p, \(v, w) sum(v * w / sum(w))) |>
+                    stats::setNames(names(p))
+                }
+              )
             )
-          )
+        }
       }
 
       # Weight if weights are given
@@ -520,11 +545,10 @@ DiseasyActivity <- R6::R6Class(                                                 
           scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
             self$contact_basis$contacts[[tt]]
         }
-      }
 
-      # Project into new age_groups if given
-      if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower)
+        # Project into new age_groups if given
+        if (!is.null(age_cuts_lower)) {
+          p <- private$population_transform_matrix(age_cuts_lower)
 
         # To perform the projection, we need the number of persons in the new and original age groups
         # Determine the population in the new age groups
