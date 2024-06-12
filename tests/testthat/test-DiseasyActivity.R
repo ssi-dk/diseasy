@@ -363,7 +363,8 @@ test_that("$get_scenario_contacts() works no scenario", {
               dimnames = list(age_labels, age_labels)
             )
           ),
-        4),
+          4
+        ),
         act$.__enclos_env__$private$activity_types
       )
     )
