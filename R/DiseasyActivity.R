@@ -459,7 +459,8 @@ DiseasyActivity <- R6::R6Class(                                                 
           list() |>
           rep(length(private$activity_types)) |>     # ... across all arenas
           stats::setNames(private$activity_types) |>
-          list()                                     # ... and nested to match output format
+          list() |>                                  # ... and nested to match output format
+          stats::setNames(as.Date(0))
 
       } else { # otherwise, we compute the openness from the scenario
 
