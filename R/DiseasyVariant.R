@@ -2,7 +2,7 @@
 #'
 #' @description TODO
 #' @export
-DiseasyVariant <- R6::R6Class(
+DiseasyVariant <- R6::R6Class(                                                                                          # nolint: object_name_linter
   classname = "DiseasyVariant",
   inherit = DiseasyBaseModule,
 
@@ -20,8 +20,8 @@ DiseasyVariant <- R6::R6Class(
       checkmate::reportAssertions(coll)
 
       # Store the given parameters
-      private$.variants = seq(n_variants) |>
-        purrr::map( ~ list("relative_infection_risk" = 1 - 0.99 * (. - 1) / (n_variants - 1)))
+      private$.variants <- seq(n_variants) |>
+        purrr::map(~ list("relative_infection_risk" = 1 - 0.99 * (. - 1) / (n_variants - 1)))
 
       # Pass arguments to the DiseasyBaseModule initializer
       super$initialize(...)
