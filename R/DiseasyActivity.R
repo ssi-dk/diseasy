@@ -857,7 +857,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Early return
       # .. if no object is given
-      if (is.null(obj)) {
+      if (is.null(obj) || (length(obj) == 0) || missing(obj)) {
         return(obj)
       }
 
