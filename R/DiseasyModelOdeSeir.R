@@ -61,7 +61,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # To be more specific, we also want to use the density of population (i.e. the state vector should sum to 1).
       # So instead of population, we use the proportion of population in the age groups.
 
-      # To convert to per capitaish we need the proportion to use
+      # To convert to per capita-ish we need the proportion to use.
 
       if (length(self %.% activity %.% get_scenario_activities()) == 0) {
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
@@ -323,28 +323,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       out[private$e1_state_indexes] <- out[private$e1_state_indexes] + new_infections
 
       return(out)
-    },
-
-
-
-
-
-    fit_regression = function(data, formula) {
-      private$not_implemented_error("`$fit_regression` must be implemented in inheiriting class")
-    },
-
-    get_prediction = function(regression_fit, new_data, quantiles) {
-      private$not_implemented_error("`$get_prediction` must be implemented in inheiriting class")
-    },
-
-    update_formula = function(formula, aggregation) {
-      private$not_implemented_error("`$update_formula` must be implemented in inheiriting class")
-    },
-
-    report_regression_fit = function(regressor, formula, family, hash) {
-      private$lg$info("Running {regressor} with formula: {format(formula)}",
-                      " and family: {purrr::pluck(family, 'family', .default = family)}",
-                      " (hash: {hash})")
     }
   )
 )
