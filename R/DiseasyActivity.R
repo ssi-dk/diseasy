@@ -494,7 +494,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             as.data.frame() # To enable the mapping below
 
           # Get the population proportion in the new age groups
-          population <- private$map_population(age_cuts_lower)
+          population <- self$map_population(age_cuts_lower)
           proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
 
           # Weight the population transformation matrix by the population proportion
@@ -627,6 +627,38 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       return(scenario_contacts)
     },
+
+
+    #' Map population between age groups
+    #'
+    #' @description
+    #'   The function computes the proportion of population in the new and old age groups.
+    #' @param age_cuts_lower `r rd_age_cuts_lower`
+    #' @return
+    #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
+    #'   those supplied to the function.
+    map_population = function(age_cuts_lower) {
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
+                                lower = 0, unique = TRUE, add = coll)
+      checkmate::assert_character(names(self$contact_basis$proportion), add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Using default population from contact_basis
+      proportion <- self$contact_basis$demography$proportion
+
+      # Creating mapping for all ages to reference and provided age_groups
+      lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$proportion), split = "[-+]"), \(x) x[1]))
+      population <- data.frame(age = 0:(length(proportion) - 1), proportion = proportion)
+
+      population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
+      population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
+
+      return(population)
+    },
+
 
     #' Rescale contact matrices to population contact rates
     #'
@@ -899,7 +931,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       # Compute proportion of population in new and old age_groups
-      population <- private$map_population(age_cuts_lower)
+      population <- self$map_population(age_cuts_lower)
 
       # Calculating transformation matrix
       tt <- merge(aggregate(proportion ~ age_group_ref + age_group_out, data = population, FUN = sum),
@@ -914,32 +946,6 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(p)
     },
 
-
-    # Map population between age groups
-    # @description
-    #   The function computes the proportion of population in the new and old age groups.
-    # @param age_cuts_lower `r rd_age_cuts_lower`
-    map_population = function(age_cuts_lower) {
-
-      # Input checks
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_character(names(self$contact_basis$proportion), add = coll)
-      checkmate::reportAssertions(coll)
-
-      # Using default population from contact_basis
-      proportion <- self$contact_basis$demography$proportion
-
-      # Creating mapping for all ages to reference and provided age_groups
-      lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$proportion), split = "[-+]"), \(x) x[1]))
-      population <- data.frame(age = 0:(length(proportion) - 1), proportion = proportion)
-
-      population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
-      population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
-
-      return(population)
-    },
 
     # Weight of nested 4-vectors
     # @description
