@@ -69,13 +69,13 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   rm(m)
 })
 
-test_that("index helpers works as expected (SEEIIRR double variant / single age group)", {
+test_that("helpers are configured as expected (SEEIIRR double variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -108,13 +108,13 @@ test_that("index helpers works as expected (SEEIIRR double variant / single age 
   rm(m)
 })
 
-test_that("index helpers works as expected (SEEIIRR double variant / double age group)", {
+test_that("helpers are configured as expected (SEEIIRR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -165,7 +165,7 @@ test_that("contact_matrix helper works as expected (no scenario - single age gro
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -208,7 +208,7 @@ test_that("contact_matrix helper works as expected (no scenario - two age groups
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -251,7 +251,7 @@ test_that("contact_matrix helper works as expected (no scenario - three age grou
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -291,8 +291,8 @@ test_that("contact_matrix helper works as expected (no scenario - three age grou
 test_that("contact_matrix helper works as expected (with scenario - all age groups)", {
   skip_if_not_installed("RSQLite")
 
-  # Define a activity scenario
-  act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
+  # Define an activity scenario
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
   act$set_activity_units(dk_activity_units)
 
   # Fully open from 2020-01-01
@@ -316,7 +316,7 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list(
-      "age_cuts_lower" = as.numeric(stringr::str_extract(names(contact_basis$DK$population), r"{^\d+}"))
+      "age_cuts_lower" = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))
     )
   )
 
@@ -331,25 +331,139 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   # However, the model uses per capita-ish rates, so we need to convert
   expect_identical(
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`), contact_basis %.% DK %.% proportion)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis %.% DK %.% counts, `+`), contact_basis %.% DK %.% proportion)
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_identical(
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis %.% DK %.% counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis %.% DK %.% counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis %.% DK %.% counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
   )
 
   rm(m)
 })
+
+
+
+test_that("RHS does not leak and solution is non-negative (SEIR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Define an activity scenario
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act$set_activity_units(dk_activity_units)
+
+  # Fully open from 2020-01-01
+  act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+  # Half risk from 2021-01.01
+  act$change_risk(date = as.Date("2020-01-05"), type = "home", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "work", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "school", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "other", risk = 0.5)
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+    disease_progression_rates = c("E" = 2, "I" = 4),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Generate a uniform initial state_vector that sums to 1
+  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+    (\(.) . / sum(.))()
+  expect_equal(sum(y0), 1)
+
+
+  # Check that rhs function does not immediately leak
+  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
+
+  # Run solver across scenario change to check for long-term leakage
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
+  checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
+
+  rm(m)
+})
+
+# test_that("helpers are configured as expected (SEEIIRR single variant / single age group)", {
+#   skip_if_not_installed("RSQLite")
+
+#   # Creating an empty model module
+#   m <- DiseasyModelOdeSeir$new(
+#     season = TRUE,
+#     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+#     observables = DiseasyObservables$new(
+#       conn = DBI::dbConnect(RSQLite::SQLite()),
+#       last_queryable_date = Sys.Date() - 1
+#     ),
+#     variant = DiseasyVariant$new(n_variants = 1),
+#     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+#     disease_progression_rates = c("E" = 2, "I" = 4),
+#     parameters = list("age_cuts_lower" = 0)
+#   )
+
+#   # Get a reference to the private environment
+#   private <- m$.__enclos_env__$private
+
+#   rm(m)
+# })
+
+# test_that("helpers are configured as expected (SEEIIRR double variant / single age group)", {
+#   skip_if_not_installed("RSQLite")
+
+#   # Creating an empty model module
+#   m <- DiseasyModelOdeSeir$new(
+#     season = TRUE,
+#     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+#     observables = DiseasyObservables$new(
+#       conn = DBI::dbConnect(RSQLite::SQLite()),
+#       last_queryable_date = Sys.Date() - 1
+#     ),
+#     variant = DiseasyVariant$new(n_variants = 2),
+#     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+#     disease_progression_rates = c("E" = 2, "I" = 4),
+#     parameters = list("age_cuts_lower" = 0)
+#   )
+
+#   rm(m)
+# })
+
+# test_that("helpers are configured as expected (SEEIIRR double variant / double age group)", {
+#   skip_if_not_installed("RSQLite")
+
+#   # Creating an empty model module
+#   m <- DiseasyModelOdeSeir$new(
+#     season = TRUE,
+#     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+#     observables = DiseasyObservables$new(
+#       conn = DBI::dbConnect(RSQLite::SQLite()),
+#       last_queryable_date = Sys.Date() - 1
+#     ),
+#     variant = DiseasyVariant$new(n_variants = 2),
+#     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+#     disease_progression_rates = c("E" = 2, "I" = 4),
+#     parameters = list("age_cuts_lower" = c(0, 60))
+#   )
+
+#   rm(m)
+# })
