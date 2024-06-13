@@ -21,7 +21,7 @@ DiseasyVariant <- R6::R6Class(                                                  
 
       # Store the given parameters
       private$.variants <- seq(n_variants) |>
-        purrr::map(~ list("relative_infection_risk" = 1 - 0.99 * (. - 1) / (n_variants - 1)))
+        purrr::map(~ list("relative_infection_risk" = 1 - 0.99 * (. - 1) / max(1, (n_variants - 1))))
 
       # Pass arguments to the DiseasyBaseModule initializer
       super$initialize(...)
