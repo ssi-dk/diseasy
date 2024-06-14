@@ -1,3 +1,91 @@
+
+test_that("helpers are configured as expected (SIR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("I" = 1, "R" = 1),
+    disease_progression_rates = c("I" = ri),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Check index helpers are correctly set
+  expect_identical(private %.% e1_state_indexes, 1)
+  expect_identical(private %.% i_state_indexes, list(1))
+  expect_identical(private %.% r1_state_indexes, 2)
+  expect_identical(private %.% s_state_indexes, 3)
+  expect_identical(private %.% state_vector_age_group, rep(1L, 3))
+  expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(3)))
+
+  # Check progression flow rates are correctly set
+  expect_identical(private %.% progression_flow_rates, c(ri, 0, 0))
+
+  # Check infection risk is correctly set
+  expect_identical(private %.% infection_risk, c(0, 0.02, 1))
+
+  rm(m)
+})
+
+test_that("helpers are configured as expected (SIR double variant / double age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 2),
+    compartment_structure = c("I" = 1, "R" = 1),
+    disease_progression_rates = c("I" = ri),
+    parameters = list("age_cuts_lower" = c(0, 60))
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Check index helpers are correctly set
+  expect_identical(private %.% e1_state_indexes, c(1, 3, 5, 7))
+  expect_identical(private %.% i_state_indexes, list(1, 3, 5, 7))
+  expect_identical(private %.% r1_state_indexes, c(2, 4, 6, 8))
+  expect_identical(private %.% s_state_indexes, c(9, 10))
+  expect_identical(private %.% state_vector_age_group, c(1L, 1L, 2L, 2L, 1L, 1L, 2L, 2L, 1L, 2L))
+  expect_identical(
+    private %.% infection_matrix_to_state_vector,
+    list(
+      c(seq.int(2),            seq.int(2) + 4L,       9L),
+      c(seq.int(2) + 2L,       seq.int(2) + 6L,       10L),
+      c(10L + seq.int(2),      10L + seq.int(2) + 4L, 10L + 9L),
+      c(10L + seq.int(2) + 2L, 10L + seq.int(2) + 6L, 10L + 10L)
+    )
+  )
+
+  # Check progression flow rates are correctly set
+  expect_identical(
+    private %.% progression_flow_rates,
+    c(ri, 0, ri, 0, ri, 0, ri, 0, 0, 0)
+  )
+
+  # Check infection risk is correctly set
+  expect_identical(
+    private %.% infection_risk,
+    c(0, 0.02, 0, 0.02, 0, 0.02, 0, 0.02, 1, 1)
+  )
+
+  rm(m)
+})
+
 test_that("helpers are configured as expected (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
@@ -20,6 +108,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
   expect_identical(private %.% i_state_indexes, list(2))
+  expect_identical(private %.% r1_state_indexes, 3)
   expect_identical(private %.% s_state_indexes, 4)
   expect_identical(private %.% state_vector_age_group, rep(1L, 4))
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(4)))
@@ -28,7 +117,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   expect_identical(private %.% progression_flow_rates, c(2, 4, 0, 0))
 
   # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, 0, 0.01, 1))
+  expect_identical(private %.% infection_risk, c(0, 0, 0.02, 1))
 
   rm(m)
 })
@@ -56,6 +145,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
   expect_identical(private %.% i_state_indexes, list(c(3, 4)))
+  expect_identical(private %.% r1_state_indexes, 5)
   expect_identical(private %.% s_state_indexes, 7)
   expect_identical(private %.% state_vector_age_group, rep(1L, 7))
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(7)))
@@ -64,7 +154,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 0))
 
   # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 1))
+  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.02, 0.02, 1))
 
   rm(m)
 })
@@ -92,6 +182,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10)))
+  expect_identical(private %.% r1_state_indexes, c(5, 11))
   expect_identical(private %.% s_state_indexes, 13)
   expect_identical(private %.% state_vector_age_group, rep(1L, 13))
   expect_identical(
@@ -103,7 +194,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 0))
 
   # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1))
+  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 1))
 
   rm(m)
 })
@@ -131,14 +222,15 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7, 13, 19))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10), c(15, 16), c(21, 22)))
+  expect_identical(private %.% r1_state_indexes, c(5, 11, 17, 23))
   expect_identical(private %.% s_state_indexes, c(25, 26))
   expect_identical(private %.% state_vector_age_group, c(rep(1L, 6), rep(2L, 6), rep(1L, 6), rep(2L, 6), 1L, 2L))
   expect_identical(
     private %.% infection_matrix_to_state_vector,
     list(
-      c(seq.int(6), seq.int(6) + 12L, 25L),
-      c(seq.int(6) + 6L, seq.int(6) + 18L, 26L),
-      c(26L + seq.int(6), 26L + seq.int(6) + 12L, 26L + 25L),
+      c(seq.int(6),            seq.int(6) + 12L,       25L),
+      c(seq.int(6) + 6L,       seq.int(6) + 18L,       26L),
+      c(26L + seq.int(6),      26L + seq.int(6) + 12L, 26L + 25L),
       c(26L + seq.int(6) + 6L, 26L + seq.int(6) + 18L, 26L + 26L)
     )
   )
@@ -152,7 +244,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   # Check infection risk is correctly set
   expect_identical(
     private %.% infection_risk,
-    c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1, 1)
+    c(0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 1, 1)
   )
 
   rm(m)
@@ -709,24 +801,26 @@ test_that("RHS passes sanity checks (single + double variant / single age group)
     c(
       0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
       0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+      - 0.1 * (1 + 0.01) * 0.8 # Susceptible
     )
   )
 
+
+  ### Check 4: re-infections should have lower rates
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  y0[private$r1_state_indexes] <- 0.8 # The rest are previously infected
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.02 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4 - 0.02 * 0.8 * 0.1, # Variant 1
       0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+      0 # Susceptible
     )
   )
 
 
-  ### Check 4: The contact matrix scaling works as expected.
+  ### Check 5: The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
   # so we rerun the test above for t = 1 instead of t = 0 and check that infections are halved
   expect_equal(
@@ -734,7 +828,7 @@ test_that("RHS passes sanity checks (single + double variant / single age group)
     c(
       0.5 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
       0.5 * 0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.5 * 0.1 * 0.8 - 0.5 * 0.1 * 0.8 * 0.01 # Susceptible
+      - 0.5 * 0.1 * (1 + 0.01) * 0.8 # Susceptible
     )
   )
 
@@ -810,45 +904,39 @@ test_that("RHS passes sanity checks (single + double variant / double age group)
       0.1 * 0.45, -0.05 * 4, 0.05 * 4, # Variant 1, age group 2
       0, 0, 0, # Variant 2, age group 1
       0, 0, 0, # Variant 2, age group 2
-      - 0.1 * 0.45, 0.1 * 0.45 # Susceptible
+      - 0.1 * 0.45, - 0.1 * 0.45 # Susceptible
     )
   )
 
   y0 <- rep(0, private$n_states)
-  y0[private$i_state_indexes[[2]]] <- 0.1 # Only infections w. variant 2
-  y0[private$s_state_indexes] <- 0.9 # The rest are susceptible
+  y0[private$i_state_indexes[[3]]] <- 0.05 # Only infections w. variant 2
+  y0[private$i_state_indexes[[4]]] <- 0.05 # Only infections w. variant 2
+  y0[private$s_state_indexes] <- 0.45 # The rest are susceptible
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0, 0, 0, # Variant 1
-      0.1 * 0.9 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.9 * 0.01 # Susceptible
+      0, 0, 0, # Variant 1, age group 1
+      0, 0, 0, # Variant 1, age group 2
+      0.1 * 0.45 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 1
+      0.1 * 0.45 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 2
+      - 0.1 * 0.45 * 0.01, - 0.1 * 0.45 * 0.01 # Susceptible
     )
   )
 
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.05 # Infections with both variants
+  y0[private$s_state_indexes] <- 0.4 # The rest are susceptible
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
-      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+      0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 1
+      0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 2
+      0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 1
+      0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 2
+      - 0.1 * (1 +  0.01) * 0.4, - 0.1 * (1 + 0.01) * 0.4 # Susceptible
     )
   )
 
-  y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
-  expect_equal(
-    unname(private$rhs(0, y0)[[1]]),
-    c(
-      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
-      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
-    )
-  )
 
 
   ### Check 4: The contact matrix scaling works as expected.
@@ -857,9 +945,11 @@ test_that("RHS passes sanity checks (single + double variant / double age group)
   expect_equal(
     unname(private$rhs(1, y0)[[1]]),
     c(
-      0.5 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
-      0.5 * 0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.5 * 0.1 * 0.8 - 0.5 * 0.1 * 0.8 * 0.01 # Susceptible
+      0.5 * 0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 1
+      0.5 * 0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 2
+      0.5 * 0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 1
+      0.5 * 0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 2
+      - 0.5 * 0.1 * (1 +  0.01) * 0.4, - 0.5 * 0.1 * (1 + 0.01) * 0.4 # Susceptible
     )
   )
 

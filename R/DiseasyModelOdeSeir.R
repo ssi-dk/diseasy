@@ -26,9 +26,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Check the input arguments
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_integerish(compartment_structure, add = coll)
-      checkmate::assert_names(names(compartment_structure), identical.to = c("E", "I", "R"), add = coll)
+      checkmate::assert_names(
+        names(compartment_structure),
+        subset.of = c("E", "I", "R"),
+        must.include = c("I", "R"),
+        add = coll
+      )
+
       checkmate::assert_numeric(disease_progression_rates, add = coll)
-      checkmate::assert_names(names(disease_progression_rates), identical.to = c("E", "I"), add = coll)
+      checkmate::assert_names(
+        names(disease_progression_rates),
+        subset.of = c("E", "I"),
+        must.include = c("I"),
+        add = coll
+      )
 
       # Check we have the needed modules loaded and configured as needed
       checkmate::assert_class(self$observables, "DiseasyObservables", add = coll)
@@ -124,8 +135,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # First, we determine all I indexes
       private$i_state_indexes <- seq(private %.% n_variants * private %.% n_age_groups) |>
         purrr::map(
-          \(k) (1:compartment_structure[["I"]]) + compartment_structure[["E"]] + sum(compartment_structure) * (k - 1)
+          \(k) {
+            purrr::pluck(compartment_structure, "E", .default = 0) +
+              (1:compartment_structure[["I"]]) + sum(compartment_structure) * (k - 1)
+          }
         )
+
+      # Store the indexes of the first recovered compartments
+      private$r1_state_indexes <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
+        sum(compartment_structure) + private %.% n_EIR_states - purrr::pluck(compartment_structure, "R")
 
 
       # Store the indexes of the susceptible states
@@ -222,7 +240,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     },
 
-    immunity = list("approximate_compartmental" = \(approach, N) c(rep(0.01, N), rep(1, N - 1)))
+    immunity = list("approximate_compartmental" = \(approach, N) c(rep(0.02, N), rep(1, N - 1)))
   ),
 
 
@@ -249,6 +267,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # Index helpers
     e1_state_indexes = NULL,
     i_state_indexes  = NULL,
+    r1_state_indexes  = NULL,
     s_state_indexes  = NULL,
     indexed_variant_infection_risk = NULL,
     state_vector_age_group = NULL,
