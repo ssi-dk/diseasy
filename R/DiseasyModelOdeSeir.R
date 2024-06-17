@@ -78,7 +78,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       if (length(self %.% activity %.% get_scenario_activities()) == 0) {
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
-        proportion <<- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
+        proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
       } else {
         proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
           dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
