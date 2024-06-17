@@ -461,24 +461,24 @@ test_that("contact_matrix helper works as expected (with scenario - single age g
   # only have a single age group and use population density as our capita. Here the re-scaling doesn't do anything.
   expect_equal(
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)), dimnames = list("0+", "0+"))
+    matrix(sum(purrr::reduce(contact_basis %.% DK %.% contacts, `+`)), dimnames = list("0+", "0+"))
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_equal(
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)) * 0.5, dimnames = list("0+", "0+"))
+    matrix(sum(purrr::reduce(contact_basis %.% DK %.% contacts, `+`)) * 0.5, dimnames = list("0+", "0+"))
   )
 
   expect_equal(
     private %.% contact_matrix(0),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)) * 0.5, dimnames = list("0+", "0+"))
+    matrix(sum(purrr::reduce(contact_basis %.% DK %.% contacts, `+`)) * 0.5, dimnames = list("0+", "0+"))
   )
 
   # The contact matrix should be valid forever
   expect_equal(
     private %.% contact_matrix(Inf),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)) * 0.5, dimnames = list("0+", "0+"))
+    matrix(sum(purrr::reduce(contact_basis %.% DK %.% contacts, `+`)) * 0.5, dimnames = list("0+", "0+"))
   )
 
   rm(m)
@@ -528,7 +528,7 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   expect_equal(
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
     act$rescale_counts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% counts, `+`),
+      purrr::reduce(contact_basis %.% DK %.% contacts, `+`),
       contact_basis %.% DK %.% proportion
     )
   )
@@ -537,7 +537,7 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   expect_equal(
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
     act$rescale_counts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% counts, `+`) * 0.5,
+      purrr::reduce(contact_basis %.% DK %.% contacts, `+`) * 0.5,
       contact_basis %.% DK %.% proportion
     )
   )
@@ -545,7 +545,7 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   expect_equal(
     private %.% contact_matrix(0),
     act$rescale_counts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% counts, `+`) * 0.5,
+      purrr::reduce(contact_basis %.% DK %.% contacts, `+`) * 0.5,
       contact_basis %.% DK %.% proportion
     )
   )
@@ -554,7 +554,7 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   expect_equal(
     private %.% contact_matrix(Inf),
     act$rescale_counts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% counts, `+`) * 0.5,
+      purrr::reduce(contact_basis %.% DK %.% contacts, `+`) * 0.5,
       contact_basis %.% DK %.% proportion
     )
   )
@@ -1046,7 +1046,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis$DK
-  basis$counts <- purrr::map(basis$counts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
+  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
@@ -1094,7 +1094,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis$DK
-  basis$counts <- purrr::map(basis$counts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
+  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
   basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
   basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
@@ -1160,7 +1160,7 @@ test_that("RHS passes sanity checks (single + double variant / double age group)
 
   # Create a activity scenario for the tests
   basis <- contact_basis$DK
-  basis$counts <- purrr::map(basis$counts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
+  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
   basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
   basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
