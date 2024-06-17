@@ -87,6 +87,7 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
 \item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
 \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
+\item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
 \item \href{#method-DiseasyActivity-rescale_counts_to_rates}{\code{DiseasyActivity$rescale_counts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
@@ -329,6 +330,28 @@ Return contacts across age groups and activities on all dates.
 }
 \subsection{Returns}{
 If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
+Map population between age groups
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyActivity-map_population"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-map_population}{}}}
+\subsection{Method \code{map_population()}}{
+The function computes the proportion of population in the new and old age groups.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$map_population(age_cuts_lower)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{data.frame} which maps the age groups from their reference in \code{contact_basis} to
+those supplied to the function.
 Rescale contact matrices to population contact rates
 }
 }
