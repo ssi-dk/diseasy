@@ -664,6 +664,9 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'
     #' @description
     #'   Re-scale from contacts to rates per individual to fractional population.
+    #'  @details
+    #'   If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
+    #'   this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
     #' @param input (`matrix array` or `list`(`matrix array`))\cr
     #'   Counts to be re-scaled.
     #' @param population (`numeric`)\cr
@@ -686,7 +689,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::reportAssertions(coll)
 
       population <- population / sum(population)
-      out <- input / outer(population, population, "*")
+      out <- input / matrix(rep(population, length(population)), nrow = length(population), byrow = TRUE)
       return(out)
     },
 
