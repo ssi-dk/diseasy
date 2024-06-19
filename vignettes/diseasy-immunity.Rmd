@@ -25,48 +25,140 @@ options("diseasy.logging" = FALSE)
 ```
 
 # Introduction
-The `DiseasyImmunity` is the module responsible for the implementation of different models for the waning of immunity towards the disease.
+The `DiseasyImmunity` is a module designed to implement various models for the waning of immunity against a disease.
 
 # Configuring the module
-The module is initialized without setting any parameters.
+The module can be initialized without setting any parameters, with the following code:
 ```{r initialization}
 im <- DiseasyImmunity$new()
 ```
 
 # Inspecting the module
 By default, the module initializes with the `no_waning()` model.
-Aditionally it initializes with infection as target, meaning that the model describes the waning of immunity towards infection.
+It also initializes with infection as target, meaning that the model describes the waning of immunity towards infection.
 
-To check which model is set and for which target use the code below, this will always be updated when adding or editing a model.
-The model instance is a named list, whereas the names are the targets which contain the functions for the models.
+ To check the currently set models and their targets, you can use the following code.
+ The model instance is a named list where the names are the targets containing the functions for the models.
 ```{r model}
 im$model
 ```
 
-To see the waning models that come with the module we can query the module.
+To see the available waning models within the module, query the module as shown below:
 ```{r available_models}
-s$available_waning_models
+im$available_waning_models
 ```
 
 # Setting
-All models are dependent on a characteristic time scale, which is the time up until when the immunity is significantly waning.
-The models are also dependent on a target which is what the immunity is waning towards.
-Following shows an example on how to set the exponential waning model.
-In this example the time scale is set to 20 and the target is set to infection.
+The input for the predefined waning models include:
+`time_scale`: A characteristic time scale, which defines the period until when the immunity is significantly waning.
+`target`: The specific aspect towards which immunity is waning, such as e.g. infection, hospitalisation, or death.
+Here is an example of how to set the exponential waning model.
+When setting the model, the console output will display the function definition of the model.
 ```{r setting the models}
 im$set_exponential_waning(time_scale = 20, target = "infection")
 ```
-Besides the available functions, it is also possible to make a custom waning function.
-The input to the custom waning function is custom_function, time_scale, target and name.
-Below there is an example of how to create a custom waning function.
-```{r custom waning function}
-im$set_custom_waning(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time_scale)), time_scale = 20, target = "infection", name = "custom_waning")
+To visualize the model, the plot function provided by the module can be used:
+```{r plot the models}
+plot(im)
 ```
 
-It is also possible to the characteristic time scale after defining the model.
+Besides the predefined functions, you can also create a custom waning function.
+The input for the custom waning function includes:
+- `custom_function`: A function defining how immunity wanes over time. It should take time (t) as a parameter and also include `time_scale` in the function expression.
+- `time_scale`: A characteristic time scale, which defines the period until when the immunity is significantly waning.
+- `target`: The specific aspect towards which immunity is waning, such as e.g. infection, hospitalisation, or death.
+- `name`: A namte for the custom function, used for identification. Default is "custom_waning".
+Here is an example of setting a custom waning function:
+```{r custom waning function}
+im$set_custom_waning(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
+                     time_scale = 20,
+                     target = "hospitalisation",
+                     name = "custom_waning")
+```
+
+To visualize all the functions in the model, use the same plot function as above:
+```{r plot the models}
+plot(im)
+```
+
+A stemlined approach to set multiple models at once is also available through the `set_waning_model` function.
+This method offers greater flixibility when configuring various waning models within the module.
+`set_waning_model` allows for setting predefined waning models or a custom waning function based on the specified `model_name` and `target`.
+If `model_name` refers to a custom function (detected by checking if it is a function), it will be set as a custom waning function.
+Otherwise, the function corresponding to `model_name` within `DiseasyImmunity` will be used to set the waning model.
+Input for both predefined models and custom waning functions can be passed to the `set_waning_model`, that uses dot-ellipsis to the waning models.
+An example of how to set they two model examples from above, using the `set_waning_model` is as follows:
+```{r set waning models function}
+im$set_waning_model(model_name = "exponential_waning", time_scale = 20, target = "infection")
+im$set_waning_model(model_name = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
+                    time_scale = 20,
+                    target = "hospitalisation",
+                    name = "custom_waning")
+```
+
+It is also possible to change the characteristic time scale after defining the model.
 To do this it is necessary to state which target it is desired to change.
 This should be done as a named list.
-An example of how to change the time scale for a given target is described.
+Following is an example of how to change the time scale for the two targets in the current models.
 ```{r setting the time scale}
-im$time_scale(list(infection = 30))
+im$time_scale(list(infection = 30, hospitalisation = 100))
+```
+
+# Approximation
+This module can also be used to approximate the waning of immunity in a compartmental ODE model, e.g. the Susceptible-Infected-Recovered-Susceptible (SEIR) models.
+This is done by extending the R compartment with a chain of N subsequent compartments.
+- Flow between compartments: The transition rate between compartments is defined by delta.
+- Flow out of compartments: The protective effect is defined as gamma, which represents the probability of not becoming infected when exposed to an infected individual.
+Three approaches are available for approximating the transition (delta) and protective (gamma) rates to match the target functions.
+- Approach 1: (`rate_equal`) - gamma values are allowed to vary freely, while delta rate is fixed between compartments.
+- Approach 2: (`gamma_fixed_step`) - gamma values are monotonically decreasing, and delta values are allowed to vary freely.
+- Approach 3: (`all_free`) -  Both gamma and delta rates are allowed to vary freely.
+These methods help approximate all the models in the current instance of the module.
+The input for the approximate compartmental function includes:
+- `approach`: One of the approaches mentoned above - "rate_equal", "gamma_fixed_step" or "all_free"
+- `N`: The number of compartments to use for the approximation.
+In this example the module contains the infection and hospitalisation targets defined earlier, which will be approximated.
+```{r approximate compartmental}
+im$approximate_compartmental(approach = "rate_equal", N = 5)
+```
+
+To visualize how the approximations compare to the target functions, the plot function can be used.
+Simply specify the approach and the number of compartments (N).
+The plot will display both the approximations and the target functions for comparison.
+```{r plot approximation}
+im$plot(approach = "rate_equal", N = 5)
+```
+
+# Compartment selection (elbow curve method)
+The accuracy of the approximation can be influenced by the number of compartments (N) used in the model.
+Therefore it is crucial to select the right N as too few compartments can lead to poor approximation,
+while too many compartments can lead to unnecessary computational time withouth significant improvement in accuracy.
+The elbow curve method is employed to determine the appropriate N for the models.
+Each approach is executed across a range of N values, and the resulting objective function values are stored in the `im$approx_value` variable.
+```{r elbow curve method}
+# Prepare the data
+N_seq <- seq(from = 2, to = 10, by = 1)
+approaches <- c("rate_equal", "gamma_fixed_step", "all_free")
+im$set_exponential_waning(time_scale = 20, target = "infection")
+
+# Run each function
+results <- map(approaches, function(approach) {
+  map(N_seq, function(N) {
+    im$approximate_compartmental(approach = approach, N = N)
+  })
+})
+
+# Convert to data frame
+df <- do.call(rbind, lapply(names(im$approx_value), function(key) {
+  data.frame(Approach = gsub("_N_.*", "", key),
+             N = as.numeric(gsub(".*N_", "", key)),
+             Value = im$approx_value[[key]])
+}))
+
+# Plot
+ggplot(df, aes(x = N, y = Value, color = Approach)) +
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = seq(min(df$N), max(df$N), by = 1)) +
+  labs(x = "N", y = "Objective Function Value") +
+  theme_minimal()
 ```
