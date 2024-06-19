@@ -60,12 +60,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Sets the `DiseasyImmunity` module to use the specified waning model.
     #' @param model_name (`character`)\cr
     #'   Name of the waning_model to use (calls the equivalent $use_<model_name>()).
+    #' @param target (`character`)\cr
+    #'   The target of the waning model (f.x. infection, hospitalisation, death).
+    #'   By default, it is set to "infection".
     #' @param dots (`list`)\cr
     #'   Named list of arguments that will be passed at dot-ellipsis to the waning model.
     set_waning_model = function(model_name, target = "infection", ...) {
       checkmate::assert(
         checkmate::check_choice(model_name, self$available_waning_models),
-        checkmate::check_function(model_name)
+        checkmate::check_function(model_name),
+        checkmate::assert_character(target, add = coll)
       )
       # Then set the model
       if (checkmate::test_function(model_name)) {
@@ -112,7 +116,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::reportAssertions(coll)
 
       # Create the waning function
-      model <- \(t) exp(-t / (time_scale * log(2)))
+      model <- \(t) exp(-t / time_scale)
 
       # Set the attributes
       attr(model, "name")        <- "exponential_waning"
@@ -237,15 +241,39 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param name
     #'   Set the name of the custom waning function
     #'   By default, it is set to "custom_waning"
-    set_custom_waning = function(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time_scale)), time_scale = 20, target = "infection", name = "custom_waning") {
+    set_custom_waning = function(custom_function =  NULL, time_scale = 20, target = "infection", name = "custom_waning") {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(custom_function, add = coll)
+      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
       checkmate::assert_character(target, add = coll)
+      checkmate::assert_character(name, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
+      # Capture the expression of custom_function to preserve its environment
+      #model <- rlang::enexpr(custom_function)
       model <- custom_function
+
+      # Option 1: Attach env to function with time_scale only
+      #rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale))
+
+      # Option 2: Clone the environement of custom funciton.
+      # Will copy .GlobalEnv often .. not the best solution
+      rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale), parent = rlang::env_clone(rlang::fn_env(custom_function)))
+
+      # Option 3: Ittererate and get only needed components of .GlobalEnv
+      # original_fn_env <- rlang::fn_env(custom_function)
+      # new_fn_env <- rlang::env()
+
+      # tryCatch(
+      #   custom_function(0),
+      #   error = function(e) {
+      #     missing_variable <- stringr::str_extract(e$message, r"{'(.*)'}", group = 1)
+      #     new_fn_env <- rlang::new_environment(data = stats::setNames(purrr::pluck(original_fn_env, missing_variable), missing_variable), parent = new_fn_env)
+      #     rlang::fn_env(custom_function) <- new_fn_env
+      #   }
+      # )
 
       # Set the attributes
       attr(model, "name")        <- name
@@ -285,7 +313,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           approach_init <- private$approach_functions[[match.arg(approach)]]
         }
         # Extract median time_scale
-        time_scale <- stats::median(unlist(private$get_time_scale()))
+        time_scale <- purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
         delta <- N / (3 * time_scale)
         # Get params and initiation for each model
         init_all <- purrr::map(private$.model, ~ {
@@ -319,8 +347,22 @@ DiseasyImmunity <- R6::R6Class(                                                 
           return(results)
         }
         result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
-        params <- c(non_optim, result$par)
 
+        # Save obj value
+        approaches <- c("rate_equal", "gamma_fixed_step", "all_free")
+        # If approach was given as numeric
+        map_approach <- function(approach) {
+          approaches[[approach]]
+        }
+        if (is.numeric(approach)) {
+          approach <- map_approach(approach)
+        }
+        # If no approach was given
+        approach <- match.arg(approach, choices = approaches)
+        print(approach)
+        private$.obj_value[[paste(approach, N, sep = "_N_")]] <- result$value
+
+        params <- c(non_optim, result$par)
         # Scale optimised parameters
         rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
           params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
@@ -352,14 +394,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param N (`numeric`)\cr
     #'   Number of compartments to be used in the model.
     #'   By default, it is set to 5
-    plot = function(t_max = NULL, approach = NULL, N = NULL) {
+    plot = function(t_max = NULL, approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
       checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
-      rates <- NULL
-      if (!is.null(approach) && !is.null(N)) {
+      # Only plots the rates if N was given as input
+      if (is.null(N)) {
+        rates <- NULL
+      } else {
         rates <- self$approximate_compartmental(approach, N)
       }
       # Set t_max if nothing is given
-      if (is.null(t_max)) t_max <- 3 * stats::median(unlist(private$get_time_scale()))
+      if (is.null(t_max)) t_max <- 3 * purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
       t <- seq(from = 0, to = t_max, length.out = 100)
       # Create an empty plot
       par(mar = c(5, 4, 4, 12) + 0.1) # Adds extra space on the right
@@ -393,7 +437,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                lty = 1, inset = c(-0.7, 0), bty = "n", xpd = TRUE, cex = 0.8)
       }
       # Write to the log
-      private$lg$info("Plotting all models in the current instance, with approximations if available")
+      private$lg$info("Plotting all models in the current instance, with approximations if given as input")
     }
   ),
 
@@ -425,6 +469,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
       name = "rates",
       expr = return(private %.% .rates)
     ),
+    #' @field obj_value (`list`)\cr
+    #'   List of selected approach and N with the obj value from the optimisation. Read-only.
+    obj_value = purrr::partial(
+      .f = active_binding,
+      name = "obj_value",
+      expr = return(private %.% .obj_value)
+    ),
     #' @field available_approaches (`character`)\cr
     #'   The list of available approaches
     available_approaches = purrr::partial(
@@ -440,6 +491,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
   private = list(
     .model = NULL,
     .rates = NULL,
+    .obj_value = NULL,
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
       purrr::map(private$.model, ~ rlang::fn_env(.x)$time_scale)

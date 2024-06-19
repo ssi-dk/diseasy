@@ -78,7 +78,7 @@ rd_time_scale <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`numeric`)\\cr",
         "Sets the time_scale of the waning (immunity) model.",
-        "The time_scale is the number of days before half of the immunity has waned",
+        "The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning",
         ifelse(type == "field", " Read only.", ""))
 }
 
