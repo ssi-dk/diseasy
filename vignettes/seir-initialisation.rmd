@@ -15,6 +15,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+devtools::load_all()
 ```
 
 Let us begin by considering a general SEIR model with $K$ and $L$ consecutive E and I states respectively, which are governed by the rates $r_e$ and $r_i$ respectively.
@@ -97,7 +99,7 @@ Which, combined with $\overline{m_1}$ yields the two level system:
 $$
 \overline{\overline{M_2}} = \begin{bmatrix}m_{11} & m_{12} & 0 \\ m_{21} & m_{22} & m_{23} \end{bmatrix}
 $$
-
+ 
 The algorithmic implementation of the recursion is then:
 ```{r}
 K <- 4 # Number of E states
@@ -285,6 +287,9 @@ Perhaps if we go one stage further and use the infection pressure "beta S I"?
 # Test that the methods works with generated data
 
 ```{r synthetic_data, include = FALSE}
+rE = 1 / 2
+rI = 1 / 4
+
 # Run a SIR model to generate the target of our initialisation
 m <- DiseasyModelOdeSeir$new(
   season = T, activity = T,
@@ -294,8 +299,8 @@ m <- DiseasyModelOdeSeir$new(
   ),
   variant = DiseasyVariant$new(n_variants = 1),
   compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-  disease_progression_rates = c("E" = 0.9, "I" = 1),
-  parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 1.5)
+  disease_progression_rates = c("E" = rE, "I" = rI),
+  parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.9)
 )
 
 # Get a reference to the private environment
@@ -310,11 +315,9 @@ sol <- deSolve::ode(y = y0, times = seq(0, 60), func = private %.% rhs, parms = 
 plot(sol)
 ```
 
-
-
-## Implementaiton of test-signal
 ```{r}
 t <- head(sol[, 1], 28)
+E <- head(sol[, 2], 28)
 I <- head(sol[, 3], 28)
 R <- head(sol[, 4], 28)
 S <- head(sol[, 5], 28)
@@ -322,17 +325,67 @@ t0 <- t[length(t)]
 
 # Adding some noise
 pop = 1e3
-II <- purrr::map_dbl(I, \(lambda) rpois(1, pop * lambda)) / pop
+II <- rI * purrr::map_dbl(I, \(lambda) rpois(1, pop * lambda)) / pop
 
 polyfit <- \(offset) lm(
-  I ~ poly(t, 2, raw = TRUE),
-  data = data.frame(t = t - t0 + offset, I = II)
+  I ~ poly(t, 3, raw = TRUE),
+  data = data.frame(t = head(t, 21) - t0 + offset, I = head(II, 21))
 )
 
 
 plot(t, II)
 lines(t, predict(polyfit(0), data.frame(t = t - t0)), col = "red")
 ```
+
+
+```{r}
+check_solution <- function(EI_states, K, L, rE, rI, offset = 0, signal = "test") {
+  # Run a SIR model to generate the target of our initialisation
+  m <- DiseasyModelOdeSeir$new(
+    season = T, activity = T,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = K, "I" = L, "R" = 1),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.9)
+  )
+  
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+
+  times <- seq(0, 10, length.out = 100) + offset - 7
+  
+  test_sol <- deSolve::ode(
+    y = c(EI_states / sum(EI_states) * (1- R[21] - S[21]), R[21], S[21]),
+    times = times, 
+    func = private %.% rhs, 
+    parms = NULL, 
+    atol = 1e-12, rtol = 1e-12
+  )
+
+  
+  if (signal == "test") {
+    plot(t, rI * I, xlim = c(0, t0 + max(times)))
+    lines(t0 + times, L * rI * test_sol[, K + 2], col = "red")    
+  } else if (signal == "prevalence") {
+    plot(t, I, xlim = c(0, t0 + max(times)))
+    lines(t0 + times, rowSums(test_sol[, (K + 2):(K + L + 1), drop = FALSE]), col = "red")
+  }
+}
+```
+
+
+
+```{r}
+check_solution(c(E[21], I[21]), 1, 1, rE, rI, signal = "test")
+```
+
+
+
 
 ```{r}
 # Compute the derivatives of the signal ("signal" vector)
@@ -343,11 +396,17 @@ names(signal) <- c("I^*", "dI^*/dt", "d^2I^*/dt^2")
 signal
 ```
 
+
+
+
+## Implementaiton of test-signal
+
+
 ```{r}
 K <- 2 # Number of E states
-L <- 2 # Number of I states
-ri <- 1
-re <- 0.8
+L <- 3 # Number of I states
+ri <- rI * L
+re <- rE * K
 
 M <- matrix(rep(0, K * (K + 1)), nrow = K)
 active_row <- c(ri, 1)
@@ -366,11 +425,16 @@ ss[is.na(ss)] <- 0
 
 E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))
 
-I_k <- predict(polyfit(0), data.frame(t = -(seq(L) - 1) / ri)) |> as.numeric()
+I_star <- predict(polyfit(0), data.frame(t = -(seq(L) - 1) / ri))
+I_l <- as.numeric(I_star) / ri
 
-EI_states <- c(E_k, I_k)
-EI_states <- EI_states / sum(EI_states)
+EI_states <- c(E_k, I_l)
 
+check_solution(EI_states, K, L, rE, rI)
+
+
+
+#EI_states <- EI_states / sum(EI_states)
 stats::setNames(
   EI_states,
   c(paste0("E_", seq(K)), paste0("I_", seq(L)))
@@ -380,9 +444,9 @@ stats::setNames(
 ## Implementation of true-infected signal
 ```{r}
 K <- 2 # Number of E states
-L <- 1
-ri <- 1
-re <- 0.9
+L <- 2 # Number of I states
+ri <- rI * L
+re <- rE * K
 
 
 # Compute the derivatives of the signal ("signal" vector)
@@ -448,9 +512,12 @@ if (nrow(M) < ncol(M)) {
   ss <- c(ss, predict(polyfit(-max(K, L) / ri * 0.5), data.frame(t = 0)))
 }
 
+EI_states <- solve(M, ss)
+check_solution(EI_states, K, L, re, ri, signal = "prevalence")
+
 
 stats::setNames(
-  solve(M, ss),
+  EI_states,
   c(paste0("E_", seq(K)), paste0("I_", seq(L)))
 )
 ```
@@ -473,9 +540,9 @@ optim(
 ## Implementation of true-infected signal with different infectivity
 ```{r}
 K <- 2 # Number of E states
-L <- 2
-ri <- 1
-re <- 0.9
+L <- 2 # Number of I states
+ri <- rI * L
+re <- rE * K
 w <- 1 - 0.25*seq(L)/L
 w <- L * w / sum(w)
 #w <- c(1, 2)
@@ -544,22 +611,26 @@ if (nrow(M) < ncol(M)) {
   ss <- c(ss, predict(polyfit(-max(K, L) / ri * 0.5), data.frame(t = 0)))
 }
 
-EI_states <- solve(M, ss)
-EI_states <- EI_states / sum(EI_states)
-
-stats::setNames(
-  EI_states,
-  c(paste0("E_", seq(K)), paste0("I_", seq(L)))
+tryCatch(
+  {
+    EI_states <-solve(M, ss)
+    EI_states <- EI_states / sum(EI_states)
+  
+    stats::setNames(
+      EI_states,
+      c(paste0("E_", seq(K)), paste0("I_", seq(L)))
+    )
+  },
+  error = function(e) print(e$message)
 )
-
 ```
 
 ## Implementation of true-infected signal with population constraint
 ```{r}
 K <- 2 # Number of E states
-L <- 2
-ri <- 1
-re <- 0.9
+L <- 2 # Number of I states
+ri <- rI * L
+re <- rE * K
 
 
 # Compute the derivatives of the signal ("signal" vector)
@@ -629,3 +700,125 @@ stats::setNames(
   c(paste0("E_", seq(K)), paste0("I_", seq(L)))
 )
 ```
+
+
+
+
+## Initialising directly via solving the ODE
+A different approach we can try, is to estimate the state vector not at time $t = 0$, but rather at time $t = -1/r_E$ (where $r_E = r_e / N$).
+The idea here is to not include any new infection in the model, and only run the $E$ and $I$ states through the model.
+
+If we have a test signal, we can try to only include the first $I$ state and then run the model.
+If we have a prevalence signal, we need to include all $I$ states.
+
+### Implementing for the test signal
+```{r}
+K <- 2 # Number of E states
+L <- 2
+ri <- 1
+re <- 0.9
+
+# Run a SIR model to generate the target of our initialisation
+m <- DiseasyModelOdeSeir$new(
+  season = T, activity = T,
+  observables = DiseasyObservables$new(
+    conn = DBI::dbConnect(RSQLite::SQLite()),
+    last_queryable_date = Sys.Date() - 1
+  ),
+  variant = DiseasyVariant$new(n_variants = 1),
+  compartment_structure = c("E" = K, "I" = 1, "R" = 1),
+  disease_progression_rates = c("E" = re / K, "I" = ri),
+  parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
+)
+
+# Get a reference to the private environment
+private <- m$.__enclos_env__$private
+
+# Generate a uniform initial state_vector that sums to 1
+y0 <- c(rep(1, K + 1), 0, 0)
+y0 <- y0 / sum(y0)
+
+times <- seq(- K / re, 0, length.out = 10)
+ss <- predict(polyfit(0), data.frame(t = times))
+plot(t, II)
+lines(t0 + times, ss, col = "red")
+
+objective_function <- function(y) {
+  sol <- deSolve::ode(
+    y = y, 
+    times = times, 
+    func = private %.% rhs, 
+    parms = NULL, 
+    atol = 1e-12, rtol = 1e-12
+  ) 
+
+  I1 <- sol[, K + 2]
+  
+  sum(ri*I1 - ss)^2
+}
+
+op <- optim(
+  par = y0,
+  fn = objective_function,
+  method = "L-BFGS-B",
+  lower = 0
+) 
+
+EI_states <- op$par[1:(K+1)]
+
+if (L > 1) {
+  I_l <- predict(polyfit(0), data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
+  EI_states <- c(EI_states, I_l)
+}
+
+
+
+
+# Run a SIR model to generate the target of our initialisation
+m <- DiseasyModelOdeSeir$new(
+  season = T, activity = T,
+  observables = DiseasyObservables$new(
+    conn = DBI::dbConnect(RSQLite::SQLite()),
+    last_queryable_date = Sys.Date() - 1
+  ),
+  variant = DiseasyVariant$new(n_variants = 1),
+  compartment_structure = c("E" = K, "I" = L, "R" = 1),
+  disease_progression_rates = c("E" = re / K, "I" = ri / L),
+  parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
+)
+
+# Get a reference to the private environment
+private <- m$.__enclos_env__$private
+
+
+sol <- deSolve::ode(
+  y = c(EI_states, 0, 0),
+  times = times, 
+  func = private %.% rhs, 
+  parms = NULL, 
+  atol = 1e-12, rtol = 1e-12
+)
+
+plot(t0 + times, ri* sol[, K + 1])
+lines(t0 + times, ss, col = "red")
+
+
+
+EI_states <- EI_states / sum(EI_states)
+
+
+
+stats::setNames(
+  EI_states,
+  c(paste0("E_", seq(K)), paste0("I_", seq(L)))
+)
+
+```
+
+
+
+
+
+
+
+
