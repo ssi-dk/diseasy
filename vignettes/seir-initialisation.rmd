@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 devtools::load_all()
 ```
 
+# Introduction
 Let us begin by considering a general SEIR model with $K$ and $L$ consecutive E and I states respectively, which are governed by the rates $r_e$ and $r_i$ respectively.
 Let us further assume that we have some signal for infections $I^*(t)$ which we would like our model to match.
 
@@ -124,7 +125,7 @@ M
 Since we assume that the signal $I^*$ only relates to $I_1$, then we can determine the $I_l$ states by evaluating the signal at $I^*(t - (l - 1) / r_i)$.
 
 
-## True infected signal
+## Prevalence signal
 If we instead have a measure of the true number of infected, $I^* = \sum_l I_l$, then the situation is more complicated since the derivative becomes:
 $$\frac{dI^*}{dt} = r_e E_K - r_i I_l$$
 If use the same method as before, we now have to consider the derivatives of both $I^*$ and $I_l$ and we cannot isolate easily. We can however, determine how the derivatives of $I^*$ relates to the state vector.
@@ -284,7 +285,7 @@ Perhaps if we go one stage further and use the infection pressure "beta S I"?
 
 
 
-# Test that the methods works with generated data
+# Testing the methods
 
 We begin by generating some synthetic data from different underlying data-generating processes
 ```{r synthetic_data, include = FALSE}
@@ -414,10 +415,10 @@ exact_model_fit_gg <- purrr::imap(synthetic_model, ~ {
   L <- n_states[2]
   
   t <- .x[, 1]
-  E <- .x[t == t0, 2:(K+1)]
-  I <- .x[t == t0, (K+2):(K+L+1)]
-  R <- .x[t == t0, 1+K+L+1]
-  S <- .x[t == t0, 1+K+L+2]
+  E <- .x[t == t0, 2:(K + 1)]
+  I <- .x[t == t0, (K + 2):(K + L + 1)]
+  R <- .x[t == t0, 1 + K + L+ 1]
+  S <- .x[t == t0, 1 + K + L + 2]
   
   run_model(c(E, I), R, S, K, L, rE, rI, signal = "incidence") |>
     dplyr::mutate(true_configuration = .y, model_configuration = .y)
@@ -483,7 +484,7 @@ incidence_signal_derivatives <- purrr::map(
   
 incidence_signal_derivatives
 ```
-
+## Incidence signal
 Now we use the method to estimate the EI states from the signal.
 (Assuming we have the correct model specification)
 
@@ -519,8 +520,8 @@ incidence_model_fit_gg <- purrr::map(names(incidence_signal_derivatives), ~ {
   EI_states <- c(E_k, I_l)
   
   t <- synthetic_model[[.x]][, 1]
-  R <- synthetic_model[[.x]][t == t0, 1+K+L+1]
-  S <- synthetic_model[[.x]][t == t0, 1+K+L+2]
+  R <- synthetic_model[[.x]][t == t0, 1 + K + L + 1]
+  S <- synthetic_model[[.x]][t == t0, 1 + K + L + 2]
   
   run_model(EI_states, R, S, K, L, rE, rI, signal = "incidence", scale_EI = TRUE) |>
     dplyr::mutate(true_configuration = .x, model_configuration = .x)
@@ -555,8 +556,8 @@ incidence_model_fit_gg <- expand.grid(
     L <- n_states[2]
     
     t <- synthetic_model[[true_configuration]][, 1]
-    R <- synthetic_model[[true_configuration]][t == t0, 1+K+L+1]
-    S <- synthetic_model[[true_configuration]][t == t0, 1+K+L+2]
+    R <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 1]
+    S <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 2]
     
     
     # The estimate E and I from the signal data
@@ -622,8 +623,8 @@ direct_incidence_fit_gg <- expand.grid(
     L <- n_states[2]
     
     t <- synthetic_model[[true_configuration]][, 1]
-    R <- synthetic_model[[true_configuration]][t == t0, 1+K+L+1]
-    S <- synthetic_model[[true_configuration]][t == t0, 1+K+L+2]
+    R <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 1]
+    S <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 2]
     
     
     # The estimate E and I from the signal data
@@ -728,17 +729,18 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal_derivatives), ~
   
     I1 <- sol[, K + 2]
     
-    sum(ri*I1 - ss)^2
+    sum(ri * I1 - ss)^2
   }
   
   op <- optim(
     par = y0,
     fn = objective_function,
     method = "L-BFGS-B",
-    lower = 0
+    lower = 0, 
+    control = list(factr = 1e-2 / .Machine$double.eps)
   ) 
   
-  EI_states <- op$par[1:(K+1)]
+  EI_states <- op$par[1:(K + 1)]
   
   if (L > 1) {
     I_l <- predict(incidence_polyfits[[.x]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
@@ -746,8 +748,8 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal_derivatives), ~
   }
 
   t <- synthetic_model[[.x]][, 1]
-  R <- synthetic_model[[.x]][t == t0, 1+K+L+1]
-  S <- synthetic_model[[.x]][t == t0, 1+K+L+2]
+  R <- synthetic_model[[.x]][t == t0, 1 + K + L + 1]
+  S <- synthetic_model[[.x]][t == t0, 1 + K + L + 2]
   
   run_model(EI_states, R, S, K, L, rE, rI, offset = 0, signal = "incidence", scale_EI = TRUE) |>
     dplyr::mutate(true_configuration = .x, model_configuration = .x)
@@ -764,6 +766,205 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
   ggplot2::theme_bw()
 ```
 
+```{r}
+simplified_incidence_fit_gg <- expand.grid(
+  model_configuration = names(incidence_signal_derivatives),
+  true_configuration  = names(incidence_signal_derivatives) 
+) |>
+  purrr::pmap(\(true_configuration, model_configuration) {
+    true_configuration  <- as.character(true_configuration)  # R forces us to do needless conversion of variables
+    model_configuration <- as.character(model_configuration) # since it refuses to respect data.types....
+    
+    # First retrieve the S and R states from the true data
+    n_states <- as.numeric(stringr::str_extract_all(true_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    t <- synthetic_model[[true_configuration]][, 1]
+    R <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 1]
+    S <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 2]
+    
+    
+    # The estimate E and I from the signal data
+    n_states <- as.numeric(stringr::str_extract_all(model_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    ri <- rI * L
+    re <- rE * K
+    
+    # Generate a uniform initial state_vector that sums to 1
+    y0 <- c(rep(1, K + 1), 0, 0)
+    y0 <- y0 / sum(y0)
+    
+    times <- seq(- 1 / rE, 0, length.out = 10)
+    ss <- predict(incidence_polyfits[[true_configuration]], data.frame(t = times))
+    
+    
+    # Run a SIR model to generate the target of our initialisation
+    m <- DiseasyModelOdeSeir$new(
+      season = T, activity = T,
+      observables = DiseasyObservables$new(
+        conn = DBI::dbConnect(RSQLite::SQLite()),
+        last_queryable_date = Sys.Date() - 1
+      ),
+      variant = DiseasyVariant$new(n_variants = 1),
+      compartment_structure = c("E" = K, "I" = 1, "R" = 1),
+      disease_progression_rates = c("E" = re / K, "I" = ri),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
+    )
+    
+    # Get a reference to the private environment
+    private <- m$.__enclos_env__$private
+     
+    
+    objective_function <- function(y) {
+      sol <- deSolve::ode(
+        y = y, 
+        times = times, 
+        func = private %.% rhs, 
+        parms = NULL, 
+        atol = 1e-12, rtol = 1e-12
+      ) 
+    
+      I1 <- sol[, K + 2]
+      
+      sum(ri * I1 - ss)^2
+    }
+    
+    op <- optim(
+      par = y0,
+      fn = objective_function,
+      method = "L-BFGS-B",
+      lower = 0,
+      control = list(factr = 1e-2 / .Machine$double.eps)
+    ) 
+    
+    EI_states <- op$par[1:(K + 1)]
+    
+    if (L > 1) {
+      I_l <- predict(incidence_polyfits[[true_configuration]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
+      EI_states <- c(EI_states, I_l)
+    }
+
+    run_model(EI_states, R, S, K, L, rE, rI, signal = "incidence", scale_EI = TRUE) |>
+      dplyr::mutate(true_configuration = true_configuration, model_configuration = model_configuration)
+  }, .progress = TRUE) |>
+  purrr::list_rbind()
+
+
+ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
+  ggplot2::geom_line(data = exact_model_fit_gg, color = "darkgrey", linewidth = 2) +
+  ggplot2::geom_line(data = simplified_incidence_fit_gg, ggplot2::aes(color = model_configuration), linewidth = 1) +
+  ggplot2::scale_color_brewer(palette = "Dark2") +
+  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "black") + 
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+```
+
+```{r}
+simplified_incidence_fit_gg <- expand.grid(
+  model_configuration = names(incidence_signal_derivatives),
+  true_configuration  = names(incidence_signal_derivatives) 
+) |>
+  purrr::pmap(\(true_configuration, model_configuration) {
+    true_configuration  <- as.character(true_configuration)  # R forces us to do needless conversion of variables
+    model_configuration <- as.character(model_configuration) # since it refuses to respect data.types....
+    
+    # First retrieve the S and R states from the true data
+    n_states <- as.numeric(stringr::str_extract_all(true_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    t <- synthetic_model[[true_configuration]][, 1]
+    R <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 1]
+    S <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 2]
+    
+    
+    # The estimate E and I from the signal data
+    n_states <- as.numeric(stringr::str_extract_all(model_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    ri <- rI * L
+    re <- rE * K
+    
+    # Generate a uniform initial state_vector that sums to 1
+    y0 <- c(rep(1, K + 1), 0, 0)
+    y0 <- y0 / sum(y0)
+    
+    times <- seq(- 1 / rE, 0, length.out = 10)
+    ss <- predict(incidence_polyfits[[true_configuration]], data.frame(t = times))
+    
+    
+    # Run a SIR model to generate the target of our initialisation
+    m <- DiseasyModelOdeSeir$new(
+      season = T, activity = T,
+      observables = DiseasyObservables$new(
+        conn = DBI::dbConnect(RSQLite::SQLite()),
+        last_queryable_date = Sys.Date() - 1
+      ),
+      variant = DiseasyVariant$new(n_variants = 1),
+      compartment_structure = c("E" = K, "I" = 1, "R" = 1),
+      disease_progression_rates = c("E" = re / K, "I" = ri),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
+    )
+    
+    # Get a reference to the private environment
+    private <- m$.__enclos_env__$private
+     
+    
+    objective_function <- function(y) {
+      sol <- deSolve::ode(
+        y = y, 
+        times = times, 
+        func = private %.% rhs, 
+        parms = NULL, 
+        atol = 1e-12, rtol = 1e-12
+      ) 
+    
+      I1 <- sol[, K + 2]
+      
+      sum(ri * I1 - ss)^2
+    }
+    
+    op <- optim(
+      par = y0,
+      fn = objective_function,
+      method = "L-BFGS-B",
+      lower = 0,
+      control = list(factr = 1e-2 / .Machine$double.eps)
+    ) 
+    
+    EI_states <- op$par[1:(K + 1)]
+    
+    if (L > 1) {
+      I_l <- predict(incidence_polyfits[[true_configuration]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
+      EI_states <- c(EI_states, I_l)
+    }
+
+    run_model(EI_states, R, S, K, L, rE, rI, signal = "incidence", scale_EI = FALSE) |>
+      dplyr::mutate(true_configuration = true_configuration, model_configuration = model_configuration)
+  }, .progress = TRUE) |>
+  purrr::list_rbind()
+
+
+ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
+  ggplot2::geom_line(data = exact_model_fit_gg, color = "darkgrey", linewidth = 2) +
+  ggplot2::geom_line(data = simplified_incidence_fit_gg, ggplot2::aes(color = model_configuration), linewidth = 1) +
+  ggplot2::scale_color_brewer(palette = "Dark2") +
+  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "black") + 
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+```
+
+
+
+
+
+# Prevalence
 
 And now for the prevalence
 
@@ -793,8 +994,79 @@ ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
 
 ```
 
+This method relies on fitting a polynomial to the latest period, so we do that here.
 ```{r}
-simplified_model_fit_gg <- purrr::map(names(signal_derivatives), ~ {
+poly_order <- 3
+
+prevalence_polyfits <- purrr::map(prevalence_signal, ~ {
+  lm(prevalence ~ poly(t, poly_order, raw = TRUE), data = dplyr::filter(dplyr::mutate(.x, t = t - t0), t <= 0))
+})
+
+prevalence_polyfit_projections <- prevalence_polyfits |> 
+  purrr::map(~ data.frame(t = prevalence_signal[[1]]$t, prevalence = predict(.x, data.frame(t = prevalence_signal[[1]]$t - t0))))
+
+prevalence_polyfit_projections_gg <- purrr::imap(prevalence_polyfit_projections, ~ dplyr::mutate(.x, true_configuration = .y)) |>
+  purrr::list_rbind()
+
+
+ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
+  ggplot2::geom_line(data = prevalence_polyfit_projections_gg, color = "red", linewidth = 1) +
+  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "red") +
+  ggplot2::geom_hline(
+    ggplot2::aes(yintercept = c0),
+    linetype = 2, color = "red",
+    data = data.frame(c0 = purrr::map_dbl(prevalence_polyfits, ~ purrr::pluck(.x, "coefficients", 1)),
+                      true_configuration = names(prevalence_polyfits))
+  ) + 
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+```
+
+The method relies on a vector of derivatives of the signal, which we compute here:
+
+```{r}
+# Compute the derivatives of the signal ("signal" vector)
+max_order_derivative <- 2
+
+prevalence_signal_derivatives <- purrr::map(
+  incidence_polyfits, ~ stats::setNames(
+    .x$coefficients[1:(max_order_derivative + 1)] * pmax(1, seq(max_order_derivative + 1) - 1),
+    c("I^*", "dI^*/dt", "d^2I^*/dt^2")
+  )
+)
+  
+prevalence_signal_derivatives
+```
+```{r}
+exact_model_fit_gg <- purrr::imap(synthetic_model, ~ {
+  n_states <-as.numeric(stringr::str_extract_all(.y, r"{\d}")[[1]])
+  K <- n_states[1]
+  L <- n_states[2]
+  
+  t <- .x[, 1]
+  E <- .x[t == t0, 2:(K + 1)]
+  I <- .x[t == t0, (K + 2):(K + L + 1)]
+  R <- .x[t == t0, 1 + K + L+ 1]
+  S <- .x[t == t0, 1 + K + L + 2]
+  
+  run_model(c(E, I), R, S, K, L, rE, rI, signal = "prevalence") |>
+    dplyr::mutate(true_configuration = .y, model_configuration = .y)
+}) |>
+  purrr::list_rbind()
+
+
+ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
+  ggplot2::geom_line(data = exact_model_fit_gg, color = "darkgrey", linewidth = 2) +
+  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "black") +
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+```
+
+
+```{r}
+simplified_model_fit_gg <- purrr::map(names(prevalence_signal_derivatives), ~ {
   n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
   K <- n_states[1]
   L <- n_states[2]
@@ -803,11 +1075,11 @@ simplified_model_fit_gg <- purrr::map(names(signal_derivatives), ~ {
   re <- rE * K
   
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- c(rep(1, K + 1), 0, 0)
+  y0 <- c(rep(1, K + L), 0, 0)
   y0 <- y0 / sum(y0)
   
   times <- seq(- 1 / rE, 0, length.out = 10)
-  ss <- predict(polyfits[[.x]], data.frame(t = times))
+  ss <- predict(prevalence_polyfits[[.x]], data.frame(t = times))
   
   
   # Run a SIR model to generate the target of our initialisation
@@ -847,16 +1119,16 @@ simplified_model_fit_gg <- purrr::map(names(signal_derivatives), ~ {
     lower = 0
   ) 
   
-  EI_states <- op$par[1:(K+1)]
+  EI_states <- op$par[1:(K + 1)]
   
   if (L > 1) {
-    I_l <- predict(polyfits[[.x]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
+    I_l <- predict(prevalence_polyfits[[.x]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
     EI_states <- c(EI_states, I_l)
   }
 
   t <- synthetic_model[[.x]][, 1]
-  R <- synthetic_model[[.x]][t == t0, 1+K+L+1]
-  S <- synthetic_model[[.x]][t == t0, 1+K+L+2]
+  R <- synthetic_model[[.x]][t == t0, 1 + K + L + 1]
+  S <- synthetic_model[[.x]][t == t0, 1 + K + L + 2]
   
   run_model(EI_states, R, S, K, L, rE, rI, signal = "prevalence", scale_EI = TRUE) |>
     dplyr::mutate(true_configuration = .x, model_configuration = .x)
@@ -864,7 +1136,7 @@ simplified_model_fit_gg <- purrr::map(names(signal_derivatives), ~ {
   purrr::list_rbind()
 
 
-ggplot2::ggplot(signal_gg, ggplot2::aes(x = t, y = incidence)) +
+ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
   ggplot2::geom_line(data = exact_model_fit_gg, color = "darkgrey", linewidth = 2) +
   ggplot2::geom_line(data = simplified_model_fit_gg, color = "red", linewidth = 1) +
   ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "black") + 
@@ -872,6 +1144,221 @@ ggplot2::ggplot(signal_gg, ggplot2::aes(x = t, y = incidence)) +
   ggplot2::facet_wrap(~ true_configuration) +
   ggplot2::theme_bw()
 ```
+
+
+```{r}
+simplified_prevalence_fit_gg <- expand.grid(
+  model_configuration = names(prevalence_signal_derivatives),
+  true_configuration  = names(prevalence_signal_derivatives) 
+) |>
+  purrr::pmap(\(true_configuration, model_configuration) {
+    true_configuration  <- as.character(true_configuration)  # R forces us to do needless conversion of variables
+    model_configuration <- as.character(model_configuration) # since it refuses to respect data.types....
+    
+    # First retrieve the S and R states from the true data
+    n_states <- as.numeric(stringr::str_extract_all(true_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    t <- synthetic_model[[true_configuration]][, 1]
+    R <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 1]
+    S <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 2]
+    
+    
+    # The estimate E and I from the signal data
+    n_states <- as.numeric(stringr::str_extract_all(model_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    ri <- rI * L
+    re <- rE * K
+    
+    # Generate a uniform initial state_vector that sums to 1
+    y0 <- c(rep(1, K + 1), 0, 0)
+    y0 <- y0 / sum(y0)
+    
+    times <- seq(- 1 / rE, 0, length.out = 10)
+    ss <- predict(prevalence_polyfits[[true_configuration]], data.frame(t = times))
+    
+    
+    # Run a SIR model to generate the target of our initialisation
+    m <- DiseasyModelOdeSeir$new(
+      season = T, activity = T,
+      observables = DiseasyObservables$new(
+        conn = DBI::dbConnect(RSQLite::SQLite()),
+        last_queryable_date = Sys.Date() - 1
+      ),
+      variant = DiseasyVariant$new(n_variants = 1),
+      compartment_structure = c("E" = K, "I" = 1, "R" = 1),
+      disease_progression_rates = c("E" = re / K, "I" = ri),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
+    )
+    
+    # Get a reference to the private environment
+    private <- m$.__enclos_env__$private
+     
+    
+    objective_function <- function(y) {
+      sol <- deSolve::ode(
+        y = y, 
+        times = times, 
+        func = private %.% rhs, 
+        parms = NULL, 
+        atol = 1e-12, rtol = 1e-12
+      ) 
+    
+      I1 <- sol[, K + 2]
+      
+      sum(ri * I1 - ss)^2
+    }
+    
+    op <- optim(
+      par = y0,
+      fn = objective_function,
+      method = "L-BFGS-B",
+      lower = 0,
+      control = list(factr = 1e-2 / .Machine$double.eps)
+    ) 
+    
+    EI_states <- op$par[1:(K + 1)]
+    
+    if (L > 1) {
+      I_l <- predict(prevalence_polyfits[[true_configuration]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
+      EI_states <- c(EI_states, I_l)
+    }
+
+    run_model(EI_states, R, S, K, L, rE, rI, signal = "prevalence", scale_EI = TRUE) |>
+      dplyr::mutate(true_configuration = true_configuration, model_configuration = model_configuration)
+  }, .progress = TRUE) |>
+  purrr::list_rbind()
+
+
+ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
+  ggplot2::geom_line(data = exact_model_fit_gg, color = "darkgrey", linewidth = 2) +
+  ggplot2::geom_line(data = simplified_prevalence_fit_gg, ggplot2::aes(color = model_configuration), linewidth = 1) +
+  ggplot2::scale_color_brewer(palette = "Dark2") +
+  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "black") + 
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+```
+
+
+
+
+```{r}
+simplified_prevalence_fit_gg <- expand.grid(
+  model_configuration = names(prevalence_signal_derivatives),
+  true_configuration  = names(prevalence_signal_derivatives) 
+) |>
+  purrr::pmap(\(true_configuration, model_configuration) {
+    true_configuration  <- as.character(true_configuration)  # R forces us to do needless conversion of variables
+    model_configuration <- as.character(model_configuration) # since it refuses to respect data.types....
+    
+    # First retrieve the S and R states from the true data
+    n_states <- as.numeric(stringr::str_extract_all(true_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    t <- synthetic_model[[true_configuration]][, 1]
+    R <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 1]
+    S <- synthetic_model[[true_configuration]][t == t0, 1 + K + L + 2]
+    
+    
+    # The estimate E and I from the signal data
+    n_states <- as.numeric(stringr::str_extract_all(model_configuration, r"{\d}")[[1]])
+    K <- n_states[1]
+    L <- n_states[2]
+    
+    ri <- rI * L
+    re <- rE * K
+    
+    # Generate a uniform initial state_vector that sums to 1
+    y0 <- c(rep(1, K + 1), 0, 0)
+    y0 <- y0 / sum(y0)
+    
+    times <- seq(- 1 / rE, 0, length.out = 10)
+    ss <- predict(prevalence_polyfits[[true_configuration]], data.frame(t = times))
+    
+    
+    # Run a SIR model to generate the target of our initialisation
+    m <- DiseasyModelOdeSeir$new(
+      season = T, activity = T,
+      observables = DiseasyObservables$new(
+        conn = DBI::dbConnect(RSQLite::SQLite()),
+        last_queryable_date = Sys.Date() - 1
+      ),
+      variant = DiseasyVariant$new(n_variants = 1),
+      compartment_structure = c("E" = K, "I" = 1, "R" = 1),
+      disease_progression_rates = c("E" = re / K, "I" = ri),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
+    )
+    
+    # Get a reference to the private environment
+    private <- m$.__enclos_env__$private
+     
+    
+    objective_function <- function(y) {
+      sol <- deSolve::ode(
+        y = y, 
+        times = times, 
+        func = private %.% rhs, 
+        parms = NULL, 
+        atol = 1e-12, rtol = 1e-12
+      ) 
+    
+      I1 <- sol[, K + 2]
+      
+      sum(ri * I1 - ss)^2
+    }
+    
+    op <- optim(
+      par = y0,
+      fn = objective_function,
+      method = "L-BFGS-B",
+      lower = 0,
+      control = list(factr = 1e-2 / .Machine$double.eps)
+    ) 
+    
+    EI_states <- op$par[1:(K + 1)]
+    
+    if (L > 1) {
+      I_l <- predict(prevalence_polyfits[[true_configuration]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
+      EI_states <- c(EI_states, I_l)
+    }
+
+    run_model(EI_states, R, S, K, L, rE, rI, signal = "prevalence", scale_EI = FALSE) |>
+      dplyr::mutate(true_configuration = true_configuration, model_configuration = model_configuration)
+  }, .progress = TRUE) |>
+  purrr::list_rbind()
+
+
+ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
+  ggplot2::geom_line(data = exact_model_fit_gg, color = "darkgrey", linewidth = 2) +
+  ggplot2::geom_line(data = simplified_prevalence_fit_gg, ggplot2::aes(color = model_configuration), linewidth = 1) +
+  ggplot2::scale_color_brewer(palette = "Dark2") +
+  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "black") + 
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -967,7 +1454,7 @@ for (k in seq(K)) {
 }
 
 # Define the vector for the matrix multiplication
-ss <- signal[2:(K+1)] 
+ss <- signal[2:(K + 1)] 
 ss[is.na(ss)] <- 0
 
 checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M))
@@ -1066,7 +1553,7 @@ for (k in seq(K)) {
 }
 
 # Define the vector for the matrix multiplication
-ss <- signal[2:(K+1)] 
+ss <- signal[2:(K + 1)] 
 ss[is.na(ss)] <- 0
 
 checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M))
@@ -1151,7 +1638,7 @@ for (k in seq(K)) {
 }
 
 # Define the vector for the matrix multiplication
-ss <- signal[2:(K+1)] 
+ss <- signal[2:(K + 1)] 
 ss[is.na(ss)] <- 0
 
 checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M))
@@ -1239,7 +1726,7 @@ objective_function <- function(y) {
 
   I1 <- sol[, K + 2]
   
-  sum(ri*I1 - ss)^2
+  sum(ri * I1 - ss)^2
 }
 
 op <- optim(
@@ -1249,7 +1736,7 @@ op <- optim(
   lower = 0
 ) 
 
-EI_states <- op$par[1:(K+1)]
+EI_states <- op$par[1:(K + 1)]
 
 if (L > 1) {
   I_l <- predict(polyfit(0), data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()  
