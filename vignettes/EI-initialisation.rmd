@@ -126,9 +126,9 @@ Since we assume that the signal $I^*$ only relates to $I_1$, then we can determi
 
 
 ## Prevalence signal
-If we instead have a measure of the true number of infected, $I^* = \sum_l I_l$, then the situation is more complicated since the derivative becomes:
-$$\frac{dI^*}{dt} = r_e E_K - r_i I_l$$
-If use the same method as before, we now have to consider the derivatives of both $I^*$ and $I_l$ and we cannot isolate easily. We can however, determine how the derivatives of $I^*$ relates to the state vector.
+If we instead have a measure of the true number of infected, $I^\dag = \sum_l I_l$, then the situation is more complicated since the derivative becomes:
+$$\frac{dI^\dag}{dt} = r_e E_K - r_i I_l$$
+If use the same method as before, we now have to consider the derivatives of both $I^\dag$ and $I_l$ and we cannot isolate easily. We can however, determine how the derivatives of $I^\dag$ relates to the state vector.
 
 For example, if we have 2 $E$ and 2 $I$ states, we can write:
 $$
@@ -144,11 +144,11 @@ I_2
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^*}{dt} \\
-\frac{d^2I^*}{dt^2}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2}
 \end{bmatrix}
 $$
-Which, with two additional constants, $I^* = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^*$, can be solved.
+Which, with two additional constants, $I^\dag = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^\dag$, can be solved.
 
 If we want more states, the problem seemingly becomes indeterminate:
 $$
@@ -167,9 +167,9 @@ I_3
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^*}{dt} \\
-\frac{d^2I^*}{dt^2} \\
-\frac{d^3I^*}{dt^3}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2} \\
+\frac{d^3I^\dag}{dt^3}
 \end{bmatrix}
 $$
 Which now requires three additional constraints.
@@ -190,11 +190,11 @@ I
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^*}{dt} \\
-\frac{d^2I^*}{dt^2}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2}
 \end{bmatrix}
 $$
-With the additional constraint $I^* = I_1 + I_2$ the system should be solvable.
+With the additional constraint $I^\dag = I_1 + I_2$ the system should be solvable.
 
 The above rate-matrices can also be implemented via recursion algorithmically:
 ```{r}
@@ -237,10 +237,10 @@ M
 Another method for gaining additional constraints on the problem is to keep some in reserve for the fititng.
 By that, I mean that if we instead of initialising the state vector for time $t_0$, we initialise it for time $t_0' \equiv t_0 - 1 / r_i$. 
 
-In this case, we can consider what the signal $I^*(t + 1/r_i)$ corresponds to in the model.
+In this case, we can consider what the signal $I^\dag(t + 1/r_i)$ corresponds to in the model.
 If we assume that $r_e <= r_i$, we can write:
 $$
-I^*(t + 1/r_i) = \sum_l^{L-1}I_l(t) + \frac{r_e}{r_i}E_K(t)
+I^\dag(t + 1/r_i) = \sum_l^{L-1}I_l(t) + \frac{r_e}{r_i}E_K(t)
 $$
 If instead $r_e > r_i$, we need to account for additional $E_k$ states.
 
@@ -248,11 +248,11 @@ If instead $r_e > r_i$, we need to account for additional $E_k$ states.
 It seems that the problem is singular whenever we have more than 1 $I$ state.
 
 Let's see if differences in infectivity can help break this degeneracy.
-In this case, the true signal becomes, $I^* = \sum_l w_l I_l$, with $w_i \neq w_j$.
+In this case, the true signal becomes, $I^\dag = \sum_l w_l I_l$, with $w_i \neq w_j$.
 
 The derivative then becomes
 $$
-\frac{dI^*}{dt} = w_1 r_e E_K - w_1 r_i I_1 \\ 
+\frac{dI^\dag}{dt} = w_1 r_e E_K - w_1 r_i I_1 \\ 
 + w_2 r_i I_1 - w_2 r_i I_2 \\
 \dots \\
 + w_L r_i I_{L-1}  - w_L r_i I_L
@@ -270,8 +270,8 @@ I_2
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^*}{dt} \\
-\frac{d^2I^*}{dt^2}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2}
 \end{bmatrix}
 $$
 
@@ -293,7 +293,7 @@ We begin by generating some synthetic data from different underlying data-genera
 rE = 1 / 2
 rI = 1 / 4
 
-combinations <- data.frame(K = c(1, 1, 2, 2, 3), L = c(1, 2, 1, 2, 3))
+combinations <- data.frame(K = c(1, 1, 2, 2, 2, 3), L = c(1, 2, 1, 2, 3, 3))
 
 synthetic_model <- combinations |>
   purrr::pmap(\(K, L) {
@@ -377,7 +377,7 @@ run_model <- function(EI_states, R, S, K, L, rE, rI, offset = 0, signal = "incid
 ## Incidence signal
 With the true solutions generated, we now generate some observational signal with noise from the $I_1$ state.
 ```{r}
-tmax <- 24
+tmax <- 24 #34 #40
 offset <- 7
 t0 <- tmax - offset
 
@@ -445,7 +445,7 @@ This method relies on fitting a polynomial to the latest period, so we do that h
 poly_order <- 3
 
 incidence_polyfits <- purrr::map(incidence_signal, ~ {
-  lm(incidence ~ poly(t, poly_order, raw = TRUE), data = dplyr::filter(dplyr::mutate(.x, t = t - t0), t <= 0))
+  lm(incidence ~ poly(t, poly_order, raw = TRUE), data = dplyr::filter(dplyr::mutate(.x, t = t - t0), t <= 0, t > -21))
 })
 
 incidence_polyfit_projections <- incidence_polyfits |> 
@@ -457,7 +457,8 @@ incidence_polyfit_projections_gg <- purrr::imap(incidence_polyfit_projections, ~
 
 ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
   ggplot2::geom_line(data = incidence_polyfit_projections_gg, color = "red", linewidth = 1) +
-  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "red") +
+  ggplot2::geom_vline(xintercept = t0,      linetype = 2, color = "red") +
+  ggplot2::geom_vline(xintercept = t0 - 20, linetype = 2, color = "red") +
   ggplot2::geom_hline(
     ggplot2::aes(yintercept = c0),
     linetype = 2, color = "red",
@@ -655,7 +656,6 @@ direct_incidence_fit_gg <- expand.grid(
   
     I_star <- predict(incidence_polyfits[[true_configuration]], data.frame(t = -(seq(L) - 1) / ri))
     I_l <- as.numeric(I_star) / ri
-    
     
     EI_states <- c(E_k, I_l)
 
@@ -1036,7 +1036,8 @@ prevalence_polyfit_projections_gg <- purrr::imap(prevalence_polyfit_projections,
 
 ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
   ggplot2::geom_line(data = prevalence_polyfit_projections_gg, color = "red", linewidth = 1) +
-  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "red") +
+  ggplot2::geom_vline(xintercept = t0,      linetype = 2, color = "red") +
+  ggplot2::geom_vline(xintercept = t0 - 20, linetype = 2, color = "red") +
   ggplot2::geom_hline(
     ggplot2::aes(yintercept = c0),
     linetype = 2, color = "red",
@@ -1186,7 +1187,7 @@ simplified_model_fit_gg <- purrr::map(names(prevalence_signal_derivatives), ~ {
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = K, "I" = L, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
   )
   
@@ -1433,242 +1434,6 @@ ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
   ggplot2::facet_wrap(~ true_configuration) +
   ggplot2::theme_bw()
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-K <- 2 # Number of E states
-L <- 2
-ri <- 1
-re <- 0.9
-
-# Run a SIR model to generate the target of our initialisation
-m <- DiseasyModelOdeSeir$new(
-  season = T, activity = T,
-  observables = DiseasyObservables$new(
-    conn = DBI::dbConnect(RSQLite::SQLite()),
-    last_queryable_date = Sys.Date() - 1
-  ),
-  variant = DiseasyVariant$new(n_variants = 1),
-  compartment_structure = c("E" = K, "I" = 1, "R" = 1),
-  disease_progression_rates = c("E" = rE, "I" = ri),
-  parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
-)
-
-# Get a reference to the private environment
-private <- m$.__enclos_env__$private
-
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- ## Implementation of true-infected signal with different infectivity -->
-<!-- ```{r} -->
-<!-- K <- 2 # Number of E states -->
-<!-- L <- 2 # Number of I states -->
-<!-- ri <- rI * L -->
-<!-- re <- rE * K -->
-<!-- w <- 1 - 0.25*seq(L)/L -->
-<!-- w <- L * w / sum(w) -->
-<!-- #w <- c(1, 2) -->
-
-<!-- # Compute the derivatives of the signal ("signal" vector) -->
-<!-- signal <- polyfit(-max(K, L) / ri * 0.5)$coefficients |> -->
-<!--   (\(coefficients) coefficients* pmax(1, seq_along(coefficients) - 1))() -->
-<!-- names(signal) <- c("I^*", "dI^*/dt", "d^2I^*/dt^2") -->
-
-<!-- # Compute the matrix -->
-<!-- M <- matrix(rep(0, (K + L) * K), ncol = K + L) -->
-<!-- progression_rates <- c(rep(re, K), rep(ri, L)) -->
-<!-- active_row <- c(rep(0, K-1), progression_rates[K:(K+L)] * c(w, 0)) - c(rep(0, K-1), progression_rates[K:(K+L)] * c(0, w)) -->
-
-
-<!-- for (k in seq(K)) { -->
-<!--   if (k > 1) { -->
-<!--     stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply -->
-
-<!--     # Implement branching process which picks up the progression rate factors as it branches down. -->
-<!--     active_row <- active_row |> -->
-<!--       purrr::imap( -->
-<!--         \(r, idx) { -->
-<!--           c( -->
-<!--             rep(0, max(0, idx - 2)), # left pad with zeros -->
-<!--             progression_rates[idx - 1] * r, -->
-<!--             - progression_rates[idx] * r, -->
-<!--             rep(0, K + L - idx) # right pad with zeros -->
-<!--           ) -->
-<!--         } -->
-<!--       ) |> -->
-<!--       purrr::reduce(`+`) -->
-<!--   } -->
-
-<!--   M[k, ] <- active_row -->
-<!-- } -->
-
-<!-- # Define the vector for the matrix multiplication -->
-<!-- ss <- signal[2:(K + 1)]  -->
-<!-- ss[is.na(ss)] <- 0 -->
-
-<!-- checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M)) -->
-
-<!-- # Add additional constraints -->
-<!-- # I* = sum_l I_l -->
-<!-- if (nrow(M) < ncol(M)) { -->
-<!--   M <- rbind( -->
-<!--     M,  -->
-<!--     c(rep(0, K), w) -->
-<!--   ) -->
-<!--   ss <- c(ss, signal[1]) -->
-<!-- } -->
-
-<!-- # Add additional constraints -->
-<!-- # I*(1/ri) = sum_l^(L-1) I_l + re/ri E_K -->
-<!-- if (nrow(M) < ncol(M)) { -->
-<!--   time_ratio <- re / (2 * ri) -->
-<!--   k <- min(floor(time_ratio), K) -->
-<!--   contribution <- c(rep(0, K - k), rep(1, k)) -->
-<!--   contribution[max(K - k, 1)] <- contribution[max(K - k, 1)] + time_ratio - k -->
-
-<!--   M <- rbind( -->
-<!--     M,  -->
-<!--     c(contribution * w[1], rep(0.5, L) * w + c(rep(0.5, L-1), 0) * w[2:L]) -->
-<!--   ) -->
-<!--   ss <- c(ss, predict(polyfit(-max(K, L) / ri * 0.5), data.frame(t = 0))) -->
-<!-- } -->
-
-<!-- tryCatch( -->
-<!--   { -->
-<!--     EI_states <-solve(M, ss) -->
-<!--     EI_states <- EI_states / sum(EI_states) -->
-
-<!--     stats::setNames( -->
-<!--       EI_states, -->
-<!--       c(paste0("E_", seq(K)), paste0("I_", seq(L))) -->
-<!--     ) -->
-<!--   }, -->
-<!--   error = function(e) print(e$message) -->
-<!-- ) -->
-<!-- ``` -->
-
-<!-- ## Implementation of true-infected signal with population constraint -->
-<!-- ```{r} -->
-<!-- K <- 2 # Number of E states -->
-<!-- L <- 2 # Number of I states -->
-<!-- ri <- rI * L -->
-<!-- re <- rE * K -->
-
-
-<!-- # Compute the derivatives of the signal ("signal" vector) -->
-<!-- signal <- polyfit(0)$coefficients |> -->
-<!--   (\(coefficients) coefficients* pmax(1, seq_along(coefficients) - 1))() -->
-<!-- names(signal) <- c("I^*", "dI^*/dt", "d^2I^*/dt^2") -->
-
-<!-- # Compute the matrix -->
-<!-- M <- matrix(rep(0, (K + L) * K), ncol = K + L) -->
-<!-- active_row <- c(rep(0, K - 1), re, rep(0, L - 1), -ri) -->
-<!-- progression_rates <- c(rep(re, K), rep(ri, L)) -->
-
-<!-- for (k in seq(K)) { -->
-<!--   if (k > 1) { -->
-<!--     stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply -->
-
-<!--     # Implement branching process which picks up the progression rate factors as it branches down. -->
-<!--     active_row <- active_row |> -->
-<!--       purrr::imap( -->
-<!--         \(r, idx) { -->
-<!--           c( -->
-<!--             rep(0, max(0, idx - 2)), # left pad with zeros -->
-<!--             progression_rates[idx - 1] * r, -->
-<!--             - progression_rates[idx] * r, -->
-<!--             rep(0, K + L - idx) # right pad with zeros -->
-<!--           ) -->
-<!--         } -->
-<!--       ) |> -->
-<!--       purrr::reduce(`+`) -->
-<!--   } -->
-
-<!--   M[k, ] <- active_row -->
-<!-- } -->
-
-<!-- # Define the vector for the matrix multiplication -->
-<!-- ss <- signal[2:(K + 1)]  -->
-<!-- ss[is.na(ss)] <- 0 -->
-
-<!-- checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M)) -->
-
-<!-- # Add additional constraints -->
-<!-- # I* = sum_l I_l -->
-<!-- if (nrow(M) < ncol(M)) { -->
-<!--   M <- rbind( -->
-<!--     M,  -->
-<!--     c(rep(0, K), rep(1, L)) -->
-<!--   ) -->
-<!--   ss <- c(ss, signal[1]) -->
-<!-- } -->
-
-<!-- # Add additional constraints -->
-<!-- # sum_k E_k + sum_l I_l = 1 - S - R -->
-<!-- if (nrow(M) < ncol(M)) { -->
-<!--   M <- rbind( -->
-<!--     M,  -->
-<!--     rep(1, K + L) -->
-<!--   ) -->
-<!--   ss <- c(ss, 1 - S[length(S)] - R[length(R)]) -->
-<!-- } -->
-
-
-<!-- EI_states <- solve(M, ss) -->
-<!-- EI_states <- EI_states / sum(EI_states) -->
-
-<!-- stats::setNames( -->
-<!--   EI_states, -->
-<!--   c(paste0("E_", seq(K)), paste0("I_", seq(L))) -->
-<!-- ) -->
-<!-- ``` -->
 
 
 
