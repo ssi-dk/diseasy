@@ -97,14 +97,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       per_capita_contact_matrixes <- contact_matrixes |>
         purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, proportion))
 
+      # Finally, we want to adjust for the structure of the SEIR model such that the (Malthusian) growth rate
+      # of the model is conserved for different number of E and I compartments.
+      # This is a scaling that we need to compute and multiply with the infection rate "beta".
+      # To optimise, we perform the scaling here onto the contact matrices directly, since we then
+      # have to do it only once.
+      malthusian_scaling <- private$compute_malthusian_scaling()
+      scaled_per_capita_contact_matrixes <- purrr::map(per_capita_contact_matrixes, ~ .x * malthusian_scaling)
+
+
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: last_queryable_date from the observables module)
-      activity_matrix_changes <- as.Date(names(per_capita_contact_matrixes)) -
+      activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrixes)) -
         self %.% observables %.% last_queryable_date
 
       # We can then create a switch that selects the correct contact matrix at the given point in time
-      contact_matrix_switch <- purrr::partial(switch, !!!per_capita_contact_matrixes)
+      contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrixes)
       private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
 
       # f1 <- \(t) dplyr::case_when(!!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}"))))
@@ -276,7 +285,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Set the default forcing functions (no forcing)
       private$infected_forcing <- \(t, infected) infected
-      private$i1_forcing <- \(t, di1_dt) di1_dt
+      private$state_vector_forcing <- \(t, dy_dt, state_vector, new_infections) dy_dt
 
     },
 
@@ -285,21 +294,26 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   Set the forcing functions for the model.
     #' @param infected_forcing (`function`)\cr
     #'   A function that takes arguments `t` and `infected` and modifies the number of infected at time `t`.
-    #' @param i1_forcing (`function`)\cr
-    #'   A function that takes arguments `t` and `di1_dt` and modifies the flow into the first infectious compartment
-    #'   at time `t`.
-    set_forcing_functions = function(infected_forcing = NULL, i1_forcing = NULL) {
+    #' @param state_vector_forcing (`function`)\cr
+    #'   A function that takes arguments `t`, `dy_dt` and `new_infections` and modifies the flow into the
+    #'   compartments at time `t`.
+    set_forcing_functions = function(infected_forcing = NULL, state_vector_forcing = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(infected_forcing, args = c("t", "infected"), null.ok = TRUE, add = coll)
-      checkmate::assert_function(i1_forcing, args = c("t", "di1_dt"), null.ok = TRUE, add = coll)
+      checkmate::assert_function(
+        state_vector_forcing,
+        args = c("t", "dy_dt", "new_infections"),
+        null.ok = TRUE,
+        add = coll
+      )
       checkmate::reportAssertions(coll)
 
       if (!is.null(infected_forcing)) {
         private$infected_forcing <- infected_forcing
       }
 
-      if (!is.null(i1_forcing)) {
-        private$i1_forcing <- i1_forcing
+      if (!is.null(state_vector_forcing)) {
+        private$state_vector_forcing <- state_vector_forcing
       }
     },
 
@@ -348,7 +362,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # Forcing functions for the right hand side function
     infected_forcing = NULL,
-    i1_forcing = NULL,
+    state_vector_forcing = NULL,
 
     rhs = function(t, state_vector, ...) {
 
@@ -430,10 +444,53 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Add the inflow from infections
       dy_dt[private$e1_state_indexes] <- dy_dt[private$e1_state_indexes] + new_infections
 
-      # Add the forcing of I1 states
-      dy_dt[private$i1_state_indexes] <- private$i1_forcing(t, dy_dt[private$i1_state_indexes])
+      # Add the forcing of the states
+      dy_dt <- private$state_vector_forcing(t, dy_dt, new_infections)
 
       return(list(dy_dt))
+    },
+
+    # @description
+    #   This function computes the differences in malthusian growth rate between the current configuration and
+    #   configuration with single E and I compartments.
+    compute_malthusian_scaling = function() {
+      # This section follows the method outlined in doi: 10.1098/rsif.2009.0386
+
+      # To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
+      # Here, we assume E_k = I_l = R_m = 0 and S = 1
+
+      ## Compute the transition rate component
+      # First get the indexes for the E and I compartments in each variant / age_group combination
+      ei_state_indexes <- purrr::map2(
+        private$e1_state_indexes,
+        private$i_state_indexes,
+        ~ seq.int(from = .x, to = max(.y))
+      )
+
+      # The diagonal elements of the transition matrix is just (minus) the progression flow rates
+      diagonal_elmements <- private$progression_flow_rates[purrr::reduce(ei_state_indexes, c)]
+
+      # The (lower) off-diagnoal elements are the progression flow rates of the previous compartment
+      # which requires a little more attention when computing
+      offdiagonal_elemments <- ei_state_indexes |>
+        purrr::map(~ c(utils::head(disease_progression_rates[.x], -1), 0)) |>
+        purrr::reduce(c) |>
+        utils::head(-1)
+
+      transition_matrix <- diag(diagonal_elmements) +
+        cbind(
+          rbind(
+            matrix(rep(0, length(offdiagonal_elemments)), nrow = 1),
+            diag(offdiagonal_elemments)
+          ),
+          matrix(rep(0, length(offdiagonal_elemments) + 1), ncol = 1)
+        )
+
+
+
+      # Compute the transmissions component
+
+
     }
   )
 )
