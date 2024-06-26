@@ -67,7 +67,7 @@ We begin by generating some synthetic data from different underlying data-genera
 rE = 1 / 2
 rI = 1 / 4
 
-combinations <- data.frame(K = c(1, 1, 2, 2, 3), L = c(1, 2, 1, 2, 3))
+combinations <- data.frame(K = c(1, 1, 2, 2, 2, 3), L = c(1, 2, 1, 2, 3, 3))
 
 synthetic_model <- combinations |>
   purrr::pmap(\(K, L) {
@@ -225,61 +225,41 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
   ri <- rI * L
   re <- rE * K
 
-    
+  # Run a SIR model to generate the target of our initialisation
+  m <- DiseasyModelOdeSeir$new(
+    season = T, activity = T,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
+    disease_progression_rates = c("I" = rI * L / (L- 1)),
+    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.1)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Get a interpolation of the signal
+  signal <- approxfun(incidence_signal[[.x]]$t, incidence_signal[[.x]]$incidence, method = "constant")
+  
+  m$set_forcing_functions(
+    infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
+    state_vector_forcing = function(t, dy_dt, new_infections) {
+      dy_dt[private$i1_state_indexes] <- dy_dt[private$i1_state_indexes] - 
+        new_infections + # With no E states, the new infections in the model (beta S I) are added to "I2", so we remove these manually
+        signal(t) # Use signal as forcing for inflow to I1
+      return(dy_dt)
+    } 
+  )
+
+  
   # Create the starting state vector and the constraints
   y0 <- c(rep(0, L - 1), 0, 1)
   y0 <- y0 / sum(y0)
   
   times <- seq(from = 0, to = t0)
-  
-    
-  objective_function <- function(beta) {
-    
-  
-    # Run a SIR model to generate the target of our initialisation
-    m <- DiseasyModelOdeSeir$new(
-      season = T, activity = T,
-      observables = DiseasyObservables$new(
-        conn = DBI::dbConnect(RSQLite::SQLite()),
-        last_queryable_date = Sys.Date() - 1
-      ),
-      variant = DiseasyVariant$new(n_variants = 1),
-      compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
-      disease_progression_rates = c("I" = rI * L / (L- 1)),
-      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = beta)
-    )
-  
-    # Get a interpolation of the signal
-    signal <- approxfun(incidence_signal[[.x]]$t, incidence_signal[[.x]]$incidence, method = "constant")
-    
-    m$set_forcing_functions(
-      infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
-      i1_forcing = \(t, di1_dt) di1_dt + signal(t)
-    )
-
-
-    # Get a reference to the private environment
-    private <- m$.__enclos_env__$private
-    
-    sol <- deSolve::ode(
-      y = y0, 
-      times = times, 
-      func = private %.% rhs, 
-      parms = NULL
-    ) 
-    
-    return((sum(sol[nrow(sol), -1]) - 1)^2)
-    
-  }
-  
-  
-  op <- optim(
-    par = 0.5,
-    fn = objective_function,
-    method = "L-BFGS-B",
-    lower = 0#, 
-    #control = list(factr = 1e-2 / .Machine$double.eps)
-  ) 
   
   sol <- deSolve::ode(
     y = y0,
@@ -288,16 +268,20 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
     parms = NULL
   )
   
-  plot()
+  R <- sol[nrow(sol), 1 + (L - 1) + 1]
+  S <- sol[nrow(sol), 1 + (L - 1) + 2]
+  
+  R <- R / (R  + S)
+  S <- S / (R  + S)
   
   
   t <- synthetic_model[[.x]][, 1]
-  R <- synthetic_model[[.x]][t == t0, 1 + K + L + 1]
-  S <- synthetic_model[[.x]][t == t0, 1 + K + L + 2]
+  E <- synthetic_model[[.x]][t == t0, 1 + seq_len(K)]
+  I <- synthetic_model[[.x]][t == t0, 1 + K + seq_len(L)]
 
-  run_model(EI_states, R, S, K, L, rE, rI, offset = 0, signal = "incidence", scale_EI = TRUE) |>
+  run_model(c(E, I), R, S, K, L, rE, rI, offset = 0, signal = "incidence", scale_EI = FALSE) |>
     dplyr::mutate(true_configuration = .x, model_configuration = .x)
-}) |>
+}, .progress = TRUE) |>
   purrr::list_rbind()
 
 
@@ -309,6 +293,126 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
   ggplot2::facet_wrap(~ true_configuration) +
   ggplot2::theme_bw()
 ```
+
+
+```{r}
+simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
+  n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
+  K <- n_states[1]
+  L <- n_states[2]
+
+  ri <- rI * L
+  re <- rE * K
+
+  # Run a SIR model to generate the target of our initialisation
+  m <- DiseasyModelOdeSeir$new(
+    season = T, activity = T,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
+    disease_progression_rates = c("I" = rI * L / (L- 1)),
+    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 1)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Get a interpolation of the signal
+  signal <- approxfun(incidence_signal[[.x]]$t, incidence_signal[[.x]]$incidence, method = "constant")
+  
+  m$set_forcing_functions(
+    infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
+    state_vector_forcing = function(t, dy_dt, new_infections) {
+      dy_dt[private$i1_state_indexes] <- dy_dt[private$i1_state_indexes] - 
+        new_infections + # With no E states, the new infections in the model (beta S I) are added to "I2", so we remove these manually
+        signal(t) # Use signal as forcing for inflow to I1
+      return(dy_dt)
+    } 
+  )
+
+  
+  # Create the starting state vector and the constraints
+  y0 <- c(rep(0, L - 1), 0, 1)
+  y0 <- y0 / sum(y0)
+  
+  times <- seq(from = 0, to = t0)
+  
+
+  
+  objective_function <- function(beta) {
+
+    private$.parameters$overall_infection_risk <- beta
+
+    sol <- deSolve::ode(
+      y = y0,
+      times = times,
+      func = private %.% rhs,
+      parms = NULL
+    )
+
+    return((sum(sol[nrow(sol), -1]) - 1)^2)
+  }
+
+  op <- optim(
+    par = 1,
+    fn = objective_function,
+    method = "L-BFGS-B",
+    lower = 0#,
+    #control = list(factr = 1e-2 / .Machine$double.eps)
+  )
+
+  # Use best beta
+  private$.parameters$overall_infection_risk <- op$par
+  
+  sol <- deSolve::ode(
+    y = y0,
+    times = times,
+    func = private %.% rhs,
+    parms = NULL
+  )
+  
+  R <- sol[nrow(sol), 1 + (L - 1) + 1]
+  S <- sol[nrow(sol), 1 + (L - 1) + 2]
+  
+  R <- R / (R  + S)
+  S <- S / (R  + S)
+  
+  
+  t <- synthetic_model[[.x]][, 1]
+  E <- synthetic_model[[.x]][t == t0, 1 + seq_len(K)]
+  I <- synthetic_model[[.x]][t == t0, 1 + K + seq_len(L)]
+
+  run_model(c(E, I), R, S, K, L, rE, rI, offset = 0, signal = "incidence", scale_EI = FALSE) |>
+    dplyr::mutate(true_configuration = .x, model_configuration = .x)
+}, .progress = TRUE) |>
+  purrr::list_rbind()
+
+
+ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
+  ggplot2::geom_line(data = exact_model_fit_gg, color = "darkgrey", linewidth = 2) +
+  ggplot2::geom_line(data = simplified_incidence_fit_gg, color = "red", linewidth = 1) +
+  ggplot2::geom_vline(xintercept = t0, linetype = 2, color = "black") +
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #### Scaling EI states
 ```{r}
@@ -334,18 +438,10 @@ simplified_incidence_fit_gg <- expand.grid(
     n_states <- as.numeric(stringr::str_extract_all(model_configuration, r"{\d}")[[1]])
     K <- n_states[1]
     L <- n_states[2]
-
+  
     ri <- rI * L
     re <- rE * K
-
-    # Generate a uniform initial state_vector that sums to 1
-    y0 <- c(rep(1, K + 1), 0, 0)
-    y0 <- y0 / sum(y0)
-
-    times <- seq(- 1 / rE, 0, length.out = 10)
-    ss <- predict(incidence_polyfits[[true_configuration]], data.frame(t = times))
-
-
+  
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
       season = T, activity = T,
@@ -354,47 +450,56 @@ simplified_incidence_fit_gg <- expand.grid(
         last_queryable_date = Sys.Date() - 1
       ),
       variant = DiseasyVariant$new(n_variants = 1),
-      compartment_structure = c("E" = K, "I" = 1, "R" = 1),
-      disease_progression_rates = c("E" = re / K, "I" = ri),
-      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0)
+      compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
+      disease_progression_rates = c("I" = rI * L / (L- 1)),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 1)
     )
-
+  
     # Get a reference to the private environment
     private <- m$.__enclos_env__$private
-
-
-    objective_function <- function(y) {
-      sol <- deSolve::ode(
-        y = y,
-        times = times,
-        func = private %.% rhs,
-        parms = NULL
-      )
-
-      I1 <- sol[, K + 2]
-
-      sum(ri * I1 - ss)^2
-    }
-
-    op <- optim(
-      par = y0,
-      fn = objective_function,
-      method = "L-BFGS-B",
-      lower = 0,
-      control = list(factr = 1e-2 / .Machine$double.eps)
+  
+    # Get a interpolation of the signal
+    signal <- approxfun(incidence_signal[[model_configuration]]$t, incidence_signal[[model_configuration]]$incidence, method = "constant")
+    
+    m$set_forcing_functions(
+      infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
+      state_vector_forcing = function(t, dy_dt, new_infections) {
+        dy_dt[private$i1_state_indexes] <- dy_dt[private$i1_state_indexes] - 
+          new_infections + # With no E states, the new infections in the model (beta S I) are added to "I2", so we remove these manually
+          signal(t) # Use signal as forcing for inflow to I1
+        return(dy_dt)
+      } 
     )
-
-    EI_states <- op$par[1:(K + 1)]
-
-    if (L > 1) {
-      I_l <- predict(incidence_polyfits[[true_configuration]], data.frame(t = -(seq(2, L) - 1) / ri - K / re)) |> as.numeric()
-      EI_states <- c(EI_states, I_l)
-    }
-
-    run_model(EI_states, R, S, K, L, rE, rI, signal = "incidence", scale_EI = TRUE) |>
+  
+    
+    # Create the starting state vector and the constraints
+    y0 <- c(rep(0, L - 1), 0, 1)
+    y0 <- y0 / sum(y0)
+    
+    times <- seq(from = 0, to = t0)
+    
+    sol <- deSolve::ode(
+      y = y0,
+      times = times,
+      func = private %.% rhs,
+      parms = NULL
+    )
+    
+    R <- sol[nrow(sol), 1 + (L - 1) + 1]
+    S <- sol[nrow(sol), 1 + (L - 1) + 2]
+    
+    R <- R / (R  + S)
+    S <- S / (R  + S)
+    
+    
+    t <- synthetic_model[[model_configuration]][, 1]
+    E <- synthetic_model[[model_configuration]][t == t0, 1 + seq_len(K)]
+    I <- synthetic_model[[model_configuration]][t == t0, 1 + K + seq_len(L)]
+  
+    run_model(c(E, I), R, S, K, L, rE, rI, offset = 0, signal = "incidence", scale_EI = FALSE) |>
       dplyr::mutate(true_configuration = true_configuration, model_configuration = model_configuration)
   }, .progress = TRUE) |>
-  purrr::list_rbind()
+    purrr::list_rbind()
 
 
 ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
