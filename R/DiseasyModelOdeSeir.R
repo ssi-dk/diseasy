@@ -112,6 +112,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # To optimise, we perform the scaling here onto the contact matrices directly, since we then
       # have to do it only once.
       if (malthusian_matching) {
+
+        if (self %.% parameters %.% overall_infection_risk == 0) {
+          stop("The overall_infection_risk parameter must be strictly positive when malthusian_matching is enabled.")
+        }
+
         reference_growth_rate <- private$compute_malthusian_growth_rate(K = 0, L = 1, age_cuts_lower = 0)
 
         # Define objective function for root finding
