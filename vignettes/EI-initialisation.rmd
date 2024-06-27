@@ -308,7 +308,7 @@ synthetic_model <- combinations |>
       variant = DiseasyVariant$new(n_variants = 1),
       compartment_structure = c("E" = K, "I" = L, "R" = 1),
       disease_progression_rates = c("E" = rE, "I" = rI),
-      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.9)
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6)
     )
     
     # Get a reference to the private environment
@@ -322,6 +322,39 @@ synthetic_model <- combinations |>
   })
 
 names(synthetic_model) <- purrr::pmap_chr(combinations, \(K, L) glue::glue("K = {K}, L = {L}"))
+
+```
+
+
+## Incidence signal
+With the true solutions generated, we now generate some observational signal with noise from the $I_1$ state.
+```{r}
+tmax <- 24 #34 #40
+offset <- 7
+t0 <- tmax - offset
+
+incidence_signal <- purrr::imap(synthetic_model, ~ {
+  n_states <-as.numeric(stringr::str_extract_all(.y, r"{\d}")[[1]])
+  K <- n_states[1]
+  L <- n_states[2]
+  
+  # Retrieve the signal
+  I <- L * rI * head(.x[, K + 2], tmax)
+  
+  # Adding some noise
+  pop = 1e3
+  II <- purrr::map_dbl(I, \(lambda) rpois(1, pop * lambda)) / pop  
+  
+  data.frame(t = head(.x[, 1], tmax), incidence = II)
+})
+
+incidence_signal_gg <- purrr::imap(incidence_signal, ~ dplyr::mutate(.x, true_configuration = .y)) |>
+  purrr::list_rbind()
+
+ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
+  ggplot2::geom_point() + 
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw() 
 
 ```
 
@@ -372,38 +405,6 @@ run_model <- function(EI_states, R, S, K, L, rE, rI, offset = 0, signal = "incid
   }
   
 }
-```
-
-## Incidence signal
-With the true solutions generated, we now generate some observational signal with noise from the $I_1$ state.
-```{r}
-tmax <- 24 #34 #40
-offset <- 7
-t0 <- tmax - offset
-
-incidence_signal <- purrr::imap(synthetic_model, ~ {
-  n_states <-as.numeric(stringr::str_extract_all(.y, r"{\d}")[[1]])
-  K <- n_states[1]
-  L <- n_states[2]
-  
-  # Retrieve the signal
-  I <- L * rI * head(.x[, K + 2], tmax)
-  
-  # Adding some noise
-  pop = 1e3
-  II <- purrr::map_dbl(I, \(lambda) rpois(1, pop * lambda)) / pop  
-  
-  data.frame(t = head(.x[, 1], tmax), incidence = II)
-})
-
-incidence_signal_gg <- purrr::imap(incidence_signal, ~ dplyr::mutate(.x, true_configuration = .y)) |>
-  purrr::list_rbind()
-
-ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
-  ggplot2::geom_point() + 
-  ggplot2::facet_wrap(~ true_configuration) +
-  ggplot2::theme_bw() 
-
 ```
 
 
