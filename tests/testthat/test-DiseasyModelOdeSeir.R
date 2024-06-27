@@ -1,6 +1,6 @@
 # For these tests to be more readable, we define some short hand here and explain their value
-re <- 2 # Overall disease progression rate from E to I
-ri <- 4 # Overall disease progression rate from I to R
+rE <- 1 / 2 # Overall disease progression rate from E to I
+rI <- 1 / 4 # Overall disease progression rate from I to R
 fr <- 0.02 # R compartments have their infection risk reduced by this factor
 fv <- 0.01 # Whenever two variants are in use, the second has a relative infection risk of this factor
 
@@ -20,7 +20,7 @@ test_that("helpers are configured as expected (SR single variant / single age gr
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("I" = 0, "R" = 1),
-    disease_progression_rates = c("I" = ri),
+    disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -45,7 +45,6 @@ test_that("helpers are configured as expected (SR single variant / single age gr
   rm(m)
 })
 
-
 test_that("helpers are configured as expected (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
@@ -58,7 +57,7 @@ test_that("helpers are configured as expected (SIR single variant / single age g
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = ri),
+    disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -75,7 +74,7 @@ test_that("helpers are configured as expected (SIR single variant / single age g
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(3)))
 
   # Check progression flow rates are correctly set
-  expect_identical(private %.% progression_flow_rates, c(ri, 0, 0))
+  expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
 
   # Check infection risk is correctly set
   expect_identical(private %.% infection_risk, c(0, fr, 1))
@@ -96,7 +95,7 @@ test_that("helpers are configured as expected (SIR double variant / double age g
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = ri),
+    disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = c(0, 60))
   )
 
@@ -123,7 +122,7 @@ test_that("helpers are configured as expected (SIR double variant / double age g
   # Check progression flow rates are correctly set
   expect_identical(
     private %.% progression_flow_rates,
-    c(ri, 0, ri, 0, ri, 0, ri, 0, 0, 0)
+    c(rI, 0, rI, 0, rI, 0, rI, 0, 0, 0)
   )
 
   # Check infection risk is correctly set
@@ -147,7 +146,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = 2, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -164,7 +163,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(4)))
 
   # Check progression flow rates are correctly set
-  expect_identical(private %.% progression_flow_rates, c(re, ri, 0, 0))
+  expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
 
   # Check infection risk is correctly set
   expect_identical(private %.% infection_risk, c(0, 0, fr, 1))
@@ -185,7 +184,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -204,7 +203,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   # Check progression flow rates are correctly set
   expect_identical(
     private %.% progression_flow_rates,
-    c(2 * re, 2 * re, 2 * ri, 2 * ri, 1, 0, 0)
+    c(2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, 0)
   )
 
   # Check infection risk is correctly set
@@ -229,7 +228,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -252,8 +251,8 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   expect_identical(
     private %.% progression_flow_rates,
     c(
-      2 * re, 2 * re, 2 * ri, 2 * ri, 1, 0, # Variant 1
-      2 * re, 2 * re, 2 * ri, 2 * ri, 1, 0, # Variant 2
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 1
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 2
       0 # Susceptible
     )
   )
@@ -284,7 +283,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 60))
   )
 
@@ -312,10 +311,10 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   expect_identical(
     private %.% progression_flow_rates,
     c(
-      2 * re, 2 * re, 2 * ri, 2 * ri, 1, 0, # Variant 1, age group 1
-      2 * re, 2 * re, 2 * ri, 2 * ri, 1, 0, # Variant 1, age group 2
-      2 * re, 2 * re, 2 * ri, 2 * ri, 1, 0, # Variant 2, age group 1
-      2 * re, 2 * re, 2 * ri, 2 * ri, 1, 0, # Variant 2, age group 2
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 1, age group 1
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 1, age group 2
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 2, age group 1
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 2, age group 2
       0, 0 # Susceptible
     )
   )
@@ -349,7 +348,8 @@ test_that("contact_matrix helper works as expected (no scenario - single age gro
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -392,7 +392,8 @@ test_that("contact_matrix helper works as expected (no scenario - two age groups
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    parameters = list("age_cuts_lower" = c(0, 60))
+    parameters = list("age_cuts_lower" = c(0, 60)),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -435,7 +436,8 @@ test_that("contact_matrix helper works as expected (no scenario - three age grou
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    parameters = list("age_cuts_lower" = c(0, 40, 80))
+    parameters = list("age_cuts_lower" = c(0, 40, 80)),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -492,7 +494,8 @@ test_that("contact_matrix helper works as expected (with scenario - single age g
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -578,7 +581,8 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list(
       "age_cuts_lower" = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))
-    )
+    ),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -629,6 +633,254 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
 
 
 
+test_that("malthusian scaling is compuated as expected (SIR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("I" = 1, "R" = 1),
+    disease_progression_rates = c("I" = rI),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+
+  expect_identical(
+    private$compute_malthusian_growth_rate(),
+    1 - rI
+  )
+
+  rm(m)
+})
+
+test_that("malthusian scaling is compuated as expected (SIR double variant / double age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a variant scenario with a more infectious variant
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant1", characteristics = list("relative_infection_risk" = 1,  "introduction_date" = as.Date(0)))
+  var$add_variant("Variant2", characteristics = list("relative_infection_risk" = 1.5, "introduction_date" = as.Date(0)))
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = var,
+    compartment_structure = c("I" = 1, "R" = 1),
+    disease_progression_rates = c("I" = rI),
+    parameters = list("age_cuts_lower" = c(0, 60))
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Manually write the subsystem
+  beta <- 0.5 * 1.5 # No activity scenario gives "unit" beta, but the more infectious variant has a higher beta
+  subsystem <- matrix(
+    c(
+      beta - rI, beta,
+      beta,      beta - rI
+    ),
+    nrow = 2,
+    byrow = TRUE
+  )
+
+  expect_identical(
+    private$compute_malthusian_growth_rate(),
+    purrr::pluck(subsystem, eigen, "values", Re, max)
+  )
+
+  rm(m)
+})
+
+test_that("malthusian scaling is compuated as expected (SEIR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Manually write the subsystem
+  beta <- 1 # No activity scenario gives unit beta
+  subsystem <- matrix(
+    c(
+      -rE,  beta,
+       rE, -rI
+    ),
+    nrow = 2,
+    byrow = TRUE
+  )
+
+  expect_identical(
+    private$compute_malthusian_growth_rate(),
+    purrr::pluck(subsystem, eigen, "values", Re, max)
+  )
+
+  rm(m)
+})
+
+test_that("malthusian scaling is compuated as expected (SEEIIRR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = 2, "I" = 2, "R" = 1),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Manually write the subsystem
+  beta <- 1 # No activity scenario gives unit beta
+  subsystem <- matrix(
+    c(
+      -2 * rE,       0,    beta,    beta,
+       2 * rE, -2 * rE,       0,       0,
+            0,  2 * rE, -2 * rI,       0,
+            0,       0,  2 * rI, -2 * rI
+    ),
+    nrow = 4,
+    byrow = TRUE
+  )
+
+   expect_identical(
+    private$compute_malthusian_growth_rate(),
+    purrr::pluck(subsystem, eigen, "values", Re, max)
+  )
+
+  rm(m)
+})
+
+test_that("malthusian scaling is compuated as expected (SEEIIRR double variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a variant scenario with a more infectious variant
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant1", characteristics = list("relative_infection_risk" = 1,  "introduction_date" = as.Date(0)))
+  var$add_variant("Variant2", characteristics = list("relative_infection_risk" = 1.5, "introduction_date" = as.Date(0)))
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = var,
+    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Manually write the subsystem
+  beta <- 1 * 1.5 # No activity scenario gives "unit" beta, but the more infectious variant has a higher beta
+  subsystem <- matrix(
+    c(
+      -2 * rE,       0,    beta,    beta,
+       2 * rE, -2 * rE,       0,       0,
+            0,  2 * rE, -2 * rI,       0,
+            0,       0,  2 * rI, -2 * rI
+    ),
+    nrow = 4,
+    byrow = TRUE
+  )
+
+  expect_identical(
+    private$compute_malthusian_growth_rate(),
+    purrr::pluck(subsystem, eigen, "values", Re, max)
+  )
+
+  rm(m)
+})
+
+test_that("malthusian scaling is compuated as expected (SEEIIRR double variant / double age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a variant scenario with a more infectious variant
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant1", characteristics = list("relative_infection_risk" = 1,  "introduction_date" = as.Date(0)))
+  var$add_variant("Variant2", characteristics = list("relative_infection_risk" = 1.5, "introduction_date" = as.Date(0)))
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = var,
+    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = c(0, 60))
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Manually write the subsystem
+  beta <- 0.5 * 1.5 # No activity scenario gives "unit" beta, but the more infectious variant has a higher beta
+  subsystem <- matrix(
+    c(
+      -2 * rE,       0,    beta,    beta,       0,       0,    beta,    beta,
+       2 * rE, -2 * rE,       0,       0,       0,       0,       0,       0,
+            0,  2 * rE, -2 * rI,       0,       0,       0,       0,       0,
+            0,       0,  2 * rI, -2 * rI,       0,       0,       0,       0,
+            0,       0,    beta,    beta, -2 * rE,       0,    beta,    beta,
+            0,       0,       0,       0,  2 * rE, -2 * rE,       0,       0,
+            0,       0,       0,       0,       0,  2 * rE, -2 * rI,       0,
+            0,       0,       0,       0,       0,       0,  2 * rI, -2 * rI
+    ),
+    nrow = 8,
+    byrow = TRUE
+  )
+
+  expect_identical(
+    private$compute_malthusian_growth_rate(),
+    purrr::pluck(subsystem, eigen, "values", Re, max)
+  )
+
+  rm(m)
+})
+
+
+
 test_that("forcing functions can be configured as expected (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
@@ -641,7 +893,7 @@ test_that("forcing functions can be configured as expected (SIR single variant /
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = ri),
+    disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -685,7 +937,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -735,7 +987,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
     ),
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -772,7 +1024,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -822,7 +1074,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 60))
   )
 
@@ -860,7 +1112,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -892,7 +1144,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = ri, "I" = ri),
+    disease_progression_rates = c("E" = rI, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 40))
   )
 
@@ -925,7 +1177,7 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = re, "I" = ri),
+    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
   )
 
@@ -938,8 +1190,8 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
   expect_identical(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0, -ri, ri, # Variant 1
-      0, -ri, ri, # Variant 2
+      0, -rI, rI, # Variant 1
+      0, -rI, rI, # Variant 2
       0 # Susceptible
     )
   )
@@ -960,7 +1212,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = ri, "I" = ri),
+    disease_progression_rates = c("E" = rI, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 40))
   )
 
@@ -973,10 +1225,10 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
   expect_identical(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0, -ri, ri, # Variant 1, age group 1
-      0, -ri, ri, # Variant 1, age group 2
-      0, -ri, ri, # Variant 2, age group 1
-      0, -ri, ri, # Variant 2, age group 2
+      0, -rI, rI, # Variant 1, age group 1
+      0, -rI, rI, # Variant 1, age group 2
+      0, -rI, rI, # Variant 2, age group 1
+      0, -rI, rI, # Variant 2, age group 2
       0, 0 # Susceptible
     )
   )
@@ -998,8 +1250,9 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = re, "I" = ri),
-    parameters = list("age_cuts_lower" = 0)
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -1013,8 +1266,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      si * ss,       -si * ri,  si * ri, # Variant 1
-      si * ss * fv,  -si * ri,  si * ri, # Variant 2
+      si * ss,       -si * rI,  si * rI, # Variant 1
+      si * ss * fv,  -si * rI,  si * rI, # Variant 2
       -(si + si * fv) * ss # Susceptible
     )
   )
@@ -1035,8 +1288,9 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = ri, "I" = ri),
-    parameters = list("age_cuts_lower" = c(0, 40))
+    disease_progression_rates = c("E" = rI, "I" = rI),
+    parameters = list("age_cuts_lower" = c(0, 40)),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -1051,10 +1305,10 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      (si + si) * ss,      -si * ri,  si * ri, # Variant 1, age group 1
-      (si + si) * ss,      -si * ri,  si * ri, # Variant 1, age group 2
-      (si + si) * ss * fv, -si * ri,  si * ri, # Variant 2, age group 1
-      (si + si) * ss * fv, -si * ri,  si * ri, # Variant 2, age group 2
+      (si + si) * ss,      -si * rI,  si * rI, # Variant 1, age group 1
+      (si + si) * ss,      -si * rI,  si * rI, # Variant 1, age group 2
+      (si + si) * ss * fv, -si * rI,  si * rI, # Variant 2, age group 1
+      (si + si) * ss * fv, -si * rI,  si * rI, # Variant 2, age group 2
       -(2 * si +  2 * si * fv) * ss, -(2 * si + 2 * si * fv) * ss # Susceptible
     )
   )
@@ -1076,8 +1330,9 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = re, "I" = ri),
-    parameters = list("age_cuts_lower" = 0)
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -1090,8 +1345,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      fr * si * (sr + sr),       -si * ri,  si * ri - fr * (si + si * fv) * sr, # Variant 1
-      fr * si * (sr + sr) * fv,  -si * ri,  si * ri - fr * (si + si * fv) * sr, # Variant 2
+      fr * si * (sr + sr),       -si * rI,  si * rI - fr * (si + si * fv) * sr, # Variant 1
+      fr * si * (sr + sr) * fv,  -si * rI,  si * rI - fr * (si + si * fv) * sr, # Variant 2
       0 # Susceptible
     )
   )
@@ -1110,8 +1365,9 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = ri, "I" = ri),
-    parameters = list("age_cuts_lower" = c(0, 40))
+    disease_progression_rates = c("E" = rI, "I" = rI),
+    parameters = list("age_cuts_lower" = c(0, 40)),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -1124,10 +1380,10 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      fr * (4 * si) * sr,       -si * ri,  si * ri - fr * sr * (2 * si + 2 * si * fv), # Variant 1, age group 1
-      fr * (4 * si) * sr,       -si * ri,  si * ri - fr * sr * (2 * si + 2 * si * fv), # Variant 1, age group 2
-      fr * (4 * si) * sr * fv,  -si * ri,  si * ri - fr * sr * (2 * si + 2 * si * fv), # Variant 2, age group 1
-      fr * (4 * si) * sr * fv,  -si * ri,  si * ri - fr * sr * (2 * si + 2 * si * fv), # Variant 2, age group 2
+      fr * (4 * si) * sr,       -si * rI,  si * rI - fr * sr * (2 * si + 2 * si * fv), # Variant 1, age group 1
+      fr * (4 * si) * sr,       -si * rI,  si * rI - fr * sr * (2 * si + 2 * si * fv), # Variant 1, age group 2
+      fr * (4 * si) * sr * fv,  -si * rI,  si * rI - fr * sr * (2 * si + 2 * si * fv), # Variant 2, age group 1
+      fr * (4 * si) * sr * fv,  -si * rI,  si * rI - fr * sr * (2 * si + 2 * si * fv), # Variant 2, age group 2
       0, 0 # Susceptible
     )
   )
@@ -1159,8 +1415,9 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = re, "I" = ri),
-    parameters = list("age_cuts_lower" = 0)
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -1175,8 +1432,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   expect_equal(
     unname(private$rhs(1, y0)[[1]]),
     c(
-      0.5 * si * ss,       -si * ri,  si * ri, # Variant 1
-      0.5 * si * ss * fv,  -si * ri,  si * ri, # Variant 2
+      0.5 * si * ss,       -si * rI,  si * rI, # Variant 1
+      0.5 * si * ss * fv,  -si * rI,  si * rI, # Variant 2
       -0.5 * si * (1 + fv) * ss # Susceptible
     )
   )
@@ -1210,8 +1467,9 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = ri, "I" = ri),
-    parameters = list("age_cuts_lower" = c(0, 40))
+    disease_progression_rates = c("E" = rI, "I" = rI),
+    parameters = list("age_cuts_lower" = c(0, 40)),
+    malthusian_scaling = FALSE
   )
 
   # Get a reference to the private environment
@@ -1226,10 +1484,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   expect_equal(
     unname(private$rhs(1, y0)[[1]]),
     c(
-      0.5 * (si + si) * ss,       -si * ri,  si * ri, # Variant 1, age group 1
-      0.5 * (si + si) * ss,       -si * ri,  si * ri, # Variant 1, age group 2
-      0.5 * (si + si) * ss * fv,  -si * ri,  si * ri, # Variant 2, age group 1
-      0.5 * (si + si) * ss * fv,  -si * ri,  si * ri, # Variant 2, age group 2
+      0.5 * (si + si) * ss,       -si * rI,  si * rI, # Variant 1, age group 1
+      0.5 * (si + si) * ss,       -si * rI,  si * rI, # Variant 1, age group 2
+      0.5 * (si + si) * ss * fv,  -si * rI,  si * rI, # Variant 2, age group 1
+      0.5 * (si + si) * ss * fv,  -si * rI,  si * rI, # Variant 2, age group 2
       -0.5 * (2 * si + 2 * si * fv) * ss, -0.5 * (2 * si + 2 * si * fv) * ss # Susceptible
     )
   )
