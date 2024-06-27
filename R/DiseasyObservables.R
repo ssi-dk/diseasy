@@ -331,7 +331,13 @@ DiseasyObservables <- R6::R6Class(                                              
     slice_ts = purrr::partial(
       .f = active_binding,
       name = "slice_ts",
-      expr = return(private %.% .slice_ts)
+      expr = {
+        if (is.null(private %.% .slice_ts)) {
+          return(glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"))
+        } else {
+          return(private %.% .slice_ts)
+        }
+      }
     ),
 
 
@@ -350,7 +356,7 @@ DiseasyObservables <- R6::R6Class(                                              
     .last_queryable_date = NULL,
     .ds                  = NULL,
 
-    .slice_ts = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
+    .slice_ts = NULL,
     .conn = NULL
   )
 )
