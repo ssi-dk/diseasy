@@ -23,6 +23,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     initialize = function(
       compartment_structure = c("E" = 2L, "I" = 3L, "R" = 2L),
       disease_progression_rates = c("E" = 1, "I" = 1),
+      malthusian_scaling = TRUE,
       ...
     ) {
 
@@ -48,6 +49,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
 
+      checkmate::assert_logical(malthusian_scaling, add = coll)
+
       # Check we have the needed modules loaded and configured as needed
       checkmate::assert_class(self$observables, "DiseasyObservables", add = coll)
       checkmate::assert_date(self$observables$last_queryable_date, add = coll)
@@ -69,6 +72,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$n_variants   <- max(length(self %.% variant %.% variants), 1)
       private$n_EIR_states <- sum(compartment_structure)
       private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
+
+      # Store the given model configuration
+      private$compartment_structure <- compartment_structure
+      private$disease_progression_rates <- disease_progression_rates
 
 
       ## Time-varying contact matrices projected onto target age-groups
@@ -102,10 +109,24 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # This is a scaling that we need to compute and multiply with the infection rate "beta".
       # To optimise, we perform the scaling here onto the contact matrices directly, since we then
       # have to do it only once.
-      malthusian_scaling <- private$compute_malthusian_scaling()
-      scaled_per_capita_contact_matrixes <- purrr::map(per_capita_contact_matrixes, ~ .x * malthusian_scaling)
+      if (malthusian_scaling) {
+        reference_growth_rate <- private$compute_malthusian_growth_rate(K = 0, L = 1, age_cuts_lower = 0)
 
+        current_growth_rate <- private$compute_malthusian_growth_rate(
+          K = purrr::pluck(private$compartment_structure, "E", .default = 0),
+          L = purrr::pluck(private$compartment_structure, "I"),
+          age_cuts_lower = self %.% parameters %.% age_cuts_lower,
+          overall_infection_risk = self %.% parameters %.% overall_infection_risk
+        )
 
+        scaled_per_capita_contact_matrixes <- per_capita_contact_matrixes |>
+          purrr::map(~ .x * reference_growth_rate / current_growth_rate)
+
+      } else {
+
+        scaled_per_capita_contact_matrixes <- per_capita_contact_matrixes
+
+      }
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: last_queryable_date from the observables module)
@@ -148,10 +169,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         sum(compartment_structure) + 1
 
       # Then we store the indexes for just the first compartment
-      private$i1_state_indexes <- private$e1_state_indexes + purrr::pluck(compartment_structure, "E", .default = 0)
+      private$i1_state_indexes <- private %.% e1_state_indexes + purrr::pluck(compartment_structure, "E", .default = 0)
 
       # Store the indexes of the first recovered compartments
-      private$r1_state_indexes <- private$i1_state_indexes + purrr::pluck(compartment_structure, "I")
+      private$r1_state_indexes <- private %.% i1_state_indexes + purrr::pluck(compartment_structure, "I")
 
 
       # Store the indexes of the infectious compartments for later RHS computation
@@ -166,9 +187,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # In RHS, we need a mapping from i_state_indexes to the relative infection risk of the corresponding variant.
-      private$indexed_variant_infection_risk <- self$variant$variants |>
+      private$indexed_variant_infection_risk <- self %.% variant %.% variants |>
         purrr::map(
-          \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private$n_age_groups)
+          \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_age_groups)
         ) |>
         purrr::reduce(c)
 
@@ -222,11 +243,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Scale the given rates for each compartment set (E / I) so overall rate is conserved
       # then add the R rates from the immunity scenario
-      disease_progression_rates <-
-        purrr::map2(
-          disease_progression_rates,
-          compartment_structure[names(disease_progression_rates)],
-          \(rate, n) rep(n * rate, n)
+      progression_flow_rates <-
+        purrr::map(
+          c("E", "I"),
+          ~ {
+            rep(
+              purrr::pluck(compartment_structure, .x) * purrr::pluck(disease_progression_rates, .x),
+              purrr::pluck(compartment_structure, .x)
+            )
+          }
         ) |>
         purrr::reduce(c, .init = c(immunity_rates, 0), .dir = "backward") # Last R state is absorbing
 
@@ -234,7 +259,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Above, we have the progression rate for each "track" in the model
       # We now repeat for each track the model to construct the full vector
       # and add rates for the S states at the end.
-      private$progression_flow_rates <- disease_progression_rates |>
+      private$progression_flow_rates <- progression_flow_rates |>
         rep(private %.% n_age_groups * private %.% n_variants) |>
         (\(.) c(., rep(0, private %.% n_age_groups)))() # Add a zero for the S compartments
 
@@ -275,12 +300,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           (\(x) replace(x, is.na(x), 1))() # Set the reduction to zero for S states
 
       }
-
-
-
-      # Store the given model configuration
-      private$compartment_structure <- compartment_structure
-      private$disease_progression_rates <- disease_progression_rates
 
 
       # Set the default forcing functions (no forcing)
@@ -451,46 +470,100 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
     # @description
-    #   This function computes the differences in malthusian growth rate between the current configuration and
-    #   configuration with single E and I compartments.
-    compute_malthusian_scaling = function() {
-      # This section follows the method outlined in doi: 10.1098/rsif.2009.0386
+    #   This function computes the malthusian growth rate for the gien model configuration.
+    # @details
+    #   This section follows the method outlined in doi: 10.1098/rsif.2009.0386
+    #   To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
+    #   Here, we linearise around S = 1.
+    #   In this limit, there is no interaction with variants (since everyone is susceptible).
+    #   The malthusian growth rate is therefore not dependent on factors such as cross-immunity.
+    # @params t (`numeric(1)` or `Date(1)`)\cr
+    #   The time at which to compute the growth rate.
+    # @params K (`integer(1)`)\cr
+    #   The number of exposed compartments in the model.
+    # @params L (`integer(1)`)\cr
+    #   The number of infectious compartments in the model.
+    # @params age_cuts_lower (`numeric`)\cr
+    #   The lower age cuts for the age groups in the model.
+    compute_malthusian_growth_rate = function(
+      t = 0,
+      K = purrr::pluck(private %.% compartment_structure, "E", .default = 0),
+      L = private %.% compartment_structure %.% I,
+      age_cuts_lower = self %.% parameters %.% age_cuts_lower,
+      overall_infection_risk = self %.% parameters %.% overall_infection_risk
+    ) {
 
-      # To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
-      # Here, we assume E_k = I_l = R_m = 0 and S = 1
+      # Early return if no disease compartments
+      if (K + L == 0) {
+        return(NA)
+      }
+
+      n_age_groups <- length(age_cuts_lower)
 
       ## Compute the transition rate component
-      # First get the indexes for the E and I compartments in each variant / age_group combination
-      ei_state_indexes <- purrr::map2(
-        private$e1_state_indexes,
-        private$i_state_indexes,
-        ~ seq.int(from = .x, to = max(.y))
-      )
 
       # The diagonal elements of the transition matrix is just (minus) the progression flow rates
-      diagonal_elmements <- private$progression_flow_rates[purrr::reduce(ei_state_indexes, c)]
+      progression_flow_rates <- c(
+        rep(K * purrr::pluck(private %.% disease_progression_rates, "E", .default = 0), K),
+        rep(L * purrr::pluck(private %.% disease_progression_rates, "I"), L)
+      )
+      transition_matrix <- diag(- rep(progression_flow_rates, n_age_groups), nrow = n_age_groups * (K + L))
 
-      # The (lower) off-diagnoal elements are the progression flow rates of the previous compartment
+
+
+      # The (lower) off-diagonal elements are the progression flow rates of the previous compartment
       # which requires a little more attention when computing
-      offdiagonal_elemments <- ei_state_indexes |>
-        purrr::map(~ c(utils::head(disease_progression_rates[.x], -1), 0)) |>
-        purrr::reduce(c) |>
-        utils::head(-1)
+      offdiagonal_elemments <- head(rep(c(head(progression_flow_rates, -1), 0), n_age_groups), -1)
 
-      transition_matrix <- diag(diagonal_elmements) +
-        cbind(
-          rbind(
-            matrix(rep(0, length(offdiagonal_elemments)), nrow = 1),
-            diag(offdiagonal_elemments)
-          ),
-          matrix(rep(0, length(offdiagonal_elemments) + 1), ncol = 1)
-        )
+      # `diag(x) <- value` does not work as expected for a 1x1 matrix (how surprising...)
+      # so we need to utilise jank instead to manually compute the corresponding indicies....
+      off_diagonal_indices <- tidyr::expand_grid(
+        i = seq(nrow(transition_matrix)),
+        j = seq(nrow(transition_matrix))
+      ) |>
+        purrr::pmap_lgl(\(i, j) j > i && i > j - 2)
+
+      transition_matrix[off_diagonal_indices] <- offdiagonal_elemments
 
 
 
-      # Compute the transmissions component
+      ## Compute the transmissions component
+
+      # First get the contact matrices
+      contact_matrixes <- self %.% activity %.% get_scenario_contacts(
+        age_cuts_lower = age_cuts_lower,
+        weights = self %.% parameters %.% activity.contact_weights
+      )
+
+      # Use the first contact matrix for computing the scaling
+      contact_matrix <- purrr::pluck(contact_matrixes, 1)
+
+      # We now compute the "beta" components of the linearised subsystem which is the
+      # contact matrix adjusted
+      # - the over all infection risk
+      # - the largest relative infection risk of the (active) variants
+
+      # Get the largest relative infection risk of the (active) variants
+      largest_variant_infection_risk <- self %.% variant %.% variants |>
+        purrr::keep(~ purrr::pluck(.x, "introduction_date") <= t) |>
+        purrr::map(\(variant) purrr::pluck(variant, "relative_infection_risk", .default = 1)) |>
+        purrr::reduce(max)
+
+      # Combine the components to get the beta matrix
+      beta_matrix <- contact_matrix * overall_infection_risk * largest_variant_infection_risk
 
 
+      # Pre-allocate the transmission matrix
+      transmission_matrix <- 0 * transition_matrix
+
+      # Then fill in with beta elements
+      for (i in seq(n_age_groups)) {    # This has to be a nested for loop for the referencing to work
+        for (j in seq(n_age_groups)) {
+          transmission_matrix[1 + (i - 1) * (K + L), (K + 1):(K + L) + (j - 1) * (K + L)] <- beta_matrix[i, j]
+        }
+      }
+
+      return(purrr::pluck(eigen(transition_matrix + transmission_matrix), "values", Re, max))
     }
   )
 )
