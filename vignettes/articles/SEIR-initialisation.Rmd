@@ -11,6 +11,9 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(diseasy)
+
+run_EI_blocks <- FALSE
+run_SR_blocks <- TRUE
 ```
 
 # Introduction
@@ -508,7 +511,7 @@ Now lets estimate the state vector from the (noisy) synthetic signal.
 
 
 This method relies on fitting a polynomial to the latest period, so we do that here.
-```{r}
+```{r, eval = run_EI_blocks}
 poly_order <- 3
 
 incidence_polyfits <- purrr::map(incidence_signal, ~ {
@@ -539,7 +542,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 
 The method relies on a vector of derivatives of the signal, which we compute here:
 
-```{r}
+```{r, eval = run_EI_blocks}
 # Compute the derivatives of the signal ("signal" vector)
 max_order_derivative <- 2
 
@@ -556,7 +559,7 @@ incidence_signal_derivatives
 Now we use the method to estimate the EI states from the signal.
 (Assuming we have the correct model specification)
 
-```{r}
+```{r, eval = run_EI_blocks}
 incidence_model_fit_gg <- purrr::map(names(incidence_signal_derivatives), ~ {
   n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
   K <- n_states[1]
@@ -610,7 +613,7 @@ If we match the underlying model, and have perfect $R$ and $S$ estimation, we ca
 very well.
 
 #### Scaling EI states
-```{r}
+```{r, eval = run_EI_blocks}
 incidence_model_fit_gg <- expand.grid(
   model_configuration = names(incidence_signal_derivatives),
   true_configuration  = names(incidence_signal_derivatives) 
@@ -677,7 +680,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 ```
 
 #### Scaling RS states
-```{r}
+```{r, eval = run_EI_blocks}
 direct_incidence_fit_gg <- expand.grid(
   model_configuration = names(incidence_signal_derivatives),
   true_configuration  = names(incidence_signal_derivatives) 
@@ -751,7 +754,7 @@ If we have a test signal, we can try to only include the first $I$ state and the
 If we have a prevalence signal, we need to include all $I$ states.
 
 
-```{r}
+```{r, eval = run_EI_blocks}
 simplified_incidence_fit_gg <- purrr::map(names(incidence_signal_derivatives), ~ {
   n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
   K <- n_states[1]
@@ -833,7 +836,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 ```
 
 #### Scaling EI states
-```{r}
+```{r, eval = run_EI_blocks}
 simplified_incidence_fit_gg <- expand.grid(
   model_configuration = names(incidence_signal_derivatives),
   true_configuration  = names(incidence_signal_derivatives) 
@@ -931,7 +934,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 ```
 
 #### Scaling RS states
-```{r}
+```{r, eval = run_EI_blocks}
 simplified_incidence_fit_gg <- expand.grid(
   model_configuration = names(incidence_signal_derivatives),
   true_configuration  = names(incidence_signal_derivatives) 
@@ -1037,7 +1040,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 And now for the prevalence
 
 This method relies on fitting a polynomial to the latest period, so we do that here.
-```{r}
+```{r, eval = run_EI_blocks}
 poly_order <- 3
 
 prevalence_polyfits <- purrr::map(prevalence_signal, ~ {
@@ -1068,7 +1071,7 @@ ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
 
 The method relies on a vector of derivatives of the signal, which we compute here:
 
-```{r}
+```{r, eval = run_EI_blocks}
 # Compute the derivatives of the signal ("signal" vector)
 max_order_derivative <- 2
 
@@ -1178,7 +1181,7 @@ prevalence_signal_derivatives
 
 
 ### Initialising via solving the ODE of simplified system
-```{r}
+```{r, eval = run_EI_blocks}
 simplified_model_fit_gg <- purrr::map(names(prevalence_signal_derivatives), ~ {
   n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
   K <- n_states[1]
@@ -1259,7 +1262,7 @@ ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
 ```
 
 #### Scaling EI states
-```{r}
+```{r, eval = run_EI_blocks}
 simplified_prevalence_fit_gg <- expand.grid(
   model_configuration = names(prevalence_signal_derivatives),
   true_configuration  = names(prevalence_signal_derivatives) 
@@ -1358,7 +1361,7 @@ ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
 
 
 #### Scaling RS states
-```{r}
+```{r, eval = run_EI_blocks}
 simplified_prevalence_fit_gg <- expand.grid(
   model_configuration = names(prevalence_signal_derivatives),
   true_configuration  = names(prevalence_signal_derivatives) 
@@ -1500,7 +1503,7 @@ Here we would also need to start the system at a time where there are no new inf
 
 ### Initialising via solving the ODE of simplified system
 
-```{r}
+```{r, eval = run_SR_blocks}
 simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
   n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
   K <- n_states[1]
@@ -1519,7 +1522,7 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
     disease_progression_rates = c("I" = rI * L / (L- 1)),
-    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.1),
+    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
     malthusian_matching = FALSE
   )
 
@@ -1580,7 +1583,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 ```
 
 
-```{r}
+```{r, eval = run_SR_blocks}
 simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
   n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
   K <- n_states[1]
@@ -1599,7 +1602,7 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
     disease_progression_rates = c("I" = rI * L / (L- 1)),
-    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 1),
+    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
     malthusian_matching = FALSE
   )
 
@@ -1689,7 +1692,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 
 
 #### Scaling EI states
-```{r}
+```{r, eval = run_SR_blocks}
 simplified_incidence_fit_gg <- expand.grid(
   model_configuration = names(incidence_signal_derivatives),
   true_configuration  = names(incidence_signal_derivatives)
@@ -1788,7 +1791,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
 ```
 
 #### Scaling RS states
-```{r}
+```{r, eval = run_SR_blocks}
 simplified_incidence_fit_gg <- expand.grid(
   model_configuration = names(incidence_signal_derivatives),
   true_configuration  = names(incidence_signal_derivatives)
@@ -1895,7 +1898,7 @@ And now for the prevalence
 
 
 ### Initialising via solving the ODE of simplified system
-```{r}
+```{r, eval = run_SR_blocks}
 simplified_model_fit_gg <- purrr::map(names(prevalence_signal_derivatives), ~ {
   n_states <- as.numeric(stringr::str_extract_all(.x, r"{\d}")[[1]])
   K <- n_states[1]
@@ -1976,7 +1979,7 @@ ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
 ```
 
 #### Scaling EI states
-```{r}
+```{r, eval = run_SR_blocks}
 simplified_prevalence_fit_gg <- expand.grid(
   model_configuration = names(prevalence_signal_derivatives),
   true_configuration  = names(prevalence_signal_derivatives)
@@ -2075,7 +2078,7 @@ ggplot2::ggplot(prevalence_signal_gg, ggplot2::aes(x = t, y = prevalence)) +
 
 
 #### Scaling RS states
-```{r}
+```{r, eval = run_SR_blocks}
 simplified_prevalence_fit_gg <- expand.grid(
   model_configuration = names(prevalence_signal_derivatives),
   true_configuration  = names(prevalence_signal_derivatives)
