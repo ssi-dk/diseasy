@@ -322,7 +322,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Set the default forcing functions (no forcing)
       private$infected_forcing <- \(t, infected) infected
-      private$state_vector_forcing <- \(t, dy_dt, state_vector, new_infections) dy_dt
+      private$state_vector_forcing <- \(t, dy_dt) dy_dt
 
     },
 
@@ -332,17 +332,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param infected_forcing (`function`)\cr
     #'   A function that takes arguments `t` and `infected` and modifies the number of infected at time `t`.
     #' @param state_vector_forcing (`function`)\cr
-    #'   A function that takes arguments `t`, `dy_dt` and `new_infections` and modifies the flow into the
+    #'   A function that takes arguments `t` and`dy_dt` and modifies the flow into the
     #'   compartments at time `t`.
     set_forcing_functions = function(infected_forcing = NULL, state_vector_forcing = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(infected_forcing, args = c("t", "infected"), null.ok = TRUE, add = coll)
-      checkmate::assert_function(
-        state_vector_forcing,
-        args = c("t", "dy_dt", "new_infections"),
-        null.ok = TRUE,
-        add = coll
-      )
+      checkmate::assert_function(state_vector_forcing, args = c("t", "dy_dt"), null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       if (!is.null(infected_forcing)) {
@@ -482,7 +477,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       dy_dt[private$e1_state_indexes] <- dy_dt[private$e1_state_indexes] + new_infections
 
       # Add the forcing of the states
-      dy_dt <- private$state_vector_forcing(t, dy_dt, new_infections)
+      dy_dt <- private$state_vector_forcing(t, dy_dt)
 
       return(list(dy_dt))
     },

@@ -344,7 +344,7 @@ names(synthetic_model) <- purrr::pmap_chr(combinations, \(K, L) glue::glue("K = 
 
 With the true solutions generated, we now generate some observational signal with noise from the $I_1$ state.
 ```{r}
-tmax <- 24
+tmax <- 38
 offset <- 7
 t0 <- tmax - offset
 
@@ -508,7 +508,15 @@ We see that the fitting works given perfect information.
 
 Now lets estimate the state vector from the (noisy) synthetic signal.
 
+<!-- $$ -->
+<!-- P_2(x) = ax + bx^2 -->
+<!-- $$ -->
 
+<!-- $$ -->
+<!-- \log I = a_0 +  a_1 x + a_2 + x^2 \Rightarrow\\ -->
+<!-- I = e^{a_0 + a_1 x + a_2 x^2} \Rightarrow\\ -->
+<!-- I = \tilde{a_0} e^{a_1x}e^{a_2 x^2} -->
+<!-- $$ -->
 
 This method relies on fitting a polynomial to the latest period, so we do that here.
 ```{r, eval = run_EI_blocks}
@@ -536,6 +544,7 @@ ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
                       true_configuration = names(incidence_polyfits))
   ) + 
   ggplot2::geom_point() +
+  ggplot2::ylim(0, 1.2*max(incidence_signal_gg$incidence)) +
   ggplot2::facet_wrap(~ true_configuration) +
   ggplot2::theme_bw()
 ```
@@ -1484,9 +1493,7 @@ $$
 If we start this system at a time where there are no new infections, we can initialize $I_l = 0$, and run the 
 simulation forward to estimate the $S$ and $R$ populations at the point of interest.
 
-There is an interesting consequence here. If the equations are modified as above, we can also infer what the 
-corresponding value of $\beta$ should be. Since we claim to know $I$ and $S$, we can solve for what $\beta$ should be.
-
+Note that we need to set $\beta = 0$ in the model to only have the forcing as the generation of new infected.
 
 ## Theory: Prevalence signal
 
@@ -1534,9 +1541,8 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
   
   m$set_forcing_functions(
     infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
-    state_vector_forcing = function(t, dy_dt, new_infections) {
+    state_vector_forcing = function(t, dy_dt) {
       dy_dt[private$i1_state_indexes] <- dy_dt[private$i1_state_indexes] - 
-        new_infections + # With no E states, the new infections in the model (beta S I) are added to "I2", so we remove these manually
         signal(t) # Use signal as forcing for inflow to I1
       return(dy_dt)
     } 
@@ -1614,9 +1620,8 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
   
   m$set_forcing_functions(
     infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
-    state_vector_forcing = function(t, dy_dt, new_infections) {
+    state_vector_forcing = function(t, dy_dt) {
       dy_dt[private$i1_state_indexes] <- dy_dt[private$i1_state_indexes] - 
-        new_infections + # With no E states, the new infections in the model (beta S I) are added to "I2", so we remove these manually
         signal(t) # Use signal as forcing for inflow to I1
       return(dy_dt)
     } 
@@ -1729,7 +1734,7 @@ simplified_incidence_fit_gg <- expand.grid(
       variant = DiseasyVariant$new(n_variants = 1),
       compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
       disease_progression_rates = c("I" = rI * L / (L- 1)),
-      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 1),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
       malthusian_matching = FALSE
     )
   
@@ -1741,9 +1746,8 @@ simplified_incidence_fit_gg <- expand.grid(
     
     m$set_forcing_functions(
       infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
-      state_vector_forcing = function(t, dy_dt, new_infections) {
+      state_vector_forcing = function(t, dy_dt) {
         dy_dt[private$i1_state_indexes] <- dy_dt[private$i1_state_indexes] - 
-          new_infections + # With no E states, the new infections in the model (beta S I) are added to "I2", so we remove these manually
           signal(t) # Use signal as forcing for inflow to I1
         return(dy_dt)
       } 
