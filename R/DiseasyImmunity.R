@@ -480,9 +480,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
       .f = active_binding,
       name = "available_waning_models",
       expr = {
-        models <- purrr::keep(ls(self), ~ startsWith(., "set_")) |>
-          purrr::map_chr(~ stringr::str_extract(., r"{(?<=set_).*}")) |>
-          purrr::discard(~ . == "waning_model" | . == "time_scales") # Filter out the generic setter and time_scales
+        models <- ls(self) |>
+          purrr::keep(~ stringr::str_detect(., r"{set_\w+_waning}")) |>
+          purrr::map_chr(~ stringr::str_extract(., r"{(?<=set_).*}"))
         return(models)
       }
     ),
