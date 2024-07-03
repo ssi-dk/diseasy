@@ -74,7 +74,7 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
   }
 
   # Compute the upper tail of the cumulative distribution function
-  q <- uniroot(\(q) phypo(q, lower.tail = lower.tail) - p, c(0, 100 / rate))
+  q <- uniroot(\(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p, c(0, 100 * sum(1 / rate)))
 
-  return(q)
+  return(q$root)
 }
