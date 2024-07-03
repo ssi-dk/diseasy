@@ -133,15 +133,15 @@ Returns the updated model(s) (invisibly).
 \subsection{Method \code{set_waning_model()}}{
 Sets the \code{DiseasyImmunity} module to use the specified waning model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_waning_model(model_name, target = "infection", ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_waning_model(model, target = "infection", ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{model_name}}{(\code{character(1)} or \verb{function(1)})\cr
+\item{\code{model}}{(\code{character(1)} or \verb{function(1)})\cr
 If a \code{character} is given, it is treated as the name of the waning function to use and
-the corresponding \verb{$set_<model_name>()} is called).
+the corresponding \verb{$set_<model>()} is called).
 
 If a \code{function} is given, it is treated as a custom waning function and is set via \verb{$set_custom_waning()}.}
 

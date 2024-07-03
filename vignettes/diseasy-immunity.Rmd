@@ -98,18 +98,18 @@ plot(im)
 various waning models within the module.
 
 `$set_waning_model()` provides a single entry-point for setting the predefined waning models or a custom waning
-function based on the specified `model_name` and `target`.
+function based on the specified `model` and `target`.
 
-If `model_name` is a `function`, it will be set as a custom waning function via `$set_custom_waning()`.
-If instead it is `character`, the corresponding to `$set_<model_name>()` method will be used to set the waning model.
+If `model` is a `function`, it will be set as a custom waning function via `$set_custom_waning()`.
+If instead it is `character`, the corresponding to `$set_<model>()` method will be used to set the waning model.
 
 Input for both predefined models and custom waning functions can be passed to the `$set_waning_model()` as additional
 arguments.
 
 An example of how to set they two model examples from above, using the `$set_waning_model()` is as follows:
 ```{r set waning models function}
-im$set_waning_model(model_name = "exponential_waning", time_scale = 20, target = "infection")
-im$set_waning_model(model_name = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
+im$set_waning_model(model = "exponential_waning", time_scale = 20, target = "infection")
+im$set_waning_model(model = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
                     time_scale = 20,
                     target = "hospitalisation",
                     name = "custom_waning")
