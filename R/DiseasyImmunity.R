@@ -11,7 +11,7 @@
 #' @return
 #'   A new instance of the `DiseasyImmunity` [R6][R6::R6Class] class.
 #' @export
-DiseasyImmunity <- R6::R6Class(                                                                                           # nolint: object_name_linter
+DiseasyImmunity <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyImmunity",
   inherit = DiseasyBaseModule,
 
@@ -53,14 +53,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the new time_scale
       purrr::iwalk(time_scales, ~ {
+
         # Check if the model has a time_scale attribute
         dots <- attr(private$.model[[.y]], "dots")
         if (!("time_scale" %in% names(dots))) {
-          stop(attr(private$.model[[.y]], "dots"), " does not use time_scale argument")
+          stop(dots, " does not use time_scale argument")
         }
+
         # Update the time_scale for the model
         rlang::fn_env(private$.model[[.y]])$time_scale <- .x
         attr(private$.model[[.y]], "dots") <- list(time_scale = .x)
+
       })
 
       # Logging
@@ -104,9 +107,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     set_no_waning = function(target = "infection") {
       checkmate::assert_character(target, len = 1, add = coll)
 
-      model   <- \(t)    1
+      model <- \(t) 1
 
-      attr(model, "name")        <- "no_waning"
+      attr(model, "name") <- "no_waning"
 
       # Set the model
       private$.model[[target]] <- model
@@ -135,8 +138,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       model <- \(t) exp(-t / time_scale)
 
       # Set the attributes
-      attr(model, "name")        <- "exponential_waning"
-      attr(model, "dots")        <- list(time_scale = time_scale)
+      attr(model, "name") <- "exponential_waning"
+      attr(model, "dots") <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -169,8 +172,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       model <- \(t) exp(-(t - time_scale) / shape) / (1 + exp(-(t - time_scale) / shape))
 
       # Set the attributes
-      attr(model, "name")        <- "sigmoidal_waning"
-      attr(model, "dots")        <- list(time_scale = time_scale, shape = shape)
+      attr(model, "name") <- "sigmoidal_waning"
+      attr(model, "dots") <- list(time_scale = time_scale, shape = shape)
 
       # Set the model
       private$.model[[target]] <- model
@@ -199,8 +202,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       model <- \(t) max(1 - 0.5 / time_scale * t, 0)
 
       # Set the attributes
-      attr(model, "name")        <- "linear_waning"
-      attr(model, "dots")        <- list(time_scale = time_scale)
+      attr(model, "name") <- "linear_waning"
+      attr(model, "dots") <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -226,11 +229,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::reportAssertions(coll)
 
       # Set the model
-      model <- \(t) ifelse(t < time_scale, 1, 0)
+      model <- \(t) as.numeric(t < time_scale)
 
       # Set the attributes
-      attr(model, "name")        <- "heaviside_waning"
-      attr(model, "dots")        <- list(time_scale = time_scale)
+      attr(model, "name") <- "heaviside_waning"
+      attr(model, "dots") <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -252,7 +255,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Set the name of the custom waning function.
     #' @return
     #'   Returns the model (invisibly).
-    set_custom_waning = function(custom_function = NULL, time_scale = 20, target = "infection", name = "custom_waning") {
+    set_custom_waning = function(
+      custom_function = NULL,
+      time_scale = 20,
+      target = "infection",
+      name = "custom_waning"
+    ) {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(custom_function, args = "t", add = coll)
@@ -269,11 +277,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Option 1: Attach env to function with time_scale only
       #rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale))
 
-      # Option 2: Clone the environement of custom funciton.
+      # Option 2: Clone the environment of custom function.
       # Will copy .GlobalEnv often .. not the best solution
       rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale), parent = rlang::env_clone(rlang::fn_env(custom_function)))
 
-      # Option 3: Ittererate and get only needed components of .GlobalEnv
+      # Option 3: Iterate and get only needed components of .GlobalEnv
       # original_fn_env <- rlang::fn_env(custom_function)
       # new_fn_env <- rlang::env()
 
@@ -287,8 +295,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # )
 
       # Set the attributes
-      attr(model, "name")        <- name
-      attr(model, "dots")        <- list(time_scale = time_scale)
+      attr(model, "name") <- name
+      attr(model, "dots") <- list(time_scale = time_scale)
 
       # Set the model
       private$.model[[target]] <- model
@@ -336,12 +344,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Extract median time_scale
         time_scale <- purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
         delta <- N / (3 * time_scale)
+
         # Get params and initiation for each model
-        init_all <- purrr::map(private$.model, ~ {
-          init_all <- approach_init(N, delta, .x)
-        })
+        init_all <- purrr::map(private$.model, ~ approach_function(N, delta, .x))
+
         # Extract the parameter scaling helper
         rescale_params <- init_all[[1]]$rescale_params
+
         # Extract optimisation parameters
         optim_par <- init_all[[1]]$optim_par
         delta <- init_all[[1]]$init_par$delta
@@ -352,6 +361,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # Objective function
         obj_function <- function(N, optim_par, models) {
+
           results <- 0
           for (i in seq_along(models)) {
             # Extract the parameter subset corresponding to the ith model
@@ -397,8 +407,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Store in cache
         private$cache(hash, rates)
       }
+
       # Write to the log
       private$lg$info("Setting approximated rates to target function(s)")
+
       # Return
       return(private$cache(hash))
     },
@@ -546,8 +558,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
         init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
         rescale_params <- function(p, gamma_N) {
           N <- (length(p) + 1) / 2 # Infer N
-          p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmodial transform all parameters
-          p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monoticity and fixed end-point
+          p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters
+          p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
           return(p)
         }
         return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
