@@ -128,7 +128,7 @@ im$set_time_scales(list("infection" = 30, "hospitalisation" = 100))
 ```
 
 # Approximating to a compartmental model
-`DiseasyImmunity` can also provide the approximations of the waning models for com compartmental ODE models.
+`DiseasyImmunity` can also provide the approximations of the waning models for compartmental ODE models.
 (e.g. the Susceptible-Infected-Recovered-Susceptible (SEIR) models).
 
 The approximation assumes the model has a number of sequential R compartments and then provides the transition rates
