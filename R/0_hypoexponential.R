@@ -1,4 +1,4 @@
-# Bi-diagnonal matrix of rates
+# Bi-diagonal matrix of rates
 theta <- \(shape, rate) {
   rbind(cbind(rep(0, shape - 1), diag(rate[1:(shape - 1)], nrow = shape - 1)), rep(0, shape)) - diag(rate)
 }
@@ -10,10 +10,13 @@ alpha <- \(shape) c(1, rep(0, shape - 1))
 ones <- \(shape) matrix(rep(1, shape))
 
 
-#' The hyopexponential distribution
+#' @title
+#'   The hyopexponential distribution
+#' @description
+#'   Density, distribution function ad quantile function for the hyopexponential distribution with
+#'   parameters shape and rate.
 #' @inherit stats::dgamma
 #' @name HypoDist
-#' @noRd
 dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
   # For the first compartment, the problem is simply an exponential distribution
