@@ -44,7 +44,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   rm(im)
     #' @return
-    #'   Returns the updated model(s).
+    #'   Returns the updated model(s) (invisibly).
     set_time_scales = function(time_scales = NULL) {
       checkmate::assert_list(time_scales)
       checkmate::assert_subset(names(time_scales), names(private$.model))
@@ -63,7 +63,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Changing time_scale in {paste(names(time_scales), collapse = ', ')} model(s)")
 
-      return(private$.model)
+      invisible(return(private$.model))
     },
 
     #' @description
@@ -78,7 +78,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param ...
     #'   Additional arguments to be passed to the waning model function.
     #' @return
-    #'  Returns the model.
+    #'  Returns the model (invisibly).
     set_waning_model = function(model_name, target = "infection", ...) {
       checkmate::assert(
         checkmate::check_choice(model_name, self$available_waning_models),
@@ -97,7 +97,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Retrieves the waning model with a constant value (1).
     #' @param target `r rd_target()`
     #' @return
-    #'  Returns the model.
+    #'  Returns the model (invisibly).
     set_no_waning = function(target = "infection") {
       checkmate::assert_character(target, add = coll)
 
@@ -111,7 +111,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting no waning model")
 
-      return("model" = model)
+      invisible(return("model" = model))
     },
 
     #' @description
@@ -119,7 +119,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
     #' @return
-    #'   Returns the model.
+    #'   Returns the model (invisibly).
     set_exponential_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
@@ -141,7 +141,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting exponential waning model")
 
-      return("model" = model)
+      invisible(return("model" = model))
     },
 
     #' @description
@@ -152,7 +152,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Higher values of `shape` result in a steeper curve, leading to a more rapid decline in immunity.
     #' @param target `r rd_target()`
     #' @return
-    #'   Returns the model.
+    #'   Returns the model (invisibly).
     set_sigmoidal_waning = function(time_scale = 20, shape = 6, target = "infection") {
 
       # Check parameters
@@ -175,7 +175,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting sigmoidal waning model")
 
-      return("model" = model)
+      invisible(return("model" = model))
     },
 
     #' @description
@@ -183,7 +183,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
     #' @return
-    #'   Returns the model.
+    #'   Returns the model (invisibly).
     set_linear_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
@@ -205,7 +205,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting linear waning model")
 
-      return("model" = model)
+      invisible(return("model" = model))
     },
 
     #' @description
@@ -213,7 +213,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
     #' @return
-    #'   Returns the model.
+    #'   Returns the model (invisibly).
     set_heaviside_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
@@ -235,7 +235,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting heaviside waning model")
 
-      return("model" = model)
+      invisible(return("model" = model))
     },
 
     #' @description
@@ -248,7 +248,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param name
     #'   Set the name of the custom waning function.
     #' @return
-    #'   Returns the model.
+    #'   Returns the model (invisibly).
     set_custom_waning = function(custom_function = NULL, time_scale = 20, target = "infection", name = "custom_waning") {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -293,7 +293,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting custom waning function(s)")
 
-      return("model" = model)
+      invisible(return("model" = model))
     },
 
     #' @description
