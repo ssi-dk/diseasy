@@ -46,8 +46,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @return
     #'   Returns the updated model(s) (invisibly).
     set_time_scales = function(time_scales = NULL) {
-      checkmate::assert_list(time_scales)
-      checkmate::assert_subset(names(time_scales), names(private$.model))
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_list(time_scales, add = coll)
+      checkmate::assert_names(names(time_scales), subset.of = names(private$.model), add = coll)
+      checkmate::reportAssertions(coll)
+
       # Set the new time_scale
       purrr::iwalk(time_scales, ~ {
         # Check if the model has a time_scale attribute
@@ -99,7 +102,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @return
     #'  Returns the model (invisibly).
     set_no_waning = function(target = "infection") {
-      checkmate::assert_character(target, add = coll)
+      checkmate::assert_character(target, len = 1, add = coll)
 
       model   <- \(t)    1
 
@@ -125,7 +128,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
-      checkmate::assert_character(target, add = coll)
+      checkmate::assert_character(target, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Create the waning function
@@ -157,9 +160,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_double(shape, lower = 1e-15, add = coll)
-      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
-      checkmate::assert_character(target, add = coll)
+      checkmate::assert_number(shape, lower = 1e-15, add = coll)
+      checkmate::assert_number(time_scale, lower = 1e-15, add = coll)
+      checkmate::assert_character(target, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
@@ -188,8 +191,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
-      checkmate::assert_character(target, add = coll)
+      checkmate::assert_number(time_scale, lower = 1e-15, add = coll)
+      checkmate::assert_character(target, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
@@ -218,8 +221,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
-      checkmate::assert_character(target, add = coll)
+      checkmate::assert_number(time_scale, lower = 1e-15, add = coll)
+      checkmate::assert_character(target, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
@@ -252,10 +255,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     set_custom_waning = function(custom_function = NULL, time_scale = 20, target = "infection", name = "custom_waning") {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_function(custom_function, add = coll)
-      checkmate::assert_double(time_scale, lower = 1e-15, add = coll)
-      checkmate::assert_character(target, add = coll)
-      checkmate::assert_character(name, add = coll)
+      checkmate::assert_function(custom_function, args = "t", add = coll)
+      checkmate::assert_number(time_scale, lower = 1e-15, add = coll)
+      checkmate::assert_character(target, len = 1, add = coll)
+      checkmate::assert_character(name, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the model
@@ -318,8 +321,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     approximate_compartmental = function(approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_number(N, lower = 1, add = coll)
+      checkmate::assert_choice(approach, c("rate_equal", "gamma_fixed_step", "all_free"), add = coll)
+      checkmate::assert_integerish(N, lower = 1, add = coll)
       checkmate::reportAssertions(coll)
+
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
