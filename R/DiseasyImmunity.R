@@ -1,12 +1,14 @@
 #' @title Diseasy' immunity handler
 #'
 #' @description
-#'   The `DiseasyImmunity` module is responsible for implementing various models for the immunity dependency of the
-#'   diseases. Meaning the different scenarios there can be of waning of immunity.
-#'   The module implements a number immunity models with different functional forms.
+#'   The `DiseasyImmunity` module is responsible for implementing various models (scenarios) for the immunity
+#'   dependencies of the disease.
+#'
+#'   The module implements a number immunity models with different functional forms and allows the user to set
+#'   their own, custom waning function.
 #'
 #'   See the vignette("diseasy-immunity") for examples of use.
-#'  @return
+#' @return
 #'   A new instance of the `DiseasyImmunity` [R6][R6::R6Class] class.
 #' @export
 DiseasyImmunity <- R6::R6Class(                                                                                           # nolint: object_name_linter
@@ -18,7 +20,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @description
     #'   Creates a new instance of the `DiseasyImmunity` [R6][R6::R6Class] class.
     #' @param ...
-    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     initialize = function(...) {
 
       source("../waning_occupancy_probability.R")
@@ -32,9 +34,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the characteristic time scale for the waning of the model.
-    #' @param time_scales (`list`)\cr
-    #'    A named list of target and new time_scale (can be multiple)
-    #'    An exmaple could be; list(infection = 60)
+    #' @param time_scales (`named list()`)\cr
+    #'    A named list of target and new `time_scale` for the target.
+    #'    Multiple targets can be updated simultaneously.
+    #' @examples
+    #'   im <- DiseasyImmunity$new()
+    #'   im$set_exponential_waning()
+    #'   im$set_time_scales(list("infection" = 10))
+    #'
+    #'   rm(im)
+    #' @return
+    #'   Returns the updated model(s).
     set_time_scales = function(time_scales = NULL) {
       checkmate::assert_list(time_scales)
       checkmate::assert_subset(names(time_scales), names(private$.model))
@@ -58,13 +68,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the `DiseasyImmunity` module to use the specified waning model.
-    #' @param model_name (`character`)\cr
-    #'   Name of the waning_model to use (calls the equivalent $use_<model_name>()).
-    #' @param target (`character`)\cr
-    #'   The target of the waning model (f.x. infection, hospitalisation, death).
-    #'   By default, it is set to "infection".
-    #' @param dots (`list`)\cr
-    #'   Named list of arguments that will be passed at dot-ellipsis to the waning model.
+    #' @param model_name (`character(1)` or `function(1)`)\cr
+    #'   If a `character` is given, it is treated as the name of the waning function to use and
+    #'   the corresponding `$set_<model_name>()` is called).
+    #'
+    #'   If a `function` is given, it is treated as a custom waning function and is set via `$set_custom_waning()`.
+    #'
+    #' @param target `r rd_target()`
+    #' @param ...
+    #'   Additional arguments to be passed to the waning model function.
+    #' @return
+    #'  Returns the model.
     set_waning_model = function(model_name, target = "infection", ...) {
       checkmate::assert(
         checkmate::check_choice(model_name, self$available_waning_models),
@@ -81,9 +95,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Retrieves the waning model with a constant value (1).
-    #' @param target (`character`)\cr
-    #'   The target of the waning model (f.x. infection, hospitalisation, death).
-    #'   By default, it is set to "infection".
+    #' @param target `r rd_target()`
+    #' @return
+    #'  Returns the model.
     set_no_waning = function(target = "infection") {
       checkmate::assert_character(target, add = coll)
 
@@ -103,10 +117,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set an exponential model for waning.
     #' @param time_scale `r rd_time_scale()`
-    #'   By default, it is set to 20
-    #' @param target (`character`)\cr
-    #'   The target of the waning model (f.x. infection, hospitalisation, death).
-    #'   By default, it is set to "infection".
+    #' @param target `r rd_target()`
+    #' @return
+    #'   Returns the model.
     set_exponential_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
@@ -134,14 +147,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set a sigmoidal model for waning.
     #' @param time_scale `r rd_time_scale()`
-    #'   By default, it is set to 20
-    #' @param shape (`numeric`)\cr
+    #' @param shape (`numeric(1)`)\cr
     #'   Determines the steepness of the waning curve in the sigmoidal waning model.
     #'   Higher values of `shape` result in a steeper curve, leading to a more rapid decline in immunity.
-    #'   By default, it is set to 6.
-    #' @param target (`character`)\cr
-    #'   The target of the waning model (f.x. infection, hospitalisation, death).
-    #'   By default, it is set to "infection".
+    #' @param target `r rd_target()`
+    #' @return
+    #'   Returns the model.
     set_sigmoidal_waning = function(time_scale = 20, shape = 6, target = "infection") {
 
       # Check parameters
@@ -170,10 +181,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set a linear model for waning.
     #' @param time_scale `r rd_time_scale()`
-    #'   By default, it is set to 20
-    #' @param target (`character`)\cr
-    #'   The target of the waning model (f.x. infection, hospitalisation, death).
-    #'   By default, it is set to "infection".
+    #' @param target `r rd_target()`
+    #' @return
+    #'   Returns the model.
     set_linear_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
@@ -199,12 +209,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to set a heaviside model for waning.
+    #'   Sets the `DiseasyImmunity` module to set a Heaviside model for waning.
     #' @param time_scale `r rd_time_scale()`
-    #'   By default, it is set to 20
-    #' @param target (`character`)\cr
-    #'   The target of the waning model (f.x. infection, hospitalisation, death).
-    #'   By default, it is set to "infection".
+    #' @param target `r rd_target()`
+    #' @return
+    #'   Returns the model.
     set_heaviside_waning = function(time_scale = 20, target = "infection") {
 
       # Check parameters
@@ -231,17 +240,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the `DiseasyImmunity` module to set a custom waning function.
-    #' @param custom_function (`function`)\cr
-    #'   Set a custom waning function in following format: \(t)
+    #' @param custom_function (`function(1)`)\cr
+    #'   A function of a single variable `t` that returns the immunity at time `t`.
+    #'   If the function has a time scale, it should be included in the function as `time_scale`.
     #' @param time_scale `r rd_time_scale()`
-    #'   By default, it is set to 20
-    #' @param target (`character`)\cr
-    #'   The target of the waning model (f.x. infection, hospitalisation, death).
-    #'   By default, it is set to "infection".
+    #' @param target `r rd_target()`
     #' @param name
-    #'   Set the name of the custom waning function
-    #'   By default, it is set to "custom_waning"
-    set_custom_waning = function(custom_function =  NULL, time_scale = 20, target = "infection", name = "custom_waning") {
+    #'   Set the name of the custom waning function.
+    #' @return
+    #'   Returns the model.
+    set_custom_waning = function(custom_function = NULL, time_scale = 20, target = "infection", name = "custom_waning") {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(custom_function, add = coll)
@@ -289,16 +297,24 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   The function creates N compartments for the models and does a phase-type distribution based on the
-    #'   time scales, resulting in the probability to be in each compartment.
-    #'   The models are then optimized to find the best fitting rates going out and between the compartments.
-    #' @param approach (`str` or `numeric`)\cr
-    #'   Specifies the approach to be used from the available approaches.
-    #'   It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
-    #'   or as a numeric value representing the approach index 1, 2, or 3.
-    #' @param N (`numeric`)\cr
+    #'   Assuming a compartmental disease model with N recovered compartments, this function approximates the
+    #'   transition rates and associated risk of infection for each compartment such the effective immunity
+    #'   best matches the waning immunity curves set in the module.
+    #' @details
+    #'   Due to the N recovered compartments being sequential, the waiting time distribution between compartments
+    #'   is a phase-type distribution (with Erlang distribution as a special case when all transition rates are equal).
+    #'   The transition rates between the compartments and the risk associated with each compartment are optimized to
+    #'   approximate the configured waning immunity scenario.
+    #'
+    #'   The function implements three methods for approximating the waning immunity curves:
+    #'     - "rate_equal": All transition rates are equal and risks are free to vary (N+1 free parameters).
+    #'     - "gamma_fixed_step": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
+    #'       (N free parameters).
+    #'     - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
+    #' @param approach (`character(1)`)\cr
+    #'   Specifies the approach to be used from the available approaches. See details.
+    #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
-    #'   By default, it is set to 5
     approximate_compartmental = function(approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -383,8 +399,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #' A function to plot all models in the instance
-    #' If desired to additionally plot the approximations, supply the approach and number of compartments (N)
+    #    Plot the waning functions for the current instance.
+    #'   If desired to additionally plot the approximations, supply the `approach` and number of compartments (`N`)
     #' @param t_max (`numeric`)\cr
     #'  The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.
     #' @param approach (`str` or `numeric`)\cr
@@ -443,8 +459,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
   # Make active bindings to the private variables
   active  = list(
-    #' @field available_waning_models (`character`)\cr
-    #'   The list of available waning models
+    #' @field available_waning_models (`character()`)\cr
+    #'   The waning models implemented in `DiseasyImmunity`. Read only.
     available_waning_models = purrr::partial(
       .f = active_binding,
       name = "available_waning_models",
@@ -455,14 +471,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
         return(models)
       }
     ),
-    #' @field model (`function`)\cr
-    #'   The model currently being used in the module. Read-only.
+
+    #' @field model (`list(function())`)\cr
+    #'   The list of models currently being used in the module. Read-only.
     model = purrr::partial(
       .f = active_binding,
       name = "model",
       expr = return(private %.% .model)
     ),
-    #' @field rate (`list`)\cr
+
+    #' @field rates (`list(numeric())`)\cr
     #'   The list of rates created by the selected approach. Read-only.
     rates = purrr::partial(
       .f = active_binding,
