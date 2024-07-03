@@ -72,9 +72,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #'   Sets the `DiseasyImmunity` module to use the specified waning model.
-    #' @param model_name (`character(1)` or `function(1)`)\cr
+    #' @param model (`character(1)` or `function(1)`)\cr
     #'   If a `character` is given, it is treated as the name of the waning function to use and
-    #'   the corresponding `$set_<model_name>()` is called).
+    #'   the corresponding `$set_<model>()` is called).
     #'
     #'   If a `function` is given, it is treated as a custom waning function and is set via `$set_custom_waning()`.
     #'
@@ -83,17 +83,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Additional arguments to be passed to the waning model function.
     #' @return
     #'  Returns the model (invisibly).
-    set_waning_model = function(model_name, target = "infection", ...) {
+    set_waning_model = function(model, target = "infection", ...) {
       checkmate::assert(
-        checkmate::check_choice(model_name, self$available_waning_models),
-        checkmate::check_function(model_name),
+        checkmate::check_choice(model, self$available_waning_models),
+        checkmate::check_function(model),
         checkmate::assert_character(target, add = coll)
       )
       # Then set the model
-      if (checkmate::test_function(model_name)) {
-        self$set_custom_waning(custom_function = model_name, target = target, ...)
+      if (checkmate::test_function(model)) {
+        self$set_custom_waning(custom_function = model, target = target, ...)
       } else {
-        self[[glue::glue("set_{model_name}")]](target = target, ...)
+        self[[glue::glue("set_{model}")]](target = target, ...)
       }
     },
 
