@@ -1,4 +1,4 @@
-# Bi-diagnonal matrix of rates
+# Bi-diagonal matrix of rates
 theta <- \(shape, rate) {
   rbind(cbind(rep(0, shape - 1), diag(rate[1:(shape - 1)], nrow = shape - 1)), rep(0, shape)) - diag(rate)
 }
@@ -10,10 +10,28 @@ alpha <- \(shape) c(1, rep(0, shape - 1))
 ones <- \(shape) matrix(rep(1, shape))
 
 
-#' The hyopexponential distribution
-#' @inherit stats::dgamma
+#' @title
+#'   The hyopexponential distribution
+#' @description
+#'   Density, distribution function ad quantile function for the hyopexponential distribution with
+#'   parameters shape and rate.
+#' @inheritParams stats::dgamma
+#' @return
+#'   - `dhypo` gives the density.
+#'   - `phypo` gives the distribution function.
+#'   - `qhypo` gives the quantile function.
+#' @examples
+#'   dhypo(1:10, shape = 2)
+#'   dhypo(1:10, shape = 2, rate = c(1, 2))
+#'
+#'   phypo(0.75, shape = 2)
+#'   phypo(0.75, shape = 2, rate = c(1, 2))
+#'   phypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
+#'
+#'   qhypo(0.75, shape = 2)
+#'   qhypo(0.75, shape = 2, rate = c(1, 2))
+#'   qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
 #' @name HypoDist
-#' @noRd
 dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
   # For the first compartment, the problem is simply an exponential distribution
@@ -56,7 +74,7 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
   }
 
   # Compute the upper tail of the cumulative distribution function
-  q <- uniroot(\(q) phypo(q, lower.tail = lower.tail) - p, c(0, 100 / rate))
+  q <- uniroot(\(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p, c(0, 100 * sum(1 / rate)))
 
-  return(q)
+  return(q$root)
 }

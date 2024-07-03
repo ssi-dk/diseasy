@@ -3,37 +3,47 @@
 \name{DiseasyImmunity}
 \alias{DiseasyImmunity}
 \title{Diseasy' immunity handler}
+\value{
+A new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class.
+}
 \description{
-The \code{DiseasyImmunity} module is responsible for implementing various models for the immunity dependency of the
-diseases. Meaning the different scenarios there can be of waning of immunity.
-The module implements a number immunity models with different functional forms.
+The \code{DiseasyImmunity} module is responsible for implementing various models (scenarios) for the immunity
+dependencies of the disease.
+
+The module implements a number immunity models with different functional forms and allows the user to set
+their own, custom waning function.
 
 See the vignette("diseasy-immunity") for examples of use.
-@return
-A new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class.
+}
+\examples{
+
+## ------------------------------------------------
+## Method `DiseasyImmunity$set_time_scales`
+## ------------------------------------------------
+
+  im <- DiseasyImmunity$new()
+  im$set_exponential_waning()
+  im$set_time_scales(list("infection" = 10))
+
+  rm(im)
 }
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyImmunity}
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{rate}}{(\code{list})\cr
-The list of rates created by the selected approach. Read-only.}
-}
-\if{html}{\out{</div>}}
-}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{available_waning_models}}{(\code{character})\cr
-The list of available waning models}
+\item{\code{available_waning_models}}{(\code{character()})\cr
+The waning models implemented in \code{DiseasyImmunity}. Read only.}
 
-\item{\code{model}}{(\code{function})\cr
-The model currently being used in the module. Read-only.}
+\item{\code{model}}{(\verb{list(function())})\cr
+The list of models currently being used in the module. Read-only.}
 
-\item{\code{rate}}{(\code{list})\cr
+\item{\code{rates}}{(\code{list(numeric())})\cr
 The list of rates created by the selected approach. Read-only.}
+
+\item{\code{obj_value}}{(\code{list})\cr
+List of selected approach and N with the obj value from the optimisation. Read-only.}
 
 \item{\code{available_approaches}}{(\code{character})\cr
 The list of available approaches}
@@ -53,6 +63,7 @@ The list of available approaches}
 \item \href{#method-DiseasyImmunity-set_heaviside_waning}{\code{DiseasyImmunity$set_heaviside_waning()}}
 \item \href{#method-DiseasyImmunity-set_custom_waning}{\code{DiseasyImmunity$set_custom_waning()}}
 \item \href{#method-DiseasyImmunity-approximate_compartmental}{\code{DiseasyImmunity$approximate_compartmental()}}
+\item \href{#method-DiseasyImmunity-plot}{\code{DiseasyImmunity$plot()}}
 \item \href{#method-DiseasyImmunity-clone}{\code{DiseasyImmunity$clone()}}
 }
 }
@@ -77,7 +88,7 @@ Creates a new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
+\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }
@@ -94,12 +105,27 @@ Sets the characteristic time scale for the waning of the model.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_scales}}{(\code{list})\cr
-A named list of target and new time_scale (can be multiple)
-An exmaple could be; list(infection = 60)}
+\item{\code{time_scales}}{(\verb{named list()})\cr
+A named list of target and new \code{time_scale} for the target.
+Multiple targets can be updated simultaneously.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+Returns the updated model(s) (invisibly).
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{  im <- DiseasyImmunity$new()
+  im$set_exponential_waning()
+  im$set_time_scales(list("infection" = 10))
+
+  rm(im)
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-set_waning_model"></a>}}
@@ -107,19 +133,26 @@ An exmaple could be; list(infection = 60)}
 \subsection{Method \code{set_waning_model()}}{
 Sets the \code{DiseasyImmunity} module to use the specified waning model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_waning_model(model_name, dots = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_waning_model(model, target = "infection", ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{model_name}}{(\code{character})\cr
-Name of the waning_model to use (calls the equivalent $use_<model_name>()).}
+\item{\code{model}}{(\code{character(1)} or \verb{function(1)})\cr
+If a \code{character} is given, it is treated as the name of the waning function to use and
+the corresponding \verb{$set_<model>()} is called).
 
-\item{\code{dots}}{(\code{list})\cr
-Named list of arguments that will be passed at dot-ellipsis to the waning model.}
+If a \code{function} is given, it is treated as a custom waning function and is set via \verb{$set_custom_waning()}.}
+
+\item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
+
+\item{\code{...}}{Additional arguments to be passed to the waning model function.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
@@ -134,11 +167,12 @@ Retrieves the waning model with a constant value (1).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{target}}{(\code{character})\cr
-The target of the waning model (f.x. infection, hospitalisation, death).
-By default, it is set to "infection".}
+\item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
@@ -153,14 +187,14 @@ Sets the \code{DiseasyImmunity} module to set an exponential model for waning.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
-By default, it is set to 20}
+\item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
 
-\item{\code{target}}{(\code{character})\cr
-The target of the waning model (f.x. infection, hospitalisation, death).
-By default, it is set to "infection".}
+\item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
@@ -179,19 +213,18 @@ Sets the \code{DiseasyImmunity} module to set a sigmoidal model for waning.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
-By default, it is set to 20}
+\item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
 
-\item{\code{shape}}{(\code{numeric})\cr
+\item{\code{shape}}{(\code{numeric(1)})\cr
 Determines the steepness of the waning curve in the sigmoidal waning model.
-Higher values of \code{shape} result in a steeper curve, leading to a more rapid decline in immunity.
-By default, it is set to 6.}
+Higher values of \code{shape} result in a steeper curve, leading to a more rapid decline in immunity.}
 
-\item{\code{target}}{(\code{character})\cr
-The target of the waning model (f.x. infection, hospitalisation, death).
-By default, it is set to "infection".}
+\item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
@@ -206,21 +239,21 @@ Sets the \code{DiseasyImmunity} module to set a linear model for waning.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
-By default, it is set to 20}
+\item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
 
-\item{\code{target}}{(\code{character})\cr
-The target of the waning model (f.x. infection, hospitalisation, death).
-By default, it is set to "infection".}
+\item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-set_heaviside_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_heaviside_waning}{}}}
 \subsection{Method \code{set_heaviside_waning()}}{
-Sets the \code{DiseasyImmunity} module to set a heaviside model for waning.
+Sets the \code{DiseasyImmunity} module to set a Heaviside model for waning.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_heaviside_waning(time_scale = 20, target = "infection")}\if{html}{\out{</div>}}
 }
@@ -228,14 +261,14 @@ Sets the \code{DiseasyImmunity} module to set a heaviside model for waning.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
-By default, it is set to 20}
+\item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
 
-\item{\code{target}}{(\code{character})\cr
-The target of the waning model (f.x. infection, hospitalisation, death).
-By default, it is set to "infection".}
+\item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
@@ -245,7 +278,7 @@ By default, it is set to "infection".}
 Sets the \code{DiseasyImmunity} module to set a custom waning function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$set_custom_waning(
-  custom_function = function(t) 1/(1 + exp((t - time_scale)/time_scale)),
+  custom_function = NULL,
   time_scale = 20,
   target = "infection",
   name = "custom_waning"
@@ -255,39 +288,80 @@ Sets the \code{DiseasyImmunity} module to set a custom waning function.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{custom_function}}{(\code{function})\cr
-Set a custom waning function in following format: \(t)}
+\item{\code{custom_function}}{(\verb{function(1)})\cr
+A function of a single variable \code{t} that returns the immunity at time \code{t}.
+If the function has a time scale, it should be included in the function as \code{time_scale}.}
 
-\item{\code{time_scale}}{(\code{numeric})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the number of days before half of the immunity has waned
-By default, it is set to 20}
+\item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
 
-\item{\code{target}}{(\code{character})\cr
-The target of the waning model (f.x. infection, hospitalisation, death).
-By default, it is set to "infection".}
+\item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 
-\item{\code{name}}{Set the name of the custom waning function
-By default, it is set to "custom_waning"}
+\item{\code{name}}{Set the name of the custom waning function.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Returns the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-approximate_compartmental"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-approximate_compartmental}{}}}
 \subsection{Method \code{approximate_compartmental()}}{
-The function creates N compartments for the models and does a phase-type distribution based on the
-time scales, resulting in the probability to be in each compartment.
-The models are then optimized to find the best fitting rates going out and between the compartments.
+Assuming a compartmental disease model with N recovered compartments, this function approximates the
+transition rates and associated risk of infection for each compartment such the effective immunity
+best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
   approach = c("rate_equal", "gamma_fixed_step", "all_free"),
-  N = 5
+  N = NULL
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{approach}}{(\code{character(1)})\cr
+Specifies the approach to be used from the available approaches. See details.}
+
+\item{\code{N}}{(\code{integer(1)})\cr
+Number of compartments to be used in the model.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Due to the N recovered compartments being sequential, the waiting time distribution between compartments
+is a phase-type distribution (with Erlang distribution as a special case when all transition rates are equal).
+The transition rates between the compartments and the risk associated with each compartment are optimized to
+approximate the configured waning immunity scenario.
+
+The function implements three methods for approximating the waning immunity curves:
+- "rate_equal": All transition rates are equal and risks are free to vary (N+1 free parameters).
+- "gamma_fixed_step": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
+(N free parameters).
+- "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyImmunity-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-plot}{}}}
+\subsection{Method \code{plot()}}{
+If desired to additionally plot the approximations, supply the \code{approach} and number of compartments (\code{N})
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$plot(
+  t_max = NULL,
+  approach = c("rate_equal", "gamma_fixed_step", "all_free"),
+  N = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t_max}}{(\code{numeric})\cr
+The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.}
+
 \item{\code{approach}}{(\code{str} or \code{numeric})\cr
 Specifies the approach to be used from the available approaches.
 It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
