@@ -61,10 +61,11 @@ The name of the chosen target is arbitrary within the context of the `DiseasyImm
 `diseasy` framework may expect named targets such as "infection", "hospitalisation", or "death".
 
 Here is an example of how to set the exponential waning model.
-When setting the model, the console output will display the function definition of the model.
 ```{r setting the models}
 im$set_exponential_waning(time_scale = 20, target = "infection")
 ```
+To inspect that the model has been set correctly use `im$model`
+
 To visualize the model, the plot function provided by the module can be used:
 ```{r plot_1}
 plot(im)
