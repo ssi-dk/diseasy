@@ -15,7 +15,22 @@ ones <- \(shape) matrix(rep(1, shape))
 #' @description
 #'   Density, distribution function ad quantile function for the hyopexponential distribution with
 #'   parameters shape and rate.
-#' @inherit stats::dgamma
+#' @inheritParams stats::dgamma
+#' @return
+#'   - `dhypo` gives the density.
+#'   - `phypo` gives the distribution function.
+#'   - `qhypo` gives the quantile function.
+#' @examples
+#'   dhypo(1:10, shape = 2)
+#'   dhypo(1:10, shape = 2, rate = c(1, 2))
+#'
+#'   phypo(0.75, shape = 2)
+#'   phypo(0.75, shape = 2, rate = c(1, 2))
+#'   phypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
+#'
+#'   qhypo(0.75, shape = 2)
+#'   qhypo(0.75, shape = 2, rate = c(1, 2))
+#'   qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
 #' @name HypoDist
 dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
