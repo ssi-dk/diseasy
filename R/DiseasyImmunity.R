@@ -324,27 +324,25 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Specifies the approach to be used from the available approaches. See details.
     #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
+    #' @return
+    #'   Returns the rates and objective value (invisibly).
     approximate_compartmental = function(approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(approach, c("rate_equal", "gamma_fixed_step", "all_free"), add = coll)
+      #checkmate::assert_choice(approach, c("rate_equal", "gamma_fixed_step", "all_free"), add = coll)
       checkmate::assert_integerish(N, lower = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
-        if (is.numeric(approach)) {
-          approach_init <- private$approach_functions[[approach]]
-        } else if (is.character(approach)) {
-          approach_init <- private$approach_functions[[match.arg(approach)]]
-        }
+        approach_init <- private$approach_functions[[match.arg(approach)]]
         # Extract median time_scale
         time_scale <- purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
         delta <- N / (3 * time_scale)
 
         # Get params and initiation for each model
-        init_all <- purrr::map(private$.model, ~ approach_function(N, delta, .x))
+        init_all <- purrr::map(private$.model, ~ approach_init(N, delta))
 
         # Extract the parameter scaling helper
         rescale_params <- init_all[[1]]$rescale_params
@@ -375,23 +373,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
           }
           return(results)
         }
-        result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
 
+        # Return the one obj value for special case when N = 1
+        if (N == 1) {
+          models <- length(private$.model)
+          params <- c(rep(1, models),0)
+          result <- list("value" = obj_function(N, params, private$.model))
+        } else {
+          result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
+          params <- c(non_optim, result$par)
+        }
         # Save obj value
-        approaches <- c("rate_equal", "gamma_fixed_step", "all_free")
-        # If approach was given as numeric
-        map_approach <- function(approach) {
-          approaches[[approach]]
-        }
-        if (is.numeric(approach)) {
-          approach <- map_approach(approach)
-        }
-        # If no approach was given
-        approach <- match.arg(approach, choices = approaches)
-        print(approach)
-        private$.obj_value[[paste(approach, N, sep = "_N_")]] <- result$value
+        approach = match.arg(approach)
+        value <- setNames(list(result$value), paste(approach, N, sep = "_N_"))
 
-        params <- c(non_optim, result$par)
         # Scale optimised parameters
         rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
           params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
@@ -402,15 +397,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
           return(params_model)
         }) |>
           stats::setNames(names(private$.model))
+
         # Store in cache
-        private$cache(hash, rates)
+        private$cache(hash, list("rates" = rates, "value" = value))
       }
 
       # Write to the log
       private$lg$info("Setting approximated rates to target function(s)")
 
       # Return
-      return(private$cache(hash))
+      invisible(return(private$cache(hash)))
     },
 
     #' @description
@@ -431,7 +427,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       if (is.null(N)) {
         rates <- NULL
       } else {
-        rates <- self$approximate_compartmental(approach, N)
+        rates <- self$approximate_compartmental(approach, N)$rates
       }
       # Set t_max if nothing is given
       if (is.null(t_max)) t_max <- 3 * purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
@@ -486,28 +482,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
         return(models)
       }
     ),
-
     #' @field model (`list(function())`)\cr
     #'   The list of models currently being used in the module. Read-only.
     model = purrr::partial(
       .f = active_binding,
       name = "model",
       expr = return(private %.% .model)
-    ),
-
-    #' @field rates (`list(numeric())`)\cr
-    #'   The list of rates created by the selected approach. Read-only.
-    rates = purrr::partial(
-      .f = active_binding,
-      name = "rates",
-      expr = return(private %.% .rates)
-    ),
-    #' @field obj_value (`list`)\cr
-    #'   List of selected approach and N with the obj value from the optimisation. Read-only.
-    obj_value = purrr::partial(
-      .f = active_binding,
-      name = "obj_value",
-      expr = return(private %.% .obj_value)
     ),
     #' @field available_approaches (`character`)\cr
     #'   The list of available approaches
@@ -523,14 +503,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
   private = list(
     .model = NULL,
-    .rates = NULL,
-    .obj_value = NULL,
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
       purrr::map(private$.model, ~ rlang::fn_env(.x)$time_scale)
     },
     approach_functions = list(
-      rate_equal = function(N, delta, f_target) {
+      rate_equal = function(N, delta) {
         optim_par <- c("gamma", "delta")
         init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = delta)
         rescale_params <- function(p, gamma_N) {
@@ -541,23 +519,33 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
         return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
       },
-      gamma_fixed_step = function(N, delta, f_target) {
+      gamma_fixed_step = function(N, delta) {
         optim_par <- "delta"
         init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
         rescale_params <- function(p, gamma_N) {
-          N <- (length(p) + 1) / 2 # Infer N
-          p <- c(p[1:N] * (1 - gamma_N) + gamma_N,  0.5 * (1 + p[-(1:N)] / (1 + abs(p[-(1:N)])))) # Ensure monoticity, fixed end-point, and Sigmodial transform the delta parameters
+          if (length(p) == 2){
+            p <- c(gamma_N,  0) # Ensure fixed end-point and no delta rate
+          } else {
+            N <- (length(p) + 1) / 2 # Infer N
+            p <- c(p[1:N] * (1 - gamma_N) + gamma_N,  0.5 * (1 + p[-(1:N)] / (1 + abs(p[-(1:N)])))) # Ensure monoticity, fixed end-point, and Sigmodial transform the delta parameters
+          }
           return(p)
         }
         return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
       },
-      all_free = function(N, delta, f_target) {
+      all_free = function(N, delta) {
         optim_par <- c("gamma", "delta")
         init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
         rescale_params <- function(p, gamma_N) {
-          N <- (length(p) + 1) / 2 # Infer N
-          p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters
-          p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
+          if (length(p) == 2){
+            N <- 1
+            p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters (here only delta)
+            p <- c(gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
+          } else {
+            N <- (length(p) + 1) / 2 # Infer N
+            p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters
+            p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
+          }
           return(p)
         }
         return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
@@ -575,9 +563,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Numerically integrate the differences
       result <- stats::integrate(integrand, lower = 0, upper = Inf)$value
     },
-
-
-
     # Compute the probability of occupying each of K sequential compartments
     # @param rate (`numeric(1)` or `numeric(K-1)`)\cr
     #   The rate of transfer between each of the K compartments.
