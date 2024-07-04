@@ -174,25 +174,31 @@ The accuracy of the approximation can be influenced by the number of compartment
 Therefore it is crucial to select the right N as too few compartments can lead to poor approximation,
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
 The elbow curve method is employed to determine the appropriate N for the models.
-Each approach is executed across a range of N values, and the resulting objective function values are stored in the `im$approx_value` variable.
+Each approach is executed across a range of N values, and the resulting objective function values are returned as `value` from the approximate_compartmental function.
 ```{r elbow curve method}
+# Clean old instance and create a new
+rm(im)
+devtools::load_all()
+im <- DiseasyImmunity$new()
+
 # Prepare the data
-N_seq <- seq(from = 2, to = 10, by = 1)
+N_seq <- seq(from = 1, to = 2, by = 1)
 approaches <- c("rate_equal", "gamma_fixed_step", "all_free")
 im$set_exponential_waning(time_scale = 20, target = "infection")
 
 # Run each function
 results <- map(approaches, function(approach) {
   map(N_seq, function(N) {
-    im$approximate_compartmental(approach = approach, N = N)
+    res <- im$approximate_compartmental(approach = approach, N = N)$value
+    setNames(list(res[[1]]), names(res))
   })
-})
+}) %>% flatten() %>% reduce(c) #reduces nested list by one level and combines lists ino a single flat list
 
 # Convert to data frame
-df <- do.call(rbind, lapply(names(im$approx_value), function(key) {
+df <- do.call(rbind, lapply(names(results), function(key) {
   data.frame(Approach = gsub("_N_.*", "", key),
              N = as.numeric(gsub(".*N_", "", key)),
-             Value = im$approx_value[[key]])
+             Value = results[[key]])
 }))
 
 # Plot
