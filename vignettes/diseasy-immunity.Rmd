@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(diseasy)
+#library(diseasy)
+devtools::load_all()
 ```
 
 ```{r options, include = FALSE}
@@ -84,7 +85,7 @@ The input for the custom waning function includes:
 Here is an example of setting a custom waning function:
 ```{r custom waning function}
 im$set_custom_waning(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
-                     time_scale = 20,
+                     time_scale = 30,
                      target = "hospitalisation",
                      name = "custom_waning")
 ```
@@ -111,7 +112,7 @@ An example of how to set they two model examples from above, using the `$set_wan
 ```{r set waning models function}
 im$set_waning_model(model = "exponential_waning", time_scale = 20, target = "infection")
 im$set_waning_model(model = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
-                    time_scale = 20,
+                    time_scale = 30,
                     target = "hospitalisation",
                     name = "custom_waning")
 ```
@@ -159,7 +160,7 @@ The input for the `$approximate_compartmental()` function includes:
 In this example the module contains the infection and hospitalisation targets defined earlier, which will be
 approximated.
 ```{r approximate compartmental}
-im$approximate_compartmental(approach = "rate_equal", N = 5)
+im$approximate_compartmental(method = "free_gamma", N = 5)
 ```
 
 To visualize how the approximations compare to the target functions, the plot function can be used.
@@ -175,36 +176,43 @@ Therefore it is crucial to select the right N as too few compartments can lead t
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
 The elbow curve method is employed to determine the appropriate N for the models.
 Each approach is executed across a range of N values, and the resulting objective function values are returned as `value` from the approximate_compartmental function.
-```{r elbow curve method}
-# Clean old instance and create a new
+```{r prepare elbow curve}
 rm(im)
 devtools::load_all()
-im <- DiseasyImmunity$new()
+im <- DiseasyImmunity$new(cache = cachem::cache_disk(dir = devtools::package_file("vignettes/vignette_data")))
+```
 
+```{r elbow curve method}
 # Prepare the data
-N_seq <- seq(from = 1, to = 2, by = 1)
-approaches <- c("rate_equal", "gamma_fixed_step", "all_free")
-im$set_exponential_waning(time_scale = 20, target = "infection")
+N_seq <- seq(from = 1, to = 10, by = 1)
+approaches <- c("rate_equal", "gamma_fixed_step")#, "all_free")
+im$set_heaviside_waning(time_scale = 20, target = "infection")
 
 # Run each function
-results <- map(approaches, function(approach) {
-  map(N_seq, function(N) {
-    res <- im$approximate_compartmental(approach = approach, N = N)$value
-    setNames(list(res[[1]]), names(res))
-  })
-}) %>% flatten() %>% reduce(c) #reduces nested list by one level and combines lists ino a single flat list
-
+results <- tidyr::expand_grid(
+  approach = approaches,
+  N = N_seq
+) |>
+  purrr::pmap(
+    \(approach, N) {
+      im$approximate_compartmental(approach = approach, N = N) |>
+        purrr::pluck("value") |>
+        stats::setNames(glue::glue("{approach}-{N}"))
+    },
+    .progress = interactive()
+  )
+  
 # Convert to data frame
-df <- do.call(rbind, lapply(names(results), function(key) {
-  data.frame(Approach = gsub("_N_.*", "", key),
-             N = as.numeric(gsub(".*N_", "", key)),
-             Value = results[[key]])
-}))
+results <- results |>
+  purrr::list_c() |>
+  tibble::enframe() |>
+  tidyr::separate_wider_delim("name", delim = "-", names = c("approach", "N"))
 
 # Plot
-ggplot(df, aes(x = N, y = Value, color = Approach)) +
-  geom_line(size = 1) +
-  scale_x_continuous(breaks = seq(min(df$N), max(df$N), by = 1)) +
-  labs(x = "N", y = "Objective Function Value") +
-  theme_minimal()
+ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = approach, group = approach)) +
+  ggplot2::geom_line() +
+  #ggplot2::xlim(1, max(results$N)) +
+  ggplot2::scale_y_log10() + 
+  ggplot2::labs(x = "N", y = "Error") +
+  ggplot2::theme_minimal()
 ```
