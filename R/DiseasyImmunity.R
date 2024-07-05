@@ -339,66 +339,81 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         tic <- Sys.time()
 
-        method_init <- private$method_functions[[match.arg(method)]]
-
         # Extract median time_scale
-        time_scale <- purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
-        delta <- N / (3 * time_scale)
+        time_scale <- purrr::pluck(private$get_time_scale(), stats::median, .default = 1)
+        delta <- N / (3 * time_scale) # Make an initial guess for the delta rate
 
-        # Get params and initiation for each model
-        init_all <- purrr::map(private$.model, ~ method_init(N, delta))
+        # To perform the optimisation, we need to produce a vector of gamma and delta "rates" from
+        # the free parameters given to the optimiser.
+        # This map depends on the method used
+        method <- match.arg(method)
 
-        # Extract the parameter scaling helper
-        rescale_params <- init_all[[1]]$rescale_params
 
-        # Extract optimisation parameters
-        optim_par <- init_all[[1]]$optim_par
-        delta <- init_all[[1]]$init_par$delta
-        gamma <- purrr::map(init_all, ~ purrr::pluck(.x, "init_par", "gamma"))
-        init_par <- list(gamma = gamma, delta = delta)
-        to_optim <- unname(unlist(init_par[optim_par]))
-        non_optim <- unname(unlist(init_par[-match(optim_par, names(init_par))]))
+        n_models <- length(self$model)
+        s <- \(p) 0.5 * (1 + p / (1 + abs(p))) # Sigmoid mapping of parameters from -Inf / Inf to 0 / 1
+
+        if (method == "free_gamma") {
+
+          par_to_delta <- \(par) s(par[-(seq_len(N - 1) + (n_models - 1) * (N - 1))]) # Last parameter is the delta rate
+          par_to_gamma <- \(par, model_id, f_inf) {
+            c(
+              cumprod(s(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # Get the N-1 gamma parameters of the n´th model
+              f_inf # And inject the fixed end-point
+            )
+          }
+          n_free_parameters <- (N - 1) * n_models + 1
+
+        } else if (method == "free_delta") {
+
+          par_to_delta <- \(par) s(par) # All parameters are delta
+          par_to_gamma <- \(par, model_id, f_inf) rev(seq(from = 1, to = f_inf, length.out = N)) # Gamma step from 1 to f_inf
+          n_free_parameters <- N - 1
+
+        } else if (method == "all_free") {
+
+          par_to_delta <- \(par) s(par[-seq_len((N - 1) * n_models)]) # Last N-1 parameters are the delta rate
+          par_to_gamma <- \(par, model_id, f_inf) {
+            c(
+              cumprod(s(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # Get the N-1 gamma parameters of the n´th model
+              f_inf # And inject the fixed end-point
+            )
+          }
+          n_free_parameters <- (N - 1) * n_models + N - 1
+
+        }
 
         # Objective function
-        obj_function <- function(N, optim_par, models) {
+        obj_function <- function(x) {
 
           results <- 0
-          for (i in seq_along(models)) {
-            # Extract the parameter subset corresponding to the ith model
-            params_model <- c(optim_par[(1:N) + (i - 1) * N], optim_par[-(1:(N * length(models)))])
-            # Scale the relevant parameters through a sigmoidal function to ensure values between 0-1.
-            # After scaling, the parameters are passed through "cumprod" to ensure monotonically decreasing values
-            # (For the relevant methods)
-            # Finally, we impute the parameters with the fixed f(Inf) value for the last compartment
-            params_model <- rescale_params(params_model, models[[i]](Inf))
-            approx <- private$get_approximation(N, params_model)
-            integrate_sum <- private$get_integration(approx, models[[i]])
-            results <- results + integrate_sum
+          for (model_id in seq_along(self$model)) {
+
+            delta <- par_to_delta(par)
+            gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
+
+            approx <- \(t) do.call(cbind, private$occupancy_probability(delta, N, t)) %*% gamma
+
+            # Finds diff from approximation and target function
+            integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
+
+            # Numerically integrate the differences
+            integral <- stats::integrate(integrand, lower = 0, upper = Inf)$value
+
+            results <- results + integral
           }
+
           return(results)
         }
 
-        # Return the one obj value for special case when N = 1
-        if (N == 1) {
-          models <- length(private$.model)
-          params <- c(rep(1, models),0)
-          result <- list("value" = obj_function(N, params, private$.model))
-        } else {
-          result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
-          params <- c(non_optim, result$par)
-        }
-        # Save obj value
-        method = match.arg(method)
+
+        # Run the optimiser to determine best rates
+        res <- stats::optim(rep(0, n_free_parameters), obj_function, control = list(maxit = 1e3), method = "BFGS")
 
         # Scale optimised parameters
         rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
-          params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
-          params_model <- rescale_params(params_model, .x(Inf))
-          if (length(params_model) != (N * 2) - 1) { # Ensure length of delta always is N-1 in rate output
-            params_model <- c(params_model[1:N], rep(params_model[-(N:1)], (N - 1)))
-          }
-          return(params_model)
-        })
+          par_to_gamma(res$par, .y, .x(Inf))
+        }) |>
+          purrr::reduce(c, .init = par_to_delta(res$par), .dir = "backward")
 
         toc <- Sys.time()
 
@@ -407,7 +422,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           hash,
           list(
             "rates" = rates,
-            "value" = result$value,
+            "value" = res$value,
             "method" = method,
             "N" = N,
             "execution_time" = toc - tic
@@ -495,6 +510,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         return(models)
       }
     ),
+
     #' @field model (`list(function())`)\cr
     #'   The list of models currently being used in the module. Read-only.
     model = purrr::partial(
@@ -502,6 +518,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       name = "model",
       expr = return(private %.% .model)
     ),
+
     #' @field available_methods (`character`)\cr
     #'   The list of available methods
     available_methods = purrr::partial(
@@ -512,67 +529,15 @@ DiseasyImmunity <- R6::R6Class(                                                 
   ),
 
   private = list(
+
     .model = NULL,
+
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
-      purrr::map(private$.model, ~ rlang::fn_env(.x)$time_scale)
+      return(purrr::map_dbl(private$.model, ~ rlang::fn_env(.x)$time_scale))
     },
-    method_functions = list(
-      free_gamma = function(N, delta) {
-        optim_par <- c("gamma", "delta")
-        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = delta)
-        rescale_params <- function(p, gamma_N) {
-          N <- length(p) - 1 # Infer N
-          p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmodial transform all parameters
-          p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monoticity and fixed end-point
-          return(p)
-        }
-        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
-      },
-      free_delta = function(N, delta) {
-        optim_par <- "delta"
-        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
-        rescale_params <- function(p, gamma_N) {
-          if (length(p) == 2){
-            p <- c(gamma_N,  0) # Ensure fixed end-point and no delta rate
-          } else {
-            N <- (length(p) + 1) / 2 # Infer N
-            p <- c(p[1:N] * (1 - gamma_N) + gamma_N,  0.5 * (1 + p[-(1:N)] / (1 + abs(p[-(1:N)])))) # Ensure monoticity, fixed end-point, and Sigmodial transform the delta parameters
-          }
-          return(p)
-        }
-        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
-      },
-      all_free = function(N, delta) {
-        optim_par <- c("gamma", "delta")
-        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
-        rescale_params <- function(p, gamma_N) {
-          if (length(p) == 2){
-            N <- 1
-            p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters (here only delta)
-            p <- c(gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
-          } else {
-            N <- (length(p) + 1) / 2 # Infer N
-            p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters
-            p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
-          }
-          return(p)
-        }
-        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
-      }
-    ),
-    get_approximation = function(N, params) {
-      gamma <- params[1:N]
-      delta <- params[-(1:N)]
-      approx <- \(t) do.call(cbind, private$occupancy_probability(delta, N, t)) %*% gamma
-    },
-    get_integration = function(approx, f_target) {
-      # Finds diff from approximation and target function
-      integrand <- \(t) (approx(t) - f_target(t))^2
 
-      # Numerically integrate the differences
-      result <- stats::integrate(integrand, lower = 0, upper = Inf)$value
-    },
+
     # Compute the probability of occupying each of K sequential compartments
     # @param rate (`numeric(1)` or `numeric(K-1)`)\cr
     #   The rate of transfer between each of the K compartments.
