@@ -494,10 +494,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     available_approaches = purrr::partial(
       .f = active_binding,
       name = "available_approaches",
-      expr = {
-        approaches <- private$.approaches
-        return(approaches)
-      }
+      expr = return(names(private$approach_functions))
     )
   ),
 
