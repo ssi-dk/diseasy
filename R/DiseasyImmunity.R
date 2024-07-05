@@ -316,33 +316,35 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   approximate the configured waning immunity scenario.
     #'
     #'   The function implements three methods for approximating the waning immunity curves:
-    #'     - "rate_equal": All transition rates are equal and risks are free to vary (N+1 free parameters).
-    #'     - "gamma_fixed_step": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
+    #'     - "free_gamma": All transition rates are equal and risks are free to vary (N+1 free parameters).
+    #'     - "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
     #'       (N free parameters).
     #'     - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
-    #' @param approach (`character(1)`)\cr
-    #'   Specifies the approach to be used from the available approaches. See details.
+    #' @param method (`character(1)`)\cr
+    #'   Specifies the method to be used from the available methods. See details.
     #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
     #' @return
     #'   Returns the rates and objective value (invisibly).
-    approximate_compartmental = function(approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
+    approximate_compartmental = function(method = c("free_gamma", "free_delta", "all_free"), N = NULL) {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      #checkmate::assert_choice(approach, c("rate_equal", "gamma_fixed_step", "all_free"), add = coll)
+      checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
       checkmate::assert_integerish(N, lower = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
-        approach_init <- private$approach_functions[[match.arg(approach)]]
+
+        method_init <- private$method_functions[[match.arg(method)]]
+
         # Extract median time_scale
         time_scale <- purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
         delta <- N / (3 * time_scale)
 
         # Get params and initiation for each model
-        init_all <- purrr::map(private$.model, ~ approach_init(N, delta))
+        init_all <- purrr::map(private$.model, ~ method_init(N, delta))
 
         # Extract the parameter scaling helper
         rescale_params <- init_all[[1]]$rescale_params
@@ -364,7 +366,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             params_model <- c(optim_par[(1:N) + (i - 1) * N], optim_par[-(1:(N * length(models)))])
             # Scale the relevant parameters through a sigmoidal function to ensure values between 0-1.
             # After scaling, the parameters are passed through "cumprod" to ensure monotonically decreasing values
-            # (For the relevant approaches)
+            # (For the relevant methods)
             # Finally, we impute the parameters with the fixed f(Inf) value for the last compartment
             params_model <- rescale_params(params_model, models[[i]](Inf))
             approx <- private$get_approximation(N, params_model)
@@ -411,23 +413,23 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #    Plot the waning functions for the current instance.
-    #'   If desired to additionally plot the approximations, supply the `approach` and number of compartments (`N`)
+    #'   If desired to additionally plot the approximations, supply the `method` and number of compartments (`N`)
     #' @param t_max (`numeric`)\cr
     #'  The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.
-    #' @param approach (`str` or `numeric`)\cr
-    #'   Specifies the approach to be used from the available approaches.
-    #'   It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
-    #'   or as a numeric value representing the approach index 1, 2, or 3.
+    #' @param method (`str` or `numeric`)\cr
+    #'   Specifies the method to be used from the available methods.
+    #'   It can be provided as a string with the method name "free_gamma", "free_delta" or "all_free".
+    #'   or as a numeric value representing the method index 1, 2, or 3.
     #' @param N (`numeric`)\cr
     #'   Number of compartments to be used in the model.
     #'   By default, it is set to 5
-    plot = function(t_max = NULL, approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
+    plot = function(t_max = NULL, method = c("free_gamma", "free_delta", "all_free"), N = NULL) {
       checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
       # Only plots the rates if N was given as input
       if (is.null(N)) {
         rates <- NULL
       } else {
-        rates <- self$approximate_compartmental(approach, N)$rates
+        rates <- self$approximate_compartmental(method, N)$rates
       }
       # Set t_max if nothing is given
       if (is.null(t_max)) t_max <- 3 * purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
@@ -489,12 +491,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
       name = "model",
       expr = return(private %.% .model)
     ),
-    #' @field available_approaches (`character`)\cr
-    #'   The list of available approaches
-    available_approaches = purrr::partial(
+    #' @field available_methods (`character`)\cr
+    #'   The list of available methods
+    available_methods = purrr::partial(
       .f = active_binding,
-      name = "available_approaches",
-      expr = return(names(private$approach_functions))
+      name = "available_methods",
+      expr = return(names(private$method_functions))
     )
   ),
 
@@ -504,8 +506,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Returns a list of all time scales with their model target
       purrr::map(private$.model, ~ rlang::fn_env(.x)$time_scale)
     },
-    approach_functions = list(
-      rate_equal = function(N, delta) {
+    method_functions = list(
+      free_gamma = function(N, delta) {
         optim_par <- c("gamma", "delta")
         init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = delta)
         rescale_params <- function(p, gamma_N) {
@@ -516,7 +518,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
         return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
       },
-      gamma_fixed_step = function(N, delta) {
+      free_delta = function(N, delta) {
         optim_par <- "delta"
         init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
         rescale_params <- function(p, gamma_N) {
