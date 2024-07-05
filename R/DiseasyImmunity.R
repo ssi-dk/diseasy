@@ -337,6 +337,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
+        tic <- Sys.time()
+
         method_init <- private$method_functions[[match.arg(method)]]
 
         # Extract median time_scale
@@ -386,8 +388,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           params <- c(non_optim, result$par)
         }
         # Save obj value
-        approach = match.arg(approach)
-        value <- setNames(list(result$value), paste(approach, N, sep = "_N_"))
+        method = match.arg(method)
 
         # Scale optimised parameters
         rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
@@ -397,11 +398,21 @@ DiseasyImmunity <- R6::R6Class(                                                 
             params_model <- c(params_model[1:N], rep(params_model[-(N:1)], (N - 1)))
           }
           return(params_model)
-        }) |>
-          stats::setNames(names(private$.model))
+        })
+
+        toc <- Sys.time()
 
         # Store in cache
-        private$cache(hash, list("rates" = rates, "value" = value))
+        private$cache(
+          hash,
+          list(
+            "rates" = rates,
+            "value" = result$value,
+            "method" = method,
+            "N" = N,
+            "execution_time" = toc - tic
+          )
+        )
       }
 
       # Write to the log
