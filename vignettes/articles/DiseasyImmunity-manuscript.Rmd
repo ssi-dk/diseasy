@@ -1,0 +1,130 @@
+---
+title: "DiseasyImmunity manuscript"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+
+```{r reset}
+devtools::load_all()
+
+rm(im)
+im <- DiseasyImmunity$new()
+
+cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data"))
+
+```
+
+```{r define waning functions}
+
+# We define our list of "raw" test functions
+f = list(
+  "exponential" = \(t) exp(-t / time_scale),
+  "sigmoidal" = \(t) exp(-(t - time_scale)) / (1 + exp(-(t - time_scale))),
+  "heaviside" = \(t) as.numeric(t < time_scale),
+  "linear" = \(t) max(1 - 0.5 / time_scale * t, 0)
+)
+# And define a list of correpsonding time_ cales
+t_f <- rep(20, length(f)) 
+
+# Construct a list with a non-zero asymptote
+g = list(
+  "exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
+  "sigmoidal" = \(t) 0.2 + 0.8 * exp(-(t - time_scale)) / (1 + exp(-(t - time_scale))),
+  "heaviside" = \(t) 0.2 + 0.8 * as.numeric(t < time_scale),
+  "linear" = \(t) 0.2 + 0.8 * max(1 - 0.5 / time_scale * t, 0)
+)
+t_g <- t_f
+
+# Construct a list with double the time scale
+h <- f
+t_h <- t_f * 2
+
+
+# Construct a list of all models
+models <- c(f, g, h) 
+model_names <- c(names(f), paste0(names(f), "_c"), paste0(names(f), "_2t"))
+time_scales <- c(t_f, t_g, t_h)
+
+zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
+
+```
+
+```{r elbow curve single target}
+# Set the combinations to test
+combinations <- tidyr::expand_grid(
+  model = zip(models, model_names, time_scales),
+  method = c("free_gamma", "free_delta"),#, "all_free"),
+  N = seq(from = 2, to = 10, by = 1)
+)
+
+
+values <- combinations |>
+  dplyr::mutate(N_prev = dplyr::lag(N), .by = c("model", "method")) |>
+  purrr::pmap(
+  .progress = interactive(),
+  .f = \(model_zip, method, N, N_prev) {
+    
+    # Unpack model
+    model <- model_zip[[1]]
+    model_name <- model_zip[[2]]
+    time_scale <- model_zip[[3]]
+    
+    # Check if we have already computed this value
+    approx <- cache$get(key = glue::glue("{model_name}-{method}-{N}"))
+    if (!cachem::is.key_missing(approx)) {
+      return(data.frame("value" = approx$value, "execution_time" = approx$execution_time))
+    }
+    
+    
+    # Check if previous N has converged
+    if (N > 2) {
+      prev_value <- cache$get(key = glue::glue("{model_name}-{method}-{N_prev}")) 
+      
+       if (cachem::is.key_missing(prev_value) || purrr::pluck(prev_value, "value") < 1e-3) {
+         return(data.frame("value" = NA, "execution_time" = NA))
+       }
+    }
+    
+    # Set the target
+    im$set_waning_model(model, time_scale = time_scale, target = "infection")
+    
+    approx <- im$approximate_compartmental(method = method, N = N) 
+    
+    cache$set(key = glue::glue("{model_name}-{method}-{N}"), approx)
+
+    return(data.frame("value" = approx$value, "execution_time" = approx$execution_time))
+  }) |>
+  purrr::list_rbind()
+
+
+results <- cbind(combinations, values) |>
+  dplyr::mutate("execution_time" = as.numeric(.data$execution_time),
+                "model" = purrr::map_chr(.data$model, ~ purrr::pluck(., 2))) |>
+  tidyr::pivot_longer(!c("model", "method", "N"), names_to = "metric") |>
+  tidyr::separate_wider_delim("model", delim = "_", names = c("model", "variant"), too_few = "align_start") |>
+  dplyr::mutate("variant" = dplyr::case_when(
+    is.na(variant) ~ "base",
+    variant == "c" ~ "non-zero asymptote",
+    variant == "2t" ~ "twice the time scale"
+  ))
+
+# Plot
+ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = method, linetype = variant)) +
+  ggplot2::geom_line(size = 1) +
+  ggplot2::geom_point() +
+  #ggplot2::xlim(1, max(results$N)) +
+  #ggplot2::scale_y_log10() + 
+  ggplot2::facet_grid(metric ~ model, scales = "free_y") + 
+  ggplot2::labs(x = "N", y = "Metric") +
+  ggplot2::theme_bw()
+```
