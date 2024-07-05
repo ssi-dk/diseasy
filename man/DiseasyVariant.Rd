@@ -2,10 +2,31 @@
 % Please edit documentation in R/DiseasyVariant.R
 \name{DiseasyVariant}
 \alias{DiseasyVariant}
-\title{TODO}
-\description{
-TODO
+\title{Diseasy' variant handler}
+\value{
+A new instance of the \code{DiseasyVariant} \link[R6:R6Class]{R6} class.
 }
+\description{
+The \code{DiseasyVariant} module is responsible for defining scenarios for disease variants to the models
+
+See vignette("diseasy-variant")
+}
+\examples{
+  # Create variant module
+  var <- DiseasyVariant$new()
+
+  # By default, a non-informative variant is included
+  var$variants
+
+  # Add variants via the `$add_variant()` method
+
+  var$add_variant(name = "WT")
+  var$add_variant(name = "Mutant", characteristics = list("relative_infection_risk" = 1.2)
+  var$variants
+
+  rm(var)
+}
+\keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyVariant}
 }
@@ -23,7 +44,6 @@ TODO. Read-only.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-DiseasyVariant-new}{\code{DiseasyVariant$new()}}
 \item \href{#method-DiseasyVariant-add_variant}{\code{DiseasyVariant$add_variant()}}
 \item \href{#method-DiseasyVariant-clone}{\code{DiseasyVariant$clone()}}
 }
@@ -32,31 +52,12 @@ TODO. Read-only.}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="initialize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-initialize'><code>diseasy::DiseasyBaseModule$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
 </details>
 }}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyVariant-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyVariant-new}{}}}
-\subsection{Method \code{new()}}{
-TODO
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$new(n_variants = 1, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n_variants}}{(\code{numeric(1)})\cr
-A quick way to generate a number of variants with decreasing relative infection risk.}
-
-\item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyVariant-add_variant"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyVariant-add_variant}{}}}
