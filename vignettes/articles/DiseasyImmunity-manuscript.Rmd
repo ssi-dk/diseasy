@@ -29,9 +29,9 @@ cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/art
 # We define our list of "raw" test functions
 f = list(
   "exponential" = \(t) exp(-t / time_scale),
-  "sigmoidal" = \(t) exp(-(t - time_scale)) / (1 + exp(-(t - time_scale))),
+  "sigmoidal" = \(t) exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
   "heaviside" = \(t) as.numeric(t < time_scale),
-  "linear" = \(t) max(1 - 0.5 / time_scale * t, 0)
+  "linear" = \(t) pmax(1 - t / time_scale, 0)
 )
 # And define a list of correpsonding time_ cales
 t_f <- rep(20, length(f)) 
@@ -39,9 +39,9 @@ t_f <- rep(20, length(f))
 # Construct a list with a non-zero asymptote
 g = list(
   "exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
-  "sigmoidal" = \(t) 0.2 + 0.8 * exp(-(t - time_scale)) / (1 + exp(-(t - time_scale))),
+  "sigmoidal" = \(t) 0.2 + 0.8 * exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
   "heaviside" = \(t) 0.2 + 0.8 * as.numeric(t < time_scale),
-  "linear" = \(t) 0.2 + 0.8 * max(1 - 0.5 / time_scale * t, 0)
+  "linear" = \(t) 0.2 + 0.8 * pmax(1 - t / time_scale, 0)
 )
 t_g <- t_f
 
@@ -59,25 +59,51 @@ zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 
 ```
 
+
+```{r manually check fits}
+#im$set_waning_model(g[["heaviside"]], time_scale = t_g[[1]], target = "infection")
+#im$approximate_compartmental(method = method, N = N)
+#plot(im, method = method, N = 3)
+```
+
+
 ```{r elbow curve single target}
 # Set the combinations to test
 combinations <- tidyr::expand_grid(
   model = zip(models, model_names, time_scales),
-  method = c("free_gamma", "free_delta"),#, "all_free"),
-  N = seq(from = 2, to = 10, by = 1)
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = seq(from = 2, to = 4, by = 1)
 )
 
 
+# Determine the previous N's for each N we test, so that we can run a
+# Kneedle algorithm to detect convergence
+# Not pretty, but works
+combinations <- combinations |>
+  dplyr::group_by(.data$model, .data$method) |>
+  dplyr::mutate(n = dplyr::row_number()) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(N_prev = list(seq_len(n - 1))) |>
+  dplyr::select(!"n") |>
+  dplyr::ungroup() |>
+  dplyr::group_by(.data$model, .data$method) |>
+  dplyr::mutate(N_prev = purrr::map(N_prev, ~ N[.]))
+
+
+
+
 values <- combinations |>
-  dplyr::mutate(N_prev = dplyr::lag(N), .by = c("model", "method")) |>
   purrr::pmap(
   .progress = interactive(),
   .f = \(model_zip, method, N, N_prev) {
     
     # Unpack model
-    model <- model_zip[[1]]
-    model_name <- model_zip[[2]]
-    time_scale <- model_zip[[3]]
+    model <<- model_zip[[1]]
+    model_name <<- model_zip[[2]]
+    time_scale <<- model_zip[[3]]
+    N <<- N
+    method <<- method
+    N_prev <<- N_prev
     
     # Check if we have already computed this value
     approx <- cache$get(key = glue::glue("{model_name}-{method}-{N}"))
@@ -87,18 +113,42 @@ values <- combinations |>
     
     
     # Check if previous N has converged
-    if (N > 2) {
-      prev_value <- cache$get(key = glue::glue("{model_name}-{method}-{N_prev}")) 
+    if (length(N_prev) > 1) {
+      prev_values <<- purrr::map(N_prev, ~ cache$get(key = glue::glue("{model_name}-{method}-{.}"))) |>
+        purrr::discard(cachem::is.key_missing) |>
+        purrr::map_dbl(~ purrr::pluck(., "value"))
       
-       if (cachem::is.key_missing(prev_value) || purrr::pluck(prev_value, "value") < 1e-3) {
-         return(data.frame("value" = NA, "execution_time" = NA))
-       }
+      # Look for the N that caused convergence
+      N_converged <- tryCatch(
+        kneedle::kneedle(
+          x = unlist(N_prev[1:length(prev_values)]),
+          y = prev_values,
+          decreasing = TRUE,
+          concave = FALSE,
+          sensitivity = 1
+        ),
+        error = function(e) numeric(0)
+      ) |>
+        purrr::pluck(1, .default = numeric(0))
+    
+      
+      if (identical(N_converged, numeric(0)) && any(diff(prev_values) > 0)) {
+        N_converged <- N_prev[[which(diff(prev_values) > 0)[1]]]
+      }
+      
+      N_converged <<- N_converged
+      
+      # Stop if there is convergence
+      if (!identical(N_converged, numeric(0)) && !(N_converged %in% tail(N_prev, 1))) {
+        #message(glue::glue("{model_name}-{method} has converged at {N_converged}"))
+        return(data.frame("value" = NA, "execution_time" = NA))
+      }
     }
     
     # Set the target
     im$set_waning_model(model, time_scale = time_scale, target = "infection")
     
-    approx <- im$approximate_compartmental(method = method, N = N) 
+    approx <- im$approximate_compartmental(method = method, N = N)
     
     cache$set(key = glue::glue("{model_name}-{method}-{N}"), approx)
 
@@ -108,6 +158,7 @@ values <- combinations |>
 
 
 results <- cbind(combinations, values) |>
+  dplyr::select(!"N_prev") |>
   dplyr::mutate("execution_time" = as.numeric(.data$execution_time),
                 "model" = purrr::map_chr(.data$model, ~ purrr::pluck(., 2))) |>
   tidyr::pivot_longer(!c("model", "method", "N"), names_to = "metric") |>
@@ -116,7 +167,8 @@ results <- cbind(combinations, values) |>
     is.na(variant) ~ "base",
     variant == "c" ~ "non-zero asymptote",
     variant == "2t" ~ "twice the time scale"
-  ))
+  )) |>
+  dplyr::filter(!is.na(value))
 
 # Plot
 ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = method, linetype = variant)) +
@@ -124,7 +176,20 @@ ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = method, linetype
   ggplot2::geom_point() +
   #ggplot2::xlim(1, max(results$N)) +
   #ggplot2::scale_y_log10() + 
-  ggplot2::facet_grid(metric ~ model, scales = "free_y") + 
+  ggplot2::facet_grid(model ~ metric, scales = "free") + 
   ggplot2::labs(x = "N", y = "Metric") +
   ggplot2::theme_bw()
 ```
+```{r}
+results |>
+  dplyr::filter(.data$metric == "value") |>
+  ggplot2::ggplot(ggplot2::aes(x = N, y = value, color = method, linetype = variant)) +
+  ggplot2::geom_line(size = 1) +
+  ggplot2::geom_point() +
+  #ggplot2::xlim(1, max(results$N)) +
+  #ggplot2::scale_y_log10() + 
+  ggplot2::facet_grid(model ~ method, scales = "free") + 
+  ggplot2::labs(x = "N", y = "Value") +
+  ggplot2::theme_bw()
+```
+
