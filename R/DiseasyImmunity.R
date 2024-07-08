@@ -355,36 +355,36 @@ DiseasyImmunity <- R6::R6Class(                                                 
         if (method == "free_gamma") {
           # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
           # The last parameter is the delta rate which is identical for all compartments
+          n_free_parameters <- (N - 1) * n_models + 1
 
-          par_to_delta <- \(par) p_0inf(par[-(seq_len(N - 1) + (n_models - 1) * (N - 1))]) # Last parameter is delta
+          par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - 1)]) # Last parameter is delta
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
               cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n´th model
               f_inf # And inject the fixed end-point
             )
           }
-          n_free_parameters <- (N - 1) * n_models + 1
 
         } else if (method == "free_delta") {
           # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
+          n_free_parameters <- N - 1
 
           par_to_delta <- \(par) p_0inf(par) # All parameters are delta
           par_to_gamma <- \(par, model_id, f_inf) seq(from = 1, to = f_inf, length.out = N) # gammas:  1 to f_inf
-          n_free_parameters <- N - 1
 
         } else if (method == "all_free") {
           # All parameters are free to vary
           # The first n_models * (N-1) parameters are the gamma rates  (N-1 for each model)
           # The last N-1 parameters are the delta rates
+          n_free_parameters <- (N - 1) * n_models + N - 1
 
-          par_to_delta <- \(par) p_0inf(par[-seq_len((N - 1) * n_models)]) # Last N-1 parameters are the delta rate
+          par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - (N - 1))]) # Last N-1 parameters are the delta rate
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
               cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n´th model
               f_inf # And inject the fixed end-point
             )
           }
-          n_free_parameters <- (N - 1) * n_models + N - 1
 
         }
 
