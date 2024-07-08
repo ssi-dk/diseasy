@@ -339,42 +339,48 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         tic <- Sys.time()
 
-        # Extract median time_scale
-        time_scale <- purrr::pluck(private$get_time_scale(), stats::median, .default = 1)
-        delta <- N / (3 * time_scale) # Make an initial guess for the delta rate
-
         # To perform the optimisation, we need to produce a vector of gamma and delta "rates" from
         # the free parameters given to the optimiser.
-        # This map depends on the method used
+        # This map depends on the method used.
         method <- match.arg(method)
 
+        # We need some helper functions that can map the optimiser parameters `par` to either
+        # [0, 1] or [0, Inf]
+        p_01 <- \(p) 1 / (1 + exp(-p)) # Sigmoid mapping of parameters from -Inf / Inf to 0 / 1
+        p_0inf <- \(p) exp(p) # Mapping of parameters from -Inf / Inf to 0 / Inf ("Softplus" function)
 
+        # We need to know the number of models the gamma's belong to
         n_models <- length(self$model)
-        s <- \(p) 0.5 * (1 + p / (1 + abs(p))) # Sigmoid mapping of parameters from -Inf / Inf to 0 / 1
 
         if (method == "free_gamma") {
+          # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
+          # The last parameter is the delta rate which is identical for all compartments
 
-          par_to_delta <- \(par) s(par[-(seq_len(N - 1) + (n_models - 1) * (N - 1))]) # Last parameter is the delta rate
+          par_to_delta <- \(par) p_0inf(par[-(seq_len(N - 1) + (n_models - 1) * (N - 1))]) # Last parameter is delta
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
-              cumprod(s(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # Get the N-1 gamma parameters of the n´th model
+              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n´th model
               f_inf # And inject the fixed end-point
             )
           }
           n_free_parameters <- (N - 1) * n_models + 1
 
         } else if (method == "free_delta") {
+          # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
 
-          par_to_delta <- \(par) s(par) # All parameters are delta
-          par_to_gamma <- \(par, model_id, f_inf) rev(seq(from = 1, to = f_inf, length.out = N)) # Gamma step from 1 to f_inf
+          par_to_delta <- \(par) p_0inf(par) # All parameters are delta
+          par_to_gamma <- \(par, model_id, f_inf) seq(from = 1, to = f_inf, length.out = N) # gammas:  1 to f_inf
           n_free_parameters <- N - 1
 
         } else if (method == "all_free") {
+          # All parameters are free to vary
+          # The first n_models * (N-1) parameters are the gamma rates  (N-1 for each model)
+          # The last N-1 parameters are the delta rates
 
-          par_to_delta <- \(par) s(par[-seq_len((N - 1) * n_models)]) # Last N-1 parameters are the delta rate
+          par_to_delta <- \(par) p_0inf(par[-seq_len((N - 1) * n_models)]) # Last N-1 parameters are the delta rate
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
-              cumprod(s(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # Get the N-1 gamma parameters of the n´th model
+              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n´th model
               f_inf # And inject the fixed end-point
             )
           }
@@ -382,11 +388,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         }
 
-        # Objective function
-        obj_function <- function(x) {
+        # For the optimisation, we define the objective function which loops over each model and computes the total
+        # square deviation from the target.
+        # The error is then the sum of these deviations across models
+        obj_function <- function(par) {
 
-          results <- 0
-          for (model_id in seq_along(self$model)) {
+          value <- purrr::map_dbl(seq_along(self$model), \(model_id) {
 
             delta <- par_to_delta(par)
             gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
@@ -399,17 +406,35 @@ DiseasyImmunity <- R6::R6Class(                                                 
             # Numerically integrate the differences
             integral <- stats::integrate(integrand, lower = 0, upper = Inf)$value
 
-            results <- results + integral
-          }
+            return(integral)
+          }) |>
+            sum()
 
-          return(results)
+          return(value)
         }
 
 
-        # Run the optimiser to determine best rates
-        res <- stats::optim(rep(0, n_free_parameters), obj_function, control = list(maxit = 1e3), method = "BFGS")
+        # We provide a starting guess for the rates
+        # Note that need to be "inverted" through the inverse of the mapping functions
+        # so they are are in the same parameter space as the optimisation occurs
+        delta_0 <- N / purrr::pluck(private$get_time_scale(), stats::median, .default = 1)
+        if (method %in% c("free_delta", "all_free")) {
+          delta_0 <- rep(delta_0, N - 1) # Distribute the delta rate to all compartments
+        }
+        p_delta_0 <- log(delta_0) # Inverse mapping of p_0inf
 
-        # Scale optimised parameters
+        if (method == "free_delta") {
+          p_gamma_0 <- numeric(0)
+        } else {
+          p_gamma_0 <- rep(1e15, n_models * (N - 1)) # p_01 is 1 at infinity
+        }
+
+        par_0 <- c(p_gamma_0, p_delta_0)
+
+        # Run the optimiser to determine best rates
+        res <- stats::optim(par_0, obj_function, control = list(maxit = 1e3), method = "BFGS")
+
+        # Map optimised parameters to rates
         rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
           par_to_gamma(res$par, .y, .x(Inf))
         }) |>
