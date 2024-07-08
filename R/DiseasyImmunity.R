@@ -397,7 +397,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             delta <- par_to_delta(par)
             gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
 
-            approx <- \(t) do.call(cbind, private$occupancy_probability(delta, N, t)) %*% gamma
+            approx <- private$get_approximation(gamma, delta, N)
 
             # Finds diff from approximation and target function
             integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
@@ -482,48 +482,78 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   By default, it is set to 5
     plot = function(t_max = NULL, method = c("free_gamma", "free_delta", "all_free"), N = NULL) {
       checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
-      # Only plots the rates if N was given as input
-      if (is.null(N)) {
-        rates <- NULL
-      } else {
-        rates <- self$approximate_compartmental(method, N)$rates
-      }
+
       # Set t_max if nothing is given
       if (is.null(t_max)) t_max <- 3 * purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
       t <- seq(from = 0, to = t_max, length.out = 100)
+
+
       # Create an empty plot
       par(mar = c(5, 4, 4, 12) + 0.1) # Adds extra space on the right
-      plot(t, type = "n", xlab = "Time", ylab = "Gamma", main = "Waning functions", ylim = c(0, 1), xlim = c(0, t_max))
-      # Create palette with different colors to use in plot
+      plot(t, type = "n", xlab = "Time", ylab = "\\gamma", main = "Waning functions", ylim = c(0, 1), xlim = c(0, t_max))
+
+
+      # Create palette with different colours to use in plot
       pcolors <- palette()
+
+
       # Plot lines for each model
       purrr::walk2(private$.model, seq_along(private$.model), ~ {
         lines(t, purrr::map_dbl(t, .x), col = pcolors[1 + .y])
       })
-      # If rates have been approximated add them to the plot
-      if (!is.null(rates)) {
-        purrr::walk2(rates, seq_along(private$.model), ~ {
-          N <- (length(.x) + 1) / 2
-          lines(t, purrr::map_dbl(t, private$get_approximation(N, .x)), col = pcolors[1 + .y], lty = "dashed")
 
-          # Get legend labels for models and approximation
-          combined_legend <- c(names(private$.model), paste("app.", names(rates)))
 
-          # Specify line types for models and approximation
-          combined_lty <- c(rep("solid", length(private$.model)), rep("dashed", length(rates)))
+      # Only plots the approximations if N was given as input
+      if (!is.null(N)) {
+        approximation <-self$approximate_compartmental(method, N)
+        gamma <- approximation$gamma
+        delta <- approximation$delta
 
-          # Combined legend (models and approximation)
-          legend("topright", legend = combined_legend, col = c(purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
-                                                               purrr::map_chr(seq_along(rates), ~ pcolors[1 + .x])),
-                 lty = combined_lty, inset = c(-0.9, 0), bty = "n", xpd = TRUE, cex = 0.8)
+        purrr::walk2(gamma, seq_along(private$.model), ~ {
+          lines(t, private$get_approximation(.x, delta, N)(t), col = pcolors[1 + .y], lty = "dashed")
         })
-      } else {
+
+        if (N > 1) {
+          approximation <-self$approximate_compartmental(method, N - 1)
+          gamma <- approximation$gamma
+          delta <- approximation$delta
+
+          purrr::walk2(gamma, seq_along(private$.model), ~ {
+            lines(t, private$get_approximation(.x, delta, N - 1)(t), col = "black", lty = "dashed")
+          })
+        }
+      }
+
+
+      # Add legend to the plot
+      if (is.null(N)) {
+
         # Only legend for models
         legend("topright", legend = names(private$.model), col = purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
-               lty = 1, inset = c(-0.7, 0), bty = "n", xpd = TRUE, cex = 0.8)
+               lty = 1, inset = c(0, 0), bty = "n", xpd = TRUE, cex = 0.8)
+
+      } else {
+        # Get legend labels for models and approximation
+        combined_legend <- c(names(private$.model), paste("app.", names(private$.model)))
+
+        # Specify line types for models and approximation
+        combined_lty <- c(rep("solid", length(private$.model)), rep("dashed", length(private$.model)))
+
+        # Combined legend (models and approximation)
+        legend(
+          "topright",
+          legend = combined_legend,
+          col = c(
+            purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
+            purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x])
+          ),
+          lty = combined_lty,
+          inset = c(0, 0),
+          bty = "n",
+          xpd = TRUE,
+          cex = 0.8)
       }
-      # Write to the log
-      private$lg$info("Plotting all models in the current instance, with approximations if given as input")
+
     }
   ),
 
@@ -567,6 +597,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Returns a list of all time scales with their model target
       return(purrr::map_dbl(private$.model, ~ rlang::fn_env(.x)$time_scale))
     },
+
+    get_approximation = function(gamma, delta, N) {
+      return(\(t) do.call(cbind, private$occupancy_probability(delta, N, t)) %*% gamma)
+    },
+
 
 
     # Compute the probability of occupying each of K sequential compartments
