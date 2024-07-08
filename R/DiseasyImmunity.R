@@ -347,7 +347,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # We need some helper functions that can map the optimiser parameters `par` to either
         # [0, 1] or [0, Inf]
         p_01 <- \(p) 1 / (1 + exp(-p)) # Sigmoid mapping of parameters from -Inf / Inf to 0 / 1
-        p_0inf <- \(p) exp(p) # Mapping of parameters from -Inf / Inf to 0 / Inf ("Softplus" function)
+        p_0inf <- \(p) log(1 + exp(p)) # Mapping of parameters from -Inf / Inf to 0 / Inf ("Softplus" function)
 
         # We need to know the number of models the gamma's belong to
         n_models <- length(self$model)
@@ -421,7 +421,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         if (method %in% c("free_delta", "all_free")) {
           delta_0 <- rep(delta_0, N - 1) # Distribute the delta rate to all compartments
         }
-        p_delta_0 <- log(delta_0) # Inverse mapping of p_0inf
+        p_delta_0 <- log(exp(delta_0) - 1) # Inverse mapping of p_0inf
 
         if (method == "free_delta") {
           p_gamma_0 <- numeric(0)
