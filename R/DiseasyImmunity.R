@@ -394,7 +394,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
         obj_function <- function(par) {
 
           value <- purrr::map_dbl(seq_along(self$model), \(model_id) {
-
             delta <- par_to_delta(par)
             gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
 
@@ -404,7 +403,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
             integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
 
             # Numerically integrate the differences
-            integral <- stats::integrate(integrand, lower = 0, upper = Inf)$value
+            integral <- tryCatch(
+              stats::integrate(integrand, lower = 0, upper = Inf)$value,
+              error = function(e) {
+                1 / min(delta) # If the any delta is too small, the integral looks divergent
+                # (since we too approach the asymptote too slowly).
+                # We use the 1 / delta to create a wall in the optimisation
+              }
+            )
 
             return(integral)
           }) |>
