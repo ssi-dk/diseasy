@@ -420,31 +420,43 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
-        # We provide a starting guess for the rates
-        # Note that need to be "inverted" through the inverse of the mapping functions
-        # so they are are in the same parameter space as the optimisation occurs
-        delta_0 <- N / purrr::pluck(private$get_time_scale(), stats::median, .default = 1)
-        if (method %in% c("free_delta", "all_free")) {
-          delta_0 <- rep(delta_0, N - 1) # Distribute the delta rate to all compartments
-        }
-        p_delta_0 <- log(exp(delta_0) - 1) # Inverse mapping of p_0inf
+        # If we have no free parameters we return the default rates
+        if (n_free_parameters == 0) {
+          gamma <- purrr::map(private$.model, \(model) model(Inf)) |>
+            stats::setNames(names(private$.model))
+          delta <- numeric(0)
+          value <- obj_function(numeric(0))
 
-        if (method == "free_delta") {
-          p_gamma_0 <- numeric(0)
         } else {
-          p_gamma_0 <- rep(1e15, n_models * (N - 1)) # p_01 is 1 at infinity
+          # We provide a starting guess for the rates
+          # Note that need to be "inverted" through the inverse of the mapping functions
+          # so they are are in the same parameter space as the optimisation occurs
+          delta_0 <- N / purrr::pluck(private$get_time_scale(), stats::median, .default = 1)
+          if (method %in% c("free_delta", "all_free")) {
+            delta_0 <- rep(delta_0, N - 1) # Distribute the delta rate to all compartments
+          }
+          p_delta_0 <- log(exp(delta_0) - 1) # Inverse mapping of p_0inf
+
+          if (method == "free_delta") {
+            p_gamma_0 <- numeric(0)
+          } else {
+            p_gamma_0 <- rep(1e15, n_models * (N - 1)) # p_01 is 1 at infinity
+          }
+
+          par_0 <- c(p_gamma_0, p_delta_0)
+
+          # Run the optimiser to determine best rates
+          res <- stats::optim(par_0, obj_function, control = list(maxit = 10 * n_free_parameters), method = "BFGS")
+          value <- res$value
+
+          # Map optimised parameters to rates
+          gamma <- purrr::map2(private$.model, seq_along(private$.model), ~ {
+            par_to_gamma(res$par, .y, .x(Inf))
+          }) |> stats::setNames(names(private$.model))
+
+          delta <- par_to_delta(res$par)
         }
 
-        par_0 <- c(p_gamma_0, p_delta_0)
-
-        # Run the optimiser to determine best rates
-        res <- stats::optim(par_0, obj_function, control = list(maxit = 1e3), method = "BFGS")
-
-        # Map optimised parameters to rates
-        rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
-          par_to_gamma(res$par, .y, .x(Inf))
-        }) |>
-          purrr::reduce(c, .init = par_to_delta(res$par), .dir = "backward")
 
         toc <- Sys.time()
 
@@ -452,8 +464,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
         private$cache(
           hash,
           list(
-            "rates" = rates,
-            "value" = res$value,
+            "gamma" = gamma,
+            "delta" = delta,
+            "value" = value,
             "method" = method,
             "N" = N,
             "execution_time" = toc - tic
