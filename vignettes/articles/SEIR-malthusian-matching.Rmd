@@ -15,15 +15,14 @@ library(diseasy)
 
 # Introduction
 When using a generalised SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively, there are some
-structural differences in the realised (malthusian) growth rate of the system for the same value of $\beta$.
+structural differences in the realised (Malthusian) growth rate of the system for the same value of $\beta$.
 
 Since we would like to be able to compare different SEIR models with different compartment structures,
 we would like to be able to account for this difference in scaling of the growth rates.
 
-Following the method outlined in doi: 10.1098/rsif.2009.0386, we compute the malthusian growth rate in the system
-and scale the contact rates such that the system achieves the same malthusian growth rate as a SIR model with the
+Following the method outlined in doi: 10.1098/rsif.2009.0386, we compute the Malthusian growth rate in the system
+and scale the contact rates such that the system achieves the same Malthusian growth rate as a SIR model with the
 same $\beta$.
-
 
 
 # Without scaling
@@ -35,13 +34,16 @@ rI = 1 / 4
 tmax <- 35
 
 # Set the combinations to test
-combinations <- data.frame(K = c(1, 1, 2, 2, 2, 3), L = c(1, 2, 1, 2, 3, 3))
-
+combinations <- tidyr::expand_grid(
+  K = seq.int(3),
+  L = seq.int(3),
+  age_cuts_lower = list(0, c(0, 30, 60))
+)
 ```
 
 ```{r}
 combinations |>
-  purrr::pmap(\(K, L) {
+  purrr::pmap(\(K, L, age_cuts_lower) {
 
     purrr::map(c(TRUE, FALSE), ~{
       # Run a SIR model to generate the target of our initialisation
@@ -57,28 +59,28 @@ combinations |>
         parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6),
         malthusian_matching = .x
       )
-    
+
       # Get a reference to the private environment
       private <- m$.__enclos_env__$private
-    
+
       # Generate a uniform initial state_vector that sums to 1
       y0 <- c(0.001, rep(0, K - 1), rep(0, L), 0, 0.999)
-    
+
       # Run solver across scenario change to check for long-term leakage
-      sol <<- deSolve::ode(y = y0, times = seq(0, 60), func = private %.% rhs, parms = NULL)
-    
+      sol <- deSolve::ode(y = y0, times = seq(0, 60), func = private %.% rhs, parms = NULL)
+
       # Retrieve the (incidence) signal
       data.frame(t = sol[, 1], incidence = L * rI * sol[, K + 2]) |>
         head(tmax) |>
         dplyr::mutate(
           incidence = incidence / incidence[6],
-          model_configuration = glue::glue("L = {L}, K = {K}"),
+          model_configuration = glue::glue("L = {L}, K = {K}, A = {length(age_cuts_lower)}"),
           malthusian_matching = ifelse(.x, "Matched growth rates", "No matching")
         ) |>
         dplyr::filter(t > 0)
       }) |>
     purrr::list_rbind()
-    
+
   }) |>
   purrr::list_rbind() |>
   ggplot2::ggplot(ggplot2::aes(x = t, y = incidence, color = model_configuration)) +
@@ -88,5 +90,6 @@ combinations |>
   ggplot2::xlab("Time") +
   ggplot2::ylab("Incidence (relative to t = 5)") +
   ggplot2::labs(color = "Model configuration") +
+  ggplot2::guides(color = "none") +
   ggplot2::theme_bw()
 ```
