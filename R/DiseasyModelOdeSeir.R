@@ -119,29 +119,35 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$scale_contact_matrices(scaling_factor)
 
 
-      # Store the indexes of the first compartments for later RHS computation
-      private$e1_state_indexes <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
+      # Store the indices of the first compartments for later RHS computation
+      private$e1_state_indices <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
         sum(compartment_structure) + 1
 
-      # Then we store the indexes for just the first compartment
-      private$i1_state_indexes <- private %.% e1_state_indexes + purrr::pluck(compartment_structure, "E", .default = 0)
+      # Then we store the indices for just the first compartment
+      private$i1_state_indices <- private %.% e1_state_indices + purrr::pluck(compartment_structure, "E", .default = 0)
 
-      # Store the indexes of the first recovered compartments
-      private$r1_state_indexes <- private %.% i1_state_indexes + purrr::pluck(compartment_structure, "I")
-
-
-      # Store the indexes of the infectious compartments for later RHS computation
-      # We create a list of indexes for each variant.
-      # First, we determine all I indexes
-      private$i_state_indexes <- purrr::map(private$i1_state_indexes, ~ . + seq_len(compartment_structure[["I"]]) - 1)
+      # Store the indices of the first recovered compartments
+      private$r1_state_indices <- private %.% i1_state_indices + purrr::pluck(compartment_structure, "I")
 
 
-      # Store the indexes of the susceptible states
-      private$s_state_indexes <- seq(private %.% n_age_groups) +
+      # Store the indices of the infectious compartments for later RHS computation
+      # We create a list of indices for each variant.
+      # First, we determine all I indices
+      private$i_state_indices <- purrr::map(private$i1_state_indices, ~ . + seq_len(compartment_structure[["I"]]) - 1)
+
+
+      # Store the indices of the susceptible states
+      private$s_state_indices <- seq(private %.% n_age_groups) +
         sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
 
 
-      # In RHS, we need a mapping from i_state_indexes to the relative infection risk of the corresponding variant.
+      # Store the indices of the Recovered and susceptible compartments
+      private$rs_state_indices <- private$r1_state_indices |>
+        purrr::map(~ . + seq_len(purrr::pluck(compartment_structure, "R")) - 1) |>
+        purrr::reduce(c, .init = private$s_state_indices, .dir = "backward")
+
+
+      # In RHS, we need a mapping from i_state_indices to the relative infection risk of the corresponding variant.
       private$indexed_variant_infection_risk <- self %.% variant %.% variants |>
         purrr::map(
           \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_age_groups)
@@ -156,18 +162,18 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # that element in the state_vector corresponds to.
       # The state vector is assumed to be ordered as follows:
       # [ [E, I, R]_age_group_1_variant_1, [E, I, R]_age_group_2_variant_1, ..., S ]
-      private$state_vector_age_group <- seq(private %.% n_age_groups) |> # Starting with the number of age groups
-        purrr::map(~ rep(., private %.% n_EIR_states)) |> # We repeat for each EIR state
+      private$rs_age_group <- seq(private %.% n_age_groups) |> # Starting with the number of age groups
+        purrr::map(~ rep(., purrr::pluck(compartment_structure, "R"))) |> # We repeat for each R state
         rep(private %.% n_variants) |> # And since we have multiple variants, this is repeated
         purrr::reduce(c, .init = seq(private %.% n_age_groups), .dir = "backward") # We collapse and add the S states
 
       # We now expand the previous map to also include an id for variant.
       # This map is used later in the RHS where we have a n x v matrix called BI_av, where n is the length of the
       # state_vector. This matrix is used as a step during the calculation of the infections.
-      # The goal here, is to make a mapping from the indexes of this matrix to the state_vector.
-      # That is, we want to determine the indexes that the infections should flow to in the RHS equation.
+      # The goal here, is to make a mapping from the indices of this matrix to the state_vector.
+      # That is, we want to determine the indices that the infections should flow to in the RHS equation.
       # This is achieved by replicating the map from before for each variant, and incrementing the ids so that
-      # each age_group/variant has a unique id. Then, we reverse the map, to determine which indexes correspond to which
+      # each age_group/variant has a unique id. Then, we reverse the map, to determine which indices correspond to which
       # age_group/variant combination.
       private$infection_matrix_to_state_vector <- seq_along(self %.% variant %.% variants) |>
         purrr::map(\(variant) (variant - 1) * private %.% n_age_groups +  private %.% state_vector_age_group) |>
@@ -305,14 +311,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     n_states     = NULL,
 
     # Index helpers
-    e1_state_indexes = NULL,
-    i1_state_indexes  = NULL,
-    i_state_indexes  = NULL,
-    r1_state_indexes  = NULL,
-    s_state_indexes  = NULL,
+    e1_state_indices = NULL,
+    i1_state_indices = NULL,
+    i_state_indices  = NULL,
+    r1_state_indices = NULL,
+    s_state_indices  = NULL,
+    rs_state_indices = NULL,
 
-    state_vector_age_group = NULL,
-    infection_matrix_to_state_vector = NULL,
+    rs_age_group = NULL,
 
     # Variable storage
     population_proportion = NULL,
@@ -333,14 +339,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 1, determine the number of infected by age group and variant
 
       # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
-      infected <- vapply(private$i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+      infected <- vapply(private$i_state_indices, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 
 
       # microbenchmark::microbenchmark( # Microseconds
-      #   purrr::map_dbl(i_state_indexes, \(indexes) sum(state_vector[indexes])),
-      #   sapply(private$i_state_indexes, \(indexes) sum(state_vector[indexes])),
-      #   sapply(private$i_state_indexes, \(indexes) sum(state_vector[indexes]), USE.NAMES = FALSE),
-      #   vapply(private$i_state_indexes, \(indexes) sum(state_vector[indexes]), FUN.VALUE = numeric(1), USE.NAMES = FALSE),
+      #   purrr::map_dbl(i_state_indices, \(indices) sum(state_vector[indices])),
+      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices])),
+      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices]), USE.NAMES = FALSE),
+      #   vapply(private$i_state_indices, \(indices) sum(state_vector[indices]), FUN.VALUE = numeric(1), USE.NAMES = FALSE),
       #   check = "equal", times = 1000L
       # )
 
@@ -635,7 +641,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       offdiagonal_elemments <- head(rep(c(head(progression_flow_rates, -1), 0), n_age_groups), -1)
 
       # `diag(x) <- value` does not work as expected for a 1x1 matrix (how surprising...)
-      # so we need to utilise jank instead to manually compute the corresponding indicies....
+      # so we need to utilise jank instead to manually compute the corresponding indices....
       off_diagonal_indices <- tidyr::expand_grid(
         i = seq_len(nrow(transition_matrix)),
         j = seq_len(nrow(transition_matrix))
