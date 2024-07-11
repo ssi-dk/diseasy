@@ -40,7 +40,7 @@ DiseasyVariant <- R6::R6Class(                                                  
     #'     - `cross_immunity` (`named vector`): The overlap in immunity of when the named variant attempts to infect
     #'       a host previously infected by the current variant. If not specified, the default is 1.
     #'     - `introduction_date` (`Date(1)`): The date the variant was introduced into the population.
-    add_variant = function(name, characteristics) {
+    add_variant = function(name, characteristics = list()) {
 
       # Check the input is well-formed
       coll <- checkmate::makeAssertCollection()
@@ -49,7 +49,7 @@ DiseasyVariant <- R6::R6Class(                                                  
 
       checkmate::assert_list(characteristics, add = coll)
       checkmate::assert_names(
-        names(characteristics),
+        purrr::pluck(characteristics, names, .default = character(0)),
         subset.of = c("relative_infection_risk", "cross_immunity", "introduction_date"),
         add = coll
       )
