@@ -33,9 +33,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Check the input arguments
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_integerish(compartment_structure, add = coll)
-      checkmate::assert_names(names(compartment_structure), identical.to = c("E", "I", "R"), add = coll)
+      checkmate::assert_names(
+        names(compartment_structure),
+        subset.of = c("E", "I", "R"),
+        must.include = c("I", "R"),
+        add = coll
+      )
+
       checkmate::assert_numeric(disease_progression_rates, add = coll)
-      checkmate::assert_names(names(disease_progression_rates), identical.to = c("E", "I"), add = coll)
+      checkmate::assert_names(
+        names(disease_progression_rates),
+        subset.of = c("E", "I"),
+        must.include = c("I"),
+        add = coll
+      )
 
       # Check we have the needed modules loaded and configured as needed
       checkmate::assert_class(self$observables, "DiseasyObservables", add = coll)
@@ -131,7 +142,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # First, we determine all I indexes
       private$i_state_indexes <- seq(private %.% n_variants * private %.% n_age_groups) |>
         purrr::map(
-          \(k) (1:compartment_structure[["I"]]) + compartment_structure[["E"]] + sum(compartment_structure) * (k - 1)
+          \(k) {
+            purrr::pluck(compartment_structure, "E", .default = 0) +
+              (1:compartment_structure[["I"]]) + sum(compartment_structure) * (k - 1)
+          }
         )
 
 
