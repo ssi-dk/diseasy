@@ -27,7 +27,7 @@ $V,a,b$ Variants
 $\sim$ Non-normalised quantity
 
 # State vector
-Each "track" of infection is placed in sequence in the state vector, $s$, and increments first in age groups
+Each "track" of infection is placed in sequence in the state vector, $\overline{\psi}$, and increments first in age groups
 then in variants.
 
 Finally, the susceptible states are placed at the end of the state vector.
@@ -35,7 +35,7 @@ Finally, the susceptible states are placed at the end of the state vector.
 NOTE: State vector uses normalised populations.
 
 $$
-\overline{s} = [\underbrace{\begin{matrix} E^1\, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group 1, Variant 1}}\;\; 
+\overline{\psi} = [\underbrace{\begin{matrix} E^1\, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group 1, Variant 1}}\;\;
 \underbrace{\begin{matrix} E^1 \, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group 2, Varaint 1}}
 \; \cdots \\
 \underbrace{\begin{matrix} E^1 \, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group A, Variant V}}
@@ -48,10 +48,10 @@ The contact matrix $\tilde{\overline{\overline{C}}}$ is $A \times A$ and indices
 from age group $j$ to age group $i$.
 (It may be helpful to memorise as $\tilde{c}_{i\leftarrow j}$)
 
-In the model, these are normalised to the "per capita" contact matrix $\overline{\overline{C}}$, meaning that the elements are 
+In the model, these are normalised to the "per capita" contact matrix $\overline{\overline{C}}$, meaning that the elements are
 $c_{ij} = \frac{\tilde{c}_{ij}}{N_j}$ where $\tilde{N}_i$ is the population of age group $i$.
 
-This way, when used in the model, the equations' infections terms becomes $\frac{\tilde{c}_{ij}}{\tilde{N}_j} \sum_l I_j^l S_i$ 
+This way, when used in the model, the equations' infections terms becomes $\frac{\tilde{c}_{ij}}{\tilde{N}_j} \sum_l I_j^l S_i$
 and the equations can be normalised via the transformations $S_a = \frac{\tilde{S}_a}{\tilde{N}_a}$.
 
 NOTE: Shouldn't we then have $c_{ij} = \tilde{c}_{ij} \tilde{N}_j$ instead?
@@ -94,12 +94,12 @@ group $i$ with persons infected with variant $a$ across all age groups.
 In the `rhs` function, we have the `infection_rate` variable which is the `infected_contact_rate` adjusted
 for additional risk factors.
 
-- $\sigma(t)$: Multiplicative effect of season
+- $s(t)$: Multiplicative effect of season
 - $\epsilon_a$: Relative infectiousness of variant $a$
 - $\Gamma$: Overall infection rate scaling factor
 
 $$
-\overline{\overline{T}} = \Gamma\;\sigma(t)\;\overline{\overline{\mathcal{E}}} \odot \overline{\overline{CI}}
+\overline{\overline{T}} = \Gamma\;s(t)\;\overline{\overline{\mathcal{E}}} \odot \overline{\overline{CI}}
 $$
 
 Where $\odot$ is the Hadamard product (element-wise multiplication), and $\overline{\overline{\mathcal{E}}}$ is the
@@ -114,8 +114,8 @@ $$
 $$
 NOTE: In the code, `private$indexed_variant_infection_risk` is $\overline{\overline{\mathcal{E}}}$ in vector form.
 
-# `weighted_infective_contacts`
-For the final computation of infections in `rhs`, we construct the matrix `weighted_infective_contacts` ($\overline{\overline{W}}$).
+# `infection_matrix`
+For the final computation of infections in `rhs`, we construct the matrix `infection_matrix` ($\overline{\overline{f}}$).
 For this purpose, we first expand the `infection_rate` matrix to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the
 rows of the `infection_rate` matrix.
 
@@ -133,12 +133,12 @@ We now have a matrix, whose elements are the infection rate for each variant mat
 In this space, we can now account for:
 
 - The state specific infection risks (i.e. the reduced risk from being infected previously / vaccinated)
-- The effect of cross-immunity between the variants 
+- The effect of cross-immunity between the variants
 
 That is, we need to construct the matrix that accounts for the waning of immunity ($\gamma_m$) and the cross-immunity
 factors $\chi_{a\leftarrow b}$ (Variant $b$ infecting a person with immunity for variant $a$).
 
-All together, this is implemented via the risk matrix $\overline{\overline{\rho}}$ which is 
+All together, this is implemented via the immunity matrix (`immunity_matrix`) $\overline{\overline{\rho}}$ which is
 $A \cdot (V \cdot M + 1) \times V$ matrix on the form:
 
 $$
@@ -148,7 +148,7 @@ $$
     \vdots \\
     1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma})
   \end{bmatrix}
-  & \cdots & 
+  & \cdots &
   \begin{bmatrix}
     1 - \chi_{1\leftarrow V} (1 - \overline{\gamma}) \\
     \vdots \\
@@ -160,7 +160,7 @@ $$
     \vdots \\
     1 - \chi_{V\leftarrow 1} (1 - \overline{\gamma})
   \end{bmatrix}
-  & \cdots & 
+  & \cdots &
   \begin{bmatrix}
     1 - \chi_{V\leftarrow V} (1 - \overline{\gamma}) \\
     \vdots \\
@@ -185,21 +185,153 @@ In total, the matrix accounts for the cross-variant $\chi_{a\leftarrow b}$ reduc
 
 Finally, we can combine everything to the flow matrix:
 $$
-\overline{\overline{f}} = \overline{\overline{\rho}} \odot 
+\overline{\overline{f}} = \overline{\overline{\rho}} \odot
 \begin{bmatrix}
   \vert &  & \vert \\
-  \overline{s}_{RS} & \cdots & \overline{s}_{RS} \\
+  \overline{\psi}_{RS} & \cdots & \overline{\psi}_{RS} \\
   \vert &  & \vert \\
-\end{bmatrix} \odot 
+\end{bmatrix} \odot
 \overline{\overline{U}}
 $$
-Where $\begin{bmatrix}\overline{s}_{RS} & \cdots & \overline{s}_{RS}\end{bmatrix}$ is $V$ repeats of the $R$ and $S$
-elements of the state vector $\overline{s}$.
+Where $\begin{bmatrix}\overline{\psi}_{RS} & \cdots & \overline{\psi}_{RS}\end{bmatrix}$ is $V$ repeats of the $R$ and $S$
+elements of the state vector $\overline{\psi}$.
 
 This matrix contains, for each $R$ and $S$ element in the state vector, a row consisting of per-variant infectious contacts
-between the corresponding compartment and the infected population in the model. These elements account for every risk 
+between the corresponding compartment and the infected population in the model. These elements account for every risk
 modifying mechanism included in the model.
 
 The row sums of this matrix is then equal to the loss from the compartment due to infectious contacts.
 The sums by variant/age group combination can also be extracted from the matrix to form the in-flow of new infections
 to the $E_1$ compartments.
+
+
+# Generator matrix
+The generator matrix, $\overline{\overline{G}}$, is a $A \cdot V \cdot (K+L) \times A \cdot V \cdot (K+L)$ matrix
+containing the dynamics of the $E$ and $I$ states under the assumption of static $R$ and $S$ states.
+
+Formally, the generator matrix is the linearisation:
+$$
+\frac{d\overline{\psi}_{EI}}{dt} = \overline{\overline{G}} \overline{\psi}_{EI}
+$$
+
+The matrix can be decomposed into two contributions:
+
+- The transition matrix, $\overline{\overline{G}}_T$, which is a bi-diagonal matrix containing the flow rates between
+  sequential compartments
+- The transmission matrix, $\overline{\overline{G}}_\beta$ which contains the flows stemming from infections.
+
+The transition matrix has the form (here for $K = 1$ and $L = 1$ and $A + V > 2$:
+$$
+\overline{\overline{G}}_T = \begin{bmatrix}
+  -r_e & 0 & 0 & 0 & \cdots & 0 & 0 \\
+  r_e & -r_i & 0 & 0 & \cdots & 0 &  0 \\
+  0 & 0 & -r_e & 0 & \cdots & 0 & 0 \\
+  0 & 0 & r_e & -r_i & \cdots & 0 & 0 \\
+  \vdots & \vdots & \vdots& \vdots & \ddots & \vdots & \vdots  \\
+  0 & 0 & 0 & 0 &  \cdots & -r_e & 0 \\
+  0 & 0 & 0 & 0 &  \cdots & r_e & -r_i
+\end{bmatrix}
+$$
+Notice that the off-diagonal has zero-elements where the (reduced) state vector changes age groups ($I^k_L$ -> $E_1^{k+1}$).
+
+The form of the transmission matrix is more difficult to write up.
+
+We lump risk modifying factors such as the effect of season $s(t)$ and overall infection rate $\Gamma$ into a single
+factor $\beta$.
+
+Some examples:
+### Double age group, single variant
+
+As long as we have only a single variant, cross immunity can be ignored and we can lump the effect of the balance
+between $R$ to $S$ into $\beta$.
+
+
+For $K = 1$ and $L = 1$, the transmission matrix is:
+$$
+\overline{\overline{G}}_\beta = \beta
+\begin{bmatrix}
+  0 & c_{1\leftarrow 1} & 0 & c_{1\leftarrow 2} \\
+  0 & 0 & 0 & 0 \\
+  0 & c_{2\leftarrow 1} & 0 & c_{2\leftarrow 2} \\
+  0 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+For $K = 1$ and $L = 2$, the transmission matrix is:
+$$
+\overline{\overline{G}}_\beta = \beta
+\begin{bmatrix}
+  0 & c_{1\leftarrow 1} & c_{1\leftarrow 1} & 0 & c_{1\leftarrow 2} & c_{1\leftarrow 2} \\
+  0 & 0 & 0 & 0 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0\\
+  0 & c_{2\leftarrow 1} & c_{2\leftarrow 1} & 0 & c_{2\leftarrow 2} & c_{2\leftarrow 2} \\
+  0 & 0 & 0 & 0 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+### Single age group, double variant
+With only one age group, the contact matrix is the scalar $c$.
+
+With two variants, we need to also account for the relative infectivity of the variants $\epsilon_a$.
+
+Then, for $K = 1$ and $L = 1$, the transmission matrix is:
+$$
+\overline{\overline{G}}_\beta = \beta\left[
+\begin{array}{cc|cc}
+  0 & \epsilon_1\hat{\rho}_{1}\,c & 0 & 0 \\
+  0 & 0 & 0 & 0 \\ \hline
+  0 & 0 & \epsilon_2\hat{\rho}_{2}\,c & 0 \\
+  0 & 0 & 0 & 0
+\end{array}
+\right]
+$$
+Where the change between variants is demarcated visually by the vertical and horizontal lines.
+We now have the additional factor $\hat{\rho}$ which explicitly accounts for the balance of $S$ and $R$ states and
+the cross-immunity between the variants:
+$$
+\hat{\rho}_{a} = S + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R_m^b
+$$
+That is, we have the unmodified contribution from the $S$ states, and the contribution from all $R$ states while
+accounting for waning of immunity ($\gamma_m$) and cross-immunity ($\chi_{a \leftarrow b}$).
+
+This factor is analogous to a "cross-section" of infection encounter, i.e. a factor that accounts for the probability
+that a contact between an infectious and non-infected person is an infectious contact.
+
+Then, for $K = 1$ and $L = 2$, the transmission matrix is:
+$$
+\overline{\overline{G}}_\beta = \beta\left[
+\begin{array}{ccc|ccc}
+  0 & \epsilon_1\hat{\rho}_{1}\,c & \epsilon_1\hat{\rho}_{1}\,c & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 \\\hline
+  0 & 0 & 0 & 0 & \epsilon_2\hat{\rho}_{2}\,c & \epsilon_2\hat{\rho}_{2}\,c \\
+  0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 \\
+\end{array}
+\right]
+$$
+
+### Double age group, double variant
+
+When including age groups, the $\hat{\rho}$ factor becomes a $A \times V$ matrix of elements
+
+$$
+\hat{\rho}_{i, a} = S_i + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R_m^{i,b}
+$$
+
+For $K = 1$ and $L = 1$, the transmission matrix is:
+$$
+\overline{\overline{G}}_\beta = \beta\left[
+\begin{array}{cccc|cccc}
+  0 & \epsilon_1\hat{\rho}_{1,1}\,c_{1\leftarrow 1} & 0 & \epsilon_1\hat{\rho}_{1,1}\,c_{1\leftarrow 2} & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+  0 & \epsilon_1\hat{\rho}_{2,1}\,c_{2\leftarrow 1} & 0 & \epsilon_1\hat{\rho}_{2,1}\,c_{2\leftarrow 2} & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ \hline
+  0 & 0 & 0 & 0 & 0 & \epsilon_2\hat{\rho}_{1,2}\,c_{1\leftarrow 1} & 0 & \epsilon_2\hat{\rho}_{1,2}\,c_{1\leftarrow 2} \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & \epsilon_2\hat{\rho}_{2,2}\,c_{2\leftarrow 1} & 0 & \epsilon_2\hat{\rho}_{2,2}\,c_{2\leftarrow 2} \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{array}
+\right]
+$$
