@@ -621,5 +621,245 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 
 
 
-# TODO Add sanity checks for RHS
+test_that("RHS passes sanity checks (single + double variant / single age group)", {
+  skip_if_not_installed("RSQLite")
 
+  # Create a activity scenario for the tests
+  basis <- contact_basis$DK
+  basis$counts <- purrr::map(basis$counts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
+  act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
+  act$change_activity(Sys.Date() - 1, opening = "baseline")
+  act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
+  act$change_risk(Sys.Date(), type = "work",   risk = 0.5)
+  act$change_risk(Sys.Date(), type = "school", risk = 0.5)
+  act$change_risk(Sys.Date(), type = "other",  risk = 0.5)
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = act,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 2),
+    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+    disease_progression_rates = c("E" = 2, "I" = 4),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  ### Check 1: With no infected, we should just get the passive flow through the states
+  y0 <- runif(private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0
+
+  flow <- y0 * private$progression_flow_rates
+  expect_identical(
+    unname(private$rhs(0, y0)[[1]]),
+    c(0, flow[-private$n_states]) - flow
+  )
+
+
+  ### Check 2: With only infected, we should get no new infections
+  y0 <- rep(0, private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 1
+  expect_identical(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0, -4, 4, # Variant 1
+      0, -4, 4, # Variant 2
+      0 # Susceptible
+    )
+  )
+
+
+  ### Check 3: With infected and susceptible, we should get new infections.
+  # However, variant 2 has much lower infection rate and this should reflect in the RHS
+  y0 <- rep(0, private$n_states)
+  y0[private$i_state_indexes[[1]]] <- 0.1 # Only infections w. variant 1
+  y0[private$s_state_indexes] <- 0.9 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0.1 * 0.9, -0.1 * 4, 0.1 * 4, # Variant 1
+      0, 0, 0, # Variant 2
+      - 0.1 * 0.9 # Susceptible
+    )
+  )
+
+  y0 <- rep(0, private$n_states)
+  y0[private$i_state_indexes[[2]]] <- 0.1 # Only infections w. variant 2
+  y0[private$s_state_indexes] <- 0.9 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0, 0, 0, # Variant 1
+      0.1 * 0.9 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.1 * 0.9 * 0.01 # Susceptible
+    )
+  )
+
+  y0 <- rep(0, private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
+  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+    )
+  )
+
+  y0 <- rep(0, private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
+  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+    )
+  )
+
+
+  ### Check 4: The contact matrix scaling works as expected.
+  # In the activity scenario, the risk is halved after 1 day
+  # so we rerun the test above for t = 1 instead of t = 0 and check that infections are halved
+  expect_equal(
+    unname(private$rhs(1, y0)[[1]]),
+    c(
+      0.5 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.5 * 0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.5 * 0.1 * 0.8 - 0.5 * 0.1 * 0.8 * 0.01 # Susceptible
+    )
+  )
+
+})
+
+test_that("RHS passes sanity checks (single + double variant / double age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a activity scenario for the tests
+  basis <- contact_basis$DK
+  basis$counts <- purrr::map(basis$counts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
+  basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
+  basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
+  act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
+  act$change_activity(Sys.Date() - 1, opening = "baseline")
+  act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
+  act$change_risk(Sys.Date(), type = "work",   risk = 0.5)
+  act$change_risk(Sys.Date(), type = "school", risk = 0.5)
+  act$change_risk(Sys.Date(), type = "other",  risk = 0.5)
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = act,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 2),
+    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+    disease_progression_rates = c("E" = 2, "I" = 4),
+    parameters = list("age_cuts_lower" = c(0, 40))
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  ### Check 1: With no infected, we should just get the passive flow through the states
+  y0 <- runif(private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0
+
+  flow <- y0 * private$progression_flow_rates
+  expect_identical(
+    unname(private$rhs(0, y0)[[1]]),
+    c(0, flow[-private$n_states]) - flow
+  )
+
+
+  ### Check 2: With only infected, we should get no new infections
+  y0 <- rep(0, private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 1
+  expect_identical(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0, -4, 4, # Variant 1, age group 1
+      0, -4, 4, # Variant 1, age group 2
+      0, -4, 4, # Variant 2, age group 1
+      0, -4, 4, # Variant 2, age group 2
+      0, 0 # Susceptible
+    )
+  )
+
+
+  ### Check 3: With infected and susceptible, we should get new infections.
+  # However, variant 2 has much lower infection rate and this should reflect in the RHS
+  y0 <- rep(0, private$n_states)
+  y0[private$i_state_indexes[[1]]] <- 0.05 # Only infections w. variant 1
+  y0[private$i_state_indexes[[2]]] <- 0.05 # Only infections w. variant 1
+  y0[private$s_state_indexes] <- 0.45 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0.1 * 0.45, -0.05 * 4, 0.05 * 4, # Variant 1, age group 1
+      0.1 * 0.45, -0.05 * 4, 0.05 * 4, # Variant 1, age group 2
+      0, 0, 0, # Variant 2, age group 1
+      0, 0, 0, # Variant 2, age group 2
+      - 0.1 * 0.45, 0.1 * 0.45 # Susceptible
+    )
+  )
+
+  y0 <- rep(0, private$n_states)
+  y0[private$i_state_indexes[[2]]] <- 0.1 # Only infections w. variant 2
+  y0[private$s_state_indexes] <- 0.9 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0, 0, 0, # Variant 1
+      0.1 * 0.9 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.1 * 0.9 * 0.01 # Susceptible
+    )
+  )
+
+  y0 <- rep(0, private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
+  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+    )
+  )
+
+  y0 <- rep(0, private$n_states)
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
+  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  expect_equal(
+    unname(private$rhs(0, y0)[[1]]),
+    c(
+      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+    )
+  )
+
+
+  ### Check 4: The contact matrix scaling works as expected.
+  # In the activity scenario, the risk is halved after 1 day
+  # so we rerun the test above for t = 1 instead of t = 0 and check that infections are halved
+  expect_equal(
+    unname(private$rhs(1, y0)[[1]]),
+    c(
+      0.5 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.5 * 0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
+      - 0.5 * 0.1 * 0.8 - 0.5 * 0.1 * 0.8 * 0.01 # Susceptible
+    )
+  )
+
+})
