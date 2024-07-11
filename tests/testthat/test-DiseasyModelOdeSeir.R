@@ -1618,3 +1618,128 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   rm(m)
 
 })
+
+test_that("RHS sanity check 6: Cross-immunity (double variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  var <- DiseasyVariant$new(n_variants = 0)
+  var$add_variant(
+    name = "WT",
+    characteristics = list("cross_immunity" = c("Mutant" = 0.5)) # WT-induced immunity is 50% effective against mutant
+  )
+  var$add_variant(
+    name = "Mutant",
+    characteristics = list("cross_immunity" = c("WT" = 0.75)) # Mutant-induced immunity is 75% effective against WT
+  )
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = TRUE,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = var,
+    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+    disease_progression_rates = c("E" = rI, "I" = rI),
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_matching = FALSE
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(#v1 v2
+        # Variant 1
+        0,  0,  # E
+        0,  0,  # I
+        fr, 1 - 0.75 * (1 - fr), # R
+
+        # Variant 2
+        0,  0,  # E
+        0,  0,  # I
+        1 - 0.5 * (1 - fr), fr, # R
+
+        # S
+        1,  1
+      ),
+      ncol = 2,
+      byrow = TRUE
+    )
+  )
+
+  rm(m)
+
+})
+
+test_that("RHS sanity check 6: Cross-immunity (double variant / double age group)", {
+  skip_if_not_installed("RSQLite")
+
+  var <- DiseasyVariant$new(n_variants = 0)
+  var$add_variant(
+    name = "WT",
+    characteristics = list("cross_immunity" = c("Mutant" = 0.5)) # WT-induced immunity is 50% effective against mutant
+  )
+  var$add_variant(
+    name = "Mutant",
+    characteristics = list("cross_immunity" = c("WT" = 0.75)) # Mutant-induced immunity is 75% effective against WT
+  )
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = TRUE,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = var,
+    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+    disease_progression_rates = c("E" = rI, "I" = rI),
+    parameters = list("age_cuts_lower" = c(0, 40)),
+    malthusian_matching = FALSE
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(#v1 v2
+        # Age group 1, Variant 1
+        0,  0,  # E
+        0,  0,  # I
+        fr, 1 - 0.75 * (1 - fr), # R
+
+        # Age group 2, Variant 1
+        0,  0,  # E
+        0,  0,  # I
+        fr, 1 - 0.75 * (1 - fr), # R
+
+        # Age group 1, Variant 2
+        0,  0,  # E
+        0,  0,  # I
+        1 - 0.5 * (1 - fr), fr, # R
+
+        # Age group 2, Variant 2
+        0,  0,  # E
+        0,  0,  # I
+        1 - 0.5 * (1 - fr), fr, # R
+
+        # S
+        1,  1,  # Age group 1
+        1,  1   # Age group 2
+      ),
+      ncol = 2,
+      byrow = TRUE
+    )
+  )
+
+  rm(m)
+
+})
