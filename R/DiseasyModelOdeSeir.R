@@ -286,7 +286,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
   private = list(
 
     .parameters = list(
-      "age_cuts_lower" = c(0, 60),
+      "age_cuts_lower" = 0,
       "overall_infection_risk" = 1,
       "activity.contact_weights" = c(1, 1, 1, 1),
       "immunity.approach" = NULL
