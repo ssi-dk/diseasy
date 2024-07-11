@@ -168,7 +168,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # This is achieved by replicating the map from before for each variant, and incrementing the ids so that
       # each age_group/variant has a unique id. Then, we reverse the map, to determine which indices correspond to which
       # age_group/variant combination.
-      private$flow_matrix_to_rs_indices <- seq_along(self %.% variant %.% variants) |>
+      private$infection_matrix_to_rs_indices <- seq_along(self %.% variant %.% variants) |>
         purrr::map(\(variant) (variant - 1) * private %.% n_age_groups + private %.% rs_age_group) |>
         purrr::reduce(c) |> # And collapse to 1d
         (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
@@ -314,7 +314,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     rs_state_indices = NULL,
 
     rs_age_group = NULL,
-    flow_matrix_to_rs_indices = NULL,
+    infection_matrix_to_rs_indices = NULL,
 
     # Variable storage
     population_proportion = NULL,
@@ -375,18 +375,18 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       ## Step 4, determine the infective interactions
       # We use the pre compted immunity_matrix to account for waning and cross-immunity
-      flow_matrix <- private$immunity_matrix * state_vector[private$rs_state_indices] *
+      infection_matrix <- private$immunity_matrix * state_vector[private$rs_state_indices] *
         infection_rate[private$rs_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
 
       # Then we can compute the loss from each compartment
-      loss_due_to_infections <- rowSums(flow_matrix)
+      loss_due_to_infections <- rowSums(infection_matrix)
 
       # Now we need to compute the flow into the exposed compartments
-      # For this, we use the pre-computed flow_matrix_to_rs_indices map
-      # new_infections <- purrr::map_dbl(private$flow_matrix_to_rs_indices, ~ sum(flow_matrix[.]))
+      # For this, we use the pre-computed infection_matrix_to_rs_indices map
+      # new_infections <- purrr::map_dbl(private$infection_matrix_to_rs_indices, ~ sum(infection_matrix[.]))
       new_infections <- vapply(
-        private$flow_matrix_to_rs_indices,
-        \(idx) sum(flow_matrix[idx]),
+        private$infection_matrix_to_rs_indices,
+        \(idx) sum(infection_matrix[idx]),
         FUN.VALUE = numeric(1),
         USE.NAMES = FALSE
       )
