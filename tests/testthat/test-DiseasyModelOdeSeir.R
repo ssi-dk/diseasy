@@ -1,3 +1,91 @@
+
+test_that("helpers are configured as expected (SIR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("I" = 1, "R" = 1),
+    disease_progression_rates = c("I" = ri),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Check index helpers are correctly set
+  expect_identical(private %.% e1_state_indexes, 1)
+  expect_identical(private %.% i_state_indexes, list(1))
+  expect_identical(private %.% r1_state_indexes, 2)
+  expect_identical(private %.% s_state_indexes, 3)
+  expect_identical(private %.% state_vector_age_group, rep(1L, 3))
+  expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(3)))
+
+  # Check progression flow rates are correctly set
+  expect_identical(private %.% progression_flow_rates, c(ri, 0, 0))
+
+  # Check infection risk is correctly set
+  expect_identical(private %.% infection_risk, c(0, 0.02, 1))
+
+  rm(m)
+})
+
+test_that("helpers are configured as expected (SIR double variant / double age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 2),
+    compartment_structure = c("I" = 1, "R" = 1),
+    disease_progression_rates = c("I" = ri),
+    parameters = list("age_cuts_lower" = c(0, 60))
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Check index helpers are correctly set
+  expect_identical(private %.% e1_state_indexes, c(1, 3, 5, 7))
+  expect_identical(private %.% i_state_indexes, list(1, 3, 5, 7))
+  expect_identical(private %.% r1_state_indexes, c(2, 4, 6, 8))
+  expect_identical(private %.% s_state_indexes, c(9, 10))
+  expect_identical(private %.% state_vector_age_group, c(1L, 1L, 2L, 2L, 1L, 1L, 2L, 2L, 1L, 2L))
+  expect_identical(
+    private %.% infection_matrix_to_state_vector,
+    list(
+      c(seq.int(2),            seq.int(2) + 4L,       9L),
+      c(seq.int(2) + 2L,       seq.int(2) + 6L,       10L),
+      c(10L + seq.int(2),      10L + seq.int(2) + 4L, 10L + 9L),
+      c(10L + seq.int(2) + 2L, 10L + seq.int(2) + 6L, 10L + 10L)
+    )
+  )
+
+  # Check progression flow rates are correctly set
+  expect_identical(
+    private %.% progression_flow_rates,
+    c(ri, 0, ri, 0, ri, 0, ri, 0, 0, 0)
+  )
+
+  # Check infection risk is correctly set
+  expect_identical(
+    private %.% infection_risk,
+    c(0, 0.02, 0, 0.02, 0, 0.02, 0, 0.02, 1, 1)
+  )
+
+  rm(m)
+})
+
 test_that("helpers are configured as expected (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
