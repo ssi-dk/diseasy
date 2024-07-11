@@ -1,0 +1,631 @@
+---
+title: "Notes: Initialising a SEIR model"
+
+author: "Rasmus Skytte Randløv"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Notes: Initialising a SEIR model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Let us begin by considering a general SEIR model with $K$ and $L$ consecutive E and I states respectively, which are governed by the rates $r_e$ and $r_i$ respectively.
+Let us further assume that we have some signal for infections $I^*(t)$ which we would like our model to match.
+
+For now, we operate with two possibilities:
+1) The signal is related to testing activity
+2) The signal is related to prevalence
+
+The general approach is to consider the derivatives of the signal and link these to the E and I states of the model.
+
+Dependent on the type of signal, there is some variation on how this link is established.
+
+
+## Test signal
+If the signal, $I^*$, is test data, we can assume that tests occurs when exiting $I_1$ in the model.
+
+That is, we assume $I^* = r_i I_1$.
+
+If we take the equation for $I_1$ and multiply by $r_i$ we obtain.
+
+$$
+r_i\frac{dI_1}{dt} = r_i r_e E_K - r_i^2 I_1 \Rightarrow \\
+\frac{dI^*}{dt} = r_i r_e E_K - r_i I^*
+$$
+If we take the second derivative, we find:
+$$
+\frac{d^2I^*}{dt^2} = r_i r_e \frac{dE_K}{dt} - r_i \frac{dI_l}{dt}
+$$
+From here, we can inject $\frac{dE_K}{dt}$ from the SEIR equations which in turn relates to $E_{k-1}$.
+$$
+\frac{d^2I^*}{dt^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{dI_l}{dt}
+$$
+
+This process can be iterated through the derivatives until all $E_K$ states are expressed in terms of the derivatives of $I^*(t)$ and $I_l^*(t)$.
+
+In this case, we can relate the $E_k$ states to the rates and derivatives of the signal in a simple form:
+
+$$
+r_i
+\begin{bmatrix}
+r_e E_K \\
+r_e^2 E_{K-1} \\
+\dots \\
+r_e^{K-1} E_2 \\
+r_e^K E_1 \\
+\end{bmatrix}
+=
+\overline{\overline{M_K}} *
+\begin{bmatrix}
+I^* \\
+\frac{dI^*}{dt} \\
+\dots \\
+\frac{d^KI^*}{dt^K} \\
+\frac{d^{K+1}I^*}{dt^{K+1}}
+\end{bmatrix}
+$$
+
+
+The matrix M can be computed via a simple recursion. To see why, start the equation for the derivative of$ I^*(t)$: 
+
+$$
+\frac{dI^*}{dt} = r_i r_e E_K - r_i I^*
+$$
+In the above formulation, this corresponds to the matrix $\overline{\overline{M_1}} = \begin{bmatrix}r_i & 1\end{bmatrix}$. 
+When taking the second derivative, we obtain:
+
+$$\frac{d^2I^*}{dt^2} = r_ir_e \frac{dE_K}{dt}- r_i \frac{dI^*}{dt} \Rightarrow \\
+\frac{d^2I^*}{dt^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{dI^*}{dt} \Rightarrow \\
+\frac{d^2I^*}{dt^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{dI^*}{dt} + I^*\right)- r_i \frac{dI^*}{dt}$$
+ 
+Which, in the matrix formulation corresponds to the sum of $r_e \overline{m_1}$ and the shifted $\overline{m_1}$, where $\overline{m_1}$ is the row vector of $\overline{M_1}$.
+
+More precisely:
+$$
+\overline{m_2} = r_e \begin{bmatrix}\overline{m_1} & 0 \end{bmatrix}+ \begin{bmatrix}0 & \overline{m_1}\end{bmatrix}
+$$
+Which, combined with $\overline{m_1}$ yields the two level system:
+
+$$
+\overline{\overline{M_2}} = \begin{bmatrix}m_{11} & m_{12} & 0 \\ m_{21} & m_{22} & m_{23} \end{bmatrix}
+$$
+
+The algorithmic implementation of the recursion is then:
+```{r}
+K <- 4 # Number of E states
+ri <- 0.9
+re <- 0.8
+
+M <- matrix(rep(0, K * (K + 1)), nrow = K)
+active_row <- c(ri, 1)
+
+for (k in seq(K)) {
+  if (k > 1) {
+    active_row <- c(0, active_row) + re * c(active_row, 0)
+  }
+
+  M[k, seq(k + 1)] <- active_row
+}
+
+M
+```
+
+
+Since we assume that the signal $I^*$ only relates to $I_1$, then we can determine the $I_l$ states by evaluating the signal at $I^*(t - (l - 1) / r_i)$.
+
+
+## True infected signal
+If we instead have a measure of the true number of infected, $I^* = \sum_l I_l$, then the situation is more complicated since the derivative becomes:
+$$\frac{dI^*}{dt} = r_e E_K - r_i I_l$$
+If use the same method as before, we now have to consider the derivatives of both $I^*$ and $I_l$ and we cannot isolate easily. We can however, determine how the derivatives of $I^*$ relates to the state vector.
+
+For example, if we have 2 $E$ and 2 $I$ states, we can write:
+$$
+\begin{bmatrix}
+0 & r_e & 0 & -r_i \\
+r_e^2 & -r_e^2 & -r_i^2 & r_i^2 \\
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+I_1 \\
+I_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^*}{dt} \\
+\frac{d^2I^*}{dt^2}
+\end{bmatrix}
+$$
+Which, with two additional constants, $I^* = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^*$, can be solved.
+
+If we want more states, the problem seemingly becomes indeterminate:
+$$
+\begin{bmatrix}
+0 & 0 & r_e & 0 & 0 & -r_i \\
+0 & r_e^2 & -r_e^2 & 0 & -r_i^2 & r_i^2 \\
+r_e^3 & -2r_e^3 & r_e^3 & r_i^3 & -2r_i^3 & r_i^3 \\
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+E_3 \\
+I_1 \\
+I_2 \\
+I_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^*}{dt} \\
+\frac{d^2I^*}{dt^2} \\
+\frac{d^3I^*}{dt^3}
+\end{bmatrix}
+$$
+Which now requires three additional constraints.
+
+If the number of states is uneven, we can still solve some cases:
+
+2 $E$ states and 1 $I$ states
+
+$$
+\begin{bmatrix}
+0 & r_e & -r_i \\
+r_e^2 & -r_e^2-r_er_i & r_i^2 \\
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+I
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^*}{dt} \\
+\frac{d^2I^*}{dt^2}
+\end{bmatrix}
+$$
+With the additional constraint $I^* = I_1 + I_2$ the system should be solvable.
+
+The above rate-matrices can also be implemented via recursion algorithmically:
+```{r}
+K <- 2 # Number of E states
+L <- 2
+ri <- 0.9
+re <- 0.8
+
+M <- matrix(rep(0, (K + L) * K), ncol = K + L)
+active_row <- c(rep(0, K - 1), re, rep(0, L - 1), -ri)
+progression_rates <- c(rep(re, K), rep(ri, L))
+
+for (k in seq(K)) {
+  
+  if (k > 1) {
+    stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply
+
+    # Implement branching process which picks up the progression rate factors as it branches down.
+    active_row <- active_row |>
+      purrr::imap(
+        \(r, idx) {
+          c(
+            rep(0, max(0, idx - 2)), # left pad with zeros
+            progression_rates[idx - 1] * r,
+            - progression_rates[idx] * r,
+            rep(0, K + L - idx) # right pad with zeros
+          )
+        }
+      ) |>
+      purrr::reduce(`+`)
+  }
+
+  M[k, ] <- active_row
+}
+
+M
+```
+
+
+Another method for gaining additional constraints on the problem is to keep some in reserve for the fititng.
+By that, I mean that if we instead of initialising the state vector for time $t_0$, we initialise it for time $t_0' \equiv t_0 - 1 / r_i$. 
+
+In this case, we can consider what the signal $I^*(t + 1/r_i)$ corresponds to in the model.
+If we assume that $r_e <= r_i$, we can write:
+$$
+I^*(t + 1/r_i) = \sum_l^{L-1}I_l(t) + \frac{r_e}{r_i}E_K(t)
+$$
+If instead $r_e > r_i$, we need to account for additional $E_k$ states.
+
+
+It seems that the problem is singular whenever we have more than 1 $I$ state.
+
+Let's see if differences in infectivity can help break this degeneracy.
+In this case, the true signal becomes, $I^* = \sum_l w_l I_l$, with $w_i \neq w_j$.
+
+The derivative then becomes
+$$
+\frac{dI^*}{dt} = w_1 r_e E_K - w_1 r_i I_1 \\ 
++ w_2 r_i I_1 - w_2 r_i I_2 \\
+\dots \\
++ w_L r_i I_{L-1}  - w_L r_i I_L
+$$
+$$
+\begin{bmatrix}
+0         &  w_1 r_e                       &  (w_2-w_1) r_i               & -w_2 r_i \\
+w_1 r_e^2 & -w_1 r_e^2 + (w_2-w_1) r_i r_e & -(w_2-w_1) r_i^2 - w_2 r_i^2 &  w_2 r_i^2
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+I_1 \\
+I_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^*}{dt} \\
+\frac{d^2I^*}{dt^2}
+\end{bmatrix}
+$$
+
+The matrix generation is the same.
+
+The matrix is still singular when using the offset method. Perhaps if we can estimate S and R.
+
+Constraining the population to be 1 does not seem to fix the underlying issues. The balance of the states is way off.
+
+Perhaps if we go one stage further and use the infection pressure "beta S I"?
+
+
+
+# Test that the methods works with generated data
+
+```{r synthetic_data, include = FALSE}
+# Run a SIR model to generate the target of our initialisation
+m <- DiseasyModelOdeSeir$new(
+  season = T, activity = T,
+  observables = DiseasyObservables$new(
+    conn = DBI::dbConnect(RSQLite::SQLite()),
+    last_queryable_date = Sys.Date() - 1
+  ),
+  variant = DiseasyVariant$new(n_variants = 1),
+  compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+  disease_progression_rates = c("E" = 0.9, "I" = 1),
+  parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 1.5)
+)
+
+# Get a reference to the private environment
+private <- m$.__enclos_env__$private
+
+# Generate a uniform initial state_vector that sums to 1
+y0 <- c(0.001, 0, 0, 0.999)
+
+# Run solver across scenario change to check for long-term leakage
+sol <- deSolve::ode(y = y0, times = seq(0, 60), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+
+plot(sol)
+```
+
+
+
+## Implementaiton of test-signal
+```{r}
+t <- head(sol[, 1], 28)
+I <- head(sol[, 3], 28)
+R <- head(sol[, 4], 28)
+S <- head(sol[, 5], 28)
+t0 <- t[length(t)]
+
+# Adding some noise
+pop = 1e3
+II <- purrr::map_dbl(I, \(lambda) rpois(1, pop * lambda)) / pop
+
+polyfit <- \(offset) lm(
+  I ~ poly(t, 2, raw = TRUE),
+  data = data.frame(t = t - t0 + offset, I = II)
+)
+
+
+plot(t, II)
+lines(t, predict(polyfit(0), data.frame(t = t - t0)), col = "red")
+```
+
+```{r}
+# Compute the derivatives of the signal ("signal" vector)
+signal <- polyfit(0)$coefficients |>
+  (\(coefficients) coefficients* pmax(1, seq_along(coefficients) - 1))()
+
+names(signal) <- c("I^*", "dI^*/dt", "d^2I^*/dt^2")
+signal
+```
+
+```{r}
+K <- 2 # Number of E states
+L <- 2 # Number of I states
+ri <- 1
+re <- 0.8
+
+M <- matrix(rep(0, K * (K + 1)), nrow = K)
+active_row <- c(ri, 1)
+
+for (k in seq(K)) {
+  if (k > 1) {
+    active_row <- c(0, active_row) + re * c(active_row, 0)
+  }
+
+  M[k, seq(k + 1)] <- active_row
+}
+
+# Define the vector for the matrix multiplication
+ss <- signal[1:(K + 1)] 
+ss[is.na(ss)] <- 0
+
+E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))
+
+I_k <- predict(polyfit(0), data.frame(t = -(seq(L) - 1) / ri)) |> as.numeric()
+
+EI_states <- c(E_k, I_k)
+EI_states <- EI_states / sum(EI_states)
+
+stats::setNames(
+  EI_states,
+  c(paste0("E_", seq(K)), paste0("I_", seq(L)))
+)
+```
+
+## Implementation of true-infected signal
+```{r}
+K <- 2 # Number of E states
+L <- 1
+ri <- 1
+re <- 0.9
+
+
+# Compute the derivatives of the signal ("signal" vector)
+signal <- polyfit(-max(K, L) / ri * 0.5)$coefficients |>
+  (\(coefficients) coefficients* pmax(1, seq_along(coefficients) - 1))()
+names(signal) <- c("I^*", "dI^*/dt", "d^2I^*/dt^2")
+
+# Compute the matrix
+M <- matrix(rep(0, (K + L) * K), ncol = K + L)
+active_row <- c(rep(0, K - 1), re, rep(0, L - 1), -ri)
+progression_rates <- c(rep(re, K), rep(ri, L))
+
+for (k in seq(K)) {
+  if (k > 1) {
+    stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply
+  
+    # Implement branching process which picks up the progression rate factors as it branches down.
+    active_row <- active_row |>
+      purrr::imap(
+        \(r, idx) {
+          c(
+            rep(0, max(0, idx - 2)), # left pad with zeros
+            progression_rates[idx - 1] * r,
+            - progression_rates[idx] * r,
+            rep(0, K + L - idx) # right pad with zeros
+          )
+        }
+      ) |>
+      purrr::reduce(`+`)
+  }
+
+  M[k, ] <- active_row
+}
+
+# Define the vector for the matrix multiplication
+ss <- signal[2:(K+1)] 
+ss[is.na(ss)] <- 0
+
+checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M))
+
+# Add additional constraints
+# I* = sum_l I_l
+if (nrow(M) < ncol(M)) {
+  M <- rbind(
+    M, 
+    c(rep(0, K), rep(1, L))
+  )
+  ss <- c(ss, signal[1])
+}
+
+# Add additional constraints
+# I*(1/ri) = sum_l^(L-1) I_l + re/ri E_K
+if (nrow(M) < ncol(M)) {
+  time_ratio <- re / (2 * ri)
+  k <- min(floor(time_ratio), K)
+  contribution <- c(rep(0, K - k), rep(1, k))
+  contribution[max(K - k, 1)] <- contribution[max(K - k, 1)] + time_ratio - k
+  
+  M <- rbind(
+    M, 
+    c(contribution, rep(1, L - 1), 0.5)
+  )
+  ss <- c(ss, predict(polyfit(-max(K, L) / ri * 0.5), data.frame(t = 0)))
+}
+
+
+stats::setNames(
+  solve(M, ss),
+  c(paste0("E_", seq(K)), paste0("I_", seq(L)))
+)
+```
+
+```{r}
+objective_function <- \(x0) sum((M %*% x0 - ss)^2)
+
+optim(
+  par = runif(K + L),
+  fn = objective_function,
+  method = "L-BFGS-B",
+  lower = 0,
+)
+```
+
+
+
+
+
+## Implementation of true-infected signal with different infectivity
+```{r}
+K <- 2 # Number of E states
+L <- 2
+ri <- 1
+re <- 0.9
+w <- 1 - 0.25*seq(L)/L
+w <- L * w / sum(w)
+#w <- c(1, 2)
+
+# Compute the derivatives of the signal ("signal" vector)
+signal <- polyfit(-max(K, L) / ri * 0.5)$coefficients |>
+  (\(coefficients) coefficients* pmax(1, seq_along(coefficients) - 1))()
+names(signal) <- c("I^*", "dI^*/dt", "d^2I^*/dt^2")
+
+# Compute the matrix
+M <- matrix(rep(0, (K + L) * K), ncol = K + L)
+progression_rates <- c(rep(re, K), rep(ri, L))
+active_row <- c(rep(0, K-1), progression_rates[K:(K+L)] * c(w, 0)) - c(rep(0, K-1), progression_rates[K:(K+L)] * c(0, w))
+
+
+for (k in seq(K)) {
+  if (k > 1) {
+    stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply
+  
+    # Implement branching process which picks up the progression rate factors as it branches down.
+    active_row <- active_row |>
+      purrr::imap(
+        \(r, idx) {
+          c(
+            rep(0, max(0, idx - 2)), # left pad with zeros
+            progression_rates[idx - 1] * r,
+            - progression_rates[idx] * r,
+            rep(0, K + L - idx) # right pad with zeros
+          )
+        }
+      ) |>
+      purrr::reduce(`+`)
+  }
+
+  M[k, ] <- active_row
+}
+
+# Define the vector for the matrix multiplication
+ss <- signal[2:(K+1)] 
+ss[is.na(ss)] <- 0
+
+checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M))
+
+# Add additional constraints
+# I* = sum_l I_l
+if (nrow(M) < ncol(M)) {
+  M <- rbind(
+    M, 
+    c(rep(0, K), w)
+  )
+  ss <- c(ss, signal[1])
+}
+
+# Add additional constraints
+# I*(1/ri) = sum_l^(L-1) I_l + re/ri E_K
+if (nrow(M) < ncol(M)) {
+  time_ratio <- re / (2 * ri)
+  k <- min(floor(time_ratio), K)
+  contribution <- c(rep(0, K - k), rep(1, k))
+  contribution[max(K - k, 1)] <- contribution[max(K - k, 1)] + time_ratio - k
+  
+  M <- rbind(
+    M, 
+    c(contribution * w[1], rep(0.5, L) * w + c(rep(0.5, L-1), 0) * w[2:L])
+  )
+  ss <- c(ss, predict(polyfit(-max(K, L) / ri * 0.5), data.frame(t = 0)))
+}
+
+EI_states <- solve(M, ss)
+EI_states <- EI_states / sum(EI_states)
+
+stats::setNames(
+  EI_states,
+  c(paste0("E_", seq(K)), paste0("I_", seq(L)))
+)
+
+```
+
+## Implementation of true-infected signal with population constraint
+```{r}
+K <- 2 # Number of E states
+L <- 2
+ri <- 1
+re <- 0.9
+
+
+# Compute the derivatives of the signal ("signal" vector)
+signal <- polyfit(0)$coefficients |>
+  (\(coefficients) coefficients* pmax(1, seq_along(coefficients) - 1))()
+names(signal) <- c("I^*", "dI^*/dt", "d^2I^*/dt^2")
+
+# Compute the matrix
+M <- matrix(rep(0, (K + L) * K), ncol = K + L)
+active_row <- c(rep(0, K - 1), re, rep(0, L - 1), -ri)
+progression_rates <- c(rep(re, K), rep(ri, L))
+
+for (k in seq(K)) {
+  if (k > 1) {
+    stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply
+  
+    # Implement branching process which picks up the progression rate factors as it branches down.
+    active_row <- active_row |>
+      purrr::imap(
+        \(r, idx) {
+          c(
+            rep(0, max(0, idx - 2)), # left pad with zeros
+            progression_rates[idx - 1] * r,
+            - progression_rates[idx] * r,
+            rep(0, K + L - idx) # right pad with zeros
+          )
+        }
+      ) |>
+      purrr::reduce(`+`)
+  }
+
+  M[k, ] <- active_row
+}
+
+# Define the vector for the matrix multiplication
+ss <- signal[2:(K+1)] 
+ss[is.na(ss)] <- 0
+
+checkmate::assert_number(nrow(M), lower = ncol(M) - 2, upper = ncol(M))
+
+# Add additional constraints
+# I* = sum_l I_l
+if (nrow(M) < ncol(M)) {
+  M <- rbind(
+    M, 
+    c(rep(0, K), rep(1, L))
+  )
+  ss <- c(ss, signal[1])
+}
+
+# Add additional constraints
+# sum_k E_k + sum_l I_l = 1 - S - R
+if (nrow(M) < ncol(M)) {
+  M <- rbind(
+    M, 
+    rep(1, K + L)
+  )
+  ss <- c(ss, 1 - S[length(S)] - R[length(R)])
+}
+
+
+EI_states <- solve(M, ss)
+EI_states <- EI_states / sum(EI_states)
+
+stats::setNames(
+  EI_states,
+  c(paste0("E_", seq(K)), paste0("I_", seq(L)))
+)
+```
