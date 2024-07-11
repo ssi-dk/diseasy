@@ -44,18 +44,40 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ### During the initialization of the model, we setup a number of intermediate vectors to speed up the computation
       # of the right-hand-side function in the ODE.
 
+      # Store a short hand for the number of groups
+      private$n_age_groups <- length(self %.% parameters %.% age_cuts_lower)
+      private$n_EIR_states <- sum(compartment_structure)
+
 
       ## Time-varying contact matrices projected onto target age-groups
+      # These matrices are the contact matrices (i.e. the largest eigen value is conserved when projecting into
+      # different age groups). In the model, we want to use the per capita rates of contacts so that the infection
+      # pressure is conserved when projecting into different age groups
       contact_matrixes <- self %.% activity %.% get_scenario_contacts(
         age_cuts_lower = self %.% parameters %.% age_cuts_lower,
         weights = self %.% parameters %.% activity.contact_weights
       )
 
-      # These are by date, so we need to convert so it is days relative to a specific date (here. last_queryable_date)
-      activity_matrix_changes <- as.Date(names(contact_matrixes)) - self %.% observables %.% last_queryable_date
+      # To convert to per capita we need the population to use
+
+      if (length(self %.% activity %.% get_scenario_activities()) == 0) {
+        # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
+        population <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
+      } else {
+        population <- self %.% activity %.% contact_basis %.% population
+      }
+
+      per_capita_contact_matrixes <- contact_matrixes |>
+        purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, population))
+
+
+      # The contact matrices are by date, so we need to convert so it is days relative to a specific date
+      # (here: last_queryable_date from the observables module)
+      activity_matrix_changes <- as.Date(names(per_capita_contact_matrixes)) -
+        self %.% observables %.% last_queryable_date
 
       # We can then create a switch that selects the correct contact matrix at the given point in time
-      contact_matrix_switch <- purrr::partial(switch, !!!contact_matrixes)
+      contact_matrix_switch <- purrr::partial(switch, !!!per_capita_contact_matrixes)
       private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
 
       # f1 <- \(t) dplyr::case_when(!!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}"))))
@@ -84,10 +106,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       #   check = "equal", times = 100L
       # )
 
-
-      # Store a short hand for the number of groups
-      private$n_age_groups <- length(self %.% parameters %.% age_cuts_lower)
-      private$n_EIR_states <- sum(compartment_structure)
 
       # Store the indexes of the first exposed compartments for later RHS computation
       private$e1_state_indexes <- (seq(length(self %.% variant %.% variants) * private %.% n_age_groups) - 1) *
