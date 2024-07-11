@@ -360,12 +360,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Step 2, determine their contacts with other age groups (beta * I)
-      infected_contacts <- private$contact_matrix(t) %*% infected
+      infected_contact_rate <- private$contact_matrix(t) %*% infected
 
 
       ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
-      # (rr * beta * beta_v * I * s(t)
-      infection_rate <- infected_contacts *
+      # rr * beta * beta_v * I * s(t)
+      infection_rate <- infected_contact_rate *
         self$season$model_t(t) *
         self$parameters[["overall_infection_risk"]] *
         private$indexed_variant_infection_risk
