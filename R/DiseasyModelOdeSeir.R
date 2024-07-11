@@ -55,6 +55,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$n_age_groups <- length(self %.% parameters %.% age_cuts_lower)
       private$n_variants   <- length(self %.% variant %.% variants)
       private$n_EIR_states <- sum(compartment_structure)
+      private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
 
       ## Time-varying contact matrices projected onto target age-groups
@@ -238,9 +239,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     progression_flow_rates = NULL,
 
+    # State counters
     n_age_groups = NULL,
     n_variants   = NULL,
     n_EIR_states = NULL,
+    n_states     = NULL,
 
     # Index helpers
     e1_state_indexes = NULL,
@@ -318,7 +321,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Combine into final RHS computation
-      dy <- c(0, progression_flow[-private$s_state_indexes]) - progression_flow - # Disease progression flow between compartments
+      dy <- c(0, progression_flow[-private$n_states]) - progression_flow - # Disease progression flow between compartments
         loss_due_to_infections # Combined loss to infections (across all variants)
 
       # Add the inflow from infections
