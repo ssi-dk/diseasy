@@ -8,7 +8,7 @@
 #'   # Create variant module
 #'   var <- DiseasyVariant$new()
 #'
-#'   # By default, a non-informative variant is included
+#'   # By default, a no variants are included
 #'   var$variants
 #'
 #'   # Add variants via the `$add_variant()` method
@@ -30,7 +30,7 @@ DiseasyVariant <- R6::R6Class(                                                  
   public = list(
 
     #' @description
-    #'   TODO
+    #'   Add a variant to the scenario.
     #' @param name (`character(1)`)\cr
     #'   The name of the variant.
     #' @param characteristics (`list`)\cr
@@ -83,7 +83,7 @@ DiseasyVariant <- R6::R6Class(                                                  
 
   active = list(
     #' @field variants (`list`)\cr
-    #'   TODO. Read-only.
+    #'   The variants currently in the module. Read-only.
     variants = purrr::partial(
       .f = active_binding,
       name = "variants",
@@ -91,7 +91,10 @@ DiseasyVariant <- R6::R6Class(                                                  
     ),
 
     #' @field cross_immunity (`matrix`)\cr
-    #'   . Read-only.
+    #'   A matrix indicating the cross immunity interactions of the variants.
+    #'   Index ij indicates the overlap in immunity when variant j infects variant i.
+    #'   Thus, an overlap of 1 means immunisation with variant i protects against infection by variant j.
+    #'   Read-only.
     cross_immunity = purrr::partial(
       .f = active_binding,
       name = "cross_immunity",
