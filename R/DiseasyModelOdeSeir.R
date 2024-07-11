@@ -32,7 +32,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Check the input arguments
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_integerish(compartment_structure, add = coll)
+      checkmate::assert_integerish(compartment_structure, lower = 0, add = coll)
       checkmate::assert_names(
         names(compartment_structure),
         subset.of = c("E", "I", "R"),
@@ -40,7 +40,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
 
-      checkmate::assert_numeric(disease_progression_rates, add = coll)
+      checkmate::assert_numeric(disease_progression_rates, lower = 0, add = coll)
       checkmate::assert_names(
         names(disease_progression_rates),
         subset.of = c("E", "I"),
