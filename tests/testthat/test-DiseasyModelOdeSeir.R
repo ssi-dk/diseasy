@@ -38,6 +38,7 @@ test_that("helpers are configured as expected (SR single variant / single age gr
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 2))
+  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(2)))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(0, 0))
@@ -87,6 +88,7 @@ test_that("helpers are configured as expected (SIR single variant / single age g
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 2))
+  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(2)))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
@@ -96,7 +98,6 @@ test_that("helpers are configured as expected (SIR single variant / single age g
     private %.% risk_matrix,
     matrix(
       c(
-        0,  # I
         fr, # R
         1   # S
       ),
@@ -139,12 +140,12 @@ test_that("helpers are configured as expected (SIR double variant / double age g
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, c(1L, 2L, 1L, 2L, 1L, 2L))
   expect_identical(
-    private %.% infection_matrix_to_state_vector,
+    private %.% flow_matrix_to_rs_indices,
     list(
-      c(seq.int(2),            seq.int(2) + 4L,       9L),
-      c(seq.int(2) + 2L,       seq.int(2) + 6L,       10L),
-      c(10L + seq.int(2),      10L + seq.int(2) + 4L, 10L + 9L),
-      c(10L + seq.int(2) + 2L, 10L + seq.int(2) + 6L, 10L + 10L)
+      c(1L, 3L, 5L),
+      c(2L, 4L, 6L),
+      c(6L + 1L, 6L + 3L, 6L + 5L),
+      c(6L + 2L, 6L + 4L, 6L + 6L)
     )
   )
 
@@ -159,25 +160,12 @@ test_that("helpers are configured as expected (SIR double variant / double age g
     private %.% risk_matrix,
     matrix(
       c(#v1 v2
-        # Age group 1, Variant 1
-        0,  0,  # I
-        fr, fr, # R
-
-        # Age group 2, Variant 1
-        0,  0,  # I
-        fr, fr, # R
-
-        # Age group 1, Variant 2
-        0,  0,  # I
-        fr, fr, # R
-
-        # Age group 2, Variant 2
-        0,  0,  # I
-        fr, fr, # R
-
-        # S
-        1,  1,  # Age group 1
-        1,  1   # Age group 2
+        fr, fr, # R, Age group 1, Variant 1
+        fr, fr, # R, Age group 2, Variant 1
+        fr, fr, # R, Age group 1, Variant 2
+        fr, fr, # R, Age group 2, Variant 2
+        1,  1,  # S, Age group 1
+        1,  1   # S, Age group 2
       ),
       ncol = 2,
       byrow = TRUE
@@ -216,6 +204,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 2))
+  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(2)))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
@@ -225,8 +214,6 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
     private %.% risk_matrix,
     matrix(
       c(
-        0,  # E
-        0,  # I
         fr, # R
         1   # S
       ),
@@ -268,6 +255,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 3))
+  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(3)))
 
   # Check progression flow rates are correctly set
   expect_identical(
@@ -280,10 +268,6 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
     private %.% risk_matrix,
     matrix(
       c(
-        0,  # E1
-        0,  # E2
-        0,  # I1
-        0,  # I2
         fr, # R1
         fr, # R2
         1   # S
@@ -327,8 +311,11 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 5))
   expect_identical(
-    private %.% infection_matrix_to_state_vector,
-    list(seq.int(13), seq.int(13) + 13L)
+    private %.% flow_matrix_to_rs_indices,
+    list(
+      seq.int(5),
+      seq.int(5) + 5L
+    )
   )
 
   # Check progression flow rates are correctly set
@@ -346,24 +333,11 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
     private %.% risk_matrix,
     matrix(
       c(#v1 v2
-        # Variant 1
-        0,  0,  # E1
-        0,  0,  # E2
-        0,  0,  # I1
-        0,  0,  # I2
-        fr, fr, # R1
-        fr, fr, # R2
-
-        # Variant 2
-        0,  0,  # E1
-        0,  0,  # E2
-        0,  0,  # I1
-        0,  0,  # I2
-        fr, fr, # R1
-        fr, fr, # R2
-
-        # S
-        1,  1
+        fr, fr, # R1, Variant 1
+        fr, fr, # R2, Variant 1
+        fr, fr, # R1, Variant 2
+        fr, fr, # R2. Variant 2
+        1,  1   # S
       ),
       ncol = 2,
       byrow = TRUE
@@ -403,12 +377,12 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, c(rep(1L, 2), rep(2L, 2), rep(1L, 2), rep(2L, 2), 1L, 2L))
   expect_identical(
-    private %.% infection_matrix_to_state_vector,
+    private %.% flow_matrix_to_rs_indices,
     list(
-      c(seq.int(6),            seq.int(6) + 12L,       25L),
-      c(seq.int(6) + 6L,       seq.int(6) + 18L,       26L),
-      c(26L + seq.int(6),      26L + seq.int(6) + 12L, 26L + 25L),
-      c(26L + seq.int(6) + 6L, 26L + seq.int(6) + 18L, 26L + 26L)
+      c(1L, 2L, 5L, 6L, 9L),
+      c(3L, 4L, 7L, 8L, 10L),
+      c(10L + 1L, 10L + 2L, 10L + 5L, 10L + 6L, 10L + 9L),
+      c(10L + 3L, 10L + 4L, 10L + 7L, 10L + 8L, 10L + 10L)
     )
   )
 
@@ -429,41 +403,16 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
     private %.% risk_matrix,
     matrix(
       c(#v1 v2
-        # Age group 1, Variant 1
-        0,  0,  # E1
-        0,  0,  # E2
-        0,  0,  # I1
-        0,  0,  # I2
-        fr, fr, # R1
-        fr, fr, # R2
-
-        # Age group 2, Variant 1
-        0,  0,  # E1
-        0,  0,  # E2
-        0,  0,  # I1
-        0,  0,  # I2
-        fr, fr, # R1
-        fr, fr, # R2
-
-        # Age group 1, Variant 2
-        0,  0,  # E1
-        0,  0,  # E2
-        0,  0,  # I1
-        0,  0,  # I2
-        fr, fr, # R1
-        fr, fr, # R2
-
-        # Age group 2, Variant 2
-        0,  0,  # E1
-        0,  0,  # E2
-        0,  0,  # I1
-        0,  0,  # I2
-        fr, fr, # R1
-        fr, fr, # R2
-
-        # S
-        1,  1,  # Age group 1
-        1,  1   # Age group 2
+        fr, fr, # R1, Age group 1, Variant 1
+        fr, fr, # R2, Age group 1, Variant 1
+        fr, fr, # R1, Age group 2, Variant 1
+        fr, fr, # R2, Age group 2, Variant 1
+        fr, fr, # R1, Age group 1, Variant 2
+        fr, fr, # R2, Age group 1, Variant 2
+        fr, fr, # R1, Age group 2, Variant 2
+        fr, fr, # R2, Age group 2, Variant 2
+        1,  1,  # S, Age group 1
+        1,  1   # S, Age group 2
       ),
       ncol = 2,
       byrow = TRUE
@@ -1671,13 +1620,9 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
     matrix(
       c(#v1 v2
         # Variant 1
-        0,  0,  # E
-        0,  0,  # I
         fr, 1 - 0.75 * (1 - fr), # R
 
         # Variant 2
-        0,  0,  # E
-        0,  0,  # I
         1 - 0.5 * (1 - fr), fr, # R
 
         # S
@@ -1728,23 +1673,15 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
     matrix(
       c(#v1 v2
         # Age group 1, Variant 1
-        0,  0,  # E
-        0,  0,  # I
         fr, 1 - 0.75 * (1 - fr), # R
 
         # Age group 2, Variant 1
-        0,  0,  # E
-        0,  0,  # I
         fr, 1 - 0.75 * (1 - fr), # R
 
         # Age group 1, Variant 2
-        0,  0,  # E
-        0,  0,  # I
         1 - 0.5 * (1 - fr), fr, # R
 
         # Age group 2, Variant 2
-        0,  0,  # E
-        0,  0,  # I
         1 - 0.5 * (1 - fr), fr, # R
 
         # S
