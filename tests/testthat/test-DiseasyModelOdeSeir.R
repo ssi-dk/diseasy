@@ -5,7 +5,7 @@ fr <- 0.05 # R compartments have their infection risk reduced by this factor
 fv <- 0.01 # Whenever two variants are in use, the second has a relative infection risk of this factor
 
 
-test_that("helpers are configured as expected (SR single variant / single age group)", {
+test_that("helpers works (SR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   # This may seem a weird test case, but in some of the initialisation code, we run a model with
@@ -59,7 +59,7 @@ test_that("helpers are configured as expected (SR single variant / single age gr
   rm(m)
 })
 
-test_that("helpers are configured as expected (SIR single variant / single age group)", {
+test_that("helpers works (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
@@ -109,7 +109,7 @@ test_that("helpers are configured as expected (SIR single variant / single age g
   rm(m)
 })
 
-test_that("helpers are configured as expected (SIR double variant / double age group)", {
+test_that("helpers works (SIR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -175,7 +175,7 @@ test_that("helpers are configured as expected (SIR double variant / double age g
   rm(m)
 })
 
-test_that("helpers are configured as expected (SEIR single variant / single age group)", {
+test_that("helpers works (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
@@ -225,7 +225,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   rm(m)
 })
 
-test_that("helpers are configured as expected (SEEIIRR single variant / single age group)", {
+test_that("helpers works (SEEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -280,7 +280,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   rm(m)
 })
 
-test_that("helpers are configured as expected (SEEIIRR double variant / single age group)", {
+test_that("helpers works (SEEIIRR double variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -347,7 +347,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   rm(m)
 })
 
-test_that("helpers are configured as expected (SEEIIRR double variant / double age group)", {
+test_that("helpers works (SEEIIRR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -423,7 +423,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
 })
 
 
-test_that("contact_matrix helper works as expected (no scenario - single age group)", {
+test_that("$contact_matrix() works (no scenario - single age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -467,7 +467,7 @@ test_that("contact_matrix helper works as expected (no scenario - single age gro
   rm(m)
 })
 
-test_that("contact_matrix helper works as expected (no scenario - two age groups)", {
+test_that("$contact_matrix() works (no scenario - two age groups)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -511,7 +511,7 @@ test_that("contact_matrix helper works as expected (no scenario - two age groups
   rm(m)
 })
 
-test_that("contact_matrix helper works as expected (no scenario - three age groups)", {
+test_that("$contact_matrix() works (no scenario - three age groups)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -555,7 +555,7 @@ test_that("contact_matrix helper works as expected (no scenario - three age grou
   rm(m)
 })
 
-test_that("contact_matrix helper works as expected (with scenario - single age group)", {
+test_that("$contact_matrix() works (with scenario - single age group)", {
   skip_if_not_installed("RSQLite")
 
   # Define an activity scenario
@@ -640,7 +640,7 @@ test_that("contact_matrix helper works as expected (with scenario - single age g
   rm(m)
 })
 
-test_that("contact_matrix helper works as expected (with scenario - all age groups)", {
+test_that("$contact_matrix() works (with scenario - all age groups)", {
   skip_if_not_installed("RSQLite")
 
   # Define an activity scenario
@@ -1042,7 +1042,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -1092,7 +1092,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -1129,7 +1129,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -1179,7 +1179,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -1583,6 +1583,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   rm(m)
 
 })
+
 
 test_that("RHS sanity check 6: Cross-immunity (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
