@@ -811,13 +811,13 @@ test_that("malthusian scaling is compuated as expected (SIR double variant / dou
 
   # Manually write the subsystem
   beta <- 0.5 * 1.5 # No activity scenario gives "unit" beta, but the more infectious variant has a higher beta
-  subsystem <- matrix(
+  subsystem <- matrix(                                                                                                  # nolint start: indentation_linter
     c(
       beta - rI, beta,
       beta,      beta - rI
     ),
     nrow = 2,
-    byrow = TRUE
+    byrow = TRUE                                                                                                        # nolint end
   )
 
   expect_identical(
@@ -849,13 +849,13 @@ test_that("malthusian scaling is compuated as expected (SEIR single variant / si
 
   # Manually write the subsystem
   beta <- 1 # No activity scenario gives unit beta
-  subsystem <- matrix(
+  subsystem <- matrix(                                                                                                  # nolint start: indentation_linter
     c(
       -rE,  beta,
        rE, -rI
     ),
     nrow = 2,
-    byrow = TRUE
+    byrow = TRUE                                                                                                        # nolint end
   )
 
   expect_identical(
@@ -887,7 +887,7 @@ test_that("malthusian scaling is compuated as expected (SEEIIRR single variant /
 
   # Manually write the subsystem
   beta <- 1 # No activity scenario gives unit beta
-  subsystem <- matrix(
+  subsystem <- matrix(                                                                                                  # nolint start: indentation_linter
     c(
       -2 * rE,       0,    beta,    beta,
        2 * rE, -2 * rE,       0,       0,
@@ -895,7 +895,7 @@ test_that("malthusian scaling is compuated as expected (SEEIIRR single variant /
             0,       0,  2 * rI, -2 * rI
     ),
     nrow = 4,
-    byrow = TRUE
+    byrow = TRUE                                                                                                        # nolint end
   )
 
    expect_identical(
@@ -933,7 +933,7 @@ test_that("malthusian scaling is compuated as expected (SEEIIRR double variant /
 
   # Manually write the subsystem
   beta <- 1 * 1.5 # No activity scenario gives "unit" beta, but the more infectious variant has a higher beta
-  subsystem <- matrix(
+  subsystem <- matrix(                                                                                                  # nolint start: indentation_linter
     c(
       -2 * rE,       0,    beta,    beta,
        2 * rE, -2 * rE,       0,       0,
@@ -941,7 +941,7 @@ test_that("malthusian scaling is compuated as expected (SEEIIRR double variant /
             0,       0,  2 * rI, -2 * rI
     ),
     nrow = 4,
-    byrow = TRUE
+    byrow = TRUE                                                                                                        # nolint end
   )
 
   expect_identical(
@@ -979,7 +979,7 @@ test_that("malthusian scaling is compuated as expected (SEEIIRR double variant /
 
   # Manually write the subsystem
   beta <- 0.5 * 1.5 # No activity scenario gives "unit" beta, but the more infectious variant has a higher beta
-  subsystem <- matrix(
+  subsystem <- matrix(                                                                                                  # nolint start: indentation_linter
     c(
       -2 * rE,       0,    beta,    beta,       0,       0,    beta,    beta,
        2 * rE, -2 * rE,       0,       0,       0,       0,       0,       0,
@@ -991,7 +991,7 @@ test_that("malthusian scaling is compuated as expected (SEEIIRR double variant /
             0,       0,       0,       0,       0,       0,  2 * rI, -2 * rI
     ),
     nrow = 8,
-    byrow = TRUE
+    byrow = TRUE                                                                                                        # nolint end
   )
 
   expect_identical(
