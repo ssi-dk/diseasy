@@ -56,6 +56,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       checkmate::assert_class(self$season, "DiseasySeason", add = coll)
 
+      checkmate::assert_class(self$variant, "DiseasyVariant", add = coll)
+
       checkmate::reportAssertions(coll)
 
 
