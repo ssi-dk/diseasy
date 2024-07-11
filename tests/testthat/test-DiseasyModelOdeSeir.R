@@ -328,27 +328,27 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   expect_null(private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date())))
 
   # Then from 2020-01-01, it should be "baseline" with risk 1, which is just the contact_basis matrices
-  # However, the model uses per capita rates, so we need to convert
+  # However, the model uses per capita-ish rates, so we need to convert
   expect_identical(
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`), contact_basis %.% DK %.% population)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`), contact_basis %.% DK %.% proportion)
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_identical(
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% population)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% population)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% population)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% proportion)
   )
 
   rm(m)

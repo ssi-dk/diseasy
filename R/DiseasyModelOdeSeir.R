@@ -50,25 +50,28 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Time-varying contact matrices projected onto target age-groups
-      # These matrices are the contact matrices (i.e. the largest eigen value is conserved when projecting into
-      # different age groups). In the model, we want to use the per capita rates of contacts so that the infection
-      # pressure is conserved when projecting into different age groups
       contact_matrixes <- self %.% activity %.% get_scenario_contacts(
         age_cuts_lower = self %.% parameters %.% age_cuts_lower,
         weights = self %.% parameters %.% activity.contact_weights
       )
 
-      # To convert to per capita we need the population to use
+      # These matrices are the contact matrices (i.e. the largest eigen value is conserved when projecting into
+      # different age groups). In the model, we want to use the per capita rates of contacts so that the infection
+      # pressure is conserved when projecting into different age groups.
+      # To be more specific, we also want to use the density of population (i.e. the state vector should sum to 1).
+      # So instead of population, we use the proportion of population in the age groups.
+
+      # To convert to per capitaish we need the proportion to use
 
       if (length(self %.% activity %.% get_scenario_activities()) == 0) {
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
-        population <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
+        proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
       } else {
-        population <- self %.% activity %.% contact_basis %.% population
+        proportion <- self %.% activity %.% contact_basis %.% proportion
       }
 
       per_capita_contact_matrixes <- contact_matrixes |>
-        purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, population))
+        purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, proportion))
 
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
