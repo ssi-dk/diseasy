@@ -40,8 +40,18 @@ test_that("helpers are configured as expected (SR single variant / single age gr
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(0, 0))
 
-  # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(fr, 1))
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(
+        fr, # R
+        1   # S
+      ),
+      ncol = 1,
+      byrow = TRUE
+    )
+  )
 
   rm(m)
 })
@@ -77,8 +87,19 @@ test_that("helpers are configured as expected (SIR single variant / single age g
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
 
-  # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, fr, 1))
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(
+        0,  # I
+        fr, # R
+        1   # S
+      ),
+      ncol = 1,
+      byrow = TRUE
+    )
+  )
 
   rm(m)
 })
@@ -126,10 +147,34 @@ test_that("helpers are configured as expected (SIR double variant / double age g
     c(rI, 0, rI, 0, rI, 0, rI, 0, 0, 0)
   )
 
-  # Check infection risk is correctly set
-  expect_identical(
-    private %.% infection_risk,
-    c(0, fr, 0, fr, 0, fr, 0, fr, 1, 1)
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(#v1 v2
+        # Age group 1, Variant 1
+        0,  0,  # I
+        fr, fr, # R
+
+        # Age group 2, Variant 1
+        0,  0,  # I
+        fr, fr, # R
+
+        # Age group 1, Variant 2
+        0,  0,  # I
+        fr, fr, # R
+
+        # Age group 2, Variant 2
+        0,  0,  # I
+        fr, fr, # R
+
+        # S
+        1,  1,  # Age group 1
+        1,  1   # Age group 2
+      ),
+      ncol = 2,
+      byrow = TRUE
+    )
   )
 
   rm(m)
@@ -166,8 +211,20 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
 
-  # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, 0, fr, 1))
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(
+        0,  # E
+        0,  # I
+        fr, # R
+        1   # S
+      ),
+      ncol = 1,
+      byrow = TRUE
+    )
+  )
 
   rm(m)
 })
@@ -207,10 +264,22 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
     c(2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, 0)
   )
 
-  # Check infection risk is correctly set
-  expect_identical(
-    private %.% infection_risk,
-    c(0, 0, 0, 0, fr, fr, 1)
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(
+        0,  # E1
+        0,  # E2
+        0,  # I1
+        0,  # I2
+        fr, # R1
+        fr, # R2
+        1   # S
+      ),
+      ncol = 1,
+      byrow = TRUE
+    )
   )
 
   rm(m)
@@ -258,13 +327,32 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
     )
   )
 
-  # Check infection risk is correctly set
-  expect_identical(
-    private %.% infection_risk,
-    c(
-      0, 0, 0, 0, fr, fr, # Variant 1
-      0, 0, 0, 0, fr, fr, # Variant 2
-      1 # Susceptible
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(#v1 v2
+        # Variant 1
+        0,  0,  # E1
+        0,  0,  # E2
+        0,  0,  # I1
+        0,  0,  # I2
+        fr, fr, # R1
+        fr, fr, # R2
+
+        # Variant 2
+        0,  0,  # E1
+        0,  0,  # E2
+        0,  0,  # I1
+        0,  0,  # I2
+        fr, fr, # R1
+        fr, fr, # R2
+
+        # S
+        1,  1
+      ),
+      ncol = 2,
+      byrow = TRUE
     )
   )
 
@@ -320,15 +408,49 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
     )
   )
 
-  # Check infection risk is correctly set
-  expect_identical(
-    private %.% infection_risk,
-    c(
-      0, 0, 0, 0, fr, fr, # Variant 1, age group 1
-      0, 0, 0, 0, fr, fr, # Variant 1, age group 2
-      0, 0, 0, 0, fr, fr, # Variant 2, age group 1
-      0, 0, 0, 0, fr, fr, # Variant 2, age group 2
-      1, 1 # Susceptible
+  # Check risk matrix is correctly set
+  expect_equal(
+    private %.% risk_matrix,
+    matrix(
+      c(#v1 v2
+        # Age group 1, Variant 1
+        0,  0,  # E1
+        0,  0,  # E2
+        0,  0,  # I1
+        0,  0,  # I2
+        fr, fr, # R1
+        fr, fr, # R2
+
+        # Age group 2, Variant 1
+        0,  0,  # E1
+        0,  0,  # E2
+        0,  0,  # I1
+        0,  0,  # I2
+        fr, fr, # R1
+        fr, fr, # R2
+
+        # Age group 1, Variant 2
+        0,  0,  # E1
+        0,  0,  # E2
+        0,  0,  # I1
+        0,  0,  # I2
+        fr, fr, # R1
+        fr, fr, # R2
+
+        # Age group 2, Variant 2
+        0,  0,  # E1
+        0,  0,  # E2
+        0,  0,  # I1
+        0,  0,  # I2
+        fr, fr, # R1
+        fr, fr, # R2
+
+        # S
+        1,  1,  # Age group 1
+        1,  1   # Age group 2
+      ),
+      ncol = 2,
+      byrow = TRUE
     )
   )
 
