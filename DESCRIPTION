@@ -25,6 +25,7 @@ Imports:
     checkmate,
     digest,
     dplyr,
+    deSolve,
     glue,
     lgr,
     lubridate,
