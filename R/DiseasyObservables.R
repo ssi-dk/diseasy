@@ -226,7 +226,7 @@ DiseasyObservables <- R6::R6Class(                                              
 
     #' @description `r rd_describe`
     describe = function() {
-      printr("# DiseasyObservables interface ######################################")
+      printr("# DiseasyObservables #########################################")
 
       printr(
         ifelse(

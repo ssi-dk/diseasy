@@ -460,7 +460,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description `r rd_describe`
     describe = function() {
-      printr("# Season model ###############################################")
+      printr("# DiseasySeason ##############################################")
       if (is.null(self$model_t)) {
         printr("Season model not yet set")
       } else {
