@@ -461,39 +461,30 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
     # @description
-    #   This function computes the generator matrix for the given model configuration.
+    #   This function computes the generator matrix for the current model configuration.
     # @details
     #   This section follows the method outlined in doi: 10.1098/rsif.2009.0386
-    #   To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
-    #   Here, we linearise around S = 1.
-    #   In this limit, there is no interaction with variants (since everyone is susceptible).
-    #   The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
     # @params t (`numeric(1)`)\cr
     #   The time at which to compute the generator matrix.
-    # @params K (`integer(1)`)\cr
-    #   The number of exposed compartments in the model.
-    # @params L (`integer(1)`)\cr
-    #   The number of infectious compartments in the model.
-    # @params age_cuts_lower (`numeric()`)\cr
-    #   The lower age cuts for the age groups in the model.
+    # @params overall_infection_risk (`numeric(1)`)\cr
+    #   The overall infection risk for the model.
     # @params RS_states (`numeric()`)\cr
     #   The population vector for R and S states to linearise around.
     #   Must sum to 1 and follow the order of R and S in the model structure.
     #   That is:  [ [R_1, ..., R_M]_age_group_1_variant_1, [R_1, ..., R_M]_age_group_2_variant_1, ..., S ].
     #   Default is that everyone is susceptible.
-    # @params overall_infection_risk (`numeric(1)`)\cr
-    #   The overall infection risk for the model.
     generator_matrix = function(
       t = 0,
-      K = purrr::pluck(private %.% compartment_structure, "E", .default = 0),
-      L = private %.% compartment_structure %.% I,
-      age_cuts_lower = self %.% parameters %.% age_cuts_lower,
+      overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(
         rep(0, private %.% n_age_groups * private %.% n_variants * private %.% compartment_structure %.% R),
         private$population_proportion
-      ),
-      overall_infection_risk = self %.% parameters %.% overall_infection_risk
+      )
     ) {
+
+
+      K <- purrr::pluck(private %.% compartment_structure, "E", .default = 0)
+      L <- private %.% compartment_structure %.% I
 
       # Early return if no disease compartments
       if (K + L == 0) {
@@ -503,30 +494,31 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Input checks
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_number(t, add = coll)
-      checkmate::assert_integerish(K, lower = 0, add = coll)
-      checkmate::assert_integerish(L, lower = 0, add = coll)
-      checkmate::assert_numeric(age_cuts_lower, lower = 0, add = coll)
       checkmate::assert_numeric(RS_states, lower = 0, upper = 1, add = coll)
       checkmate::assert_number(overall_infection_risk, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
 
       ## Compute the transition rate component
 
-      # Shorthand for the number of age groups
-      n_age_groups <- length(age_cuts_lower)
-
       # The diagonal elements of the transition matrix is just (minus) the progression flow rates
       progression_flow_rates <- c(
         rep(K * purrr::pluck(private %.% disease_progression_rates, "E", .default = 0), K),
         rep(L * purrr::pluck(private %.% disease_progression_rates, "I"), L)
       )
-      transition_matrix <- diag(- rep(progression_flow_rates, n_age_groups), nrow = n_age_groups * (K + L))
+      transition_matrix <- diag(
+        - rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
+        nrow = private %.% n_age_groups * private %.% n_variants * (K + L)
+      )
 
 
 
       # The (lower) off-diagonal elements are the progression flow rates of the previous compartment
       # which requires a little more attention when computing
-      offdiagonal_elements <- head(rep(c(head(progression_flow_rates, -1), 0), n_age_groups), -1)
+      offdiagonal_elements <- rep(
+        c(head(progression_flow_rates, -1), 0),
+        private %.% n_age_groups * private %.% n_variants
+      ) |>
+        head(-1)
 
       # `diag(x) <- value` does not work as expected for a 1x1 matrix (how surprising...)
       # so we need to utilise jank instead to manually compute the corresponding indices....
@@ -545,47 +537,67 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Ensure the RS_states sums to 1
       RS_states <- RS_states / sum(RS_states)
 
-      # First get the contact matrices
-      contact_matrixes <- self %.% activity %.% get_scenario_contacts(
-        age_cuts_lower = age_cuts_lower,
-        weights = self %.% parameters %.% activity.contact_weights
+
+      # Retrieve the active contact matrix
+      contact_matrix <- private %.% contact_matrix(t)
+
+      # If the contact matrix is 1 x 1, convert to scalar since R wont multiply otherwise
+      if (length(contact_matrix) == 1) contact_matrix <- as.numeric(contact_matrix)
+
+
+      # Get the relative infection risk of the variants
+      epsilon <- self %.% variant %.% variants |>
+        purrr::map_dbl(\(variant) purrr::pluck(variant, "relative_infection_risk", .default = 1))
+
+
+      # Compute the "cross-section" of the contacts
+      # The pre-computed "immunity_matrix" contains what we need
+      rho <- private %.% immunity_matrix * RS_states
+      rho <- purrr::map_dbl(private %.% infection_matrix_to_rs_indices, ~ sum(rho[.])) |>
+        matrix(nrow = private %.% n_age_groups, ncol = private %.% n_variants)
+
+      # Compute the scaling of the contact rates
+      beta_0 <- overall_infection_risk * self %.% season %.% model_t(t)
+
+      # Combine the components to get what we need for each diagonal block of the generator matrix
+      transmission_matrix_components <- purrr::map2(
+        epsilon,
+        asplit(rho, MARGIN = 2), # Split by column (i.e. variant)
+        \(e, r) beta_0 * e * matrix(rep(r, length(r)), nrow = length(r)) * contact_matrix
       )
-
-      # We now compute the "beta" components of the linearised subsystem which is the
-      # contact matrix adjusted for
-      # - the overall infection risk
-      # - the largest relative infection risk of the (active) variants
-      # - The fraction of population with (partial) immunity
-
-      # Get the largest relative infection risk of the (active) variants
-      largest_variant_infection_risk <- self %.% variant %.% variants |>
-        purrr::keep(~ purrr::pluck(.x, "introduction_date") <= t) |>
-        purrr::map(\(variant) purrr::pluck(variant, "relative_infection_risk", .default = 1)) |>
-        purrr::reduce(max)
-
-      # Compute the population level of immunity
-
-
-      # Combine the components to get the beta matrix
-      beta_matrix <- private$contact_matrix(t) *
-        overall_infection_risk *
-        largest_variant_infection_risk *
-
-
-
-
 
       # Pre-allocate the transmission matrix
       transmission_matrix <- 0 * transition_matrix
 
       # Then fill in with beta elements
-      for (i in seq(n_age_groups)) {    # This has to be a nested for loop for the referencing to work
-        for (j in seq(n_age_groups)) {
-          transmission_matrix[1 + (i - 1) * (K + L), (K + 1):(K + L) + (j - 1) * (K + L)] <- beta_matrix[i, j]
+      for (a in seq(private %.% n_variants)) { # This has to be a nested for loop for the referencing to work
+        for (i in seq(private %.% n_age_groups)) {
+          for (j in seq(private %.% n_age_groups)) {
+            transmission_matrix[
+              #                                   Block offset
+              1 + (i - 1) * (K + L)               + (a - 1) * (K + L) * private %.% n_age_groups,
+              (K + 1):(K + L) + (j - 1) * (K + L) + (a - 1) * (K + L) * private %.% n_age_groups
+            ] <- transmission_matrix_components[[a]][i, j]
+          }
         }
       }
 
-      return(transition_matrix + transmission_matrix)
+      # Combine the components to get the generator matrix
+      generator_matrix <- transition_matrix + transmission_matrix
+
+
+      # We need to remove the effect from "in-active" variants since they are not yet introduced to the system
+      active_variants <- self %.% variant %.% variants |>
+        purrr::map(~ purrr::pluck(.x, "introduction_date", .default = as.Date(0))) |>
+        purrr::map_lgl(~ .x - (self %.% observables %.% last_queryable_date + t) <= 0)
+
+      inactive_idx <- seq_len((K + L) * private %.% n_age_groups) +
+        (K + L) * private %.% n_age_groups * (which(!active_variants) - 1)
+
+      generator_matrix[inactive_idx, ] <- 0
+      generator_matrix[, inactive_idx] <- 0
+
+      return(generator_matrix)
     },
 
     # @description
