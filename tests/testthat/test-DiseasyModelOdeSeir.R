@@ -5,6 +5,47 @@ fr <- 0.02 # R compartments have their infection risk reduced by this factor
 fv <- 0.01 # Whenever two variants are in use, the second has a relative infection risk of this factor
 
 
+test_that("helpers are configured as expected (SR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # This may seem a weird test case, but in some of the initialisation code, we run a model with
+  # one less I states, and we need to ensure the index helpers still works in this case
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("I" = 0, "R" = 1),
+    disease_progression_rates = c("I" = ri),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Check index helpers are correctly set
+  expect_identical(private %.% e1_state_indexes, 1)
+  expect_identical(private %.% i1_state_indexes, 1)
+  expect_identical(private %.% i_state_indexes, list(numeric(0)))
+  expect_identical(private %.% r1_state_indexes, 1)
+  expect_identical(private %.% s_state_indexes, 2)
+  expect_identical(private %.% state_vector_age_group, rep(1L, 2))
+  expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(2)))
+
+  # Check progression flow rates are correctly set
+  expect_identical(private %.% progression_flow_rates, c(0, 0))
+
+  # Check infection risk is correctly set
+  expect_identical(private %.% infection_risk, c(fr, 1))
+
+  rm(m)
+})
+
+
 test_that("helpers are configured as expected (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
