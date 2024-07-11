@@ -38,7 +38,7 @@ test_that("helpers are configured as expected (SR single variant / single age gr
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 2))
-  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(2)))
+  expect_identical(private %.% infection_matrix_to_rs_indices, list(seq.int(2)))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(0, 0))
@@ -88,7 +88,7 @@ test_that("helpers are configured as expected (SIR single variant / single age g
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 2))
-  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(2)))
+  expect_identical(private %.% infection_matrix_to_rs_indices, list(seq.int(2)))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
@@ -140,7 +140,7 @@ test_that("helpers are configured as expected (SIR double variant / double age g
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, c(1L, 2L, 1L, 2L, 1L, 2L))
   expect_identical(
-    private %.% flow_matrix_to_rs_indices,
+    private %.% infection_matrix_to_rs_indices,
     list(
       c(1L, 3L, 5L),
       c(2L, 4L, 6L),
@@ -204,7 +204,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 2))
-  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(2)))
+  expect_identical(private %.% infection_matrix_to_rs_indices, list(seq.int(2)))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
@@ -255,7 +255,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
 
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 3))
-  expect_identical(private %.% flow_matrix_to_rs_indices, list(seq.int(3)))
+  expect_identical(private %.% infection_matrix_to_rs_indices, list(seq.int(3)))
 
   # Check progression flow rates are correctly set
   expect_identical(
@@ -311,7 +311,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, rep(1L, 5))
   expect_identical(
-    private %.% flow_matrix_to_rs_indices,
+    private %.% infection_matrix_to_rs_indices,
     list(
       seq.int(5),
       seq.int(5) + 5L
@@ -377,7 +377,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   # Check flow matrix helpers are correctly set
   expect_identical(private %.% rs_age_group, c(rep(1L, 2), rep(2L, 2), rep(1L, 2), rep(2L, 2), 1L, 2L))
   expect_identical(
-    private %.% flow_matrix_to_rs_indices,
+    private %.% infection_matrix_to_rs_indices,
     list(
       c(1L, 2L, 5L, 6L, 9L),
       c(3L, 4L, 7L, 8L, 10L),
