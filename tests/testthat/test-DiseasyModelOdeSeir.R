@@ -26,6 +26,7 @@ test_that("helpers are configured as expected (SIR single variant / single age g
 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
+  expect_identical(private %.% i1_state_indexes, 1)
   expect_identical(private %.% i_state_indexes, list(1))
   expect_identical(private %.% r1_state_indexes, 2)
   expect_identical(private %.% s_state_indexes, 3)
@@ -63,6 +64,7 @@ test_that("helpers are configured as expected (SIR double variant / double age g
 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 3, 5, 7))
+  expect_identical(private %.% i1_state_indexes, c(1, 3, 5, 7))
   expect_identical(private %.% i_state_indexes, list(1, 3, 5, 7))
   expect_identical(private %.% r1_state_indexes, c(2, 4, 6, 8))
   expect_identical(private %.% s_state_indexes, c(9, 10))
@@ -113,6 +115,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
+  expect_identical(private %.% i1_state_indexes, 2)
   expect_identical(private %.% i_state_indexes, list(2))
   expect_identical(private %.% r1_state_indexes, 3)
   expect_identical(private %.% s_state_indexes, 4)
@@ -150,6 +153,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
+  expect_identical(private %.% i1_state_indexes, 3)
   expect_identical(private %.% i_state_indexes, list(c(3, 4)))
   expect_identical(private %.% r1_state_indexes, 5)
   expect_identical(private %.% s_state_indexes, 7)
@@ -193,6 +197,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7))
+  expect_identical(private %.% i1_state_indexes, c(3, 9))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10)))
   expect_identical(private %.% r1_state_indexes, c(5, 11))
   expect_identical(private %.% s_state_indexes, 13)
@@ -247,6 +252,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7, 13, 19))
+  expect_identical(private %.% i1_state_indexes, c(3, 9, 15, 21))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10), c(15, 16), c(21, 22)))
   expect_identical(private %.% r1_state_indexes, c(5, 11, 17, 23))
   expect_identical(private %.% s_state_indexes, c(25, 26))
