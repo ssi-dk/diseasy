@@ -46,6 +46,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Store a short hand for the number of groups
       private$n_age_groups <- length(self %.% parameters %.% age_cuts_lower)
+      private$n_variants   <- length(self %.% variant %.% variants)
       private$n_EIR_states <- sum(compartment_structure)
 
 
@@ -111,27 +112,22 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Store the indexes of the first exposed compartments for later RHS computation
-      private$e1_state_indexes <- (seq(length(self %.% variant %.% variants) * private %.% n_age_groups) - 1) *
+      private$e1_state_indexes <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
         sum(compartment_structure) + 1
 
 
       # Store the indexes of the infectious compartments for later RHS computation
       # We create a list of indexes for each variant.
       # First, we determine all I indexes
-      private$i_state_indexes <- seq(length(self %.% variant %.% variants) * private %.% n_age_groups) |>
+      private$i_state_indexes <- seq(private %.% n_variants * private %.% n_age_groups) |>
         purrr::map(
           \(k) (1:compartment_structure[["I"]]) + compartment_structure[["E"]] + sum(compartment_structure) * (k - 1)
         )
 
-      # # Then we split these by the variant it belongs to
-      # private$i_state_indexes <- i_state_indexes |>
-      #     (\(.)unname(split(., cut(seq_along(.), length(self %.% variant %.% variants), labels = FALSE))))()
-
-
 
       # Store the indexes of the susceptible states
       private$s_state_indexes <- seq(private %.% n_age_groups) +
-        sum(compartment_structure) * private %.% n_age_groups * length(self %.% variant %.% variants)
+        sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
 
 
       # During the evaluation of the RHS function, we need to map the state_vector to the elements of an
@@ -141,10 +137,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # that element in the state_vector corresponds to.
       # The state vector is assumed to be ordered as follows:
       # [ [E, I, R]_age_group_1_variant_1, [E, I, R]_age_group_2_variant_1, ..., S ]
-      private$state_vector_age_group <- seq(private$n_age_groups) |> # Starting with the number of age groups
-        purrr::map(~ rep(., private$n_EIR_states)) |> # We repeat for each EIR state
-        rep(length(self %.% variant %.% variants)) |> # And since we have multiple variants, this is repeated
-        purrr::reduce(c, .init = seq(private$n_age_groups), .dir = "backward") # We collapse and add the S states
+      private$state_vector_age_group <- seq(private %.% n_age_groups) |> # Starting with the number of age groups
+        purrr::map(~ rep(., private %.% n_EIR_states)) |> # We repeat for each EIR state
+        rep(private %.% n_variants) |> # And since we have multiple variants, this is repeated
+        purrr::reduce(c, .init = seq(private %.% n_age_groups), .dir = "backward") # We collapse and add the S states
 
       # We now expand the previous map to also include an id for variant.
       # This map is used later in the RHS where we have a n x v matrix called BI_av, where n is the length of the
@@ -155,7 +151,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # each age_group/variant has a unique id. Then, we reverse the map, to determine which indexes correspond to which
       # age_group/variant combination.
       private$infection_matrix_to_state_vector <- seq_along(self %.% variant %.% variants) |>
-        purrr::map(\(variant) (variant - 1) * private$n_age_groups +  private$state_vector_age_group) |>
+        purrr::map(\(variant) (variant - 1) * private %.% n_age_groups +  private %.% state_vector_age_group) |>
         purrr::reduce(c) |> # And collapse to 1d
         (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
 
@@ -196,7 +192,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # We now repeat for each track the model to construct the full vector
       # and add rates for the S states at the end.
       private$progression_flow_rates <- disease_progression_rates |>
-        rep(private %.% n_age_groups * length(self %.% variant %.% variants)) |>
+        rep(private %.% n_age_groups * private %.% n_variants) |>
         (\(.) c(., rep(0, private %.% n_age_groups)))() # Add a zero for the S compartments
 
 
@@ -205,7 +201,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Configure the infection risk per contact vector
       # This is written as a map over variants to allow for easy implementation of variant-specific parameters
       private$infection_risk <- c(rep(0, sum(purrr::discard_at(compartment_structure, "R"))), immunity_risks) |>
-        rep(private %.% n_age_groups * length(self %.% variant %.% variants)) |>
+        rep(private %.% n_age_groups * private %.% n_variants) |>
         (\(.) c(., rep(1, private %.% n_age_groups)))() # Add a 1 for the S compartments
 
 
@@ -234,6 +230,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     progression_flow_rates = NULL,
 
     n_age_groups = NULL,
+    n_variants   = NULL,
     n_EIR_states = NULL,
 
     # Index helpers
