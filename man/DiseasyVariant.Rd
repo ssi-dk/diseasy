@@ -15,7 +15,7 @@ See vignette("diseasy-variant")
   # Create variant module
   var <- DiseasyVariant$new()
 
-  # By default, a non-informative variant is included
+  # By default, a no variants are included
   var$variants
 
   # Add variants via the `$add_variant()` method
@@ -34,10 +34,13 @@ See vignette("diseasy-variant")
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
 \item{\code{variants}}{(\code{list})\cr
-TODO. Read-only.}
+The variants currently in the module. Read-only.}
 
 \item{\code{cross_immunity}}{(\code{matrix})\cr
-. Read-only.}
+A matrix indicating the cross immunity interactions of the variants.
+Index ij indicates the overlap in immunity when variant j infects variant i.
+Thus, an overlap of 1 means immunisation with variant i protects against infection by variant j.
+Read-only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -62,9 +65,9 @@ TODO. Read-only.}
 \if{html}{\out{<a id="method-DiseasyVariant-add_variant"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyVariant-add_variant}{}}}
 \subsection{Method \code{add_variant()}}{
-TODO
+Add a variant to the scenario.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$add_variant(name, characteristics)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$add_variant(name, characteristics = list())}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
