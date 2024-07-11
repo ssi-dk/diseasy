@@ -1,0 +1,222 @@
+---
+title: "SEIR: Implementation"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+# Indexes and accents
+$K,k$ Exposed states
+
+$L,l$ Infected states
+
+$M,m$ Recovered states
+
+$A,i,j$ Age groups
+
+$V,a,b$ Variants
+
+$\sim$ Non-normalised quantity
+
+# State vector
+Each "track" of infection is placed in sequence in the state vector, $s$, and increments first in age groups
+then in variants.
+
+Finally, the susceptible states are placed at the end of the state vector.
+
+NOTE: State vector uses normalised populations.
+
+$$
+\overline{s} = [\underbrace{\begin{matrix} E^1\, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group 1, Variant 1}}\;\; 
+\underbrace{\begin{matrix} E^1 \, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group 2, Varaint 1}}
+\; \cdots \\
+\underbrace{\begin{matrix} E^1 \, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group A, Variant V}}
+\;S_1 \, \cdots \, S_A
+]
+$$
+
+# Contact matrix
+The contact matrix $\tilde{\overline{\overline{C}}}$ is $A \times A$ and indices $\tilde{c}_{ij}$ can be understood as contacts
+from age group $j$ to age group $i$.
+(It may be helpful to memorise as $\tilde{c}_{i\leftarrow j}$)
+
+In the model, these are normalised to the "per capita" contact matrix $\overline{\overline{C}}$, meaning that the elements are 
+$c_{ij} = \frac{\tilde{c}_{ij}}{N_j}$ where $\tilde{N}_i$ is the population of age group $i$.
+
+This way, when used in the model, the equations' infections terms becomes $\frac{\tilde{c}_{ij}}{\tilde{N}_j} \sum_l I_j^l S_i$ 
+and the equations can be normalised via the transformations $S_a = \frac{\tilde{S}_a}{\tilde{N}_a}$.
+
+NOTE: Shouldn't we then have $c_{ij} = \tilde{c}_{ij} \tilde{N}_j$ instead?
+
+$$
+\dot{\tilde{I}} = \tilde{\beta}\, \tilde{I} \tilde{S} - r_I \tilde{I} \Rightarrow\\
+\frac{\dot{\tilde{I}}}{N} = \frac{\tilde{\beta}\, \tilde{I} \tilde{S}}{N} - \frac{ r_I \tilde{I}}{N} \Rightarrow\\
+\dot{I} = \tilde{\beta}\, I \tilde{S} - r_I I \Rightarrow\\
+\dot{I} = N\tilde{\beta}\, I \frac{\tilde{S}}{N} - r_I I \Rightarrow\\
+\dot{I} = \underbrace{N\tilde{\beta}}_{\beta}\, I S - r_I I
+$$
+
+# `infected`
+In the `rhs` function, we have the `infected` variable contains the $\overline{\overline{I}}$ matrix which is a $A \times V$ matrix with elements
+
+$$
+\overline{\overline{I}} = \begin{bmatrix}
+\sum_l I^l_{1,1} & \cdots & \sum_l I^l_{1,V} \\
+\vdots & \ddots & \vdots \\
+\sum_l I^l_{A,1} & \cdots & \sum_l I^l_{A,V}
+\end{bmatrix}
+$$
+
+
+# `infected_contact_rate`
+
+In the `rhs` function, we have the `infected_contact_rate` variable which is $\overline{\overline{C}}\; \overline{\overline{I}}$
+$$
+\overline{\overline{CI}} = \overline{\overline{C}}\; \overline{\overline{I}} = \begin{bmatrix}
+\sum_i c_{1,i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{1,i} \sum_l I^l_{i,V} \\
+\vdots & \ddots & \vdots \\
+\sum_i c_{A,i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{A,i} \sum_l I^l_{i,V}
+\end{bmatrix}
+$$
+
+That is, the element $(\overline{\overline{C}}\; \overline{\overline{I}})_{i, a}$ contains the rate of contact for age
+group $i$ with persons infected with variant $a$ across all age groups.
+
+# `infection_rate`
+In the `rhs` function, we have the `infection_rate` variable which is the `infected_contact_rate` adjusted
+for additional risk factors.
+
+- $\sigma(t)$: Multiplicative effect of season
+- $\epsilon_a$: Relative infectiousness of variant $a$
+- $\Gamma$: Overall infection rate scaling factor
+
+$$
+\overline{\overline{T}} = \Gamma\;\sigma(t)\;\overline{\overline{\mathcal{E}}} \odot \overline{\overline{CI}}
+$$
+
+Where $\odot$ is the Hadamard product (element-wise multiplication), and $\overline{\overline{\mathcal{E}}}$ is the
+$A \times V$ matrix:
+
+$$
+\overline{\overline{\mathcal{E}}} = \begin{bmatrix}
+\epsilon_1 & \cdots & \epsilon_V \\
+\vdots & \ddots & \vdots \\
+\epsilon_1 & \cdots & \epsilon_V
+\end{bmatrix}
+$$
+NOTE: In the code, `private$indexed_variant_infection_risk` is $\overline{\overline{\mathcal{E}}}$ in vector form.
+
+# `weighted_infective_contacts`
+For the final computation of infections in `rhs`, we construct the matrix `weighted_infective_contacts` ($\overline{\overline{W}}$).
+For this purpose, we first expand the `infection_rate` matrix to a $A \cdot (V \cdot (K+L+M) + 1) \times V$ matrix by repeating the
+rows of the `infection_rate` matrix.
+
+Each element in the state vector has a corresponding age group. If we write this age group of element $s$ as $i|s$, then
+we construct the matrix:
+$$
+\overline{\overline{U}} = \begin{bmatrix}
+  t_{i|s=1, 1} & \cdots & t_{i|s=1, V} \\
+  t_{i|s=2, 1} & \cdots & t_{i|s=2, V} \\
+  \vdots & \vdots &\vdots
+\end{bmatrix}
+$$
+We now have a matrix, whose elements are the infection rate for each variant matched to the elements of the state vector.
+
+In this space, we can now account for:
+
+- The state specific infection risks (i.e. the reduced risk from being infected previously / vaccinated)
+- The effect of cross-immunity between the variants 
+
+That is, we need to construct the matrix that accounts for the waning of immunity ($\gamma_m$) and the cross-immunity
+factors $\chi_{a\leftarrow b}$ (Variant $b$ infecting a person with immunity for variant $a$).
+
+All together, this is implemented via the risk matrix $\overline{\overline{\rho}}$ which is 
+$A \cdot (V \cdot (K+L+M) + 1) \times V$ matrix on the form:
+
+$$
+\overline{\overline{\rho}} = \begin{bmatrix}
+  \begin{bmatrix}
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma}) \\
+    \vdots \\
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma})
+  \end{bmatrix}
+  & \cdots & 
+  \begin{bmatrix}
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{1\leftarrow V} (1 - \overline{\gamma}) \\
+    \vdots \\
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{1\leftarrow V} (1 - \overline{\gamma})
+  \end{bmatrix} \\
+  \vdots & \ddots & \vdots \\
+  \begin{bmatrix}
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{V\leftarrow 1} (1 - \overline{\gamma}) \\
+    \vdots \\
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{V\leftarrow 1} (1 - \overline{\gamma})
+  \end{bmatrix}
+  & \cdots & 
+  \begin{bmatrix}
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{V\leftarrow V} (1 - \overline{\gamma}) \\
+    \vdots \\
+    \overline{0}_K \\
+    \overline{0}_L \\
+    1 - \chi_{V\leftarrow V} (1 - \overline{\gamma})
+  \end{bmatrix} \\
+  \overline{0}_A & \cdots & \overline{0}_A
+\end{bmatrix}
+$$
+Where $\overline{0}_n$ is a zero vector of length $n$.
+
+In $\overline{\overline{\rho}}$, the matrices of the form:
+$$
+\begin{bmatrix}
+  \overline{0}_K \\
+  \overline{0}_L \\
+  1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma}) \\
+  \vdots \\
+  \overline{0}_K \\
+  \overline{0}_L \\
+  1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma})
+\end{bmatrix}
+$$
+are $A \cdot (K + L + M) \times 1$ matrices with repeated sub-matrices.
+
+In total, the matrix accounts for the cross-variant $\chi_{a\leftarrow b}$ reductions of immunity ($1-\overline{\gamma}$).
+
+Finally, we can combine everything to the flow matrix:
+$$
+\overline{\overline{f}} = \overline{\overline{\rho}} \odot 
+\begin{bmatrix}
+  \overline{s} & \cdots & \overline{s}
+\end{bmatrix} \odot 
+\overline{\overline{U}}
+$$
+Where $\begin{bmatrix}\overline{s} & \cdots & \overline{s}\end{bmatrix}$ is $V$ repeats of $\overline{s}$.
+
+This matrix contains, for each element in the state vector, a row consisting of per-variant infectious contacts
+between the corresponding compartment and the infected population in the model. These elements account for every risk 
+modifying mechanism included in the model.
+
+The row sums of this matrix is then equal to the loss from the compartment due to infectious contacts.
+The sums by variant/age group combination can also be extracted from the matrix to form the in-flow of new infections
+to the $E_1$ compartments.
