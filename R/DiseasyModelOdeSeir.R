@@ -244,7 +244,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     infection_risk = NULL,
     contact_matrix = NULL,
 
-    rhs = function(state_vector, t) {
+    rhs = function(t, state_vector, ...) {
 
       # Compute the flow from infections
       # Each variant attempts to infect the population
@@ -263,13 +263,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 1, determine the number of infected by age group and variant
 
       # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
-      infected <- vapply(i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+      infected <- vapply(private$i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 
       # microbenchmark::microbenchmark( # Microseconds
       #   purrr::map_dbl(i_state_indexes, \(indexes) sum(state_vector[indexes])),
-      #   sapply(i_state_indexes, \(indexes) sum(state_vector[indexes])),
-      #   sapply(i_state_indexes, \(indexes) sum(state_vector[indexes]), USE.NAMES = FALSE),
-      #   vapply(i_state_indexes, \(indexes) sum(state_vector[indexes]), FUN.VALUE = numeric(1), USE.NAMES = FALSE),
+      #   sapply(private$i_state_indexes, \(indexes) sum(state_vector[indexes])),
+      #   sapply(private$i_state_indexes, \(indexes) sum(state_vector[indexes]), USE.NAMES = FALSE),
+      #   vapply(private$i_state_indexes, \(indexes) sum(state_vector[indexes]), FUN.VALUE = numeric(1), USE.NAMES = FALSE),
       #   check = "equal", times = 1000L
       # )
 
@@ -289,12 +289,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Step 3, apply the effect of season and overall infection risk (rr * beta * I * s(t)
-      infection_rate <- infected_contacts * self$parameters[["overall_infection_risk"]] * private$season$model_t(t)
+      infection_rate <- infected_contacts * self$parameters[["overall_infection_risk"]] * self$season$model_t(t)
 
 
       ## Step 4, determine the infective interactions
       # To match our model structure (state_vector) we use the mapping of state_vector to age_groups
-      risk_weighted_contacts <- risk_weighted_state_vector * BI_av[private$state_vector_age_group, ]
+      risk_weighted_contacts <- risk_weighted_state_vector * infection_rate[private$state_vector_age_group, , drop = FALSE] # R challenge: "respect data-types". Level: Impossible
 
       # Then we can compute the loss from each compartment
       loss_due_to_infections <- rowSums(risk_weighted_contacts)
@@ -309,17 +309,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Combine into final RHS computation
-      out <-
-        # Disease progression flow between compartments
-        c(0, progression_flow[-1]) - progression_flow
-
-        # Combined loss to infections (across all variants)
-        -  loss_due_to_infections
+      dy <- c(0, progression_flow[-private$s_state_indexes]) - progression_flow - # Disease progression flow between compartments
+        loss_due_to_infections # Combined loss to infections (across all variants)
 
       # Add the inflow from infections
-      out[private$e1_state_indexes] <- out[private$e1_state_indexes] + new_infections
+      dy[private$e1_state_indexes] <- dy[private$e1_state_indexes] + new_infections
 
-      return(out)
+      return(list(dy))
     }
   )
 )
