@@ -227,13 +227,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # (thereby also accounting for cross-immunity)
 
       # Account for cross-immunity
-      private$risk_matrix <- self %.% variant %.% cross_immunity |>
+      private$immunity_matrix <- self %.% variant %.% cross_immunity |>
         purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_age_groups)) |>
         purrr::reduce(c) |>
         matrix(ncol = private$n_variants) |>
         rbind(
           matrix(
-            rep(1, private %.% n_age_groups * private %.% n_variants ),
+            rep(1, private %.% n_age_groups * private %.% n_variants),
             ncol = private %.% n_variants
           )
         )
@@ -320,7 +320,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     population_proportion = NULL,
     per_capita_contact_matrices = NULL,
     contact_matrix = NULL,
-    risk_matrix = NULL,
+    immunity_matrix = NULL,
     indexed_variant_infection_risk = NULL,
 
     # Forcing functions for the right hand side function
@@ -374,8 +374,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Step 4, determine the infective interactions
-      # We use the pre compted risk_matrix to account for waning and cross-immunity
-      flow_matrix <- private$risk_matrix * state_vector[private$rs_state_indices] *
+      # We use the pre compted immunity_matrix to account for waning and cross-immunity
+      flow_matrix <- private$immunity_matrix * state_vector[private$rs_state_indices] *
         infection_rate[private$rs_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
 
       # Then we can compute the loss from each compartment
