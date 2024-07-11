@@ -76,7 +76,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
         proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
       } else {
-        proportion <- self %.% activity %.% contact_basis %.% proportion
+        proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+          dplyr::summarise("proportion" = sum(.data$proportion), .by = .data$age_group_out) |>
+          dplyr::pull("proportion")
       }
 
       per_capita_contact_matrixes <- contact_matrixes |>
