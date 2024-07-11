@@ -143,7 +143,8 @@ DiseasyVariant <- R6::R6Class(                                                  
             matrix(
               nrow = length(self %.% variants),
               ncol = length(self %.% variants),
-              byrow = TRUE
+              byrow = TRUE,
+              dimnames = list(names(self %.% variants), names(self %.% variants))
             )
 
           return(cross_immunity)
