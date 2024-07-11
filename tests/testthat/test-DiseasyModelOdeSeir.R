@@ -29,13 +29,15 @@ test_that("helpers are configured as expected (SR single variant / single age gr
   private <- m$.__enclos_env__$private
 
   # Check index helpers are correctly set
-  expect_identical(private %.% e1_state_indexes, 1)
-  expect_identical(private %.% i1_state_indexes, 1)
-  expect_identical(private %.% i_state_indexes, list(numeric(0)))
-  expect_identical(private %.% r1_state_indexes, 1)
-  expect_identical(private %.% s_state_indexes, 2)
-  expect_identical(private %.% state_vector_age_group, rep(1L, 2))
-  expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(2)))
+  expect_identical(private %.% e1_state_indices, 1)
+  expect_identical(private %.% i1_state_indices, 1)
+  expect_identical(private %.% i_state_indices, list(numeric(0)))
+  expect_identical(private %.% r1_state_indices, 1)
+  expect_identical(private %.% s_state_indices, 2)
+  expect_identical(private %.% rs_state_indices, c(1, 2))
+
+  # Check flow matrix helpers are correctly set
+  expect_identical(private %.% rs_age_group, rep(1L, 2))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(0, 0))
@@ -76,13 +78,15 @@ test_that("helpers are configured as expected (SIR single variant / single age g
   private <- m$.__enclos_env__$private
 
   # Check index helpers are correctly set
-  expect_identical(private %.% e1_state_indexes, 1)
-  expect_identical(private %.% i1_state_indexes, 1)
-  expect_identical(private %.% i_state_indexes, list(1))
-  expect_identical(private %.% r1_state_indexes, 2)
-  expect_identical(private %.% s_state_indexes, 3)
-  expect_identical(private %.% state_vector_age_group, rep(1L, 3))
-  expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(3)))
+  expect_identical(private %.% e1_state_indices, 1)
+  expect_identical(private %.% i1_state_indices, 1)
+  expect_identical(private %.% i_state_indices, list(1))
+  expect_identical(private %.% r1_state_indices, 2)
+  expect_identical(private %.% s_state_indices, 3)
+  expect_identical(private %.% rs_state_indices, c(2, 3))
+
+  # Check flow matrix helpers are correctly set
+  expect_identical(private %.% rs_age_group, rep(1L, 2))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
@@ -125,12 +129,15 @@ test_that("helpers are configured as expected (SIR double variant / double age g
   private <- m$.__enclos_env__$private
 
   # Check index helpers are correctly set
-  expect_identical(private %.% e1_state_indexes, c(1, 3, 5, 7))
-  expect_identical(private %.% i1_state_indexes, c(1, 3, 5, 7))
-  expect_identical(private %.% i_state_indexes, list(1, 3, 5, 7))
-  expect_identical(private %.% r1_state_indexes, c(2, 4, 6, 8))
-  expect_identical(private %.% s_state_indexes, c(9, 10))
-  expect_identical(private %.% state_vector_age_group, c(1L, 1L, 2L, 2L, 1L, 1L, 2L, 2L, 1L, 2L))
+  expect_identical(private %.% e1_state_indices, c(1, 3, 5, 7))
+  expect_identical(private %.% i1_state_indices, c(1, 3, 5, 7))
+  expect_identical(private %.% i_state_indices, list(1, 3, 5, 7))
+  expect_identical(private %.% r1_state_indices, c(2, 4, 6, 8))
+  expect_identical(private %.% s_state_indices, c(9, 10))
+  expect_identical(private %.% rs_state_indices, c(2, 4, 6, 8, 9, 10))
+
+  # Check flow matrix helpers are correctly set
+  expect_identical(private %.% rs_age_group, c(1L, 2L, 1L, 2L, 1L, 2L))
   expect_identical(
     private %.% infection_matrix_to_state_vector,
     list(
@@ -200,13 +207,15 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   private <- m$.__enclos_env__$private
 
   # Check index helpers are correctly set
-  expect_identical(private %.% e1_state_indexes, 1)
-  expect_identical(private %.% i1_state_indexes, 2)
-  expect_identical(private %.% i_state_indexes, list(2))
-  expect_identical(private %.% r1_state_indexes, 3)
-  expect_identical(private %.% s_state_indexes, 4)
-  expect_identical(private %.% state_vector_age_group, rep(1L, 4))
-  expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(4)))
+  expect_identical(private %.% e1_state_indices, 1)
+  expect_identical(private %.% i1_state_indices, 2)
+  expect_identical(private %.% i_state_indices, list(2))
+  expect_identical(private %.% r1_state_indices, 3)
+  expect_identical(private %.% s_state_indices, 4)
+  expect_identical(private %.% rs_state_indices, c(3, 4))
+
+  # Check flow matrix helpers are correctly set
+  expect_identical(private %.% rs_age_group, rep(1L, 2))
 
   # Check progression flow rates are correctly set
   expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
@@ -250,13 +259,15 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   private <- m$.__enclos_env__$private
 
   # Check index helpers are correctly set
-  expect_identical(private %.% e1_state_indexes, 1)
-  expect_identical(private %.% i1_state_indexes, 3)
-  expect_identical(private %.% i_state_indexes, list(c(3, 4)))
-  expect_identical(private %.% r1_state_indexes, 5)
-  expect_identical(private %.% s_state_indexes, 7)
-  expect_identical(private %.% state_vector_age_group, rep(1L, 7))
-  expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(7)))
+  expect_identical(private %.% e1_state_indices, 1)
+  expect_identical(private %.% i1_state_indices, 3)
+  expect_identical(private %.% i_state_indices, list(c(3, 4)))
+  expect_identical(private %.% r1_state_indices, 5)
+  expect_identical(private %.% s_state_indices, 7)
+  expect_identical(private %.% rs_state_indices, c(5, 6, 7))
+
+  # Check flow matrix helpers are correctly set
+  expect_identical(private %.% rs_age_group, rep(1L, 3))
 
   # Check progression flow rates are correctly set
   expect_identical(
@@ -306,12 +317,15 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   private <- m$.__enclos_env__$private
 
   # Check index helpers are correctly set
-  expect_identical(private %.% e1_state_indexes, c(1, 7))
-  expect_identical(private %.% i1_state_indexes, c(3, 9))
-  expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10)))
-  expect_identical(private %.% r1_state_indexes, c(5, 11))
-  expect_identical(private %.% s_state_indexes, 13)
-  expect_identical(private %.% state_vector_age_group, rep(1L, 13))
+  expect_identical(private %.% e1_state_indices, c(1, 7))
+  expect_identical(private %.% i1_state_indices, c(3, 9))
+  expect_identical(private %.% i_state_indices, list(c(3, 4), c(9, 10)))
+  expect_identical(private %.% r1_state_indices, c(5, 11))
+  expect_identical(private %.% s_state_indices, 13)
+  expect_identical(private %.% rs_state_indices, c(5, 6, 11, 12, 13))
+
+  # Check flow matrix helpers are correctly set
+  expect_identical(private %.% rs_age_group, rep(1L, 5))
   expect_identical(
     private %.% infection_matrix_to_state_vector,
     list(seq.int(13), seq.int(13) + 13L)
@@ -380,12 +394,14 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   private <- m$.__enclos_env__$private
 
   # Check index helpers are correctly set
-  expect_identical(private %.% e1_state_indexes, c(1, 7, 13, 19))
-  expect_identical(private %.% i1_state_indexes, c(3, 9, 15, 21))
-  expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10), c(15, 16), c(21, 22)))
-  expect_identical(private %.% r1_state_indexes, c(5, 11, 17, 23))
-  expect_identical(private %.% s_state_indexes, c(25, 26))
-  expect_identical(private %.% state_vector_age_group, c(rep(1L, 6), rep(2L, 6), rep(1L, 6), rep(2L, 6), 1L, 2L))
+  expect_identical(private %.% e1_state_indices, c(1, 7, 13, 19))
+  expect_identical(private %.% i1_state_indices, c(3, 9, 15, 21))
+  expect_identical(private %.% i_state_indices, list(c(3, 4), c(9, 10), c(15, 16), c(21, 22)))
+  expect_identical(private %.% r1_state_indices, c(5, 11, 17, 23))
+  expect_identical(private %.% s_state_indices, c(25, 26))
+
+  # Check flow matrix helpers are correctly set
+  expect_identical(private %.% rs_age_group, c(rep(1L, 2), rep(2L, 2), rep(1L, 2), rep(2L, 2), 1L, 2L))
   expect_identical(
     private %.% infection_matrix_to_state_vector,
     list(
@@ -1244,7 +1260,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
 
   # With no infected, we should just get the passive flow through the states
   y0 <- runif(private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 0
+  y0[purrr::reduce(private$i_state_indices, c)] <- 0
 
   flow <- y0 * private$progression_flow_rates
   expect_identical(
@@ -1276,7 +1292,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
 
   #With no infected, we should just get the passive flow through the states
   y0 <- runif(private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 0
+  y0[purrr::reduce(private$i_state_indices, c)] <- 0
 
   flow <- y0 * private$progression_flow_rates
   expect_identical(
@@ -1309,7 +1325,7 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
 
   # With only infected, we should get no new infections
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 1
+  y0[purrr::reduce(private$i_state_indices, c)] <- 1
   expect_identical(
     unname(private$rhs(0, y0)[[1]]),
     c(
@@ -1344,7 +1360,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
 
   # With only infected, we should get no new infections
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 1
+  y0[purrr::reduce(private$i_state_indices, c)] <- 1
   expect_identical(
     unname(private$rhs(0, y0)[[1]]),
     c(
@@ -1384,8 +1400,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
   # With infected and susceptible, we should get new infections.
   # However, variant 2 has much lower infection rate and this should reflect in the RHS
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- si <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- ss <- 0.8 # The rest are susceptible
+  y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.1 # Infections with both variants
+  y0[private$s_state_indices] <- ss <- 0.8 # The rest are susceptible
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
@@ -1423,8 +1439,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
   # However, variant 2 has much lower infection rate and this should reflect in the RHS
 
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- si <- 0.05 # Infections with both variants
-  y0[private$s_state_indexes] <- ss <- 0.4 # The rest are susceptible
+  y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
+  y0[private$s_state_indices] <- ss <- 0.4 # The rest are susceptible
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
@@ -1463,8 +1479,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
 
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- si <- 0.1 # Infections with both variants
-  y0[private$r1_state_indexes] <- sr <- 0.4 # The rest are previously infected
+  y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.1 # Infections with both variants
+  y0[private$r1_state_indices] <- sr <- 0.4 # The rest are previously infected
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
@@ -1498,8 +1514,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
 
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- si <- 0.05 # Infections with both variants
-  y0[private$r1_state_indexes] <- sr <- 0.4 # The rest are previously infected
+  y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
+  y0[private$r1_state_indices] <- sr <- 0.4 # The rest are previously infected
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
@@ -1550,8 +1566,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   # In the activity scenario, the risk is halved after 1 day
   # so we rerun the test above for t = 1 instead of t = 0 and check that infections are halved
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- si <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- ss <- 0.8 # The rest are susceptible
+  y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.1 # Infections with both variants
+  y0[private$s_state_indices] <- ss <- 0.8 # The rest are susceptible
   expect_equal(
     unname(private$rhs(1, y0)[[1]]),
     c(
@@ -1602,8 +1618,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   # In the activity scenario, the risk is halved after 1 day
   # so we rerun the test above for t = 1 instead of t = 0 and check that infections are halved
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- si <- 0.05 # Infections with both variants
-  y0[private$s_state_indexes] <- ss <- 0.4 # The rest are susceptible
+  y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
+  y0[private$s_state_indices] <- ss <- 0.4 # The rest are susceptible
   expect_equal(
     unname(private$rhs(1, y0)[[1]]),
     c(
