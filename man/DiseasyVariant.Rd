@@ -21,7 +21,7 @@ See vignette("diseasy-variant")
   # Add variants via the `$add_variant()` method
 
   var$add_variant(name = "WT")
-  var$add_variant(name = "Mutant", characteristics = list("relative_infection_risk" = 1.2)
+  var$add_variant(name = "Mutant", characteristics = list("relative_infection_risk" = 1.2))
   var$variants
 
   rm(var)
