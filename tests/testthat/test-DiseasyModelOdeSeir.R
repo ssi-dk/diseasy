@@ -1,7 +1,6 @@
-test_that("index helpers works as expected (SEIR single variant / single age group)", {
+test_that("helpers are configured as expected (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
-  # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
@@ -9,24 +8,32 @@ test_that("index helpers works as expected (SEIR single variant / single age gro
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = TRUE,
+    variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
+    disease_progression_rates = c("E" = 2, "I" = 4),
     parameters = list("age_cuts_lower" = 0)
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
   expect_identical(private %.% i_state_indexes, list(2))
   expect_identical(private %.% s_state_indexes, 4)
   expect_identical(private %.% state_vector_age_group, rep(1L, 4))
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(4)))
 
+  # Check progression flow rates are correctly set
+  expect_identical(private %.% progression_flow_rates, c(2, 4, 0, 0))
+
+  # Check infection risk is correctly set
+  expect_identical(private %.% infection_risk, c(0, 0, 0.01, 1))
+
   rm(m)
 })
 
-test_that("index helpers works as expected (SEEIIRR single variant / single age group)", {
+test_that("helpers are configured as expected (SEEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -37,19 +44,27 @@ test_that("index helpers works as expected (SEEIIRR single variant / single age 
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = TRUE,
+    variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = 2, "I" = 4),
     parameters = list("age_cuts_lower" = 0)
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
   expect_identical(private %.% i_state_indexes, list(c(3, 4)))
   expect_identical(private %.% s_state_indexes, 7)
   expect_identical(private %.% state_vector_age_group, rep(1L, 7))
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(7)))
+
+  # Check progression flow rates are correctly set
+  expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 0))
+
+  # Check infection risk is correctly set
+  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 1))
 
   rm(m)
 })
@@ -67,12 +82,14 @@ test_that("index helpers works as expected (SEEIIRR double variant / single age 
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = 2, "I" = 4),
     parameters = list("age_cuts_lower" = 0)
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10)))
   expect_identical(private %.% s_state_indexes, 13)
@@ -81,6 +98,12 @@ test_that("index helpers works as expected (SEEIIRR double variant / single age 
     private %.% infection_matrix_to_state_vector,
     list(seq.int(13), seq.int(13) + 13L)
   )
+
+  # Check progression flow rates are correctly set
+  expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 0))
+
+  # Check infection risk is correctly set
+  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1))
 
   rm(m)
 })
@@ -98,12 +121,14 @@ test_that("index helpers works as expected (SEEIIRR double variant / double age 
     ),
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = 2, "I" = 4),
     parameters = list("age_cuts_lower" = c(0, 60))
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7, 13, 19))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10), c(15, 16), c(21, 22)))
   expect_identical(private %.% s_state_indexes, c(25, 26))
@@ -118,9 +143,20 @@ test_that("index helpers works as expected (SEEIIRR double variant / double age 
     )
   )
 
+  # Check progression flow rates are correctly set
+  expect_identical(
+    private %.% progression_flow_rates,
+    c(4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 0, 0)
+  )
+
+  # Check infection risk is correctly set
+  expect_identical(
+    private %.% infection_risk,
+    c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1, 1)
+  )
+
   rm(m)
 })
-
 
 
 test_that("contact_matrix helper works as expected (no scenario - single age group)", {
@@ -269,212 +305,6 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   expect_identical(
     private %.% contact_matrix(Inf),
     purrr::reduce(contact_basis$DK$counts, `+`) * 0.5
-  )
-
-  rm(m)
-})
-
-
-
-test_that("progression_flow_rates are set as expected (SEIR single variant / single age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = DiseasyVariant$new(n_variants = 1),
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = 2, "I" = 4),
-    parameters = list("age_cuts_lower" = 0)
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(private %.% progression_flow_rates, c(2, 4, 0, 0))
-
-  rm(m)
-})
-
-test_that("progression_flow_rates are set as expected (SEEIIRR single variant / single age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = TRUE,
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = 2, "I" = 4),
-    parameters = list("age_cuts_lower" = 0)
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 0))
-
-  rm(m)
-})
-
-test_that("progression_flow_rates are set as expected (SEEIIRR double variant / single age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = DiseasyVariant$new(n_variants = 2),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = 2, "I" = 4),
-    parameters = list("age_cuts_lower" = 0)
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 0))
-
-  rm(m)
-})
-
-test_that("progression_flow_rates are set as expected (SEEIIRR double variant / double age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = DiseasyVariant$new(n_variants = 2),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = 2, "I" = 4),
-    parameters = list("age_cuts_lower" = c(0, 60))
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(
-    private %.% progression_flow_rates,
-    c(4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 0, 0)
-  )
-
-  rm(m)
-})
-
-
-
-test_that("infection_risk is set as expected (SEIR single variant / single age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = DiseasyVariant$new(n_variants = 1),
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    parameters = list("age_cuts_lower" = 0)
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(private %.% infection_risk, c(0, 0, 0.01, 1))
-
-  rm(m)
-})
-
-test_that("infection_risk is set as expected (SEEIIRR single variant / single age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = TRUE,
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    parameters = list("age_cuts_lower" = 0)
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 1))
-
-  rm(m)
-})
-
-test_that("infection_risk is set as expected (SEEIIRR double variant / single age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = DiseasyVariant$new(n_variants = 2),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    parameters = list("age_cuts_lower" = 0)
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1))
-
-  rm(m)
-})
-
-test_that("infection_risk is set as expected (SEEIIRR double variant / double age group)", {
-  skip_if_not_installed("RSQLite")
-
-  # Creating an empty model module
-  m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-    observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
-      last_queryable_date = Sys.Date() - 1
-    ),
-    variant = DiseasyVariant$new(n_variants = 2),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    parameters = list("age_cuts_lower" = c(0, 60))
-  )
-
-  # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
-
-  expect_identical(
-    private %.% infection_risk,
-    c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1, 1)
   )
 
   rm(m)
