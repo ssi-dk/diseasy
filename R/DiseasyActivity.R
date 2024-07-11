@@ -726,10 +726,10 @@ DiseasyActivity <- R6::R6Class(                                                 
   active = list(
     #' @field scenario_matrix (`matrix` `array`)\cr
     #'   A reduced view of the internal state of restrictions (showing only used activity units). Read-only.
-    scenario_matrix = function(value) {
-
-      if (missing(value)) {
-
+    scenario_matrix = purrr::partial(
+      .f = active_binding,
+      name = "risk_matrix",
+      expr = {
         if (any(private %.% .scenario_matrix != 0)) {
 
           # We filter out rows without any 1's (these activity units are not active)
@@ -751,24 +751,24 @@ DiseasyActivity <- R6::R6Class(                                                 
           return(NULL)
         }
 
-      } else {
-        private$read_only_error("scenario_matrix")
       }
-    },
+    ),
 
     #' @field risk_matrix (`matrix` `array`)\cr
     #'   A reduced view of the internal state of overall risk multipliers. Read-only.
     risk_matrix = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "risk_matrix",
-      expr = return(private %.% .risk_matrix)),
+      expr = return(private %.% .risk_matrix)
+    ),
 
 
     #' @field contact_basis `r rd_contact_basis("field")`
     contact_basis = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "contact_basis",
-      expr = return(private %.% .contact_basis))
+      expr = return(private %.% .contact_basis)
+    )
   ),
 
   private = list(
