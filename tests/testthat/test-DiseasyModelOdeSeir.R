@@ -429,10 +429,10 @@ test_that("contact_matrix helper works as expected (with scenario - single age g
   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
   # Half risk from 2021-01.01
-  act$change_risk(date = as.Date("2021-01-01"), type = "home", risk = 0.5)
-  act$change_risk(date = as.Date("2021-01-01"), type = "work", risk = 0.5)
+  act$change_risk(date = as.Date("2021-01-01"), type = "home",   risk = 0.5)
+  act$change_risk(date = as.Date("2021-01-01"), type = "work",   risk = 0.5)
   act$change_risk(date = as.Date("2021-01-01"), type = "school", risk = 0.5)
-  act$change_risk(date = as.Date("2021-01-01"), type = "other", risk = 0.5)
+  act$change_risk(date = as.Date("2021-01-01"), type = "other",  risk = 0.5)
 
 
   # Creating an empty model module
@@ -456,28 +456,47 @@ test_that("contact_matrix helper works as expected (with scenario - single age g
   expect_null(private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date())))
 
   # Then from 2020-01-01, it should be "baseline" with risk 1, which is just the contact_basis matrices
-  # However, the model uses per capita-ish rates, so we need to convert. Except in this case, where we
-  # only have a single age group and use population density as our capita. Here the re-scaling doesn't do anything.
-  expect_identical(
+  # However, the model uses per capita-ish rates, so we need to convert.
+
+  # To convert, we need the proportion of the population in the different age groups
+  proportion <- m$activity$contact_basis$proportion
+
+  expect_equal(
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)), dimnames = list("0+", "0+"))
+    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+      act$rescale_counts_to_rates(proportion) |>
+      (\(m) m * outer(proportion, proportion, "*"))() |>
+      sum() |>
+      matrix(dimnames = list("0+", "0+"))
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_identical(
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)) * 0.5, dimnames = list("0+", "0+"))
+    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+      act$rescale_counts_to_rates(proportion) |>
+      (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
+      sum() |>
+      matrix(dimnames = list("0+", "0+"))
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)) * 0.5, dimnames = list("0+", "0+"))
+    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+      act$rescale_counts_to_rates(proportion) |>
+      (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
+      sum() |>
+      matrix(dimnames = list("0+", "0+"))
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(sum(purrr::reduce(contact_basis %.% DK %.% counts, `+`)) * 0.5, dimnames = list("0+", "0+"))
+    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+      act$rescale_counts_to_rates(proportion) |>
+      (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
+      sum() |>
+      matrix(dimnames = list("0+", "0+"))
   )
 
   rm(m)
@@ -494,10 +513,10 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
   # Half risk from 2021-01.01
-  act$change_risk(date = as.Date("2021-01-01"), type = "home", risk = 0.5)
-  act$change_risk(date = as.Date("2021-01-01"), type = "work", risk = 0.5)
+  act$change_risk(date = as.Date("2021-01-01"), type = "home",   risk = 0.5)
+  act$change_risk(date = as.Date("2021-01-01"), type = "work",   risk = 0.5)
   act$change_risk(date = as.Date("2021-01-01"), type = "school", risk = 0.5)
-  act$change_risk(date = as.Date("2021-01-01"), type = "other", risk = 0.5)
+  act$change_risk(date = as.Date("2021-01-01"), type = "other",  risk = 0.5)
 
 
   # Creating an empty model module
@@ -1045,7 +1064,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis$DK
-  basis$counts <- purrr::map(basis$counts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
+  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
@@ -1098,17 +1117,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
-
-  input <- act$get_scenario_contacts(c(0, 40), weights = c(1, 1, 1, 1))[[1]]
-  population <- rep(0.5, 2)
-  act$rescale_counts_to_rates(input, population)
-
-  act2 <- DiseasyActivity$new()
-  N <- 2
-  population2 <- rep(1/N, N)
-  input2 <- act2$get_scenario_contacts(seq(N-1), weights = rep(1, 4))[[1]]
-  act2$rescale_counts_to_rates(input2, population2)
-
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
   act$change_risk(Sys.Date(), type = "work",   risk = 0.5)
   act$change_risk(Sys.Date(), type = "school", risk = 0.5)
@@ -1159,7 +1167,7 @@ test_that("RHS passes sanity checks (single + double variant / double age group)
 
   # Create a activity scenario for the tests
   basis <- contact_basis$DK
-  basis$counts <- purrr::map(basis$counts, ~ 0.25 / 256 + 0 * .) # Create "unit" contact matrices
+  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16  + 0 * .) # Create "unit" contact matrices
   basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
   basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
