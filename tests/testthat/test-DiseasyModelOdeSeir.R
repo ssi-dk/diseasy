@@ -45,7 +45,7 @@ test_that("helpers are configured as expected (SR single variant / single age gr
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(
         fr, # R
@@ -95,7 +95,7 @@ test_that("helpers are configured as expected (SIR single variant / single age g
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(
         fr, # R
@@ -157,7 +157,7 @@ test_that("helpers are configured as expected (SIR double variant / double age g
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(#v1 v2
         fr, fr, # R, Age group 1, Variant 1
@@ -211,7 +211,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(
         fr, # R
@@ -265,7 +265,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(
         fr, # R1
@@ -330,7 +330,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(#v1 v2
         fr, fr, # R1, Variant 1
@@ -400,7 +400,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(#v1 v2
         fr, fr, # R1, Age group 1, Variant 1
@@ -1616,14 +1616,14 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(#v1 v2
         # Variant 1
-        fr, 1 - 0.75 * (1 - fr), # R
+        fr, 1 - 0.5 * (1 - fr), # R
 
         # Variant 2
-        1 - 0.5 * (1 - fr), fr, # R
+        1 - 0.75 * (1 - fr), fr, # R
 
         # S
         1,  1
@@ -1669,20 +1669,20 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
 
   # Check risk matrix is correctly set
   expect_equal(
-    private %.% risk_matrix,
+    private %.% immunity_matrix,
     matrix(
       c(#v1 v2
         # Age group 1, Variant 1
-        fr, 1 - 0.75 * (1 - fr), # R
+        fr, 1 - 0.5 * (1 - fr), # R
 
         # Age group 2, Variant 1
-        fr, 1 - 0.75 * (1 - fr), # R
+        fr, 1 - 0.5 * (1 - fr), # R
 
         # Age group 1, Variant 2
-        1 - 0.5 * (1 - fr), fr, # R
+        1 - 0.75 * (1 - fr), fr, # R
 
         # Age group 2, Variant 2
-        1 - 0.5 * (1 - fr), fr, # R
+        1 - 0.75 * (1 - fr), fr, # R
 
         # S
         1,  1,  # Age group 1
