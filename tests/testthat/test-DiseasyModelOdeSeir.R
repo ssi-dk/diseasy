@@ -358,18 +358,18 @@ test_that("contact_matrix helper works as expected (no scenario - two age groups
   # Then from 1970-01-01, it should always be the same
   expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(rep(2, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(rep(2, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(rep(2, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
   )
 
   rm(m)
@@ -401,18 +401,18 @@ test_that("contact_matrix helper works as expected (no scenario - three age grou
   # Then from 1970-01-01, it should always be the same
   expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(rep(3, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(rep(3, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(rep(3, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
   )
 
   rm(m)
