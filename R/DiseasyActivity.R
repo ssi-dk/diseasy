@@ -689,7 +689,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::reportAssertions(coll)
 
       population <- population / sum(population)
-      out <- input / matrix(rep(population, length(population)), nrow = length(population), byrow = TRUE)
+      out <- input / outer(population, population, "*")
       return(out)
     },
 
