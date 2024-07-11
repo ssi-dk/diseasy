@@ -374,7 +374,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
 
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = as.Date("2020-01-01")
@@ -405,65 +405,144 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   rm(m)
 })
 
-# test_that("helpers are configured as expected (SEEIIRR single variant / single age group)", {
-#   skip_if_not_installed("RSQLite")
+test_that("RHS does not leak and solution is non-negative (SEEIIRR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
 
-#   # Creating an empty model module
-#   m <- DiseasyModelOdeSeir$new(
-#     season = TRUE,
-#     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-#     observables = DiseasyObservables$new(
-#       conn = DBI::dbConnect(RSQLite::SQLite()),
-#       last_queryable_date = Sys.Date() - 1
-#     ),
-#     variant = DiseasyVariant$new(n_variants = 1),
-#     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-#     disease_progression_rates = c("E" = 2, "I" = 4),
-#     parameters = list("age_cuts_lower" = 0)
-#   )
+  # Define an activity scenario
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act$set_activity_units(dk_activity_units)
 
-#   # Get a reference to the private environment
-#   private <- m$.__enclos_env__$private
+  # Fully open from 2020-01-01
+  act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
-#   rm(m)
-# })
+  # Half risk from 2021-01.01
+  act$change_risk(date = as.Date("2020-01-05"), type = "home", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "work", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "school", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "other", risk = 0.5)
 
-# test_that("helpers are configured as expected (SEEIIRR double variant / single age group)", {
-#   skip_if_not_installed("RSQLite")
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = act,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = 2, "I" = 4),
+    parameters = list("age_cuts_lower" = 0)
+  )
 
-#   # Creating an empty model module
-#   m <- DiseasyModelOdeSeir$new(
-#     season = TRUE,
-#     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-#     observables = DiseasyObservables$new(
-#       conn = DBI::dbConnect(RSQLite::SQLite()),
-#       last_queryable_date = Sys.Date() - 1
-#     ),
-#     variant = DiseasyVariant$new(n_variants = 2),
-#     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-#     disease_progression_rates = c("E" = 2, "I" = 4),
-#     parameters = list("age_cuts_lower" = 0)
-#   )
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
 
-#   rm(m)
-# })
+  # Generate a uniform initial state_vector that sums to 1
+  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+    (\(.) . / sum(.))()
+  expect_equal(sum(y0), 1)
 
-# test_that("helpers are configured as expected (SEEIIRR double variant / double age group)", {
-#   skip_if_not_installed("RSQLite")
 
-#   # Creating an empty model module
-#   m <- DiseasyModelOdeSeir$new(
-#     season = TRUE,
-#     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
-#     observables = DiseasyObservables$new(
-#       conn = DBI::dbConnect(RSQLite::SQLite()),
-#       last_queryable_date = Sys.Date() - 1
-#     ),
-#     variant = DiseasyVariant$new(n_variants = 2),
-#     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-#     disease_progression_rates = c("E" = 2, "I" = 4),
-#     parameters = list("age_cuts_lower" = c(0, 60))
-#   )
+  # Check that rhs function does not immediately leak
+  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
 
-#   rm(m)
-# })
+  # Run solver across scenario change to check for long-term leakage
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
+  checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
+
+  rm(m)
+})
+
+test_that("RHS does not leak and solution is non-negative (SEEIIRR double variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 2),
+    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = 2, "I" = 4),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Generate a uniform initial state_vector that sums to 1
+  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+    (\(.) . / sum(.))()
+  expect_equal(sum(y0), 1)
+
+
+  # Check that rhs function does not immediately leak
+  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
+
+  # Run solver across scenario change to check for long-term leakage
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
+  checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
+
+  rm(m)
+})
+
+test_that("RHS does not leak and solution is non-negative (SEEIIRR double variant / double age group)", {
+  skip_if_not_installed("RSQLite")
+
+  # Define an activity scenario
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act$set_activity_units(dk_activity_units)
+
+  # Fully open from 2020-01-01
+  act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+  # Half risk from 2021-01.01
+  act$change_risk(date = as.Date("2020-01-05"), type = "home", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "work", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "school", risk = 0.5)
+  act$change_risk(date = as.Date("2020-01-05"), type = "other", risk = 0.5)
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = act,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 2),
+    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    disease_progression_rates = c("E" = 2, "I" = 4),
+    parameters = list("age_cuts_lower" = c(0, 60))
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Generate a uniform initial state_vector that sums to 1
+  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+    (\(.) . / sum(.))()
+  expect_equal(sum(y0), 1)
+
+
+  # Check that rhs function does not immediately leak
+  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
+
+  # Run solver across scenario change to check for long-term leakage
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, parms = NULL, atol = 1e-12, rtol = 1e-12)
+  checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
+  checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
+
+  rm(m)
+})
+
+
+
+# TODO Add sanity checks for RHS
+
