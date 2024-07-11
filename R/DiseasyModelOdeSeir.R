@@ -81,7 +81,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Time-varying contact matrices projected onto target age-groups
-      contact_matrixes <- self %.% activity %.% get_scenario_contacts(
+      contact_matrices <- self %.% activity %.% get_scenario_contacts(
         age_cuts_lower = self %.% parameters %.% age_cuts_lower,
         weights = self %.% parameters %.% activity.contact_weights
       )
@@ -93,7 +93,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # So instead of population, we use the proportion of population in the age groups.
 
       # To convert to per capita-ish we need the proportion to use.
-
       if (length(self %.% activity %.% get_scenario_activities()) == 0) {
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
         private$population_proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
@@ -103,20 +102,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           dplyr::pull("proportion")
       }
 
-      private$per_capita_contact_matrices <- contact_matrixes |>
+      # We then construct the normalised matrices
+      private$per_capita_contact_matrices <- contact_matrices |>
         purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, private$population_proportion))
 
-      # Finally, we want to adjust for the structure of the SEIR model such that the (Malthusian) growth rate
-      # of the model is conserved for different number of E and I compartments.
-      # This is a scaling that we need to compute and multiply with the infection rate "beta".
-      # To optimise, we perform the scaling here onto the contact matrices directly, since we then
-      # have to do it only once.
-      if (malthusian_matching) {
-        scaling_factor <- private$malthusian_scaling_factor()
-      } else {
-        scaling_factor <- 1
-      }
-      private$scale_contact_matrices(scaling_factor)
+      # Call `$set_contact_matrix` to store this initial scaling of the contact matrices
+      private$set_contact_matrix()
+
+
 
 
       # Store the indices of the first compartments for later RHS computation
@@ -249,6 +242,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Set the default forcing functions (no forcing)
       private$infected_forcing <- \(t, infected) infected
       private$state_vector_forcing <- \(t, dy_dt) dy_dt
+
+
+      # Finally, we want to adjust for the structure of the SEIR model such that the (Malthusian) growth rate
+      # of the model is conserved for different number of E and I compartments.
+      # This is a scaling that we need to compute and multiply with the infection rate "beta".
+      # To optimise, we perform the scaling here onto the contact matrices directly, since we then
+      # have to do it only once.
+      if (malthusian_matching) {
+        private$set_contact_matrix(private$malthusian_scaling_factor())
+      }
 
     },
 
@@ -410,23 +413,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
     # @description
-    #  Scale the contact matrices of the model.
+    #  Configure the contact matrix helper in the model.
     # @param scaling_factor (`numeric(1)`)\cr
     #   The scaling factor to apply to the contact matrices.
     # @return
     #  NULL (called for side effects).
-    scale_contact_matrices = function(scaling_factor) {
+    set_contact_matrix = function(scaling_factor = 1) {
 
       # Apply the scaling factor to the contact matrices
-      scaled_per_capita_contact_matrixes <- purrr::map(private$per_capita_contact_matrices, ~ .x * scaling_factor)
+      scaled_per_capita_contact_matrices <- purrr::map(private$per_capita_contact_matrices, ~ .x * scaling_factor)
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: last_queryable_date from the observables module)
-      activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrixes)) -
+      activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrices)) -
         self %.% observables %.% last_queryable_date
 
       # We can then create a switch that selects the correct contact matrix at the given point in time
-      contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrixes)
+      contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrices)
       private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
 
       # f1 <- \(t) dplyr::case_when(!!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}"))))
