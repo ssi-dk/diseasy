@@ -245,7 +245,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 1, determine the number of infected by age group and variant
 
       # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
-      I_av <- vapply(i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+      infected <- vapply(i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 
       # microbenchmark::microbenchmark( # Microseconds
       #   purrr::map_dbl(i_state_indexes, \(indexes) sum(state_vector[indexes])),
@@ -256,22 +256,22 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # )
 
 
-      I_av <- matrix(I_av, nrow = private$n_age_groups)
+      infected <- matrix(infected, nrow = private$n_age_groups)
 
       # microbenchmark::microbenchmark( # Nanoseconds
-      #   matrix(I_av, nrow = length(self$parameters$age_groups), ncol = length(self$variant$variants)),
-      #   matrix(I_av, nrow = length(self$parameters$age_groups)),
-      #   matrix(I_av, nrow = private$n_age_groups),
+      #   matrix(infected, nrow = length(self$parameters$age_groups), ncol = length(self$variant$variants)),
+      #   matrix(infected, nrow = length(self$parameters$age_groups)),
+      #   matrix(infected, nrow = private$n_age_groups),
       #   check = "equal", times = 1000L
       # )
 
 
-      ## Step 2, determine their contacts with other age groups
-      BI_av <- private$contact_matrix(t) %*% I_av
+      ## Step 2, determine their contacts with other age groups (beta * I)
+      infected_contacts <- private$contact_matrix(t) %*% infected
 
 
-      ## Step 3, apply the effect of season and overall infection risk
-      BI_av <- BI_av * self$parameters[["overall_infection_risk"]] * private$season$model_t(t)
+      ## Step 3, apply the effect of season and overall infection risk (rr * beta * I * s(t)
+      infection_rate <- infected_contacts * self$parameters[["overall_infection_risk"]] * private$season$model_t(t)
 
 
       ## Step 4, determine the infective interactions
