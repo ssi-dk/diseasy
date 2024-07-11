@@ -134,25 +134,21 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # )
 
 
-      # Store the indexes of the first exposed compartments for later RHS computation
+      # Store the indexes of the first compartments for later RHS computation
       private$e1_state_indexes <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
         sum(compartment_structure) + 1
+
+      # Then we store the indexes for just the first compartment
+      private$i1_state_indexes <- private$e1_state_indexes + purrr::pluck(compartment_structure, "E", .default = 0)
+
+      # Store the indexes of the first recovered compartments
+      private$r1_state_indexes <- private$i1_state_indexes + purrr::pluck(compartment_structure, "I")
 
 
       # Store the indexes of the infectious compartments for later RHS computation
       # We create a list of indexes for each variant.
       # First, we determine all I indexes
-      private$i_state_indexes <- seq(private %.% n_variants * private %.% n_age_groups) |>
-        purrr::map(
-          \(k) {
-            purrr::pluck(compartment_structure, "E", .default = 0) +
-              (1:compartment_structure[["I"]]) + sum(compartment_structure) * (k - 1)
-          }
-        )
-
-      # Store the indexes of the first recovered compartments
-      private$r1_state_indexes <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
-        sum(compartment_structure) + private %.% n_EIR_states - purrr::pluck(compartment_structure, "R") + 1
+      private$i_state_indexes <- purrr::map(private$i1_state_indexes, ~ . + seq_len(compartment_structure[["I"]]) - 1)
 
 
       # Store the indexes of the susceptible states
@@ -307,6 +303,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # Index helpers
     e1_state_indexes = NULL,
+    i1_state_indexes  = NULL,
     i_state_indexes  = NULL,
     r1_state_indexes  = NULL,
     s_state_indexes  = NULL,
