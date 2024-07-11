@@ -228,18 +228,61 @@ test_that("contact_matrix helper works as expected (no scenario - two age groups
   # Then from 1970-01-01, it should always be the same
   expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(rep(0.5, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(2, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(rep(0.5, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(2, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(rep(0.5, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(2, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+  )
+
+  rm(m)
+})
+
+test_that("contact_matrix helper works as expected (no scenario - three age groups)", {
+  skip_if_not_installed("RSQLite")
+
+  # Creating an empty model module
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 2),
+    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
+    parameters = list("age_cuts_lower" = c(0, 40, 80))
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # The default contact matrix starts on 1970-01-01
+  # (.. So it should not be there before)
+  expect_null(private %.% contact_matrix(- as.numeric(Sys.Date())))
+
+  # Then from 1970-01-01, it should always be the same
+  expect_identical(
+    private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
+    matrix(rep(3, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+  )
+
+  expect_identical(
+    private %.% contact_matrix(0),
+    matrix(rep(3, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+  )
+
+  # The contact matrix should be valid forever
+  expect_identical(
+    private %.% contact_matrix(Inf),
+    matrix(rep(3, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
   )
 
   rm(m)
@@ -285,26 +328,27 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
   expect_null(private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date())))
 
   # Then from 2020-01-01, it should be "baseline" with risk 1, which is just the contact_basis matrices
+  # However, the model uses per capita rates, so we need to convert
   expect_identical(
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis$DK$counts, `+`)
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`), contact_basis %.% DK %.% population)
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_identical(
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis$DK$counts, `+`) * 0.5
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% population)
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    purrr::reduce(contact_basis$DK$counts, `+`) * 0.5
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% population)
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    purrr::reduce(contact_basis$DK$counts, `+`) * 0.5
+    act$rescale_counts_to_rates(purrr::reduce(contact_basis$DK$counts, `+`) * 0.5, contact_basis %.% DK %.% population)
   )
 
   rm(m)
