@@ -140,6 +140,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
 
 
+      # In RHS, we need a mapping from i_state_indexes to the relative infection risk of the corresponding variant.
+      private$indexed_variant_infection_risk <- self$variant$variants |>
+        purrr::map(
+          \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private$n_age_groups)
+        ) |>
+        purrr::reduce(c)
+
+
       # During the evaluation of the RHS function, we need to map the state_vector to the elements of an
       # infection matrix.
 
@@ -249,8 +257,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # Index helpers
     e1_state_indexes = NULL,
-    i_state_indexes = NULL,
-    s_state_indexes = NULL,
+    i_state_indexes  = NULL,
+    s_state_indexes  = NULL,
+    indexed_variant_infection_risk = NULL,
     state_vector_age_group = NULL,
     infection_matrix_to_state_vector = NULL,
 
@@ -266,18 +275,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Compute the risk weighted state_vector
       risk_weighted_state_vector <- private$infection_risk * state_vector
 
-      # Determine the infection pressure by variant by accounting for relative infection risk of the variant
-      # and the number of individuals infected by each variant.
-      infection_pressure_per_variant <- purrr::map2(
-        private$i_state_indexes,
-        private$variant$variants,
-        ~ .y[["relative_infection_risk"]] * sum(state_vector[.x])
-      )
-
       ## Step 1, determine the number of infected by age group and variant
 
       # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
       infected <- vapply(private$i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+
 
       # microbenchmark::microbenchmark( # Microseconds
       #   purrr::map_dbl(i_state_indexes, \(indexes) sum(state_vector[indexes])),
@@ -302,8 +304,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       infected_contacts <- private$contact_matrix(t) %*% infected
 
 
-      ## Step 3, apply the effect of season and overall infection risk (rr * beta * I * s(t)
-      infection_rate <- infected_contacts * self$parameters[["overall_infection_risk"]] * self$season$model_t(t)
+      ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
+      # (rr * beta * beta_v * I * s(t)
+      infection_rate <- infected_contacts *
+        self$season$model_t(t) *
+        self$parameters[["overall_infection_risk"]] *
+        private$indexed_variant_infection_risk
 
 
       ## Step 4, determine the infective interactions
