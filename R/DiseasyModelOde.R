@@ -2,7 +2,7 @@
 #'
 #' @description TODO
 #' @export
-DiseasyModelOde <- R6::R6Class(
+DiseasyModelOde <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyModelOde",
   inherit = DiseasyModel,
 

@@ -3,13 +3,13 @@ test_that("index helpers works as expected (SEIR single variant / single age gro
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = T,
+    variant = TRUE,
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     parameters = list("age_cuts_lower" = 0)
   )
@@ -31,13 +31,13 @@ test_that("index helpers works as expected (SEEIIRR single variant / single age 
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = T,
+    variant = TRUE,
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0)
   )
@@ -59,7 +59,7 @@ test_that("index helpers works as expected (SEEIIRR double variant / single age 
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -90,7 +90,7 @@ test_that("index helpers works as expected (SEEIIRR double variant / double age 
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -128,7 +128,7 @@ test_that("contact_matrix helper works as expected (no scenario - single age gro
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -171,7 +171,7 @@ test_that("contact_matrix helper works as expected (no scenario - two age groups
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -228,7 +228,7 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -281,7 +281,7 @@ test_that("progression_flow_rates are set as expected (SEIR single variant / sin
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -306,13 +306,13 @@ test_that("progression_flow_rates are set as expected (SEEIIRR single variant / 
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = T,
+    variant = TRUE,
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = 2, "I" = 4),
     parameters = list("age_cuts_lower" = 0)
@@ -331,7 +331,7 @@ test_that("progression_flow_rates are set as expected (SEEIIRR double variant / 
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -356,7 +356,7 @@ test_that("progression_flow_rates are set as expected (SEEIIRR double variant / 
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -386,7 +386,7 @@ test_that("infection_risk is set as expected (SEIR single variant / single age g
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -410,13 +410,13 @@ test_that("infection_risk is set as expected (SEEIIRR single variant / single ag
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = T,
+    variant = TRUE,
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0)
   )
@@ -434,7 +434,7 @@ test_that("infection_risk is set as expected (SEEIIRR double variant / single ag
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -458,7 +458,7 @@ test_that("infection_risk is set as expected (SEEIIRR double variant / double ag
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = T,
+    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
