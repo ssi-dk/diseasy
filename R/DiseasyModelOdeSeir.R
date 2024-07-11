@@ -47,7 +47,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_names(
         names(disease_progression_rates),
         subset.of = c("E", "I"),
-        must.include = c("I"),
+        must.include = "I",
         add = coll
       )
 
