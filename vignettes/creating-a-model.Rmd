@@ -24,7 +24,7 @@ This vignette provides an overview of the `DiseasyModel` class and its use in cr
 As described in the package introduction (`vignette("diseasy")`), the power of `diseasy` comes from combining different
 "functional" modules with model "templates" to create a large ensemble of models easily.
 
-It is `DiseasyModel` that defines how such model templates should look, and provides the mechanism by witch the
+It is `DiseasyModel` that defines how such model templates should look, and provides the mechanism by which the
 functional modules are loaded in the model templates to create the individual model members of the ensemble.
 
 Before we dive into the details of `DiseasyModel`, let's first consider what it means to be a "model template":
