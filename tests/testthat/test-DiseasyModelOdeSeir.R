@@ -800,24 +800,26 @@ test_that("RHS passes sanity checks (single + double variant / single age group)
     c(
       0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
       0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+      - 0.1 * (1 + 0.01) * 0.8 # Susceptible
     )
   )
 
+
+  ### Check 4: re-infections should have lower rates
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  y0[private$r1_state_indexes] <- 0.8 # The rest are previously infected
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
+      0.02 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4 - 0.02 * 0.8 * 0.1, # Variant 1
       0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+      0 # Susceptible
     )
   )
 
 
-  ### Check 4: The contact matrix scaling works as expected.
+  ### Check 5: The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
   # so we rerun the test above for t = 1 instead of t = 0 and check that infections are halved
   expect_equal(
@@ -825,7 +827,7 @@ test_that("RHS passes sanity checks (single + double variant / single age group)
     c(
       0.5 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
       0.5 * 0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.5 * 0.1 * 0.8 - 0.5 * 0.1 * 0.8 * 0.01 # Susceptible
+      - 0.5 * 0.1 * (1 + 0.01) * 0.8 # Susceptible
     )
   )
 
@@ -901,45 +903,39 @@ test_that("RHS passes sanity checks (single + double variant / double age group)
       0.1 * 0.45, -0.05 * 4, 0.05 * 4, # Variant 1, age group 2
       0, 0, 0, # Variant 2, age group 1
       0, 0, 0, # Variant 2, age group 2
-      - 0.1 * 0.45, 0.1 * 0.45 # Susceptible
+      - 0.1 * 0.45, - 0.1 * 0.45 # Susceptible
     )
   )
 
   y0 <- rep(0, private$n_states)
-  y0[private$i_state_indexes[[2]]] <- 0.1 # Only infections w. variant 2
-  y0[private$s_state_indexes] <- 0.9 # The rest are susceptible
+  y0[private$i_state_indexes[[3]]] <- 0.05 # Only infections w. variant 2
+  y0[private$i_state_indexes[[4]]] <- 0.05 # Only infections w. variant 2
+  y0[private$s_state_indexes] <- 0.45 # The rest are susceptible
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0, 0, 0, # Variant 1
-      0.1 * 0.9 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.9 * 0.01 # Susceptible
+      0, 0, 0, # Variant 1, age group 1
+      0, 0, 0, # Variant 1, age group 2
+      0.1 * 0.45 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 1
+      0.1 * 0.45 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 2
+      - 0.1 * 0.45 * 0.01, - 0.1 * 0.45 * 0.01 # Susceptible
     )
   )
 
   y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
+  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.05 # Infections with both variants
+  y0[private$s_state_indexes] <- 0.4 # The rest are susceptible
   expect_equal(
     unname(private$rhs(0, y0)[[1]]),
     c(
-      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
-      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
+      0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 1
+      0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 2
+      0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 1
+      0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 2
+      - 0.1 * (1 +  0.01) * 0.4, - 0.1 * (1 + 0.01) * 0.4 # Susceptible
     )
   )
 
-  y0 <- rep(0, private$n_states)
-  y0[purrr::reduce(private$i_state_indexes, c)] <- 0.1 # Infections with both variants
-  y0[private$s_state_indexes] <- 0.8 # The rest are susceptible
-  expect_equal(
-    unname(private$rhs(0, y0)[[1]]),
-    c(
-      0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
-      0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.1 * 0.8 - 0.1 * 0.8 * 0.01 # Susceptible
-    )
-  )
 
 
   ### Check 4: The contact matrix scaling works as expected.
@@ -948,9 +944,11 @@ test_that("RHS passes sanity checks (single + double variant / double age group)
   expect_equal(
     unname(private$rhs(1, y0)[[1]]),
     c(
-      0.5 * 0.1 * 0.8, -0.1 * 4, 0.1 * 4, # Variant 1
-      0.5 * 0.1 * 0.8 * 0.01, -0.1 * 4, 0.1 * 4, # Variant 2
-      - 0.5 * 0.1 * 0.8 - 0.5 * 0.1 * 0.8 * 0.01 # Susceptible
+      0.5 * 0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 1
+      0.5 * 0.1 * 0.4, -0.05 * 4, 0.05 * 4, # Variant 1, age group 2
+      0.5 * 0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 1
+      0.5 * 0.1 * 0.4 * 0.01, -0.05 * 4, 0.05 * 4, # Variant 2, age group 2
+      - 0.5 * 0.1 * (1 +  0.01) * 0.4, - 0.5 * 0.1 * (1 + 0.01) * 0.4 # Susceptible
     )
   )
 
