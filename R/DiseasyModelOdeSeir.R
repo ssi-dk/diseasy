@@ -112,74 +112,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # To optimise, we perform the scaling here onto the contact matrices directly, since we then
       # have to do it only once.
       if (malthusian_matching) {
-
-        if (self %.% parameters %.% overall_infection_risk == 0) {
-          stop("The overall_infection_risk parameter must be strictly positive when malthusian_matching is enabled.")
-        }
-
-        reference_growth_rate <- private$compute_malthusian_growth_rate(K = 0, L = 1, age_cuts_lower = 0)
-
-        # Define objective function for root finding
-        f <- \(scaling_factor) private$compute_malthusian_growth_rate(
-          K = purrr::pluck(private$compartment_structure, "E", .default = 0),
-          L = purrr::pluck(private$compartment_structure, "I"),
-          age_cuts_lower = self %.% parameters %.% age_cuts_lower,
-          overall_infection_risk = scaling_factor * self %.% parameters %.% overall_infection_risk
-        ) - reference_growth_rate
-
-        # Compute upper bound
-        upper <- 10
-        while (f(upper) < 0) {
-          upper <- upper * 10
-          if (upper > 1e10) {
-            break
-          }
-        }
-
-        scaling_factor <- uniroot(f, c(0, upper))$root
-
-        scaled_per_capita_contact_matrixes <- purrr::map(per_capita_contact_matrixes, ~ .x * scaling_factor)
-
+        scaling_factor <- private$malthusian_scaling_factor()
       } else {
-
-        scaled_per_capita_contact_matrixes <- per_capita_contact_matrixes
-
+        scaling_factor <- 1
       }
-
-      # The contact matrices are by date, so we need to convert so it is days relative to a specific date
-      # (here: last_queryable_date from the observables module)
-      activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrixes)) -
-        self %.% observables %.% last_queryable_date
-
-      # We can then create a switch that selects the correct contact matrix at the given point in time
-      contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrixes)
-      private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
-
-      # f1 <- \(t) dplyr::case_when(!!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}"))))
-      #
-      # f2h <- purrr::partial(switch, !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes))
-      # f2 <- \(t) f2h(sum(activity_matrix_changes <= t))
-      #
-      # f3h <- purrr::partial(switch, !!!stats::setNames(rev(seq_along(activity_matrix_changes)), rev(activity_matrix_changes)))
-      # f3 <- \(t) f3h(sum(activity_matrix_changes > t) + 1)
-      #
-      # f4 <- \(t) purrr::partial(switch, !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes))(sum(activity_matrix_changes <= t))
-      #
-      # microbenchmark::microbenchmark( # Microseconds!
-      #   f1(50),
-      #   f2(50),
-      #   f3(50),
-      #   f4(50),
-      #   check = "equal", times = 100L
-      # )
-      #
-      # microbenchmark::microbenchmark( # Microseconds!
-      #   f1(-1400),
-      #   f2(-1400),
-      #   f3(-1400),
-      #   f4(-1400),
-      #   check = "equal", times = 100L
-      # )
+      private$scale_contact_matrices(scaling_factor)
 
 
       # Store the indexes of the first compartments for later RHS computation
@@ -581,8 +518,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # `diag(x) <- value` does not work as expected for a 1x1 matrix (how surprising...)
       # so we need to utilise jank instead to manually compute the corresponding indicies....
       off_diagonal_indices <- tidyr::expand_grid(
-        i = seq(nrow(transition_matrix)),
-        j = seq(nrow(transition_matrix))
+        i = seq_len(nrow(transition_matrix)),
+        j = seq_len(nrow(transition_matrix))
       ) |>
         purrr::pmap_lgl(\(i, j) j > i && i > j - 2)
 
@@ -627,6 +564,41 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       return(purrr::pluck(eigen(transition_matrix + transmission_matrix), "values", Re, max))
+    },
+
+    # @description
+    #   This function computes the relative difference in growth rates between the current model and the SIR model.
+    # @param RS_states (`named numeric()`)\cr
+    #   The population vector for R and S states to linearise around.
+    #   (Must sum to 1).
+    malthusian_scaling_factor = function(RS_states) {
+
+      if (self %.% parameters %.% overall_infection_risk == 0) {
+        stop("The overall_infection_risk parameter must be strictly positive matching malthusian growth rates.")
+      }
+
+      reference_growth_rate <- private$compute_malthusian_growth_rate(K = 0, L = 1, age_cuts_lower = 0)
+
+      # Define objective function for root finding
+      f <- \(scaling_factor) {
+        private$compute_malthusian_growth_rate(
+          K = purrr::pluck(private$compartment_structure, "E", .default = 0),
+          L = purrr::pluck(private$compartment_structure, "I"),
+          age_cuts_lower = self %.% parameters %.% age_cuts_lower,
+          overall_infection_risk = scaling_factor * self %.% parameters %.% overall_infection_risk
+        ) - reference_growth_rate
+      }
+
+      # Compute upper bound
+      upper <- 10
+      while (f(upper) < 0) {
+        upper <- upper * 10
+        if (upper > 1e10) {
+          break
+        }
+      }
+
+      return(uniroot(f, c(0, upper))$root)
     }
   )
 )
