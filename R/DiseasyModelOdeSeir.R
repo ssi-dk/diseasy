@@ -64,7 +64,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Store a short hand for the number of groups
       private$n_age_groups <- length(self %.% parameters %.% age_cuts_lower)
-      private$n_variants   <- length(self %.% variant %.% variants)
+      private$n_variants   <- max(length(self %.% variant %.% variants), 1)
       private$n_EIR_states <- sum(compartment_structure)
       private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
