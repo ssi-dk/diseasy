@@ -96,15 +96,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       if (length(self %.% activity %.% get_scenario_activities()) == 0) {
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
-        proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
+        private$population_proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
       } else {
-        proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+        private$population_proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
           dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
           dplyr::pull("proportion")
       }
 
-      per_capita_contact_matrixes <<- contact_matrixes |>
-        purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, proportion))
+      private$per_capita_contact_matrices <- contact_matrixes |>
+        purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, private$population_proportion))
 
       # Finally, we want to adjust for the structure of the SEIR model such that the (Malthusian) growth rate
       # of the model is conserved for different number of E and I compartments.
@@ -386,8 +386,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     state_vector_age_group = NULL,
     infection_matrix_to_state_vector = NULL,
 
-
-    infection_risk = NULL,
+    # Variable storage
+    population_proportion = NULL,
+    per_capita_contact_matrices = NULL,
     contact_matrix = NULL,
 
     cross_immunity_matrix = NULL,
@@ -483,7 +484,56 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
     # @description
-    #   This function computes the Malthusian growth rate for the gien model configuration.
+    #  Scale the contact matrices of the model.
+    # @param scaling_factor (`numeric(1)`)\cr
+    #   The scaling factor to apply to the contact matrices.
+    # @return
+    #  NULL (called for side effects).
+    scale_contact_matrices = function(scaling_factor) {
+
+      # Apply the scaling factor to the contact matrices
+      scaled_per_capita_contact_matrixes <- purrr::map(private$per_capita_contact_matrices, ~ .x * scaling_factor)
+
+      # The contact matrices are by date, so we need to convert so it is days relative to a specific date
+      # (here: last_queryable_date from the observables module)
+      activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrixes)) -
+        self %.% observables %.% last_queryable_date
+
+      # We can then create a switch that selects the correct contact matrix at the given point in time
+      contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrixes)
+      private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
+
+      # f1 <- \(t) dplyr::case_when(!!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}"))))
+      #
+      # f2h <- purrr::partial(switch, !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes))
+      # f2 <- \(t) f2h(sum(activity_matrix_changes <= t))
+      #
+      # f3h <- purrr::partial(switch, !!!stats::setNames(rev(seq_along(activity_matrix_changes)), rev(activity_matrix_changes)))
+      # f3 <- \(t) f3h(sum(activity_matrix_changes > t) + 1)
+      #
+      # f4 <- \(t) purrr::partial(switch, !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes))(sum(activity_matrix_changes <= t))
+      #
+      # microbenchmark::microbenchmark( # Microseconds!
+      #   f1(50),
+      #   f2(50),
+      #   f3(50),
+      #   f4(50),
+      #   check = "equal", times = 100L
+      # )
+      #
+      # microbenchmark::microbenchmark( # Microseconds!
+      #   f1(-1400),
+      #   f2(-1400),
+      #   f3(-1400),
+      #   f4(-1400),
+      #   check = "equal", times = 100L
+      # )
+    },
+
+
+
+    # @description
+    #   This function computes the Malthusian growth rate for the given model configuration.
     # @details
     #   This section follows the method outlined in doi: 10.1098/rsif.2009.0386
     #   To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
