@@ -175,8 +175,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # This is achieved by replicating the map from before for each variant, and incrementing the ids so that
       # each age_group/variant has a unique id. Then, we reverse the map, to determine which indices correspond to which
       # age_group/variant combination.
-      private$infection_matrix_to_state_vector <- seq_along(self %.% variant %.% variants) |>
-        purrr::map(\(variant) (variant - 1) * private %.% n_age_groups +  private %.% state_vector_age_group) |>
+      private$flow_matrix_to_rs_indices <- seq_along(self %.% variant %.% variants) |>
+        purrr::map(\(variant) (variant - 1) * private %.% n_age_groups + private %.% rs_age_group) |>
         purrr::reduce(c) |> # And collapse to 1d
         (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
 
@@ -228,22 +228,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Configure the risk matrix
-      # This matrix accounts for the immunity associated with the compartments and the cross-immunity between
-      # the variants. It is a A * ( V * (K + L + M) + 1) X V matrix where element n,b contains risk modifier for
+      # This matrix accounts for the immunity associated with the RS compartments and the cross-immunity between
+      # the variants. It is a A * ( V * M + 1) X V matrix where element n,b contains risk modifier for
       # compartment n being infected by variant b, given the immunity status of compartment n
       # (thereby also accounting for cross-immunity)
 
       # Account for cross-immunity
       private$risk_matrix <- self %.% variant %.% cross_immunity |>
-        purrr::map(\(chi) {
-          rep(
-            c(
-              rep(0, sum(purrr::discard_at(compartment_structure, "R"))),
-              1 - chi * (1 - immunity_risks)
-            ),
-            private %.% n_age_groups
-          )
-        }) |>
+        purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_age_groups)) |>
         purrr::reduce(c) |>
         matrix(ncol = private$n_variants) |>
         rbind(
@@ -319,6 +311,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     rs_state_indices = NULL,
 
     rs_age_group = NULL,
+    flow_matrix_to_rs_indices = NULL,
 
     # Variable storage
     population_proportion = NULL,
@@ -378,24 +371,19 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Step 4, determine the infective interactions
-
-      # Compute the risk weighted state_vector
-      # This vector has zeros for E and I states, ones for S states, and
-      risk_weighted_state_vector <- private$infection_risk * state_vector
-
-      # To match our model structure (state_vector) we use the mapping of state_vector to age_groups
-      weighted_infective_contacts <- private$risk_matrix * state_vector *
-        infection_rate[private$state_vector_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
+      # We use the pre compted risk_matrix to account for waning and cross-immunity
+      flow_matrix <- private$risk_matrix * state_vector[private$rs_state_indices] *
+        infection_rate[private$rs_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
 
       # Then we can compute the loss from each compartment
-      loss_due_to_infections <- rowSums(weighted_infective_contacts)
+      loss_due_to_infections <- rowSums(flow_matrix)
 
       # Now we need to compute the flow into the exposed compartments
-      # For this, we use the pre-computed infection_matrix_to_state_vector map
-      # new_infections <- purrr::map_dbl(private$infection_matrix_to_state_vector, ~ sum(weighted_infective_contacts[.]))
+      # For this, we use the pre-computed flow_matrix_to_rs_indices map
+      # new_infections <- purrr::map_dbl(private$flow_matrix_to_rs_indices, ~ sum(flow_matrix[.]))
       new_infections <- vapply(
-        private$infection_matrix_to_state_vector,
-        \(idx) sum(weighted_infective_contacts[idx]),
+        private$flow_matrix_to_rs_indices,
+        \(idx) sum(flow_matrix[idx]),
         FUN.VALUE = numeric(1),
         USE.NAMES = FALSE
       )
@@ -406,11 +394,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Combine into final RHS computation
-      dy_dt <- c(0, progression_flow[-private$n_states]) - progression_flow - # Disease progression flow between compartments
-        loss_due_to_infections # Combined loss to infections (across all variants)
+      # Disease progression flow between compartments
+      dy_dt <- c(0, progression_flow[-private$n_states]) - progression_flow
+
+      # Combined loss to infections (across all variants)
+      dy_dt[private$rs_state_indices] <- dy_dt[private$rs_state_indices] - loss_due_to_infections
 
       # Add the inflow from infections
-      dy_dt[private$e1_state_indexes] <- dy_dt[private$e1_state_indexes] + new_infections
+      dy_dt[private$e1_state_indices] <- dy_dt[private$e1_state_indices] + new_infections
 
       # Add the forcing of the states
       dy_dt <- private$state_vector_forcing(t, dy_dt)
