@@ -2,7 +2,7 @@
 #'
 #' @description TODO
 #' @export
-DiseasyModelOdeSeir <- R6::R6Class(
+DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter
   classname = "DiseasyModelOdeSeir",
   inherit = DiseasyModel,
 
@@ -16,7 +16,8 @@ DiseasyModelOdeSeir <- R6::R6Class(
     initialize = function(
       compartment_structure = c("E" = 2L, "I" = 3L, "R" = 2L),
       disease_progression_rates = c("E" = 1, "I" = 1),
-      ...) {
+      ...
+    ) {
 
       # Pass arguments to the DiseasyModel initializer
       super$initialize(...)
@@ -132,10 +133,10 @@ DiseasyModelOdeSeir <- R6::R6Class(
       # This is achieved by replicating the map from before for each variant, and incrementing the ids so that
       # each age_group/variant has a unique id. Then, we reverse the map, to determine which indexes correspond to which
       # age_group/variant combination.
-      private$infection_matrix_to_state_vector <- seq(length(self %.% variant %.% variants)) |>
+      private$infection_matrix_to_state_vector <- seq_along(self %.% variant %.% variants) |>
         purrr::map(\(variant) (variant - 1) * private$n_age_groups +  private$state_vector_age_group) |>
         purrr::reduce(c) |> # And collapse to 1d
-        (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Determine the corresponding age_group/variant combination
+        (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
 
 
 
@@ -227,80 +228,80 @@ DiseasyModelOdeSeir <- R6::R6Class(
 
     rhs = function(state_vector, t) {
 
-        # Compute the flow from infections
-        # Each variant attempts to infect the population
+      # Compute the flow from infections
+      # Each variant attempts to infect the population
 
-        # Compute the risk weighted state_vector
-        risk_weighted_state_vector <- private$infection_risk * state_vector
+      # Compute the risk weighted state_vector
+      risk_weighted_state_vector <- private$infection_risk * state_vector
 
-        # Determine the infection pressure by variant by accounting for relative infection risk of the variant
-        # and the number of individuals infected by each variant.
-        infection_pressure_per_variant <- purrr::map2(
-          private$i_state_indexes,
-          private$variant$variants,
-          ~ .y[["relative_infection_risk"]] * sum(state_vector[.x])
-        )
+      # Determine the infection pressure by variant by accounting for relative infection risk of the variant
+      # and the number of individuals infected by each variant.
+      infection_pressure_per_variant <- purrr::map2(
+        private$i_state_indexes,
+        private$variant$variants,
+        ~ .y[["relative_infection_risk"]] * sum(state_vector[.x])
+      )
 
-        ## Step 1, determine the number of infected by age group and variant
+      ## Step 1, determine the number of infected by age group and variant
 
-        # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
-        I_av <- vapply(i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+      # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
+      I_av <- vapply(i_state_indexes, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 
-        # microbenchmark::microbenchmark( # Microseconds
-        #   purrr::map_dbl(i_state_indexes, \(indexes) sum(state_vector[indexes])),
-        #   sapply(i_state_indexes, \(indexes) sum(state_vector[indexes])),
-        #   sapply(i_state_indexes, \(indexes) sum(state_vector[indexes]), USE.NAMES = FALSE),
-        #   vapply(i_state_indexes, \(indexes) sum(state_vector[indexes]), FUN.VALUE = numeric(1), USE.NAMES = FALSE),
-        #   check = "equal", times = 1000L
-        # )
-
-
-        I_av <- matrix(I_av, nrow = private$n_age_groups)
-
-        # microbenchmark::microbenchmark( # Nanoseconds
-        #   matrix(I_av, nrow = length(self$parameters$age_groups), ncol = length(self$variant$variants)),
-        #   matrix(I_av, nrow = length(self$parameters$age_groups)),
-        #   matrix(I_av, nrow = private$n_age_groups),
-        #   check = "equal", times = 1000L
-        # )
+      # microbenchmark::microbenchmark( # Microseconds
+      #   purrr::map_dbl(i_state_indexes, \(indexes) sum(state_vector[indexes])),
+      #   sapply(i_state_indexes, \(indexes) sum(state_vector[indexes])),
+      #   sapply(i_state_indexes, \(indexes) sum(state_vector[indexes]), USE.NAMES = FALSE),
+      #   vapply(i_state_indexes, \(indexes) sum(state_vector[indexes]), FUN.VALUE = numeric(1), USE.NAMES = FALSE),
+      #   check = "equal", times = 1000L
+      # )
 
 
-        ## Step 2, determine their contacts with other age groups
-        BI_av <- private$contact_matrix(t) %*% I_av
+      I_av <- matrix(I_av, nrow = private$n_age_groups)
+
+      # microbenchmark::microbenchmark( # Nanoseconds
+      #   matrix(I_av, nrow = length(self$parameters$age_groups), ncol = length(self$variant$variants)),
+      #   matrix(I_av, nrow = length(self$parameters$age_groups)),
+      #   matrix(I_av, nrow = private$n_age_groups),
+      #   check = "equal", times = 1000L
+      # )
 
 
-        ## Step 3, apply the effect of season and overall infection risk
-        BI_av <- BI_av * self$parameters[["overall_infection_risk"]] * private$season$model_t(t)
+      ## Step 2, determine their contacts with other age groups
+      BI_av <- private$contact_matrix(t) %*% I_av
 
 
-        ## Step 4, determine the infective interactions
-        # To match our model structure (state_vector) we use the mapping of state_vector to age_groups
-        risk_weighted_contacts <- risk_weighted_state_vector * BI_av[private$state_vector_age_group, ]
-
-        # Then we can compute the loss from each compartment
-        loss_due_to_infections <- rowSums(risk_weighted_contacts)
-
-        # Now we need to compute the flow into the exposed compartments
-        # For this, we use the pre-computed infection_matrix_to_state_vector map
-        new_infections <- purrr::map_dbl(private$infection_matrix_to_state_vector, ~ sum(risk_weighted_contacts[.]))
+      ## Step 3, apply the effect of season and overall infection risk
+      BI_av <- BI_av * self$parameters[["overall_infection_risk"]] * private$season$model_t(t)
 
 
-        ## Step 5, compute the disease progression flow in the model
-        progression_flow <- private$progression_flow_rates * state_vector
+      ## Step 4, determine the infective interactions
+      # To match our model structure (state_vector) we use the mapping of state_vector to age_groups
+      risk_weighted_contacts <- risk_weighted_state_vector * BI_av[private$state_vector_age_group, ]
+
+      # Then we can compute the loss from each compartment
+      loss_due_to_infections <- rowSums(risk_weighted_contacts)
+
+      # Now we need to compute the flow into the exposed compartments
+      # For this, we use the pre-computed infection_matrix_to_state_vector map
+      new_infections <- purrr::map_dbl(private$infection_matrix_to_state_vector, ~ sum(risk_weighted_contacts[.]))
 
 
-        ## Combine into final RHS computation
-        out <-
-          # Disease progression flow between compartments
-          c(0, progression_flow[-1]) - progression_flow
+      ## Step 5, compute the disease progression flow in the model
+      progression_flow <- private$progression_flow_rates * state_vector
 
-           # Combined loss to infections (across all variants)
-          -  loss_due_to_infections
 
-        # Add the inflow from infections
-        out[private$e1_state_indexes] <- out[private$e1_state_indexes] + new_infections
+      ## Combine into final RHS computation
+      out <-
+        # Disease progression flow between compartments
+        c(0, progression_flow[-1]) - progression_flow
 
-        return(out)
+        # Combined loss to infections (across all variants)
+        -  loss_due_to_infections
+
+      # Add the inflow from infections
+      out[private$e1_state_indexes] <- out[private$e1_state_indexes] + new_infections
+
+      return(out)
     }
-  ),
+  )
 )
