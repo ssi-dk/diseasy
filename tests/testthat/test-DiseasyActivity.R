@@ -475,7 +475,7 @@ test_that("dk_reference scenario works", {
   ## Test dk_reference scenario
   act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis %.% DK)
   checkmate::expect_class(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), "list")
-  # More tests could be made ... but tested above. The length may change over time so mayby some particular dates.
+  # More tests could be made ... but tested above. The length may change over time so maybe some particular dates.
 
   ## Test weighted contact types. Most meaningful for contact matrices
   tmp_list          <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
