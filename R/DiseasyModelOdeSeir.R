@@ -61,7 +61,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # To be more specific, we also want to use the density of population (i.e. the state vector should sum to 1).
       # So instead of population, we use the proportion of population in the age groups.
 
-      # To convert to per capitaish we need the proportion to use
+      # To convert to per capita-ish we need the proportion to use.
 
       if (length(self %.% activity %.% get_scenario_activities()) == 0) {
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
