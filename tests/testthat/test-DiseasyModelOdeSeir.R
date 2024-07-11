@@ -20,6 +20,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
   expect_identical(private %.% i_state_indexes, list(2))
+  expect_identical(private %.% r1_state_indexes, 3)
   expect_identical(private %.% s_state_indexes, 4)
   expect_identical(private %.% state_vector_age_group, rep(1L, 4))
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(4)))
@@ -56,6 +57,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, 1)
   expect_identical(private %.% i_state_indexes, list(c(3, 4)))
+  expect_identical(private %.% r1_state_indexes, 5)
   expect_identical(private %.% s_state_indexes, 7)
   expect_identical(private %.% state_vector_age_group, rep(1L, 7))
   expect_identical(private %.% infection_matrix_to_state_vector, list(seq.int(7)))
@@ -92,6 +94,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10)))
+  expect_identical(private %.% r1_state_indexes, c(5, 11))
   expect_identical(private %.% s_state_indexes, 13)
   expect_identical(private %.% state_vector_age_group, rep(1L, 13))
   expect_identical(
@@ -131,6 +134,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   # Check index helpers are correctly set
   expect_identical(private %.% e1_state_indexes, c(1, 7, 13, 19))
   expect_identical(private %.% i_state_indexes, list(c(3, 4), c(9, 10), c(15, 16), c(21, 22)))
+  expect_identical(private %.% r1_state_indexes, c(5, 11, 17, 23))
   expect_identical(private %.% s_state_indexes, c(25, 26))
   expect_identical(private %.% state_vector_age_group, c(rep(1L, 6), rep(2L, 6), rep(1L, 6), rep(2L, 6), 1L, 2L))
   expect_identical(

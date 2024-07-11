@@ -148,6 +148,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           }
         )
 
+      # Store the indexes of the first recovered compartments
+      private$r1_state_indexes <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
+        sum(compartment_structure) + private %.% n_EIR_states - purrr::pluck(compartment_structure, "R")
+
 
       # Store the indexes of the susceptible states
       private$s_state_indexes <- seq(private %.% n_age_groups) +
@@ -272,6 +276,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # Index helpers
     e1_state_indexes = NULL,
     i_state_indexes  = NULL,
+    r1_state_indexes  = NULL,
     s_state_indexes  = NULL,
     indexed_variant_infection_risk = NULL,
     state_vector_age_group = NULL,
