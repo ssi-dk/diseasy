@@ -81,9 +81,9 @@ $$
 In the `rhs` function, we have the `infected_contact_rate` variable which is $\overline{\overline{C}}\; \overline{\overline{I}}$
 $$
 \overline{\overline{CI}} = \overline{\overline{C}}\; \overline{\overline{I}} = \begin{bmatrix}
-\sum_i c_{1,i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{1,i} \sum_l I^l_{i,V} \\
+\sum_i c_{1\leftarrow i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{1\leftarrow i} \sum_l I^l_{i,V} \\
 \vdots & \ddots & \vdots \\
-\sum_i c_{A,i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{A,i} \sum_l I^l_{i,V}
+\sum_i c_{A\leftarrow i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{A\leftarrow i} \sum_l I^l_{i,V}
 \end{bmatrix}
 $$
 
@@ -116,19 +116,19 @@ NOTE: In the code, `private$indexed_variant_infection_risk` is $\overline{\overl
 
 # `weighted_infective_contacts`
 For the final computation of infections in `rhs`, we construct the matrix `weighted_infective_contacts` ($\overline{\overline{W}}$).
-For this purpose, we first expand the `infection_rate` matrix to a $A \cdot (V \cdot (K+L+M) + 1) \times V$ matrix by repeating the
+For this purpose, we first expand the `infection_rate` matrix to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the
 rows of the `infection_rate` matrix.
 
-Each element in the state vector has a corresponding age group. If we write this age group of element $s$ as $i|s$, then
-we construct the matrix:
+Each element in the state vector has a corresponding age group. If we write this age group of element $e$ as $i|e$, then,
+for all states in $R$ or $S$ compartments, we construct the matrix:
 $$
 \overline{\overline{U}} = \begin{bmatrix}
-  t_{i|s=1, 1} & \cdots & t_{i|s=1, V} \\
-  t_{i|s=2, 1} & \cdots & t_{i|s=2, V} \\
+  t_{i|e=1, 1} & \cdots & t_{i|e=1, V} \\
+  t_{i|e=2, 1} & \cdots & t_{i|e=2, V} \\
   \vdots & \vdots &\vdots
 \end{bmatrix}
 $$
-We now have a matrix, whose elements are the infection rate for each variant matched to the elements of the state vector.
+We now have a matrix, whose elements are the infection rate for each variant matched to the $R$ and $S$ elements of the state vector.
 
 In this space, we can now account for:
 
@@ -139,67 +139,47 @@ That is, we need to construct the matrix that accounts for the waning of immunit
 factors $\chi_{a\leftarrow b}$ (Variant $b$ infecting a person with immunity for variant $a$).
 
 All together, this is implemented via the risk matrix $\overline{\overline{\rho}}$ which is 
-$A \cdot (V \cdot (K+L+M) + 1) \times V$ matrix on the form:
+$A \cdot (V \cdot M + 1) \times V$ matrix on the form:
 
 $$
 \overline{\overline{\rho}} = \begin{bmatrix}
   \begin{bmatrix}
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma}) \\
     \vdots \\
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma})
   \end{bmatrix}
   & \cdots & 
   \begin{bmatrix}
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{1\leftarrow V} (1 - \overline{\gamma}) \\
     \vdots \\
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{1\leftarrow V} (1 - \overline{\gamma})
   \end{bmatrix} \\
   \vdots & \ddots & \vdots \\
   \begin{bmatrix}
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{V\leftarrow 1} (1 - \overline{\gamma}) \\
     \vdots \\
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{V\leftarrow 1} (1 - \overline{\gamma})
   \end{bmatrix}
   & \cdots & 
   \begin{bmatrix}
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{V\leftarrow V} (1 - \overline{\gamma}) \\
     \vdots \\
-    \overline{0}_K \\
-    \overline{0}_L \\
     1 - \chi_{V\leftarrow V} (1 - \overline{\gamma})
   \end{bmatrix} \\
-  \overline{0}_A & \cdots & \overline{0}_A
+  \overline{1}_A & \cdots & \overline{1}_A
 \end{bmatrix}
 $$
-Where $\overline{0}_n$ is a zero vector of length $n$.
+Where $\overline{1}_A$ is a ones vector of length $A$.
 
 In $\overline{\overline{\rho}}$, the matrices of the form:
 $$
 \begin{bmatrix}
-  \overline{0}_K \\
-  \overline{0}_L \\
   1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma}) \\
   \vdots \\
-  \overline{0}_K \\
-  \overline{0}_L \\
   1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma})
 \end{bmatrix}
 $$
-are $A \cdot (K + L + M) \times 1$ matrices with repeated sub-matrices.
+are $A \cdot M \times 1$ matrices with repeated sub-matrices.
 
 In total, the matrix accounts for the cross-variant $\chi_{a\leftarrow b}$ reductions of immunity ($1-\overline{\gamma}$).
 
@@ -207,13 +187,16 @@ Finally, we can combine everything to the flow matrix:
 $$
 \overline{\overline{f}} = \overline{\overline{\rho}} \odot 
 \begin{bmatrix}
-  \overline{s} & \cdots & \overline{s}
+  \vert &  & \vert \\
+  \overline{s}_{RS} & \cdots & \overline{s}_{RS} \\
+  \vert &  & \vert \\
 \end{bmatrix} \odot 
 \overline{\overline{U}}
 $$
-Where $\begin{bmatrix}\overline{s} & \cdots & \overline{s}\end{bmatrix}$ is $V$ repeats of $\overline{s}$.
+Where $\begin{bmatrix}\overline{s}_{RS} & \cdots & \overline{s}_{RS}\end{bmatrix}$ is $V$ repeats of the $R$ and $S$
+elements of the state vector $\overline{s}$.
 
-This matrix contains, for each element in the state vector, a row consisting of per-variant infectious contacts
+This matrix contains, for each $R$ and $S$ element in the state vector, a row consisting of per-variant infectious contacts
 between the corresponding compartment and the infected population in the model. These elements account for every risk 
 modifying mechanism included in the model.
 
