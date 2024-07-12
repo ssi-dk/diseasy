@@ -180,7 +180,8 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -190,7 +191,7 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE,   1,
-      rE, -rI
+       rE, -rI
     ),
     nrow = 2,
     byrow = TRUE                                                                                                        # nolint end
@@ -217,7 +218,8 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("E" = 1, "I" = 2, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -228,8 +230,8 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE,       1,       1,
-      rE, -2 * rI,       0,
-      0,  2 * rI, -2 * rI
+       rE, -2 * rI,       0,
+        0,  2 * rI, -2 * rI
     ),
     nrow = 3,
     byrow = TRUE                                                                                                        # nolint end
@@ -284,7 +286,8 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
     variant = var,
     compartment_structure = c("E" = 1, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -299,14 +302,14 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE,   rho_1,   rho_1,   0,          0,          0, 0, 0, 0,
-      rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
-      0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
-      0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
-      0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
-      0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
-      0,       0,       0,   0,          0,          0, 0, 0, 0,
-      0,       0,       0,   0,          0,          0, 0, 0, 0,
-      0,       0,       0,   0,          0,          0, 0, 0, 0
+       rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
+        0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
+        0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
+        0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
+        0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
+        0,       0,       0,   0,          0,          0, 0, 0, 0,
+        0,       0,       0,   0,          0,          0, 0, 0, 0,
+        0,       0,       0,   0,          0,          0, 0, 0, 0
     ),
     nrow = 9,
     byrow = TRUE                                                                                                        # nolint end
@@ -330,14 +333,14 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE,   rho_1,   rho_1,   0,          0,          0, 0, 0, 0,
-      rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
-      0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
-      0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
-      0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
-      0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
-      0,       0,       0,   0,          0,          0, 0, 0, 0,
-      0,       0,       0,   0,          0,          0, 0, 0, 0,
-      0,       0,       0,   0,          0,          0, 0, 0, 0
+       rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
+        0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
+        0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
+        0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
+        0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
+        0,       0,       0,   0,          0,          0, 0, 0, 0,
+        0,       0,       0,   0,          0,          0, 0, 0, 0,
+        0,       0,       0,   0,          0,          0, 0, 0, 0
     ),
     nrow = 9,
     byrow = TRUE                                                                                                        # nolint end
@@ -361,14 +364,14 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE,   rho_1,   rho_1,   0,          0,          0,   0,       0,         0,
-      rE, -2 * rI,       0,   0,          0,          0,   0,       0,         0,
-      0,  2 * rI, -2 * rI,   0,          0,          0,   0,       0,         0,
-      0,       0,       0, -rE, e2 * rho_2, e2 * rho_2,   0,       0,         0,
-      0,       0,       0,  rE,    -2 * rI,          0,   0,       0,         0,
-      0,       0,       0,   0,     2 * rI,    -2 * rI,   0,       0,         0,
-      0,       0,       0,   0,          0,          0, -rE,   rho_3,     rho_3,
-      0,       0,       0,   0,          0,          0,  rE, - 2 * rI,        0,
-      0,       0,       0,   0,          0,          0,   0,   2 * rI, - 2 * rI
+       rE, -2 * rI,       0,   0,          0,          0,   0,       0,         0,
+        0,  2 * rI, -2 * rI,   0,          0,          0,   0,       0,         0,
+        0,       0,       0, -rE, e2 * rho_2, e2 * rho_2,   0,       0,         0,
+        0,       0,       0,  rE,    -2 * rI,          0,   0,       0,         0,
+        0,       0,       0,   0,     2 * rI,    -2 * rI,   0,       0,         0,
+        0,       0,       0,   0,          0,          0, -rE,   rho_3,     rho_3,
+        0,       0,       0,   0,          0,          0,  rE, - 2 * rI,        0,
+        0,       0,       0,   0,          0,          0,   0,   2 * rI, - 2 * rI
     ),
     nrow = 9,
     byrow = TRUE                                                                                                        # nolint end
@@ -417,7 +420,8 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
     variant = var,
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 60))
+    parameters = list("age_cuts_lower" = c(0, 60)),
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -433,13 +437,13 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE, rho_1,   0, rho_1,   0,          0,   0,          0,
-      rE,   -rI,   0,     0,   0,          0,   0,          0,
-      0, rho_1, -rE, rho_1,   0,          0,   0,          0,
-      0,     0,  rE,   -rI,   0,          0,   0,          0,
-      0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
-      0,     0,   0,     0,  rE,        -rI,   0,          0,
-      0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
-      0,     0,   0,     0,   0,          0,  rE,        -rI
+       rE,   -rI,   0,     0,   0,          0,   0,          0,
+        0, rho_1, -rE, rho_1,   0,          0,   0,          0,
+        0,     0,  rE,   -rI,   0,          0,   0,          0,
+        0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
+        0,     0,   0,     0,  rE,        -rI,   0,          0,
+        0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
+        0,     0,   0,     0,   0,          0,  rE,        -rI
     ),
     nrow = 8,
     byrow = TRUE                                                                                                        # nolint end
@@ -463,13 +467,13 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE, rho_1,   0, rho_1,   0,          0,   0,          0,
-      rE,   -rI,   0,     0,   0,          0,   0,          0,
-      0, rho_1, -rE, rho_1,   0,          0,   0,          0,
-      0,     0,  rE,   -rI,   0,          0,   0,          0,
-      0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
-      0,     0,   0,     0,  rE,        -rI,   0,          0,
-      0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
-      0,     0,   0,     0,   0,          0,  rE,        -rI
+       rE,   -rI,   0,     0,   0,          0,   0,          0,
+        0, rho_1, -rE, rho_1,   0,          0,   0,          0,
+        0,     0,  rE,   -rI,   0,          0,   0,          0,
+        0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
+        0,     0,   0,     0,  rE,        -rI,   0,          0,
+        0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
+        0,     0,   0,     0,   0,          0,  rE,        -rI
     ),
     nrow = 8,
     byrow = TRUE                                                                                                        # nolint end
