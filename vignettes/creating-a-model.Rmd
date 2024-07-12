@@ -34,7 +34,7 @@ Developing a model in `diseasy` involves constructing a model template that inco
 into a model design.
 
 For instance, let's consider the creation of a simple SIR (Susceptible, Infectious, Recovered) infection
-model with a seasonal forcing `\sigma(t)` of the overall infection rate, denoted by \beta.
+model with a seasonal forcing $\sigma(t)$ of the overall infection rate, denoted by \beta.
 
 The SEIR model with seasonal forcing can be represented by the following set of differential equations:
 
@@ -50,17 +50,17 @@ $$
 \frac{dR(t)}{dt} = \gamma \cdot I(t)
 $$
 
-When developing this model traditionally, we would choose some functional form for the seasonal forcing `\sigma(t)`,
+When developing this model traditionally, we would choose some functional form for the seasonal forcing $\sigma(t)$,
 e.g. a sinusoidal relationship:
 $$
 \sigma(t) = A \cdot \cos(k \cdot t + \phi)
 $$
 
-The strategy of `diseasy` is to source the seasonal forcing `\sigma(t)` directly from the corresponding functional module
+The strategy of `diseasy` is to source the seasonal forcing $\sigma(t)$ directly from the corresponding functional module
 (`DiseasySeason`).
 
 Every implementation of a seasonal forcing in `DiseasySeason` has the same function signature
-(i.e. they all take only a single argument `t` once configured).
+(i.e. they all take only a single argument $t$ once configured).
 
 This way, we can configure different instances of `DiseasySeason` using the whole range of (available) plausible
 functional forms of seasonal forcing:
@@ -73,7 +73,7 @@ functional forms of seasonal forcing:
 Since the modules of `diseasy` are "objects" in an object-oriented-programming sense, the functional forms of the
 seasonal forcing can have parameters (as we see in the list above), but these are stored in the object when configuring
 the module, and the actual seasonal forcing exposed to the models all have the same function signature that takes
-only time as input (`\sigma(t)`)[^1].
+only time as input ($\sigma(t)$)[^1].
 
 This way, we can easily swap out different seasonal forcing models in our model templates without having to change the
 model equations themselves. If new seasonal forcing models are developed, they are then automatically available to the
@@ -109,7 +109,7 @@ purrr::keep(names(DiseasyModel$private_fields), ~ startsWith(., ".Diseasy")) |>
 
 This means, that once a new `DiseasyModel` instance is created, it will have the functional modules internally
 available. Going back to the above example of the SIR model with seasonal forcing, the model template would be
-access the seasonal forcing `\sigma(t)` via the call `self$season$model_t(t)`.
+access the seasonal forcing $\sigma(t)$ via the call `self$season$model_t(t)`.
 ```{r check_DiseasySeason_function_signature, include = FALSE}
 # If the the signature of DiseasySeason is changed, please update this vignette
 stopifnot("model_t" %in% names(DiseasySeason$active))
