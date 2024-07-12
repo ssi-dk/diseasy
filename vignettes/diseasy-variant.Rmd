@@ -54,7 +54,7 @@ variant$variants
 ```
 
 In the above example, there is perfect cross immunity between the variants (since we did not specify otherwise).
-These interactions are in `DiseasyVariant` capatured via `$cross_immunity`, a matrix showing the overlap in immunity
+These interactions are in `DiseasyVariant` captured via `$cross_immunity`, a matrix showing the overlap in immunity
 between the variants.
 
 We can inspect the cross immunity matrix via `$cross_immunity`.
