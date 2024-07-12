@@ -126,14 +126,14 @@ DiseasyVariant <- R6::R6Class(                                                  
       expr = {
 
         # Return a unit 1x1 matrix if variants are not configured
-        if (is.null(self %.% variants)) {
+        if (is.null(private$.variants)) {
           return(matrix(1, nrow = 1, ncol = 1))
         } else {
 
           # For each combination of immunity and infection, calculate the cross-immunity of the interaction
           cross_immunity <- tidyr::expand_grid(
-            "immunity_variant"  = names(self %.% variants),
-            "infection_variant" = names(self %.% variants)
+            "immunity_variant"  = names(private$.variants),
+            "infection_variant" = names(private$.variants)
           ) |>
             purrr::pmap_dbl(
               \(immunity_variant, infection_variant) {
@@ -141,10 +141,10 @@ DiseasyVariant <- R6::R6Class(                                                  
               }
             ) |>
             matrix(
-              nrow = length(self %.% variants),
-              ncol = length(self %.% variants),
+              nrow = length(private$.variants),
+              ncol = length(private$.variants),
               byrow = TRUE,
-              dimnames = list(names(self %.% variants), names(self %.% variants))
+              dimnames = list(names(private$.variants), names(private$.variants))
             )
 
           return(cross_immunity)
