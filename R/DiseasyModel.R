@@ -9,6 +9,7 @@
 #'     * `$activity`: `DiseasyActivity`
 #'     * `$observables`: `DiseasyObservables`
 #'     * `$season`: `DiseasySeason`
+#'     * `$variant` : `DiseasyVariant`
 #'
 #'     Configured instances of these modules can be provided during initialisation.
 #'     Alternatively, default instances of these modules can optionally be created.
@@ -34,7 +35,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param activity,observables,season (`boolean` or `R6::R6Class instance`)\cr
+    #' @param activity,observables,season,variant (`boolean` or `R6::R6Class instance`)\cr
     #'   If a boolean is given, it dictates whether to load a new instance module of this class.
     #'
     #'   If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`
@@ -53,6 +54,7 @@ DiseasyModel <- R6::R6Class(                                                    
     initialize = function(activity    = FALSE,
                           observables = FALSE,
                           season      = FALSE,
+                          variant     = FALSE,
                           label       = NULL,
                           ...) {
 
@@ -65,6 +67,9 @@ DiseasyModel <- R6::R6Class(                                                    
                         add = coll)
       checkmate::assert(checkmate::check_logical(season, null.ok = TRUE),
                         checkmate::check_class(season, "DiseasySeason", null.ok = TRUE),
+                        add = coll)
+      checkmate::assert(checkmate::check_logical(variant, null.ok = TRUE),
+                        checkmate::check_class(variant, "DiseasyVariant", null.ok = TRUE),
                         add = coll)
       checkmate::assert_character(label, len = 1, any.missing = FALSE, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
@@ -89,6 +94,12 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(DiseasySeason$new())
       } else if (inherits(season, "DiseasySeason")) {
         self$load_module(season)
+      }
+
+      if (isTRUE(variant)) {
+        self$load_module(DiseasyVariant$new())
+      } else if (inherits(variant, "DiseasyVariant")) {
+        self$load_module(variant)
       }
 
       # Set the label for the model
@@ -148,29 +159,43 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @seealso [diseasy::DiseasyActivity]
     #' @importFrom diseasystore `%.%`
     activity = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "activity",
-      expr = return(private %.% .DiseasyActivity)),
+      expr = return(private %.% .DiseasyActivity)
+    ),
 
 
     #' @field observables (`diseasy::DiseasyObservables`)\cr
-    #'   The local copy of an DiseasyObservables module. Read-only.
+    #'   The local copy of a DiseasyObservables module. Read-only.
     #' @seealso [diseasy::DiseasyObservables]
     #' @importFrom diseasystore `%.%`
     observables = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "observables",
-      expr = return(private %.% .DiseasyObservables)),
+      expr = return(private %.% .DiseasyObservables)
+    ),
 
 
     #' @field season (`diseasy::season`)\cr
-    #'   The local copy of an season module. Read-only.
+    #'   The local copy of a season module. Read-only.
     #' @seealso [diseasy::DiseasySeason]
     #' @importFrom diseasystore `%.%`
     season = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "season",
-      expr = return(private %.% .DiseasySeason)),
+      expr = return(private %.% .DiseasySeason)
+    ),
+
+
+    #' @field variant (`diseasy::variant`)\cr
+    #'  The local copy of a variant module. Read-only.
+    #' @seealso [diseasy::DiseasyVariant]
+    #' @importFrom diseasystore `%.%`
+    variant = purrr::partial(
+      .f = active_binding,
+      name = "variant",
+      expr = return(private %.% .DiseasyVariant)
+    ),
 
 
     #' @field parameters (`list()`)\cr
@@ -187,6 +212,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasyActivity    = NULL,
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
+    .DiseasyVariant     = NULL,
     .parameters  = NULL,
 
     # @param label (`character`)\cr
