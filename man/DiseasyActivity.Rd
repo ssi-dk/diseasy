@@ -88,7 +88,7 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
 \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
 \item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
-\item \href{#method-DiseasyActivity-rescale_counts_to_rates}{\code{DiseasyActivity$rescale_counts_to_rates()}}
+\item \href{#method-DiseasyActivity-rescale_contacts_to_rates}{\code{DiseasyActivity$rescale_contacts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
 \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
@@ -356,22 +356,22 @@ Rescale contact matrices to population contact rates
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-rescale_counts_to_rates"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_counts_to_rates}{}}}
-\subsection{Method \code{rescale_counts_to_rates()}}{
+\if{html}{\out{<a id="method-DiseasyActivity-rescale_contacts_to_rates"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_contacts_to_rates}{}}}
+\subsection{Method \code{rescale_contacts_to_rates()}}{
 Re-scale from contacts to rates per individual to fractional population.
 @details
 If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
 this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, population)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_contacts_to_rates(input, population)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
-Counts to be re-scaled.}
+Contacts to be re-scaled.}
 
 \item{\code{population}}{(\code{numeric})\cr
 Population vector to weight contacts by.

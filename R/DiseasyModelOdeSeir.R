@@ -104,7 +104,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We then construct the normalised matrices
       private$per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, private$population_proportion))
+        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, private$population_proportion))
 
       # Call `$set_contact_matrix` to store this initial scaling of the contact matrices
       private$set_contact_matrix()
