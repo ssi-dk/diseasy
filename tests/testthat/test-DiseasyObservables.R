@@ -187,22 +187,17 @@ test_that("$set_slice_ts() works", {
   obs$set_slice_ts(slice_ts = "2021-03-01 09:00:00")
   expect_identical(obs$slice_ts, "2021-03-01 09:00:00")
 
+  obs$set_slice_ts(slice_ts = as.Date("2021-03-01"))
+  expect_identical(obs$slice_ts, as.Date("2021-03-01"))
+
 
   # Testing malformed inputs
-
-  # slice_ts as date
-  expect_error(
-    obs$set_slice_ts(slice_ts = as.Date("2021-03-01")),
-    class = "simpleError", regexp = "'slice_ts' failed: Must be of type 'character'"
-  )
-  expect_identical(obs$slice_ts, "2021-03-01 09:00:00")
-
   # slice_ts NA_date
   expect_error(
     obs$set_slice_ts(slice_ts = as.Date(NA)),
     class = "simpleError", regexp = "Contains missing values"
   )
-  expect_identical(obs$slice_ts, "2021-03-01 09:00:00")
+  expect_identical(obs$slice_ts, as.Date("2021-03-01"))
 
   rm(obs)
 })

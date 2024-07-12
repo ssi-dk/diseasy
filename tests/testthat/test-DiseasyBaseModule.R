@@ -92,9 +92,9 @@ test_that("errors work", {
                class = "simpleError",
                regex = "Not implemented: test1")
 
-  expect_error(private$not_implemented_error(c("test1", "test2")),
+  expect_error(private$not_implemented_error("test1", "test2"),
                class = "simpleError",
-               regex = "Not implemented: test1test2")
+               regex = "Not implemented: test1 test2")
 
   rm(m)
 })

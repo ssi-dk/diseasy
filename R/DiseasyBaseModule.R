@@ -1,4 +1,4 @@
-#' @title Diseasy' basic module
+#' @title Base module for diseasy
 #'
 #' @description
 #'   The `DiseasyBaseModule` module implements common functionality that all modules have available.
@@ -72,11 +72,29 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #' @param clone (`boolean`)\cr
     #'   Toggle whether or not the module should be cloned when loading. Default TRUE.
     #' @details
-    #'   The methods allows the setting of the internal module instances after the `DiseasyBaseModule` instance is
-    #'   created.
+    #'   The methods allows the setting of the internal module instances after the instance is created.
     #' @return `NULL`
     load_module = function(module, clone = TRUE) {
 
+      # Within the `diseasy` framework, some modules includes instances of other modules.
+      # One such module instance that is used across modules is the `DiseasyObservables` since
+      # it is the main interface with data and many modules need data to run.
+
+      # Here, we check this module instance for any modules it contains. For each of these nested modules, we check
+      # if they require the module being loaded. If they do, we load the module into the nested instance as well.
+      # This happens via recursive calls to `$load_module()` on the nested instance with `clone = FALSE`, but only
+      # if the nested module does not already contain a loaded instance.
+
+      # This way, a copy (reference) of the module being loaded is propagated to the nested modules. Any changes to the
+      # parent module is then reflected in the nested instances.
+
+
+      # Check the instance has a slot for the module to be loaded
+      if (!paste0(".", class(module)[1]) %in% names(private)) {
+        stop(glue::glue("Module {class(module)[1]} not found in {class(self)[1]}"))
+      }
+
+      # Check if the module should be cloned (i.e. a new instance is created, or if the module is used by reference)
       if (clone) {
         # Create a clone of the module
         module <- module$clone()
@@ -85,38 +103,18 @@ DiseasyBaseModule <- R6::R6Class(                                               
         module$set_moduleowner(class(self)[1])
       }
 
-      # Within the `diseasy` framework, some modules includes instances of other modules.
-      # One such module instance that is used across modules is the `DiseasyObservables` since
-      # it is the main interface with data and many modules need data to run.
-      # Here, we check if this module instance has includes another instance of a module which uses
-      # the `DiseasyObservables`.
-      # If it does, we load recursively call `load_module` on the nested instance with clone = FALSE, but only
-      # if the nested module does not contain a loaded instance already.
-      # This way, this model instance has the `DiseasyObservables` instance loaded and any nested instances
-      # that needs the `DiseasyObservables` module uses the same as this (parent) instance.
 
-      # First we check if the given module is the `DiseasyObservables` module
-      # If it is, we load it into the nested instances
-      modules_with_observables <- "DiseasySeason"
-      if (class(module)[1] == "DiseasyObservables") {
-        modules_with_observables |>
-          purrr::map_chr(~ paste0(".", .)) |>
-          purrr::walk(~ {
-            if (!is.null(purrr::pluck(private, .)) && is.null(purrr::pluck(private, ., "observables"))) {
-              purrr::pluck(private, .)$load_module(module, clone = FALSE)
-            }
-          })
-      }
+      # Determine all current diseasy modules loaded into the current instance
+      nested_diseasy_modules <- as.list(private, all.names = TRUE) |>
+        purrr::keep(~ inherits(., "DiseasyBaseModule"))
 
-      # Then we check the reverse case:
-      # That is, we check if the given module requires `DiseasyObservables` and
-      # then load the existing `DiseasyObservables` into the given module before storing it
-      if (class(module)[1] %in% modules_with_observables &&
-            is.null(purrr::pluck(module, "observables")) &&
-            !is.null(purrr::pluck(private, ".DiseasyObservables"))) {
 
-        module$load_module(purrr::pluck(private, ".DiseasyObservables"), clone = FALSE)
-      }
+      # Use already loaded instances to populate the module being loaded
+      purrr::walk(nested_diseasy_modules, ~ try(module$load_module(., clone = FALSE), silent = TRUE))
+
+
+      # Load the module into currently nested modules
+      purrr::walk(nested_diseasy_modules, ~ try(.$load_module(module, clone = FALSE), silent = TRUE))
 
 
       # Finally, store the module
@@ -306,7 +304,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     },
 
     not_implemented_error = function(...) {
-      stop("Not implemented: ", glue::glue_collapse(...), call. = FALSE)
+      stop("Not implemented: ", glue::glue_collapse(c(...), sep = " "), call. = FALSE)
     },
 
     # Common logging
