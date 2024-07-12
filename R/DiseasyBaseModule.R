@@ -304,7 +304,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     },
 
     not_implemented_error = function(...) {
-      stop("Not implemented: ", glue::glue_collapse(...), call. = FALSE)
+      stop("Not implemented: ", glue::glue_collapse(c(...), sep = " "), call. = FALSE)
     },
 
     # Common logging

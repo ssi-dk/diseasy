@@ -257,7 +257,7 @@ test_that("$get_results() gives error", {
   # Test the get_results
   expect_error(m$get_results(),
                class = "simpleError",
-               regex = "Each model must implement their own `get_results` methods")
+               regex = "`DiseasyModel` should not be used directly")
 
   rm(m)
 })

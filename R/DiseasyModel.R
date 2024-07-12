@@ -106,7 +106,10 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @return `r rd_get_results_return`
     #' @seealso `r rd_get_results_seealso`
     get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
-      private$not_implemented_error("Each model must implement their own `get_results` methods")
+      private$not_implemented_error(
+        "`DiseasyModel` should not be used directly. Did you do so by mistake?",
+        "Instead, use a model that inherits`DiseasyModel` as it should implement the `$get_results()` method."
+      )
     },
 
 
