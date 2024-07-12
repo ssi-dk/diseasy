@@ -121,15 +121,16 @@ DiseasyModel <- R6::R6Class(                                                    
       # Input validation
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(observable, add = coll)
-      checkmate::assert_number(self$parameters$training_length, add = coll)
-      checkmate::assert_date(self$observables$last_queryable_date, add = coll)
+      checkmate::assert_number(self %.% parameters %.% training_length, add = coll)
+      checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
       checkmate::reportAssertions(coll)
 
       # Get the observable at the stratification level
-      start_date <- self$observables$last_queryable_date - lubridate::days(self$parameters$training_length)
-      end_date   <- self$observables$last_queryable_date # Only within the training period
+      start_date <- self %.% observables %.% last_queryable_date -
+        lubridate::days(self %.% parameters %.% training_length)
+      end_date   <- self %.% observables %.% last_queryable_date # Only within the training period
 
-      data <- self$observables$get_observation(observable, stratification, start_date, end_date) |>
+      data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
         dplyr::mutate(t = lubridate::interval(max(zoo::as.Date(date)), zoo::as.Date(date)) / lubridate::days(1))
 
       return(data)
