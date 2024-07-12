@@ -65,7 +65,7 @@ test_that("$add_variant() works", {
     pattern = "Must be of type 'numeric'"
   )
   checkmate::expect_character(
-    checkmate_err_msg(variant$add_variant(name = "variant", characteristics = list("cross_immunity" = c(1)))),
+    checkmate_err_msg(variant$add_variant(name = "variant", characteristics = list("cross_immunity" = list(1)))),
     pattern = "Must have names"
   )
   checkmate::expect_character(
