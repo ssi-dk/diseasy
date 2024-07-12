@@ -9,13 +9,15 @@
 #'     * `$activity`: `DiseasyActivity`
 #'     * `$observables`: `DiseasyObservables`
 #'     * `$season`: `DiseasySeason`
-#'     Configured instances of these modules can be provided during initialisation. If not, default instances are
-#'     created.
+#'
+#'     Configured instances of these modules can be provided during initialisation.
+#'     Alternatively, default instances of these modules can optionally be created.
+#'
 #'   * Model interface:
 #'     The module defines the functions `$get_results()`, `$get_training_data()` and the `$parameters` binding.
 #'     These functions define the "API" of the models and ensure the models can take part in the ensemble.
 #' @examples
-#'   # Normally, you would not want to create this module directly, but it is possible.
+#'   # Normally, one would not want to create this module directly, but it is possible.
 #'   Model_module <- DiseasyModel$new()
 #'
 #'   rm(Model_module)
@@ -31,19 +33,21 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
-    #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes
+    #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
     #' @param activity,observables,season (`boolean` or `R6::R6Class instance`)\cr
-    #'   If a boolean is given, it dictates whether to load a new instance module of this class\cr
-    #'   If an instance of the module is provided instead, this instance is cloned to the new `DiseasyModel` instance\cr
-    #'   Default is `FALSE`.
+    #'   If a boolean is given, it dictates whether to load a new instance module of this class.
+    #'
+    #'   If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`
+    #'   instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
+    #'   instance will not reflect in the copy that is added to `DiseasyModel`.
     #' @param label (`character`)\cr
-    #'   A human readable label for the model instance
+    #'   A human readable label for the model instance.
     #' @param ...
-    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
     #' @details
     #'   The `DiseasyModel` is the main template that the individual models should inherit from since this defines the
     #'   set of methods the later framework expects from each model. In addition, it provides the main interface with
-    #'   the other modules of the framework
+    #'   the other modules of the framework.
     #' @return
     #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     initialize = function(activity    = FALSE,
@@ -182,7 +186,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .parameters  = NULL,
 
     # @param label (`character`)\cr
-    #   A human readable label for the model instance
+    #   A human readable label for the model instance.
     label = NULL,
 
     model_cannot_predict = function(observable = NULL, stratification = NULL) {

@@ -17,16 +17,17 @@ The module contains the functional modules via its active bindings:
 \item \verb{$activity}: \code{DiseasyActivity}
 \item \verb{$observables}: \code{DiseasyObservables}
 \item \verb{$season}: \code{DiseasySeason}
-Configured instances of these modules can be provided during initialisation. If not, default instances are
-created.
 }
+
+Configured instances of these modules can be provided during initialisation.
+Alternatively, default instances of these modules can optionally be created.
 \item Model interface:
 The module defines the functions \verb{$get_results()}, \verb{$get_training_data()} and the \verb{$parameters} binding.
 These functions define the "API" of the models and ensure the models can take part in the ensemble.
 }
 }
 \examples{
-  # Normally, you would not want to create this module directly, but it is possible.
+  # Normally, one would not want to create this module directly, but it is possible.
   Model_module <- DiseasyModel$new()
 
   rm(Model_module)
@@ -85,7 +86,7 @@ The parameters used in the model. Read-only.}
 \if{latex}{\out{\hypertarget{method-DiseasyModel-new}{}}}
 \subsection{Method \code{new()}}{
 Creates a new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
-This module is typically not constructed directly but rather through \verb{DiseasyModel*} classes
+This module is typically not constructed directly but rather through \verb{DiseasyModel*} classes.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$new(
   activity = FALSE,
@@ -100,21 +101,23 @@ This module is typically not constructed directly but rather through \verb{Disea
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{activity, observables, season}}{(\code{boolean} or \verb{R6::R6Class instance})\cr
-If a boolean is given, it dictates whether to load a new instance module of this class\cr
-If an instance of the module is provided instead, this instance is cloned to the new \code{DiseasyModel} instance\cr
-Default is \code{FALSE}.}
+If a boolean is given, it dictates whether to load a new instance module of this class.
+
+If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel}
+instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
+instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
 \item{\code{label}}{(\code{character})\cr
-A human readable label for the model instance}
+A human readable label for the model instance.}
 
-\item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
 The \code{DiseasyModel} is the main template that the individual models should inherit from since this defines the
 set of methods the later framework expects from each model. In addition, it provides the main interface with
-the other modules of the framework
+the other modules of the framework.
 }
 
 \subsection{Returns}{
