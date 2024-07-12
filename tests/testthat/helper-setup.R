@@ -69,7 +69,7 @@ get_test_conns <- function() {
     parts <- strsplit(x, "::", fixed = TRUE)[[1]]
 
     # Skip unavailable packages
-    if (!rlang::is_installed(parts[1])) {
+    if (!requireNamespace(parts[1], quietly = TRUE)) {
       message("Library ", parts[1], " not available!")
       return(NULL)
     }
