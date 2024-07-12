@@ -668,18 +668,18 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
     #'   this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
     #' @param input (`matrix array` or `list`(`matrix array`))\cr
-    #'   Counts to be re-scaled.
+    #'   Contacts to be re-scaled.
     #' @param population (`numeric`)\cr
     #'   Population vector to weight contacts by.
     #'   Must use same age_groups as the contact matrix input.
     #' @return
     #'   Returns an object with the same structure as the input
-    rescale_counts_to_rates = function(input, population) {
+    rescale_contacts_to_rates = function(input, population) {
 
       # If input is a list, iteratively apply function to list elements
       if (checkmate::test_class(input, "list")) {
         checkmate::assert_class(input[[1]], "matrix")
-        return(purrr::map(input, .f = \(xx) self$rescale_counts_to_rates(input = xx, population = population)))
+        return(purrr::map(input, .f = \(xx) self$rescale_contacts_to_rates(input = xx, population = population)))
       }
 
       # Input checks
