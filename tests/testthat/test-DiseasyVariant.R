@@ -32,8 +32,8 @@ test_that("$add_variant() works", {
       "introduction_date" = Sys.Date()
     )
   )
-  expect_false(identical(variant$hahs, hash_new_instance))
-  expect_false(identical(variant$hahs, hash_wt))
+  expect_false(identical(variant$hash, hash_new_instance))
+  expect_false(identical(variant$hash, hash_wt))
 
 
   # Check malformed input
