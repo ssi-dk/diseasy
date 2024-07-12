@@ -34,29 +34,29 @@ Developing a model in `diseasy` involves constructing a model template that inco
 into a model design.
 
 For instance, let's consider the creation of a simple SIR (Susceptible, Infectious, Recovered) infection
-model with a seasonal forcing `s(t)` of the overall infection rate, denoted by \beta.
+model with a seasonal forcing `\sigma(t)` of the overall infection rate, denoted by \beta.
 
 The SEIR model with seasonal forcing can be represented by the following set of differential equations:
 
 $$
-\frac{dS}{dt} = - \beta \cdot s(t) \cdot S \cdot I
+\frac{dS(t)}{dt} = - \beta \cdot \sigma(t) \cdot S(t) \cdot I(t)
 $$
 
 $$
-\frac{dI}{dt} = \beta \cdot s(t) \cdot S \cdot I - \gamma \cdot I
+\frac{dI(t)}{dt} = \beta \cdot \sigma(t) \cdot S(t) \cdot I(t) - \gamma \cdot I(t)
 $$
 
 $$
-\frac{dR}{dt} = \gamma \cdot I
+\frac{dR(t)}{dt} = \gamma \cdot I(t)
 $$
 
-When developing this model traditionally, we would choose some functional form for the seasonal forcing `s(t)`,
+When developing this model traditionally, we would choose some functional form for the seasonal forcing `\sigma(t)`,
 e.g. a sinusoidal relationship:
 $$
-s(t) = A \cdot \cos(kt+\phi)
+\sigma(t) = A \cdot \cos(k \cdot t + \phi)
 $$
 
-The strategy of `diseasy` is to source the seasonal forcing `s(t)` directly from the corresponding functional module
+The strategy of `diseasy` is to source the seasonal forcing `\sigma(t)` directly from the corresponding functional module
 (`DiseasySeason`).
 
 Every implementation of a seasonal forcing in `DiseasySeason` has the same function signature
@@ -65,7 +65,7 @@ Every implementation of a seasonal forcing in `DiseasySeason` has the same funct
 This way, we can configure different instances of `DiseasySeason` using the whole range of (available) plausible
 functional forms of seasonal forcing:
 
-* No seasonal forcing ($s(t) = 1$)
+* No seasonal forcing ($\sigma(t) = 1$)
 * Sinusoidal forcing
 * Temperature dependent forcing
 * Other plausible seasonal forcing forms
@@ -73,7 +73,7 @@ functional forms of seasonal forcing:
 Since the modules of `diseasy` are "objects" in an object-oriented-programming sense, the functional forms of the
 seasonal forcing can have parameters (as we see in the list above), but these are stored in the object when configuring
 the module, and the actual seasonal forcing exposed to the models all have the same function signature that takes
-only time as input (`s(t)`)[^1].
+only time as input (`\sigma(t)`)[^1].
 
 This way, we can easily swap out different seasonal forcing models in our model templates without having to change the
 model equations themselves. If new seasonal forcing models are developed, they are then automatically available to the
@@ -89,7 +89,7 @@ To create a model template in `diseasy` is to create a new class that inherits t
 This gives the model template access to the functional modules that are available in the package, it defines
 how the user sets the parameters of the model and queries the model for results.
 
-In addition, it provides useful utility for the implementation of the model such as logging and caching.
+In addition, it provides useful utilities for the implementation of the model such as logging and caching.
 
 ## A container for functional modules
 The `DiseasyModel` class contains slots for instances of functional modules:
@@ -109,7 +109,7 @@ purrr::keep(names(DiseasyModel$private_fields), ~ startsWith(., ".Diseasy")) |>
 
 This means, that once a new `DiseasyModel` instance is created, it will have the functional modules internally
 available. Going back to the above example of the SIR model with seasonal forcing, the model template would be
-access the seasonal forcing `s(t)` via the call `self$season$model_t(t)`.
+access the seasonal forcing `\sigma(t)` via the call `self$season$model_t(t)`.
 ```{r check_DiseasySeason_function_signature, include = FALSE}
 # If the the signature of DiseasySeason is changed, please update this vignette
 stopifnot("model_t" %in% names(DiseasySeason$active))
@@ -145,4 +145,4 @@ be provided (target observable, time-window and stratification level). In return
 The outputs of the model are standardised, and should follow the structure of the `training_data` provided by
 `$get_training_data()` enriched by model prediction, model id and realization id.
 
-[^1]: The seasonal model exposed by a configured `DiseasySeason` instance is "closure" instead of a pure function.
+[^1]: The seasonal model exposed by a configured `DiseasySeason` instance is a "closure" instead of a pure function.
