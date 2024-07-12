@@ -526,8 +526,9 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, unique = TRUE, add = coll)
+      checkmate::assert_numeric(
+        age_cuts_lower, any.missing = FALSE, null.ok = TRUE, lower = 0, unique = TRUE, add = coll
+      )
       checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -675,8 +676,9 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_numeric(population, add = coll)
       checkmate::reportAssertions(coll)
 
-      population <- population / sum(population)
-      out <- input / outer(population, population, "*")
+      proportion <- population / sum(population)
+      out <- input / matrix(rep(proportion, length(proportion)), nrow = length(proportion), byrow = TRUE)
+
       return(out)
     },
 
