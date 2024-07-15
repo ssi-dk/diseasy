@@ -437,17 +437,17 @@ metrics_double <- combinations_double |>
 metrics_double_gg <- metrics_double |>
   dplyr::inner_join(
     "model" = c(
-      "exp_sum/exp_sum", 
+      "exp_sum/exp_sum",
       "sigmoidal/sigmoidal",
       "exp_sum/sigmoidal",
-      "exp_sum/exp_sum-2t", 
+      "exp_sum/exp_sum-2t",
       "sigmoidal/sigmoidal-2t",
-      "exp_sum/exp_sum-c", 
+      "exp_sum/exp_sum-c",
       "sigmoidal/sigmoidal-c",
       "exp_sum/sigmoidal-2t",
       "exp_sum/sigmoidal-c",
     ),
-    .by = "model"
+    by = "model"
   )
   dplyr::mutate("execution_time" = as.numeric(.data$execution_time)) |>
   dplyr::filter(!is.na(value)) |>
@@ -458,7 +458,7 @@ convergence_double_gg <- convergence_double |>
 
 
 # Plot
-ggplot2::ggplot(metrics_double_gg, ggplot2::aes(x = N, y = value, color = method, linetype = variant)) +
+ggplot2::ggplot(metrics_double_gg, ggplot2::aes(x = N, y = value, color = method)) +
   ggplot2::geom_line(linewidth = 1) +
   ggplot2::geom_point() +
   ggplot2::scale_y_log10() +
