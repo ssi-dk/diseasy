@@ -26,9 +26,9 @@ im <- DiseasyImmunity$new()
 
 # We define our list of "raw" test functions
 f = list(
-  "exponential" = \(t) exp(-t / time_scale),
+  #"exponential" = \(t) exp(-t / time_scale),
   "sigmoidal" = \(t) exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
-  "heaviside" = \(t) as.numeric(t < time_scale),
+  #"heaviside" = \(t) as.numeric(t < time_scale),
   "exp_sum" = \(t) (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
   "linear" = \(t) pmax(1 - t / time_scale, 0)
 )
@@ -37,9 +37,9 @@ t_f <- rep(20, length(f))
 
 # Construct a list with a non-zero asymptote
 g = list(
-  "exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
+  #"exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
   "sigmoidal" = \(t) 0.2 + 0.8 * exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
-  "heaviside" = \(t) 0.2 + 0.8 * as.numeric(t < time_scale),
+  #"heaviside" = \(t) 0.2 + 0.8 * as.numeric(t < time_scale),
   "exp_sum" = \(t) (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
   "linear" = \(t) 0.2 + 0.8 * pmax(1 - t / time_scale, 0)
 )
@@ -85,14 +85,14 @@ combinations_single <- tidyr::expand_grid(
 )
 
 #future::plan("sequential")
-#future::plan("multisession")
+future::plan("multisession")
 
 # Run the approximations and note the convergence point
 combinations_single |>
-  #furrr::future_pwalk(
-  purrr::pwalk(
+  furrr::future_pwalk(
+  #purrr::pwalk(
     .progress = interactive(),
-    #.options = furrr::furrr_options("seed" = TRUE),
+    .options = furrr::furrr_options("seed" = TRUE),
     .f = \(model_zip, method) {
 
       N = seq(from = 2, to = 10, by = 1)
@@ -105,6 +105,8 @@ combinations_single |>
       # Place holder for the convergence value
       N_converged <- numeric(0)
 
+      im_p <- DiseasyImmunity$new()
+
       # Generate approximations and store them and the convergence point
       for (n in seq_along(N)) {
 
@@ -115,8 +117,8 @@ combinations_single |>
         if (!(N[n] %in% names(current_approxes))) {
 
           # Set the target and approximate
-          im$set_waning_model(model, time_scale = time_scale, target = "infection")
-          approx <- im$approximate_compartmental(method = method, N = N[n])
+          im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
+          approx <- im_p$approximate_compartmental(method = method, N = N[n])
 
           # Append to existing results
           if (cachem::is.key_missing(current_approxes)) {
@@ -127,37 +129,9 @@ combinations_single |>
           # Store to cache
           cache$set(key = glue::glue("{model_name}-{method}"), current_approxes)
         }
-
-        # Check if approximation has converged
-        if (identical(N_converged, numeric(0)) && length(current_approxes) > 1) {
-          prev_values <- purrr::map_dbl(current_approxes, ~ purrr::pluck(., "value")) |>
-            tibble::enframe(name = "N", value = "value") |>
-            dplyr::mutate("N" = as.numeric(N)) |>
-            dplyr::filter(.data$N <= N[n])
-
-          # Look for the N that caused convergence using Kneedle algorithm
-          N_converged <- tryCatch(
-            kneedle::kneedle(
-              x = prev_values$N,
-              y = prev_values$value,
-              decreasing = TRUE,
-              concave = FALSE,
-              sensitivity = 1
-            ),
-            error = function(e) numeric(0)
-          ) |>
-            purrr::pluck(1, .default = numeric(0))
-
-          # In some cases, values are increasing not decreasing, so we manually detect these
-          # (We allow a small increase to account for numerical imprecision)
-          detect_increase <- \(x) ((x - cummin(x)) / cummin(x)) > 1e-3
-          if (identical(N_converged, numeric(0)) && any(detect_increase(prev_values$value))) {
-            N_converged <- prev_values$N[[which(detect_increase(prev_values$value))[1]]]
-          }
-        }
       }
 
-      return(ifelse(identical(N_converged, numeric(0)), NA, N_converged))
+      rm(im_p)
     }
   ) |>
   tibble::tibble(
@@ -363,14 +337,14 @@ combinations_double <- tidyr::expand_grid(
 )
 
 #future::plan("sequential")
-#future::plan("multisession")
+future::plan("multisession")
 
 # Run the approximations and note the convergence point
 combinations_double |>
-  #furrr::future_pwalk(
-  purrr::pwalk(
+  furrr::future_pwalk(
+  #purrr::pwalk(
     .progress = interactive(),
-    #.options = furrr::furrr_options("seed" = TRUE),
+    .options = furrr::furrr_options("seed" = TRUE),
     .f = \(model1_zip, model2_zip, method) {
 
       N = seq(from = 2, to = 5, by = 1)
@@ -387,6 +361,8 @@ combinations_double |>
       # Place holder for the convergence value
       N_converged <- numeric(0)
 
+      im_p <- DiseasyImmunity$new()
+
       # Generate approximations and store them and the convergence point
       for (n in seq_along(N)) {
 
@@ -394,21 +370,25 @@ combinations_double |>
         current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}"))
 
         # Compute next values
+        if (!(N[n] %in% names(current_approxes))) {
 
-        # Set the target and approximate
-        im$set_waning_model(model1, time_scale = time_scale1, target = "infection")
-        im$set_waning_model(model2, time_scale = time_scale2, target = "hospitalisation")
-        approx <- im$approximate_compartmental(method = method, N = N[n])
+          # Set the target and approximate
+          im_p$set_waning_model(model1, time_scale = time_scale1, target = "infection")
+          im_p$set_waning_model(model2, time_scale = time_scale2, target = "hospitalisation")
+          approx <- im_p$approximate_compartmental(method = method, N = N[n])
 
-        # Append to existing results
-        if (cachem::is.key_missing(current_approxes)) {
-          current_approxes <- list()
+          # Append to existing results
+          if (cachem::is.key_missing(current_approxes)) {
+            current_approxes <- list()
+          }
+          current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N[n]))
+
+          # Store to cache
+          cache$set(key = glue::glue("{model_name}-{method}"), current_approxes)
         }
-        current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N[n]))
-
-        # Store to cache
-        cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}"), current_approxes)
       }
+
+      rm(im_p)
     }
   )
 ```
