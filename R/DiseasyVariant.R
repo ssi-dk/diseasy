@@ -82,7 +82,7 @@ DiseasyVariant <- R6::R6Class(                                                  
       if (is.null(self$variants)) {
         printr("No variants have been configured")
       } else {
-        variant$variants |>
+        self$variants |>
           purrr::iwalk(\(characteristics, name) {
             printr(glue::glue("Variant: {name}"))
             if (length(characteristics) > 0) {
