@@ -92,6 +92,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   activity = FALSE,
   observables = FALSE,
   season = FALSE,
+  parameters = NULL,
   label = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -111,6 +112,9 @@ instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 A human readable label for the model instance.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+
+\item{\code{parmeters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.}
 }
 \if{html}{\out{</div>}}
 }
