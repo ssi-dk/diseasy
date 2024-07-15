@@ -658,14 +658,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
       if (length(rate) == 1) {
 
         # If a scalar rate is given, the problem reduces to the Erlang-distribution
-        prob_lt_k <- purrr::map(1:(K - 1), \(k) pgamma(t, shape = k, rate = rate, lower.tail = FALSE))
+        prob_lt_k <- purrr::map(seq_len(K - 1), \(k) pgamma(t, shape = k, rate = rate, lower.tail = FALSE))
 
       } else {
         # We can compute the waiting time distributions (hypoexponential distributions)
         # https://en.wikipedia.org/wiki/Hypoexponential_distribution
 
         # Retrieve each of the hypoexponential distributions
-        prob_lt_k <- purrr::map(1:(K - 1), \(k) phypo(t, shape = k, rate = rate[1:k], lower.tail = FALSE))
+        prob_lt_k <- purrr::map(seq_len(K - 1), \(k) phypo(t, shape = k, rate = rate[seq_len(k)], lower.tail = FALSE))
 
       }
 
