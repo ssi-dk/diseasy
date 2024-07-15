@@ -142,7 +142,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # In RHS, we need a mapping from i_state_indices to the relative infection risk of the corresponding variant.
-      private$indexed_variant_infection_risk <- self %.% variant %.% variants |>
+      private$indexed_variant_infection_risk <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
         purrr::map(
           \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_age_groups)
         ) |>
