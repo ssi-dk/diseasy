@@ -412,7 +412,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               }
             )
 
-            return(integral)
+            return(sqrt(integral))
           }) |>
             sum()
 
