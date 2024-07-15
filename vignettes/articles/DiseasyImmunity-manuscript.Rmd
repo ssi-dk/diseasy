@@ -17,7 +17,7 @@ library(diseasy)
 ```{r reset}
 devtools::load_all()
 
-rm(im)
+if (exists("im")) rm(im)
 im <- DiseasyImmunity$new()
 
 ```
@@ -68,10 +68,10 @@ im$approximate_compartmental(method = "free_gamma", N = 3)
 ```
 
 ```{r manually check fits}
-im$set_waning_model(g[["sigmoidal"]], time_scale = t_g[[1]], target = "infection")
+im$set_waning_model(g[["exponential"]], time_scale = t_g[[1]], target = "infection")
 plot(im, method = "all_free", N = 3)
 
-im$approximate_compartmental(method = "all_free", N = 3)
+im$approximate_compartmental(method = "free_delta", N = 4)
 ```
 
 
@@ -84,15 +84,15 @@ combinations_single <- tidyr::expand_grid(
   method = c("free_gamma", "free_delta", "all_free")
 )
 
-future::plan("sequential")
+#future::plan("sequential")
 #future::plan("multisession")
 
 # Run the approximations and note the convergence point
-convergence_single <- combinations_single |>
-  furrr::future_pmap_dbl(
-  #purrr::pmap_dbl(
+combinations_single |>
+  #furrr::future_pwalk(
+  purrr::pwalk(
     .progress = interactive(),
-    .options = furrr::furrr_options("seed" = TRUE),
+    #.options = furrr::furrr_options("seed" = TRUE),
     .f = \(model_zip, method) {
 
       N = seq(from = 2, to = 10, by = 1)
@@ -110,12 +110,6 @@ convergence_single <- combinations_single |>
 
         # Get the results up until now
         current_approxes <- cache$get(key = glue::glue("{model_name}-{method}"))
-
-        # # If convergence has been detected, we stop computing further values after some additional
-        # # context values have been computed
-        # if (!identical(N_converged, numeric(0)) && !(N_converged %in% tail(prev_values$N, 2))) {
-        #   next
-        # }
 
         # Compute next values
         if (!(N[n] %in% names(current_approxes))) {
@@ -210,6 +204,58 @@ non_monotonicity_single |>
 
 
 
+```{r detect single target convergence}
+convergence_single <- combinations_single |>
+  purrr::pmap_dbl(
+    .progress = interactive(),
+    .f = \(model_zip, method) {
+
+      # Unpack model
+      model <- model_zip[[1]]
+      model_name <- model_zip[[2]]
+      time_scale <- model_zip[[3]]
+
+      # Place holder for the convergence value
+      N_converged <- numeric(0)
+
+      # Get the results
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}"))
+
+      # Check if approximation has converged
+      prev_values <- purrr::map_dbl(current_approxes, ~ purrr::pluck(., "value")) |>
+        tibble::enframe(name = "N", value = "value") |>
+        dplyr::mutate("N" = as.numeric(N))
+
+      # Look for the N that caused convergence using Kneedle algorithm
+      N_converged <- tryCatch(
+        kneedle::kneedle(
+          x = prev_values$N,
+          y = prev_values$value,
+          decreasing = TRUE,
+          concave = FALSE,
+          sensitivity = 1
+        ),
+        error = function(e) numeric(0)
+      ) |>
+        purrr::pluck(1, .default = numeric(0))
+
+      # In some cases, values are increasing not decreasing, so we manually detect these
+      # (We allow a small increase to account for numerical imprecision)
+      detect_increase <- \(x) (x - cummin(x)) > 1e-3 * cummin(x)
+      if (identical(N_converged, numeric(0)) && any(detect_increase(prev_values$value))) {
+        N_converged <- prev_values$N[[which(detect_increase(prev_values$value))[1]]]
+      }
+
+      return(ifelse(identical(N_converged, numeric(0)), NA, N_converged))
+    }
+  ) |>
+  tibble::tibble(
+    "model" = purrr::map_chr(combinations_single$model, ~ purrr::pluck(., 2)),
+    "method" = combinations_single$method,
+    "N" = _)
+```
+
+
 
 ```{r elbow curve single target}
 metrics_single <- combinations_single |>
@@ -275,6 +321,7 @@ ggplot2::ggplot(metrics_single_gg, ggplot2::aes(x = N, y = value, color = method
   ggplot2::theme_bw()
 ```
 
+
 ```{r}
 metrics_single_gg |>
   dplyr::filter(.data$metric == "value") |>
@@ -282,11 +329,26 @@ metrics_single_gg |>
   ggplot2::geom_line(linewidth = 1) +
   ggplot2::geom_point() +
   ggplot2::geom_vline(data = convergence_single_gg, ggplot2::aes(xintercept = N, linetype = method, color = method)) +
-  ggplot2::scale_y_log10() +
+  #ggplot2::scale_y_log10() +
   ggplot2::facet_grid(model ~ variant, scales = "free") +
   ggplot2::labs(x = "N", y = "Value") +
   ggplot2::theme_bw()
 ```
+
+```{r debug}
+purrr::pluck(cache$get(key = glue::glue("sigmoidal-free_delta")), "3")
+```
+
+```{r debug}
+metrics_single |>
+  dplyr::filter(.data$model == "sigmoidal", .data$method == "free_delta")
+```
+
+```{r debug}
+metrics_single_gg |>
+  dplyr::filter(.data$model == "sigmoidal", .data$variant == "base", .data$method == "free_delta")
+```
+
 
 
 
@@ -300,18 +362,18 @@ combinations_double <- tidyr::expand_grid(
   method = c("free_gamma", "free_delta", "all_free")
 )
 
-future::plan("sequential")
+#future::plan("sequential")
 #future::plan("multisession")
 
 # Run the approximations and note the convergence point
-convergence_double <- combinations_double |>
-  furrr::future_pmap_dbl(
-  #purrr::pmap_dbl(
+combinations_double |>
+  #furrr::future_pwalk(
+  purrr::pwalk(
     .progress = interactive(),
-    .options = furrr::furrr_options("seed" = TRUE),
+    #.options = furrr::furrr_options("seed" = TRUE),
     .f = \(model1_zip, model2_zip, method) {
 
-      N = seq(from = 2, to = 10, by = 1)
+      N = seq(from = 2, to = 5, by = 1)
 
       # Unpack model
       model1 <- model1_zip[[1]]
@@ -331,12 +393,6 @@ convergence_double <- combinations_double |>
         # Get the results up until now
         current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}"))
 
-        # # If convergence has been detected, we stop computing further values after some additional
-        # # context values have been computed
-        # if (!identical(N_converged, numeric(0)) && !(N_converged %in% tail(prev_values$N, 2))) {
-        #   next
-        # }
-
         # Compute next values
 
         # Set the target and approximate
@@ -352,36 +408,54 @@ convergence_double <- combinations_double |>
 
         # Store to cache
         cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}"), current_approxes)
+      }
+    }
+  )
+```
 
 
-        # Check if approximation has converged
-        if (identical(N_converged, numeric(0)) && length(current_approxes) > 1) {
-          prev_values <- purrr::map_dbl(current_approxes, ~ purrr::pluck(., "value")) |>
-            tibble::enframe(name = "N", value = "value") |>
-            dplyr::mutate("N" = as.numeric(N)) |>
-            dplyr::filter(.data$N <= N[n])
+```{r detect double target convergence}
+convergence_double <- combinations_double |>
+  purrr::pmap(
+    .progress = interactive(),
+    .f = \(model1_zip, model2_zip, method) {
 
-          # Look for the N that caused convergence using kneedle algorithm
-          N_converged <- tryCatch(
-            kneedle::kneedle(
-              x = prev_values$N,
-              y = prev_values$value,
-              decreasing = TRUE,
-              concave = FALSE,
-              sensitivity = 1
-            ),
-            error = function(e) numeric(0)
-          ) |>
-            purrr::pluck(1, .default = numeric(0))
+      # Unpack model
+      model1 <- model1_zip[[1]]
+      model1_name <- model1_zip[[2]]
+      time_scale1 <- model1_zip[[3]]
 
-          # In some cases, values are increasing not decreasing, so we manually detect these
-          # (We allow a small increase to account for numerical imprecision)
-          detect_increase <- \(x) ((x - cummin(x)) / cummin(x)) > 1e-3
-          if (identical(N_converged, numeric(0)) && any(detect_increase(prev_values$value))) {
-            N_converged <- prev_values$N[[which(detect_increase(prev_values$value))[1]]]
-          }
-        }
+      model2 <- model2_zip[[1]]
+      model2_name <- model2_zip[[2]]
+      time_scale2 <- model2_zip[[3]]
 
+      # Get the results
+      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}"))
+
+
+      # Check if approximation has converged
+      prev_values <- purrr::map_dbl(current_approxes, ~ purrr::pluck(., "value")) |>
+        tibble::enframe(name = "N", value = "value") |>
+        dplyr::mutate("N" = as.numeric(N))
+
+      # Look for the N that caused convergence using kneedle algorithm
+      N_converged <- tryCatch(
+        kneedle::kneedle(
+          x = prev_values$N,
+          y = prev_values$value,
+          decreasing = TRUE,
+          concave = FALSE,
+          sensitivity = 1
+        ),
+        error = function(e) numeric(0)
+      ) |>
+        purrr::pluck(1, .default = numeric(0))
+
+      # In some cases, values are increasing not decreasing, so we manually detect these
+      # (We allow a small increase to account for numerical imprecision)
+      detect_increase <- \(x) (x - cummin(x)) > 1e-3 *  cummin(x)
+      if (identical(N_converged, numeric(0)) && any(detect_increase(prev_values$value))) {
+        N_converged <- prev_values$N[[which(detect_increase(prev_values$value))[1]]]
       }
 
       return(ifelse(identical(N_converged, numeric(0)), NA, N_converged))
@@ -467,7 +541,7 @@ convergence_double_gg <- convergence_double |>
 ggplot2::ggplot(metrics_double_gg, ggplot2::aes(x = N, y = value, color = method)) +
   ggplot2::geom_line(linewidth = 1) +
   ggplot2::geom_point() +
-  ggplot2::scale_y_log10() +
+  #ggplot2::scale_y_log10() +
   ggplot2::facet_grid(metric ~ model, scales = "free") +
   ggplot2::labs(x = "N", y = "Metric") +
   ggplot2::theme_bw()
