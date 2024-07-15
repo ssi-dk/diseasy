@@ -1,6 +1,7 @@
 #' @title TODO
 #'
 #' @description TODO
+#' @keywords model-template
 #' @export
 DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter
   classname = "DiseasyModelOdeSeir",
