@@ -54,23 +54,19 @@ DiseasyVariant <- R6::R6Class(                                                  
         add = coll
       )
 
-      if ("relative_infection_risk" %in% names(characteristics)) {
-        checkmate::assert_number(characteristics$relative_infection_risk, add = coll)
-      }
-      if ("cross_immunity" %in% names(characteristics)) {
-        checkmate::assert(
-          checkmate::check_list(characteristics$cross_immunity, names = "named", types = "numeric"),
-          checkmate::check_numeric(characteristics$cross_immunity, names = "named"),
-          add = coll
-        )
-      }
-      if ("introduction_date" %in% names(characteristics)) {
-        checkmate::assert(
-          checkmate::check_date(characteristics$introduction_date),
-          checkmate::check_number(characteristics$introduction_date),
-          add = coll
-        )
-      }
+      checkmate::assert_number(characteristics$relative_infection_risk, null.ok = TRUE, add = coll)
+
+      checkmate::assert(
+        checkmate::check_list(characteristics$cross_immunity, names = "named", types = "numeric", null.ok = TRUE),
+        checkmate::check_numeric(characteristics$cross_immunity, names = "named", null.ok = TRUE),
+        add = coll
+      )
+
+      checkmate::assert(
+        checkmate::check_date(characteristics$introduction_date, null.ok = TRUE),
+        checkmate::check_number(characteristics$introduction_date, null.ok = TRUE),
+        add = coll
+      )
 
       checkmate::reportAssertions(coll)
 
