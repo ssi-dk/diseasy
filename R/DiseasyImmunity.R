@@ -440,7 +440,15 @@ DiseasyImmunity <- R6::R6Class(                                                 
           if (method == "free_delta") {
             p_gamma_0 <- numeric(0)
           } else {
-            p_gamma_0 <- rep(1e15, n_models * (N - 1)) # p_01 is 1 at infinity
+            gamma_0 <- private$.model |>
+              purrr::map(~ head(seq(from = 1, to = .x(Inf), length.out = N), N - 1)) |>
+              purrr::map(~ .x / c(1, .x[seq_len(N - 2)])) |> # Account for the cumprod
+              purrr::reduce(c)
+
+            p_gamma_0 = pmin(
+              log(gamma_0) - log(1 - gamma_0), # Inverse mapping of p_01
+              1e15 # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead
+            )
           }
 
           par_0 <- c(p_gamma_0, p_delta_0)
