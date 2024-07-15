@@ -94,12 +94,12 @@ group $i$ with persons infected with variant $a$ across all age groups.
 In the `rhs` function, we have the `infection_rate` variable which is the `infected_contact_rate` adjusted
 for additional risk factors.
 
-- $s(t)$: Multiplicative effect of season
+- $\sigma(t)$: Multiplicative effect of season
 - $\epsilon_a$: Relative infectiousness of variant $a$
 - $\Gamma$: Overall infection rate scaling factor
 
 $$
-\overline{\overline{T}} = \Gamma\;s(t)\;\overline{\overline{\mathcal{E}}} \odot \overline{\overline{CI}}
+\overline{\overline{T}} = \Gamma\;\sigma(t)\;\overline{\overline{\mathcal{E}}} \odot \overline{\overline{CI}}
 $$
 
 Where $\odot$ is the Hadamard product (element-wise multiplication), and $\overline{\overline{\mathcal{E}}}$ is the
@@ -220,7 +220,7 @@ The matrix can be decomposed into two contributions:
   sequential compartments
 - The transmission matrix, $\overline{\overline{G}}_\beta$ which contains the flows stemming from infections.
 
-The transition matrix has the form (here for $K = 1$ and $L = 1$ and $A + V > 2$:
+The transition matrix has the form (here for $K = 1$ and $L = 1$ and $A + V > 2)$:
 $$
 \overline{\overline{G}}_T = \begin{bmatrix}
   -r_e & 0 & 0 & 0 & \cdots & 0 & 0 \\
@@ -236,7 +236,7 @@ Notice that the off-diagonal has zero-elements where the (reduced) state vector 
 
 The form of the transmission matrix is more difficult to write up.
 
-We lump risk modifying factors such as the effect of season $s(t)$ and overall infection rate $\Gamma$ into a single
+We lump risk modifying factors such as the effect of season $\sigma(t)$ and overall infection rate $\Gamma$ into a single
 factor $\beta$.
 
 Some examples:
