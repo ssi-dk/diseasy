@@ -6,6 +6,7 @@
 \description{
 TODO
 }
+\keyword{model-template}
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{DiseasyModelOdeSeir}
 }
