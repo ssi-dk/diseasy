@@ -20,7 +20,7 @@ devtools::load_all()
 rm(im)
 im <- DiseasyImmunity$new()
 
-cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data"))
+cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/single"))
 
 ```
 
@@ -31,6 +31,7 @@ f = list(
   "exponential" = \(t) exp(-t / time_scale),
   "sigmoidal" = \(t) exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
   "heaviside" = \(t) as.numeric(t < time_scale),
+  "exp_sum" = \(t) (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
   "linear" = \(t) pmax(1 - t / time_scale, 0)
 )
 # And define a list of correpsonding time_ cales
@@ -41,6 +42,7 @@ g = list(
   "exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
   "sigmoidal" = \(t) 0.2 + 0.8 * exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
   "heaviside" = \(t) 0.2 + 0.8 * as.numeric(t < time_scale),
+  "exp_sum" = \(t) (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
   "linear" = \(t) 0.2 + 0.8 * pmax(1 - t / time_scale, 0)
 )
 t_g <- t_f
@@ -52,7 +54,7 @@ t_h <- t_f * 2
 
 # Construct a list of all models
 models <- c(f, g, h) 
-model_names <- c(names(f), paste0(names(f), "_c"), paste0(names(f), "_2t"))
+model_names <- c(names(f), paste0(names(f), "-c"), paste0(names(f), "-2t"))
 time_scales <- c(t_f, t_g, t_h)
 
 zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
@@ -61,10 +63,91 @@ zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 
 
 ```{r manually check fits}
-#im$set_waning_model(g[["heaviside"]], time_scale = t_g[[1]], target = "infection")
-#im$approximate_compartmental(method = method, N = N)
-#plot(im, method = method, N = 3)
+im$set_waning_model(g[["exp_sum"]], time_scale = t_g[[1]], target = "infection")
+plot(im, method = "free_gamma", N = 3)
+
+im$approximate_compartmental(method = "free_gamma", N = 3)
 ```
+
+```{r manually check fits}
+im$set_waning_model(g[["exp_sum"]], time_scale = t_g[[1]], target = "infection")
+plot(im, method = "all_free", N = 3)
+
+im$approximate_compartmental(method = "all_free", N = 3)
+```
+
+
+```{r run all single targets}
+# Set the combinations to test
+combinations <- tidyr::expand_grid(
+  model = zip(models, model_names, time_scales),
+  method = c("free_gamma", "free_delta", "all_free")
+)
+
+
+# Run the approximations and note the convergence point
+convergence_single <- combinations |>
+  purrr::pmap(
+  .progress = interactive(),
+  .f = \(model_zip, method) {
+    
+    N = seq(from = 2, to = 15, by = 1)
+    
+    # Unpack model
+    model <- model_zip[[1]]
+    model_name <- model_zip[[2]]
+    time_scale <- model_zip[[3]]
+    
+    # Place holder for the convergence value
+    N_converged <- NA
+    
+    # Generate approximations and store them and the convergence point
+    purrr::walk(seq_along(N), \(n) {
+      
+      # Check if approximation has converged
+      if (n > 1) {
+        prev_values <- purrr::map(N[seq_len(n - 1)], ~ cache$get(key = glue::glue("{model_name}-{method}-{.}"))) |>
+          purrr::discard(cachem::is.key_missing) |>
+          purrr::map_dbl(~ purrr::pluck(., "value"))
+        
+        # Look for the N that caused convergence using kneedle algorithm
+        N_converged <- tryCatch(
+          kneedle::kneedle(
+            x = unlist(N_prev[1:length(prev_values)]),
+            y = prev_values,
+            decreasing = TRUE,
+            concave = FALSE,
+            sensitivity = 1
+          ),
+          error = function(e) numeric(0)
+        ) |>
+          purrr::pluck(1, .default = numeric(0))
+      
+        # In some cases, values are increasing not decreasing, so we manually detect these
+        if (identical(N_converged, numeric(0)) && any(diff(prev_values) > 0)) {
+          N_converged <- N_prev[[which(diff(prev_values) > 0)[1]]]
+        }
+      }
+      
+      # Check if we need to compute this value
+      approx <- cache$get(key = glue::glue("{model_name}-{method}-{N[n]}"))
+      if (cachem::is.key_missing(approx)) {
+        # Set the target
+        im$set_waning_model(model, time_scale = time_scale, target = "infection")
+          
+        approx <- im$approximate_compartmental(method = method, N = N)
+          
+        cache$set(key = glue::glue("{model_name}-{method}-{N[n]}"), approx)
+      }
+    })
+    
+    return(N_converged)
+  }) |>
+  purrr::list_rbind()
+```
+
+
+
 
 
 ```{r elbow curve single target}
@@ -72,7 +155,7 @@ zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 combinations <- tidyr::expand_grid(
   model = zip(models, model_names, time_scales),
   method = c("free_gamma", "free_delta", "all_free"),
-  N = seq(from = 2, to = 4, by = 1)
+  N = seq(from = 2, to = 15, by = 1)
 )
 
 
@@ -139,7 +222,7 @@ values <- combinations |>
       N_converged <<- N_converged
       
       # Stop if there is convergence
-      if (!identical(N_converged, numeric(0)) && !(N_converged %in% tail(N_prev, 1))) {
+      if (!identical(N_converged, numeric(0)) && !(N_converged %in% tail(N_prev, 2))) {
         #message(glue::glue("{model_name}-{method} has converged at {N_converged}"))
         return(data.frame("value" = NA, "execution_time" = NA))
       }
@@ -162,7 +245,7 @@ results <- cbind(combinations, values) |>
   dplyr::mutate("execution_time" = as.numeric(.data$execution_time),
                 "model" = purrr::map_chr(.data$model, ~ purrr::pluck(., 2))) |>
   tidyr::pivot_longer(!c("model", "method", "N"), names_to = "metric") |>
-  tidyr::separate_wider_delim("model", delim = "_", names = c("model", "variant"), too_few = "align_start") |>
+  tidyr::separate_wider_delim("model", delim = "-", names = c("model", "variant"), too_few = "align_start") |>
   dplyr::mutate("variant" = dplyr::case_when(
     is.na(variant) ~ "base",
     variant == "c" ~ "non-zero asymptote",
@@ -193,3 +276,141 @@ results |>
   ggplot2::theme_bw()
 ```
 
+```{r}
+results |>
+  dplyr::filter(.data$metric == "value") |>
+  ggplot2::ggplot(ggplot2::aes(x = N, y = value, color = method)) +
+  ggplot2::geom_line(size = 1) +
+  ggplot2::geom_point() +
+  #ggplot2::xlim(1, max(results$N)) +
+  ggplot2::scale_y_log10() + 
+  ggplot2::facet_grid(model ~ variant, scales = "free") + 
+  ggplot2::labs(x = "N", y = "Value") +
+  ggplot2::theme_bw()
+```
+
+```{r}
+cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/double"))
+```
+
+```{r elbow curve double target}
+# Set the combinations to test
+combinations <- tidyr::expand_grid(
+  model1 = zip(models, model_names, time_scales),
+  model2 = zip(models, model_names, time_scales),
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = seq(from = 2, to = 15, by = 1)
+)
+
+
+# Determine the previous N's for each N we test, so that we can run a
+# Kneedle algorithm to detect convergence
+# Not pretty, but works
+combinations <- combinations |>
+  dplyr::group_by(.data$model1, .data$model2, .data$method) |>
+  dplyr::mutate(n = dplyr::row_number()) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(N_prev = list(seq_len(n - 1))) |>
+  dplyr::select(!"n") |>
+  dplyr::ungroup() |>
+  dplyr::group_by(.data$model1, .data$model2, .data$method) |>
+  dplyr::mutate(N_prev = purrr::map(N_prev, ~ N[.]))
+
+
+future::plan("multisession")
+
+values <- combinations |>
+  dplyr::arrange(.data$model1, .data$model2, .data$method) |>
+  furrr::future_pmap(
+  .progress = interactive(),
+  .f = \(model1_zip, model2_zip, method, N, N_prev) {
+    
+    # Unpack model
+    model1 <<- model1_zip[[1]]
+    model1_name <<- model1_zip[[2]]
+    time_scale1 <<- model1_zip[[3]]
+    
+    model2 <<- model2_zip[[1]]
+    model2_name <<- model2_zip[[2]]
+    time_scale2 <<- model2_zip[[3]]
+    N <<- N
+    method <<- method
+    N_prev <<- N_prev
+    
+    # Check if we have already computed this value
+    approx <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{N}"))
+    if (!cachem::is.key_missing(approx)) {
+      return(data.frame("value" = approx$value, "execution_time" = approx$execution_time))
+    }
+    
+    
+    # Check if previous N has converged
+    if (length(N_prev) > 1) {
+      prev_values <<- purrr::map(N_prev, ~ cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{.}"))) |>
+        purrr::discard(cachem::is.key_missing) |>
+        purrr::map_dbl(~ purrr::pluck(., "value"))
+      
+      # Look for the N that caused convergence
+      N_converged <- tryCatch(
+        kneedle::kneedle(
+          x = unlist(N_prev[1:length(prev_values)]),
+          y = prev_values,
+          decreasing = TRUE,
+          concave = FALSE,
+          sensitivity = 1
+        ),
+        error = function(e) numeric(0)
+      ) |>
+        purrr::pluck(1, .default = numeric(0))
+    
+      
+      if (identical(N_converged, numeric(0)) && any(diff(prev_values) > 0)) {
+        N_converged <- N_prev[[which(diff(prev_values) > 0)[1]]]
+      }
+      
+      N_converged <<- N_converged
+      
+      # Stop if there is convergence
+      if (!identical(N_converged, numeric(0)) && !(N_converged %in% tail(N_prev, 2))) {
+        #message(glue::glue("{model_name}-{method} has converged at {N_converged}"))
+        return(data.frame("value" = NA, "execution_time" = NA))
+      }
+    }
+    
+    # Set the target
+    im$set_waning_model(model1, time_scale = time_scale1, target = "infection")
+    im$set_waning_model(model2, time_scale = time_scale2, target = "hospitalisation")
+    
+    approx <- im$approximate_compartmental(method = method, N = N)
+    
+    cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}-{N}"), approx)
+
+    return(data.frame("value" = approx$value, "execution_time" = approx$execution_time))
+  }) |>
+  purrr::list_rbind()
+
+
+results <- cbind(combinations, values) |>
+  dplyr::select(!"N_prev") |>
+  dplyr::mutate("execution_time" = as.numeric(.data$execution_time),
+                "model_1" = purrr::map_chr(.data$model1, ~ purrr::pluck(., 2)),
+                "model_2" = purrr::map_chr(.data$model2, ~ purrr::pluck(., 2))) |>
+  tidyr::pivot_longer(!c("model", "method", "N"), names_to = "metric") |>
+  tidyr::separate_wider_delim("model", delim = "-", names = c("model", "variant"), too_few = "align_start") |>
+  dplyr::mutate("variant" = dplyr::case_when(
+    is.na(variant) ~ "base",
+    variant == "c" ~ "non-zero asymptote",
+    variant == "2t" ~ "twice the time scale"
+  )) |>
+  dplyr::filter(!is.na(value))
+
+# Plot
+ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = method, linetype = variant)) +
+  ggplot2::geom_line(size = 1) +
+  ggplot2::geom_point() +
+  #ggplot2::xlim(1, max(results$N)) +
+  #ggplot2::scale_y_log10() + 
+  ggplot2::facet_grid(model ~ metric, scales = "free") + 
+  ggplot2::labs(x = "N", y = "Metric") +
+  ggplot2::theme_bw()
+```
