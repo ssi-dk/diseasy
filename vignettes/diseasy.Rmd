@@ -86,17 +86,12 @@ The use of these modules is varied and each module comes with their own vignette
 ## Model modules
 As stated above, the functional modules provide functionality for the disease models.
 
-The currently available model modules are:
+The currently available model templates are:
 ```{r available_model_modules}
 ls("package:diseasy", pattern = "DiseasyModel.+")
 ```
 
-Presently, no models are included in the package. These will come in the following releases.
-
-```{r models_now_available, include = FALSE}
-# If the model are now included, please continue the writing of this vignette
-stopifnot(identical(ls("package:diseasy", pattern = "DiseasyModel.+"), character(0)))
-```
+See their associated vingettes for an introduction to the models.
 
 
 ## Configuring
