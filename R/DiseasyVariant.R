@@ -45,7 +45,7 @@ DiseasyVariant <- R6::R6Class(                                                  
       # Check the input is well-formed
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(name, add = coll)
-      checkmate::assert_disjunct(name, names(self$variants), add = coll)
+      checkmate::assert_disjunct(name, names(self %.% variants), add = coll)
 
       checkmate::assert_list(characteristics, add = coll)
       checkmate::assert_names(
@@ -79,10 +79,10 @@ DiseasyVariant <- R6::R6Class(                                                  
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyVariant #############################################")
-      if (is.null(self$variants)) {
+      if (is.null(self %.% variants)) {
         printr("No variants have been configured")
       } else {
-        self$variants |>
+        self %.% variants |>
           purrr::iwalk(\(characteristics, name) {
             printr(glue::glue("Variant: {name}"))
             if (length(characteristics) > 0) {
@@ -93,10 +93,10 @@ DiseasyVariant <- R6::R6Class(                                                  
           })
       }
 
-      if (length(self$variants) > 1) {
+      if (length(self %.% variants) > 1) {
         printr("Cross immunity interactions:")
         printr("(Index ij indicates variant j infecting host with immunity i)")
-        printr(self$cross_immunity)
+        printr(self %.% cross_immunity)
       }
     }
   ),
