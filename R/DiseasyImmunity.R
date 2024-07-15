@@ -330,7 +330,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
-      checkmate::assert_integerish(N, lower = 1, add = coll)
+      checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
