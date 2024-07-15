@@ -641,8 +641,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     occupancy_probability = function(rate, K, t) {                                                                      # nolint: object_name_linter
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
-        checkmate::check_number(rate),
-        checkmate::check_numeric(rate, lower = -1e14, any.missing = FALSE, len = K - 1),
+        checkmate::check_number(rate, lower = 0),
+        checkmate::check_numeric(rate, lower = 0, any.missing = FALSE, len = K - 1),
         add = coll
       )
       checkmate::assert_integerish(K, lower = 1, add = coll)
