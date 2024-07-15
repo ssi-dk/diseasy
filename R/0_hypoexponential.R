@@ -1,6 +1,6 @@
 # Bi-diagonal matrix of rates
-theta <- \(shape, rate) {
-  rbind(cbind(rep(0, shape - 1), diag(rate[1:(shape - 1)], nrow = shape - 1)), rep(0, shape)) - diag(rate)
+theta <- \(shape) {
+  rbind(cbind(rep(0, shape - 1), diag(nrow = shape - 1)), rep(0, shape)) - diag(nrow = shape)
 }
 
 # Initial state (all in first compartment)
@@ -40,7 +40,7 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
   }
 
   # Compute the density function
-  tt <- theta(shape, rate)
+  tt <- rate * theta(shape)
   d <- vapply(
     x,
     \(x) - alpha(shape) %*% expm::expm(x * tt) %*% tt %*% ones(shape),
@@ -63,7 +63,7 @@ phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
   # Compute the upper tail of the cumulative distribution function
   p <- vapply(
     q,
-    \(q) alpha(shape) %*% expm::expm(q * theta(shape, rate)) %*% ones(shape),
+    \(q) alpha(shape) %*% expm::expm(q * rate * theta(shape)) %*% ones(shape),
     FUN.VALUE = numeric(1),
     USE.NAMES = FALSE
   )
