@@ -159,7 +159,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
                         ~ digest::digest(attributes(.)))
 
         # Add the class name to "salt" the hashes
-        hash_list <- c(hash_list[!purrr::map_lgl(hash_list, is.null)], class = class(self)[1]) |>
+        hash_list <- c(purrr::discard(hash_list, is.null), class = class(self)[1]) |>
           purrr::map_chr(digest::digest)
 
         # Reduce to single hash and return
