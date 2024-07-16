@@ -386,3 +386,14 @@ test_that("active binding: available_season_models works", {
 
   rm(s)
 })
+
+
+test_that("$describe() works", {
+  s <- DiseasySeason$new()
+  expect_no_error(withr::with_output_sink(nullfile(), s$describe()))
+
+  s$set_reference_date(as.Date("2022-01-01"))
+  expect_no_error(withr::with_output_sink(nullfile(), s$describe()))
+
+  rm(s)
+})
