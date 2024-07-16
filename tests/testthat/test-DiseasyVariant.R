@@ -87,7 +87,7 @@ test_that("active binding: variants works", {
 
   # Try to set the variants
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(var$variants <- list("name" = "WT"), error = \(e) e),                                   # nolint: implicit_assignment_linter
+  expect_identical(tryCatch(var$variants <- list("name" = "WT"), error = \(e) e),                                       # nolint: implicit_assignment_linter
                    simpleError("`$variants` is read only"))
   expect_null(var %.% variants)
 
@@ -103,7 +103,7 @@ test_that("active binding: cross_immunity works", {
 
   # Try to set the cross_immunity
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(var$cross_immunity <- matrix(2), error = \(e) e),                                       # nolint: implicit_assignment_linter
+  expect_identical(tryCatch(var$cross_immunity <- matrix(2), error = \(e) e),                                           # nolint: implicit_assignment_linter
                    simpleError("`$cross_immunity` is read only"))
   expect_equal(var %.% cross_immunity, matrix(1))
 
