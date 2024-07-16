@@ -109,3 +109,24 @@ test_that("active binding: cross_immunity works", {
 
   rm(var)
 })
+
+
+test_that("$describe() works", {
+  var <- DiseasyVariant$new()
+  expect_no_error(withr::with_output_sink(nullfile(), var$describe()))
+
+  var$add_variant(name = "WT")
+  expect_no_error(withr::with_output_sink(nullfile(), var$describe()))
+
+  var$add_variant(
+    name = "Mutant",
+    characteristics = list(
+      "relative_infection_risk" = 1.2,
+      "cross_immunity" = c("WT" = 0.5),
+      "introduction_date" = Sys.Date()
+    )
+  )
+  expect_no_error(withr::with_output_sink(nullfile(), var$describe()))
+
+  rm(var)
+})
