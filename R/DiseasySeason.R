@@ -464,8 +464,10 @@ DiseasySeason <- R6::R6Class(                                                   
       printr(glue::glue("Season model: {attr(self$model_t, 'name')}"))
       printr(glue::glue("{attr(self$model_t, 'description')}"))
       if (!is.null(attr(self$model_t, "dots"))) {
-        printr("Parameters: ",
-                stringr::str_extract(toString(list(attr(self$model_t, "dots"))), r"{(?<=list\().*(?=\))}"))
+        printr(
+          "Parameters: ",
+          stringr::str_extract(toString(list(attr(self$model_t, "dots"))), r"{(?<=list\().*(?=\))}")
+        )
       }
 
       if (is.null(self$reference_date)) {
