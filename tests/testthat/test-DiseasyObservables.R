@@ -410,6 +410,8 @@ test_that("active binding: available_observables works", {
 
 
 test_that("$describe() works", {
+  skip_if_not_installed("RSQLite")
+
   obs <- DiseasyObservables$new()
   expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
 
