@@ -47,11 +47,11 @@ Having contacts as counts is important if you want to project the contact matric
 (see `?contact_basis` for more details on how the `contact_basis` is constructed)
 ```{r dk_configuration}
 act$set_activity_units(dk_activity_units)
-act$set_contact_basis(contact_basis$DK)
+act$set_contact_basis(contact_basis %.% DK)
 
 # This configuration can also be done as part of the constructor
 # act <- DiseasyActivity$new(activity_units = dk_activity_units
-#                            contact_basis = contact_basis$DK)
+#                            contact_basis = contact_basis %.% DK)
 ```
 
 # Defining an activity scenario

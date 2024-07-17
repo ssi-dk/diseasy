@@ -317,12 +317,10 @@ synthetic_model <- combinations |>
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = L, "R" = 1),
       disease_progression_rates = c("E" = rE, "I" = rI),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6)
@@ -381,12 +379,10 @@ run_model <- function(EI_states, R, S, K, L, rE, rI, offset = 0, signal = "incid
 
   # Run a SIR model to generate the target of our initialisation
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE, activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = K, "I" = L, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6)
@@ -782,12 +778,10 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal_derivatives), ~
 
   # Run a SIR model to generate the target of our initialisation
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE, activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = K, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = ri),
     parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -882,12 +876,10 @@ simplified_incidence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = 1, "R" = 1),
       disease_progression_rates = c("E" = rE, "I" = ri),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -980,12 +972,10 @@ simplified_incidence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = 1, "R" = 1),
       disease_progression_rates = c("E" = rE, "I" = ri),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1209,12 +1199,10 @@ simplified_model_fit_gg <- purrr::map(names(prevalence_signal_derivatives), ~ {
 
   # Run a SIR model to generate the target of our initialisation
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE, activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = K, "I" = L, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1308,12 +1296,10 @@ simplified_prevalence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = 1, "R" = 1),
       disease_progression_rates = c("E" = rE, "I" = ri),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1407,12 +1393,10 @@ simplified_prevalence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = 1, "R" = 1),
       disease_progression_rates = c("E" = rE, "I" = ri),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1521,12 +1505,10 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
 
   # Run a SIR model to generate the target of our initialisation
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE, activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
     disease_progression_rates = c("I" = rI * L / (L- 1)),
     parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1600,12 +1582,10 @@ simplified_incidence_fit_gg <- purrr::map(names(incidence_signal), ~ {
 
   # Run a SIR model to generate the target of our initialisation
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE, activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
     disease_progression_rates = c("I" = rI * L / (L- 1)),
     parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1726,12 +1706,10 @@ simplified_incidence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = 0, "I" = L - 1, "R" = 1),
       disease_progression_rates = c("I" = rI * L / (L- 1)),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1832,12 +1810,10 @@ simplified_incidence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = 1, "R" = 1),
       disease_progression_rates = c("E" = re / K, "I" = ri),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -1921,12 +1897,10 @@ simplified_model_fit_gg <- purrr::map(names(prevalence_signal_derivatives), ~ {
 
   # Run a SIR model to generate the target of our initialisation
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE, activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = K, "I" = L, "R" = 1),
     disease_progression_rates = c("E" = re / K, "I" = ri),
     parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -2020,12 +1994,10 @@ simplified_prevalence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = 1, "R" = 1),
       disease_progression_rates = c("E" = re / K, "I" = ri),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),
@@ -2119,12 +2091,10 @@ simplified_prevalence_fit_gg <- expand.grid(
 
     # Run a SIR model to generate the target of our initialisation
     m <- DiseasyModelOdeSeir$new(
-      season = TRUE, activity = TRUE,
       observables = DiseasyObservables$new(
         conn = DBI::dbConnect(RSQLite::SQLite()),
         last_queryable_date = Sys.Date() - 1
       ),
-      variant = DiseasyVariant$new(),
       compartment_structure = c("E" = K, "I" = 1, "R" = 1),
       disease_progression_rates = c("E" = re / K, "I" = ri),
       parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0),

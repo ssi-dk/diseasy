@@ -3,13 +3,11 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0),
     malthusian_matching = FALSE
@@ -47,13 +45,11 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = c(0, 60)),
     malthusian_matching = FALSE
@@ -91,13 +87,11 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = c(0, 40, 80)),
     malthusian_matching = FALSE
@@ -149,13 +143,11 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0),
     malthusian_matching = FALSE
@@ -234,13 +226,11 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list(
       "age_cuts_lower" = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))
