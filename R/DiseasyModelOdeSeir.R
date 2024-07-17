@@ -279,6 +279,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
 
+    #' @description
+    #'   This function computes the Malthusian growth rate for the given model configuration.
+    #' @details
+    #'   This section follows the method outlined in doi: 10.1098/rsif.2009.0386
+    #'   To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
+    #'   Here, we linearise around S = 1.
+    #'   In this limit, there is no interaction with variants (since everyone is susceptible).
+    #'   The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
+    #' @params ... Parameters passed to `$generator_matrix()`.
+    malthusian_growth_rate = function(...) {
+      return(purrr::pluck(private$generator_matrix(...), eigen, "values", Re, max))
+    },
+
+
     #' @field immunity
     #'   Placeholder for the immunity module
     immunity = list("approximate_compartmental" = \(approach, N) c(rep(0.95, N), rep(1, N - 1)))
@@ -600,123 +614,36 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       return(generator_matrix)
     },
 
-    # @description
-    #   This function computes the Malthusian growth rate for the given model configuration.
-    # @details
-    #   This section follows the method outlined in doi: 10.1098/rsif.2009.0386
-    #   To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
-    #   Here, we linearise around S = 1.
-    #   In this limit, there is no interaction with variants (since everyone is susceptible).
-    #   The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
-    # @params t (`numeric(1)` or `Date(1)`)\cr
-    #   The time at which to compute the growth rate.
-    # @params K (`integer(1)`)\cr
-    #   The number of exposed compartments in the model.
-    # @params L (`integer(1)`)\cr
-    #   The number of infectious compartments in the model.
-    # @params age_cuts_lower (`numeric`)\cr
-    #   The lower age cuts for the age groups in the model.
-    compute_malthusian_growth_rate = function(
-      t = 0,
-      K = purrr::pluck(private %.% compartment_structure, "E", .default = 0),
-      L = private %.% compartment_structure %.% I,
-      age_cuts_lower = self %.% parameters %.% age_cuts_lower,
-      overall_infection_risk = self %.% parameters %.% overall_infection_risk
-    ) {
-
-      # Early return if no disease compartments
-      if (K + L == 0) {
-        return(NA)
-      }
-
-      n_age_groups <- length(age_cuts_lower)
-
-      ## Compute the transition rate component
-
-      # The diagonal elements of the transition matrix is just (minus) the progression flow rates
-      progression_flow_rates <- c(
-        rep(K * purrr::pluck(private %.% disease_progression_rates, "E", .default = 0), K),
-        rep(L * purrr::pluck(private %.% disease_progression_rates, "I"), L)
-      )
-      transition_matrix <- diag(- rep(progression_flow_rates, n_age_groups), nrow = n_age_groups * (K + L))
-
-
-
-      # The (lower) off-diagonal elements are the progression flow rates of the previous compartment
-      # which requires a little more attention when computing
-      offdiagonal_elemments <- head(rep(c(head(progression_flow_rates, -1), 0), n_age_groups), -1)
-
-      # `diag(x) <- value` does not work as expected for a 1x1 matrix (how surprising...)
-      # so we need to utilise jank instead to manually compute the corresponding indices....
-      off_diagonal_indices <- tidyr::expand_grid(
-        i = seq_len(nrow(transition_matrix)),
-        j = seq_len(nrow(transition_matrix))
-      ) |>
-        purrr::pmap_lgl(\(i, j) j > i && i > j - 2)
-
-      transition_matrix[off_diagonal_indices] <- offdiagonal_elemments
-
-
-
-      ## Compute the transmissions component
-
-      # First get the contact matrices
-      contact_matrixes <- self %.% activity %.% get_scenario_contacts(
-        age_cuts_lower = age_cuts_lower,
-        weights = self %.% parameters %.% activity.contact_weights
-      )
-
-      # Use the first contact matrix for computing the scaling
-      contact_matrix <- purrr::pluck(contact_matrixes, 1)
-
-      # We now compute the "beta" components of the linearised subsystem which is the
-      # contact matrix adjusted
-      # - the over all infection risk
-      # - the largest relative infection risk of the (active) variants
-
-      # Get the largest relative infection risk of the (active) variants
-      largest_variant_infection_risk <- self %.% variant %.% variants |>
-        purrr::keep(~ purrr::pluck(.x, "introduction_date") <= t) |>
-        purrr::map(\(variant) purrr::pluck(variant, "relative_infection_risk", .default = 1)) |>
-        purrr::reduce(max)
-
-      # Combine the components to get the beta matrix
-      beta_matrix <- contact_matrix * overall_infection_risk * largest_variant_infection_risk
-
-
-      # Pre-allocate the transmission matrix
-      transmission_matrix <- 0 * transition_matrix
-
-      # Then fill in with beta elements
-      for (i in seq(n_age_groups)) {    # This has to be a nested for loop for the referencing to work
-        for (j in seq(n_age_groups)) {
-          transmission_matrix[1 + (i - 1) * (K + L), (K + 1):(K + L) + (j - 1) * (K + L)] <- beta_matrix[i, j]
-        }
-      }
-
-      return(purrr::pluck(eigen(transition_matrix + transmission_matrix), "values", Re, max))
-    },
 
     # @description
     #   This function computes the relative difference in growth rates between the current model and the SIR model.
-    # @param RS_states (`named numeric()`)\cr
-    #   The population vector for R and S states to linearise around.
-    #   (Must sum to 1).
-    malthusian_scaling_factor = function(RS_states) {
+    # @params ... Parameters passed to `$generator_matrix()`.
+    malthusian_scaling_factor = function(...) {
 
       if (self %.% parameters %.% overall_infection_risk == 0) {
         stop("The overall_infection_risk parameter must be strictly positive matching malthusian growth rates.")
       }
 
-      reference_growth_rate <- private$compute_malthusian_growth_rate(K = 0, L = 1, age_cuts_lower = 0)
+      # The reference model is an SIR model with the same parameters as the current model
+      # except that it uses only a single age group
+      reference_model <- DiseasyModelOdeSeir$new(
+        compartment_structure = c("E" = 0L, "I" = 1L, "R" = 1L),
+        disease_progression_rates = purrr::discard_at(private %.% disease_progression_rates, ~ . == "E"),
+        malthusian_matching = FALSE,
+        activity = self %.% activity,
+        observables = self %.% observables,
+        season = self %.% season,
+        variant = self %.% variant,
+        parameters = modifyList(self %.% parameters, list("age_cuts_lower" = 0), keep.null = TRUE)
+      )
+
+      reference_growth_rate <- reference_model$malthusian_growth_rate(...)
 
       # Define objective function for root finding
       f <- \(scaling_factor) {
-        private$compute_malthusian_growth_rate(
-          K = purrr::pluck(private$compartment_structure, "E", .default = 0),
-          L = purrr::pluck(private$compartment_structure, "I"),
-          age_cuts_lower = self %.% parameters %.% age_cuts_lower,
-          overall_infection_risk = scaling_factor * self %.% parameters %.% overall_infection_risk
+        self$malthusian_growth_rate(
+          overall_infection_risk = scaling_factor * self %.% parameters %.% overall_infection_risk,
+          ...
         ) - reference_growth_rate
       }
 
