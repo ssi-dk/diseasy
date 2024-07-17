@@ -249,7 +249,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @field immunity
     #'   Placeholder for the immunity module
-    immunity = list("approximate_compartmental" = \(approach, N) c(rep(0.01, N), rep(1, N - 1)))
+    immunity = list("approximate_compartmental" = \(approach, N) c(rep(0.02, N), rep(1, N - 1)))
   ),
 
 

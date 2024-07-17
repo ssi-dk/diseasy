@@ -29,7 +29,7 @@ test_that("helpers are configured as expected (SEIR single variant / single age 
   expect_identical(private %.% progression_flow_rates, c(2, 4, 0, 0))
 
   # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, 0, 0.01, 1))
+  expect_identical(private %.% infection_risk, c(0, 0, 0.02, 1))
 
   rm(m)
 })
@@ -66,7 +66,7 @@ test_that("helpers are configured as expected (SEEIIRR single variant / single a
   expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 0))
 
   # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 1))
+  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.02, 0.02, 1))
 
   rm(m)
 })
@@ -106,7 +106,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / single a
   expect_identical(private %.% progression_flow_rates, c(4, 4, 8, 8, 1, 0, 4, 4, 8, 8, 1, 0, 0))
 
   # Check infection risk is correctly set
-  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1))
+  expect_identical(private %.% infection_risk, c(0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 1))
 
   rm(m)
 })
@@ -140,9 +140,9 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   expect_identical(
     private %.% infection_matrix_to_state_vector,
     list(
-      c(seq.int(6), seq.int(6) + 12L, 25L),
-      c(seq.int(6) + 6L, seq.int(6) + 18L, 26L),
-      c(26L + seq.int(6), 26L + seq.int(6) + 12L, 26L + 25L),
+      c(seq.int(6),            seq.int(6) + 12L,       25L),
+      c(seq.int(6) + 6L,       seq.int(6) + 18L,       26L),
+      c(26L + seq.int(6),      26L + seq.int(6) + 12L, 26L + 25L),
       c(26L + seq.int(6) + 6L, 26L + seq.int(6) + 18L, 26L + 26L)
     )
   )
@@ -156,7 +156,7 @@ test_that("helpers are configured as expected (SEEIIRR double variant / double a
   # Check infection risk is correctly set
   expect_identical(
     private %.% infection_risk,
-    c(0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 0, 0, 0, 0, 0.01, 0.01, 1, 1)
+    c(0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 0, 0, 0, 0, 0.02, 0.02, 1, 1)
   )
 
   rm(m)
