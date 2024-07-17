@@ -9,27 +9,6 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
   public = list(
 
-    #' @description
-    #'   Creates a new instance of the `DiseasyModelOde` [R6][R6::R6Class] class.
-    #'   This module is typically not constructed directly but rather through `DiseasyModelOde*` classes,
-    #'   such as [DiseasyModelOdeSeir].
-    #' @param training_length `r rd_training_length()`
-    #' @param ...
-    #'   parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
-    initialize = function(training_length, ...) {
-
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_integerish(training_length, len = 1, add = coll)
-      checkmate::reportAssertions(coll)
-
-      # Store the given parameters
-      private$.parameters$training_length <- training_length
-
-      # Pass arguments to the DiseasyModel initializer
-      super$initialize(...)
-    },
-
-
     # Roxygen has only limited support for R6 docs currently, so we need to do some tricks for the documentation
     # of get_results
     #' @description `r rd_get_results_description`
