@@ -23,13 +23,12 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   act$change_risk(date = as.Date("2020-01-05"), type = "other", risk = 0.5)
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
+
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = as.Date("2020-01-01")
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -73,13 +72,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -110,13 +107,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -160,13 +155,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 60))
@@ -198,13 +191,10 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -230,13 +220,10 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rI, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 40))
@@ -267,8 +254,6 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -306,8 +291,6 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -348,8 +331,6 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -390,8 +371,6 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -436,8 +415,6 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -476,8 +453,6 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -516,7 +491,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   skip_if_not_installed("RSQLite")
 
   # Create a activity scenario for the tests
-  basis <- contact_basis$DK
+  basis <- contact_basis %.% DK
   basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
@@ -530,7 +505,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -569,7 +543,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   skip_if_not_installed("RSQLite")
 
   # Create a activity scenario for the tests
-  basis <- contact_basis$DK
+  basis <- contact_basis %.% DK
   basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
   basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
   basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
@@ -585,7 +559,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -637,8 +610,6 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
   )
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -690,8 +661,6 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
   )
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = TRUE,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
