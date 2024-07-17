@@ -3,6 +3,7 @@
 #' @description
 #'   The `DiseasyModel` module implements common functionality that all models have available beyond that provided by
 #'   `DiseasyBaseModule`.
+#'
 #'   Most notably, the model module facilitates:
 #'   * Module interfaces:
 #'     The module contains the functional modules via its active bindings:
@@ -42,6 +43,11 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   instance will not reflect in the copy that is added to `DiseasyModel`.
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
+    #'
+    #'   Each model has their own parameters.
+    #'
+    #'   Common parameters are:
+    #'   `r rd_diseasymodel_parameters`
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance.
     #' @param ...
@@ -113,6 +119,7 @@ DiseasyModel <- R6::R6Class(                                                    
       # Update the existing private$parameters with the new parameters -- overwriting the existing ones
       if (!is.null(parameters)) {
         private$.parameters <- modifyList(private$.parameters, parameters, keep.null = TRUE)
+        private$validate_parameters()
       }
 
 
@@ -202,9 +209,17 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   The parameters used in the model. Read-only.
     #' @importFrom diseasystore `%.%`
     parameters = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "parameters",
-      expr = return(private %.% .parameters))
+      expr = {
+        # If the class is "DiseasyModel", we break the iteration, otherwise we recursively iterate deeper
+        if (exists("super")) {
+          return(c(super$.parameters, private %.% .parameters))
+        } else {
+          return(private %.% .parameters)
+        }
+      }
+    )
   ),
 
   private = list(
@@ -212,7 +227,24 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasyActivity    = NULL,
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
-    .parameters = NULL,
+
+    .parameters = list(
+      "training_length" = list("training" = -Inf, "testing" = 0, "validation" = 0)
+    ),
+
+    # @description
+    #   Assert parameters conform to the expected format
+    # @details
+    #   Sub-classes implement additional validation checks
+    # @return `NULL` (called for side-effects)
+    validate_parameters = function() {
+      with(self %.% parameters, {
+        coll <- checkmate::makeAssertCollection()
+        checkmate::assert_integerish(training_length, add = coll)
+        checkmate::assert_names(names(training_length), subset.of = c("training", "testing", "validation"), add = coll)
+        checkmate::reportAssertions(coll)
+      })
+    },
 
     # @param label (`character`)\cr
     #   A human readable label for the model instance.
