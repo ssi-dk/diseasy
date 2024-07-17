@@ -30,9 +30,9 @@ These functions define the "API" of the models and ensure the models can take pa
 }
 \examples{
   # Normally, one would not want to create this module directly, but it is possible.
-  Model_module <- DiseasyModel$new()
+  m <- DiseasyModel$new()
 
-  rm(Model_module)
+  rm(m)
 }
 \seealso{
 \link[lgr:lgr-package]{lgr}
