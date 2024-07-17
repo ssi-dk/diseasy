@@ -136,6 +136,11 @@ The parameters of the model should be contained within the `$parameters` slot of
 These are then exposed to the user, and logic can be implemented to allow the user to set some parameters of the model
 while leaving others free to be determined by the model during model fitting.
 
+#### Validating the parameters
+The model template can test the user provided `parameters` by implementing the private `$validate_parameters()` method.
+Note that some parameters may be set inheirited from superclasses, so the implementation of the `$validate_parameters()`
+method should also call the parent validation method (`super$validate_parameters()`).
+
 ### Getting results
 Once the parameters of the model is set (either by the user or by the model), the user can query the model for results
 using the `$get_results()` function. Through this function, the user provides the parameters of the result that should
