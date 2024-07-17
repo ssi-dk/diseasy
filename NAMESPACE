@@ -3,6 +3,7 @@
 export(DiseasyActivity)
 export(DiseasyBaseModule)
 export(DiseasyModel)
+export(DiseasyModelOde)
 export(DiseasyObservables)
 export(DiseasySeason)
 export(DiseasyVariant)
