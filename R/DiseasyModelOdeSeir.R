@@ -1,6 +1,36 @@
-#' @title TODO
+#' @title A flexible SEIR model template
 #'
-#' @description TODO
+#' @description
+#'   This class provides a `diseasy` model-template for a compartmental SEIR ordinary differential equation model.
+#'   The number of consecutive exposed, infectious, and recovered compartments can flexibly be specified to generate a
+#'   number of structurally different SEIR models.
+#'
+#'   Similarly, the number of age groups in the model can also be controlled to create structurally different models.
+#'
+#'   The model implements the following features:
+#'   - A scaling of infection risk based on season (via `DiseasySeason`)
+#'   - Contact matrices and activity scenarios (via `DiseasyActivity`)
+#'   - Waning of immunity (via `DiseasyImmunity`)
+#'   - Asymmetric cross-immunity interactions between variants (via `DiseasyVariant`)
+#'
+#'    See `vignette(diseasy-model-ode-seir)` for a detailed examples of how to use this model.
+#' @examplesIf rlang::is_installed("RSQLite")
+#'   The model can be instantiated almost without arguments, but a observables modules needs to be specified.
+#'   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
+#'                                 conn = DBI::dbConnect(RSQLite::SQLite()))
+#'
+#'   # We create a default instance which has:
+#'   # * 1 age group (0+)
+#'   # * 1 variant
+#'   # * No season scaling
+#'   # * No activity scenarios
+#'   m <- DiseasyModelOdeSeir$new(observables = obs)
+#'
+#'   # TODO: Continue this minimal example once module is complete
+#'
+#'   rm(m)
+#' @return
+#'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
 #' @export
 DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter
@@ -269,6 +299,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param state_vector_forcing (`function`)\cr
     #'   A function that takes arguments `t` and`dy_dt` and modifies the flow into the
     #'   compartments at time `t`.
+    #' @return `r rd_side_effects`
     set_forcing_functions = function(infected_forcing = NULL, state_vector_forcing = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(infected_forcing, args = c("t", "infected"), null.ok = TRUE, add = coll)
@@ -294,6 +325,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   In this limit, there is no interaction with variants (since everyone is susceptible).
     #'   The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
     #' @param ... Parameters passed to `$generator_matrix()`.
+    #' @return (`numeric(1)`)\cr
+    #'   The Malthusian growth rate for the model.
     malthusian_growth_rate = function(...) {
       return(purrr::pluck(private$generator_matrix(...), eigen, "values", Re, max))
     },
@@ -436,8 +469,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #  Configure the contact matrix helper in the model.
     # @param scaling_factor (`numeric(1)`)\cr
     #   The scaling factor to apply to the contact matrices.
-    # @return
-    #  NULL (called for side effects).
+    # @return `r rd_side_effects()`
     set_contact_matrix = function(scaling_factor = 1) {
 
       # Apply the scaling factor to the contact matrices

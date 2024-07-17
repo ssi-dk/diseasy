@@ -20,9 +20,9 @@
 #'     These functions define the "API" of the models and ensure the models can take part in the ensemble.
 #' @examples
 #'   # Normally, one would not want to create this module directly, but it is possible.
-#'   Model_module <- DiseasyModel$new()
+#'   m <- DiseasyModel$new()
 #'
-#'   rm(Model_module)
+#'   rm(m)
 #' @return
 #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
 #' @export
