@@ -321,6 +321,31 @@ test_that("$get_results() gives error", {
 })
 
 
+test_that("parameter validation works", {
+
+  checkmate_err_msg <- \(expr) {
+    tryCatch(
+      expr,
+      error = \(e) {
+        e$message |>
+          stringr::str_remove_all(stringr::fixed("\n *")) |>
+          stringr::str_remove_all(stringr::fixed("* ")) |>
+          simpleError(message = _) |>
+          stop()
+      }
+    )
+  }
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyModel$new(parameters = list("training_length" = c("plotting" = 10))),
+      pattern = "Names must be a subset of {'training', 'testing', 'validation'}"
+    )
+  )
+
+})
+
+
 test_that("active binding: activity works", {
 
   # Creating an empty module
