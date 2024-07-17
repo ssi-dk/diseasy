@@ -22,6 +22,7 @@ TODO
 \itemize{
 \item \href{#method-DiseasyModelOdeSeir-new}{\code{DiseasyModelOdeSeir$new()}}
 \item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
+\item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
 \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
 }
 }
@@ -46,6 +47,9 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
   compartment_structure = c(E = 2L, I = 3L, R = 2L),
   disease_progression_rates = c(E = 1, I = 1),
   malthusian_matching = TRUE,
+  activity = TRUE,
+  season = TRUE,
+  variant = TRUE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -66,7 +70,9 @@ The exposed compartments can optionally be omitted.}
 \item{\code{malthusian_matching}}{(\code{logical(1)})\cr
 Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?}
 
-\item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
+\item{\code{activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\n If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+
+\item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }
@@ -90,11 +96,36 @@ Set the forcing functions for the model.
 A function that takes arguments \code{t} and \code{infected} and modifies the number of infected at time \code{t}.}
 
 \item{\code{state_vector_forcing}}{(\code{function})\cr
-A function that takes arguments \code{t}, \code{dy_dt} and \code{new_infections} and modifies the flow into the
+A function that takes arguments \code{t} and\code{dy_dt} and modifies the flow into the
 compartments at time \code{t}.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-malthusian_growth_rate"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-malthusian_growth_rate}{}}}
+\subsection{Method \code{malthusian_growth_rate()}}{
+This function computes the Malthusian growth rate for the given model configuration.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$malthusian_growth_rate(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Parameters passed to \verb{$generator_matrix()}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This section follows the method outlined in doi: 10.1098/rsif.2009.0386
+To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
+Here, we linearise around S = 1.
+In this limit, there is no interaction with variants (since everyone is susceptible).
+The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-clone"></a>}}

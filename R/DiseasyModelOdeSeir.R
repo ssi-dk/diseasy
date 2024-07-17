@@ -21,17 +21,21 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   The exposed compartments can optionally be omitted.
     #' @param malthusian_matching (`logical(1)`)\cr
     #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
+    #' @param activity,season,variant `r rd_diseasy_module`
     #' @param ...
-    #'   parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
+    #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     initialize = function(
       compartment_structure = c("E" = 2L, "I" = 3L, "R" = 2L),
       disease_progression_rates = c("E" = 1, "I" = 1),
       malthusian_matching = TRUE,
+      activity = TRUE,
+      season = TRUE,
+      variant = TRUE,
       ...
     ) {
 
       # Pass arguments to the DiseasyModel initialiser
-      super$initialize(...)
+      super$initialize(activity, season, variant, ...)
 
 
       # Check the input arguments
@@ -289,7 +293,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   Here, we linearise around S = 1.
     #'   In this limit, there is no interaction with variants (since everyone is susceptible).
     #'   The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
-    #' @params ... Parameters passed to `$generator_matrix()`.
+    #' @param ... Parameters passed to `$generator_matrix()`.
     malthusian_growth_rate = function(...) {
       return(purrr::pluck(private$generator_matrix(...), eigen, "values", Re, max))
     },

@@ -36,12 +36,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param activity,observables,season,variant (`boolean` or `R6::R6Class instance`)\cr
-    #'   If a boolean is given, it dictates whether to load a new instance module of this class.
-    #'
-    #'   If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`
-    #'   instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
-    #'   instance will not reflect in the copy that is added to `DiseasyModel`.
+    #' @param activity,observables,season,variant `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'

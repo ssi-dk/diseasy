@@ -9,13 +9,11 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("I" = 1, "R" = 1),
     disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -71,8 +69,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -171,13 +168,10 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0),
@@ -209,13 +203,11 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
-    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 2, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0),
@@ -277,7 +269,6 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -411,7 +402,6 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    season = TRUE,
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),

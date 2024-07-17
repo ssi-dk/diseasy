@@ -190,3 +190,11 @@ rd_activity_weights <- paste(
   "(`numeric(4)`)\\cr",
   "vector of weights for the four types of contacts. If NULL (default), no weighting is done."
 )
+
+rd_diseasy_module <- paste(
+  "(`boolean` or `R6::R6Class instance`)\\cr",
+  "If a boolean is given, it dictates whether to load a new instance module of this class.\\n",
+  "If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`",
+  "instance. This copy is a \"clone\" of the instance at the time it is added and any subsequent changes to the",
+  "instance will not reflect in the copy that is added to `DiseasyModel`."
+)
