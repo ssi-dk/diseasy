@@ -10,9 +10,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
+    #' @param compartment_structure (`named numeric()`)\cr
+    #'   The structure of the compartments in the model.
+    #'   The names should be `E`, `I`, and `R` for the exposed, infectious, and recovered compartments, respectively.
+    #'   The exposed compartments can optionally be omitted.
+    #' @param disease_progression_rates (`named numeric()`)\cr
+    #'   The overall progression rates for the disease states.
+    #'   The reciprocal of each rate is the average time spent in the all of the corresponding compartments.
+    #'   The exposed compartments can optionally be omitted.
     #' @param ...
     #'   parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
-    #' @details
     initialize = function(
       compartment_structure = c("E" = 2L, "I" = 3L, "R" = 2L),
       disease_progression_rates = c("E" = 1, "I" = 1),
@@ -211,6 +218,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     },
 
+    #' @field immunity
+    #'   Placeholder for the immunity module
     immunity = list("approximate_compartmental" = \(approach, N) c(rep(0.01, N), rep(1, N - 1)))
   ),
 
