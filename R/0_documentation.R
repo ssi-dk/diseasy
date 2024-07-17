@@ -119,12 +119,11 @@ rd_target_schema <- function(type = "param") {
 }
 
 
-rd_training_length <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
-  paste("(`numeric`)\\cr",
-        "The number of days that should be included in the training of the model.",
-        ifelse(type == "field", " Read only.", ""))
-}
+rd_diseasymodel_parameters <- paste(
+  "* `training_length` (`named numeric`)\\cr",
+  "  The number of days that should be included in the training splits of the data for the model.",
+  "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
+)
 
 
 rd_start_date <- function(type = "param", minimum = FALSE) {

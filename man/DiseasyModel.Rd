@@ -9,6 +9,7 @@ A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
 \description{
 The \code{DiseasyModel} module implements common functionality that all models have available beyond that provided by
 \code{DiseasyBaseModule}.
+
 Most notably, the model module facilitates:
 \itemize{
 \item Module interfaces:
@@ -116,7 +117,14 @@ instance. This copy is a "clone" of the instance at the time it is added and any
 instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
 \item{\code{parameters}}{(\verb{named list()})\cr
-List of parameters to set for the model during initialization.}
+List of parameters to set for the model during initialization.
+
+Each model has their own parameters.
+
+Common parameters are:
+\itemize{
+\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+}}
 
 \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance.}
