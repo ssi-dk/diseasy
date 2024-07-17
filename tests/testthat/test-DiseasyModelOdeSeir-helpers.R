@@ -17,7 +17,7 @@ test_that("helpers works (SR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("I" = 0, "R" = 1),
     disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0),
@@ -68,7 +68,7 @@ test_that("helpers works (SIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("I" = 1, "R" = 1),
     disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -111,6 +111,10 @@ test_that("helpers works (SIR single variant / single age group)", {
 test_that("helpers works (SIR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2")
+
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
@@ -119,7 +123,7 @@ test_that("helpers works (SIR double variant / double age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = var,
     compartment_structure = c("I" = 1, "R" = 1),
     disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = c(0, 60))
@@ -171,7 +175,7 @@ test_that("helpers works (SIR double variant / double age group)", {
     )
   )
 
-  rm(m)
+  rm(m, var)
 })
 
 test_that("helpers works (SEIR single variant / single age group)", {
@@ -184,7 +188,7 @@ test_that("helpers works (SEIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -235,7 +239,7 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -282,6 +286,10 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
 test_that("helpers works (SEEIIRR double variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2")
+
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     season = TRUE,
@@ -290,7 +298,7 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = var,
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -343,11 +351,15 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
     )
   )
 
-  rm(m)
+  rm(m, var)
 })
 
 test_that("helpers works (SEEIIRR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
+
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -357,7 +369,7 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = var,
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 60))
@@ -432,7 +444,7 @@ test_that("forcing functions can be configured as expected (SIR single variant /
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("I" = 1, "R" = 1),
     disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0)

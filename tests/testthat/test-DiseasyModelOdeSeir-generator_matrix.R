@@ -15,7 +15,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("I" = 1, "R" = 1),
     disease_progression_rates = c("I" = rI),
     parameters = list("age_cuts_lower" = 0)
@@ -48,7 +48,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   chi_21 <- 0.75 # Cross immunity factors
 
   # Create a variant scenario with a more infectious variant
-  var <- DiseasyVariant$new(n_variants = 0)
+  var <- DiseasyVariant$new()
   var$add_variant(
     "Variant 1",
     characteristics = list(
@@ -177,7 +177,7 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0),
@@ -215,7 +215,7 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 1),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 1, "I" = 2, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0),
@@ -254,7 +254,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   chi_21 <- 0.75 # Cross immunity factors
 
   # Create a variant scenario with a more infectious variant
-  var <- DiseasyVariant$new(n_variants = 0)
+  var <- DiseasyVariant$new()
   var$add_variant(
     "Variant 1",
     characteristics = list(
@@ -394,7 +394,7 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   chi_21 <- 0.75 # Cross immunity factors
 
   # Create a variant scenario with a more infectious variant
-  var <- DiseasyVariant$new(n_variants = 0)
+  var <- DiseasyVariant$new()
   var$add_variant(
     "Variant 1",
     characteristics = list(
