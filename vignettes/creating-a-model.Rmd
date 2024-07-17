@@ -138,7 +138,7 @@ while leaving others free to be determined by the model during model fitting.
 
 #### Validating the parameters
 The model template can test the user provided `parameters` by implementing the private `$validate_parameters()` method.
-Note that some parameters may be set inheirited from superclasses, so the implementation of the `$validate_parameters()`
+Note that some parameters may be set inherited from superclasses, so the implementation of the `$validate_parameters()`
 method should also call the parent validation method (`super$validate_parameters()`).
 
 ### Getting results
