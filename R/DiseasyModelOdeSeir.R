@@ -169,7 +169,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # This is achieved by replicating the map from before for each variant, and incrementing the ids so that
       # each age_group/variant has a unique id. Then, we reverse the map, to determine which indices correspond to which
       # age_group/variant combination.
-      private$infection_matrix_to_rs_indices <- seq_along(self %.% variant %.% variants) |>
+      private$infection_matrix_to_rs_indices <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
+        seq_along() |>
         purrr::map(\(variant) (variant - 1) * private %.% n_age_groups + private %.% rs_age_group) |>
         purrr::reduce(c) |> # And collapse to 1d
         (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
@@ -561,7 +562,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Get the relative infection risk of the variants
-      epsilon <- self %.% variant %.% variants |>
+      epsilon <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
         purrr::map_dbl(\(variant) purrr::pluck(variant, "relative_infection_risk", .default = 1))
 
 
