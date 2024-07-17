@@ -4196,38 +4196,6 @@
       "sysreqs_packages": {}
     },
     {
-      "ref": "diseasystore",
-      "package": "diseasystore",
-      "version": "0.2.2",
-      "type": "standard",
-      "direct": false,
-      "binary": false,
-      "dependencies": ["checkmate", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
-      "vignettes": false,
-      "needscompilation": false,
-      "metadata": {
-        "RemoteType": "standard",
-        "RemotePkgRef": "diseasystore",
-        "RemoteRef": "diseasystore",
-        "RemoteRepos": "https://cran.rstudio.com",
-        "RemotePkgPlatform": "source",
-        "RemoteSha": "0.2.2"
-      },
-      "sources": ["https://cran.rstudio.com/src/contrib/diseasystore_0.2.2.tar.gz", "https://cran.rstudio.com/src/contrib/Archive/diseasystore/diseasystore_0.2.2.tar.gz"],
-      "target": "src/contrib/diseasystore_0.2.2.tar.gz",
-      "platform": "source",
-      "rversion": "*",
-      "directpkg": false,
-      "license": "GPL (>= 3)",
-      "filesize": 704912,
-      "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "params": [],
-      "install_args": "",
-      "repotype": "cran",
-      "sysreqs": "",
-      "sysreqs_packages": {}
-    },
-    {
       "ref": "installed::/opt/R/4.4.1/lib/R/library/codetools",
       "package": "codetools",
       "version": "0.2-20",
