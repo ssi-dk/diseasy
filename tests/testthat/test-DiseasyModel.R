@@ -449,9 +449,95 @@ test_that("active binding: parameters works", {
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),                                            # nolint: implicit_assignment_linter
+  expect_identical(tryCatch(m$parameters <- c("test" = 2), error = \(e) e),                                             # nolint: implicit_assignment_linter
                    simpleError("`$parameters` is read only"))
   checkmate::expect_list(m %.% parameters)
+
+  rm(m)
+})
+
+
+test_that("active binding: training_period, testing_period and validation_period works", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a empty module
+  m <- DiseasyModel$new()
+  expect_error(m %.% training_period,   "Observables module is not loaded!")
+  expect_error(m %.% testing_period,    "Observables module is not loaded!")
+  expect_error(m %.% validation_period, "Observables module is not loaded!")
+  rm(m)
+
+  # Creating a module with an observables module without a `last_queryable_date`
+  obs <- DiseasyObservables$new("Google COVID-19", conn = DBI::dbConnect(RSQLite::SQLite()))
+  m <- DiseasyModel$new(observables = obs)
+  expect_error(m %.% training_period,   r"{`\$last_queryable_date` not configured in observables module!}")
+  expect_error(m %.% testing_period,    r"{`\$last_queryable_date` not configured in observables module!}")
+  expect_error(m %.% validation_period, r"{`\$last_queryable_date` not configured in observables module!}")
+  rm(m)
+
+
+
+  # Creating a fully configured module
+  obs$set_last_queryable_date(as.Date("2020-03-01"))
+
+  # - with only training period
+  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10)))
+  expect_identical(
+    m %.% training_period,
+    list("start" = as.Date("2020-03-01") - 10, "end" = as.Date("2020-03-01"))
+  )
+  expect_identical(m %.% testing_period,    list("start" = NULL, "end" = NULL))
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+  rm(m)
+
+
+  # - with training and testing periods
+  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10, "testing" = 5)))
+  expect_identical(
+    m %.% training_period,
+    list("start" = as.Date("2020-03-01") - 10 - 5, "end" = as.Date("2020-03-01") - 5)
+  )
+  expect_identical(
+    m %.% testing_period,
+    list("start" = as.Date("2020-03-01") - 5, "end" = as.Date("2020-03-01"))
+  )
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+  rm(m)
+
+
+  # - with training, testing and validation periods.
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
+  )
+  expect_identical(
+    m$training_period,
+    list("start" = as.Date("2020-03-01") - 10 - 5 - 2, "end" = as.Date("2020-03-01") - 5 - 2)
+  )
+  expect_identical(
+    m %.% testing_period,
+    list("start" = as.Date("2020-03-01") - 5 - 2, "end" = as.Date("2020-03-01") - 2)
+  )
+  expect_identical(
+    m %.% validation_period,
+    list("start" = as.Date("2020-03-01") - 2, "end" = as.Date("2020-03-01"))
+  )
+  rm(m)
+
+
+
+  # Try to set training_period through the binding
+  # test_that cannot capture this error, so we have to hack it
+  m <- DiseasyModel$new()
+
+  expect_identical(tryCatch(m$training_period <- c("start" = Sys.Date()), error = \(e) e),                              # nolint: implicit_assignment_linter
+                   simpleError("`$training_period` is read only"))
+
+  expect_identical(tryCatch(m$testing_period <- c("start" = Sys.Date()), error = \(e) e),                               # nolint: implicit_assignment_linter
+                   simpleError("`$testing_period` is read only"))
+
+  expect_identical(tryCatch(m$validation_period <- c("start" = Sys.Date()), error = \(e) e),                            # nolint: implicit_assignment_linter
+                   simpleError("`$validation_period` is read only"))
 
   rm(m)
 })

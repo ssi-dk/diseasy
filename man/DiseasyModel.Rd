@@ -67,6 +67,15 @@ The local copy of a variant module. Read-only.}
 
 \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
+
+\item{\code{training_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the training period. Read-only.}
+
+\item{\code{testing_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the testing period. Read-only.}
+
+\item{\code{validation_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the validation period. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
