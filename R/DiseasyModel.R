@@ -40,7 +40,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`
     #'   instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
     #'   instance will not reflect in the copy that is added to `DiseasyModel`.
-    #' @param parmeters (`named list()`)\cr
+    #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance.

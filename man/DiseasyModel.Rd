@@ -108,13 +108,13 @@ If an instance of the module is provided instead, a copy of this instance is add
 instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
 instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
+\item{\code{parameters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.}
+
 \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
-
-\item{\code{parmeters}}{(\verb{named list()})\cr
-List of parameters to set for the model during initialization.}
 }
 \if{html}{\out{</div>}}
 }
