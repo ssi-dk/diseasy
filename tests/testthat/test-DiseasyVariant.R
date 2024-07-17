@@ -45,32 +45,34 @@ test_that("$add_variant() works", {
       error = \(e) {
         e$message |>
           stringr::str_remove_all(stringr::fixed("\n *")) |>
-          stringr::str_remove_all(stringr::fixed("* "))
+          stringr::str_remove_all(stringr::fixed("* ")) |>
+          simpleError(message = _) |>
+          stop()
       }
     )
   }
 
-  checkmate::expect_character(
+  expect_error(
     checkmate_err_msg(var$add_variant(name = "WT")),
     pattern = "Must be disjunct from"
   )
-  checkmate::expect_character(
+  expect_error(
     checkmate_err_msg(var$add_variant(name = 1)),
     pattern = "Must be of type 'character'"
   )
-  checkmate::expect_character(
+  expect_error(
     checkmate_err_msg(var$add_variant(name = "variant", characteristics = list("relative_infection_risk" = "a"))),
     pattern = "Must be of type 'number'"
   )
-  checkmate::expect_character(
+  expect_error(
     checkmate_err_msg(var$add_variant(name = "variant", characteristics = list("cross_immunity" = c("a" = "b")))),
     pattern = "Must be of type 'numeric'"
   )
-  checkmate::expect_character(
+  expect_error(
     checkmate_err_msg(var$add_variant(name = "variant", characteristics = list("cross_immunity" = list(1)))),
     pattern = "Must have names"
   )
-  checkmate::expect_character(
+  expect_error(
     checkmate_err_msg(var$add_variant(name = "variant", characteristics = list("introduction_date" = "a"))),
     pattern = "Must be of class 'Date'"
   )
