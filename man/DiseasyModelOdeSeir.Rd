@@ -2,9 +2,44 @@
 % Please edit documentation in R/DiseasyModelOdeSeir.R
 \name{DiseasyModelOdeSeir}
 \alias{DiseasyModelOdeSeir}
-\title{TODO}
+\title{A flexible SEIR model template}
+\value{
+A new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} class.
+}
 \description{
-TODO
+This class provides a \code{diseasy} model-template for a compartmental SEIR ordinary differential equation model.
+The number of consecutive exposed, infectious, and recovered compartments can flexibly be specified to generate a
+number of structurally different SEIR models.
+
+Similarly, the number of age groups in the model can also be controlled to create structurally different models.
+
+The model implements the following features:
+\itemize{
+\item A scaling of infection risk based on season (via \code{DiseasySeason})
+\item Contact matrices and activity scenarios (via \code{DiseasyActivity})
+\item Waning of immunity (via \code{DiseasyImmunity})
+\item Asymmetric cross-immunity interactions between variants (via \code{DiseasyVariant})
+}
+
+See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to use this model.
+}
+\examples{
+\dontshow{if (rlang::is_installed("RSQLite")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+  The model can be instantiated almost without arguments, but a observables modules needs to be specified.
+  obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
+                                conn = DBI::dbConnect(RSQLite::SQLite()))
+
+  # We create a default instance which has:
+  # * 1 age group (0+)
+  # * 1 variant
+  # * No season scaling
+  # * No activity scenarios
+  m <- DiseasyModelOdeSeir$new(observables = obs)
+
+  # TODO: Continue this minimal example once module is complete
+
+  rm(m)
+\dontshow{\}) # examplesIf}
 }
 \keyword{model-template}
 \section{Super classes}{

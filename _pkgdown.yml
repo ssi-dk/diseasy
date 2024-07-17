@@ -29,7 +29,6 @@ reference:
     contents:
     - DiseasyBaseModule
     - DiseasyModel
-    - DiseasyModelOde
     - diseasyoption
     - hypoexponential
 
