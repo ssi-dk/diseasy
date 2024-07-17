@@ -59,10 +59,10 @@ The local copy of an activity module. Read-only.}
 \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
 The local copy of a DiseasyObservables module. Read-only.}
 
-\item{\code{season}}{(\code{diseasy::season})\cr
+\item{\code{season}}{(\code{diseasy::DiseasySeason})\cr
 The local copy of a season module. Read-only.}
 
-\item{\code{variant}}{(\code{diseasy::variant})\cr
+\item{\code{variant}}{(\code{diseasy::.DiseasyVariant})\cr
 The local copy of a variant module. Read-only.}
 
 \item{\code{parameters}}{(\code{list()})\cr
