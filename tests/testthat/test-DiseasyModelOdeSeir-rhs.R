@@ -52,7 +52,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
-  rm(m)
+  rm(m, act)
 })
 
 test_that("RHS does not leak and solution is non-negative (SEEIIRR single variant / single age group)", {
@@ -102,7 +102,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
-  rm(m)
+  rm(m, act)
 })
 
 test_that("RHS does not leak and solution is non-negative (SEEIIRR double variant / single age group)", {
@@ -189,7 +189,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
-  rm(m)
+  rm(m, act)
 })
 
 
@@ -532,7 +532,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
     )
   )
 
-  rm(m)
+  rm(m, act)
 
 })
 

@@ -212,7 +212,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
       matrix(dimnames = list("0+", "0+"))
   )
 
-  rm(m)
+  rm(m, act)
 })
 
 test_that("$contact_matrix() works (with scenario - all age groups)", {
@@ -291,5 +291,5 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
     )
   )
 
-  rm(m)
+  rm(m, act)
 })
