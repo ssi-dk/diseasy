@@ -1,7 +1,7 @@
 # For these tests to be more readable, we define some short hand here and explain their value
 rE <- 1 / 2 # Overall disease progression rate from E to I
 rI <- 1 / 4 # Overall disease progression rate from I to R
-fr <- 0.02 # R compartments have their infection risk reduced by this factor
+fr <- 0.05 # R compartments have their infection risk reduced by this factor
 fv <- 0.01 # Whenever two variants are in use, the second has a relative infection risk of this factor
 
 
