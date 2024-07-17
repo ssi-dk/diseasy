@@ -83,6 +83,11 @@ DiseasyModel <- R6::R6Class(                                                    
         checkmate::check_class(season, "DiseasySeason", null.ok = TRUE),
         add = coll
       )
+      checkmate::assert(
+        checkmate::check_logical(variant, null.ok = TRUE),
+        checkmate::check_class(variant, "DiseasyVariant", null.ok = TRUE),
+        add = coll
+      )
       checkmate::assert_list(parameters, null.ok = TRUE, add = coll)
       if (!is.null(parameters)) {
         checkmate::assert_names(
@@ -209,7 +214,7 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
-    #' @field season (`diseasy::season`)\cr
+    #' @field season (`diseasy::DiseasySeason`)\cr
     #'   The local copy of a season module. Read-only.
     #' @seealso [diseasy::DiseasySeason]
     #' @importFrom diseasystore `%.%`
@@ -220,7 +225,7 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
-    #' @field variant (`diseasy::variant`)\cr
+    #' @field variant (`diseasy::.DiseasyVariant`)\cr
     #'  The local copy of a variant module. Read-only.
     #' @seealso [diseasy::DiseasyVariant]
     #' @importFrom diseasystore `%.%`
