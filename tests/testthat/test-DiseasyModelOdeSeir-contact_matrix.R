@@ -9,7 +9,7 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0),
     malthusian_matching = FALSE
@@ -53,7 +53,7 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = c(0, 60)),
     malthusian_matching = FALSE
@@ -97,7 +97,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = c(0, 40, 80)),
     malthusian_matching = FALSE
@@ -155,7 +155,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0),
     malthusian_matching = FALSE
@@ -240,7 +240,7 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = DiseasyVariant$new(n_variants = 2),
+    variant = DiseasyVariant$new(),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list(
       "age_cuts_lower" = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))

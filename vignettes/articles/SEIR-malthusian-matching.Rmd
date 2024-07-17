@@ -53,7 +53,7 @@ combinations |>
           conn = DBI::dbConnect(RSQLite::SQLite()),
           last_queryable_date = Sys.Date() - 1
         ),
-        variant = DiseasyVariant$new(n_variants = 1),
+        variant = DiseasyVariant$new(),
         compartment_structure = c("E" = K, "I" = L, "R" = 1),
         disease_progression_rates = c("E" = rE, "I" = rI),
         parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6),
