@@ -214,7 +214,7 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
-    #' @field season (`diseasy::season`)\cr
+    #' @field season (`diseasy::DiseasySeason`)\cr
     #'   The local copy of a season module. Read-only.
     #' @seealso [diseasy::DiseasySeason]
     #' @importFrom diseasystore `%.%`
@@ -225,7 +225,7 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
-    #' @field variant (`diseasy::variant`)\cr
+    #' @field variant (`diseasy::.DiseasyVariant`)\cr
     #'  The local copy of a variant module. Read-only.
     #' @seealso [diseasy::DiseasyVariant]
     #' @importFrom diseasystore `%.%`
