@@ -273,7 +273,36 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$compartment_structure <- compartment_structure
       private$disease_progression_rates <- disease_progression_rates
 
+
+      # Set the default forcing functions (no forcing)
+      private$infected_forcing <- \(t, infected) infected
+      private$i1_forcing <- \(t, di1_dt) di1_dt
+
     },
+
+
+    #' @description
+    #'   Set the forcing functions for the model.
+    #' @param infected_forcing (`function`)\cr
+    #'   A function that takes arguments `t` and `infected` and modifies the number of infected at time `t`.
+    #' @param i1_forcing (`function`)\cr
+    #'   A function that takes arguments `t` and `di1_dt` and modifies the flow into the first infectious compartment
+    #'   at time `t`.
+    set_forcing_functions = function(infected_forcing = NULL, i1_forcing = NULL) {
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_function(infected_forcing, args = c("t", "infected"), null.ok = TRUE, add = coll)
+      checkmate::assert_function(i1_forcing, args = c("t", "di1_dt"), null.ok = TRUE, add = coll)
+      checkmate::reportAssertions(coll)
+
+      if (!is.null(infected_forcing)) {
+        private$infected_forcing <- infected_forcing
+      }
+
+      if (!is.null(i1_forcing)) {
+        private$i1_forcing <- i1_forcing
+      }
+    },
+
 
     #' @field immunity
     #'   Placeholder for the immunity module
@@ -317,6 +346,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     cross_immunity_matrix = NULL,
 
+    # Forcing functions for the right hand side function
+    infected_forcing = NULL,
+    i1_forcing = NULL,
+
     rhs = function(t, state_vector, ...) {
 
       # Compute the flow from infections
@@ -339,13 +372,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       #   check = "equal", times = 1000L
       # )
 
+      # Add any forcing of infections
+      infected <- private$infected_forcing(t, infected)
 
+      # Reshape the infected vector to a matrix for later computation
       infected <- matrix(infected, nrow = private$n_age_groups)
 
       # microbenchmark::microbenchmark( # Nanoseconds
-      #   matrix(infected, nrow = length(self$parameters$age_groups), ncol = length(self$variant$variants)),
-      #   matrix(infected, nrow = length(self$parameters$age_groups)),
+      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower), ncol = length(self$variant$variants)),
+      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower)),
       #   matrix(infected, nrow = private$n_age_groups),
+      #   matrix(infected, nrow = private$n_age_groups, ncol = private$n_variants),
       #   check = "equal", times = 1000L
       # )
 
@@ -387,13 +424,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Combine into final RHS computation
-      dy <- c(0, progression_flow[-private$n_states]) - progression_flow - # Disease progression flow between compartments
+      dy_dt <- c(0, progression_flow[-private$n_states]) - progression_flow - # Disease progression flow between compartments
         loss_due_to_infections # Combined loss to infections (across all variants)
 
       # Add the inflow from infections
-      dy[private$e1_state_indexes] <- dy[private$e1_state_indexes] + new_infections
+      dy_dt[private$e1_state_indexes] <- dy_dt[private$e1_state_indexes] + new_infections
 
-      return(list(dy))
+      # Add the forcing of I1 states
+      dy_dt[private$i1_state_indexes] <- private$i1_forcing(t, dy_dt[private$i1_state_indexes])
+
+      return(list(dy_dt))
     }
   )
 )

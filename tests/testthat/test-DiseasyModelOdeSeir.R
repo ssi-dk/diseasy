@@ -629,6 +629,37 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
 
 
 
+test_that("forcing functions can be configured as expected (SIR single variant / single age group)", {
+  skip_if_not_installed("RSQLite")
+
+  m <- DiseasyModelOdeSeir$new(
+    season = TRUE,
+    activity = DiseasyActivity$new(contact_basis = contact_basis$DK),
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("I" = 1, "R" = 1),
+    disease_progression_rates = c("I" = ri),
+    parameters = list("age_cuts_lower" = 0)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+  # Change the forcing functions one at a time
+  m$set_forcing_functions(infected_forcing = \(t, infected) t)
+  expect_identical(private$infected_forcing, \(t, infected) t)
+
+  m$set_forcing_functions(i1_forcing = \(t, di1_dt) t)
+  expect_identical(private$i1_forcing, \(t, di1_dt) t)
+
+  rm(m)
+})
+
+
+
 test_that("RHS does not leak and solution is non-negative (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
