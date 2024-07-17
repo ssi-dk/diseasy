@@ -52,6 +52,26 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param malthusian_matching (`logical(1)`)\cr
     #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
     #' @param activity,season,variant `r rd_diseasy_module`
+    #' @param parameters (`named list()`)\cr
+    #'   List of parameters to set for the model during initialization.
+    #'
+    #'   Parameters controlling the structure of the model:
+    #'   * `age_cuts_lower` - Determines the age groups in the model.
+    #'
+    #'   Parameters controlling the dynamics of the model:
+    #'   (Can be inferred from observational data via initialisation routines)
+    #'   * `overall_infection_risk` - A scalar that scales contact rates to infection rates.
+    #'
+    #'   Parameters controlling initialisation routines
+    #'   * `incidence_polynomial_order` - The degree of the polynomial to fit to the incidence curves.
+    #*   * `incidence_polynomial_training_length` - The number of days to include in the incidence polynomial fit.
+    #'
+    #'   Parameters controlling the functional modules:
+    #'   * `activity.weights` - passed to `DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)`
+    #'   * `immunity.method` - passed to `DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)`
+    #'
+    #'   Additional parameters are:
+    #'   `r rd_diseasymodel_parameters`
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     initialize = function(
@@ -61,11 +81,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
+      parameters = NULL,
       ...
     ) {
 
       # Pass arguments to the DiseasyModel initialiser
-      super$initialize(activity, season, variant, ...)
+      super$initialize(activity, season, variant, parameters, ...)
 
 
       # Check the input arguments
@@ -118,7 +139,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Time-varying contact matrices projected onto target age-groups
       contact_matrices <- self %.% activity %.% get_scenario_contacts(
         age_cuts_lower = self %.% parameters %.% age_cuts_lower,
-        weights = self %.% parameters %.% activity.contact_weights
+        weights = self %.% parameters %.% activity.weights
       )
 
       # These matrices are the contact matrices (i.e. the largest eigen value is conserved when projecting into
@@ -213,7 +234,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Get risks and accompanying rates from DiseasyImmunity
       immunity_approx <- self %.% immunity %.% approximate_compartmental(
-        approach = self %.% parameters %.% "immunity.approach",
+        method = self %.% parameters %.% immunity.method,
         N = compartment_structure[["R"]]
       )
       immunity_risks <- 1 - immunity_approx[1:compartment_structure[["R"]]]
@@ -334,18 +355,68 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @field immunity
     #'   Placeholder for the immunity module
-    immunity = list("approximate_compartmental" = \(approach, N) c(rep(0.95, N), rep(1, N - 1)))
+    immunity = list("approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N) {
+      c(rep(0.95, N), rep(1, N - 1))
+    })
   ),
 
 
   private = list(
 
-    .parameters = list(
-      "age_cuts_lower" = 0,
-      "overall_infection_risk" = 1,
-      "activity.contact_weights" = c(1, 1, 1, 1),
-      "immunity.approach" = NULL
-    ),
+    .parameters = NULL,
+
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list(
+          # Structural model parameters
+          "age_cuts_lower" = 0,
+
+          # Models determinable by initialisation routines
+          "overall_infection_risk" = 1,
+
+          # Parameters for fitting polynomials to the incidence curves
+          "incidence_polynomial_order" = 3,
+          "incidence_polynomial_training_length" = 21,
+
+          # Defaults for functional modules
+          "activity.weights" = c(1, 1, 1, 1),
+          "immunity.method" = "free_gamma"
+        ),
+        keep.null = TRUE
+      )
+    },
+
+    # @description
+    #   Assert parameters conform to the expected format
+    # @details
+    #   Sub-classes implement additional validation checks
+    # @return `r rd_side_effects()`
+    validate_parameters = function() {
+      coll <- checkmate::makeAssertCollection()
+      # Validate the structural parameters
+      checkmate::assert_integerish(self %.% parameters %.% age_cuts_lower, lower = 0, add = coll)
+
+      # Validate the dynamical parameters
+      checkmate::assert_number(self %.% parameters %.% overall_infection_risk, lower = 0, add = coll)
+
+      # Validate the incidence polynomial parameters
+      checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_order, lower = 0, add = coll)
+      checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_training_length, lower = 0, add = coll)
+
+      # Validate the functional modules parameters
+      checkmate::assert_numeric(self %.% parameters %.% activity.weights, lower = 0, len = 4, add = coll)
+      checkmate::assert_choice(
+        self %.% parameters %.% immunity.method,
+        choices = eval(formals(self %.% immunity %.% approximate_compartmental)$method),
+        add = coll
+      )
+
+      checkmate::reportAssertions(coll)
+
+      super$validate_parameters() # Validate inherited parameters
+    },
 
     compartment_structure = NULL,
     disease_progression_rates = NULL,

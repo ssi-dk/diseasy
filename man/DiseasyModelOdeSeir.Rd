@@ -85,6 +85,7 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
   activity = TRUE,
   season = TRUE,
   variant = TRUE,
+  parameters = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -105,7 +106,37 @@ The exposed compartments can optionally be omitted.}
 \item{\code{malthusian_matching}}{(\code{logical(1)})\cr
 Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?}
 
-\item{\code{activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\n If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+\item{\code{activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+
+\item{\code{parameters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.
+
+Parameters controlling the structure of the model:
+\itemize{
+\item \code{age_cuts_lower} - Determines the age groups in the model.
+}
+
+Parameters controlling the dynamics of the model:
+(Can be inferred from observational data via initialisation routines)
+\itemize{
+\item \code{overall_infection_risk} - A scalar that scales contact rates to infection rates.
+}
+
+Parameters controlling initialisation routines
+\itemize{
+\item \code{incidence_polynomial_order} - The degree of the polynomial to fit to the incidence curves.
+}
+
+Parameters controlling the functional modules:
+\itemize{
+\item \code{activity.weights} - passed to \code{DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)}
+\item \code{immunity.method} - passed to \code{DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)}
+}
+
+Additional parameters are:
+\itemize{
+\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+}}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
 }
@@ -136,6 +167,9 @@ compartments at time \code{t}.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+NULL (called for side effects)
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-malthusian_growth_rate"></a>}}
@@ -161,6 +195,10 @@ In this limit, there is no interaction with variants (since everyone is suscepti
 The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
 }
 
+\subsection{Returns}{
+(\code{numeric(1)})\cr
+The Malthusian growth rate for the model.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-clone"></a>}}
