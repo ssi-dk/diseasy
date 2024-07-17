@@ -1,0 +1,358 @@
+---
+title: "Notes: Initialising a SEIR model from incidence data (EI states)"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+# Introduction
+Let us begin by considering a general SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively, 
+which are governed by the rates $r_e$ and $r_i$ respectively.
+
+Let us further assume that we have some signal for infections which we would like our model to match.
+
+For now, we operate with two possibilities:
+
+1) The signal is related to incidence: $I^*(t)$ 
+
+2) The signal is related to prevalence $I^\dag(t)$ 
+
+
+The general approach is to consider the derivatives of the signal and link these to the E and I states of the model.
+
+Dependent on the type of signal, there is some variation on how this link is established.
+
+
+## Incidence signal
+If the signal is incidence, we can assume that signal occurs when exiting $I_1$ in the model.
+
+That is, we assume $I^* = r_i I_1$.
+
+If we take the equation for $\dot{I}_1$ and multiply by $r_i$ we obtain.
+
+$$
+r_i\frac{dI_1}{dt} = r_i r_e E_K - r_i^2 I_1 \Rightarrow \\
+\frac{dI^*}{dt} = r_i r_e E_K - r_i I^*
+$$
+If we take the second derivative, we find:
+$$
+\frac{d^2I^*}{dt^2} = r_i r_e \frac{dE_K}{dt} - r_i \frac{dI_l}{dt}
+$$
+From here, we can inject $\frac{dE_K}{dt}$ from the SEIR equations which in turn relates to $E_{k-1}$.
+$$
+\frac{d^2I^*}{dt^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{dI_l}{dt}
+$$
+
+This process can be iterated through the derivatives until all $E_K$ states are expressed in terms of the derivatives of $I^*(t)$ and $I_l^*(t)$.
+
+In this case, we can relate the $E_k$ states to the rates and derivatives of the signal in a simple form:
+
+$$
+r_i
+\begin{bmatrix}
+r_e E_K \\
+r_e^2 E_{K-1} \\
+\dots \\
+r_e^{K-1} E_2 \\
+r_e^K E_1 \\
+\end{bmatrix}
+=
+\overline{\overline{M_K}} *
+\begin{bmatrix}
+I^* \\
+\frac{dI^*}{dt} \\
+\dots \\
+\frac{d^KI^*}{dt^K} \\
+\frac{d^{K+1}I^*}{dt^{K+1}}
+\end{bmatrix}
+$$
+
+
+The matrix M can be computed via a simple recursion. To see why, start the equation for the derivative of$ I^*(t)$: 
+
+$$
+\frac{dI^*}{dt} = r_i r_e E_K - r_i I^*
+$$
+In the above formulation, this corresponds to the matrix $\overline{\overline{M_1}} = \begin{bmatrix}r_i & 1\end{bmatrix}$. 
+When taking the second derivative, we obtain:
+
+$$\frac{d^2I^*}{dt^2} = r_ir_e \frac{dE_K}{dt}- r_i \frac{dI^*}{dt} \Rightarrow \\
+\frac{d^2I^*}{dt^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{dI^*}{dt} \Rightarrow \\
+\frac{d^2I^*}{dt^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{dI^*}{dt} + I^*\right)- r_i \frac{dI^*}{dt}$$
+ 
+Which, in the matrix formulation corresponds to the sum of $r_e \overline{m_1}$ and the shifted $\overline{m_1}$, where $\overline{m_1}$ is the row vector of $\overline{M_1}$.
+
+More precisely:
+$$
+\overline{m_2} = r_e \begin{bmatrix}\overline{m_1} & 0 \end{bmatrix}+ \begin{bmatrix}0 & \overline{m_1}\end{bmatrix}
+$$
+Which, combined with $\overline{m_1}$ yields the two level system:
+
+$$
+\overline{\overline{M_2}} = \begin{bmatrix}m_{11} & m_{12} & 0 \\ m_{21} & m_{22} & m_{23} \end{bmatrix}
+$$
+ 
+The algorithmic implementation of the recursion is then:
+```{r}
+K <- 4 # Number of E states
+ri <- 0.9
+re <- 0.8
+
+M <- matrix(rep(0, K * (K + 1)), nrow = K)
+active_row <- c(ri, 1)
+
+for (k in seq(K)) {
+  if (k > 1) {
+    active_row <- c(0, active_row) + re * c(active_row, 0)
+  }
+
+  M[k, seq(k + 1)] <- active_row
+}
+
+M
+```
+
+
+Since we assume that the signal $I^*$ only relates to $I_1$, then we can determine the $I_l$ states by evaluating the signal at $I^*(t - (l - 1) / r_i)$.
+
+
+## Prevalence signal
+If we instead have a measure of the true number of infected, $I^\dag = \sum_l I_l$, then the situation is more complicated since the derivative becomes:
+$$\frac{dI^\dag}{dt} = r_e E_K - r_i I_l$$
+If use the same method as before, we now have to consider the derivatives of both $I^\dag$ and $I_l$ and we cannot isolate easily. We can however, determine how the derivatives of $I^\dag$ relates to the state vector.
+
+For example, if we have 2 $E$ and 2 $I$ states, we can write:
+$$
+\begin{bmatrix}
+0 & r_e & 0 & -r_i \\
+r_e^2 & -r_e^2 & -r_i^2 & r_i^2 \\
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+I_1 \\
+I_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2}
+\end{bmatrix}
+$$
+Which, with two additional constants, $I^\dag = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^\dag$, can be solved.
+
+If we want more states, the problem seemingly becomes indeterminate:
+$$
+\begin{bmatrix}
+0 & 0 & r_e & 0 & 0 & -r_i \\
+0 & r_e^2 & -r_e^2 & 0 & -r_i^2 & r_i^2 \\
+r_e^3 & -2r_e^3 & r_e^3 & r_i^3 & -2r_i^3 & r_i^3 \\
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+E_3 \\
+I_1 \\
+I_2 \\
+I_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2} \\
+\frac{d^3I^\dag}{dt^3}
+\end{bmatrix}
+$$
+Which now requires three additional constraints.
+
+If the number of states is uneven, we can still solve some cases:
+
+2 $E$ states and 1 $I$ states
+
+$$
+\begin{bmatrix}
+0 & r_e & -r_i \\
+r_e^2 & -r_e^2-r_er_i & r_i^2 \\
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+I
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2}
+\end{bmatrix}
+$$
+With the additional constraint $I^\dag = I_1 + I_2$ the system should be solvable.
+
+The above rate-matrices can also be implemented via recursion algorithmically:
+```{r}
+K <- 2 # Number of E states
+L <- 2
+ri <- 0.9
+re <- 0.8
+
+M <- matrix(rep(0, (K + L) * K), ncol = K + L)
+active_row <- c(rep(0, K - 1), re, rep(0, L - 1), -ri)
+progression_rates <- c(rep(re, K), rep(ri, L))
+
+for (k in seq(K)) {
+  
+  if (k > 1) {
+    stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply
+
+    # Implement branching process which picks up the progression rate factors as it branches down.
+    active_row <- active_row |>
+      purrr::imap(
+        \(r, idx) {
+          c(
+            rep(0, max(0, idx - 2)), # left pad with zeros
+            progression_rates[idx - 1] * r,
+            - progression_rates[idx] * r,
+            rep(0, K + L - idx) # right pad with zeros
+          )
+        }
+      ) |>
+      purrr::reduce(`+`)
+  }
+
+  M[k, ] <- active_row
+}
+
+M
+```
+
+
+Another method for gaining additional constraints on the problem is to keep some in reserve for the fititng.
+By that, I mean that if we instead of initialising the state vector for time $t_0$, we initialise it for time $t_0' \equiv t_0 - 1 / r_i$. 
+
+In this case, we can consider what the signal $I^\dag(t + 1/r_i)$ corresponds to in the model.
+If we assume that $r_e <= r_i$, we can write:
+$$
+I^\dag(t + 1/r_i) = \sum_l^{L-1}I_l(t) + \frac{r_e}{r_i}E_K(t)
+$$
+If instead $r_e > r_i$, we need to account for additional $E_k$ states.
+
+
+It seems that the problem is singular whenever we have more than 1 $I$ state.
+
+Let's see if differences in infectivity can help break this degeneracy.
+In this case, the true signal becomes, $I^\dag = \sum_l w_l I_l$, with $w_i \neq w_j$.
+
+The derivative then becomes
+$$
+\frac{dI^\dag}{dt} = w_1 r_e E_K - w_1 r_i I_1 \\ 
++ w_2 r_i I_1 - w_2 r_i I_2 \\
+\dots \\
++ w_L r_i I_{L-1}  - w_L r_i I_L
+$$
+$$
+\begin{bmatrix}
+0         &  w_1 r_e                       &  (w_2-w_1) r_i               & -w_2 r_i \\
+w_1 r_e^2 & -w_1 r_e^2 + (w_2-w_1) r_i r_e & -(w_2-w_1) r_i^2 - w_2 r_i^2 &  w_2 r_i^2
+\end{bmatrix} *
+\begin{bmatrix}
+E_1 \\
+E_2 \\
+I_1 \\
+I_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{dI^\dag}{dt} \\
+\frac{d^2I^\dag}{dt^2}
+\end{bmatrix}
+$$
+
+The matrix generation is the same.
+
+The matrix is still singular when using the offset method. Perhaps if we can estimate S and R.
+
+Constraining the population to be 1 does not seem to fix the underlying issues. The balance of the states is way off.
+
+Perhaps if we go one stage further and use the infection pressure "beta S I"?
+
+
+
+# Testing the methods
+
+We begin by generating some synthetic data from different underlying data-generating processes
+```{r synthetic_data, include = FALSE}
+# Set the time scales of the problem
+rE = 1 / 2
+rI = 1 / 4
+
+combinations <- data.frame(K = c(1, 1, 2, 2, 2, 3), L = c(1, 2, 1, 2, 3, 3))
+
+synthetic_model <- combinations |>
+  purrr::pmap(\(K, L) {
+    
+    # Run a SIR model to generate the target of our initialisation
+    m <- DiseasyModelOdeSeir$new(
+      season = T, activity = T,
+      observables = DiseasyObservables$new(
+        conn = DBI::dbConnect(RSQLite::SQLite()),
+        last_queryable_date = Sys.Date() - 1
+      ),
+      variant = DiseasyVariant$new(n_variants = 1),
+      compartment_structure = c("E" = K, "I" = L, "R" = 1),
+      disease_progression_rates = c("E" = rE, "I" = rI),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6)
+    )
+    
+    # Get a reference to the private environment
+    private <- m$.__enclos_env__$private
+    
+    # Generate a uniform initial state_vector that sums to 1
+    y0 <- c(0.001, rep(0, K - 1), rep(0, L), 0, 0.999)
+    
+    # Run solver across scenario change to check for long-term leakage
+    deSolve::ode(y = y0, times = seq(0, 60), func = private %.% rhs, parms = NULL)
+  })
+
+names(synthetic_model) <- purrr::pmap_chr(combinations, \(K, L) glue::glue("K = {K}, L = {L}"))
+
+```
+
+
+## Incidence signal
+With the true solutions generated, we now generate some observational signal with noise from the $I_1$ state.
+```{r}
+tmax <- 24 #34 #40
+offset <- 7
+t0 <- tmax - offset
+
+incidence_signal <- purrr::imap(synthetic_model, ~ {
+  n_states <-as.numeric(stringr::str_extract_all(.y, r"{\d}")[[1]])
+  K <- n_states[1]
+  L <- n_states[2]
+  
+  # Retrieve the signal
+  I <- L * rI * head(.x[, K + 2], tmax)
+  
+  # Adding some noise
+  pop = 1e3
+  II <- purrr::map_dbl(I, \(lambda) rpois(1, pop * lambda)) / pop  
+  
+  data.frame(t = head(.x[, 1], tmax), incidence = II)
+})
+
+incidence_signal_gg <- purrr::imap(incidence_signal, ~ dplyr::mutate(.x, true_configuration = .y)) |>
+  purrr::list_rbind()
+
+ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
+  ggplot2::geom_point() + 
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw() 
+
+```

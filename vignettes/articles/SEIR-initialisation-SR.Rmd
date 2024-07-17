@@ -1,0 +1,175 @@
+---
+title: "Notes: Initialising a SEIR model from incidence data (SR states)"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+# Introduction
+Let us begin by considering a general SEIR model with $K$, $L$ and $M$ consecutive $E$, $I$, and $R$ states respectively, which are governed by the rates $r_e$ and $r_i$ respectively.
+Let us further assume that we have some signal for infections $I^*(t)$ which we would like our model to match.
+
+For now, we operate with two possibilities:
+1) The signal is related to testing activity
+2) The signal is related to prevalence
+
+The general approach is to consider the derivatives of the signal and link these to the E and I states of the model.
+
+Dependent on the type of signal, there is some variation on how this link is established.
+
+
+## Incidence signal
+If the signal, $I^*$, is test data, we can assume that tests occurs when exiting $I_1$ in the model.
+
+That is, we assume $I^* = r_i I_1$.
+
+We can modify the SEIR equation to take this signal as a forcing function with no $E$ states and one less $I$ state (no $I_1$ state).
+The equations are as normal expect for the following changes:
+$$
+I = \frac{I^*}{r_i} + \sum_{l=2}^L I_l
+$$
+
+$$
+\frac{dI_2}{dt} = I^* - r_i I_2
+$$
+If we start this system at a time where there are no new infections, we can initialize $I_l = 0$, and run the simulation forward to estimate the $S$ and $R$ populations at the point of interest.
+
+There is an interesting consequence here. If the equations are modified as above, we can also infer what the corresponding value of $\beta$ should be. Since we claim to know $I$ and $S$, we can solve for what $\beta$ should be.
+
+## Prevalence signal
+
+If we instead have a measure of the true number of infected, $I^* = \sum_l I_l$, then we only need to force the infection pressure:
+
+$$
+I = I^*
+$$
+Here we would also need to start the system at a time where there are no new infections ($I_l = 0$).
+
+# Testing the methods
+
+We begin by generating some synthetic data from different underlying data-generating processes
+```{r synthetic_data, include = FALSE}
+# Set the time scales of the problem
+rE = 1 / 2
+rI = 1 / 4
+
+combinations <- data.frame(K = c(1, 1, 2, 2, 2, 3), L = c(1, 2, 1, 2, 3, 3))
+
+synthetic_model <- combinations |>
+  purrr::pmap(\(K, L) {
+
+    # Run a SIR model to generate the target of our initialisation
+    m <- DiseasyModelOdeSeir$new(
+      season = T, activity = T,
+      observables = DiseasyObservables$new(
+        conn = DBI::dbConnect(RSQLite::SQLite()),
+        last_queryable_date = Sys.Date() - 1
+      ),
+      variant = DiseasyVariant$new(n_variants = 1),
+      compartment_structure = c("E" = K, "I" = L, "R" = 1),
+      disease_progression_rates = c("E" = rE, "I" = rI),
+      parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.9)
+    )
+
+    # Get a reference to the private environment
+    private <- m$.__enclos_env__$private
+
+    # Generate a uniform initial state_vector that sums to 1
+    y0 <- c(0.001, rep(0, K - 1), rep(0, L), 0, 0.999)
+
+    # Run solver across scenario change to check for long-term leakage
+    deSolve::ode(y = y0, times = seq(0, 60), func = private %.% rhs, parms = NULL)
+  })
+
+names(synthetic_model) <- purrr::pmap_chr(combinations, \(K, L) glue::glue("K = {K}, L = {L}"))
+
+```
+
+We define a function to run the model forward based on the estimated initial state vector.
+```{r}
+run_model <- function(EI_states, R, S, K, L, rE, rI, offset = 0, signal = "incidence", scale_EI = TRUE) {
+  checkmate::assert_numeric(EI_states, lower = 0)
+  checkmate::assert_choice(signal, c("incidence", "prevalence"))
+
+  # Run a SIR model to generate the target of our initialisation
+  m <- DiseasyModelOdeSeir$new(
+    season = T, activity = T,
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = DiseasyVariant$new(n_variants = 1),
+    compartment_structure = c("E" = K, "I" = L, "R" = 1),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.9)
+  )
+
+  # Get a reference to the private environment
+  private <- m$.__enclos_env__$private
+
+
+  times <- seq(0, 10, length.out = 100) + offset
+
+  if (scale_EI) {
+    y0 <- c(EI_states / sum(EI_states) * (1 - R - S), R, S)
+  } else {
+    y0 <- c(EI_states, R / S * (1 - sum(EI_states)), (1 - R / S) * (1 - sum(EI_states)))
+  }
+
+  sol <- deSolve::ode(
+    y = y0,
+    times = times,
+    func = private %.% rhs,
+    parms = NULL,
+    abstol = 1e-12, reltol = 1e-12
+  )
+
+
+  if (signal == "incidence") {
+    return(data.frame(t = t0 + times, incidence = L * rI * sol[, K + 2]))
+  } else if (signal == "prevalence") {
+    return(data.frame(t = t0 + times, prevalence = rowSums(sol[, (K + 2):(K + L + 1), drop = FALSE])))
+  }
+
+}
+```
+
+## Incidence signal
+With the true solutions generated, we now generate some observational signal with noise from the $I_1$ state.
+```{r}
+tmax <- 24
+offset <- 7
+t0 <- tmax - offset
+
+incidence_signal <- purrr::imap(synthetic_model, ~ {
+  n_states <-as.numeric(stringr::str_extract_all(.y, r"{\d}")[[1]])
+  K <- n_states[1]
+  L <- n_states[2]
+
+  # Retrieve the signal
+  I <- L * rI * head(.x[, K + 2], tmax)
+
+  # Adding some noise
+  pop = 1e3
+  II <- purrr::map_dbl(I, \(lambda) rpois(1, pop * lambda)) / pop
+
+  data.frame(t = head(.x[, 1], tmax), incidence = II)
+})
+
+incidence_signal_gg <- purrr::imap(incidence_signal, ~ dplyr::mutate(.x, true_configuration = .y)) |>
+  purrr::list_rbind()
+
+ggplot2::ggplot(incidence_signal_gg, ggplot2::aes(x = t, y = incidence)) +
+  ggplot2::geom_point() +
+  ggplot2::facet_wrap(~ true_configuration) +
+  ggplot2::theme_bw()
+
+```

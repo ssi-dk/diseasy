@@ -52,7 +52,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance.
     #' @param ...
-    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @details
     #'   The `DiseasyModel` is the main template that the individual models should inherit from since this defines the
     #'   set of methods the later framework expects from each model. In addition, it provides the main interface with
