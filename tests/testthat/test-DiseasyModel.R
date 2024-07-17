@@ -11,13 +11,15 @@ test_that("initialize works", {
   act <- DiseasyActivity$new()
   s   <- DiseasySeason$new()
   obs <- DiseasyObservables$new()
+  var <- DiseasyVariant$new()
 
   m_act_instance <- DiseasyModel$new(activity = act)
   m_s_instance   <- DiseasyModel$new(season = s)
   m_obs_instance <- DiseasyModel$new(observables = obs)
+  m_var_instance <- DiseasyModel$new(variant = var)
 
   # Check the hash is unique for each module when created this way
-  modules <- list(m, m_act_instance, m_s_instance, m_obs_instance)
+  modules <- list(m, m_act_instance, m_s_instance, m_obs_instance, m_var_instance)
   expect_length(unique(purrr::map(modules, ~ .x$hash)), length(modules))
 
 
@@ -25,17 +27,19 @@ test_that("initialize works", {
   m_act_boolean <- DiseasyModel$new(activity = TRUE)
   m_s_boolean   <- DiseasyModel$new(season = TRUE)
   m_obs_boolean <- DiseasyModel$new(observables = TRUE)
+  m_var_boolean <- DiseasyModel$new(variant = TRUE)
 
   # Check the hash is the same when created this way
   expect_identical(m_act_instance$hash, m_act_boolean$hash)
   expect_identical(m_s_instance$hash,   m_s_boolean$hash)
   expect_identical(m_obs_instance$hash, m_obs_boolean$hash)
+  expect_identical(m_var_instance$hash, m_var_boolean$hash)
 
   # Check a label can be set
   m_label <- DiseasyModel$new(label = "test")
   expect_equal(m_label$hash, m$hash) # label should not change the hash
 
-  rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_label)
+  rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_var_boolean, m_label)
 })
 
 
