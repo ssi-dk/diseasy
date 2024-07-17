@@ -138,10 +138,7 @@ Common parameters are:
 \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance.}
 
-\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
-
-\item{\code{parmeters}}{(\verb{named list()})\cr
-List of parameters to set for the model during initialization.}
+\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }

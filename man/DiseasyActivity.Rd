@@ -360,6 +360,9 @@ Rescale contact matrices to population contact rates
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_counts_to_rates}{}}}
 \subsection{Method \code{rescale_counts_to_rates()}}{
 Re-scale from contacts to rates per individual to fractional population.
+@details
+If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
+this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, population)}\if{html}{\out{</div>}}
 }

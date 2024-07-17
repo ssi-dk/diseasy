@@ -20,6 +20,7 @@ TODO
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiseasyModelOdeSeir-new}{\code{DiseasyModelOdeSeir$new()}}
+\item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
 \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
 }
 }
@@ -43,6 +44,7 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$new(
   compartment_structure = c(E = 2L, I = 3L, R = 2L),
   disease_progression_rates = c(E = 1, I = 1),
+  malthusian_matching = TRUE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -50,7 +52,7 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{compartment_structure}}{(\verb{named numeric()})\cr
+\item{\code{compartment_structure}}{(\verb{named integer()})\cr
 The structure of the compartments in the model.
 The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively.
 The exposed compartments can optionally be omitted.}
@@ -60,7 +62,35 @@ The overall progression rates for the disease states.
 The reciprocal of each rate is the average time spent in the all of the corresponding compartments.
 The exposed compartments can optionally be omitted.}
 
+\item{\code{malthusian_matching}}{(\code{logical(1)})\cr
+Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?}
+
 \item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-set_forcing_functions"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-set_forcing_functions}{}}}
+\subsection{Method \code{set_forcing_functions()}}{
+Set the forcing functions for the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$set_forcing_functions(
+  infected_forcing = NULL,
+  state_vector_forcing = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{infected_forcing}}{(\code{function})\cr
+A function that takes arguments \code{t} and \code{infected} and modifies the number of infected at time \code{t}.}
+
+\item{\code{state_vector_forcing}}{(\code{function})\cr
+A function that takes arguments \code{t}, \code{dy_dt} and \code{new_infections} and modifies the flow into the
+compartments at time \code{t}.}
 }
 \if{html}{\out{</div>}}
 }

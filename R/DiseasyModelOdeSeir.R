@@ -10,7 +10,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param compartment_structure (`named numeric()`)\cr
+    #' @param compartment_structure (`named integer()`)\cr
     #'   The structure of the compartments in the model.
     #'   The names should be `E`, `I`, and `R` for the exposed, infectious, and recovered compartments, respectively.
     #'   The exposed compartments can optionally be omitted.
@@ -18,16 +18,18 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   The overall progression rates for the disease states.
     #'   The reciprocal of each rate is the average time spent in the all of the corresponding compartments.
     #'   The exposed compartments can optionally be omitted.
+    #' @param malthusian_matching (`logical(1)`)\cr
+    #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
     #' @param ...
     #'   parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     initialize = function(
       compartment_structure = c("E" = 2L, "I" = 3L, "R" = 2L),
       disease_progression_rates = c("E" = 1, "I" = 1),
-      malthusian_scaling = TRUE,
+      malthusian_matching = TRUE,
       ...
     ) {
 
-      # Pass arguments to the DiseasyModel initializer
+      # Pass arguments to the DiseasyModel initialiser
       super$initialize(...)
 
 
@@ -49,7 +51,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
 
-      checkmate::assert_logical(malthusian_scaling, add = coll)
+      checkmate::assert_logical(malthusian_matching, add = coll)
 
       # Check we have the needed modules loaded and configured as needed
       checkmate::assert_class(self$observables, "DiseasyObservables", add = coll)
@@ -101,7 +103,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           dplyr::pull("proportion")
       }
 
-      per_capita_contact_matrixes <- contact_matrixes |>
+      per_capita_contact_matrixes <<- contact_matrixes |>
         purrr::map(~ self %.% activity %.% rescale_counts_to_rates(.x, proportion))
 
       # Finally, we want to adjust for the structure of the SEIR model such that the (Malthusian) growth rate
@@ -109,18 +111,29 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # This is a scaling that we need to compute and multiply with the infection rate "beta".
       # To optimise, we perform the scaling here onto the contact matrices directly, since we then
       # have to do it only once.
-      if (malthusian_scaling) {
+      if (malthusian_matching) {
         reference_growth_rate <- private$compute_malthusian_growth_rate(K = 0, L = 1, age_cuts_lower = 0)
 
-        current_growth_rate <- private$compute_malthusian_growth_rate(
+        # Define objective function for root finding
+        f <- \(scaling_factor) private$compute_malthusian_growth_rate(
           K = purrr::pluck(private$compartment_structure, "E", .default = 0),
           L = purrr::pluck(private$compartment_structure, "I"),
           age_cuts_lower = self %.% parameters %.% age_cuts_lower,
-          overall_infection_risk = self %.% parameters %.% overall_infection_risk
-        )
+          overall_infection_risk = scaling_factor * self %.% parameters %.% overall_infection_risk
+        ) - reference_growth_rate
 
-        scaled_per_capita_contact_matrixes <- per_capita_contact_matrixes |>
-          purrr::map(~ .x * reference_growth_rate / current_growth_rate)
+        # Compute upper bound
+        upper <- 10
+        while (f(upper) < 0) {
+          upper <- upper * 10
+          if (upper > 1e10) {
+            break
+          }
+        }
+
+        scaling_factor <- uniroot(f, c(0, upper))$root
+
+        scaled_per_capita_contact_matrixes <- purrr::map(per_capita_contact_matrixes, ~ .x * scaling_factor)
 
       } else {
 
@@ -470,13 +483,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
     # @description
-    #   This function computes the malthusian growth rate for the gien model configuration.
+    #   This function computes the Malthusian growth rate for the gien model configuration.
     # @details
     #   This section follows the method outlined in doi: 10.1098/rsif.2009.0386
     #   To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
     #   Here, we linearise around S = 1.
     #   In this limit, there is no interaction with variants (since everyone is susceptible).
-    #   The malthusian growth rate is therefore not dependent on factors such as cross-immunity.
+    #   The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
     # @params t (`numeric(1)` or `Date(1)`)\cr
     #   The time at which to compute the growth rate.
     # @params K (`integer(1)`)\cr

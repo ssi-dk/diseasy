@@ -18,7 +18,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
     initialize = function(training_length, ...) {
 
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_number(training_length, add = coll)
+      checkmate::assert_integerish(training_length, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Store the given parameters

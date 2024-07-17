@@ -21,7 +21,8 @@ test_that("helpers are configured as expected (SR single variant / single age gr
     variant = DiseasyVariant$new(n_variants = 1),
     compartment_structure = c("I" = 0, "R" = 1),
     disease_progression_rates = c("I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list("age_cuts_lower" = 0),
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -349,7 +350,7 @@ test_that("contact_matrix helper works as expected (no scenario - single age gro
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -393,7 +394,7 @@ test_that("contact_matrix helper works as expected (no scenario - two age groups
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = c(0, 60)),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -437,7 +438,7 @@ test_that("contact_matrix helper works as expected (no scenario - three age grou
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = c(0, 40, 80)),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -495,7 +496,7 @@ test_that("contact_matrix helper works as expected (with scenario - single age g
     variant = DiseasyVariant$new(n_variants = 2),
     compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
     parameters = list("age_cuts_lower" = 0),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -582,7 +583,7 @@ test_that("contact_matrix helper works as expected (with scenario - all age grou
     parameters = list(
       "age_cuts_lower" = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))
     ),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -1252,7 +1253,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -1290,7 +1291,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rI, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 40)),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -1332,7 +1333,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -1367,7 +1368,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rI, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 40)),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -1417,7 +1418,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list("age_cuts_lower" = 0),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
@@ -1469,7 +1470,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
     compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
     disease_progression_rates = c("E" = rI, "I" = rI),
     parameters = list("age_cuts_lower" = c(0, 40)),
-    malthusian_scaling = FALSE
+    malthusian_matching = FALSE
   )
 
   # Get a reference to the private environment
