@@ -167,20 +167,27 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   the `last_queryable_date` of the `DiseasyObservables` module.
     #' @param observable `r rd_observable()`
     #' @param stratification `r rd_stratification()`
+    #' @param period (`character`)\cr
+    #'   The period to return data for. That is, the training, testing or validation period.
     #' @return The output of `DiseasyObservables$get_observation` constrained to the training period.
-    get_training_data = function(observable, stratification = NULL) {
+    get_data = function(observable, stratification = NULL, period = c("training", "testing", "validation")) {
+      period <- match.arg(period)
 
       # Input validation
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(observable, add = coll)
       checkmate::assert_number(self %.% parameters %.% training_length, add = coll)
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
+      checkmate::assert_choice(period, c("training", "testing", "validation"), add = coll)
       checkmate::reportAssertions(coll)
 
       # Get the observable at the stratification level
-      start_date <- self %.% observables %.% last_queryable_date -
-        lubridate::days(self %.% parameters %.% training_length)
-      end_date   <- self %.% observables %.% last_queryable_date # Only within the training period
+      start_date <- purrr::pluck(self, glue::glue("{period}_period"), "start")
+      end_date   <- purrr::pluck(self, glue::glue("{period}_period"), "end")
+
+      if (is.null(start_date) || is.null(end_date)) {
+        stop("Requested period is not configured! Check the corresponding `$<period>_period`.")
+      }
 
       data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
         dplyr::mutate(t = lubridate::interval(max(zoo::as.Date(date)), zoo::as.Date(date)) / lubridate::days(1))
