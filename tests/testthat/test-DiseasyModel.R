@@ -57,6 +57,20 @@ test_that("initialize works with model parameters", {
           list("a" = 1, "b" = 2),
           keep.null = TRUE
         )
+      },
+      validate_parameters = function() {
+        coll <- checkmate::makeAssertCollection()
+        checkmate::assert_integerish(
+          self %.% parameters %.% a,
+          add = coll
+        )
+        checkmate::assert_integerish(
+          self %.% parameters %.% b,
+          add = coll
+        )
+        checkmate::reportAssertions(coll)
+
+        super$validate_parameters()
       }
     )
   )
@@ -75,9 +89,22 @@ test_that("initialize works with model parameters", {
 
   # Check that setting non-existing parameters will give an error
   expect_error(
-    DiseasyModelParameterTest$new(parameters = list("d" = 3)),
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("d" = 3))),
     class = "simpleError",
-    regex = "additional elements"
+    regex = r"{but has additional elements \{'d'\}}"
+  )
+
+  # Check that parameter validation catches malformed parameters
+  expect_error( # Model specific parameters are validated
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("a" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'integerish'"
+  )
+
+  expect_error( # Inherited parameters are validated
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("training_length" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'numeric'"
   )
 })
 
@@ -329,24 +356,11 @@ test_that("$get_results() gives error", {
 
 test_that("parameter validation works", {
 
-  checkmate_err_msg <- \(expr) {
-    tryCatch(
-      expr,
-      error = \(e) {
-        e$message |>
-          stringr::str_remove_all(stringr::fixed("\n *")) |>
-          stringr::str_remove_all(stringr::fixed("* ")) |>
-          simpleError(message = _) |>
-          stop()
-      }
-    )
-  }
-
   expect_error(
     checkmate_err_msg(
-      DiseasyModel$new(parameters = list("training_length" = c("plotting" = 10))),
-      pattern = "Names must be a subset of {'training', 'testing', 'validation'}"
-    )
+      DiseasyModel$new(parameters = list("training_length" = c("plotting" = 10)))
+    ),
+    regex = r"{Names must be a subset of \{'training','testing','validation'\}}"
   )
 
 })
@@ -431,13 +445,13 @@ test_that("active binding: parameters works", {
   m <- DiseasyModel$new()
 
   # Retrieve the parameters
-  expect_null(m %.% parameters)
+  checkmate::expect_list(m %.% parameters)
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),                                            # nolint: implicit_assignment_linter
                    simpleError("`$parameters` is read only"))
-  expect_null(m %.% parameters)
+  checkmate::expect_list(m %.% parameters)
 
   rm(m)
 })

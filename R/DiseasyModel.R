@@ -283,12 +283,17 @@ DiseasyModel <- R6::R6Class(                                                    
     #   Sub-classes implement additional validation checks
     # @return `NULL` (called for side-effects)
     validate_parameters = function() {
-      with(self %.% parameters, {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_integerish(training_length, add = coll)
-        checkmate::assert_names(names(training_length), subset.of = c("training", "testing", "validation"), add = coll)
-        checkmate::reportAssertions(coll)
-      })
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_numeric(
+        self %.% parameters %.% training_length,
+        add = coll
+      )
+      checkmate::assert_names(
+        names(self %.% parameters %.% training_length),
+        subset.of = c("training", "testing", "validation"),
+        add = coll
+      )
+      checkmate::reportAssertions(coll)
     },
 
     # @param label (`character`)\cr
