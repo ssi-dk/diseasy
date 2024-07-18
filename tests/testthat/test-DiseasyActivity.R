@@ -312,7 +312,7 @@ test_that("$set_contact_basis() works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis %.% DK
-  custom_basis$counts <- custom_basis$counts[-1]
+  custom_basis$contacts <- custom_basis$contacts[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
                regexp = r"{missing.*elements.*\{'home'\}}")
 
