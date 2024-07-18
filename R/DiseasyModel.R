@@ -358,7 +358,6 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
-
     .parameters = NULL,
 
     # @field default_parameters (`list`)\cr

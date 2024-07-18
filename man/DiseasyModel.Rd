@@ -139,6 +139,9 @@ Common parameters are:
 A human readable label for the model instance.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+
+\item{\code{parmeters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.}
 }
 \if{html}{\out{</div>}}
 }
