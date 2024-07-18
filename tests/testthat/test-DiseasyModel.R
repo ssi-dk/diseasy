@@ -1,4 +1,4 @@
-test_that("initialize works", {
+test_that("initialize works with functional modules", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -36,6 +36,39 @@ test_that("initialize works", {
   expect_equal(m_label$hash, m$hash) # label should not change the hash
 
   rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_label)
+})
+
+
+test_that("initialize works with model parameters", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      .parameters = list("a" = 1, "b" = 2)
+    )
+  )
+
+  # Test that parameters use the default value
+  m <- DiseasyModelParameterTest$new()
+  expect_equal(m %.% parameters %.% a, 1)
+  expect_equal(m %.% parameters %.% b, 2)
+  rm(m)
+
+  # Test that parameters can be set during initialization
+  m <- DiseasyModelParameterTest$new(parameters = list("a" = 3, "b" = 4))
+  expect_equal(m %.% parameters %.% a, 3)
+  expect_equal(m %.% parameters %.% b, 4)
+  rm(m)
+
+  # Check that setting non-existing parameters will give an error
+  expect_error(
+    DiseasyModelParameterTest$new(parameters = list("d" = 3)),
+    class = "simpleError",
+    regex = "additional elements"
+  )
 })
 
 
