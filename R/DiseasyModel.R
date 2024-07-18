@@ -260,26 +260,10 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "training_period",
       expr = {
-        if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
-        }
-        if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
-        }
+        training_period_end <- self %.% observables %.% last_queryable_date -
+          lubridate::days(sum(purrr::discard(self %.% parameters %.% training_length), "training"))
 
-        training_length <- purrr::pluck(self %.% parameters %.% training_length, "training", .default = 0)
-        training_offset <- purrr::discard_at(self %.% parameters %.% training_length, "training") |>
-          purrr::reduce(sum, .init = 0)
-
-        training_period_end <- self %.% observables %.% last_queryable_date - lubridate::days(training_offset)
-
-        training_period_start <- max(
-          training_period_end - lubridate::days(max(training_length - 1, 0)),
-          self %.% observables %.% ds %.% min_start_date,
-          na.rm = TRUE
-        )
-
-        return(list("start" = training_period_start, "end" = training_period_end))
+        return(list("start" = self %.% observables %.% ds %.% min_start_date, "end" = training_period_end))
       }
     ),
 
@@ -290,28 +274,10 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "testing_period",
       expr = {
-        if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
-        }
-        if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
-        }
+        testing_end_date <- self %.% observables %.% last_queryable_date -
+          lubridate::days(purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0))
 
-        testing_length <- purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0)
-        testing_offset <- purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0)
-
-        if (testing_length == 0) {
-          return(list("start" = NULL, "end" = NULL))
-        }
-
-        testing_period_end <- self %.% observables %.% last_queryable_date - lubridate::days(testing_offset)
-
-        testing_period_start <- max(
-          testing_period_end - lubridate::days(max(testing_length - 1, 0)),
-          self %.% observables %.% ds %.% min_start_date
-        )
-
-        return(list("start" = testing_period_start, "end" = testing_period_end))
+        return(list("start" = self %.% training_period %.% end, "end" = testing_end_date))
       }
     ),
 
@@ -322,27 +288,7 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "validation_period",
       expr = {
-        if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
-        }
-        if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
-        }
-
-        validation_length <- purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0)
-
-        if (validation_length == 0) {
-          return(list("start" = NULL, "end" = NULL))
-        }
-
-        validation_period_end <- self %.% observables %.% last_queryable_date
-
-        validation_period_start <- max(
-          validation_period_end - lubridate::days(max(validation_length - 1, 0)),
-          self %.% observables %.% ds %.% min_start_date
-        )
-
-        return(list("start" = validation_period_start, "end" = validation_period_end))
+        return(list("start" = self %.% testing_period %.% end, "end" = self %.% observables %.% last_queryable_date))
       }
     )
   ),
