@@ -238,6 +238,46 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "parameters",
       expr = return(private %.% .parameters)
+    ),
+
+
+    #' @field training_period (`list`(`Date`))\cr
+    #'   The start and end dates of the training period. Read-only.
+    #' @importFrom diseasystore `%.%`
+    training_period = purrr::partial(
+      .f = active_binding,
+      name = "training_period",
+      expr = {
+        training_period_end <- self %.% observables %.% last_queryable_date -
+          lubridate::days(sum(purrr::discard(self %.% parameters %.% training_length), "training"))
+
+        return(list("start" = self %.% observables %.% ds %.% min_start_date, "end" = training_period_end))
+      }
+    ),
+
+    #' @field testing_period (`list`(`Date`))\cr
+    #'   The start and end dates of the testing period. Read-only.
+    #' @importFrom diseasystore `%.%`
+    testing_period = purrr::partial(
+      .f = active_binding,
+      name = "testing_period",
+      expr = {
+        testing_end_date <- self %.% observables %.% last_queryable_date -
+          lubridate::days(purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0))
+
+        return(list("start" = self %.% training_period %.% end, "end" = testing_end_date))
+      }
+    ),
+
+    #' @field validation_period (`list`(`Date`))\cr
+    #'   The start and end dates of the validation period. Read-only.
+    #' @importFrom diseasystore `%.%`
+    validation_period = purrr::partial(
+      .f = active_binding,
+      name = "validation_period",
+      expr = {
+        return(list("start" = self %.% testing_period %.% end, "end" = self %.% observables %.% last_queryable_date))
+      }
     )
   ),
 
