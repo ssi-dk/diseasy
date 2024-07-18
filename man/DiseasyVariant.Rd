@@ -48,6 +48,7 @@ Read-only.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiseasyVariant-add_variant}{\code{DiseasyVariant$add_variant()}}
+\item \href{#method-DiseasyVariant-describe}{\code{DiseasyVariant$describe()}}
 \item \href{#method-DiseasyVariant-clone}{\code{DiseasyVariant$clone()}}
 }
 }
@@ -86,6 +87,16 @@ a host previously infected by the current variant. If not specified, the default
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyVariant-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyVariant-describe}{}}}
+\subsection{Method \code{describe()}}{
+Prints a human readable report of the internal state of the module.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$describe()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyVariant-clone"></a>}}
