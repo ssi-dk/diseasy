@@ -51,7 +51,13 @@ test_that("initialize works with model parameters", {
     classname = "DiseasyModelParameterTest",
     inherit = DiseasyModel,
     private = list(
-      .parameters = list("a" = 1, "b" = 2)
+      .parameters = function() { # Has to be a function to retrieve the superclass version also
+        modifyList(
+          super$.parameters(),
+          list("a" = 1, "b" = 2),
+          keep.null = TRUE
+        )
+      }
     )
   )
 

@@ -92,7 +92,7 @@ DiseasyModel <- R6::R6Class(                                                    
       if (!is.null(parameters)) {
         checkmate::assert_names(
           names(parameters),
-          subset.of = names(self %.% parameters),
+          subset.of = names(self %.% parameters()), # At this stage, parameters is still a function
           type = "unique",
           add = coll
         )
@@ -129,12 +129,19 @@ DiseasyModel <- R6::R6Class(                                                    
       }
 
 
-      # Update the existing private$parameters with the new parameters -- overwriting the existing ones
-      if (!is.null(parameters)) {
-        private$.parameters <- modifyList(private$.parameters, parameters, keep.null = TRUE)
-        private$validate_parameters()
-      }
+      # Update the existing private$parameters with the new parameters
+      updated_parameters <- modifyList(
+        private %.% .parameters(),
+        purrr::pluck(parameters, .default = list()),
+        keep.null = TRUE
+      )
 
+      # Overwrite the existing parameters with the new ones
+      # Note that we simultaneously convert from a function to a simple list
+      unlockBinding(".parameters", private)
+      private$.parameters <- updated_parameters
+      lockBinding(".parameters", private)
+      private %.% validate_parameters()
 
       # Set the label for the model
       private$label <- label
@@ -238,14 +245,7 @@ DiseasyModel <- R6::R6Class(                                                    
     parameters = purrr::partial(
       .f = active_binding,
       name = "parameters",
-      expr = {
-        # If the class is "DiseasyModel", we break the iteration, otherwise we recursively iterate deeper
-        if (exists("super")) {
-          return(c(super$.parameters, private %.% .parameters))
-        } else {
-          return(private %.% .parameters)
-        }
-      }
+      expr = return(private %.% .parameters)
     )
   ),
 
@@ -256,9 +256,26 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
 
-    .parameters = list(
-      "training_length" = list("training" = -Inf, "testing" = 0, "validation" = 0)
-    ),
+    # @field .parameters (`list`)\cr
+    #   The parameters used in the model.
+    # @details
+    #   When implementing the model, this should be a function that returns a list of parameters and
+    #   which adds the model specific parameters to the inherited parameters.
+    #   It has to be a function, since only functions can be accesses via the `super` binding.
+    #   Non-function objects are seemingly completely overwritten when inheriting.
+    # @example
+    #   .parameters = function() {
+    #      modifyList(
+    #       super$.parameters(),
+    #       list("model_specific_param_1" = 1, "model_specific_param_2" = 2),
+    #       keep.null = TRUE
+    #     )
+    #   }
+    .parameters = function() {
+      list(
+        "training_length" = c("training" = -Inf, "testing" = 0, "validation" = 0)
+      )
+    },
 
     # @description
     #   Assert parameters conform to the expected format
