@@ -131,32 +131,32 @@ finally, an integer counter for the day relative to the end of the training peri
 Beyond providing access to the functional modules, `DiseasyModel` defines how the user will interface with the model.
 
 ### Setting parameters
-The parameters of the model should be contained within the `$parameters` slot of the model template.
+The default parameters of the model should be contained within the `$parameters` slot of the model template.
 
 These are then exposed to the user, and logic can be implemented to allow the user to set some parameters of the model
 while leaving others free to be determined by the model during model fitting.
 
-For technical reasons[^2], you should implement the `private$.parameters` slot as a function that combines the
+For technical reasons[^2], you should implement the `private$default_parameters()` slot as a function that combines the
 model-specific parameters with the inherited parameters from the superclasses.
-```{r .parameters implementation, eval = FALSE}
-.parameters = function() {
+```{r .parameters implementation, eval = FALSE}                                                                         # nolint: assignment_linter, object_usage_linter
+default_parameters = function() {
   modifyList(
-    super$.parameters(), # Obtain parameters from the superclasses
+    super$default_parameters(), # Obtain parameters from the superclasses
     # Overwrite with model-specific parameters
     list("model_specific_param_1" = 1, "model_specific_param_2" = "method_1"),
     keep.null = TRUE
   )
 }
-```
-During initialisation, these are then evaluated to a single list of parameters and overwrites the `private$.parameters`
-slot. The parameters are then acccessable via `$parameters`.
+```                                                                                                                     # nolint end
+During initialisation, these are then evaluated to a single list of parameters, updated with the user-specified values
+for the parmaters and stored in the `private$.parameters` slot. The parameters are then acccessable via `$parameters`.
 
 #### Validating the parameters
 The model template can test the user provided `parameters` by implementing the `private$validate_parameters()` method.
 Note that some parameters may be set inherited from superclasses, so the implementation of the `$validate_parameters()`
 method should also call the parent validation method (`super$validate_parameters()`).
 
-```{r .parameter validation implementation, eval = FALSE}
+```{r .parameter validation implementation, eval = FALSE}                                                               # nolint: assignment_linter, object_usage_linter
 validate_parameters = function() {
   checkmate::assert_number(self$parameters$model_specific_param_1)
   checkmate::assert_choice(
@@ -165,7 +165,7 @@ validate_parameters = function() {
   )
   super$validate_parameters()
 }
-```
+```                                                                                                                     # nolint end
 
 ### Getting results
 Once the parameters of the model is set (either by the user or by the model), the user can query the model for results
@@ -178,7 +178,5 @@ The outputs of the model are standardised, and should follow the structure of th
 
 [^1]: The seasonal model exposed by a configured `DiseasySeason` instance is a "closure" instead of a pure function.
 [^2]: In R6, functions from superclasses are available via the `super` keyword but non-function objects are not.
-by implementing the `private$.parameters` slot as a function, we can ensure that the parameters from the superclasses
-are available to the model template.
-For computational efficiency however, we evaluate the function at initialisation, update the list of parameters with the
-user-provided values, and store as list in the same `private$.parameters` slot.
+by implementing the `private$default_parameters` slot as a function, we can ensure that the parameters from the
+superclasses are available to the model template.

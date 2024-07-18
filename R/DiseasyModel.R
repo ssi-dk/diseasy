@@ -92,7 +92,7 @@ DiseasyModel <- R6::R6Class(                                                    
       if (!is.null(parameters)) {
         checkmate::assert_names(
           names(parameters),
-          subset.of = names(self %.% parameters()), # At this stage, parameters is still a function
+          subset.of = names(private %.% default_parameters()),
           type = "unique",
           add = coll
         )
@@ -131,16 +131,13 @@ DiseasyModel <- R6::R6Class(                                                    
 
       # Update the existing private$parameters with the new parameters
       updated_parameters <- modifyList(
-        private %.% .parameters(),
+        private %.% default_parameters(),
         purrr::pluck(parameters, .default = list()),
         keep.null = TRUE
       )
 
-      # Overwrite the existing parameters with the new ones
-      # Note that we simultaneously convert from a function to a simple list
-      unlockBinding(".parameters", private)
+      # Store the updated parameters
       private$.parameters <- updated_parameters
-      lockBinding(".parameters", private)
       private %.% validate_parameters()
 
       # Set the label for the model
@@ -256,22 +253,22 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
 
-    # @field .parameters (`list`)\cr
-    #   The parameters used in the model.
+    .parameters = NULL,
+
+    # @field default_parameters (`list`)\cr
+    #   The default parameters used in the model.
     # @details
     #   When implementing the model, this should be a function that returns a list of parameters and
     #   which adds the model specific parameters to the inherited parameters.
-    #   It has to be a function, since only functions can be accesses via the `super` binding.
-    #   Non-function objects are seemingly completely overwritten when inheriting.
-    # @example
-    #   .parameters = function() {
+    # @example                                                                                                          # nolint start: commented_code_linter
+    #   default_parameters = function() {
     #      modifyList(
-    #       super$.parameters(),
+    #       super$default_parameters(),
     #       list("model_specific_param_1" = 1, "model_specific_param_2" = 2),
     #       keep.null = TRUE
     #     )
-    #   }
-    .parameters = function() {
+    #   }                                                                                                               # nolint end
+    default_parameters = function() {
       list(
         "training_length" = c("training" = -Inf, "testing" = 0, "validation" = 0)
       )
