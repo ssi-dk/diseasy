@@ -353,6 +353,48 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
 
+    #' @description
+    #'   Infer the state_vector from incidence data
+    #' @param incidence (`data.frame`)\cr
+    #'   Incidence observations as a `data.frame` with columns
+    #'   - `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)
+    #'   - `date`: The date of the observations
+    #'   - `incidence`: The incidence in the age group at the given date
+    #' @param method (`character(1)`)\cr
+    #'   The method to use for initialising the state vector.
+    #'   - `derivative`: Directly infers the EI compartments from derivatives of the incidence signal.
+    #'   - `eigen-value`: Uses the eigenvalues of the generator matrix to infer the state vector.
+    #'
+    #'   See the article `SEIR-initialisation` on the online documentation for more information.
+    #' @return (`numeric()`)\cr
+    #'   The initial state vector for the model.
+    initialize_state_vector = function(incidence, method = c("derivative", "eigen-value")) {
+      method <- match.arg(method)
+
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_data_frame(incidence, add = coll)
+      checkmate::assert_names(colnames(incidence), permutation.of = c("age_group", "date", "incidence"), add = coll)
+      checkmate::assert_character(incidence$age_group, add = coll)
+      checkmate::assert_date(incidence$date, add = coll)
+      checkmate::assert_numeric(incidence$incidence, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # We first compute the time relative to the training period end
+      incidence <- incidence |>
+        dplyr::mutate("t" = as.numeric(.data$date - self %.% training_end_date, units = "days"))
+
+      # Now we have ensure that incidence is a three-column data.frame with the time series (t) of the incidence for
+      # each age-group in the model.
+
+      # Fit polynomials to the incidence curves for each age group
+      incidence_poly <- lm(
+        incidence ~ poly(t, self %.% parameters %.% incidence_polynomial_order, raw = TRUE) * age_group,
+        data = dplyr::filter(incidence, t <= 0, t > self %.% parameters %.% incidence_polynomial_training_length)
+      )
+
+    },
+
+
     #' @field immunity
     #'   Placeholder for the immunity module
     immunity = list("approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N) {
