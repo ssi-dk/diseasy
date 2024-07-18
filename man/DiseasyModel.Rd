@@ -18,6 +18,7 @@ The module contains the functional modules via its active bindings:
 \item \verb{$activity}: \code{DiseasyActivity}
 \item \verb{$observables}: \code{DiseasyObservables}
 \item \verb{$season}: \code{DiseasySeason}
+\item \verb{$variant} : \code{DiseasyVariant}
 }
 
 Configured instances of these modules can be provided during initialisation.
@@ -43,6 +44,8 @@ These functions define the "API" of the models and ensure the models can take pa
 \link{DiseasyObservables}
 
 \link{DiseasySeason}
+
+\link{DiseasyVariant}
 }
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyModel}
@@ -54,10 +57,13 @@ These functions define the "API" of the models and ensure the models can take pa
 The local copy of an activity module. Read-only.}
 
 \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
-The local copy of an DiseasyObservables module. Read-only.}
+The local copy of a DiseasyObservables module. Read-only.}
 
 \item{\code{season}}{(\code{diseasy::season})\cr
-The local copy of an season module. Read-only.}
+The local copy of a season module. Read-only.}
+
+\item{\code{variant}}{(\code{diseasy::variant})\cr
+The local copy of a variant module. Read-only.}
 
 \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
@@ -93,6 +99,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   activity = FALSE,
   observables = FALSE,
   season = FALSE,
+  variant = FALSE,
   parameters = NULL,
   label = NULL,
   ...
@@ -102,7 +109,7 @@ This module is typically not constructed directly but rather through \verb{Disea
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{activity, observables, season}}{(\code{boolean} or \verb{R6::R6Class instance})\cr
+\item{\code{activity, observables, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr
 If a boolean is given, it dictates whether to load a new instance module of this class.
 
 If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel}
@@ -123,6 +130,9 @@ Common parameters are:
 A human readable label for the model instance.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+
+\item{\code{parmeters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.}
 }
 \if{html}{\out{</div>}}
 }
