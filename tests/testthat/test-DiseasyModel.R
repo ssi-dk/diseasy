@@ -1,4 +1,4 @@
-test_that("initialize works", {
+test_that("initialize works with functional modules", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -36,6 +36,72 @@ test_that("initialize works", {
   expect_equal(m_label$hash, m$hash) # label should not change the hash
 
   rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_label)
+})
+
+
+test_that("initialize works with model parameters", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("a" = 1, "b" = 2),
+          keep.null = TRUE
+        )
+      },
+      validate_parameters = function() {
+        coll <- checkmate::makeAssertCollection()
+        checkmate::assert_integerish(
+          self %.% parameters %.% a,
+          add = coll
+        )
+        checkmate::assert_integerish(
+          self %.% parameters %.% b,
+          add = coll
+        )
+        checkmate::reportAssertions(coll)
+
+        super$validate_parameters()
+      }
+    )
+  )
+
+  # Test that parameters use the default value
+  m <- DiseasyModelParameterTest$new()
+  expect_equal(m %.% parameters %.% a, 1)
+  expect_equal(m %.% parameters %.% b, 2)
+  rm(m)
+
+  # Test that parameters can be set during initialization
+  m <- DiseasyModelParameterTest$new(parameters = list("a" = 3, "b" = 4))
+  expect_equal(m %.% parameters %.% a, 3)
+  expect_equal(m %.% parameters %.% b, 4)
+  rm(m)
+
+  # Check that setting non-existing parameters will give an error
+  expect_error(
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("d" = 3))),
+    class = "simpleError",
+    regex = r"{but has additional elements \{'d'\}}"
+  )
+
+  # Check that parameter validation catches malformed parameters
+  expect_error( # Model specific parameters are validated
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("a" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'integerish'"
+  )
+
+  expect_error( # Inherited parameters are validated
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("training_length" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'numeric'"
+  )
 })
 
 
@@ -263,6 +329,18 @@ test_that("$get_results() gives error", {
 })
 
 
+test_that("parameter validation works", {
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyModel$new(parameters = list("training_length" = c("plotting" = 10)))
+    ),
+    regex = r"{Names must be a subset of \{'training','testing','validation'\}}"
+  )
+
+})
+
+
 test_that("active binding: activity works", {
 
   # Creating an empty module
@@ -324,13 +402,13 @@ test_that("active binding: parameters works", {
   m <- DiseasyModel$new()
 
   # Retrieve the parameters
-  expect_null(m %.% parameters)
+  checkmate::expect_list(m %.% parameters)
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),                                            # nolint: implicit_assignment_linter
                    simpleError("`$parameters` is read only"))
-  expect_null(m %.% parameters)
+  checkmate::expect_list(m %.% parameters)
 
   rm(m)
 })
