@@ -1,4 +1,4 @@
-test_that("initialize works", {
+test_that("initialize works with functional modules", {
   skip_if_not_installed("RSQLite")
 
   # Creating an empty model module
@@ -36,6 +36,72 @@ test_that("initialize works", {
   expect_equal(m_label$hash, m$hash) # label should not change the hash
 
   rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_label)
+})
+
+
+test_that("initialize works with model parameters", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("a" = 1, "b" = 2),
+          keep.null = TRUE
+        )
+      },
+      validate_parameters = function() {
+        coll <- checkmate::makeAssertCollection()
+        checkmate::assert_integerish(
+          self %.% parameters %.% a,
+          add = coll
+        )
+        checkmate::assert_integerish(
+          self %.% parameters %.% b,
+          add = coll
+        )
+        checkmate::reportAssertions(coll)
+
+        super$validate_parameters()
+      }
+    )
+  )
+
+  # Test that parameters use the default value
+  m <- DiseasyModelParameterTest$new()
+  expect_equal(m %.% parameters %.% a, 1)
+  expect_equal(m %.% parameters %.% b, 2)
+  rm(m)
+
+  # Test that parameters can be set during initialization
+  m <- DiseasyModelParameterTest$new(parameters = list("a" = 3, "b" = 4))
+  expect_equal(m %.% parameters %.% a, 3)
+  expect_equal(m %.% parameters %.% b, 4)
+  rm(m)
+
+  # Check that setting non-existing parameters will give an error
+  expect_error(
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("d" = 3))),
+    class = "simpleError",
+    regex = r"{but has additional elements \{'d'\}}"
+  )
+
+  # Check that parameter validation catches malformed parameters
+  expect_error( # Model specific parameters are validated
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("a" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'integerish'"
+  )
+
+  expect_error( # Inherited parameters are validated
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("training_length" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'numeric'"
+  )
 })
 
 
@@ -263,6 +329,18 @@ test_that("$get_results() gives error", {
 })
 
 
+test_that("parameter validation works", {
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyModel$new(parameters = list("training_length" = c("plotting" = 10)))
+    ),
+    regex = r"{Names must be a subset of \{'training','testing','validation'\}}"
+  )
+
+})
+
+
 test_that("active binding: activity works", {
 
   # Creating an empty module
@@ -324,13 +402,99 @@ test_that("active binding: parameters works", {
   m <- DiseasyModel$new()
 
   # Retrieve the parameters
-  expect_null(m %.% parameters)
+  checkmate::expect_list(m %.% parameters)
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),                                            # nolint: implicit_assignment_linter
+  expect_identical(tryCatch(m$parameters <- c("test" = 2), error = \(e) e),                                             # nolint: implicit_assignment_linter
                    simpleError("`$parameters` is read only"))
-  expect_null(m %.% parameters)
+  checkmate::expect_list(m %.% parameters)
+
+  rm(m)
+})
+
+
+test_that("active binding: training_period, testing_period and validation_period works", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a empty module
+  m <- DiseasyModel$new()
+  expect_error(m %.% training_period,   "Observables module is not loaded!")
+  expect_error(m %.% testing_period,    "Observables module is not loaded!")
+  expect_error(m %.% validation_period, "Observables module is not loaded!")
+  rm(m)
+
+  # Creating a module with an observables module without a `last_queryable_date`
+  obs <- DiseasyObservables$new("Google COVID-19", conn = DBI::dbConnect(RSQLite::SQLite()))
+  m <- DiseasyModel$new(observables = obs)
+  expect_error(m %.% training_period,   r"{`\$last_queryable_date` not configured in observables module!}")
+  expect_error(m %.% testing_period,    r"{`\$last_queryable_date` not configured in observables module!}")
+  expect_error(m %.% validation_period, r"{`\$last_queryable_date` not configured in observables module!}")
+  rm(m)
+
+
+
+  # Creating a fully configured module
+  obs$set_last_queryable_date(as.Date("2020-03-01"))
+
+  # - with only training period
+  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10)))
+  expect_identical(
+    m %.% training_period,
+    list("start" = as.Date("2020-03-01") - 10, "end" = as.Date("2020-03-01"))
+  )
+  expect_identical(m %.% testing_period,    list("start" = NULL, "end" = NULL))
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+  rm(m)
+
+
+  # - with training and testing periods
+  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10, "testing" = 5)))
+  expect_identical(
+    m %.% training_period,
+    list("start" = as.Date("2020-03-01") - 10 - 5, "end" = as.Date("2020-03-01") - 5)
+  )
+  expect_identical(
+    m %.% testing_period,
+    list("start" = as.Date("2020-03-01") - 5, "end" = as.Date("2020-03-01"))
+  )
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+  rm(m)
+
+
+  # - with training, testing and validation periods.
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
+  )
+  expect_identical(
+    m$training_period,
+    list("start" = as.Date("2020-03-01") - 10 - 5 - 2, "end" = as.Date("2020-03-01") - 5 - 2)
+  )
+  expect_identical(
+    m %.% testing_period,
+    list("start" = as.Date("2020-03-01") - 5 - 2, "end" = as.Date("2020-03-01") - 2)
+  )
+  expect_identical(
+    m %.% validation_period,
+    list("start" = as.Date("2020-03-01") - 2, "end" = as.Date("2020-03-01"))
+  )
+  rm(m)
+
+
+
+  # Try to set training_period through the binding
+  # test_that cannot capture this error, so we have to hack it
+  m <- DiseasyModel$new()
+
+  expect_identical(tryCatch(m$training_period <- c("start" = Sys.Date()), error = \(e) e),                              # nolint: implicit_assignment_linter
+                   simpleError("`$training_period` is read only"))
+
+  expect_identical(tryCatch(m$testing_period <- c("start" = Sys.Date()), error = \(e) e),                               # nolint: implicit_assignment_linter
+                   simpleError("`$testing_period` is read only"))
+
+  expect_identical(tryCatch(m$validation_period <- c("start" = Sys.Date()), error = \(e) e),                            # nolint: implicit_assignment_linter
+                   simpleError("`$validation_period` is read only"))
 
   rm(m)
 })

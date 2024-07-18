@@ -9,6 +9,7 @@ A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
 \description{
 The \code{DiseasyModel} module implements common functionality that all models have available beyond that provided by
 \code{DiseasyBaseModule}.
+
 Most notably, the model module facilitates:
 \itemize{
 \item Module interfaces:
@@ -60,6 +61,15 @@ The local copy of an season module. Read-only.}
 
 \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
+
+\item{\code{training_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the training period. Read-only.}
+
+\item{\code{testing_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the testing period. Read-only.}
+
+\item{\code{validation_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the validation period. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -68,7 +78,7 @@ The parameters used in the model. Read-only.}
 \itemize{
 \item \href{#method-DiseasyModel-new}{\code{DiseasyModel$new()}}
 \item \href{#method-DiseasyModel-get_results}{\code{DiseasyModel$get_results()}}
-\item \href{#method-DiseasyModel-get_training_data}{\code{DiseasyModel$get_training_data()}}
+\item \href{#method-DiseasyModel-get_data}{\code{DiseasyModel$get_data()}}
 \item \href{#method-DiseasyModel-clone}{\code{DiseasyModel$clone()}}
 }
 }
@@ -92,6 +102,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   activity = FALSE,
   observables = FALSE,
   season = FALSE,
+  parameters = NULL,
   label = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -106,6 +117,16 @@ If a boolean is given, it dictates whether to load a new instance module of this
 If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel}
 instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
 instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+
+\item{\code{parameters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.
+
+Each model has their own parameters.
+
+Common parameters are:
+\itemize{
+\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+}}
 
 \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance.}
@@ -156,13 +177,17 @@ A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the lev
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModel-get_training_data"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModel-get_training_data}{}}}
-\subsection{Method \code{get_training_data()}}{
+\if{html}{\out{<a id="method-DiseasyModel-get_data"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModel-get_data}{}}}
+\subsection{Method \code{get_data()}}{
 A method that returns training data for the models based on the model value of \code{training_length} and
 the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_training_data(observable, stratification = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_data(
+  observable,
+  stratification = NULL,
+  period = c("training", "testing", "validation")
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -171,6 +196,9 @@ the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \item{\code{observable}}{(\code{character})\cr The observable to provide prediction for. Must match observable in \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
 
 \item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in stratification evaluated to give the stratification level.}
+
+\item{\code{period}}{(\code{character})\cr
+The period to return data for. That is, the training, testing or validation period.}
 }
 \if{html}{\out{</div>}}
 }
