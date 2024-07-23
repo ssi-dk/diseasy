@@ -37,15 +37,6 @@
       see \code{\link{plot.window}}.}
     }
   }
-
-\item{K}{(\code{integer(1)})\cr
-The number of sequential compartments.}
-
-\item{functions}{(\code{list})\cr
-A list of target functions to optimisze for.}
-
-\item{tmax}{((\code{integer(1)})\cr
-The maximum number of time steps.}
 }
 \description{
 Generic function for plotting of \R objects.

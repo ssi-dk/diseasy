@@ -290,7 +290,8 @@ If the function has a time scale, it should be included in the function as \code
 
 \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 
-\item{\code{name}}{Set the name of the custom waning function.}
+\item{\code{name}}{(\code{character(1)})\cr
+Set the name of the custom waning function.}
 }
 \if{html}{\out{</div>}}
 }
@@ -357,7 +358,8 @@ If desired to additionally plot the approximations, supply the \code{method} and
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{t_max}}{(\code{numeric})\cr
-The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.}
+The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the
+accumulated time scales.}
 
 \item{\code{method}}{(\code{str} or \code{numeric})\cr
 Specifies the method to be used from the available methods.
@@ -365,8 +367,7 @@ It can be provided as a string with the method name "free_gamma", "free_delta" o
 or as a numeric value representing the method index 1, 2, or 3.}
 
 \item{\code{N}}{(\code{numeric})\cr
-Number of compartments to be used in the model.
-By default, it is set to 5}
+Number of compartments to be used in the model.}
 }
 \if{html}{\out{</div>}}
 }
