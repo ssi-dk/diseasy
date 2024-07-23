@@ -39,14 +39,8 @@ The waning models implemented in \code{DiseasyImmunity}. Read only.}
 \item{\code{model}}{(\verb{list(function())})\cr
 The list of models currently being used in the module. Read-only.}
 
-\item{\code{rates}}{(\code{list(numeric())})\cr
-The list of rates created by the selected approach. Read-only.}
-
-\item{\code{obj_value}}{(\code{list})\cr
-List of selected approach and N with the obj value from the optimisation. Read-only.}
-
-\item{\code{available_approaches}}{(\code{character})\cr
-The list of available approaches}
+\item{\code{available_methods}}{(\code{character})\cr
+The list of available methods}
 }
 \if{html}{\out{</div>}}
 }
@@ -313,7 +307,7 @@ transition rates and associated risk of infection for each compartment such the 
 best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
-  approach = c("rate_equal", "gamma_fixed_step", "all_free"),
+  method = c("free_gamma", "free_delta", "all_free"),
   N = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -321,8 +315,8 @@ best matches the waning immunity curves set in the module.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{approach}}{(\code{character(1)})\cr
-Specifies the approach to be used from the available approaches. See details.}
+\item{\code{method}}{(\code{character(1)})\cr
+Specifies the method to be used from the available methods. See details.}
 
 \item{\code{N}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
@@ -336,22 +330,25 @@ The transition rates between the compartments and the risk associated with each 
 approximate the configured waning immunity scenario.
 
 The function implements three methods for approximating the waning immunity curves:
-- "rate_equal": All transition rates are equal and risks are free to vary (N+1 free parameters).
-- "gamma_fixed_step": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
+- "free_gamma": All transition rates are equal and risks are free to vary (N+1 free parameters).
+- "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
 (N free parameters).
 - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
 }
 
+\subsection{Returns}{
+Returns the rates and objective value (invisibly).
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-plot}{}}}
 \subsection{Method \code{plot()}}{
-If desired to additionally plot the approximations, supply the \code{approach} and number of compartments (\code{N})
+If desired to additionally plot the approximations, supply the \code{method} and number of compartments (\code{N})
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$plot(
   t_max = NULL,
-  approach = c("rate_equal", "gamma_fixed_step", "all_free"),
+  method = c("free_gamma", "free_delta", "all_free"),
   N = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -362,10 +359,10 @@ If desired to additionally plot the approximations, supply the \code{approach} a
 \item{\code{t_max}}{(\code{numeric})\cr
 The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.}
 
-\item{\code{approach}}{(\code{str} or \code{numeric})\cr
-Specifies the approach to be used from the available approaches.
-It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
-or as a numeric value representing the approach index 1, 2, or 3.}
+\item{\code{method}}{(\code{str} or \code{numeric})\cr
+Specifies the method to be used from the available methods.
+It can be provided as a string with the method name "free_gamma", "free_delta" or "all_free".
+or as a numeric value representing the method index 1, 2, or 3.}
 
 \item{\code{N}}{(\code{numeric})\cr
 Number of compartments to be used in the model.
