@@ -52,28 +52,26 @@ t_h <- t_f * 2
 
 # Construct a list of all models
 models <- c(f, g, h)
-model_names <- c(names(f), paste0(names(f), "-c"), paste0(names(f), "-2t"))
+model_names <- c(paste0(names(f), "-0"), paste0(names(f), "-c"), paste0(names(f), "-2t"))
 time_scales <- c(t_f, t_g, t_h)
 
 zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 
 ```
 
-
 ```{r manually check fits}
-im$set_waning_model(g[["sigmoidal"]], time_scale = t_g[[1]], target = "infection")
+im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
 plot(im, method = "free_gamma", N = 3)
 
 im$approximate_compartmental(method = "free_gamma", N = 3)
 ```
 
 ```{r manually check fits}
-im$set_waning_model(g[["exponential"]], time_scale = t_g[[1]], target = "infection")
+im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
 plot(im, method = "all_free", N = 3)
 
-im$approximate_compartmental(method = "free_delta", N = 4)
+im$approximate_compartmental(method = "all_free", N = 3)
 ```
-
 
 ```{r run all single targets}
 cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/single"))
@@ -84,60 +82,70 @@ combinations_single <- tidyr::expand_grid(
   method = c("free_gamma", "free_delta", "all_free")
 )
 
-#future::plan("sequential")
-future::plan("multisession")
+future::plan("sequential")
+#future::plan("multisession")
 
 # Run the approximations and note the convergence point
-combinations_single |>
-  furrr::future_pwalk(
-  #purrr::pwalk(
-    .progress = interactive(),
-    .options = furrr::furrr_options("seed" = TRUE),
-    .f = \(model_zip, method) {
+combinations <- combinations_single |>
+  purrr::pmap(~ zip(list(..1), ..2))
 
-      N = seq(from = 2, to = 10, by = 1)
+N_max <- 10
 
-      # Unpack model
-      model <- model_zip[[1]]
-      model_name <- model_zip[[2]]
-      time_scale <- model_zip[[3]]
 
-      # Place holder for the convergence value
-      N_converged <- numeric(0)
+progressr::with_progress({
+  p <- progressr::progressor(steps = length(combinations) * N_max)
 
-      im_p <- DiseasyImmunity$new()
+  invisible(future.apply::future_lapply(
+    combinations,
+    future.seed = TRUE,
+    FUN = \(combination) {
 
-      # Generate approximations and store them and the convergence point
-      for (n in seq_along(N)) {
+        N = seq(from = 2, to = N_max, by = 1)
 
-        # Get the results up until now
-        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}"))
+        # Unpack model
+        model_zip <- combination[[1]][[1]]
+        method <- combination[[1]][[2]]
 
-        # Compute next values
-        if (!(N[n] %in% names(current_approxes))) {
+        model <- model_zip[[1]]
+        model_name <- model_zip[[2]]
+        time_scale <- model_zip[[3]]
 
-          # Set the target and approximate
-          im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
-          approx <- im_p$approximate_compartmental(method = method, N = N[n])
+        # Place holder for the convergence value
+        N_converged <- numeric(0)
 
-          # Append to existing results
-          if (cachem::is.key_missing(current_approxes)) {
-            current_approxes <- list()
+        im_p <- DiseasyImmunity$new()
+
+        # Generate approximations and store them and the convergence point
+        for (n in seq_along(N)) {
+          set.seed(n) # Not sure where a random seed is used, but future_lapply detects a call to rng
+
+          # Get the results up until now
+          current_approxes <- cache$get(key = glue::glue("{model_name}-{method}"))
+
+          # Compute next values
+          if (!(N[n] %in% names(current_approxes))) {
+
+            # Set the target and approximate
+            im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
+            approx <- im_p$approximate_compartmental(method = method, N = N[n])
+
+            # Append to existing results
+            if (cachem::is.key_missing(current_approxes)) {
+              current_approxes <- list()
+            }
+            current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N[n]))
+
+            # Store to cache
+            cache$set(key = glue::glue("{model_name}-{method}"), current_approxes)
           }
-          current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N[n]))
 
-          # Store to cache
-          cache$set(key = glue::glue("{model_name}-{method}"), current_approxes)
+          p()
         }
-      }
 
-      rm(im_p)
-    }
-  ) |>
-  tibble::tibble(
-    "model" = purrr::map_chr(combinations_single$model, ~ purrr::pluck(., 2)),
-    "method" = combinations_single$method,
-    "N" = _)
+        rm(im_p)
+      }
+    ))
+})
 ```
 
 ```{r check monotonicity in solution}
@@ -175,8 +183,6 @@ non_monotonicity_single <- combinations_single |>
 non_monotonicity_single |>
   dplyr::filter(!.data$monotone)
 ```
-
-
 
 ```{r detect single target convergence}
 convergence_single <- combinations_single |>
@@ -229,8 +235,6 @@ convergence_single <- combinations_single |>
     "N" = _)
 ```
 
-
-
 ```{r elbow curve single target}
 metrics_single <- combinations_single |>
   purrr::pmap(
@@ -270,7 +274,7 @@ metrics_single_gg <- metrics_single |>
   dplyr::mutate("execution_time" = as.numeric(.data$execution_time)) |>
   tidyr::separate_wider_delim("model", delim = "-", names = c("model", "variant"), too_few = "align_start") |>
   dplyr::mutate("variant" = dplyr::case_when(
-    is.na(variant) ~ "base",
+    variant == "0" ~ "base",
     variant == "c" ~ "non-zero asymptote",
     variant == "2t" ~ "twice the time scale"
   )) |>
@@ -280,7 +284,7 @@ metrics_single_gg <- metrics_single |>
 convergence_single_gg <- convergence_single |>
    tidyr::separate_wider_delim("model", delim = "-", names = c("model", "variant"), too_few = "align_start") |>
   dplyr::mutate("variant" = dplyr::case_when(
-    is.na(variant) ~ "base",
+    variant == "0" ~ "base",
     variant == "c" ~ "non-zero asymptote",
     variant == "2t" ~ "twice the time scale"
   ))
@@ -294,7 +298,6 @@ ggplot2::ggplot(metrics_single_gg, ggplot2::aes(x = N, y = value, color = method
   ggplot2::labs(x = "N", y = "Metric") +
   ggplot2::theme_bw()
 ```
-
 
 ```{r}
 metrics_single_gg |>
@@ -324,6 +327,13 @@ metrics_single_gg |>
 ```
 
 
+```{r manually check fits}
+im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
+im$set_waning_model(f[["linear"]], time_scale = t_h[[1]], target = "hospitalisation")
+plot(im, method = "free_gamma", N = 3)
+
+im$approximate_compartmental(method = "free_gamma", N = 3)
+```
 
 
 ```{r run all double targets}
@@ -337,19 +347,29 @@ combinations_double <- tidyr::expand_grid(
 )
 
 #future::plan("sequential")
-future::plan("multisession")
+future::plan("multisession")#, workers = 4)
 
 # Run the approximations and note the convergence point
-combinations_double |>
-  furrr::future_pwalk(
-  #purrr::pwalk(
-    .progress = interactive(),
-    .options = furrr::furrr_options("seed" = TRUE),
-    .f = \(model1_zip, model2_zip, method) {
+combinations <- combinations_double |>
+  purrr::pmap(~ zip(list(..1), list(..2), ..3))
 
-      N = seq(from = 2, to = 5, by = 1)
+N_max <- 10
+
+progressr::with_progress({
+  p <- progressr::progressor(steps = length(combinations) * N_max)
+
+  invisible(future.apply::future_lapply(
+    combinations,
+    future.seed = TRUE,
+    FUN = \(combination) {
+
+      N = seq(from = 2, to = N_max, by = 1)
 
       # Unpack model
+      model1_zip <- combination[[1]][[1]]
+      model2_zip <- combination[[1]][[2]]
+      method <- combination[[1]][[3]]
+
       model1 <- model1_zip[[1]]
       model1_name <- model1_zip[[2]]
       time_scale1 <- model1_zip[[3]]
@@ -365,6 +385,7 @@ combinations_double |>
 
       # Generate approximations and store them and the convergence point
       for (n in seq_along(N)) {
+        set.seed(n) # Not sure where a random seed is used, but future_lapply detects a call to rng
 
         # Get the results up until now
         current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}"))
@@ -384,15 +405,17 @@ combinations_double |>
           current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N[n]))
 
           # Store to cache
-          cache$set(key = glue::glue("{model_name}-{method}"), current_approxes)
+          cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}"), current_approxes)
         }
+
+        p()
       }
 
       rm(im_p)
     }
-  )
+  ))
+})
 ```
-
 
 ```{r detect double target convergence}
 convergence_double <- combinations_double |>
@@ -448,7 +471,6 @@ convergence_double <- combinations_double |>
     "N" = _)
 ```
 
-
 ```{r elbow curve double target}
 metrics_double <- combinations_double |>
   purrr::pmap(
@@ -496,19 +518,17 @@ metrics_double <- combinations_double |>
 # Prepare for plotting
 metrics_double_gg <- metrics_double |>
   dplyr::inner_join(
-    "model" = c(
-      "exp_sum/exp_sum",
-      "sigmoidal/sigmoidal",
-      "exp_sum/sigmoidal",
-      "exp_sum/exp_sum-2t",
-      "sigmoidal/sigmoidal-2t",
-      "exp_sum/exp_sum-c",
-      "sigmoidal/sigmoidal-c",
-      "exp_sum/sigmoidal-2t",
-      "exp_sum/sigmoidal-c",
+    data.frame(
+      "model" = c(
+        "exp_sum-0/exp_sum-0",
+        "sigmoidal-0/sigmoidal-0",
+        "exp_sum-0/sigmoidal-0",
+        "sigmoidal-0/sigmoidal-2t",
+        "exp_sum-0/exp_sum-2t"
+      )
     ),
     by = "model"
-  )
+  ) |>
   dplyr::mutate("execution_time" = as.numeric(.data$execution_time)) |>
   dplyr::filter(!is.na(value)) |>
   tidyr::pivot_longer(!c("model", "method", "N"), names_to = "metric")
