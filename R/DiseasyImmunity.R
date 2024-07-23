@@ -700,7 +700,3 @@ DiseasyImmunity <- R6::R6Class(                                                 
   )
 )
 
-
-#' @inherit base::plot
-#' @export
-plot.DiseasyImmunity <- function(obj, ...) obj$plot(...)
