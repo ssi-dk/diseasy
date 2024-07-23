@@ -96,7 +96,7 @@ plot(im)
 ```
 
 ## Setting the waning model programmatically
-`DiseasyImmunity` also provides the `$set_waning_model()` function which allows greater flixibility when configuring
+`DiseasyImmunity` also provides the `$set_waning_model()` function which allows greater flexibility when configuring
 various waning models within the module.
 
 `$set_waning_model()` provides a single entry-point for setting the predefined waning models or a custom waning
