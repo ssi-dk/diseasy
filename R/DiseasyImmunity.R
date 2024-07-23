@@ -533,16 +533,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
         purrr::walk2(gamma, seq_along(private$.model), ~ {
           lines(t, private$get_approximation(.x, delta, N)(t), col = pcolors[1 + .y], lty = "dashed")
         })
-
-        if (N > 1) {
-          approximation <-self$approximate_compartmental(method, N - 1)
-          gamma <- approximation$gamma
-          delta <- approximation$delta
-
-          purrr::walk2(gamma, seq_along(private$.model), ~ {
-            lines(t, private$get_approximation(.x, delta, N - 1)(t), col = "black", lty = "dashed")
-          })
-        }
       }
 
 
