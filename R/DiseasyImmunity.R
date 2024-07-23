@@ -249,7 +249,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   If the function has a time scale, it should be included in the function as `time_scale`.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
-    #' @param name
+    #' @param name (`character(1)`)\cr
     #'   Set the name of the custom waning function.
     #' @return
     #'   Returns the model (invisibly).
@@ -326,7 +326,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Number of compartments to be used in the model.
     #' @return
     #'   Returns the rates and objective value (invisibly).
-    approximate_compartmental = function(method = c("free_gamma", "free_delta", "all_free"), N = NULL) {
+    approximate_compartmental = function(method = c("free_gamma", "free_delta", "all_free"), N = NULL) {                # nolint: object_name_linter
+
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
@@ -360,7 +361,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - 1)]) # Last parameter is delta
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
-              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n´th model
+              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n'th model
               f_inf # And inject the fixed end-point
             )
           }
@@ -378,10 +379,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # The last N-1 parameters are the delta rates
           n_free_parameters <- (N - 1) * n_models + N - 1
 
-          par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - (N - 1))]) # Last N-1 parameters are the delta rate
+          par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - (N - 1))]) # Last N-1 parameters are the deltas
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
-              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n´th model
+              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n'th model
               f_inf # And inject the fixed end-point
             )
           }
@@ -446,7 +447,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               purrr::map(~ .x / c(1, .x[seq_len(N - 2)])) |> # Account for the cumprod
               purrr::reduce(c)
 
-            p_gamma_0 = pmin(
+            p_gamma_0 <- pmin(
               log(gamma_0) - log(1 - gamma_0), # Inverse mapping of p_01
               1e15 # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead
             )
@@ -497,15 +498,15 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #    Plot the waning functions for the current instance.
     #'   If desired to additionally plot the approximations, supply the `method` and number of compartments (`N`)
     #' @param t_max (`numeric`)\cr
-    #'  The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.
+    #'   The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the
+    #'   accumulated time scales.
     #' @param method (`str` or `numeric`)\cr
     #'   Specifies the method to be used from the available methods.
     #'   It can be provided as a string with the method name "free_gamma", "free_delta" or "all_free".
     #'   or as a numeric value representing the method index 1, 2, or 3.
     #' @param N (`numeric`)\cr
     #'   Number of compartments to be used in the model.
-    #'   By default, it is set to 5
-    plot = function(t_max = NULL, method = c("free_gamma", "free_delta", "all_free"), N = NULL) {
+    plot = function(t_max = NULL, method = c("free_gamma", "free_delta", "all_free"), N = NULL) {                       # nolint: object_name_linter
       checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
 
       # Set t_max if nothing is given
@@ -515,7 +516,15 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Create an empty plot
       par(mar = c(5, 4, 4, 12) + 0.1) # Adds extra space on the right
-      plot(t, type = "n", xlab = "Time", ylab = "\\gamma", main = "Waning functions", ylim = c(0, 1), xlim = c(0, t_max))
+      plot(
+        t,
+        type = "n",
+        xlab = "Time",
+        ylab = "\\gamma",
+        main = "Waning functions",
+        ylim = c(0, 1),
+        xlim = c(0, t_max)
+      )
 
 
       # Create palette with different colours to use in plot
@@ -530,7 +539,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Only plots the approximations if N was given as input
       if (!is.null(N)) {
-        approximation <-self$approximate_compartmental(method, N)
+        approximation <- self$approximate_compartmental(method, N)
         gamma <- approximation$gamma
         delta <- approximation$delta
 
@@ -544,8 +553,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
       if (is.null(N)) {
 
         # Only legend for models
-        legend("topright", legend = names(private$.model), col = purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
-               lty = 1, inset = c(0, 0), bty = "n", xpd = TRUE, cex = 0.8)
+        legend(
+          "topright",
+          legend = names(private$.model),
+          col = purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
+          lty = 1,
+          inset = c(0, 0),
+          bty = "n",
+          xpd = TRUE,
+          cex = 0.8
+        )
 
       } else {
         # Get legend labels for models and approximation
@@ -566,7 +583,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
           inset = c(0, 0),
           bty = "n",
           xpd = TRUE,
-          cex = 0.8)
+          cex = 0.8
+        )
       }
 
     }
@@ -613,7 +631,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       return(purrr::map_dbl(private$.model, ~ rlang::fn_env(.x)$time_scale))
     },
 
-    get_approximation = function(gamma, delta, N) {
+    get_approximation = function(gamma, delta, N) {                                                                     # nolint: object_name_linter
       return(\(t) do.call(cbind, private$occupancy_probability(delta, N, t)) %*% gamma)
     },
 
@@ -630,8 +648,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     # @return
     #   A `list()` with the k'th element containing the probability of occupying the k'th compartment over time.
     # @examples
-    #  occupancy_probability(0.1, 3, seq(0, 50))
-    #  occupancy_probability(c(0.1, 0.2), 3, seq(0, 50))
+    #  occupancy_probability(0.1, 3, seq(0, 50))                                                                        # nolint: commented_code_linter
+    #  occupancy_probability(c(0.1, 0.2), 3, seq(0, 50))                                                                # nolint: commented_code_linter
     occupancy_probability = function(rate, K, t) {                                                                      # nolint: object_name_linter
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
