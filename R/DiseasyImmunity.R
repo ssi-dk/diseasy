@@ -426,6 +426,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             stats::setNames(names(private$.model))
           delta <- numeric(0)
           value <- obj_function(numeric(0))
+          res <- list()
 
         } else {
           # We provide a starting guess for the rates
@@ -454,7 +455,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_0 <- c(p_gamma_0, p_delta_0)
 
           # Run the optimiser to determine best rates
-          res <- stats::optim(par_0, obj_function, control = list(maxit = 10 * n_free_parameters), method = "BFGS")
+          res <- stats::optim(par_0, obj_function, control = list(maxit = 100 * n_free_parameters), method = "BFGS")
           value <- res$value
 
           # Map optimised parameters to rates
@@ -471,13 +472,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Store in cache
         private$cache(
           hash,
-          list(
-            "gamma" = gamma,
-            "delta" = delta,
-            "value" = value,
-            "method" = method,
-            "N" = N,
-            "execution_time" = toc - tic
+          modifyList(
+            res,
+            list(
+              "gamma" = gamma,
+              "delta" = delta,
+              "value" = value,
+              "method" = method,
+              "N" = N,
+              "execution_time" = toc - tic
+            )
           )
         )
       }
