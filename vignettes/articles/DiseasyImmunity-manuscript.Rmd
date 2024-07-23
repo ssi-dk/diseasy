@@ -546,3 +546,23 @@ ggplot2::ggplot(metrics_double_gg, ggplot2::aes(x = N, y = value, color = method
   ggplot2::labs(x = "N", y = "Metric") +
   ggplot2::theme_bw()
 ```
+
+
+
+```{r}
+metrics_double_gg <- metrics_double |>
+  dplyr::filter(N == 10) |>
+  tidyr::separate_wider_delim("model", delim = "/", names = c("target_1", "target_2")) |>
+  dplyr::mutate(
+    "target_1" = factor(.data$target_1, levels = model_names),
+    "target_2" = factor(.data$target_2, levels = model_names)
+  )
+
+metrics_double_gg |>
+  ggplot2::ggplot(ggplot2::aes(x = target_1, y = target_2, fill = value)) +
+  ggplot2::geom_tile() +
+  ggplot2::facet_wrap(~ method) +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5))
+
+grid::grid.text("f", x = grid::unit(0.91, "npc"), y = grid::unit(0.80, "npc"))
+```
