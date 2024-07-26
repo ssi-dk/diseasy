@@ -26,7 +26,7 @@ im <- DiseasyImmunity$new()
 
 # We define our list of "raw" test functions
 f <- list(
-  #"exponential" = \(t) exp(-t / time_scale),
+  "exponential" = \(t) exp(-t / time_scale),
   "sigmoidal" = \(t) exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
   #"heaviside" = \(t) as.numeric(t < time_scale),
   "exp_sum" = \(t) (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
@@ -37,7 +37,7 @@ t_f <- rep(20, length(f))
 
 # Construct a list with a non-zero asymptote
 g <- list(
-  #"exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
+  "exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
   "sigmoidal" = \(t) 0.2 + 0.8 * exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
   #"heaviside" = \(t) 0.2 + 0.8 * as.numeric(t < time_scale),
   "exp_sum" = \(t) (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
@@ -82,8 +82,8 @@ combinations_single <- tidyr::expand_grid(
   method = c("free_gamma", "free_delta", "all_free")
 )
 
-future::plan("sequential")
-#future::plan("multisession")
+#future::plan("sequential")
+future::plan("multisession")
 
 # Run the approximations and note the convergence point
 combinations <- combinations_single |>
@@ -350,7 +350,7 @@ combinations_double <- tidyr::expand_grid(
 )
 
 #future::plan("sequential")
-future::plan("multisession")#, workers = 4)
+future::plan("multisession", workers = 4)
 
 # Run the approximations and note the convergence point
 combinations <- combinations_double |>
@@ -366,7 +366,7 @@ progressr::with_progress({
     future.seed = TRUE,
     FUN = \(combination) {
 
-      N <- seq(from = 2, to = N_max, by = 1)                                                                             # nolint: object_name_linter
+      N <- seq(from = 2, to = N_max, by = 1)                                                                            # nolint: object_name_linter
 
       # Unpack model
       model1_zip <- combination[[1]][[1]]
