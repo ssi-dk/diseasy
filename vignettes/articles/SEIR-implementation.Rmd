@@ -60,7 +60,7 @@ Finally, the susceptible states are placed at the end of the state vector.
 
 $$
 \overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Age group 1, Variant 1}}\\
-\underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Age group 2, Varaint 1}}
+\underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Age group 2, Variant 1}}
 \; \cdots \\
 \underbrace{\begin{matrix} E_{A,V}^1 \, \cdots \, E_{A,V}^K \;\;\; I_{A,V}^1 \, \cdots \, I_{A,V}^L \;\;\; R_{A,V}^1 \, \cdots \, R_{A,V}^M \end{matrix}}_{\text{Age group A, Variant V}}
 \;\; S_1 \, \cdots \, S_A]
@@ -155,7 +155,7 @@ Each element, $e$, in the state vector, $\psi$ has a corresponding age group whi
 Since only $R$ and $S$ compartments are susceptible to infection, we need only to consider the $RS$ states to compute
 the new infections in the model.
 
-We are therfore interested in the reduced state vector $\overline{\psi}_{RS}$ whose elements $e^*$ are the $R$ and $S$ elements
+We are therefore interested in the reduced state vector $\overline{\psi}_{RS}$ whose elements $e^*$ are the $R$ and $S$ elements
 of the full state vector $\overline{\psi}$. That is, $\overline{\psi}_{RS} = \{\psi_{e^*} \mid e^* \in \{R, S\}\}$.
 
 Therefore, we construct the matrix $\overline{\overline{U}}$ which has a row for all states in $R$ or $S$ compartments,
@@ -219,7 +219,7 @@ $$
 \end{bmatrix}
 $$
 are $A \cdot M \times 1$ matrices with repeated sub-matrices.
-That is, $1 - \chi_{a\leftarrow b} (1 - \overline{\gamma})$ is a vector of length $M$ which is reapeated
+That is, $1 - \chi_{a\leftarrow b} (1 - \overline{\gamma})$ is a vector of length $M$ which is repeated
 for each age group, to form the $A \cdot M \times 1$ matrix.
 
 In total, the matrix accounts for the cross-variant $\chi_{a\leftarrow b}$ reductions of immunity ($1-\overline{\gamma}$).
