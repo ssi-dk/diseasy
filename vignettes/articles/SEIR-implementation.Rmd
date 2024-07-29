@@ -13,38 +13,63 @@ knitr::opts_chunk$set(
 library(diseasy)
 ```
 
+# Introduction
+
+This vignette is a companion to the implementation of the SEIR ode model `?DiseasyModelOdeSEIR`.
+Here, we outline the mathematical implementation of the model and connect it to the code.
+
 # Indexes and accents
-$K,k$ Exposed states
+To begin, here we define a set meaning to the different indices and accents used in the vignette:
 
-$L,l$ Infected states
+| Symbol  | Description                |
+|---------|----------------------------|
+| $K,k$   | Exposed states             |
+| $L,l$   | Infected states            |
+| $M,m$   | Recovered states           |
+| $A,i,j$ | Age groups                 |
+| $V,a,b$ | Variants                   |
+| $^\sim$ | Non-normalised quantity    |
 
-$M,m$ Recovered states
+Where uppercase letters denote the number of such elements and lowercase letters denote a specific element.
 
-$A,i,j$ Age groups
+# The model structure
 
-$V,a,b$ Variants
+The SEIR model we are building is a compartmental model with (near) arbitrary number of exposed, infected, and recovered
+compartments. The model also supports multiple age groups and multiple variants.
 
-$\sim$ Non-normalised quantity
+We divide the model into different "tracks" with each track implementing the disease progression for a group of individuals.
+That is, if we have $A$ age groups and $V$ variants, we have $A \cdot V$ tracks which each start with the first exposed state
+(or the first infected state if no exposed states are included in the model). As the infection progresses within each individual,
+they are moved down the track through infection and eventually into recovery.
+
+Schematically, the model can be represented as in the figure below:
+
+```{r echo = FALSE, fig.align = "center", fig.cap = "SEIR Model overview for a two variant model", out.width = "120%"}
+knitr::include_graphics(devtools::package_file("vignettes/articles/SEIR-implementation-model.png"))
+```
+
+This figure shows the disease progression for two variant tracks for a single age group.
+The arrows in the figure indicates the infections in the model within these tracks[^1].
 
 # State vector
+
 Each "track" of infection is placed in sequence in the state vector, $\overline{\psi}$, and increments first in age groups
 then in variants.
 
 Finally, the susceptible states are placed at the end of the state vector.
 
+$$
+\overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Age group 1, Variant 1}}\\
+\underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Age group 2, Varaint 1}}
+\; \cdots \\
+\underbrace{\begin{matrix} E_{A,V}^1 \, \cdots \, E_{A,V}^K \;\;\; I_{A,V}^1 \, \cdots \, I_{A,V}^L \;\;\; R_{A,V}^1 \, \cdots \, R_{A,V}^M \end{matrix}}_{\text{Age group A, Variant V}}
+\;\; S_1 \, \cdots \, S_A]
+$$
+
 NOTE: State vector uses normalised populations.
 
-$$
-\overline{\psi} = [\underbrace{\begin{matrix} E^1\, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group 1, Variant 1}}\;\;
-\underbrace{\begin{matrix} E^1 \, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group 2, Varaint 1}}
-\; \cdots \\
-\underbrace{\begin{matrix} E^1 \, \cdots \, E^K \;\; I^1 \, \cdots \, I^L \;\; R^1 \, \cdots \, R^M \end{matrix}}_{\text{Age group A, Variant V}}
-\;S_1 \, \cdots \, S_A
-]
-$$
-
 # Contact matrix
-The contact matrix $\tilde{\overline{\overline{C}}}$ is $A \times A$ and indices $\tilde{c}_{ij}$ can be understood as contacts
+The contact matrix, $\tilde{\overline{\overline{C}}}$, is a $A \times A$ matrix. The elements $\tilde{c}_{ij}$ can denotes the contacts
 from age group $j$ to age group $i$.
 (It may be helpful to memorise as $\tilde{c}_{i\leftarrow j}$)
 
@@ -64,8 +89,10 @@ $$
 \dot{I} = \underbrace{N\tilde{\beta}}_{\beta}\, I S - r_I I
 $$
 
-# `infected`
-In the `rhs` function, we have the `infected` variable contains the $\overline{\overline{I}}$ matrix which is a $A \times V$ matrix with elements
+# The `infected` matrix
+In the computation of the right-hand side of the ODE, we have a helper matrix $\overline{\overline{I}}$ stored as `infected` in the code.
+
+This $\overline{\overline{I}}$ matrix is a $A \times V$ matrix with elements
 
 $$
 \overline{\overline{I}} = \begin{bmatrix}
@@ -75,10 +102,13 @@ $$
 \end{bmatrix}
 $$
 
+That is, the element $i_{a, v}$ contains the sum of all infected compartments for the track associated with age group $a$ and variant $v$.
 
-# `infected_contact_rate`
 
-In the `rhs` function, we have the `infected_contact_rate` variable which is $\overline{\overline{C}}\; \overline{\overline{I}}$
+# The `infected_contact_rate` matrix
+
+During the right-hand side computation, we also have a helper matrix `infected_contact_rate` which is $\overline{\overline{C}}\; \overline{\overline{I}}$
+
 $$
 \overline{\overline{CI}} = \overline{\overline{C}}\; \overline{\overline{I}} = \begin{bmatrix}
 \sum_i c_{1\leftarrow i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{1\leftarrow i} \sum_l I^l_{i,V} \\
@@ -90,8 +120,9 @@ $$
 That is, the element $(\overline{\overline{C}}\; \overline{\overline{I}})_{i, a}$ contains the rate of contact for age
 group $i$ with persons infected with variant $a$ across all age groups.
 
-# `infection_rate`
-In the `rhs` function, we have the `infection_rate` variable which is the `infected_contact_rate` adjusted
+# The `infection_rate` matrix
+
+Continuing the computation of the right-hand side, we have the `infection_rate` matrix ($\overline{\overline{T}}$) which is the `infected_contact_rate` ($\overline{\overline{CI}}$) adjusted
 for additional risk factors.
 
 - $\sigma(t)$: Multiplicative effect of season
@@ -114,17 +145,25 @@ $$
 $$
 NOTE: In the code, `private$indexed_variant_infection_risk` is $\overline{\overline{\mathcal{E}}}$ in vector form.
 
-# `infection_matrix`
-For the final computation of infections in `rhs`, we construct the matrix `infection_matrix` ($\overline{\overline{f}}$).
-For this purpose, we first expand the `infection_rate` matrix to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the
+# The `infection_matrix`
+For the final computation of infections of the right-hand side, we construct the matrix `infection_matrix` ($\overline{\overline{f}}$).
+For this purpose, we first expand the `infection_rate` matrix ($\overline{\overline{T}}$) to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the
 rows of the `infection_rate` matrix.
 
-Each element in the state vector has a corresponding age group. If we write this age group of element $e$ as $i|e$, then,
-for all states in $R$ or $S$ compartments, we construct the matrix:
+Each element, $e$, in the state vector, $\psi$ has a corresponding age group which we can write as $i|e$.
+
+Since only $R$ and $S$ compartments are susceptible to infection, we need only to consider the $RS$ states to compute
+the new infections in the model.
+
+We are therfore interested in the reduced state vector $\overline{\psi}_{RS}$ whose elements $e^*$ are the $R$ and $S$ elements
+of the full state vector $\overline{\psi}$. That is, $\overline{\psi}_{RS} = \{\psi_{e^*} \mid e^* \in \{R, S\}\}$.
+
+Therefore, we construct the matrix $\overline{\overline{U}}$ which has a row for all states in $R$ or $S$ compartments,
+and column for each variant $v$.
 $$
 \overline{\overline{U}} = \begin{bmatrix}
-  t_{i|e=1, 1} & \cdots & t_{i|e=1, V} \\
-  t_{i|e=2, 1} & \cdots & t_{i|e=2, V} \\
+  t_{i|e^*=1, 1} & \cdots & t_{i|e^*=1, V} \\
+  t_{i|e^*=2, 1} & \cdots & t_{i|e^*=2, V} \\
   \vdots & \vdots &\vdots
 \end{bmatrix}
 $$
@@ -174,12 +213,14 @@ Where $\overline{1}_A$ is a ones vector of length $A$.
 In $\overline{\overline{\rho}}$, the matrices of the form:
 $$
 \begin{bmatrix}
-  1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma}) \\
+  1 - \chi_{a\leftarrow b} (1 - \overline{\gamma}) \\
   \vdots \\
-  1 - \chi_{1\leftarrow 1} (1 - \overline{\gamma})
+  1 - \chi_{a\leftarrow b} (1 - \overline{\gamma})
 \end{bmatrix}
 $$
 are $A \cdot M \times 1$ matrices with repeated sub-matrices.
+That is, $1 - \chi_{a\leftarrow b} (1 - \overline{\gamma})$ is a vector of length $M$ which is reapeated
+for each age group, to form the $A \cdot M \times 1$ matrix.
 
 In total, the matrix accounts for the cross-variant $\chi_{a\leftarrow b}$ reductions of immunity ($1-\overline{\gamma}$).
 
@@ -232,7 +273,7 @@ $$
   0 & 0 & 0 & 0 &  \cdots & r_e & -r_i
 \end{bmatrix}
 $$
-Notice that the off-diagonal has zero-elements where the (reduced) state vector changes age groups ($I^k_L$ -> $E_1^{k+1}$).
+Notice that the off-diagonal has zero-elements where the (reduced) state vector changes age groups ($I_k^L \rightarrow E_{k+1}^1$).
 
 The form of the transmission matrix is more difficult to write up.
 
@@ -240,6 +281,7 @@ We lump risk modifying factors such as the effect of season $\sigma(t)$ and over
 factor $\beta$.
 
 Some examples:
+
 ### Double age group, single variant
 
 As long as we have only a single variant, cross immunity can be ignored and we can lump the effect of the balance
@@ -290,7 +332,7 @@ Where the change between variants is demarcated visually by the vertical and hor
 We now have the additional factor $\hat{\rho}$ which explicitly accounts for the balance of $S$ and $R$ states and
 the cross-immunity between the variants:
 $$
-\hat{\rho}_{a} = S + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R_m^b
+\hat{\rho}_{a} = S + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R^m_b
 $$
 That is, we have the unmodified contribution from the $S$ states, and the contribution from all $R$ states while
 accounting for waning of immunity ($\gamma_m$) and cross-immunity ($\chi_{a \leftarrow b}$).
@@ -317,7 +359,7 @@ $$
 When including age groups, the $\hat{\rho}$ factor becomes a $A \times V$ matrix of elements
 
 $$
-\hat{\rho}_{i, a} = S_i + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R_m^{i,b}
+\hat{\rho}_{i, a} = S_i + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R^m_{i,b}
 $$
 
 For $K = 1$ and $L = 1$, the transmission matrix is:
@@ -335,3 +377,6 @@ $$
 \end{array}
 \right]
 $$
+
+[^1]: Other age groups are implicitly included in the shown model, but the infections between age groups
+are not schematically shown.
