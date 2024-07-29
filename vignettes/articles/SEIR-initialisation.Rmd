@@ -48,16 +48,16 @@ That is, we assume $I^* = r_i I_1$.
 If we take the equation for $I_1$ and multiply by $r_i$ we obtain.
 
 $$
-r_i\frac{dI_1}{dt} = r_i r_e E_K - r_i^2 I_1 \Rightarrow \\
-\frac{dI^*}{dt} = r_i r_e E_K - r_i I^*
+r_i\frac{d I_1}{d t} = r_i r_e E_K - r_i^2 I_1 \Rightarrow \\
+\frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
 $$
 If we take the second derivative, we find:
 $$
-\frac{d^2I^*}{dt^2} = r_i r_e \frac{dE_K}{dt} - r_i \frac{dI_l}{dt}
+\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t} - r_i \frac{d I_l}{d t}
 $$
-From here, we can inject $\frac{dE_K}{dt}$ from the SEIR equations which in turn relates to $E_{k-1}$.
+From here, we can inject $\frac{d E_K}{d t}$ from the SEIR equations which in turn relates to $E_{k-1}$.
 $$
-\frac{d^2I^*}{dt^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{dI_l}{dt}
+\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I_l}{d t}
 $$
 
 This process can be iterated through the derivatives until all $E_K$ states are expressed in terms of $I^*(t)$ and
@@ -78,10 +78,10 @@ r_e^K E_1 \\
 \overline{\overline{M_K}} \cdot
 \begin{bmatrix}
 I^* \\
-\frac{dI^*}{dt} \\
+\frac{d I^*}{d t} \\
 \dots \\
-\frac{d^KI^*}{dt^K} \\
-\frac{d^{K+1}I^*}{dt^{K+1}}
+\frac{d^K I^*}{d t^K} \\
+\frac{d^{K+1}I^*}{d t^{K+1}}
 \end{bmatrix}
 $$
 
@@ -90,16 +90,16 @@ The matrix $\overline{\overline{M_K}}$ can be computed via a simple recursion. T
 derivative of $I^*(t)$:
 
 $$
-\frac{dI^*}{dt} = r_i r_e E_K - r_i I^*
+\frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
 $$
 In the above formulation, this corresponds to the matrix
 $\overline{\overline{M_1}} = \begin{bmatrix}r_i & 1\end{bmatrix}$.
 
 When taking the second derivative, we obtain:
 
-$$\frac{d^2I^*}{dt^2} = r_ir_e \frac{dE_K}{dt}- r_i \frac{dI^*}{dt} \Rightarrow \\
-\frac{d^2I^*}{dt^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{dI^*}{dt} \Rightarrow \\
-\frac{d^2I^*}{dt^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{dI^*}{dt} + I^*\right)- r_i \frac{dI^*}{dt}$$
+$$\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t}- r_i \frac{d I^*}{d t} \Rightarrow \\
+\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I^*}{d t} \Rightarrow \\
+\frac{d^2I^*}{d t^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{d I^*}{d t} + I^*\right)- r_i \frac{d I^*}{d t}$$
 
 Which, in the matrix formulation corresponds to the sum of $r_e \overline{m_1}$ and the shifted $\overline{m_1}$,
 where $\overline{m_1}$ is the row vector of $\overline{\overline{M_1}}$.
@@ -140,7 +140,7 @@ signal at $I^*(t - (l - 1) / r_i)$.
 ## Theory: Prevalence signal
 If we instead have a measure of the true number of infected, $I^\dag = \sum_l I_l$, then the situation is more
 complicated since the derivative becomes:
-$$\frac{dI^\dag}{dt} = r_e E_K - r_i I_l$$
+$$\frac{d I^\dag}{d t} = r_e E_K - r_i I_l$$
 
 If use the same method as before, we now have to consider the derivatives of both $I^\dag$ and $I_l$ and we cannot
 isolate easily.
@@ -161,8 +161,8 @@ I_2
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^\dag}{dt} \\
-\frac{d^2I^\dag}{dt^2}
+\frac{d I^\dag}{d t} \\
+\frac{d^2I^\dag}{d t^2}
 \end{bmatrix}
 $$
 Which, with two additional constants, $I^\dag = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^\dag$, can be solved.
@@ -184,9 +184,9 @@ I_3
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^\dag}{dt} \\
-\frac{d^2I^\dag}{dt^2} \\
-\frac{d^3I^\dag}{dt^3}
+\frac{d I^\dag}{d t} \\
+\frac{d^2I^\dag}{d t^2} \\
+\frac{d^3I^\dag}{d t^3}
 \end{bmatrix}
 $$
 Which now requires three additional constraints.
@@ -207,8 +207,8 @@ I
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^\dag}{dt} \\
-\frac{d^2I^\dag}{dt^2}
+\frac{d I^\dag}{d t} \\
+\frac{d^2I^\dag}{d t^2}
 \end{bmatrix}
 $$
 With the additional constraint $I^\dag = I_1 + I_2$ the system should be solvable.
@@ -269,7 +269,7 @@ In this case, the true signal becomes, $I^\dag = \sum_l w_l I_l$, with $w_i \neq
 
 The derivative then becomes
 $$
-\frac{dI^\dag}{dt} = w_1 r_e E_K - w_1 r_i I_1 \\
+\frac{d I^\dag}{d t} = w_1 r_e E_K - w_1 r_i I_1 \\
 + w_2 r_i I_1 - w_2 r_i I_2 \\
 \dots \\
 + w_L r_i I_{L-1}  - w_L r_i I_L
@@ -287,8 +287,8 @@ I_2
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{dI^\dag}{dt} \\
-\frac{d^2I^\dag}{dt^2}
+\frac{d I^\dag}{d t} \\
+\frac{d^2I^\dag}{d t^2}
 \end{bmatrix}
 $$
 
@@ -554,7 +554,7 @@ max_order_derivative <- 2
 incidence_signal_derivatives <- purrr::map(
   incidence_polyfits, ~ stats::setNames(
     .x$coefficients[1:(max_order_derivative + 1)] * pmax(1, seq(max_order_derivative + 1) - 1),
-    c("I^*", "dI^*/dt", "d^2I^*/dt^2")
+    c("I^*", "d I^*/d t", "d^2I^*/d t^2")
   )
 )
 
@@ -1077,7 +1077,7 @@ max_order_derivative <- 2
 prevalence_signal_derivatives <- purrr::map(
   prevalence_polyfits, ~ stats::setNames(
     .x$coefficients[1:(max_order_derivative + 1)] * pmax(1, seq(max_order_derivative + 1) - 1),
-    c("I^*", "dI^*/dt", "d^2I^*/dt^2")
+    c("I^*", "d I^*/d t", "d^2I^*/d t^2")
   )
 )
 
@@ -1472,7 +1472,7 @@ I = \frac{I^*}{r_i} + \sum_{l=2}^L I_l
 $$
 
 $$
-\frac{dI_2}{dt} = I^* - r_i I_2
+\frac{d I_2}{d t} = I^* - r_i I_2
 $$
 If we start this system at a time where there are no new infections, we can initialize $I_l = 0$, and run the
 simulation forward to estimate the $S$ and $R$ populations at the point of interest.
