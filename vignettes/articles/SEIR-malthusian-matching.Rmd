@@ -1,5 +1,5 @@
 ---
-title: "SEIR: Accounting for structual differences in malthusian growth rates"
+title: "SEIR: Accounting for structural differences in malthusian growth rates"
 ---
 
 ```{r, include = FALSE}
