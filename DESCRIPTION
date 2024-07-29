@@ -42,6 +42,7 @@ Suggests:
     DBI,
     devtools,
     duckdb,
+    ggplot2,
     jsonlite,
     knitr,
     lintr,
