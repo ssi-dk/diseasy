@@ -6,10 +6,12 @@ CCW
 
 backends
 bitemporal
+bmatrix
 
 catalog
 cetera
 cdot
+cdots
 classname
 cloneable
 CMD
@@ -22,11 +24,13 @@ COVID
 covid
 colname
 
+dag
 db
 dbi
 DBIConnection
 DBIDriver
 dbplyr
+ddots
 dI
 diseasy
 diseasystore
@@ -67,7 +71,7 @@ github
 gov
 Gruson
 
-hypoexponential
+hline
 
 ij
 ILI
@@ -82,22 +86,25 @@ Kirkeby
 kt
 
 Lasse
-linelist
+leftarrow
 linter
 linters
 lintr
 Lyngse
 
+mathcal
 md
 medrxiv
 Mielke
 moduleowner
 Myrup
 
+neq
 nolint
 normalise
 nrow
 
+odot
 OO
 ORCID
 org
@@ -120,15 +127,18 @@ R's
 Randl
 Rasmus
 regex
+rightarrow
+Rightarrow
 rlang
 rm
 RM
 Rmd
+RS
 
 SCDB
 Schou
 SEIR
-simulist
+sim
 Skytte
 SSI
 Statens
@@ -145,6 +155,9 @@ TODOs
 ts
 
 u
+underbrace
+
+vdots
 
 walkthrough
 www
