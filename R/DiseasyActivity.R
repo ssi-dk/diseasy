@@ -602,7 +602,8 @@ DiseasyActivity <- R6::R6Class(                                                 
           #  m_{i+k,j} * N_{i+k} + m_{i+k,j+1} * N_{i+k} + ... + m_{i+1,j+k} * N_{i+k}) /
           # (N_i + N_{i+1} + ... N_{i+k})
           # Where k is the number of basis age_groups being aggregated
-          # (NB: the above is only if the new age groups are just aggregations of the old (i.e p has only 0 and 1 values)
+          # (NB: the above is only if the new age groups are just aggregations of the old
+          # (i.e p has only 0 and 1 values))
           # if there is a split, the fractional values in p enter in the above equations.
           scenario_contacts <- scenario_contacts |>
             lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_i) %*% t(p)) / N))
