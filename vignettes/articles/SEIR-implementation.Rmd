@@ -252,7 +252,7 @@ containing the dynamics of the $E$ and $I$ states under the assumption of static
 
 Formally, the generator matrix is the linearisation:
 $$
-\frac{d\overline{\psi}_{EI}}{dt} = \overline{\overline{G}} \overline{\psi}_{EI}
+\frac{d\overline{\psi}_{EI}}{d t} = \overline{\overline{G}} \overline{\psi}_{EI}
 $$
 
 The matrix can be decomposed into two contributions:
