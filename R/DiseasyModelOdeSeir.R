@@ -459,14 +459,24 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 1, determine the number of infected by age group and variant
 
       # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
-      infected <- vapply(private$i_state_indices, \(idx) sum(state_vector[idx]), FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+      infected <- vapply(
+        private$i_state_indices,
+        \(idx) sum(state_vector[idx]),
+        FUN.VALUE = numeric(1),
+        USE.NAMES = FALSE
+      )
 
 
       # microbenchmark::microbenchmark( # Microseconds
       #   purrr::map_dbl(i_state_indices, \(indices) sum(state_vector[indices])),
       #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices])),
       #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices]), USE.NAMES = FALSE),
-      #   vapply(private$i_state_indices, \(indices) sum(state_vector[indices]), FUN.VALUE = numeric(1), USE.NAMES = FALSE),
+      #   vapply(
+      #     private$i_state_indices,
+      #     \(indices) sum(state_vector[indices]),
+      #     FUN.VALUE = numeric(1),
+      #     USE.NAMES = FALSE
+      #   ),
       #   check = "equal", times = 1000L
       # )
 
@@ -555,15 +565,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrices)
       private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
 
-      # f1 <- \(t) dplyr::case_when(!!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}"))))
+      # f1 <- \(t) dplyr::case_when(
+      #   !!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}")))
+      # )
       #
       # f2h <- purrr::partial(switch, !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes))
       # f2 <- \(t) f2h(sum(activity_matrix_changes <= t))
       #
-      # f3h <- purrr::partial(switch, !!!stats::setNames(rev(seq_along(activity_matrix_changes)), rev(activity_matrix_changes)))
+      # f3h <- purrr::partial(
+      #   switch,
+      #   !!!stats::setNames(rev(seq_along(activity_matrix_changes)), rev(activity_matrix_changes))
+      # )
       # f3 <- \(t) f3h(sum(activity_matrix_changes > t) + 1)
       #
-      # f4 <- \(t) purrr::partial(switch, !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes))(sum(activity_matrix_changes <= t))
+      # f4 <- \(t) purrr::partial(
+      #   switch,
+      #   !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes)
+      # )(sum(activity_matrix_changes <= t))
       #
       # microbenchmark::microbenchmark( # Microseconds!
       #   f1(50),
