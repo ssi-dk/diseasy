@@ -86,7 +86,7 @@ The currently available model templates are:
 ls("package:diseasy", pattern = "DiseasyModel.+")
 ```
 
-See their associated vingettes for an introduction to the models.
+See their associated vignettes for an introduction to the models.
 
 ```{r cleanup, include = FALSE}
 rm(s)
