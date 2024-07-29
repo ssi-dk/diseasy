@@ -260,10 +260,24 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "training_period",
       expr = {
-        training_period_end <- self %.% observables %.% last_queryable_date -
-          lubridate::days(sum(purrr::discard(self %.% parameters %.% training_length), "training"))
+        # We work backwards from the `last_queryable_date` and remove the testing and validation periods
+        # to determine the end of the training period
+        training_length <- purrr::pluck(self %.% parameters %.% training_length, "training", .default = 0)
 
-        return(list("start" = self %.% observables %.% ds %.% min_start_date, "end" = training_period_end))
+        training_period_end <- purrr::pluck(self, "observables", "last_queryable_date", .default = as.Date(NA)) -
+          lubridate::days(sum(self %.% parameters %.% training_length) - training_length)
+
+        # The start of the training period is the maximum of the minimum start date of the observables (if set)
+        # and the training length
+        training_period_start <- dplyr::coalesce(
+          max(
+            purrr::pluck(self, "observables", "ds", "min_start_date", .default = as.Date(NA)),
+            training_period_end - lubridate::days(training_length)
+          ),
+          training_period_end - lubridate::days(training_length)
+        )
+
+        return(list("start" = training_period_start, "end" = training_period_end))
       }
     ),
 
@@ -274,7 +288,8 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "testing_period",
       expr = {
-        testing_end_date <- self %.% observables %.% last_queryable_date -
+        # With the training period set, we can determine the testing period
+        testing_end_date <- self %.% training_period %.% end +
           lubridate::days(purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0))
 
         return(list("start" = self %.% training_period %.% end, "end" = testing_end_date))
@@ -288,7 +303,13 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "validation_period",
       expr = {
-        return(list("start" = self %.% testing_period %.% end, "end" = self %.% observables %.% last_queryable_date))
+        # With the testing period set, we can determine the testing period
+        return(
+          list(
+            "start" = self %.% testing_period %.% end,
+            "end" = purrr::pluck(self, "observables", "last_queryable_date", .default = as.Date(NA))
+          )
+        )
       }
     )
   ),
