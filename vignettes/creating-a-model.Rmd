@@ -39,15 +39,15 @@ model with a seasonal forcing $\sigma(t)$ of the overall infection rate, denoted
 The SEIR model with seasonal forcing can be represented by the following set of differential equations:
 
 $$
-\frac{dS(t)}{dt} = - \beta \cdot \sigma(t) \cdot S(t) \cdot I(t)
+\frac{d S(t)}{d t} = - \beta \cdot \sigma(t) \cdot S(t) \cdot I(t)
 $$
 
 $$
-\frac{dI(t)}{dt} = \beta \cdot \sigma(t) \cdot S(t) \cdot I(t) - \gamma \cdot I(t)
+\frac{d I(t)}{d t} = \beta \cdot \sigma(t) \cdot S(t) \cdot I(t) - \gamma \cdot I(t)
 $$
 
 $$
-\frac{dR(t)}{dt} = \gamma \cdot I(t)
+\frac{d R(t)}{d t} = \gamma \cdot I(t)
 $$
 
 When developing this model traditionally, we would choose some functional form for the seasonal forcing $\sigma(t)$,
