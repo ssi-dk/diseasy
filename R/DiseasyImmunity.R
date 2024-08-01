@@ -330,10 +330,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
     #'   Should the approximation penalise rapid changes in immunity levels?
     #'   If a numeric value supplied, it is used as a penalty factor.
-    #' @param optim.method (`character(1)`)\cr
-    #'   The optimisation method to use. See `stats::optim` for available methods.
-    #' @param ...
-    #'   Additional arguments to be passed to `optim`.
     #' @return
     #'   Returns the rates and objective value (invisibly).
     approximate_compartmental = function(
@@ -492,7 +488,30 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_0 <- c(p_gamma_0, p_delta_0)
 
           # Run the optimiser to determine best rates
-          res <- stats::optim(par_0, \(p) sum(obj_function(p)), method = optim.method, ...)
+          mc <- tibble::tibble("method" = character(0), "maxit" = numeric(0), "maxfeval" = numeric(0)) |>
+            tibble::add_row("method" = "subplex", "maxit" = 10, "maxfeval" = 100) |>
+            tibble::add_row("method" = "BFGS", "maxit" = 100, "maxfeval" = 100)
+
+          # One-dimensional optimization by Nelder-Mead is unreliable
+          if (n_free_parameters == 1) {
+            mc <- mc |>
+              dplyr::filter(.data$method != "Nelder-Mead")
+          }
+
+          invisible(capture.output(
+            res <- optimx::polyopt(par_0, \(p) sum(obj_function(p)), methcontrol = mc, control = list(trace = 0))
+          ))
+          par <- tail(res, 1) |>
+            dplyr::select(tidyselect::starts_with("p")) |>
+            as.list() |>
+            unlist() |>
+            unname()
+
+          res <- tail(res, 1) |>
+            dplyr::select(!tidyselect::starts_with("p")) |>
+            as.list() |>
+            modifyList(list("par" = par))
+
 
           # Get the full metrics for the best solution
           metrics <- obj_function(res$par)
