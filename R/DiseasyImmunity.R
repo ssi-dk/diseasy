@@ -324,14 +324,33 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Specifies the method to be used from the available methods. See details.
     #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
+    #' @param monotonic (`logical(1)` or `numeric(1)`)\cr
+    #'   Should non-monotonic approximations be penalised?
+    #'   If a numeric value supplied, it is used as a penalty factor.
+    #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
+    #'   Should the approximation penalise rapid changes in immunity levels?
+    #'   If a numeric value supplied, it is used as a penalty factor.
+    #' @param optim.method (`character(1)`)\cr
+    #'   The optimisation method to use. See `stats::optim` for available methods.
+    #' @param ...
+    #'   Additional arguments to be passed to `optim`.
     #' @return
     #'   Returns the rates and objective value (invisibly).
-    approximate_compartmental = function(method = c("free_gamma", "free_delta", "all_free"), N = NULL) {                # nolint: object_name_linter
+    approximate_compartmental = function(
+      method = c("free_gamma", "free_delta", "all_free"),
+      N = NULL,                                                                                                        # nolint: object_name_linter
+      monotonic = TRUE,
+      individual_level = TRUE,
+      optim.method = "Nelder-Mead",
+      ...
+    ) {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
+      checkmate::assert_number(as.numeric(monotonic), add = coll)
+      checkmate::assert_number(as.numeric(individual_level), add = coll)
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
@@ -424,10 +443,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
               # Penalise non-monotone solutions
-              integral <- integral + 100 * sum(purrr::keep(diff(gamma), ~ . > 0))
+              integral <- integral + monotonic * sum(purrr::keep(diff(gamma), ~ . > 0))
 
               # Penalise spread of gamma
-              integral <- integral + sd(gamma)
+              integral <- integral + individual_level * sd(gamma)
 
               return(sqrt(integral))
             }
@@ -472,7 +491,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_0 <- c(p_gamma_0, p_delta_0)
 
           # Run the optimiser to determine best rates
-          res <- stats::optim(par_0, obj_function, control = list(maxit = 10 * n_free_parameters), method = "BFGS")
+          res <- stats::optim(par_0, obj_function, method = optim.method, ...)
           value <- res$value
 
           # Map optimised parameters to rates
