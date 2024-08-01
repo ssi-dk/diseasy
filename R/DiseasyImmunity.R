@@ -361,7 +361,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - 1)]) # Last parameter is delta
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
-              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n'th model
+              p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
               f_inf # And inject the fixed end-point
             )
           }
@@ -382,7 +382,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - (N - 1))]) # Last N-1 parameters are the deltas
           par_to_gamma <- \(par, model_id, f_inf) {
             c(
-              cumprod(p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)])), # The gamma parameters of the n'th model
+              p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
               f_inf # And inject the fixed end-point
             )
           }
@@ -412,6 +412,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 # We use the 1 / delta to create a wall in the optimisation
               }
             )
+
+
+            # Penalise non-monotone solutions
+            integral <- integral + 100 * sum(purrr::keep(diff(gamma), ~ . > 0))
 
             return(sqrt(integral))
           }) |>
@@ -444,7 +448,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
           } else {
             gamma_0 <- private$.model |>
               purrr::map(~ head(seq(from = 1, to = .x(Inf), length.out = N), N - 1)) |>
-              purrr::map(~ .x / c(1, .x[seq_len(N - 2)])) |> # Account for the cumprod
               purrr::reduce(c)
 
             p_gamma_0 <- pmin(
