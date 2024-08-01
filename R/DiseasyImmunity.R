@@ -413,7 +413,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # The error is then the sum of these deviations across models
         obj_function <- function(par) {
 
-          value <- purrr::map_dbl(seq_along(self$model), \(model_id) {
+          metrics <- purrr::map(seq_along(self$model), \(model_id) {
 
             delta <- par_to_delta(par)
             gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
@@ -422,7 +422,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             if (any(is.infinite(delta))) {
 
               # We define the objective function as infinite in this case
-              return(Inf)
+              return(list("value" = Inf, "penalty" = Inf))
 
             } else {
 
@@ -443,17 +443,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
               # Penalise non-monotone solutions
-              value <- value + monotonic * sum(purrr::keep(diff(gamma), ~ . > 0))
+              penalty <- monotonic * sum(purrr::keep(diff(gamma), ~ . > 0))
 
               # Penalise spread of gamma
-              value <- value + individual_level * sd(gamma)
+              penalty <- penalty + individual_level * sd(gamma)
 
-              return(value)
+              return(list("value" = value, "penalty" = penalty))
             }
           }) |>
-            sum()
+            purrr::list_transpose() |>
+            purrr::map_dbl(sum)
 
-          return(value)
+          return(metrics)
         }
 
 
@@ -491,8 +492,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_0 <- c(p_gamma_0, p_delta_0)
 
           # Run the optimiser to determine best rates
-          res <- stats::optim(par_0, obj_function, method = optim.method, ...)
-          value <- res$value
+          res <- stats::optim(par_0, \(p) sum(obj_function(p)), method = optim.method, ...)
+
+          # Get the full metrics for the best solution
+          metrics <- obj_function(res$par)
 
           # Map optimised parameters to rates
           gamma <- purrr::map2(private$.model, seq_along(private$.model), ~ {
@@ -513,9 +516,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
             list(
               "gamma" = gamma,
               "delta" = delta,
-              "value" = value,
               "method" = method,
               "N" = N,
+              "sqrt_integral" = purrr::pluck(metrics, "value"),
+              "penalty" = purrr::pluck(metrics, "penalty"),
               "execution_time" = toc - tic
             )
           )

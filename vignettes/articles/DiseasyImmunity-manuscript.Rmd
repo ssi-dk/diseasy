@@ -258,7 +258,12 @@ metrics_single <- combinations_single |>
         metrics <- current_approxes |>
           purrr::list_transpose() |>
           tibble::as_tibble() |>
-          dplyr::transmute("model" = !!model_name, "method" = !!method, .data$N, .data$value, .data$execution_time)
+          dplyr::transmute(
+            "model" = !!model_name,
+            "method" = !!method,
+            .data$N,
+            "value" = .data$sqrt_integral,
+            .data$execution_time)
       }
 
       return(metrics)
@@ -508,9 +513,8 @@ metrics_double <- combinations_double |>
             "model" = !!paste(model1_name, model2_name, sep = "/"),                                                     # nolint: paste_linter
             "method" = !!method,
             .data$N,
-            .data$value,
-            .data$execution_time
-          )
+            "value" = .data$sqrt_integral,
+            .data$execution_time)
       }
 
       return(metrics)
