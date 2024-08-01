@@ -426,6 +426,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Penalise non-monotone solutions
               integral <- integral + 100 * sum(purrr::keep(diff(gamma), ~ . > 0))
 
+              # Penalise spread of gamma
+              integral <- integral + sd(gamma)
+
               return(sqrt(integral))
             }
           }) |>
