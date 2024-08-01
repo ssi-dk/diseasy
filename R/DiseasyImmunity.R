@@ -395,29 +395,39 @@ DiseasyImmunity <- R6::R6Class(                                                 
         obj_function <- function(par) {
 
           value <- purrr::map_dbl(seq_along(self$model), \(model_id) {
+
             delta <- par_to_delta(par)
             gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
 
-            approx <- private$get_approximation(gamma, delta, N)
+            # Some optimisers yield non-finite delta
+            if (any(is.infinite(delta))) {
 
-            # Finds diff from approximation and target function
-            integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
+              # We define the objective function as infinite in this case
+              return(Inf)
 
-            # Numerically integrate the differences
-            integral <- tryCatch(
-              stats::integrate(integrand, lower = 0, upper = Inf)$value,
-              error = function(e) {
-                1 / min(delta) # If the any delta is too small, the integral looks divergent
-                # (since we too approach the asymptote too slowly).
-                # We use the 1 / delta to create a wall in the optimisation
-              }
-            )
+            } else {
+
+              approx <- private$get_approximation(gamma, delta, N)
+
+              # Finds diff from approximation and target function
+              integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
+
+              # Numerically integrate the differences
+              integral <- tryCatch(
+                stats::integrate(integrand, lower = 0, upper = Inf)$value,
+                error = function(e) {
+                  1 / min(delta) # If the any delta is too small, the integral looks divergent
+                  # (since we too approach the asymptote too slowly).
+                  # We use the 1 / delta to create a wall in the optimisation
+                }
+              )
 
 
-            # Penalise non-monotone solutions
-            integral <- integral + 100 * sum(purrr::keep(diff(gamma), ~ . > 0))
+              # Penalise non-monotone solutions
+              integral <- integral + 100 * sum(purrr::keep(diff(gamma), ~ . > 0))
 
-            return(sqrt(integral))
+              return(sqrt(integral))
+            }
           }) |>
             sum()
 
@@ -656,8 +666,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     occupancy_probability = function(rate, K, t) {                                                                      # nolint: object_name_linter
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
-        checkmate::check_number(rate, lower = 0),
-        checkmate::check_numeric(rate, lower = 0, any.missing = FALSE, len = K - 1),
+        checkmate::check_number(rate, lower = 0, finite = TRUE),
+        checkmate::check_numeric(rate, lower = 0, finite = TRUE, any.missing = FALSE, len = K - 1),
         add = coll
       )
       checkmate::assert_integerish(K, lower = 1, add = coll)
