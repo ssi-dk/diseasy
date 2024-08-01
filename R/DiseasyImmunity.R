@@ -469,7 +469,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # We provide a starting guess for the rates
           # Note that need to be "inverted" through the inverse of the mapping functions
           # so they are are in the same parameter space as the optimisation occurs
-          delta_0 <- N / purrr::pluck(private$get_time_scale(), stats::median, .default = 1)
+          delta_0 <- N / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
           if (method %in% c("free_delta", "all_free")) {
             delta_0 <- rep(delta_0, N - 1) # Distribute the delta rate to all compartments
           }
@@ -663,7 +663,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
-      return(purrr::map_dbl(private$.model, ~ rlang::fn_env(.x)$time_scale))
+      return(purrr::map(private$.model, ~ purrr::pluck(.x, rlang::fn_env, "time_scale")))
     },
 
     get_approximation = function(gamma, delta, N) {                                                                     # nolint: object_name_linter
