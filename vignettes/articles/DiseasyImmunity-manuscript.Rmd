@@ -10,7 +10,10 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(diseasy)
+#library(diseasy) # It turns out devtools::load_all() does not load the package
+# if it has been called with library first.
+# Lots of time wasted because of this.
+# Only swap to library once we are happy with the implementation of `DiseasyImmunity`
 ```
 
 
