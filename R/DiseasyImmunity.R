@@ -432,8 +432,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
               integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
 
               # Numerically integrate the differences
-              integral <- tryCatch(
-                stats::integrate(integrand, lower = 0, upper = Inf)$value,
+              value <- tryCatch(
+                sqrt(stats::integrate(integrand, lower = 0, upper = Inf)$value),
                 error = function(e) {
                   1 / min(delta) # If the any delta is too small, the integral looks divergent
                   # (since we too approach the asymptote too slowly).
@@ -443,12 +443,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
               # Penalise non-monotone solutions
-              integral <- integral + monotonic * sum(purrr::keep(diff(gamma), ~ . > 0))
+              value <- value + monotonic * sum(purrr::keep(diff(gamma), ~ . > 0))
 
               # Penalise spread of gamma
-              integral <- integral + individual_level * sd(gamma)
+              value <- value + individual_level * sd(gamma)
 
-              return(sqrt(integral))
+              return(value)
             }
           }) |>
             sum()
