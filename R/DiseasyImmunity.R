@@ -423,7 +423,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
 
             # Some optimisers yield non-finite delta
-            if (any(is.infinite(delta))) {
+            if (any(is.infinite(delta)) || any(is.na(delta)) || any(is.na(gamma))) {
 
               # We define the objective function as infinite in this case
               return(list("value" = Inf, "penalty" = Inf))
