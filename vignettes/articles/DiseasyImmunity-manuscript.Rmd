@@ -79,10 +79,13 @@ im$approximate_compartmental(method = "all_free", N = 3)
 ```{r run all single targets}
 cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/single"))
 
+N_max <- 5                                                                                                            # nolint: object_name_linter
+
 # Set the combinations to test
 combinations_single <- tidyr::expand_grid(
   model = zip(models, model_names, time_scales),
-  method = c("free_gamma", "free_delta", "all_free")
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = seq(from = 2, to = N_max, by = 1)
 )
 
 #future::plan("sequential")
@@ -90,13 +93,13 @@ future::plan("multisession")
 
 # Run the approximations and note the convergence point
 combinations <- combinations_single |>
-  purrr::pmap(~ zip(list(..1), ..2))
+  purrr::pmap(~ zip(list(..1), ..2, ..3))
 
 N_max <- 10                                                                                                             # nolint: object_name_linter
 
 
 progressr::with_progress({
-  p <- progressr::progressor(steps = length(combinations) * N_max)
+  p <- progressr::progressor(steps = length(combinations))
 
   invisible(future.apply::future_lapply(
     combinations,
@@ -108,39 +111,44 @@ progressr::with_progress({
       # Unpack model
       model_zip <- combination[[1]][[1]]
       method <- combination[[1]][[2]]
+      N <- combination[[1]][[3]]
+
+      # Not sure where a random seed is used, but future_lapply detects a call to rng
+      set.seed(N)
 
       model <- model_zip[[1]]
       model_name <- model_zip[[2]]
       time_scale <- model_zip[[3]]
 
       im_p <- DiseasyImmunity$new()
+      # Set the target
+      im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
 
       # Generate approximations and store them and the convergence point
-      for (n in seq_along(N)) {
-        set.seed(n) # Not sure where a random seed is used, but future_lapply detects a call to rng
 
-        # Get the results up until now
+      # Get the results up until now
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}"))
+
+      # Compute next values
+      if (!(N %in% names(current_approxes))) {
+
+        approx <- im_p$approximate_compartmental(method = method, N = N, monotonic = monotonic, individual_level = individual_level, optim.method = c(rep("subplex", 2), "CG"), maxit = c(rep(100, 2), 100), maxfeval = c(rep(250, 2), 1000))
+
+        # Get cache again
         current_approxes <- cache$get(key = glue::glue("{model_name}-{method}"))
 
-        # Compute next values
-        if (!(N[n] %in% names(current_approxes))) {
-
-          # Set the target and approximate
-          im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
-          approx <- im_p$approximate_compartmental(method = method, N = N[n])
-
-          # Append to existing results
-          if (cachem::is.key_missing(current_approxes)) {
-            current_approxes <- list()
-          }
-          current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N[n]))
-
-          # Store to cache
-          cache$set(key = glue::glue("{model_name}-{method}"), current_approxes)
+        # Append to existing results
+        if (cachem::is.key_missing(current_approxes)) {
+          current_approxes <- list()
         }
 
-        p()
+        current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N))
+
+        # Store to cache
+        cache$set(key = glue::glue("{model_name}-{method}"), current_approxes)
       }
+
+      p()
 
       rm(im_p)
     }
@@ -152,7 +160,7 @@ progressr::with_progress({
 non_monotonicity_single <- combinations_single |>
   purrr::pmap(
     .progress = interactive(),
-    .f = \(model_zip, method) {
+    .f = \(model_zip, method, N) {
 
       # Unpack model
       model <- model_zip[[1]]
@@ -188,7 +196,7 @@ non_monotonicity_single |>
 convergence_single <- combinations_single |>
   purrr::pmap_dbl(
     .progress = interactive(),
-    .f = \(model_zip, method) {
+    .f = \(model_zip, method, N) {
 
       # Unpack model
       model <- model_zip[[1]]
@@ -237,7 +245,7 @@ convergence_single <- combinations_single |>
 metrics_single <- combinations_single |>
   purrr::pmap(
     .progress = interactive(),
-    .f = \(model_zip, method) {
+    .f = \(model_zip, method, N) {
 
       # Unpack model
       model <- model_zip[[1]]
@@ -350,11 +358,14 @@ im$approximate_compartmental(method = "free_delta", N = 3)
 ```{r run all double targets}
 cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/double"))
 
+N_max <- 10
+
 # Set the combinations to test
 combinations_double <- tidyr::expand_grid(
   model1 = zip(models, model_names, time_scales),
   model2 = zip(models, model_names, time_scales),
-  method = c("free_gamma", "free_delta", "all_free")
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = seq(from = 2, to = N_max, by = 1)
 )
 
 #future::plan("sequential")
@@ -362,24 +373,22 @@ future::plan("multisession", workers = 4)
 
 # Run the approximations and note the convergence point
 combinations <- combinations_double |>
-  purrr::pmap(~ zip(list(..1), list(..2), ..3))
-
-N_max <- 10                                                                                                             # nolint: object_name_linter
+  purrr::pmap(~ zip(list(..1), list(..2), ..3, ..4))
+                                                                                                          # nolint: object_name_linter
 
 progressr::with_progress({
-  p <- progressr::progressor(steps = length(combinations) * N_max)
+  p <- progressr::progressor(steps = length(combinations))
 
   invisible(future.apply::future_lapply(
     combinations,
     future.seed = TRUE,
     FUN = \(combination) {
 
-      N <- seq(from = 2, to = N_max, by = 1)                                                                            # nolint: object_name_linter
-
       # Unpack model
       model1_zip <- combination[[1]][[1]]
       model2_zip <- combination[[1]][[2]]
       method <- combination[[1]][[3]]
+      N <- combination[[1]][[4]]
 
       model1 <- model1_zip[[1]]
       model1_name <- model1_zip[[2]]
@@ -391,33 +400,34 @@ progressr::with_progress({
 
       im_p <- DiseasyImmunity$new()
 
-      # Generate approximations and store them and the convergence point
-      for (n in seq_along(N)) {
-        set.seed(n) # Not sure where a random seed is used, but future_lapply detects a call to rng
+      # Not sure where a random seed is used, but future_lapply detects a call to rng
+      set.seed(N)
 
-        # Get the results up until now
+      # Get the results up until now
+      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}"))
+
+      # Compute next values
+      if (!(N %in% names(current_approxes))) {
+
+        # Set the target and approximate
+        im_p$set_waning_model(model1, time_scale = time_scale1, target = "infection")
+        im_p$set_waning_model(model2, time_scale = time_scale2, target = "hospitalisation")
+        approx <- im_p$approximate_compartmental(method = method, N = N)
+
+        # Get cache again
         current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}"))
 
-        # Compute next values
-        if (!(N[n] %in% names(current_approxes))) {
-
-          # Set the target and approximate
-          im_p$set_waning_model(model1, time_scale = time_scale1, target = "infection")
-          im_p$set_waning_model(model2, time_scale = time_scale2, target = "hospitalisation")
-          approx <- im_p$approximate_compartmental(method = method, N = N[n])
-
-          # Append to existing results
-          if (cachem::is.key_missing(current_approxes)) {
-            current_approxes <- list()
-          }
-          current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N[n]))
-
-          # Store to cache
-          cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}"), current_approxes)
+        # Append to existing results
+        if (cachem::is.key_missing(current_approxes)) {
+          current_approxes <- list()
         }
+        current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N))
 
-        p()
+        # Store to cache
+        cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}"), current_approxes)
       }
+
+      p()
 
       rm(im_p)
     }
@@ -429,7 +439,7 @@ progressr::with_progress({
 convergence_double <- combinations_double |>
   purrr::pmap(
     .progress = interactive(),
-    .f = \(model1_zip, model2_zip, method) {
+    .f = \(model1_zip, model2_zip, method, N) {
 
       # Unpack model
       model1 <- model1_zip[[1]]
@@ -484,7 +494,7 @@ convergence_double <- combinations_double |>
 metrics_double <- combinations_double |>
   purrr::pmap(
     .progress = interactive(),
-    .f = \(model1_zip, model2_zip, method) {
+    .f = \(model1_zip, model2_zip, method, N) {
 
       # Unpack model
       model1 <- model1_zip[[1]]
