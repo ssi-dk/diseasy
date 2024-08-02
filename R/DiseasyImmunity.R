@@ -330,6 +330,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
     #'   Should the approximation penalise rapid changes in immunity levels?
     #'   If a numeric value supplied, it is used as a penalty factor.
+    #' @param optim.method (`character()`)\cr
+    #'   List of methods to be used for optimization.
+    #' @param maxit (`integer()`)\cr
+    #'   Maximum number of iterations for the optimization.
+    #' @param maxfeval (`integer()`)\cr
+    #'   Maximum number of function evaluations for the optimization.
     #' @return
     #'   Returns the rates and objective value (invisibly).
     approximate_compartmental = function(
@@ -337,7 +343,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
       N = NULL,                                                                                                        # nolint: object_name_linter
       monotonic = TRUE,
       individual_level = TRUE,
-      optim.method = "Nelder-Mead",
+      optim.method = "subplex",
+      maxit = 100,
+      maxfeval = 100,
       ...
     ) {
 
@@ -488,12 +496,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_0 <- c(p_gamma_0, p_delta_0)
 
           # Run the optimiser to determine best rates
-          mc <- tibble::tibble("method" = character(0), "maxit" = numeric(0), "maxfeval" = numeric(0)) |>
-            tibble::add_row("method" = "subplex", "maxit" = 10, "maxfeval" = 100) |>
-            tibble::add_row("method" = "BFGS", "maxit" = 100, "maxfeval" = 100)
+          mc <- tibble::tibble("method" = optim.method, "maxit" = maxit, "maxfeval" = maxfeval)
 
           # One-dimensional optimization by Nelder-Mead is unreliable
-          if (n_free_parameters == 1) {
+          if (n_free_parameters == 1 && length(unique(mc$method)) > 1) {
             mc <- mc |>
               dplyr::filter(.data$method != "Nelder-Mead")
           }
