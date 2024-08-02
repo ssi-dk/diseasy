@@ -309,7 +309,13 @@ best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
   method = c("free_gamma", "free_delta", "all_free"),
-  N = NULL
+  N = NULL,
+  monotonic = TRUE,
+  individual_level = TRUE,
+  optim.method = "subplex",
+  maxit = 100,
+  maxfeval = 100,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -321,6 +327,23 @@ Specifies the method to be used from the available methods. See details.}
 
 \item{\code{N}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
+
+\item{\code{monotonic}}{(\code{logical(1)} or \code{numeric(1)})\cr
+Should non-monotonic approximations be penalised?
+If a numeric value supplied, it is used as a penalty factor.}
+
+\item{\code{individual_level}}{(\code{logical(1)} or \code{numeric(1)})\cr
+Should the approximation penalise rapid changes in immunity levels?
+If a numeric value supplied, it is used as a penalty factor.}
+
+\item{\code{optim.method}}{(\code{character()})\cr
+List of methods to be used for optimization.}
+
+\item{\code{maxit}}{(\code{integer()})\cr
+Maximum number of iterations for the optimization.}
+
+\item{\code{maxfeval}}{(\code{integer()})\cr
+Maximum number of function evaluations for the optimization.}
 }
 \if{html}{\out{</div>}}
 }
