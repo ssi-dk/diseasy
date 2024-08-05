@@ -98,26 +98,26 @@ cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/art
 
 # Set the optimiser configurations to test
 optim_configs <- list(
-  list("method" = "Nelder-Mead", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "BFGS", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "CG", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "subplex", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "nlm", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
-  #list("method" = "Rcgmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  #list("method" = "Rtnmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  #list("method" = "Rvmmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  #list("method" = "snewton", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
-  #list("method" = "snewtonm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
-  list("method" = "spg", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "hjn", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "nvm", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "slsqp", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "tnewt", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "anms", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "pracmanm", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "nlnm", "maxit" = 10, "maxfeval" = 200)#,
-  #list("method" = "snewtm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  data.frame("method" = "Nelder-Mead", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "BFGS", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "CG", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "subplex", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
+  #data.frame("method" = "Rcgmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "Rtnmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "Rvmmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "snewton", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  #data.frame("method" = "snewtonm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  data.frame("method" = "spg", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "hjn", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nvm", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "slsqp", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "tnewt", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "anms", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "pracmanm", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxit" = 10, "maxfeval" = 200)#,
+  #data.frame("method" = "snewtm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
 )
 
 
@@ -179,11 +179,7 @@ progressr::with_progress({
       # Get the results up until now
       current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
 
-      mc <- tibble::tibble(
-        "method" = optim_config$method,
-        "maxit" = optim_config$maxit,
-        "maxfeval" = optim_config$maxfeval
-      ) |>
+      mc <- optim_config |>
         tidyr::unite("label", tidyselect::everything())
 
       optim_label <- paste(mc$label, collapse = "_")
@@ -196,9 +192,7 @@ progressr::with_progress({
           N = N,
           monotonic = monotonic,
           individual_level = individual_level,
-          optim.method = optim_config$method,
-          maxit = optim_config$maxit,
-          maxfeval = optim_config$maxfeval
+          polyopt_methodcontrol = optim_config
         )
 
         # Get cache again
@@ -327,18 +321,18 @@ cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/art
 
 # Set the optimiser configurations to test
 optim_configs <- list(
-  list("method" = "nlm", "maxit" = 10, "maxfeval" = 25),
-  list("method" = "nlm", "maxit" = 10, "maxfeval" = 50),
-  list("method" = "nlm", "maxit" = 10, "maxfeval" = 100),
-  list("method" = "nlm", "maxit" = 5, "maxfeval" = 200),
-  list("method" = "nlm", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "nlnm", "maxit" = 10, "maxfeval" = 100),
-  list("method" = "nlnm", "maxit" = 5, "maxfeval" = 200),
-  list("method" = "nlnm", "maxit" = 10, "maxfeval" = 200),
-  list("method" = "nlnm", "maxit" = 20, "maxfeval" = 200),
-  list("method" = "nlminb", "maxit" = 10, "maxfeval" = 100),
-  list("method" = "nlminb", "maxit" = 5, "maxfeval" = 200),
-  list("method" = "nlminb", "maxit" = 10, "maxfeval" = 200)
+  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 25),
+  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 50),
+  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 100),
+  data.frame("method" = "nlm", "maxit" = 5, "maxfeval" = 200),
+  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxit" = 10, "maxfeval" = 100),
+  data.frame("method" = "nlnm", "maxit" = 5, "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxit" = 20, "maxfeval" = 200),
+  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 100),
+  data.frame("method" = "nlminb", "maxit" = 5, "maxfeval" = 200),
+  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200)
 )
 
 
@@ -400,11 +394,7 @@ progressr::with_progress({
       # Get the results up until now
       current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
 
-      mc <- tibble::tibble(
-        "method" = optim_config$method,
-        "maxit" = optim_config$maxit,
-        "maxfeval" = optim_config$maxfeval
-      ) |>
+      mc <- optim_config |>
         tidyr::unite("label", tidyselect::everything())
 
       optim_label <- paste(mc$label, collapse = "_")
@@ -544,10 +534,10 @@ cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/art
 
 # Set the optimiser configurations to test
 optim_configs <- list(
-  list("method" = c("nlm", "BFGS"), "maxit" = c(5, 10), "maxfeval" = 100),
-  list("method" = c("nlm", "Nelder-Mead"), "maxit" = c(5, 10), "maxfeval" = c(100, 200)),
-  list("method" = c("nlm", "nlnm"), "maxit" = c(5, 10), "maxfeval" = 100),
-  list("method" = "nlnm", "maxit" = 10, "maxfeval" = 100) # Use as reference - also converges
+  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(5, 10), "maxfeval" = 100),
+  data.frame("method" = c("nlm", "Nelder-Mead"), "maxit" = c(5, 10), "maxfeval" = c(100, 200)),
+  data.frame("method" = c("nlm", "nlnm"), "maxit" = c(5, 10), "maxfeval" = 100),
+  data.frame("method" = "nlnm", "maxit" = 10, "maxfeval" = 100) # Use as reference - also converges
 )
 
 
@@ -609,11 +599,7 @@ progressr::with_progress({
       # Get the results up until now
       current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
 
-      mc <- tibble::tibble(
-        "method" = optim_config$method,
-        "maxit" = optim_config$maxit,
-        "maxfeval" = optim_config$maxfeval
-      ) |>
+      mc <- optim_config |>
         tidyr::unite("label", tidyselect::everything())
 
       optim_label <- paste(mc$label, collapse = "_")

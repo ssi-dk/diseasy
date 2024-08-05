@@ -320,6 +320,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'     - "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
     #'       (N free parameters).
     #'     - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
+    #'
+    #'   The optimization minimises the square root of the squared differences between the target waning and the
+    #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
+    #'   if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
+    #'
+    #'   The minimisation is performed using the `polyopt` function from the `optimx` package, which allows for
+    #'   multiple optimisation methods and consecutive calls to different optimisation algorithms.
+    #'   By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
+    #'   most efficient (see `vignette("diseasy-immunity")`).
+    #'   Optimiser defaults can be changed by providing the `optim.method`, `maxit`, `maxeval`, and/or `maxfeval` arguments.
+    #'
     #' @param method (`character(1)`)\cr
     #'   Specifies the method to be used from the available methods. See details.
     #' @param N (`integer(1)`)\cr
@@ -330,22 +341,30 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
     #'   Should the approximation penalise rapid changes in immunity levels?
     #'   If a numeric value supplied, it is used as a penalty factor.
-    #' @param optim.method (`character()`)\cr
-    #'   List of methods to be used for optimization.
-    #' @param maxit (`integer()`)\cr
-    #'   Maximum number of iterations for the optimization.
-    #' @param maxfeval (`integer()`)\cr
-    #'   Maximum number of function evaluations for the optimization.
+    #' @param polyopt_methodcontrol (`data.frame(1)`)\cr
+    #'   Controls for the `optimx::polyopt` function.
+    #'
+    #'   Must be a data.frame with columns:
+    #'   - `method` (`character()`): The optimisation method to use.
+    #'   - `maxit` (`integer()`): Maximum number of iterations for the optimization.
+    #'   - `maxeval` (`integer()`): Maximum number of function evaluations for the optimization.
+    #'   - `maxfeval` (`integer()`): Maximum number of function evaluations for the optimization.
+    #' @param ...
+    #'   Additional arguments to be passed to the `optimx::polyopt`.
     #' @return
     #'   Returns the rates and objective value (invisibly).
+    #' @seealso [vignette("diseasy-immunity")], [optimx::polyopt]
     approximate_compartmental = function(
       method = c("free_gamma", "free_delta", "all_free"),
       N = NULL,                                                                                                        # nolint: object_name_linter
       monotonic = TRUE,
       individual_level = TRUE,
-      optim.method = "subplex",
-      maxit = 100,
-      maxfeval = 100,
+      polyopt_methodcontrol = data.frame(
+        "method" = "nlnm",
+        "maxit" = 10,
+        "maxeval" = 100,
+        "maxfeval" = 100
+      ),
       ...
     ) {
 
@@ -353,8 +372,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
-      checkmate::assert_number(as.numeric(monotonic), add = coll)
+      checkmate::assert_number(as.numeric( monotonous), add = coll)
       checkmate::assert_number(as.numeric(individual_level), add = coll)
+      checkmate::assert_data_frame(
+        polyopt_methodcontrol,
+        types = c("character", "integerish", "integerish"),
+        add = coll
+      )
+      checkmate::assert_names(
+        names(polyopt_methodcontrol),
+        subset.of = c("method", "maxit", "maxeval", "maxfeval"),
+        add = coll
+      )
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
@@ -423,7 +452,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
 
             # Some optimisers yield non-finite delta
-            if (any(is.infinite(delta)) || any(is.na(delta)) || any(is.na(gamma))) {
+            if (any(is.infinite(delta)) || anyNA(delta) || anyNA(gamma)) {
 
               # We define the objective function as infinite in this case
               return(list("value" = Inf, "penalty" = Inf))
@@ -493,20 +522,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
             )
           }
 
-          par_0 <- c(p_gamma_0, p_delta_0)
 
-          # Run the optimiser to determine best rates
-          mc <- tibble::tibble("method" = optim.method, "maxit" = maxit, "maxfeval" = maxfeval)
-
-          # One-dimensional optimization by Nelder-Mead is unreliable
-          if (n_free_parameters == 1 && length(unique(mc$method)) > 1) {
-            mc <- mc |>
-              dplyr::filter(.data$method != "Nelder-Mead")
-          }
-
+          # Run the optimisation
           invisible(capture.output(
-            res <- optimx::polyopt(par_0, \(p) sum(obj_function(p)), methcontrol = mc, control = list(trace = 0))
-          ))
+          res <- optimx::polyopt(
+            par = c(p_gamma_0, p_delta_0),
+            fn = \(p) sum(obj_function(p)),
+            methcontrol = polyopt_methodcontrol,
+            ...
+          )))
+
+          # `optimx` has different output format from `optim`
+          # Try to unify the output formats here
           par <- tail(res, 1) |>
             dplyr::select(tidyselect::starts_with("p")) |>
             as.list() |>
@@ -570,7 +597,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   or as a numeric value representing the method index 1, 2, or 3.
     #' @param N (`numeric`)\cr
     #'   Number of compartments to be used in the model.
-    plot = function(t_max = NULL, method = c("free_gamma", "free_delta", "all_free"), N = NULL) {                       # nolint: object_name_linter
+    #' @param ...
+    #'   Additional arguments to be passed to `$approximate_compartmental()`.
+    plot = function(t_max = NULL, method = c("free_gamma", "free_delta", "all_free"), N = NULL, ...) {                  # nolint: object_name_linter
       checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
 
       # Set t_max if nothing is given
@@ -603,7 +632,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Only plots the approximations if N was given as input
       if (!is.null(N)) {
-        approximation <- self$approximate_compartmental(method, N)
+        approximation <- self$approximate_compartmental(method, N, ...)
         gamma <- approximation$gamma
         delta <- approximation$delta
 
