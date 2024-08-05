@@ -293,6 +293,22 @@ optim_summery |>
 
 ```{r compare optimisations single metic}
 # Plot points with names of method
+tt |>
+  dplyr::filter(is.finite(.data$value)) |>
+  #dplyr::filter(.data$value <= 2*median(.data$value), .data$execution_time <= 2*median(.data$execution_time), .by =  "N") |>
+  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
+  ggplot2::geom_point() +
+  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
+  ggplot2::theme_bw() +
+  ggplot2::xlim(0, 10) +
+  ggplot2::ylim(0, NA) +
+  ggplot2::facet_wrap(~N, scales = "free_y")
+
+```
+
+```{r compare optimisations single metic}
+# Plot points with names of method
 optim_summery |>
   dplyr::summarise(
     "value" = sum(.data$value),
@@ -302,12 +318,12 @@ optim_summery |>
   ) |>
   dplyr::filter(is.finite(.data$value)) |>
   dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = convergence)) +
+  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
   ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0, nudge_y = -2) +
-  ggplot2::labs(x = "Value", y = "Execution time") +
+  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
   ggplot2::theme_bw() +
-  ggplot2::xlim(0, NA) +
+  ggplot2::xlim(0, 10) +
   ggplot2::ylim(0, NA) +
   ggplot2::facet_grid(N ~ method, scales = "free_y")
 
@@ -508,6 +524,23 @@ optim_summery |>
 ```
 
 
+
+```{r compare optimisations single metic}
+# Plot points with names of method
+tt |>
+  dplyr::filter(is.finite(.data$value)) |>
+  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  "N") |>
+  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
+  ggplot2::geom_point() +
+  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
+  ggplot2::theme_bw() +
+  ggplot2::xlim(0, 8) +
+  ggplot2::ylim(0, NA) +
+  ggplot2::facet_wrap(~N, scales = "free_y")
+
+```
+
 ```{r compare optimisations single metic}
 # Plot points with names of method
 optim_summery |>
@@ -518,12 +551,13 @@ optim_summery |>
     .by = c("optim_method" ,"method", "N")
   ) |>
   dplyr::filter(is.finite(.data$value)) |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = convergence)) +
+  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
+  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
   ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0, nudge_y = -2) +
-  ggplot2::labs(x = "Value", y = "Execution time") +
+  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
   ggplot2::theme_bw() +
-  ggplot2::xlim(0, NA) +
+  ggplot2::xlim(0, 8) +
   ggplot2::ylim(0, NA) +
   ggplot2::facet_grid(N ~ method, scales = "free_y")
 
@@ -713,6 +747,23 @@ optim_summery |>
 ```
 
 
+
+```{r compare optimisations single metic}
+# Plot points with names of method
+tt |>
+  dplyr::filter(is.finite(.data$value)) |>
+  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  "N") |>
+    ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
+  ggplot2::geom_point() +
+  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
+  ggplot2::theme_bw() +
+  ggplot2::xlim(0, 8) +
+  ggplot2::ylim(0, NA) +
+  ggplot2::facet_wrap(~N, scales = "free_y")
+
+```
+
 ```{r compare optimisations single metic}
 # Plot points with names of method
 optim_summery |>
@@ -723,12 +774,13 @@ optim_summery |>
     .by = c("optim_method" ,"method", "N")
   ) |>
   dplyr::filter(is.finite(.data$value)) |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = convergence)) +
+  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
+  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
   ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0, nudge_y = -2) +
-  ggplot2::labs(x = "Value", y = "Execution time") +
+  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
   ggplot2::theme_bw() +
-  ggplot2::xlim(0, NA) +
+  ggplot2::xlim(0, 8) +
   ggplot2::ylim(0, NA) +
   ggplot2::facet_grid(N ~ method, scales = "free_y")
 
