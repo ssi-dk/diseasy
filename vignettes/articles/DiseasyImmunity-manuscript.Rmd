@@ -113,7 +113,7 @@ optim_configs <- list(
   data.frame("method" = "nvm", "maxit" = 10),
   data.frame("method" = "slsqp", "maxeval" = 200),
   data.frame("method" = "tnewt", "maxeval" = 200),
-  data.frame("method" = "anms", "maxfeval" = 200),
+  #data.frame("method" = "anms", "maxfeval" = 200), # Very slow
   data.frame("method" = "pracmanm", "maxfeval" = 200),
   data.frame("method" = "nlnm", "maxfeval" = 200),
   data.frame("method" = "ucminf", "maxit" = 10),
