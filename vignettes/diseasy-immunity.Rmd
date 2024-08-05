@@ -146,7 +146,7 @@ that best approximates the set waning functions:
 
 - Approach 1: (`rate_equal`) - $\gamma_n$ values are allowed to vary freely, while the $\delta_n$ rates are equal
   between compartments ($\delta_n = \delta$).
-- Approach 2: (`gamma_fixed_step`) - $\gamma_n$ values are monotonically decreasing ($\gamma_n = (n-1)/(N-1)$),
+- Approach 2: (`gamma_fixed_step`) - $\gamma_n$ values are monotonously decreasing ($\gamma_n = (n-1)/(N-1)$),
   and $\delta_n$ are allowed to vary freely.
 - Approach 3: (`all_free`) -  Both $\gamma_n$ and $\delta_n$ are allowed to vary freely.
 

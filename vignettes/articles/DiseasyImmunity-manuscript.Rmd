@@ -141,7 +141,7 @@ combinations <- combinations_single |>
 
 
 
-monotonic <- 100
+monotonous <- 100
 individual_level <- 0
 #optim.method <- "BFGS"# "Nelder-Mead"
 #maxit <- 1e3
@@ -154,7 +154,7 @@ progressr::with_progress({
     future.seed = TRUE,
     FUN = \(combination) {
 
-      monotonic <- monotonic
+      monotonous <- monotonous
       individual_level <- individual_level
 
       # Unpack model
@@ -177,7 +177,7 @@ progressr::with_progress({
       # Generate approximations and store them and the convergence point
 
       # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       mc <- optim_config |>
         tidyr::unite("label", tidyselect::everything())
@@ -190,13 +190,13 @@ progressr::with_progress({
         approx <- im_p$approximate_compartmental(
           method = method,
           N = N,
-          monotonic = monotonic,
+          monotonous = monotonous,
           individual_level = individual_level,
           polyopt_methodcontrol = optim_config
         )
 
         # Get cache again
-        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
         # Append to existing results
         if (cachem::is.key_missing(current_approxes)) {
@@ -206,7 +206,7 @@ progressr::with_progress({
         current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), optim_label))
 
         # Store to cache
-        cache$set(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"), current_approxes)
+        cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"), current_approxes)
       }
 
       p()
@@ -231,7 +231,7 @@ optim_summery <- combinations_single |>
       time_scale <- model_zip[[3]]
 
       # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       if (cachem::is.key_missing(current_approxes)) {
 
@@ -356,7 +356,7 @@ combinations <- combinations_single |>
 
 
 
-monotonic <- 100
+monotonous <- 100
 individual_level <- 0
 #optim.method <- "BFGS"# "Nelder-Mead"
 #maxit <- 1e3
@@ -369,7 +369,7 @@ progressr::with_progress({
     future.seed = TRUE,
     FUN = \(combination) {
 
-      monotonic <- monotonic
+      monotonous <- monotonous
       individual_level <- individual_level
 
       # Unpack model
@@ -392,7 +392,7 @@ progressr::with_progress({
       # Generate approximations and store them and the convergence point
 
       # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       mc <- optim_config |>
         tidyr::unite("label", tidyselect::everything())
@@ -405,7 +405,7 @@ progressr::with_progress({
         approx <- im_p$approximate_compartmental(
           method = method,
           N = N,
-          monotonic = monotonic,
+          monotonous = monotonous,
           individual_level = individual_level,
           optim.method = optim_config$method,
           maxit = optim_config$maxit,
@@ -413,7 +413,7 @@ progressr::with_progress({
         )
 
         # Get cache again
-        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
         # Append to existing results
         if (cachem::is.key_missing(current_approxes)) {
@@ -423,7 +423,7 @@ progressr::with_progress({
         current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), optim_label))
 
         # Store to cache
-        cache$set(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"), current_approxes)
+        cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"), current_approxes)
       }
 
       p()
@@ -448,7 +448,7 @@ optim_summery <- combinations_single |>
       time_scale <- model_zip[[3]]
 
       # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       if (cachem::is.key_missing(current_approxes)) {
 
@@ -561,7 +561,7 @@ combinations <- combinations_single |>
 
 
 
-monotonic <- 100
+monotonous <- 100
 individual_level <- 0
 #optim.method <- "BFGS"# "Nelder-Mead"
 #maxit <- 1e3
@@ -574,7 +574,7 @@ progressr::with_progress({
     future.seed = TRUE,
     FUN = \(combination) {
 
-      monotonic <- monotonic
+      monotonous <- monotonous
       individual_level <- individual_level
 
       # Unpack model
@@ -597,7 +597,7 @@ progressr::with_progress({
       # Generate approximations and store them and the convergence point
 
       # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       mc <- optim_config |>
         tidyr::unite("label", tidyselect::everything())
@@ -610,7 +610,7 @@ progressr::with_progress({
         approx <- im_p$approximate_compartmental(
           method = method,
           N = N,
-          monotonic = monotonic,
+          monotonous = monotonous,
           individual_level = individual_level,
           optim.method = optim_config$method,
           maxit = optim_config$maxit,
@@ -618,7 +618,7 @@ progressr::with_progress({
         )
 
         # Get cache again
-        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
         # Append to existing results
         if (cachem::is.key_missing(current_approxes)) {
@@ -628,7 +628,7 @@ progressr::with_progress({
         current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), optim_label))
 
         # Store to cache
-        cache$set(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"), current_approxes)
+        cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"), current_approxes)
       }
 
       p()
@@ -653,7 +653,7 @@ optim_summery <- combinations_single |>
       time_scale <- model_zip[[3]]
 
       # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}-{N}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       if (cachem::is.key_missing(current_approxes)) {
 
@@ -757,7 +757,7 @@ future::plan("multisession", workers = 15)
 combinations <- combinations_single |>
   purrr::pmap(~ zip(list(..1), ..2, ..3))
 
-monotonic <- 100
+monotonous <- 100
 individual_level <- 0
 
 progressr::with_progress({
@@ -768,7 +768,7 @@ progressr::with_progress({
     future.seed = TRUE,
     FUN = \(combination) {
 
-      monotonic <- monotonic
+      monotonous <- monotonous
       individual_level <- individual_level
 
       # Unpack model
@@ -790,15 +790,15 @@ progressr::with_progress({
       # Generate approximations and store them and the convergence point
 
       # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}"))
 
       # Compute next values
       if (!(N %in% names(current_approxes))) {
 
-        approx <- im_p$approximate_compartmental(method = method, N = N, monotonic = monotonic, individual_level = individual_level, optim.method = c(rep("subplex", 2), "CG"), maxit = c(rep(100, 2), 100), maxfeval = c(rep(250, 2), 1000))
+        approx <- im_p$approximate_compartmental(method = method, N = N, monotonous = monotonous, individual_level = individual_level, optim.method = c(rep("subplex", 2), "CG"), maxit = c(rep(100, 2), 100), maxfeval = c(rep(250, 2), 1000))
 
         # Get cache again
-        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}"))
+        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}"))
 
         # Append to existing results
         if (cachem::is.key_missing(current_approxes)) {
@@ -808,7 +808,7 @@ progressr::with_progress({
         current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N))
 
         # Store to cache
-        cache$set(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}"), current_approxes)
+        cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}"), current_approxes)
       }
 
       p()
@@ -820,7 +820,7 @@ progressr::with_progress({
 ```
 
 The solutions have a few "issues".
-- They are not always monotonic
+- They are not always monotonous
 - They are not always converged as the problem can be degenerate
 
 The latter is not necessarily a problem since we mostly care about having the
@@ -831,7 +831,7 @@ Adding a penalty for spread of gamma values does not make more solutions converg
 Also note that I have tried changing the optimiser method without any noticeable
 difference in the results.
 
-```{r check monotonicity in solution}
+```{r check monotonousity in solution}
 solution_summery_single <- combinations_single |>
   purrr::pmap(
     .progress = interactive(),
@@ -843,7 +843,7 @@ solution_summery_single <- combinations_single |>
       time_scale <- model_zip[[3]]
 
       # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}"))
       if (cachem::is.key_missing(current_approxes)) {
         return(NULL)
       } else {
@@ -892,7 +892,7 @@ convergence_single <- combinations_single |>
       time_scale <- model_zip[[3]]
 
       # Get the results
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}"))
 
       # Check if approximation has converged
       prev_values <- purrr::map_dbl(current_approxes, ~ purrr::pluck(., "value")) |>
@@ -941,7 +941,7 @@ metrics_single <- combinations_single |>
       time_scale <- model_zip[[3]]
 
       # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonic}-{individual_level}"))
+      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}"))
       if (cachem::is.key_missing(current_approxes)) {
         metrics <- data.frame(
           "model" = model_name,
@@ -1013,7 +1013,7 @@ metrics_single_gg |>
   ggplot2::labs(x = "N", y = "Value") +
   ggplot2::theme_bw()
 
-#ggplot2::ggsave(glue::glue("monotoniggplot2::ggsave("subplex_10")c_{monotonic}_individual_level_{individual_level}.png"))
+#ggplot2::ggsave(glue::glue("monotonous_{monotonous}_individual_level_{individual_level}.png"))
 #ggplot2::ggsave("subplex_10_subplex_10_individual_level.png")
 ```
 
@@ -1075,7 +1075,7 @@ combinations <- combinations_double |>
   purrr::pmap(~ zip(list(..1), list(..2), ..3, ..4))
                                                                                                           # nolint: object_name_linter
 
-monotonic <- 100
+monotonous <- 100
 individual_level <- 1
 
 progressr::with_progress({
@@ -1086,7 +1086,7 @@ progressr::with_progress({
     future.seed = TRUE,
     FUN = \(combination) {
 
-      monotonic <- monotonic
+      monotonous <- monotonous
       individual_level <- individual_level
 
       # Unpack model
@@ -1109,7 +1109,7 @@ progressr::with_progress({
       set.seed(N)
 
       # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonic}-{individual_level}"))
+      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonous}-{individual_level}"))
 
       # Compute next values
       if (!(N %in% names(current_approxes))) {
@@ -1117,10 +1117,10 @@ progressr::with_progress({
         # Set the target and approximate
         im_p$set_waning_model(model1, time_scale = time_scale1, target = "infection")
         im_p$set_waning_model(model2, time_scale = time_scale2, target = "hospitalisation")
-        approx <- im_p$approximate_compartmental(method = method, N = N, montonic = monotonic, individual_level = individual_level)
+        approx <- im_p$approximate_compartmental(method = method, N = N, montonic = monotonous, individual_level = individual_level)
 
         # Get cache again
-        current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonic}-{individual_level}"))
+        current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonous}-{individual_level}"))
 
         # Append to existing results
         if (cachem::is.key_missing(current_approxes)) {
@@ -1129,7 +1129,7 @@ progressr::with_progress({
         current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), N))
 
         # Store to cache
-        cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonic}-{individual_level}"), current_approxes)
+        cache$set(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonous}-{individual_level}"), current_approxes)
       }
 
       p()
@@ -1156,7 +1156,7 @@ convergence_double <- combinations_double |>
       time_scale2 <- model2_zip[[3]]
 
       # Get the results
-      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonic}-{individual_level}"))
+      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonous}-{individual_level}"))
 
 
       # Check if approximation has converged
@@ -1211,7 +1211,7 @@ metrics_double <- combinations_double |>
       time_scale2 <- model2_zip[[3]]
 
       # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonic}-{individual_level}"))
+      current_approxes <- cache$get(key = glue::glue("{model1_name}-{model2_name}-{method}-{monotonous}-{individual_level}"))
       if (cachem::is.key_missing(approx)) {
         metrics <- data.frame(
           "model" = !!paste(model1_name, model2_name, sep = "/"),                                                       # nolint: paste_linter
