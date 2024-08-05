@@ -335,8 +335,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Specifies the method to be used from the available methods. See details.
     #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
-    #' @param monotonic (`logical(1)` or `numeric(1)`)\cr
-    #'   Should non-monotonic approximations be penalised?
+    #' @param monotonous (`logical(1)` or `numeric(1)`)\cr
+    #'   Should non-monotonous approximations be penalised?
     #'   If a numeric value supplied, it is used as a penalty factor.
     #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
     #'   Should the approximation penalise rapid changes in immunity levels?
@@ -356,8 +356,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @seealso [vignette("diseasy-immunity")], [optimx::polyopt]
     approximate_compartmental = function(
       method = c("free_gamma", "free_delta", "all_free"),
-      N = NULL,                                                                                                        # nolint: object_name_linter
-      monotonic = TRUE,
+      N = NULL,                                                                                                         # nolint: object_name_linter
+      monotonous = TRUE,
       individual_level = TRUE,
       polyopt_methodcontrol = data.frame(
         "method" = "nlnm",
@@ -476,7 +476,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
               # Penalise non-monotone solutions
-              penalty <- monotonic * sum(purrr::keep(diff(gamma), ~ . > 0))
+              penalty <- monotonous * sum(purrr::keep(diff(gamma), ~ . > 0))
 
               # Penalise spread of gamma
               penalty <- penalty + individual_level * sd(gamma)
