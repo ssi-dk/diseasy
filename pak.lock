@@ -2019,7 +2019,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["diseasystore", "checkmate", "digest", "dplyr", "expm", "glue", "lgr", "lintr", "lubridate", "Matrix", "pracma", "purrr", "R6", "rlang", "stringr"],
+      "dependencies": ["diseasystore", "checkmate", "digest", "dplyr", "expm", "glue", "lgr", "lintr", "lubridate", "Matrix", "nloptr", "optimx", "pracma", "purrr", "R6", "rlang", "stringr"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",
@@ -2193,6 +2193,75 @@
       "repotype": "cranlike"
     },
     {
+      "ref": "nloptr",
+      "package": "nloptr",
+      "version": "2.1.1",
+      "type": "standard",
+      "direct": false,
+      "binary": true,
+      "dependencies": [],
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "nloptr",
+        "RemoteType": "standard",
+        "RemoteRef": "nloptr",
+        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+        "RemoteSha": "2.1.1"
+      },
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/nloptr_2.1.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/nloptr_2.1.1.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
+      "directpkg": false,
+      "license": "LGPL (>= 3)",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "",
+      "sysreqs": "cmake (>= 3.2.0) which is used only on Linux or\n        macOS systems when no system build of nlopt (>= 2.7.0) can be\n        found.",
+      "sysreqs_packages": [
+        {
+          "sysreq": "cmake",
+          "packages": "cmake",
+          "pre_install": {},
+          "post_install": {}
+        }
+      ],
+      "needscompilation": false,
+      "repotype": "cranlike"
+    },
+    {
+      "ref": "numDeriv",
+      "package": "numDeriv",
+      "version": "2016.8-1.1",
+      "type": "standard",
+      "direct": false,
+      "binary": true,
+      "dependencies": [],
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "numDeriv",
+        "RemoteType": "standard",
+        "RemoteRef": "numDeriv",
+        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+        "RemoteSha": "2016.8-1.1"
+      },
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/numDeriv_2016.8-1.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/numDeriv_2016.8-1.1.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
+      "directpkg": false,
+      "license": "GPL-2",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "",
+      "sysreqs": "",
+      "sysreqs_packages": {},
+      "needscompilation": false,
+      "repotype": "cranlike"
+    },
+    {
       "ref": "openssl",
       "package": "openssl",
       "version": "2.2.0",
@@ -2227,6 +2296,37 @@
           "post_install": {}
         }
       ],
+      "needscompilation": false,
+      "repotype": "cranlike"
+    },
+    {
+      "ref": "optimx",
+      "package": "optimx",
+      "version": "2023-10.21",
+      "type": "standard",
+      "direct": false,
+      "binary": true,
+      "dependencies": ["numDeriv", "nloptr", "pracma"],
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "optimx",
+        "RemoteType": "standard",
+        "RemoteRef": "optimx",
+        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+        "RemoteSha": "2023-10.21"
+      },
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/optimx_2023-10.21.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/optimx_2023-10.21.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
+      "directpkg": false,
+      "license": "GPL-2",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "",
+      "sysreqs": "",
+      "sysreqs_packages": {},
       "needscompilation": false,
       "repotype": "cranlike"
     },
@@ -4320,8 +4420,8 @@
     "version": "22.04",
     "url": {},
     "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install git libcurl4-openssl-dev libssl-dev make libgit2-dev zlib1g-dev pandoc libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
+    "install_scripts": "apt-get -y install git libcurl4-openssl-dev libssl-dev make libgit2-dev zlib1g-dev pandoc cmake libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
     "post_install": {},
-    "packages": ["git", "libcurl4-openssl-dev", "libssl-dev", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
+    "packages": ["git", "libcurl4-openssl-dev", "libssl-dev", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "cmake", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
   }
 }
