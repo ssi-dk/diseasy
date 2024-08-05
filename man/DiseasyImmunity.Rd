@@ -27,6 +27,9 @@ See the vignette("diseasy-immunity") for examples of use.
 
   rm(im)
 }
+\seealso{
+\link{vignette("diseasy-immunity")}, \link[optimx:polyopt]{optimx::polyopt}
+}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyImmunity}
 }
@@ -310,11 +313,10 @@ best matches the waning immunity curves set in the module.
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
   method = c("free_gamma", "free_delta", "all_free"),
   N = NULL,
-  monotonic = TRUE,
+  monotonous = TRUE,
   individual_level = TRUE,
-  optim.method = "subplex",
-  maxit = 100,
-  maxfeval = 100,
+  polyopt_methodcontrol = data.frame(method = "nlnm", maxit = 10, maxeval = 100, maxfeval
+    = 100),
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -328,22 +330,26 @@ Specifies the method to be used from the available methods. See details.}
 \item{\code{N}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
 
-\item{\code{monotonic}}{(\code{logical(1)} or \code{numeric(1)})\cr
-Should non-monotonic approximations be penalised?
+\item{\code{monotonous}}{(\code{logical(1)} or \code{numeric(1)})\cr
+Should non-monotonous approximations be penalised?
 If a numeric value supplied, it is used as a penalty factor.}
 
 \item{\code{individual_level}}{(\code{logical(1)} or \code{numeric(1)})\cr
 Should the approximation penalise rapid changes in immunity levels?
 If a numeric value supplied, it is used as a penalty factor.}
 
-\item{\code{optim.method}}{(\code{character()})\cr
-List of methods to be used for optimization.}
+\item{\code{polyopt_methodcontrol}}{(\code{data.frame(1)})\cr
+Controls for the \code{optimx::polyopt} function.
 
-\item{\code{maxit}}{(\code{integer()})\cr
-Maximum number of iterations for the optimization.}
+Must be a data.frame with columns:
+\itemize{
+\item \code{method} (\code{character()}): The optimisation method to use.
+\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization.
+\item \code{maxeval} (\code{integer()}): Maximum number of function evaluations for the optimization.
+\item \code{maxfeval} (\code{integer()}): Maximum number of function evaluations for the optimization.
+}}
 
-\item{\code{maxfeval}}{(\code{integer()})\cr
-Maximum number of function evaluations for the optimization.}
+\item{\code{...}}{Additional arguments to be passed to the \code{optimx::polyopt}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -358,6 +364,16 @@ The function implements three methods for approximating the waning immunity curv
 - "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
 (N free parameters).
 - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
+
+The optimization minimises the square root of the squared differences between the target waning and the
+approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
+if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
+
+The minimisation is performed using the \code{polyopt} function from the \code{optimx} package, which allows for
+multiple optimisation methods and consecutive calls to different optimisation algorithms.
+By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
+most efficient (see \code{vignette("diseasy-immunity")}).
+Optimiser defaults can be changed by providing the \code{optim.method}, \code{maxit}, \code{maxeval}, and/or \code{maxfeval} arguments.
 }
 
 \subsection{Returns}{
@@ -373,7 +389,8 @@ If desired to additionally plot the approximations, supply the \code{method} and
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$plot(
   t_max = NULL,
   method = c("free_gamma", "free_delta", "all_free"),
-  N = NULL
+  N = NULL,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -391,6 +408,8 @@ or as a numeric value representing the method index 1, 2, or 3.}
 
 \item{\code{N}}{(\code{numeric})\cr
 Number of compartments to be used in the model.}
+
+\item{\code{...}}{Additional arguments to be passed to \verb{$approximate_compartmental()}.}
 }
 \if{html}{\out{</div>}}
 }
