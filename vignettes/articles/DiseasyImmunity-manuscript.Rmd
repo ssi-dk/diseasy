@@ -93,269 +93,187 @@ we run the approximations.
 
 First, we need to determine how to optimise the parameters since quality of the
 fit is seemingly very dependent on the method used
-```{r run different optimisation algos}
-cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/optim_nloptr"))
+```{r optimiser helper}
+optimiser <- function(combinations, monotonous, individual_level, cache) {
 
-# Set the optimiser configurations to test
-optim_configs <- list(
-  # Optimx algos:
-  # data.frame("method" = "Nelder-Mead", "maxit" = 10),
-  data.frame("method" = "BFGS", "maxit" = 10),
-  # data.frame("method" = "CG", "maxit" = 10),
-  # data.frame("method" = "subplex", "maxfeval" = 200),
-  data.frame("method" = "nlm", "maxit" = 10),
-  # data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
-  # #data.frame("method" = "Rcgmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  # #data.frame("method" = "Rtnmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  # #data.frame("method" = "Rvmmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  # #data.frame("method" = "snewton", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
-  # #data.frame("method" = "snewtonm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
-  # data.frame("method" = "spg", "maxit" = 10, "maxfeval" = 200),
-  # data.frame("method" = "nvm", "maxit" = 10),
-  # data.frame("method" = "slsqp", "maxeval" = 200),
-  # data.frame("method" = "tnewt", "maxeval" = 200),
-  # #data.frame("method" = "anms", "maxfeval" = 200), # Very slow
-  # data.frame("method" = "pracmanm", "maxfeval" = 200),
-  data.frame("method" = "nlnm", "maxfeval" = 200),
-  # data.frame("method" = "ucminf", "maxit" = 10),
-  # data.frame("method" = "newuoa", "maxfeval" = 200),
-  # data.frame("method" = "bobyqa", "maxfeval" = 200),
-  # data.frame("method" = "nmkb", "maxfeval" = 200),
-  # data.frame("method" = "hjkb", "maxfeval" = 200), # Function evaluation limit exceeded -- may not converge.
-  # data.frame("method" = "lbfgsb3c", "maxit" = 10)#,
-  # #data.frame("method" = "lbfgs"), # Needs params?
-  # #data.frame("method" = "mla"), # Needs params?
-  # #data.frame("method" = "snewtm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  progressr::with_progress({
+    p <- progressr::progressor(steps = length(combinations))
 
-  # nloptr algos:
-  list("algorithm" = "auglag", "maxeval" = 200),
-  list("algorithm" = "bobyqa", "maxeval" = 200),
-  list("algorithm" = "ccsaq", "maxeval" = 200),
-  list("algorithm" = "cobyla", "maxeval" = 200),
-  #list("algorithm" = "crs2lm", "maxeval" = 200), Requires lower, upper
-  #list("algorithm" = "direct", "maxeval" = 200), Requires lower, upper
-  #list("algorithm" = "directL", "maxeval" = 200), Requires lower, upper
-  #list("algorithm" = "isres", "maxeval" = 200), Requires lower, upper
-  list("algorithm" = "lbfgs", "maxeval" = 200),
-  #list("algorithm" = "mlsl", "maxeval" = 200), Requires lower, upper
-  list("algorithm" = "mma", "maxeval" = 200),
-  list("algorithm" = "neldermead", "maxeval" = 200),
-  #list("algorithm" = "newuoa", "maxeval" = 200), Has no control args
-  list("algorithm" = "sbplx", "maxeval" = 200),
-  list("algorithm" = "slsqp", "maxeval" = 200),
-  #list("algorithm" = "stogo", "maxeval" = 200), Has no control args
-  list("algorithm" = "tnewton", "maxeval" = 200),
-  list("algorithm" = "varmetric", "maxeval" = 200)
-)
+    invisible(future.apply::future_lapply(
+      combinations,
+      future.seed = TRUE,
+      FUN = \(combination) {
 
+        monotonous <- monotonous
+        individual_level <- individual_level
 
-# Set the combinations to test
-combinations_single <- tidyr::expand_grid(
-  model = zip(models, model_names, time_scales),
-  method = c("free_gamma", "free_delta", "all_free"),
-  N = c(3, 5),
-  optim_config = optim_configs
-)
+        # Unpack model
+        model_zip <- combination[[1]][[1]]
+        method <- combination[[1]][[2]]
+        N <- combination[[1]][[3]]
+        optim_config <- combination[[1]][[4]]
 
-#future::plan("sequential")
-future::plan("multisession", workers = 6)
+        # Not sure where a random seed is used, but future_lapply detects a call to rng
+        set.seed(N)
 
+        model <- model_zip[[1]]
+        model_name <- model_zip[[2]]
+        time_scale <- model_zip[[3]]
 
-# Run the approximations and note the convergence point
-combinations <- combinations_single |>
-  purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
+        im_p <- DiseasyImmunity$new()
+        # Set the target
+        im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
 
+        # Generate approximations and store them and the convergence point
 
-
-
-
-monotonous <- 100
-individual_level <- 0
-#optim.method <- "BFGS"# "Nelder-Mead"
-#maxit <- 1e3
-
-progressr::with_progress({
-  p <- progressr::progressor(steps = length(combinations))
-
-  invisible(future.apply::future_lapply(
-    combinations,
-    future.seed = TRUE,
-    FUN = \(combination) {
-
-      monotonous <- monotonous
-      individual_level <- individual_level
-
-      # Unpack model
-      model_zip <- combination[[1]][[1]]
-      method <- combination[[1]][[2]]
-      N <- combination[[1]][[3]]
-      optim_config <- combination[[1]][[4]]
-
-      # Not sure where a random seed is used, but future_lapply detects a call to rng
-      set.seed(N)
-
-      model <- model_zip[[1]]
-      model_name <- model_zip[[2]]
-      time_scale <- model_zip[[3]]
-
-      im_p <- DiseasyImmunity$new()
-      # Set the target
-      im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
-
-      # Generate approximations and store them and the convergence point
-
-      # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-      mc <- optim_config |>
-        as.data.frame() |>
-        tidyr::unite("label", tidyselect::everything())
-
-      optim_label <- paste(mc$label, collapse = "_")
-
-      # Compute next values
-      if (!(optim_label %in% names(current_approxes))) {
-
-        approx <- im_p$approximate_compartmental(
-          method = method,
-          N = N,
-          monotonous = monotonous,
-          individual_level = individual_level,
-          optim_control = optim_config
-        )
-
-        # Get cache again
+        # Get the results up until now
         current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
-        # Append to existing results
-        if (cachem::is.key_missing(current_approxes)) {
-          current_approxes <- list()
-        }
+        mc <- optim_config |>
+          as.data.frame() |>
+          tidyr::unite("label", tidyselect::everything())
 
-        current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), optim_label))
+        optim_label <- paste(mc$label, collapse = "_")
 
-        # Store to cache
-        cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"), current_approxes)
-      }
+        # Compute next values
+        if (!(optim_label %in% names(current_approxes))) {
 
-      p()
-
-      rm(im_p)
-    }
-  ))
-})
-```
-
-```{r compare optimisations}
-optim_summery <- combinations_single |>
-  dplyr::select(!"optim_config") |>
-  dplyr::distinct() |>
-  purrr::pmap(
-    .progress = interactive(),
-    .f = \(model_zip, method, N, optim_config) {
-
-      # Unpack model
-      model <- model_zip[[1]]
-      model_name <- model_zip[[2]]
-      time_scale <- model_zip[[3]]
-
-      # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-      if (cachem::is.key_missing(current_approxes)) {
-
-        return(NULL)
-
-      } else {
-        summery <- current_approxes |>
-          purrr::list_transpose() |>
-          tibble::as_tibble() |>
-          dplyr::transmute(
-            "optim_method" = names(current_approxes),
-            "model" = !!model_name,
-            .data$method,
-            .data$N,
-            .data$convergence,
-            .data$value,
-            .data$execution_time
+          approx <- im_p$approximate_compartmental(
+            method = method,
+            N = N,
+            monotonous = monotonous,
+            individual_level = individual_level,
+            optim_control = optim_config
           )
 
-        return(summery)
+          # Get cache again
+          current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
+
+          # Append to existing results
+          if (cachem::is.key_missing(current_approxes)) {
+            current_approxes <- list()
+          }
+
+          current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), optim_label))
+
+          # Store to cache
+          cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"), current_approxes)
+        }
+
+        p()
+
+        rm(im_p)
       }
-    }
-  ) |>
-  purrr::list_rbind()
-
-
-optim_summery |>
-  dplyr::select(!"execution_time") |>
-  tidyr::pivot_wider(
-    id_cols = c("optim_method", "model", "N"),
-    names_from = "method",
-    values_from = c("value", "convergence"),
-    names_glue = "{method}_{.value}",
-  ) |>
-  dplyr::select("optim_method", "model", "N", starts_with("free_delta"), starts_with("free_gamma"), starts_with("all_free")) |>
-  dplyr::arrange(.data$free_delta_value + .data$free_gamma_value + .data$all_free_value)
-```
-
-```{r compare optimisations single metic}
-tt <- optim_summery |>
-  dplyr::summarise(
-    "value" = sum(.data$value),
-    "execution_time" = sum(.data$execution_time),
-    "convergence" = mean(.data$convergence),
-    .by = c("optim_method", "N")
-  ) |>
-  dplyr::arrange(.data$value) |>
-  dplyr::filter(is.finite(.data$value))
-
-print(tt)
-```
-
-```{r convergence}
-optim_summery |>
-  dplyr::summarise(max_convergence = max(.data$convergence), .by = c("optim_method", "N")) |>
-  dplyr::filter(max_convergence == 0)
+    ))
+  })
+}
 ```
 
 
-```{r compare optimisations single metic}
-# Plot points with names of method
-tt |>
-  dplyr::filter(is.finite(.data$value)) |>
-  #dplyr::filter(.data$value <= 2*median(.data$value), .data$execution_time <= 2*median(.data$execution_time), .by =  "N") |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
-  ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
-  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
-  ggplot2::theme_bw() +
-  ggplot2::xlim(0, 10) +
-  ggplot2::ylim(0, NA) +
-  ggplot2::facet_wrap(~ N, scales = "free_y")
+```{r summariser helper}
+summariser <- function(combinations) {
+  optim_summery <- combinations |>
+    dplyr::select(!"optim_config") |>
+    dplyr::distinct() |>
+    purrr::pmap(
+      .progress = interactive(),
+      .f = \(model_zip, method, N, optim_config) {
 
-```
+        # Unpack model
+        model <- model_zip[[1]]
+        model_name <- model_zip[[2]]
+        time_scale <- model_zip[[3]]
 
-```{r compare optimisations single metic}
-# Plot points with names of method
-optim_summery |>
-  dplyr::summarise(
-    "value" = sum(.data$value),
-    "execution_time" = sum(.data$execution_time),
-    "convergence" = mean(.data$convergence),
-    .by = c("optim_method" ,"method", "N")
-  ) |>
-  dplyr::filter(is.finite(.data$value)) |>
-  dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
-  ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
-  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
-  ggplot2::theme_bw() +
-  ggplot2::xlim(0, 10) +
-  ggplot2::ylim(0, NA) +
-  ggplot2::facet_grid(N ~ method, scales = "free_y")
+        # Check if we have already computed this value
+        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
+        if (cachem::is.key_missing(current_approxes)) {
+
+          return(NULL)
+
+        } else {
+          summery <- current_approxes |>
+            purrr::list_transpose() |>
+            tibble::as_tibble() |>
+            dplyr::transmute(
+              "optim_method" = names(current_approxes),
+              "model" = !!model_name,
+              .data$method,
+              .data$N,
+              .data$convergence,
+              .data$value,
+              .data$execution_time
+            )
+
+          return(summery)
+        }
+      }
+    ) |>
+    purrr::list_rbind()
+
+  # First overview
+  optim_summery |>
+    dplyr::select(!"execution_time") |>
+    tidyr::pivot_wider(
+      id_cols = c("optim_method", "model", "N"),
+      names_from = "method",
+      values_from = c("value", "convergence"),
+      names_glue = "{method}_{.value}",
+    ) |>
+    dplyr::select("optim_method", "model", "N", starts_with("free_delta"), starts_with("free_gamma"), starts_with("all_free")) |>
+    dplyr::arrange(.data$free_delta_value + .data$free_gamma_value + .data$all_free_value) |>
+    print()
+
+  # Single metric overview
+  tt <- optim_summery |>
+    dplyr::summarise(
+      "value" = sum(.data$value),
+      "execution_time" = sum(.data$execution_time),
+      "convergence" = mean(.data$convergence),
+      .by = c("optim_method", "N")
+    ) |>
+    dplyr::arrange(.data$value) |>
+    dplyr::filter(is.finite(.data$value))
+
+  print(tt)
+
+  # Convergence
+  optim_summery |>
+    dplyr::summarise(max_convergence = max(.data$convergence), .by = c("optim_method", "N")) |>
+    dplyr::filter(max_convergence == 0)
+
+  # Plot points with names of method
+  tt |>
+    dplyr::filter(is.finite(.data$value)) |>
+    #dplyr::filter(.data$value <= 2*median(.data$value), .data$execution_time <= 2*median(.data$execution_time), .by =  "N") |>
+    ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1, Inf), right = TRUE, include.lowest = TRUE))) +
+    ggplot2::geom_point() +
+    ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+    ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
+    ggplot2::theme_bw() +
+    ggplot2::xlim(0, 10) +
+    ggplot2::ylim(0, NA) +
+    ggplot2::facet_wrap(~ N, scales = "free_y")
+
+  # # Plot points with names of method
+  # optim_summery |>
+  #   dplyr::summarise(
+  #     "value" = sum(.data$value),
+  #     "execution_time" = sum(.data$execution_time),
+  #     "convergence" = mean(.data$convergence),
+  #     .by = c("optim_method" ,"method", "N")
+  #   ) |>
+  #   dplyr::filter(is.finite(.data$value)) |>
+  #   dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
+  #   ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
+  #   ggplot2::geom_point() +
+  #   ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
+  #   ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
+  #   ggplot2::theme_bw() +
+  #   ggplot2::xlim(0, 10) +
+  #   ggplot2::ylim(0, NA) +
+  #   ggplot2::facet_grid(N ~ method, scales = "free_y")
+}
 ```
 
 
@@ -371,6 +289,89 @@ optim_configs <- list(
   list("method" = "CG", "maxit" = 10),
 
   # Optimx algos:
+  data.frame("method" = "subplex", "maxfeval" = 200),
+  data.frame("method" = "nlm", "maxit" = 10),
+  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
+  #data.frame("method" = "Rcgmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "Rtnmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "Rvmmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "snewton", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  #data.frame("method" = "snewtonm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  data.frame("method" = "spg", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nvm", "maxit" = 10),
+  data.frame("method" = "slsqp", "maxeval" = 200),
+  data.frame("method" = "tnewt", "maxeval" = 200),
+  #data.frame("method" = "anms", "maxfeval" = 200), # Very slow
+  data.frame("method" = "pracmanm", "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxfeval" = 200),
+  data.frame("method" = "ucminf", "maxit" = 10),
+  data.frame("method" = "newuoa", "maxfeval" = 200),
+  data.frame("method" = "bobyqa", "maxfeval" = 200),
+  data.frame("method" = "nmkb", "maxfeval" = 200),
+  # data.frame("method" = "hjkb", "maxfeval" = 200), # Function evaluation limit exceeded -- may not converge.
+  # data.frame("method" = "lbfgsb3c", "maxit" = 10)#,
+  # #data.frame("method" = "lbfgs"), # Needs params?
+  # #data.frame("method" = "mla"), # Needs params?
+  # #data.frame("method" = "snewtm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+
+  # nloptr algos:
+  list("algorithm" = "auglag", "maxeval" = 200),
+  list("algorithm" = "auglag", "maxeval" = 400),
+  list("algorithm" = "bobyqa", "maxeval" = 200),
+  list("algorithm" = "bobyqa", "maxeval" = 400),
+  list("algorithm" = "ccsaq", "maxeval" = 200),
+  list("algorithm" = "cobyla", "maxeval" = 200),
+  #list("algorithm" = "crs2lm", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "direct", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "directL", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "isres", "maxeval" = 200), Requires lower, upper
+  list("algorithm" = "lbfgs", "maxeval" = 200),
+  #list("algorithm" = "mlsl", "maxeval" = 200), Requires lower, upper
+  list("algorithm" = "mma", "maxeval" = 200),
+  list("algorithm" = "neldermead", "maxeval" = 200),
+  list("algorithm" = "newuoa", "maxeval" = 200),
+  list("algorithm" = "newuoa", "maxeval" = 400),
+  list("algorithm" = "sbplx", "maxeval" = 200),
+  list("algorithm" = "slsqp", "maxeval" = 200),
+  #list("algorithm" = "stogo", "maxeval" = 200), Has no control args
+  list("algorithm" = "tnewton", "maxeval" = 200),
+  list("algorithm" = "varmetric", "maxeval" = 200)
+)
+
+
+# Set the combinations to test
+combinations <- tidyr::expand_grid(
+  model = zip(models, model_names, time_scales),
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = c(3, 5),
+  optim_config = optim_configs
+)
+
+#future::plan("sequential")
+future::plan("multisession", workers = 6)
+
+
+# Run the approximations and note the convergence point
+combinations_zip <- combinations |>
+  purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
+
+
+
+optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
+
+summariser(combinations)
+```
+
+
+```{r run different optimisation algos}
+cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/optim_nloptr"))
+
+# Set the optimiser configurations to test
+optim_configs <- list(
+  # Optimx algos:
+  data.frame("method" = "Nelder-Mead", "maxit" = 10),
+  data.frame("method" = "BFGS", "maxit" = 10),
+  data.frame("method" = "CG", "maxit" = 10),
   data.frame("method" = "subplex", "maxfeval" = 200),
   data.frame("method" = "nlm", "maxit" = 10),
   data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
@@ -471,7 +472,7 @@ optim_configs <- list(
 
 
 # Set the combinations to test
-combinations_single <- tidyr::expand_grid(
+combinations <- tidyr::expand_grid(
   model = zip(models, model_names, time_scales),
   method = c("free_gamma", "free_delta", "all_free"),
   N = c(3, 5),
@@ -483,202 +484,15 @@ future::plan("sequential")
 
 
 # Run the approximations and note the convergence point
-combinations <- combinations_single |>
+combinations_zip <- combinations |>
   purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
 
 
+optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
 
-
-
-monotonous <- 100
-individual_level <- 0
-#optim.method <- "BFGS"# "Nelder-Mead"
-#maxit <- 1e3
-
-progressr::with_progress({
-  p <- progressr::progressor(steps = length(combinations))
-
-  invisible(future.apply::future_lapply(
-    combinations,
-    future.seed = TRUE,
-    FUN = \(combination) {
-
-      monotonous <- monotonous
-      individual_level <- individual_level
-
-      # Unpack model
-      model_zip <- combination[[1]][[1]]
-      method <- combination[[1]][[2]]
-      N <- combination[[1]][[3]]
-      optim_config <- combination[[1]][[4]]
-
-      # Not sure where a random seed is used, but future_lapply detects a call to rng
-      set.seed(N)
-
-      model <- model_zip[[1]]
-      model_name <- model_zip[[2]]
-      time_scale <- model_zip[[3]]
-
-      im_p <- DiseasyImmunity$new()
-      # Set the target
-      im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
-
-      # Generate approximations and store them and the convergence point
-
-      # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-      mc <- optim_config |>
-        as.data.frame() |>
-        tidyr::unite("label", tidyselect::everything())
-
-      optim_label <- paste(mc$label, collapse = "_")
-
-      # Compute next values
-      if (!(optim_label %in% names(current_approxes))) {
-
-        approx <- im_p$approximate_compartmental(
-          method = method,
-          N = N,
-          monotonous = monotonous,
-          individual_level = individual_level,
-          optim_control = optim_config
-        )
-
-        # Get cache again
-        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-        # Append to existing results
-        if (cachem::is.key_missing(current_approxes)) {
-          current_approxes <- list()
-        }
-
-        current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), optim_label))
-
-        # Store to cache
-        cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"), current_approxes)
-      }
-
-      p()
-
-      rm(im_p)
-    }
-  ))
-})
+summariser(combinations)
 ```
 
-```{r compare optimisations}
-optim_summery <- combinations_single |>
-  dplyr::select(!"optim_config") |>
-  dplyr::distinct() |>
-  purrr::pmap(
-    .progress = interactive(),
-    .f = \(model_zip, method, N, optim_config) {
-
-      # Unpack model
-      model <- model_zip[[1]]
-      model_name <- model_zip[[2]]
-      time_scale <- model_zip[[3]]
-
-      # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-      if (cachem::is.key_missing(current_approxes)) {
-
-        return(NULL)
-
-      } else {
-        summery <- current_approxes |>
-          purrr::list_transpose() |>
-          tibble::as_tibble() |>
-          dplyr::transmute(
-            "optim_method" = names(current_approxes),
-            "model" = !!model_name,
-            .data$method,
-            .data$N,
-            .data$convergence,
-            .data$value,
-            .data$execution_time
-          )
-
-        return(summery)
-      }
-    }
-  ) |>
-  purrr::list_rbind()
-
-
-optim_summery |>
-  dplyr::select(!"execution_time") |>
-  tidyr::pivot_wider(
-    id_cols = c("optim_method", "model", "N"),
-    names_from = "method",
-    values_from = c("value", "convergence"),
-    names_glue = "{method}_{.value}",
-  ) |>
-  dplyr::select("optim_method", "model", "N", starts_with("free_delta"), starts_with("free_gamma"), starts_with("all_free")) |>
-  dplyr::arrange(.data$free_delta_value + .data$free_gamma_value + .data$all_free_value)
-```
-
-```{r compare optimisations single metic}
-tt <- optim_summery |>
-  dplyr::summarise(
-    "value" = sum(.data$value),
-    "execution_time" = sum(.data$execution_time),
-    "convergence" = mean(.data$convergence),
-    .by = c("optim_method", "N")
-  ) |>
-  dplyr::arrange(.data$value) |>
-  dplyr::filter(is.finite(.data$value))
-
-print(tt)
-```
-
-```{r convergence}
-optim_summery |>
-  dplyr::summarise(max_convergence = max(.data$convergence), .by = c("optim_method", "N")) #|>
-  #dplyr::filter(max_convergence == 0)
-```
-
-
-
-```{r compare optimisations single metic}
-# Plot points with names of method
-tt |>
-  dplyr::filter(is.finite(.data$value)) |>
-  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  "N") |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
-  ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
-  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
-  ggplot2::theme_bw() +
-  ggplot2::xlim(0, 8) +
-  ggplot2::ylim(0, NA) +
-  ggplot2::facet_wrap(~ N, scales = "free_y")
-
-```
-
-```{r compare optimisations single metic}
-# Plot points with names of method
-optim_summery |>
-  dplyr::summarise(
-    "value" = sum(.data$value),
-    "execution_time" = sum(.data$execution_time),
-    "convergence" = mean(.data$convergence),
-    .by = c("optim_method" ,"method", "N")
-  ) |>
-  dplyr::filter(is.finite(.data$value)) |>
-  dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
-  ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
-  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
-  ggplot2::theme_bw() +
-  ggplot2::xlim(0, 8) +
-  ggplot2::ylim(0, NA) +
-  ggplot2::facet_grid(N ~ method, scales = "free_y")
-
-```
 
 ```{r run different optimisation algos nlm speed}
 cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/optim_nlm_combi"))
@@ -697,7 +511,7 @@ optim_configs <- list(
 )
 
 # Set the combinations to test
-combinations_single <- tidyr::expand_grid(
+combinations <- tidyr::expand_grid(
   model = zip(models, model_names, time_scales),
   method = c("free_gamma", "free_delta", "all_free"),
   N = c(3, 5, 10),
@@ -709,203 +523,13 @@ future::plan("sequential")
 
 
 # Run the approximations and note the convergence point
-combinations <- combinations_single |>
+combinations_zip <- combinations |>
   purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
 
+optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
 
-
-
-
-monotonous <- 100
-individual_level <- 0
-#optim.method <- "BFGS"# "Nelder-Mead"
-#maxit <- 1e3
-
-progressr::with_progress({
-  p <- progressr::progressor(steps = length(combinations))
-
-  invisible(future.apply::future_lapply(
-    combinations,
-    future.seed = TRUE,
-    FUN = \(combination) {
-
-      monotonous <- monotonous
-      individual_level <- individual_level
-
-      # Unpack model
-      model_zip <- combination[[1]][[1]]
-      method <- combination[[1]][[2]]
-      N <- combination[[1]][[3]]
-      optim_config <- combination[[1]][[4]]
-
-      # Not sure where a random seed is used, but future_lapply detects a call to rng
-      set.seed(N)
-
-      model <- model_zip[[1]]
-      model_name <- model_zip[[2]]
-      time_scale <- model_zip[[3]]
-
-      im_p <- DiseasyImmunity$new()
-      # Set the target
-      im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
-
-      # Generate approximations and store them and the convergence point
-
-      # Get the results up until now
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-      mc <- optim_config |>
-        as.data.frame() |>
-        tidyr::unite("label", tidyselect::everything())
-
-      optim_label <- paste(mc$label, collapse = "_")
-
-      # Compute next values
-      if (!(optim_label %in% names(current_approxes))) {
-
-        approx <- im_p$approximate_compartmental(
-          method = method,
-          N = N,
-          monotonous = monotonous,
-          individual_level = individual_level,
-          optim_control = optim_config
-        )
-
-        # Get cache again
-        current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-        # Append to existing results
-        if (cachem::is.key_missing(current_approxes)) {
-          current_approxes <- list()
-        }
-
-        current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), optim_label))
-
-        # Store to cache
-        cache$set(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"), current_approxes)
-      }
-
-      p()
-
-      rm(im_p)
-    }
-  ))
-})
+summariser(combinations)
 ```
-
-```{r compare optimisations}
-optim_summery <- combinations_single |>
-  dplyr::select(!"optim_config") |>
-  dplyr::distinct() |>
-  purrr::pmap(
-    .progress = interactive(),
-    .f = \(model_zip, method, N, optim_config) {
-
-      # Unpack model
-      model <- model_zip[[1]]
-      model_name <- model_zip[[2]]
-      time_scale <- model_zip[[3]]
-
-      # Check if we have already computed this value
-      current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
-
-      if (cachem::is.key_missing(current_approxes)) {
-
-        return(NULL)
-
-      } else {
-        summery <- current_approxes |>
-          purrr::list_transpose() |>
-          tibble::as_tibble() |>
-          dplyr::transmute(
-            "optim_method" = names(current_approxes),
-            "model" = !!model_name,
-            .data$method,
-            .data$N,
-            .data$convergence,
-            .data$value,
-            .data$execution_time
-          )
-
-        return(summery)
-      }
-    }
-  ) |>
-  purrr::list_rbind()
-
-
-optim_summery |>
-  dplyr::select(!"execution_time") |>
-  tidyr::pivot_wider(
-    id_cols = c("optim_method", "model", "N"),
-    names_from = "method",
-    values_from = c("value", "convergence"),
-    names_glue = "{method}_{.value}",
-  ) |>
-  dplyr::select("optim_method", "model", "N", starts_with("free_delta"), starts_with("free_gamma"), starts_with("all_free")) |>
-  dplyr::arrange(.data$free_delta_value + .data$free_gamma_value + .data$all_free_value)
-```
-
-```{r compare optimisations single metic}
-tt <- optim_summery |>
-  dplyr::summarise(
-    "value" = sum(.data$value),
-    "execution_time" = sum(.data$execution_time),
-    "convergence" = mean(.data$convergence),
-    .by = c("optim_method", "N")
-  ) |>
-  dplyr::arrange(.data$value) |>
-  dplyr::filter(is.finite(.data$value))
-
-print(tt)
-```
-
-```{r convergence}
-optim_summery |>
-  dplyr::summarise(max_convergence = max(.data$convergence), .by = c("optim_method", "N")) #|>
-  #dplyr::filter(max_convergence == 0)
-```
-
-
-
-```{r compare optimisations single metic}
-# Plot points with names of method
-tt |>
-  dplyr::filter(is.finite(.data$value)) |>
-  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  "N") |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
-  ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
-  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
-  ggplot2::theme_bw() +
-  ggplot2::xlim(0, 8) +
-  ggplot2::ylim(0, NA) +
-  ggplot2::facet_wrap(~ N, scales = "free_y")
-
-```
-
-```{r compare optimisations single metic}
-# Plot points with names of method
-optim_summery |>
-  dplyr::summarise(
-    "value" = sum(.data$value),
-    "execution_time" = sum(.data$execution_time),
-    "convergence" = mean(.data$convergence),
-    .by = c("optim_method" ,"method", "N")
-  ) |>
-  dplyr::filter(is.finite(.data$value)) |>
-  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
-  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
-  ggplot2::geom_point() +
-  ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
-  ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
-  ggplot2::theme_bw() +
-  ggplot2::xlim(0, 8) +
-  ggplot2::ylim(0, NA) +
-  ggplot2::facet_grid(N ~ method, scales = "free_y")
-
-```
-
 
 
 
