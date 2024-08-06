@@ -325,7 +325,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
     #'   if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
     #'
-    #'   The minimisation is performed using the either `nloptr::<optimiser>` or `optimx::polyopt` optimisers.
+    #'   The minimisation is performed using the either `stats::optim`, `nloptr::<optimiser>` or `optimx::polyopt`
+    #'   optimisers.
     #'   By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
     #'   most efficient (see `vignette("diseasy-immunity")`).
     #'   Optimiser defaults can be changed via the `optim_control` argument.
@@ -341,14 +342,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Should the approximation penalise rapid changes in immunity levels?
     #'   If a numeric value supplied, it is used as a penalty factor.
     #' @param optim_control (`data.frame(1)` or `list()`)\cr
-    #'   Controls for the optimisers. The optimiser to use is inferred from the column names.
-    #'   - `nlopt::nlopt`: passed as `control` argument.
+    #'   Controls for the optimisers. The optimiser to use is inferred from the input.
+    #'   - `stats::optim`: passed as `control` argument.
+    #'   - `nlopt::<algorithm>`: passed as `control` argument.
     #'   - `optimx::polyopt`: passed as `methcontrol` argument.
+    #'
+    #'   For `stats::optim` a `list` with entries:
+    #'   - `method` (`character()`): The optimisation method to use.
+    #'   - `maxit` (`integer()`): Maximum number of iterations for the optimization. Optional.
+    #'   - ... Additional `control` arguments to be passed to `stats::optim`.
     #'
     #'   For `nlopt::nlopt` a `list` with entries:
     #'    - `algorithm` (`character(1)`): The name of the `nloptr` algorithm to use.
     #'    - `maxeval` (`integer(1)`): Maximum number of function evaluations for the optimization. Optional.
-    #'    - ... Additional `opts` arguments to be passed to `nloptr::nloptr`.
+    #'    - ... Additional `control` arguments to be passed to `nloptr::<algorithm>`.
     #'
     #'   For `optimx::polyopt` a `data.frame` with columns:
     #'   - `method` (`character()`): The optimisation method to use.
@@ -543,7 +550,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
               control = within(optim_control, rm("algorithm")), # More weird R syntax...
               ...
             )
-          } else if ("method" %in% names(optim_control)) {
+          } else if (checkmate::test_list(optim_control) && "method" %in% names(optim_control)) {
+
+            res <- stats::optim(
+              par = c(p_gamma_0, p_delta_0),
+              fn = \(p) sum(obj_function(p)),
+              method = optim_control$method,
+              control = within(optim_control, rm("method")), # More weird R syntax...
+              ...
+            )
+
+          } else if (checkmate::test_data_frame(optim_control) && "method" %in% colnames(optim_control)) {
+
             invisible(capture.output(
             res <- optimx::polyopt(
               par = c(p_gamma_0, p_delta_0),
@@ -552,7 +570,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               ...
             )))
 
-            # `optimx` has different output format from `optim`
+            # `optimx` has different output format from the other optimisers
             # Try to unify the output formats here
             par <- tail(res, 1) |>
               dplyr::select(tidyselect::starts_with("p")) |>
@@ -566,7 +584,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               modifyList(list("par" = par))
 
           } else {
-            stop("`optim_control` format matches neither `nloptr::nloptr` nor `optimx::polyopt`!")
+            stop("`optim_control` format matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::polyopt`!")
           }
 
           # Get the full metrics for the best solution

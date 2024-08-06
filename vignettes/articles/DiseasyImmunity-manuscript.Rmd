@@ -73,14 +73,14 @@ We run a few examples to manually inspect the fitting
 im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
 plot(im, method = "free_gamma", N = 3)
 
-im$approximate_compartmental(method = "free_delta", N = 2)
+im$approximate_compartmental(method = "free_delta", N = 2, optim_control = list("method" = "BFGS", "maxit" = 20))
 ```
 
 ```{r manually check fits}
-#im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
-#plot(im, method = "all_free", N = 3)
+im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
+plot(im, method = "free_gamma", N = 3)
 
-#im$approximate_compartmental(method = "all_free", N = 3)
+im$approximate_compartmental(method = "free_delta", N = 2, optim_control = list("algorithm" = "newuoa", "maxeval" = 200))
 ```
 
 
@@ -94,38 +94,58 @@ we run the approximations.
 First, we need to determine how to optimise the parameters since quality of the
 fit is seemingly very dependent on the method used
 ```{r run different optimisation algos}
-cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/optim"))
+cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/optim_nloptr"))
 
 # Set the optimiser configurations to test
 optim_configs <- list(
-  data.frame("method" = "Nelder-Mead", "maxit" = 10),
+  # Optimx algos:
+  # data.frame("method" = "Nelder-Mead", "maxit" = 10),
   data.frame("method" = "BFGS", "maxit" = 10),
-  data.frame("method" = "CG", "maxit" = 10),
-  data.frame("method" = "subplex", "maxfeval" = 200),
+  # data.frame("method" = "CG", "maxit" = 10),
+  # data.frame("method" = "subplex", "maxfeval" = 200),
   data.frame("method" = "nlm", "maxit" = 10),
-  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
-  #data.frame("method" = "Rcgmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  #data.frame("method" = "Rtnmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  #data.frame("method" = "Rvmmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
-  #data.frame("method" = "snewton", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
-  #data.frame("method" = "snewtonm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
-  data.frame("method" = "spg", "maxit" = 10, "maxfeval" = 200),
-  data.frame("method" = "nvm", "maxit" = 10),
-  data.frame("method" = "slsqp", "maxeval" = 200),
-  data.frame("method" = "tnewt", "maxeval" = 200),
-  #data.frame("method" = "anms", "maxfeval" = 200), # Very slow
-  data.frame("method" = "pracmanm", "maxfeval" = 200),
+  # data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
+  # #data.frame("method" = "Rcgmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  # #data.frame("method" = "Rtnmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  # #data.frame("method" = "Rvmmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  # #data.frame("method" = "snewton", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  # #data.frame("method" = "snewtonm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  # data.frame("method" = "spg", "maxit" = 10, "maxfeval" = 200),
+  # data.frame("method" = "nvm", "maxit" = 10),
+  # data.frame("method" = "slsqp", "maxeval" = 200),
+  # data.frame("method" = "tnewt", "maxeval" = 200),
+  # #data.frame("method" = "anms", "maxfeval" = 200), # Very slow
+  # data.frame("method" = "pracmanm", "maxfeval" = 200),
   data.frame("method" = "nlnm", "maxfeval" = 200),
-  data.frame("method" = "ucminf", "maxit" = 10),
-  data.frame("method" = "newuoa", "maxfeval" = 200),
-  data.frame("method" = "bobyqa", "maxfeval" = 200),
-  data.frame("method" = "nmkb", "maxfeval" = 200),
-  data.frame("method" = "hjkb", "maxfeval" = 200), # Function evaluation limit exceeded -- may not converge.
-  data.frame("method" = "lbfgsb3c", "maxit" = 10)#,
-  #data.frame("method" = "lbfgs"), # Needs params?
-  #data.frame("method" = "mla"), # Needs params?
+  # data.frame("method" = "ucminf", "maxit" = 10),
+  # data.frame("method" = "newuoa", "maxfeval" = 200),
+  # data.frame("method" = "bobyqa", "maxfeval" = 200),
+  # data.frame("method" = "nmkb", "maxfeval" = 200),
+  # data.frame("method" = "hjkb", "maxfeval" = 200), # Function evaluation limit exceeded -- may not converge.
+  # data.frame("method" = "lbfgsb3c", "maxit" = 10)#,
+  # #data.frame("method" = "lbfgs"), # Needs params?
+  # #data.frame("method" = "mla"), # Needs params?
+  # #data.frame("method" = "snewtm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
 
-  #data.frame("method" = "snewtm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  # nloptr algos:
+  list("algorithm" = "auglag", "maxeval" = 200),
+  list("algorithm" = "bobyqa", "maxeval" = 200),
+  list("algorithm" = "ccsaq", "maxeval" = 200),
+  list("algorithm" = "cobyla", "maxeval" = 200),
+  #list("algorithm" = "crs2lm", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "direct", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "directL", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "isres", "maxeval" = 200), Requires lower, upper
+  list("algorithm" = "lbfgs", "maxeval" = 200),
+  #list("algorithm" = "mlsl", "maxeval" = 200), Requires lower, upper
+  list("algorithm" = "mma", "maxeval" = 200),
+  list("algorithm" = "neldermead", "maxeval" = 200),
+  #list("algorithm" = "newuoa", "maxeval" = 200), Has no control args
+  list("algorithm" = "sbplx", "maxeval" = 200),
+  list("algorithm" = "slsqp", "maxeval" = 200),
+  #list("algorithm" = "stogo", "maxeval" = 200), Has no control args
+  list("algorithm" = "tnewton", "maxeval" = 200),
+  list("algorithm" = "varmetric", "maxeval" = 200)
 )
 
 
@@ -137,8 +157,8 @@ combinations_single <- tidyr::expand_grid(
   optim_config = optim_configs
 )
 
-future::plan("sequential")
-#future::plan("multisession", workers = 15)
+#future::plan("sequential")
+future::plan("multisession", workers = 6)
 
 
 # Run the approximations and note the convergence point
@@ -188,6 +208,7 @@ progressr::with_progress({
       current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       mc <- optim_config |>
+        as.data.frame() |>
         tidyr::unite("label", tidyselect::everything())
 
       optim_label <- paste(mc$label, collapse = "_")
@@ -200,7 +221,7 @@ progressr::with_progress({
           N = N,
           monotonous = monotonous,
           individual_level = individual_level,
-          polyopt_methodcontrol = optim_config
+          optim_control = optim_config
         )
 
         # Get cache again
@@ -311,7 +332,7 @@ tt |>
   ggplot2::theme_bw() +
   ggplot2::xlim(0, 10) +
   ggplot2::ylim(0, NA) +
-  ggplot2::facet_wrap(~N, scales = "free_y")
+  ggplot2::facet_wrap(~ N, scales = "free_y")
 
 ```
 
@@ -337,6 +358,91 @@ optim_summery |>
 
 ```
 
+
+
+```{r run different optimisation algos}
+cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/article_data/optim_nloptr"))
+
+# Set the optimiser configurations to test
+optim_configs <- list(
+  # Optim algos
+  list("method" = "Nelder-Mead", "maxit" = 10),
+  list("method" = "BFGS", "maxit" = 10),
+  list("method" = "CG", "maxit" = 10),
+
+  # Optimx algos:
+  data.frame("method" = "subplex", "maxfeval" = 200),
+  data.frame("method" = "nlm", "maxit" = 10),
+  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
+  #data.frame("method" = "Rcgmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "Rtnmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "Rvmmin", "maxit" = 10, "maxfeval" = 200), # Method issue, NA params?
+  #data.frame("method" = "snewton", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  #data.frame("method" = "snewtonm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+  data.frame("method" = "spg", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nvm", "maxit" = 10),
+  data.frame("method" = "slsqp", "maxeval" = 200),
+  data.frame("method" = "tnewt", "maxeval" = 200),
+  #data.frame("method" = "anms", "maxfeval" = 200), # Very slow
+  data.frame("method" = "pracmanm", "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxfeval" = 200),
+  data.frame("method" = "ucminf", "maxit" = 10),
+  data.frame("method" = "newuoa", "maxfeval" = 200),
+  data.frame("method" = "bobyqa", "maxfeval" = 200),
+  data.frame("method" = "nmkb", "maxfeval" = 200),
+  # data.frame("method" = "hjkb", "maxfeval" = 200), # Function evaluation limit exceeded -- may not converge.
+  # data.frame("method" = "lbfgsb3c", "maxit" = 10)#,
+  # #data.frame("method" = "lbfgs"), # Needs params?
+  # #data.frame("method" = "mla"), # Needs params?
+  # #data.frame("method" = "snewtm", "maxit" = 10, "maxfeval" = 200), # Needs gradient and Hessian
+
+  # nloptr algos:
+  list("algorithm" = "auglag", "maxeval" = 200),
+  list("algorithm" = "auglag", "maxeval" = 400),
+  list("algorithm" = "bobyqa", "maxeval" = 200),
+  list("algorithm" = "bobyqa", "maxeval" = 400),
+  list("algorithm" = "ccsaq", "maxeval" = 200),
+  list("algorithm" = "cobyla", "maxeval" = 200),
+  #list("algorithm" = "crs2lm", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "direct", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "directL", "maxeval" = 200), Requires lower, upper
+  #list("algorithm" = "isres", "maxeval" = 200), Requires lower, upper
+  list("algorithm" = "lbfgs", "maxeval" = 200),
+  #list("algorithm" = "mlsl", "maxeval" = 200), Requires lower, upper
+  list("algorithm" = "mma", "maxeval" = 200),
+  list("algorithm" = "neldermead", "maxeval" = 200),
+  list("algorithm" = "newuoa", "maxeval" = 200),
+  list("algorithm" = "newuoa", "maxeval" = 400),
+  list("algorithm" = "sbplx", "maxeval" = 200),
+  list("algorithm" = "slsqp", "maxeval" = 200),
+  #list("algorithm" = "stogo", "maxeval" = 200), Has no control args
+  list("algorithm" = "tnewton", "maxeval" = 200),
+  list("algorithm" = "varmetric", "maxeval" = 200)
+)
+
+
+# Set the combinations to test
+combinations <- tidyr::expand_grid(
+  model = zip(models, model_names, time_scales),
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = c(3, 5),
+  optim_config = optim_configs
+)
+
+#future::plan("sequential")
+future::plan("multisession", workers = 6)
+
+
+# Run the approximations and note the convergence point
+combinations_zip <- combinations |>
+  purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
+
+
+
+optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
+
+summariser(combinations)
+```
 
 # nlm looks fast, can we do better?
 
@@ -373,7 +479,7 @@ combinations_single <- tidyr::expand_grid(
 )
 
 future::plan("sequential")
-#future::plan("multisession", workers = 15)
+#future::plan("multisession", workers = 6)
 
 
 # Run the approximations and note the convergence point
@@ -423,6 +529,7 @@ progressr::with_progress({
       current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       mc <- optim_config |>
+        as.data.frame() |>
         tidyr::unite("label", tidyselect::everything())
 
       optim_label <- paste(mc$label, collapse = "_")
@@ -435,7 +542,7 @@ progressr::with_progress({
           N = N,
           monotonous = monotonous,
           individual_level = individual_level,
-          polyopt_methodcontrol = optim_config
+          optim_control = optim_config
         )
 
         # Get cache again
@@ -547,7 +654,7 @@ tt |>
   ggplot2::theme_bw() +
   ggplot2::xlim(0, 8) +
   ggplot2::ylim(0, NA) +
-  ggplot2::facet_wrap(~N, scales = "free_y")
+  ggplot2::facet_wrap(~ N, scales = "free_y")
 
 ```
 
@@ -561,7 +668,7 @@ optim_summery |>
     .by = c("optim_method" ,"method", "N")
   ) |>
   dplyr::filter(is.finite(.data$value)) |>
-  #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
+  dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  c("method", "N")) |>
   ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
   ggplot2::geom_point() +
   ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
@@ -598,7 +705,7 @@ combinations_single <- tidyr::expand_grid(
 )
 
 future::plan("sequential")
-#future::plan("multisession", workers = 15)
+#future::plan("multisession", workers = 6)
 
 
 # Run the approximations and note the convergence point
@@ -648,6 +755,7 @@ progressr::with_progress({
       current_approxes <- cache$get(key = glue::glue("{model_name}-{method}-{monotonous}-{individual_level}-{N}"))
 
       mc <- optim_config |>
+        as.data.frame() |>
         tidyr::unite("label", tidyselect::everything())
 
       optim_label <- paste(mc$label, collapse = "_")
@@ -660,7 +768,7 @@ progressr::with_progress({
           N = N,
           monotonous = monotonous,
           individual_level = individual_level,
-          polyopt_methodcontrol = optim_config
+          optim_control = optim_config
         )
 
         # Get cache again
@@ -765,14 +873,14 @@ optim_summery |>
 tt |>
   dplyr::filter(is.finite(.data$value)) |>
   #dplyr::filter(.data$value <= mean(.data$value), .data$execution_time <= mean(.data$execution_time), .by =  "N") |>
-    ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
+  ggplot2::ggplot(ggplot2::aes(x = value, y = as.numeric(execution_time), color = optim_method, shape = cut(convergence, breaks = c(0, 0.25, 0.5, 0.75, 1), right = TRUE, include.lowest = TRUE))) +
   ggplot2::geom_point() +
   ggplot2::geom_text(ggplot2::aes(label = optim_method), nudge_x = 0.5, nudge_y = 0, vjust = 0.5, hjust = 0) +
   ggplot2::labs(x = "Value", y = "Execution time", shape = "Convergence", color = "Method") +
   ggplot2::theme_bw() +
   ggplot2::xlim(0, 8) +
   ggplot2::ylim(0, NA) +
-  ggplot2::facet_wrap(~N, scales = "free_y")
+  ggplot2::facet_wrap(~ N, scales = "free_y")
 
 ```
 
