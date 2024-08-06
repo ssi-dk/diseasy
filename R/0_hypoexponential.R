@@ -41,7 +41,12 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
   # Compute the density function
   tt <- theta(shape, rate)
-  d <- purrr::map_dbl(x, \(x) - as.numeric(alpha(shape) %*% Matrix::expm(x * tt) %*% tt %*% ones(shape)))
+  d <- vapply(
+    x,
+    \(x) - alpha(shape) %*% expm::expm(x * tt) %*% tt %*% ones(shape),
+    FUN.VALUE = numeric(1),
+    USE.NAMES = FALSE
+  )
 
   return(d)
 }
@@ -56,7 +61,12 @@ phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
   }
 
   # Compute the upper tail of the cumulative distribution function
-  p <- purrr::map_dbl(q, \(q) as.numeric(alpha(shape) %*% Matrix::expm(q * theta(shape, rate)) %*% ones(shape)))
+  p <- vapply(
+    q,
+    \(q) alpha(shape) %*% expm::expm(q * theta(shape, rate)) %*% ones(shape),
+    FUN.VALUE = numeric(1),
+    USE.NAMES = FALSE
+  )
 
   # Convert to lower tail if needed
   if (lower.tail) p <- 1 - p
