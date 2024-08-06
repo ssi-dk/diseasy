@@ -28,7 +28,7 @@ See the vignette("diseasy-immunity") for examples of use.
   rm(im)
 }
 \seealso{
-\link{vignette("diseasy-immunity")}, \link[optimx:polyopt]{optimx::polyopt}
+\link{vignette("diseasy-immunity")}, \link[nloptr:nloptr]{nloptr::nloptr}, \link[optimx:polyopt]{optimx::polyopt}
 }
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyImmunity}
@@ -315,8 +315,7 @@ best matches the waning immunity curves set in the module.
   N = NULL,
   monotonous = TRUE,
   individual_level = TRUE,
-  polyopt_methodcontrol = data.frame(method = "nlnm", maxit = 10, maxeval = 100, maxfeval
-    = 100),
+  optim_control = data.frame(method = "nlnm", maxit = 10, maxeval = 100, maxfeval = 100),
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -338,18 +337,29 @@ If a numeric value supplied, it is used as a penalty factor.}
 Should the approximation penalise rapid changes in immunity levels?
 If a numeric value supplied, it is used as a penalty factor.}
 
-\item{\code{polyopt_methodcontrol}}{(\code{data.frame(1)})\cr
-Controls for the \code{optimx::polyopt} function.
+\item{\code{optim_control}}{(\code{data.frame(1)} or \code{list()})\cr
+Controls for the optimisers. The optimiser to use is inferred from the column names.
+\itemize{
+\item \code{nlopt::nlopt}: passed as \code{control} argument.
+\item \code{optimx::polyopt}: passed as \code{methcontrol} argument.
+}
 
-Must be a data.frame with columns:
+For \code{nlopt::nlopt} a \code{list} with entries:
+\itemize{
+\item \code{algorithm} (\code{character(1)}): The name of the \code{nloptr} algorithm to use.
+\item \code{maxeval} (\code{integer(1)}): Maximum number of function evaluations for the optimization. Optional.
+\item ... Additional \code{opts} arguments to be passed to \code{nloptr::nloptr}.
+}
+
+For \code{optimx::polyopt} a \code{data.frame} with columns:
 \itemize{
 \item \code{method} (\code{character()}): The optimisation method to use.
-\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization.
-\item \code{maxeval} (\code{integer()}): Maximum number of function evaluations for the optimization.
-\item \code{maxfeval} (\code{integer()}): Maximum number of function evaluations for the optimization.
+\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization. Optional.
+\item \code{maxeval} (\code{integer()}): Maximum number of function evaluations for the optimization. Optional.
+\item \code{maxfeval} (\code{integer()}): Maximum number of function evaluations for the optimization. Optional.
 }}
 
-\item{\code{...}}{Additional arguments to be passed to the \code{optimx::polyopt}.}
+\item{\code{...}}{Additional arguments to be passed to the optimiser.}
 }
 \if{html}{\out{</div>}}
 }
@@ -365,15 +375,14 @@ The function implements three methods for approximating the waning immunity curv
 (N free parameters).
 - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
 
-The optimization minimises the square root of the squared differences between the target waning and the
+The optimisation minimises the square root of the squared differences between the target waning and the
 approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
 if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
 
-The minimisation is performed using the \code{polyopt} function from the \code{optimx} package, which allows for
-multiple optimisation methods and consecutive calls to different optimisation algorithms.
+The minimisation is performed using the either \verb{nloptr::<optimiser>} or \code{optimx::polyopt} optimisers.
 By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
 most efficient (see \code{vignette("diseasy-immunity")}).
-Optimiser defaults can be changed by providing the \code{optim.method}, \code{maxit}, \code{maxeval}, and/or \code{maxfeval} arguments.
+Optimiser defaults can be changed via the \code{optim_control} argument.
 }
 
 \subsection{Returns}{

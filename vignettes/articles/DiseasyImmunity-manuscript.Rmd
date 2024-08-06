@@ -345,22 +345,22 @@ cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/art
 
 # Set the optimiser configurations to test
 optim_configs <- list(
-  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 25),
-  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 50),
-  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 100),
-  data.frame("method" = "nlm", "maxit" = 5, "maxfeval" = 200),
-  data.frame("method" = "nlm", "maxit" = 10, "maxfeval" = 200),
-  data.frame("method" = "nlm", "maxit" = 20, "maxfeval" = 100),
-  data.frame("method" = "nlm", "maxit" = 40, "maxfeval" = 100),
-  data.frame("method" = "nlnm", "maxit" = 10, "maxfeval" = 100),
-  data.frame("method" = "nlnm", "maxit" = 5, "maxfeval" = 200),
-  data.frame("method" = "nlnm", "maxit" = 10, "maxfeval" = 200),
-  data.frame("method" = "nlnm", "maxit" = 20, "maxfeval" = 200),
-  data.frame("method" = "nlnm", "maxit" = 30, "maxfeval" = 300),
-  data.frame("method" = "nlnm", "maxit" = 40, "maxfeval" = 400),
+  data.frame("method" = "nlm", "maxit" = 5),
+  data.frame("method" = "nlm", "maxit" = 10),
+  data.frame("method" = "nlm", "maxit" = 20),
+  data.frame("method" = "nlm", "maxit" = 40),
+  data.frame("method" = "nlnm", "maxfeval" = 50),
+  data.frame("method" = "nlnm", "maxfeval" = 100),
+  data.frame("method" = "nlnm", "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxfeval" = 300),
+  data.frame("method" = "nlnm", "maxfeval" = 400),
   data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 100),
   data.frame("method" = "nlminb", "maxit" = 5, "maxfeval" = 200),
-  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200)
+  data.frame("method" = "nlminb", "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "BFGS", "maxit" = 10),
+  data.frame("method" = "BFGS", "maxit" = 25),
+  data.frame("method" = "BFGS", "maxit" = 50),
+  data.frame("method" = "BFGS", "maxit" = 100)
 )
 
 
@@ -435,9 +435,7 @@ progressr::with_progress({
           N = N,
           monotonous = monotonous,
           individual_level = individual_level,
-          optim.method = optim_config$method,
-          maxit = optim_config$maxit,
-          maxfeval = optim_config$maxfeval
+          polyopt_methodcontrol = optim_config
         )
 
         # Get cache again
@@ -580,18 +578,22 @@ cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/art
 
 # Set the optimiser configurations to test
 optim_configs <- list(
-  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(5, 10), "maxfeval" = 100),
-  data.frame("method" = c("nlm", "Nelder-Mead"), "maxit" = c(5, 10), "maxfeval" = c(100, 200)),
-  data.frame("method" = c("nlm", "nlnm"), "maxit" = c(5, 10), "maxfeval" = 100),
-  data.frame("method" = "nlnm", "maxit" = 10, "maxfeval" = 100) # Use as reference - also converges
+  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(5, 25)),
+  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(10, 25)),
+  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(5, 50)),
+  data.frame("method" = c("nlm", "nlnm"), "maxit" = 5, "maxfeval" = 100),
+  data.frame("method" = c("nlm", "nlnm"), "maxit" = 10, "maxfeval" = 100),
+  data.frame("method" = c("nlm", "nlnm"), "maxit" = 10, "maxfeval" = 200),
+  data.frame("method" = "nlnm", "maxfeval" = 50),
+  data.frame("method" = "nlnm", "maxfeval" = 100),
+  data.frame("method" = "nlnm", "maxfeval" = 200)
 )
-
 
 # Set the combinations to test
 combinations_single <- tidyr::expand_grid(
   model = zip(models, model_names, time_scales),
   method = c("free_gamma", "free_delta", "all_free"),
-  N = c(3, 5),
+  N = c(3, 5, 10),
   optim_config = optim_configs
 )
 
@@ -658,9 +660,7 @@ progressr::with_progress({
           N = N,
           monotonous = monotonous,
           individual_level = individual_level,
-          optim.method = optim_config$method,
-          maxit = optim_config$maxit,
-          maxfeval = optim_config$maxfeval
+          polyopt_methodcontrol = optim_config
         )
 
         # Get cache again
