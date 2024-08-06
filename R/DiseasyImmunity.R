@@ -321,15 +321,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'       (N free parameters).
     #'     - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
     #'
-    #'   The optimization minimises the square root of the squared differences between the target waning and the
+    #'   The optimisation minimises the square root of the squared differences between the target waning and the
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
     #'   if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
     #'
-    #'   The minimisation is performed using the `polyopt` function from the `optimx` package, which allows for
-    #'   multiple optimisation methods and consecutive calls to different optimisation algorithms.
+    #'   The minimisation is performed using the either `nloptr::<optimiser>` or `optimx::polyopt` optimisers.
     #'   By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
     #'   most efficient (see `vignette("diseasy-immunity")`).
-    #'   Optimiser defaults can be changed by providing the `optim.method`, `maxit`, `maxeval`, and/or `maxfeval` arguments.
+    #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'
     #' @param method (`character(1)`)\cr
     #'   Specifies the method to be used from the available methods. See details.
@@ -341,25 +340,32 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
     #'   Should the approximation penalise rapid changes in immunity levels?
     #'   If a numeric value supplied, it is used as a penalty factor.
-    #' @param polyopt_methodcontrol (`data.frame(1)`)\cr
-    #'   Controls for the `optimx::polyopt` function.
+    #' @param optim_control (`data.frame(1)` or `list()`)\cr
+    #'   Controls for the optimisers. The optimiser to use is inferred from the column names.
+    #'   - `nlopt::nlopt`: passed as `control` argument.
+    #'   - `optimx::polyopt`: passed as `methcontrol` argument.
     #'
-    #'   Must be a data.frame with columns:
+    #'   For `nlopt::nlopt` a `list` with entries:
+    #'    - `algorithm` (`character(1)`): The name of the `nloptr` algorithm to use.
+    #'    - `maxeval` (`integer(1)`): Maximum number of function evaluations for the optimization. Optional.
+    #'    - ... Additional `opts` arguments to be passed to `nloptr::nloptr`.
+    #'
+    #'   For `optimx::polyopt` a `data.frame` with columns:
     #'   - `method` (`character()`): The optimisation method to use.
-    #'   - `maxit` (`integer()`): Maximum number of iterations for the optimization.
-    #'   - `maxeval` (`integer()`): Maximum number of function evaluations for the optimization.
-    #'   - `maxfeval` (`integer()`): Maximum number of function evaluations for the optimization.
+    #'   - `maxit` (`integer()`): Maximum number of iterations for the optimization. Optional.
+    #'   - `maxeval` (`integer()`): Maximum number of function evaluations for the optimization. Optional.
+    #'   - `maxfeval` (`integer()`): Maximum number of function evaluations for the optimization. Optional.
     #' @param ...
-    #'   Additional arguments to be passed to the `optimx::polyopt`.
+    #'   Additional arguments to be passed to the optimiser.
     #' @return
     #'   Returns the rates and objective value (invisibly).
-    #' @seealso [vignette("diseasy-immunity")], [optimx::polyopt]
+    #' @seealso [vignette("diseasy-immunity")], [nloptr::nloptr], [optimx::polyopt]
     approximate_compartmental = function(
       method = c("free_gamma", "free_delta", "all_free"),
       N = NULL,                                                                                                         # nolint: object_name_linter
       monotonous = TRUE,
       individual_level = TRUE,
-      polyopt_methodcontrol = data.frame(
+      optim_control = data.frame(
         "method" = "nlnm",
         "maxit" = 10,
         "maxeval" = 100,
@@ -374,14 +380,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
       checkmate::assert_number(as.numeric( monotonous), add = coll)
       checkmate::assert_number(as.numeric(individual_level), add = coll)
-      checkmate::assert_data_frame(
-        polyopt_methodcontrol,
-        types = c("character", "integerish", "integerish"),
+      checkmate::assert(
+        checkmate::check_list(optim_control, types = c("character", "integerish")), # nloptr opts
+        checkmate::check_data_frame(optim_control, types = c("character", "integerish")), # optimx methcopntrol
         add = coll
       )
-      checkmate::assert_names(
-        names(polyopt_methodcontrol),
-        subset.of = c("method", "maxit", "maxeval", "maxfeval"),
+      checkmate::assert(
+        checkmate::check_names( # nloptr opts
+          names(optim_control),
+          subset.of = c("algorithm", "maxeval")
+        ),
+        checkmate::check_names( # optimx methcontrol
+          names(optim_control),
+          subset.of = c("method", "maxit", "maxeval", "maxfeval")
+        ),
         add = coll
       )
       checkmate::reportAssertions(coll)
@@ -423,7 +435,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           n_free_parameters <- N - 1
 
           par_to_delta <- \(par) p_0inf(par) # All parameters are delta
-          par_to_gamma <- \(par, model_id, f_inf) seq(from = 1, to = f_inf, length.out = N) # gammas:  1 to f_inf
+          par_to_gamma <- \(par, model_id, f_inf) seq(from = 1, to = f_inf, length.out = N) # gammas: 1 to f_inf
 
         } else if (method == "all_free") {
           # All parameters are free to vary
@@ -524,27 +536,38 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Run the optimisation
-          invisible(capture.output(
-          res <- optimx::polyopt(
-            par = c(p_gamma_0, p_delta_0),
-            fn = \(p) sum(obj_function(p)),
-            methcontrol = polyopt_methodcontrol,
-            ...
-          )))
+          if ("algorithm" %in% names(optim_control)) {
+            res <- getExportedValue("nloptr", optim_control$algorithm)(
+              x0 = c(p_gamma_0, p_delta_0),
+              fn = \(p) sum(obj_function(p)),
+              control = within(optim_control, rm("algorithm")), # More weird R syntax...
+              ...
+            )
+          } else if ("method" %in% names(optim_control)) {
+            invisible(capture.output(
+            res <- optimx::polyopt(
+              par = c(p_gamma_0, p_delta_0),
+              fn = \(p) sum(obj_function(p)),
+              methcontrol = optim_control,
+              ...
+            )))
 
-          # `optimx` has different output format from `optim`
-          # Try to unify the output formats here
-          par <- tail(res, 1) |>
-            dplyr::select(tidyselect::starts_with("p")) |>
-            as.list() |>
-            unlist() |>
-            unname()
+            # `optimx` has different output format from `optim`
+            # Try to unify the output formats here
+            par <- tail(res, 1) |>
+              dplyr::select(tidyselect::starts_with("p")) |>
+              as.list() |>
+              unlist() |>
+              unname()
 
-          res <- tail(res, 1) |>
-            dplyr::select(!tidyselect::starts_with("p")) |>
-            as.list() |>
-            modifyList(list("par" = par))
+            res <- tail(res, 1) |>
+              dplyr::select(!tidyselect::starts_with("p")) |>
+              as.list() |>
+              modifyList(list("par" = par))
 
+          } else {
+            stop("`optim_control` format matches neither `nloptr::nloptr` nor `optimx::polyopt`!")
+          }
 
           # Get the full metrics for the best solution
           metrics <- obj_function(res$par)
