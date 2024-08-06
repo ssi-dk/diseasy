@@ -455,7 +455,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             if (any(is.infinite(delta)) || anyNA(delta) || anyNA(gamma)) {
 
               # We define the objective function as infinite in this case
-              return(list("value" = Inf, "penalty" = Inf))
+              return(list("value" = 1 / .Machine$double.eps, "penalty" = 1 / .Machine$double.eps))
 
             } else {
 
@@ -468,7 +468,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               value <- tryCatch(
                 sqrt(stats::integrate(integrand, lower = 0, upper = Inf)$value),
                 error = function(e) {
-                  1 / min(delta) # If the any delta is too small, the integral looks divergent
+                  1 / (min(delta) + .Machine$double.eps) # If the any delta is too small, the integral looks divergent
                   # (since we too approach the asymptote too slowly).
                   # We use the 1 / delta to create a wall in the optimisation
                 }
