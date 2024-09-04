@@ -338,17 +338,25 @@ Should the approximation penalise rapid changes in immunity levels?
 If a numeric value supplied, it is used as a penalty factor.}
 
 \item{\code{optim_control}}{(\code{data.frame(1)} or \code{list()})\cr
-Controls for the optimisers. The optimiser to use is inferred from the column names.
+Controls for the optimisers. The optimiser to use is inferred from the input.
 \itemize{
-\item \code{nlopt::nlopt}: passed as \code{control} argument.
+\item \code{stats::optim}: passed as \code{control} argument.
+\item \verb{nloptr::<algorithm>}: passed as \code{control} argument.
 \item \code{optimx::polyopt}: passed as \code{methcontrol} argument.
 }
 
-For \code{nlopt::nlopt} a \code{list} with entries:
+For \code{stats::optim} a \code{list} with entries:
+\itemize{
+\item \code{method} (\code{character()}): The optimisation method to use.
+\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization. Optional.
+\item ... Additional \code{control} arguments to be passed to \code{stats::optim}.
+}
+
+For \verb{nloptr::<algorithm>} a \code{list} with entries:
 \itemize{
 \item \code{algorithm} (\code{character(1)}): The name of the \code{nloptr} algorithm to use.
 \item \code{maxeval} (\code{integer(1)}): Maximum number of function evaluations for the optimization. Optional.
-\item ... Additional \code{opts} arguments to be passed to \code{nloptr::nloptr}.
+\item ... Additional \code{control} arguments to be passed to \verb{nloptr::<algorithm>}.
 }
 
 For \code{optimx::polyopt} a \code{data.frame} with columns:
@@ -379,7 +387,8 @@ The optimisation minimises the square root of the squared differences between th
 approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
 if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
 
-The minimisation is performed using the either \verb{nloptr::<optimiser>} or \code{optimx::polyopt} optimisers.
+The minimisation is performed using the either \code{stats::optim}, \verb{nloptr::<optimiser>} or \code{optimx::polyopt}
+optimisers.
 By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
 most efficient (see \code{vignette("diseasy-immunity")}).
 Optimiser defaults can be changed via the \code{optim_control} argument.

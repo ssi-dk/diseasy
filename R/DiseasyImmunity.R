@@ -344,7 +344,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param optim_control (`data.frame(1)` or `list()`)\cr
     #'   Controls for the optimisers. The optimiser to use is inferred from the input.
     #'   - `stats::optim`: passed as `control` argument.
-    #'   - `nlopt::<algorithm>`: passed as `control` argument.
+    #'   - `nloptr::<algorithm>`: passed as `control` argument.
     #'   - `optimx::polyopt`: passed as `methcontrol` argument.
     #'
     #'   For `stats::optim` a `list` with entries:
@@ -352,7 +352,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   - `maxit` (`integer()`): Maximum number of iterations for the optimization. Optional.
     #'   - ... Additional `control` arguments to be passed to `stats::optim`.
     #'
-    #'   For `nlopt::nlopt` a `list` with entries:
+    #'   For `nloptr::<algorithm>` a `list` with entries:
     #'    - `algorithm` (`character(1)`): The name of the `nloptr` algorithm to use.
     #'    - `maxeval` (`integer(1)`): Maximum number of function evaluations for the optimization. Optional.
     #'    - ... Additional `control` arguments to be passed to `nloptr::<algorithm>`.
@@ -389,7 +389,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_number(as.numeric(individual_level), add = coll)
       checkmate::assert(
         checkmate::check_list(optim_control, types = c("character", "integerish")), # nloptr opts
-        checkmate::check_data_frame(optim_control, types = c("character", "integerish")), # optimx methcopntrol
+        checkmate::check_data_frame(optim_control, types = c("character", "integerish")), # optimx methcontrol
         add = coll
       )
       checkmate::assert(
