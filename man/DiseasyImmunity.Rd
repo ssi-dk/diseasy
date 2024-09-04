@@ -341,7 +341,7 @@ If a numeric value supplied, it is used as a penalty factor.}
 Controls for the optimisers. The optimiser to use is inferred from the input.
 \itemize{
 \item \code{stats::optim}: passed as \code{control} argument.
-\item \verb{nlopt::<algorithm>}: passed as \code{control} argument.
+\item \verb{nloptr::<algorithm>}: passed as \code{control} argument.
 \item \code{optimx::polyopt}: passed as \code{methcontrol} argument.
 }
 
@@ -352,7 +352,7 @@ For \code{stats::optim} a \code{list} with entries:
 \item ... Additional \code{control} arguments to be passed to \code{stats::optim}.
 }
 
-For \code{nlopt::nlopt} a \code{list} with entries:
+For \verb{nloptr::<algorithm>} a \code{list} with entries:
 \itemize{
 \item \code{algorithm} (\code{character(1)}): The name of the \code{nloptr} algorithm to use.
 \item \code{maxeval} (\code{integer(1)}): Maximum number of function evaluations for the optimization. Optional.
