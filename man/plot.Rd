@@ -14,6 +14,18 @@ The module to generate visualisation for.}
 \item{...}{Parameters sent to the specific plotting methods.
 See the \verb{$plot()} method for each module}
 }
+\value{
+NULL (called for side effects)
+}
 \description{
-Visualise \code{diseasy} modules
+Visualise \code{diseasy} modules.
+}
+\examples{
+  immunity <- DiseasyImmunity$new()
+  immunity$plot()
+
+  immunity$set_exponential_waning(target = "hospitalisation")
+  immunity$plot()
+
+  rm(immunity)
 }
