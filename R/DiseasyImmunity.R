@@ -269,28 +269,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the model
       # Capture the expression of custom_function to preserve its environment
-      #model <- rlang::enexpr(custom_function)
       model <- custom_function
-
-      # Option 1: Attach env to function with time_scale only
-      #rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale))
 
       # Option 2: Clone the environment of custom function.
       # Will copy .GlobalEnv often .. not the best solution
-      rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale), parent = rlang::env_clone(rlang::fn_env(custom_function)))
-
-      # Option 3: Iterate and get only needed components of .GlobalEnv
-      # original_fn_env <- rlang::fn_env(custom_function)
-      # new_fn_env <- rlang::env()
-
-      # tryCatch(
-      #   custom_function(0),
-      #   error = function(e) {
-      #     missing_variable <- stringr::str_extract(e$message, r"{'(.*)'}", group = 1)
-      #     new_fn_env <- rlang::new_environment(data = stats::setNames(purrr::pluck(original_fn_env, missing_variable), missing_variable), parent = new_fn_env)
-      #     rlang::fn_env(custom_function) <- new_fn_env
-      #   }
-      # )
+      rlang::fn_env(model) <- rlang::new_environment(
+        data = list(time_scale = time_scale),
+        parent = rlang::env_clone(rlang::fn_env(custom_function))
+      )
 
       # Set the attributes
       attr(model, "name") <- name
@@ -562,13 +548,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           } else if (checkmate::test_data_frame(optim_control) && "method" %in% colnames(optim_control)) {
 
-            invisible(capture.output(
-            res <- optimx::polyopt(
-              par = c(p_gamma_0, p_delta_0),
-              fn = \(p) sum(obj_function(p)),
-              methcontrol = optim_control,
-              ...
-            )))
+            invisible(
+              capture.output(
+                res <- optimx::polyopt(                                                                                 # nolint: implicit_assignment_linter
+                  par = c(p_gamma_0, p_delta_0),
+                  fn = \(p) sum(obj_function(p)),
+                  methcontrol = optim_control,
+                  ...
+                )
+              )
+            )
 
             # `optimx` has different output format from the other optimisers
             # Try to unify the output formats here
@@ -833,4 +822,3 @@ DiseasyImmunity <- R6::R6Class(                                                 
     }
   )
 )
-
