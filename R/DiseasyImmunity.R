@@ -367,6 +367,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
       ...
     ) {
 
+
+      # Determine the method to use
+      method <- match.arg(method)
+
+
       # Check parameters
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
@@ -400,7 +405,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # To perform the optimisation, we need to produce a vector of gamma and delta "rates" from
         # the free parameters given to the optimiser.
         # This map depends on the method used.
-        method <- match.arg(method)
 
         # We need some helper functions that can map the optimiser parameters `par` to either
         # [0, 1] or [0, Inf]
