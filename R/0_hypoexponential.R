@@ -88,11 +88,7 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
   # Compute the upper tail of the cumulative distribution function
   q <- stats::uniroot(
     f = \(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p,
-    interval = c(0, 100 * sum(1 / rate)),
-    check.conv = TRUE,
-    extendInt = "yes",
-    tol = .Machine$double.eps,
-    maxiter = 10000
+    interval = c(0, 100 * sum(1 / rate))
   )
 
   return(q$root)
