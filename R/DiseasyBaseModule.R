@@ -370,10 +370,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
 #' @return `r rd_side_effects`
 #' @examples
 #'   immunity <- DiseasyImmunity$new()
-#'   immunity$plot()
+#'   plot(immunity)
 #'
 #'   immunity$set_exponential_waning(target = "hospitalisation")
-#'   immunity$plot()
+#'   plot(immunity)
 #'
 #'   rm(immunity)
 #' @export

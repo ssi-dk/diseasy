@@ -15,17 +15,17 @@ The module to generate visualisation for.}
 See the \verb{$plot()} method for each module}
 }
 \value{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 \description{
 Visualise \code{diseasy} modules.
 }
 \examples{
   immunity <- DiseasyImmunity$new()
-  immunity$plot()
+  plot(immunity)
 
   immunity$set_exponential_waning(target = "hospitalisation")
-  immunity$plot()
+  plot(immunity)
 
   rm(immunity)
 }
