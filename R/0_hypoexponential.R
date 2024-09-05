@@ -15,6 +15,8 @@ ones <- \(shape) matrix(rep(1, shape))
 #' @description
 #'   Density, distribution function and quantile function for the hyopexponential distribution with
 #'   parameters shape and rate.
+#' @details
+#'   Note that `qhypo` has poorer precision (\eqn{~ 10^{-3}}) than `dhypo` and `phypo` (\eqn{~ 10^{-6}}).
 #' @inheritParams stats::dgamma
 #' @return
 #'   - `dhypo` gives the density.
