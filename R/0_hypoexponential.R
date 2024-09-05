@@ -13,7 +13,7 @@ ones <- \(shape) matrix(rep(1, shape))
 #' @title
 #'   The hyopexponential distribution
 #' @description
-#'   Density, distribution function ad quantile function for the hyopexponential distribution with
+#'   Density, distribution function and quantile function for the hyopexponential distribution with
 #'   parameters shape and rate.
 #' @inheritParams stats::dgamma
 #' @return
@@ -36,7 +36,7 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
-    return(dexp(x, rate))
+    return(stats::dexp(x, rate))
   }
 
   # Compute the density function
@@ -57,7 +57,7 @@ phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
-    return(pexp(q, rate, lower.tail = lower.tail))
+    return(stats::pexp(q, rate, lower.tail = lower.tail))
   }
 
   # Compute the upper tail of the cumulative distribution function
@@ -80,11 +80,18 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
-    return(qexp(p, rate, lower.tail = lower.tail))
+    return(stats::qexp(p, rate, lower.tail = lower.tail))
   }
 
   # Compute the upper tail of the cumulative distribution function
-  q <- uniroot(\(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p, c(0, 100 * sum(1 / rate)))
+  q <- stats::uniroot(
+    f = \(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p,
+    interval = c(0, 100 * sum(1 / rate)),
+    check.conv = TRUE,
+    extendInt = "yes",
+    tol = .Machine$double.eps,
+    maxiter = 10000
+  )
 
   return(q$root)
 }
