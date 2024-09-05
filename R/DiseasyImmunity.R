@@ -115,7 +115,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting no waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -145,7 +145,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting exponential waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -179,7 +179,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting sigmoidal waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -209,7 +209,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting linear waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -239,7 +239,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting heaviside waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -288,7 +288,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting custom waning function(s)")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
