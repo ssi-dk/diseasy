@@ -43,3 +43,17 @@ test_that("obj_value is correct nomatter input type for approach", {
 
   expect_equal(im1$approximate_compartmental(N = 2), im2$approximate_compartmental(approach = "rate_equal", N = 2))
 })
+
+
+test_that("$plot() works", {
+  im <- DiseasyImmunity$new()
+  expect_no_condition(im$plot())
+
+  im$set_exponential_waning()
+  expect_no_condition(im$plot())
+
+  im$set_no_waning(target = "hospitalisation")
+  expect_no_condition(im$plot())
+
+  rm(im)
+})
