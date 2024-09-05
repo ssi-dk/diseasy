@@ -36,10 +36,28 @@ test_that("use_waning_models works with known model", {
 
 test_that("obj_value is correct nomatter input type for approach", {
   im1 <- DiseasyImmunity$new()
-  im2 <- DiseasyImmunity$new()
-
   im1$set_exponential_waning()
-  im2$set_exponential_waning()
 
-  expect_equal(im1$approximate_compartmental(N = 2), im2$approximate_compartmental(approach = "rate_equal", N = 2))
+  im2 <- im1$clone()
+
+  expect_identical(
+    within(im1$approximate_compartmental(N = 2), rm("execution_time")),
+    within(im2$approximate_compartmental(method = "free_gamma", N = 2), rm("execution_time"))
+  )
+
+  rm(im1, im2)
+})
+
+
+test_that("$plot() works", {
+  im <- DiseasyImmunity$new()
+  expect_no_condition(im$plot())
+
+  im$set_exponential_waning()
+  expect_no_condition(im$plot())
+
+  im$set_no_waning(target = "hospitalisation")
+  expect_no_condition(im$plot())
+
+  rm(im)
 })

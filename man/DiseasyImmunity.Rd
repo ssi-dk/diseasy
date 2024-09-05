@@ -27,6 +27,9 @@ See the vignette("diseasy-immunity") for examples of use.
 
   rm(im)
 }
+\seealso{
+\link{vignette("diseasy-immunity")}, \link[nloptr:nloptr]{nloptr::nloptr}, \link[optimx:polyopt]{optimx::polyopt}
+}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyImmunity}
 }
@@ -39,14 +42,8 @@ The waning models implemented in \code{DiseasyImmunity}. Read only.}
 \item{\code{model}}{(\verb{list(function())})\cr
 The list of models currently being used in the module. Read-only.}
 
-\item{\code{rates}}{(\code{list(numeric())})\cr
-The list of rates created by the selected approach. Read-only.}
-
-\item{\code{obj_value}}{(\code{list})\cr
-List of selected approach and N with the obj value from the optimisation. Read-only.}
-
-\item{\code{available_approaches}}{(\code{character})\cr
-The list of available approaches}
+\item{\code{available_methods}}{(\code{character})\cr
+The list of available methods}
 }
 \if{html}{\out{</div>}}
 }
@@ -296,7 +293,8 @@ If the function has a time scale, it should be included in the function as \code
 
 \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
 
-\item{\code{name}}{Set the name of the custom waning function.}
+\item{\code{name}}{(\code{character(1)})\cr
+Set the name of the custom waning function.}
 }
 \if{html}{\out{</div>}}
 }
@@ -313,19 +311,63 @@ transition rates and associated risk of infection for each compartment such the 
 best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
-  approach = c("rate_equal", "gamma_fixed_step", "all_free"),
-  N = NULL
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = NULL,
+  monotonous = TRUE,
+  individual_level = TRUE,
+  optim_control = data.frame(method = "nlnm", maxit = 10, maxeval = 100, maxfeval = 100),
+  ...
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{approach}}{(\code{character(1)})\cr
-Specifies the approach to be used from the available approaches. See details.}
+\item{\code{method}}{(\code{character(1)})\cr
+Specifies the method to be used from the available methods. See details.}
 
 \item{\code{N}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
+
+\item{\code{monotonous}}{(\code{logical(1)} or \code{numeric(1)})\cr
+Should non-monotonous approximations be penalised?
+If a numeric value supplied, it is used as a penalty factor.}
+
+\item{\code{individual_level}}{(\code{logical(1)} or \code{numeric(1)})\cr
+Should the approximation penalise rapid changes in immunity levels?
+If a numeric value supplied, it is used as a penalty factor.}
+
+\item{\code{optim_control}}{(\code{data.frame(1)} or \code{list()})\cr
+Controls for the optimisers. The optimiser to use is inferred from the input.
+\itemize{
+\item \code{stats::optim}: passed as \code{control} argument.
+\item \verb{nloptr::<algorithm>}: passed as \code{control} argument.
+\item \code{optimx::polyopt}: passed as \code{methcontrol} argument.
+}
+
+For \code{stats::optim} a \code{list} with entries:
+\itemize{
+\item \code{method} (\code{character()}): The optimisation method to use.
+\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization. Optional.
+\item ... Additional \code{control} arguments to be passed to \code{stats::optim}.
+}
+
+For \verb{nloptr::<algorithm>} a \code{list} with entries:
+\itemize{
+\item \code{algorithm} (\code{character(1)}): The name of the \code{nloptr} algorithm to use.
+\item \code{maxeval} (\code{integer(1)}): Maximum number of function evaluations for the optimization. Optional.
+\item ... Additional \code{control} arguments to be passed to \verb{nloptr::<algorithm>}.
+}
+
+For \code{optimx::polyopt} a \code{data.frame} with columns:
+\itemize{
+\item \code{method} (\code{character()}): The optimisation method to use.
+\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization. Optional.
+\item \code{maxeval} (\code{integer()}): Maximum number of function evaluations for the optimization. Optional.
+\item \code{maxfeval} (\code{integer()}): Maximum number of function evaluations for the optimization. Optional.
+}}
+
+\item{\code{...}}{Additional arguments to be passed to the optimiser.}
 }
 \if{html}{\out{</div>}}
 }
@@ -336,23 +378,37 @@ The transition rates between the compartments and the risk associated with each 
 approximate the configured waning immunity scenario.
 
 The function implements three methods for approximating the waning immunity curves:
-- "rate_equal": All transition rates are equal and risks are free to vary (N+1 free parameters).
-- "gamma_fixed_step": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
+- "free_gamma": All transition rates are equal and risks are free to vary (N+1 free parameters).
+- "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
 (N free parameters).
 - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
+
+The optimisation minimises the square root of the squared differences between the target waning and the
+approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
+if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
+
+The minimisation is performed using the either \code{stats::optim}, \verb{nloptr::<optimiser>} or \code{optimx::polyopt}
+optimisers.
+By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
+most efficient (see \code{vignette("diseasy-immunity")}).
+Optimiser defaults can be changed via the \code{optim_control} argument.
 }
 
+\subsection{Returns}{
+Returns the rates and objective value (invisibly).
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-plot}{}}}
 \subsection{Method \code{plot()}}{
-If desired to additionally plot the approximations, supply the \code{approach} and number of compartments (\code{N})
+If desired to additionally plot the approximations, supply the \code{method} and number of compartments (\code{N})
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$plot(
   t_max = NULL,
-  approach = c("rate_equal", "gamma_fixed_step", "all_free"),
-  N = NULL
+  method = c("free_gamma", "free_delta", "all_free"),
+  N = NULL,
+  ...
 )}\if{html}{\out{</div>}}
 }
 
@@ -360,16 +416,18 @@ If desired to additionally plot the approximations, supply the \code{approach} a
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{t_max}}{(\code{numeric})\cr
-The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.}
+The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the
+accumulated time scales.}
 
-\item{\code{approach}}{(\code{str} or \code{numeric})\cr
-Specifies the approach to be used from the available approaches.
-It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
-or as a numeric value representing the approach index 1, 2, or 3.}
+\item{\code{method}}{(\code{str} or \code{numeric})\cr
+Specifies the method to be used from the available methods.
+It can be provided as a string with the method name "free_gamma", "free_delta" or "all_free".
+or as a numeric value representing the method index 1, 2, or 3.}
 
 \item{\code{N}}{(\code{numeric})\cr
-Number of compartments to be used in the model.
-By default, it is set to 5}
+Number of compartments to be used in the model.}
+
+\item{\code{...}}{Additional arguments to be passed to \verb{$approximate_compartmental()}.}
 }
 \if{html}{\out{</div>}}
 }

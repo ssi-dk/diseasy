@@ -13,8 +13,10 @@ ones <- \(shape) matrix(rep(1, shape))
 #' @title
 #'   The hyopexponential distribution
 #' @description
-#'   Density, distribution function ad quantile function for the hyopexponential distribution with
+#'   Density, distribution function and quantile function for the hyopexponential distribution with
 #'   parameters shape and rate.
+#' @details
+#'   Note that `qhypo` has poorer precision (\eqn{~ 10^{-3}}) than `dhypo` and `phypo` (\eqn{~ 10^{-6}}).
 #' @inheritParams stats::dgamma
 #' @return
 #'   - `dhypo` gives the density.
@@ -36,12 +38,17 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
-    return(dexp(x, rate))
+    return(stats::dexp(x, rate))
   }
 
   # Compute the density function
   tt <- theta(shape, rate)
-  d <- purrr::map_dbl(x, \(x) - as.numeric(alpha(shape) %*% Matrix::expm(x * tt) %*% tt %*% ones(shape)))
+  d <- vapply(
+    x,
+    \(x) - alpha(shape) %*% expm::expm(x * tt) %*% tt %*% ones(shape),
+    FUN.VALUE = numeric(1),
+    USE.NAMES = FALSE
+  )
 
   return(d)
 }
@@ -52,11 +59,16 @@ phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
-    return(pexp(q, rate, lower.tail = lower.tail))
+    return(stats::pexp(q, rate, lower.tail = lower.tail))
   }
 
   # Compute the upper tail of the cumulative distribution function
-  p <- purrr::map_dbl(q, \(q) as.numeric(alpha(shape) %*% Matrix::expm(q * theta(shape, rate)) %*% ones(shape)))
+  p <- vapply(
+    q,
+    \(q) alpha(shape) %*% expm::expm(q * theta(shape, rate)) %*% ones(shape),
+    FUN.VALUE = numeric(1),
+    USE.NAMES = FALSE
+  )
 
   # Convert to lower tail if needed
   if (lower.tail) p <- 1 - p
@@ -70,11 +82,14 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 
   # For the first compartment, the problem is simply an exponential distribution
   if (shape == 1) {
-    return(qexp(p, rate, lower.tail = lower.tail))
+    return(stats::qexp(p, rate, lower.tail = lower.tail))
   }
 
   # Compute the upper tail of the cumulative distribution function
-  q <- uniroot(\(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p, c(0, 100 * sum(1 / rate)))
+  q <- stats::uniroot(
+    f = \(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p,
+    interval = c(0, 100 * sum(1 / rate))
+  )
 
   return(q$root)
 }
