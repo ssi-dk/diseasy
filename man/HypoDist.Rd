@@ -31,7 +31,7 @@ qhypo(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE)
 }
 }
 \description{
-Density, distribution function ad quantile function for the hyopexponential distribution with
+Density, distribution function and quantile function for the hyopexponential distribution with
 parameters shape and rate.
 }
 \examples{
