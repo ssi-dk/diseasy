@@ -34,6 +34,9 @@ qhypo(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE)
 Density, distribution function and quantile function for the hyopexponential distribution with
 parameters shape and rate.
 }
+\details{
+Note that \code{qhypo} has poorer precision (\eqn{~ 10^{-3}}) than \code{dhypo} and \code{phypo} (\eqn{~ 10^{-6}}).
+}
 \examples{
   dhypo(1:10, shape = 2)
   dhypo(1:10, shape = 2, rate = c(1, 2))
