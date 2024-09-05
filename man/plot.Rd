@@ -22,10 +22,10 @@ Visualise \code{diseasy} modules.
 }
 \examples{
   immunity <- DiseasyImmunity$new()
-  immunity$plot()
+  plot(immunity)
 
   immunity$set_exponential_waning(target = "hospitalisation")
-  immunity$plot()
+  plot(immunity)
 
   rm(immunity)
 }
