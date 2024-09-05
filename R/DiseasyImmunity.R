@@ -633,7 +633,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
 
       # Set t_max if nothing is given
-      if (is.null(t_max)) t_max <- 3 * purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
+      if (is.null(t_max)) t_max <- 3 * purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
       t <- seq(from = 0, to = t_max, length.out = 100)
 
 
@@ -751,7 +751,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
-      return(purrr::map(private$.model, ~ purrr::pluck(.x, rlang::fn_env, "time_scale")))
+      return(purrr::map(self$model, ~ purrr::pluck(.x, rlang::fn_env, as.list, "time_scale", .default = NULL)))
     },
 
     get_approximation = function(gamma, delta, N) {                                                                     # nolint: object_name_linter
