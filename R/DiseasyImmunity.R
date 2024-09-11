@@ -197,7 +197,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::reportAssertions(coll)
 
       # Set the model
-      model <- \(t) max(1 - 0.5 / time_scale * t, 0)
+      model <- \(t) pmax(1 - t / time_scale, 0)
 
       # Set the attributes
       attr(model, "name") <- "linear_waning"
