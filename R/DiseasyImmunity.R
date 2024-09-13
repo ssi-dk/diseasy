@@ -354,7 +354,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Returns the rates and objective value (invisibly).
     #' @seealso [vignette("diseasy-immunity")], [nloptr::nloptr], [optimx::polyopt]
     approximate_compartmental = function(
-      method = c("free_gamma", "free_delta", "all_free"),
+      method = c("free_gamma", "free_delta", "all_free", "all_free_combi"),
       N = NULL,                                                                                                         # nolint: object_name_linter
       monotonous = TRUE,
       individual_level = TRUE,
@@ -374,7 +374,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
+      checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free", "all_free_combi"), add = coll)
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
       checkmate::assert_number(as.numeric( monotonous), add = coll)
       checkmate::assert_number(as.numeric(individual_level), add = coll)
@@ -411,6 +411,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
         p_01 <- \(p) 1 / (1 + exp(-p)) # Sigmoid mapping of parameters from -Inf / Inf to 0 / 1
         p_0inf <- \(p) log(1 + exp(p)) # Mapping of parameters from -Inf / Inf to 0 / Inf ("Softplus" function)
 
+        # Later, we will need the inversion functions also
+        inv_p_01 <- \(p) {
+          pmin(
+            log(p) - log(1 - p), # Inverse mapping of p_01
+            1e15 # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead of infinity
+          )
+        }
+        inv_p_0inf <- \(p) log(exp(p) - 1)
+
+
         # We need to know the number of models the gamma's belong to
         n_models <- length(self$model)
 
@@ -434,7 +444,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           par_to_delta <- \(par) p_0inf(par) # All parameters are delta
           par_to_gamma <- \(par, model_id, f_inf) seq(from = 1, to = f_inf, length.out = N) # gammas: 1 to f_inf
 
-        } else if (method == "all_free") {
+        } else if (method %in% c("all_free", "all_free_combi")) {
           # All parameters are free to vary
           # The first n_models * (N-1) parameters are the gamma rates  (N-1 for each model)
           # The last N-1 parameters are the delta rates
@@ -510,26 +520,76 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         } else {
           # We provide a starting guess for the rates
+
           # Note that need to be "inverted" through the inverse of the mapping functions
           # so they are are in the same parameter space as the optimisation occurs
-          delta_0 <- N / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
-          if (method %in% c("free_delta", "all_free")) {
-            delta_0 <- rep(delta_0, N - 1) # Distribute the delta rate to all compartments
-          }
-          p_delta_0 <- log(exp(delta_0) - 1) # Inverse mapping of p_0inf
 
+
+          # Use time scales as guess for starting delta
+          delta_0 <- N / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+
+          # Account for the differences in methods
+          if (method == "free_gamma") {
+
+            # free_gamma has only the one free delta parameter, so no need to do anything
+
+          } else if (method %in% c("free_delta", "all_free")) {
+
+            # Distribute the delta rate estimate to all compartments
+            delta_0 <- rep(delta_0, N - 1)
+
+          } else if (method == "all_free_combi") {
+
+            # Use free_gamma solution as starting point
+            delta_0 <- self$approximate_compartmental(
+              method = "free_gamma",
+              N = N,                                                                                                    # nolint: object_name_linter
+              monotonous = monotonous,
+              individual_level = individual_level,
+              optim_control = optim_control,
+              ...
+            ) |>
+              purrr::pluck("delta") |>
+              rep(N - 1)
+
+          }
+
+
+
+          # Use linearly distributed gamma rates as starting point
           if (method == "free_delta") {
-            p_gamma_0 <- numeric(0)
-          } else {
+
+            # free_delta has no free gamma parameters (uses linearly distributed values)
+            gamma_0 <- numeric(0)
+
+          } else if (method %in% c("free_gamma", "all_free")) {
+
             gamma_0 <- private$.model |>
-              purrr::map(~ head(seq(from = 1, to = .x(Inf), length.out = N), N - 1)) |>
+              purrr::map(~ utils::head(seq(from = 1, to = .x(Inf), length.out = N), N - 1)) |>
               purrr::reduce(c)
 
-            p_gamma_0 <- pmin(
-              log(gamma_0) - log(1 - gamma_0), # Inverse mapping of p_01
-              1e15 # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead
-            )
+          } else if (method == "all_free_combi") {
+
+            # Use free_gamma solution as starting point
+            gamma_0 <- self$approximate_compartmental(
+              method = "free_gamma",
+              N = N,                                                                                                    # nolint: object_name_linter
+              monotonous = monotonous,
+              individual_level = individual_level,
+              optim_control = optim_control,
+              ...
+            ) |>
+              purrr::pluck("gamma") |>
+              purrr::map(~ utils::head(., N - 1)) |> # Drop last value since it is fixed in the method
+              purrr::reduce(c)
           }
+
+
+          # Inverse mapping of parameters to optimiser space
+          p_delta_0 <- inv_p_0inf(delta_0)
+          p_gamma_0 <- inv_p_01(gamma_0)
+
+
 
 
           # Run the optimisation
@@ -592,7 +652,22 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
-        toc <- Sys.time()
+
+        # If the all_free_combi method is used, add the execution time from the free_gamma method
+        if (method == "all_free_combi") {
+          execution_time_offset <- self$approximate_compartmental(
+            method = "free_gamma",
+            N = N,                                                                                                      # nolint: object_name_linter
+            monotonous = monotonous,
+            individual_level = individual_level,
+            optim_control = optim_control,
+            ...
+          ) |>
+            purrr::pluck("execution_time")
+        } else {
+          execution_time_offset <- 0
+        }
+
 
         # Store in cache
         private$cache(
@@ -606,7 +681,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "N" = N,
               "sqrt_integral" = purrr::pluck(metrics, "value"),
               "penalty" = purrr::pluck(metrics, "penalty"),
-              "execution_time" = toc - tic
+              "execution_time" = Sys.time() - tic + execution_time_offset
             )
           )
         )
