@@ -127,10 +127,17 @@ rd_training_length <- function(type = "param") {
 }
 
 
-rd_start_date <- function(type = "param") {
+rd_start_date <- function(type = "param", minimum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date`)\\cr",
-        "Study period start.",
+        paste0(ifelse(minimum, "(Minimum)", ""), "Study period start."),
+        ifelse(type == "field", " Read only.", ""))
+}
+
+rd_end_date <- function(type = "param", maximum = FALSE) {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`Date`)\\cr",
+        paste0(ifelse(maximum, "(Maximum)", ""), "Study period end."),
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -139,14 +146,6 @@ rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
         "Date or timestamp (parsable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
-        ifelse(type == "field", " Read only.", ""))
-}
-
-
-rd_end_date <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
-  paste("(`Date`)\\cr",
-        "Study period end.",
         ifelse(type == "field", " Read only.", ""))
 }
 
