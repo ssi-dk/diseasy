@@ -489,8 +489,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Penalise non-monotone solutions
               penalty <- monotonous * sum(purrr::keep(diff(gamma), ~ . > 0))
 
-              # Penalise spread of gamma
-              penalty <- penalty + individual_level * sd(gamma)
+              # Penalise spread of gamma and delta
+              # Compute sd of equidistant gamma
+              sd_0_gamma <- sd(seq(from = self$model[[model_id]](0), to = gamma[N], length.out = N))
+              penalty <- penalty + individual_level * (abs(sd(gamma) - sd_0_gamma) + sd(delta))
 
               return(list("value" = value, "penalty" = penalty))
             }
