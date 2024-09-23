@@ -306,17 +306,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'     - "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
     #'       (N free parameters).
     #'     - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
+    #'     - "all_free_combi": As "all_free" but uses the "free_gamma" solution as starting point for the optimiser.
     #'
     #'   The optimisation minimises the square root of the squared differences between the target waning and the
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
     #'   if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
     #'
-    #'   The minimisation is performed using the either `stats::optim`, `stats::<optimiser>`, `nloptr::<optimiser>` or
-    #'   `optimx::optimr` optimisers.
+    #'   The minimisation is performed using the either `stats::optim`, `stats::nlm`, `stats::nlminb`,
+    #'   `nloptr::<optimiser>` or `optimx::optimr` optimisers.
     #'
     #'   By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
     #'   most efficient (see `vignette("diseasy-immunity")`).
     #'   Optimiser defaults can be changed via the `optim_control` argument.
+    #'   NOTE: for "all_free_combi", changing the optimiser controls does not influence the starting point which uses
+    #'   the "free_gamma" defaults.
     #'
     #' @param method (`character(1)`)\cr
     #'   Specifies the method to be used from the available methods. See details.
@@ -329,25 +332,26 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Should the approximation penalise rapid changes in immunity levels?
     #'   If a numeric value supplied, it is used as a penalty factor.
     #' @param optim_control (`list()`)\cr
-    #'   Controls for the optimisers.
-    #    A `method` entry must be supplied which is used to infer the optimiser.
+    #'   Optional controls for the optimisers.
+    #'   Each method has their own default controls for the optimiser.
+    #'   A `optim_method` entry must be supplied which is used to infer the optimiser.
     #'
-    #'   In order, the `method` entry is matched against the following optimisers and remaining `optim_control` entries
+    #'   In order, the `optim_method` entry is matched against the following optimisers and remaining `optim_control` entries
     #'   are passed as argument to the optimiser as described below.
     #'
-    #'   If `method` matches any of the methods in `stats::optim`:
-    #'   - Additional `optim_control` arguments passed as `control` to `stats::optim` using the chosen `method`.
+    #'   If `optim_method` matches any of the methods in `stats::optim`:
+    #'   - Additional `optim_control` arguments passed as `control` to `stats::optim` using the chosen `optim_method`.
     #'
-    #'   If `method` is "nlm":
+    #'   If `optim_method` is "nlm":
     #'   - Additional `optim_control` arguments passed as arguments to `stats::nlm`.
     #'
-    #'   If `method` is "nlminb":":
+    #'   If `optim_method` is "nlminb":":
     #'   - Additional `optim_control` arguments passed as `control` to `stats::nlminb`.
     #'
-    #'   If `method` matches any of the algorithms in `nloptr`:
+    #'   If `optim_method` matches any of the algorithms in `nloptr`:
     #'   - Additional `optim_control` arguments passed as `control` to `nloptr::<method>`.
     #'
-    #'   If `method` matches any of the methods in `optimx::optimr`:
+    #'   If `optim_method` matches any of the methods in `optimx::optimr`:
     #'   - Additional `optim_control` arguments passed as `control` to `stats::optimr` using the chosen `method`.
     #'
     #' @param ...
@@ -360,12 +364,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       N = NULL,                                                                                                         # nolint: object_name_linter
       monotonous = TRUE,
       individual_level = TRUE,
-      optim_control = data.frame(
-        "method" = "nlnm",
-        "maxit" = 10,
-        "maxeval" = 100,
-        "maxfeval" = 100
-      ),
+      optim_control = NULL,
       ...
     ) {
 
@@ -383,7 +382,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_list(optim_control, types = c("character", "integerish"))
       checkmate::assert_names(
         names(optim_control),
-        subset.of = c("method", "maxit", "maxeval", "maxfeval"),
+        subset.of = c("optim_method", "maxit", "maxeval", "maxfeval"),
         add = coll
       )
       checkmate::reportAssertions(coll)
@@ -504,6 +503,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
+
+        # Set default optimisation controls
+        default_optim_controls <- list(
+          "free_delta" = list("method" = "tnewton"),
+          "free_gamma" = list("method" = "nlm"),
+          "all_free"   = list("method" = "nlm")
+        )
+
+
+
         # If we have no free parameters we return the default rates
         if (n_free_parameters == 0) {
           gamma <- purrr::map(private$.model, \(model) model(Inf)) |>
@@ -540,7 +549,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               N = N,                                                                                                    # nolint: object_name_linter
               monotonous = monotonous,
               individual_level = individual_level,
-              optim_control = optim_control,
+              optim_control = purrr::pluck(default_optim_controls, "free_gamma"),
               ...
             ) |>
               purrr::pluck("delta") |>
@@ -570,7 +579,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               N = N,                                                                                                    # nolint: object_name_linter
               monotonous = monotonous,
               individual_level = individual_level,
-              optim_control = optim_control,
+              optim_control = purrr::pluck(default_optim_controls, "free_gamma"),
               ...
             ) |>
               purrr::pluck("gamma") |>
@@ -584,29 +593,31 @@ DiseasyImmunity <- R6::R6Class(                                                 
           p_gamma_0 <- inv_p_01(gamma_0)
 
 
+          # Check optimiser is configured
+          if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
 
 
           # Run the optimisation
           optimx_methods <- optimx::ctrldefault(1)$allmeth
 
           # Infer and call the optimiser
-          if (optim_control %.% method %in% eval(formals(stats::optim)$method)) {
+          if (optim_control %.% optim_method %in% eval(formals(stats::optim)$method)) {
             # Optimiser is `stats::optim`
 
             res <- stats::optim(
               par = c(p_gamma_0, p_delta_0),
               fn = \(p) sum(obj_function(p)),
-              method = optim_control %.% method,
-              control = within(optim_control, rm("method")),
+              method = optim_control$optim_method,
+              control = within(optim_control, rm("optim_method")),
               ...
             )
 
-          } else if (optim_control %.% method ==  "nlm") {
+          } else if (optim_control %.% optim_method ==  "nlm") {
             # Optimiser is `stats::nlm`
 
             res <- purrr::partial(
-              getExportedValue("stats", optim_control %.% method),
-              !!!within(optim_control, rm("method"))
+              getExportedValue("stats", optim_control %.% optim_method),
+              !!!within(optim_control, rm("optim_method"))
             )(
               f = \(p) sum(obj_function(p)),
               p = c(p_gamma_0, p_delta_0),
@@ -617,39 +628,39 @@ DiseasyImmunity <- R6::R6Class(                                                 
             res$par <- res$estimate
             res$estimate <- NULL
 
-          } else if (optim_control %.% method ==  "nlminb") {
+          } else if (optim_control %.% optim_method ==  "nlminb") {
             # Optimiser is `stats::nlminb`
 
-            res <- getExportedValue("stats", optim_control %.% method)(
+            res <- getExportedValue("stats", optim_control %.% optim_method)(
               start = c(p_gamma_0, p_delta_0),
               objective = \(p) sum(obj_function(p)),
-              control = within(optim_control, rm("method")),
+              control = within(optim_control, rm("optim_method")),
               ...
             )
 
-          } else if (optim_control %.% method %in% getNamespaceExports("nloptr")) {
+          } else if (optim_control %.% optim_method %in% getNamespaceExports("nloptr")) {
             # Optimiser is `nloptr::<method>`
 
-            res <- getExportedValue("nloptr", optim_control %.% method)(
+            res <- getExportedValue("nloptr", optim_control %.% optim_method)(
               x0 = c(p_gamma_0, p_delta_0),
               fn = \(p) sum(obj_function(p)),
-              control = within(optim_control, rm("method")),
+              control = within(optim_control, rm("optim_method")),
               ...
             )
 
-          } else if (optim_control %.% method %in% optimx_methods) {
+          } else if (optim_control %.% optim_method %in% optimx_methods) {
             # Optimiser is `optimx::optimr`
 
             res <- optimx::optimr(
               par = c(p_gamma_0, p_delta_0),
               fn = \(p) sum(obj_function(p)),
-              method = optim_control %.% method,
-              control = within(optim_control, rm("method")),
+              method = optim_control %.% optim_method,
+              control = within(optim_control, rm("optim_method")),
               ...
             )
 
           } else {
-            stop("`optim_control` couldn't parse to valid `stats::optim`, `nloptr::nloptr` or `optimx::optimr` call!")
+            stop("`optim_control` format matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::polyopt`!")
           }
 
           # Get the full metrics for the best solution
