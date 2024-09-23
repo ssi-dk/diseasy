@@ -311,8 +311,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
     #'   if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
     #'
-    #'   The minimisation is performed using the either `stats::optim`, `nloptr::<optimiser>` or `optimx::polyopt`
-    #'   optimisers.
+    #'   The minimisation is performed using the either `stats::optim`, `stats::<optimiser>`, `nloptr::<optimiser>` or
+    #'   `optimx::optimr` optimisers.
+    #'
     #'   By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
     #'   most efficient (see `vignette("diseasy-immunity")`).
     #'   Optimiser defaults can be changed via the `optim_control` argument.
@@ -327,31 +328,32 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
     #'   Should the approximation penalise rapid changes in immunity levels?
     #'   If a numeric value supplied, it is used as a penalty factor.
-    #' @param optim_control (`data.frame(1)` or `list()`)\cr
-    #'   Controls for the optimisers. The optimiser to use is inferred from the input.
-    #'   - `stats::optim`: passed as `control` argument.
-    #'   - `nloptr::<algorithm>`: passed as `control` argument.
-    #'   - `optimx::polyopt`: passed as `methcontrol` argument.
+    #' @param optim_control (`list()`)\cr
+    #'   Controls for the optimisers.
+    #    A `method` entry must be supplied which is used to infer the optimiser.
     #'
-    #'   For `stats::optim` a `list` with entries:
-    #'   - `method` (`character()`): The optimisation method to use.
-    #'   - `maxit` (`integer()`): Maximum number of iterations for the optimization. Optional.
-    #'   - ... Additional `control` arguments to be passed to `stats::optim`.
+    #'   In order, the `method` entry is matched against the following optimisers and remaining `optim_control` entries
+    #'   are passed as argument to the optimiser as described below.
     #'
-    #'   For `nloptr::<algorithm>` a `list` with entries:
-    #'    - `algorithm` (`character(1)`): The name of the `nloptr` algorithm to use.
-    #'    - `maxeval` (`integer(1)`): Maximum number of function evaluations for the optimization. Optional.
-    #'    - ... Additional `control` arguments to be passed to `nloptr::<algorithm>`.
+    #'   If `method` matches any of the methods in `stats::optim`:
+    #'   - Additional `optim_control` arguments passed as `control` to `stats::optim` using the chosen `method`.
     #'
-    #'   For `optimx::polyopt` a `data.frame` with columns:
-    #'   - `method` (`character()`): The optimisation method to use.
-    #'   - `maxit` (`integer()`): Maximum number of iterations for the optimization. Optional.
-    #'   - `maxeval` (`integer()`): Maximum number of function evaluations for the optimization. Optional.
-    #'   - `maxfeval` (`integer()`): Maximum number of function evaluations for the optimization. Optional.
+    #'   If `method` is "nlm":
+    #'   - Additional `optim_control` arguments passed as arguments to `stats::nlm`.
+    #'
+    #'   If `method` is "nlminb":":
+    #'   - Additional `optim_control` arguments passed as `control` to `stats::nlminb`.
+    #'
+    #'   If `method` matches any of the algorithms in `nloptr`:
+    #'   - Additional `optim_control` arguments passed as `control` to `nloptr::<method>`.
+    #'
+    #'   If `method` matches any of the methods in `optimx::optimr`:
+    #'   - Additional `optim_control` arguments passed as `control` to `stats::optimr` using the chosen `method`.
+    #'
     #' @param ...
     #'   Additional arguments to be passed to the optimiser.
     #' @return
-    #'   Returns the rates and objective value (invisibly).
+    #'   Returns the results from the optimisation with the approximated rates and execution time.
     #' @seealso [vignette("diseasy-immunity")], [nloptr::nloptr], [optimx::polyopt]
     approximate_compartmental = function(
       method = c("free_gamma", "free_delta", "all_free", "all_free_combi"),
@@ -378,20 +380,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
       checkmate::assert_number(as.numeric( monotonous), add = coll)
       checkmate::assert_number(as.numeric(individual_level), add = coll)
-      checkmate::assert(
-        checkmate::check_list(optim_control, types = c("character", "integerish")), # nloptr opts
-        checkmate::check_data_frame(optim_control, types = c("character", "integerish")), # optimx methcontrol
-        add = coll
-      )
-      checkmate::assert(
-        checkmate::check_names( # nloptr opts
-          names(optim_control),
-          subset.of = c("algorithm", "maxeval")
-        ),
-        checkmate::check_names( # optimx methcontrol
-          names(optim_control),
-          subset.of = c("method", "maxit", "maxeval", "maxfeval")
-        ),
+      checkmate::assert_list(optim_control, types = c("character", "integerish"))
+      checkmate::assert_names(
+        names(optim_control),
+        subset.of = c("method", "maxit", "maxeval", "maxfeval"),
         add = coll
       )
       checkmate::reportAssertions(coll)
@@ -593,51 +585,69 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Run the optimisation
-          if ("algorithm" %in% names(optim_control)) {
-            res <- getExportedValue("nloptr", optim_control$algorithm)(
-              x0 = c(p_gamma_0, p_delta_0),
-              fn = \(p) sum(obj_function(p)),
-              control = within(optim_control, rm("algorithm")), # More weird R syntax...
-              ...
-            )
-          } else if (checkmate::test_list(optim_control) && "method" %in% names(optim_control)) {
+          optimx_methods <- optimx::ctrldefault(1)$allmeth
+
+          # Infer and call the optimiser
+          if (optim_control %.% method %in% eval(formals(stats::optim)$method)) {
+            # Optimiser is `stats::optim`
 
             res <- stats::optim(
               par = c(p_gamma_0, p_delta_0),
               fn = \(p) sum(obj_function(p)),
-              method = optim_control$method,
-              control = within(optim_control, rm("method")), # More weird R syntax...
+              method = optim_control %.% method,
+              control = within(optim_control, rm("method")),
               ...
             )
 
-          } else if (checkmate::test_data_frame(optim_control) && "method" %in% colnames(optim_control)) {
+          } else if (optim_control %.% method ==  "nlm") {
+            # Optimiser is `stats::nlm`
 
-            invisible(
-              capture.output(
-                res <- optimx::polyopt(                                                                                 # nolint: implicit_assignment_linter
-                  par = c(p_gamma_0, p_delta_0),
-                  fn = \(p) sum(obj_function(p)),
-                  methcontrol = optim_control,
-                  ...
-                )
-              )
+            res <- purrr::partial(
+              getExportedValue("stats", optim_control %.% method),
+              !!!within(optim_control, rm("method"))
+            )(
+              f = \(p) sum(obj_function(p)),
+              p = c(p_gamma_0, p_delta_0),
+              ...
             )
 
-            # `optimx` has different output format from the other optimisers
-            # Try to unify the output formats here
-            par <- tail(res, 1) |>
-              dplyr::select(tidyselect::starts_with("p")) |>
-              as.list() |>
-              unlist() |>
-              unname()
+            # "nlm" has a different naming convention.
+            res$par <- res$estimate
+            res$estimate <- NULL
 
-            res <- tail(res, 1) |>
-              dplyr::select(!tidyselect::starts_with("p")) |>
-              as.list() |>
-              modifyList(list("par" = par))
+          } else if (optim_control %.% method ==  "nlminb") {
+            # Optimiser is `stats::nlminb`
+
+            res <- getExportedValue("stats", optim_control %.% method)(
+              start = c(p_gamma_0, p_delta_0),
+              objective = \(p) sum(obj_function(p)),
+              control = within(optim_control, rm("method")),
+              ...
+            )
+
+          } else if (optim_control %.% method %in% getNamespaceExports("nloptr")) {
+            # Optimiser is `nloptr::<method>`
+
+            res <- getExportedValue("nloptr", optim_control %.% method)(
+              x0 = c(p_gamma_0, p_delta_0),
+              fn = \(p) sum(obj_function(p)),
+              control = within(optim_control, rm("method")),
+              ...
+            )
+
+          } else if (optim_control %.% method %in% optimx_methods) {
+            # Optimiser is `optimx::optimr`
+
+            res <- optimx::optimr(
+              par = c(p_gamma_0, p_delta_0),
+              fn = \(p) sum(obj_function(p)),
+              method = optim_control %.% method,
+              control = within(optim_control, rm("method")),
+              ...
+            )
 
           } else {
-            stop("`optim_control` format matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::polyopt`!")
+            stop("`optim_control` couldn't parse to valid `stats::optim`, `nloptr::nloptr` or `optimx::optimr` call!")
           }
 
           # Get the full metrics for the best solution
