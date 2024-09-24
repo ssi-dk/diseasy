@@ -32,6 +32,7 @@ jobs:
           CONFIG_PATH: .github/sync.yaml
           COMMIT_PREFIX: "chore: "
           PR_BODY: Automatically synchronise AEF-DDF files between repositories
+          ASSIGNEES: RasmusSkytte
           COMMIT_EACH_FILE: false
 
 
@@ -62,4 +63,5 @@ jobs:
           CONFIG_PATH: .github/sync_reverse.yaml
           COMMIT_PREFIX: "chore: "
           PR_BODY: Automatically synchronise AEF-DDF files between repositories
+          ASSIGNEES: RasmusSkytte
           COMMIT_EACH_FILE: false
