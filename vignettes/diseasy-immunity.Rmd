@@ -166,7 +166,7 @@ To visualize how the approximations compare to the target functions, the plot fu
 Simply specify the approach and the number of compartments (`N`).
 The plot will display both the approximations and the target functions for comparison.
 ```{r plot approximation}
-im$plot(approach = "rate_equal", N = 5)
+im$plot(method = "free_gamma", N = 5)
 ```
 
 # Compartment selection (elbow curve method)
@@ -175,41 +175,31 @@ Therefore it is crucial to select the right N as too few compartments can lead t
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
 The elbow curve method is employed to determine the appropriate N for the models.
 Each approach is executed across a range of N values, and the resulting objective function values are returned as `value` from the approximate_compartmental function.
-```{r prepare elbow curve}
-rm(im)
-devtools::load_all()
-im <- DiseasyImmunity$new(cache = cachem::cache_disk(dir = devtools::package_file("vignettes/vignette_data")))
-```
 
 ```{r elbow curve method}
 # Prepare the data
-N_seq <- seq(from = 1, to = 10, by = 1)                                                                                 # nolint: object_name_linter
-approaches <- c("rate_equal", "gamma_fixed_step")#, "all_free")
+N_seq <- seq(from = 2, to = 7, by = 1)                                                                                  # nolint: object_name_linter
+methods <- c("free_gamma", "free_delta", "all_free")
 im$set_heaviside_waning(time_scale = 20, target = "infection")
 
 # Run each function
 results <- tidyr::expand_grid(
-  approach = approaches,
+  method = methods,
   N = N_seq
 ) |>
   purrr::pmap(
-    \(approach, N) {                                                                                                    # nolint: object_name_linter
-      im$approximate_compartmental(approach = approach, N = N) |>
-        purrr::pluck("value") |>
-        stats::setNames(glue::glue("{approach}-{N}"))
+    \(method, N) {                                                                                                      # nolint: object_name_linter
+      im$approximate_compartmental(method = method, N = N, optim_control = data.frame("method" = "nlm", "maxit" = 100))
     },
     .progress = interactive()
-  )
-
-# Convert to data frame
-results <- results |>
-  purrr::list_c() |>
-  tibble::enframe() |>
-  tidyr::separate_wider_delim("name", delim = "-", names = c("approach", "N"))
+  ) |>
+  purrr::list_transpose() |>
+  tibble::as_tibble()
 
 # Plot
-ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = approach, group = approach)) +
+ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = method)) +
   ggplot2::geom_line() +
+  ggplot2::geom_point(ggplot2::aes(shape = convergence == 0)) +
   #ggplot2::xlim(1, max(results$N)) +
   ggplot2::scale_y_log10() +
   ggplot2::labs(x = "N", y = "Error") +
