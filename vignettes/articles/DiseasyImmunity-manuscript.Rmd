@@ -71,10 +71,23 @@ zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 We run a few examples to manually inspect the fitting
 ```{r manually check fits}
 im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
-plot(im, method = "free_gamma", N = 3)
+#plot(im, method = "free_gamma", N = 3)
 
-im$approximate_compartmental(method = "free_delta", N = 2, optim_control = list("method" = "BFGS", "maxit" = 20))
+im$approximate_compartmental(method = "free_delta", N = 3, monotonous = F, individual_level = F)
 ```
+```{r}
+im$approximate_compartmental(method = "free_gamma", N = 3, monotonous = F, individual_level = F)
+```
+
+```{r}
+im$approximate_compartmental(method = "all_free", N = 3, monotonous = F, individual_level = F)
+```
+
+```{r}
+im$approximate_compartmental(method = "all_free_combi", N = 3, monotonous = F, individual_level = F)
+```
+
+
 
 ```{r manually check fits}
 im$set_waning_model(f[["linear"]], time_scale = t_f[[1]], target = "infection")
@@ -171,7 +184,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache) {
 
 
 ```{r summariser helper}
-summariser <- function(combinations) {
+summariser <- function(combinations, monotonous, individual_level, cache) {
   optim_summery <- combinations |>
     dplyr::select(!"optim_config") |>
     dplyr::distinct() |>
@@ -348,7 +361,7 @@ combinations <- tidyr::expand_grid(
 )
 
 #future::plan("sequential")
-future::plan("multisession", workers = 6)
+future::plan("multisession")
 
 
 # Run the approximations and note the convergence point
@@ -356,10 +369,11 @@ combinations_zip <- combinations |>
   purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
 
 
+monotonous <- 100
+individual_level <- 0
 
-optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
-
-summariser(combinations)
+optimiser(combinations_zip, monotonous = monotonous, individual_level = individual_level, cache = cache)
+summariser(combinations, monotonous = monotonous, individual_level = individual_level, cache = cache)
 ```
 
 
@@ -431,7 +445,7 @@ combinations <- tidyr::expand_grid(
 )
 
 #future::plan("sequential")
-future::plan("multisession", workers = 6)
+future::plan("multisession")
 
 
 # Run the approximations and note the convergence point
@@ -440,9 +454,11 @@ combinations_zip <- combinations |>
 
 
 
-optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
+monotonous <- 100
+individual_level <- 0
 
-summariser(combinations)
+optimiser(combinations_zip, monotonous = monotonous, individual_level = individual_level, cache = cache)
+summariser(combinations, monotonous = monotonous, individual_level = individual_level, cache = cache)
 ```
 
 # nlm looks fast, can we do better?
@@ -480,7 +496,7 @@ combinations <- tidyr::expand_grid(
 )
 
 future::plan("sequential")
-#future::plan("multisession", workers = 6)
+#future::plan("multisession")
 
 
 # Run the approximations and note the convergence point
@@ -488,9 +504,11 @@ combinations_zip <- combinations |>
   purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
 
 
-optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
+monotonous <- 100
+individual_level <- 0
 
-summariser(combinations)
+optimiser(combinations_zip, monotonous = monotonous, individual_level = individual_level, cache = cache)
+summariser(combinations, monotonous = monotonous, individual_level = individual_level, cache = cache)
 ```
 
 
@@ -501,7 +519,10 @@ cache <- cachem::cache_disk(dir = devtools::package_file("vignettes/articles/art
 optim_configs <- list(
   data.frame("method" = c("nlm", "BFGS"), "maxit" = c(5, 25)),
   data.frame("method" = c("nlm", "BFGS"), "maxit" = c(10, 25)),
+  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(20, 25)),
   data.frame("method" = c("nlm", "BFGS"), "maxit" = c(5, 50)),
+  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(10, 50)),
+  data.frame("method" = c("nlm", "BFGS"), "maxit" = c(20, 50)),
   data.frame("method" = c("nlm", "nlnm"), "maxit" = 5, "maxfeval" = 100),
   data.frame("method" = c("nlm", "nlnm"), "maxit" = 10, "maxfeval" = 100),
   data.frame("method" = c("nlm", "nlnm"), "maxit" = 10, "maxfeval" = 200),
@@ -519,7 +540,7 @@ combinations <- tidyr::expand_grid(
 )
 
 future::plan("sequential")
-#future::plan("multisession", workers = 6)
+#future::plan("multisession")
 
 
 # Run the approximations and note the convergence point
@@ -527,8 +548,7 @@ combinations_zip <- combinations |>
   purrr::pmap(~ zip(list(..1), ..2, ..3, list(..4)))
 
 optimiser(combinations_zip, monotonous = 100, individual_level = 0, cache = cache)
-
-summariser(combinations)
+summariser(combinations, monotonous = 100, individual_level = 0, cache = cache)
 ```
 
 
