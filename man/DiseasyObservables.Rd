@@ -2,9 +2,9 @@
 % Please edit documentation in R/DiseasyObservables.R
 \name{DiseasyObservables}
 \alias{DiseasyObservables}
-\title{Diseasy' observables handler}
+\title{Diseasy's observables handler}
 \value{
-A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
+A new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
 }
 \description{
 The \code{DiseasyObservables} module is responsible for interfacing with the available \code{diseasystores} and provide
@@ -139,9 +139,6 @@ Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}

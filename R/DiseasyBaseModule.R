@@ -1,4 +1,4 @@
-#' @title Base module for diseasy
+#' @title Diseasy's basic module
 #'
 #' @description
 #'   The `DiseasyBaseModule` module implements common functionality that all modules have available.

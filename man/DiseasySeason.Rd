@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasySeason.R
 \name{DiseasySeason}
 \alias{DiseasySeason}
-\title{Diseasy' season handler}
+\title{Diseasy's season handler}
 \value{
 A new instance of the \code{DiseasySeason} \link[R6:R6Class]{R6} class.
 }
