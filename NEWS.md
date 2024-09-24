@@ -2,6 +2,8 @@
 
 ## Features:
 
+* `DiseasyVariant`: A functional module to implement scenarios for disease variants (#111).
+
 * `DiseasyModel`: A base class for the model templates (#36).
   * R6 class that defines the interface for the models and empower the flexible configuration of models from the
     functional modules.
