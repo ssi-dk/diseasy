@@ -1984,7 +1984,7 @@
     {
       "ref": "local::.",
       "package": "diseasy",
-      "version": "0.0.0.9000",
+      "version": "0.1",
       "type": "local",
       "direct": true,
       "binary": false,
@@ -1995,7 +1995,7 @@
         "RemoteType": "local"
       },
       "sources": "file:///home/runner/work/diseasy/diseasy",
-      "target": "src/contrib/diseasy_0.0.0.9000.tar.gz",
+      "target": "src/contrib/diseasy_0.1.tar.gz",
       "platform": "source",
       "rversion": "*",
       "directpkg": true,
