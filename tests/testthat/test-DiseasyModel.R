@@ -11,13 +11,15 @@ test_that("initialize works", {
   act <- DiseasyActivity$new()
   s   <- DiseasySeason$new()
   obs <- DiseasyObservables$new()
+  var <- DiseasyVariant$new()
 
   m_act_instance <- DiseasyModel$new(activity = act)
   m_s_instance   <- DiseasyModel$new(season = s)
   m_obs_instance <- DiseasyModel$new(observables = obs)
+  m_var_instance <- DiseasyModel$new(variant = var)
 
   # Check the hash is unique for each module when created this way
-  modules <- list(m, m_act_instance, m_s_instance, m_obs_instance)
+  modules <- list(m, m_act_instance, m_s_instance, m_obs_instance, m_var_instance)
   expect_length(unique(purrr::map(modules, ~ .x$hash)), length(modules))
 
 
@@ -25,17 +27,19 @@ test_that("initialize works", {
   m_act_boolean <- DiseasyModel$new(activity = TRUE)
   m_s_boolean   <- DiseasyModel$new(season = TRUE)
   m_obs_boolean <- DiseasyModel$new(observables = TRUE)
+  m_var_boolean <- DiseasyModel$new(variant = TRUE)
 
   # Check the hash is the same when created this way
   expect_identical(m_act_instance$hash, m_act_boolean$hash)
   expect_identical(m_s_instance$hash,   m_s_boolean$hash)
   expect_identical(m_obs_instance$hash, m_obs_boolean$hash)
+  expect_identical(m_var_instance$hash, m_var_boolean$hash)
 
   # Check a label can be set
   m_label <- DiseasyModel$new(label = "test")
   expect_equal(m_label$hash, m$hash) # label should not change the hash
 
-  rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_label)
+  rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_var_boolean, m_label)
 })
 
 
@@ -107,56 +111,77 @@ test_that("$hash works", {
 
   s   <- DiseasySeason$new()
   obs <- DiseasyObservables$new()
+  var <- DiseasyVariant$new()
 
   # Loading DiseasyActivity
   m$load_module(act)
-  hash_activity_loaded <- m$hash
-  expect_false(hash_activity_loaded == hash_new_instance)
+  hash_1 <- m$hash
+  expect_false(hash_1 == hash_new_instance)
 
   # Loading DiseasySeason
   m$load_module(s)
-  hash_activity_season_loaded <- m$hash
-  expect_false(hash_activity_season_loaded == hash_new_instance)
-  expect_false(hash_activity_season_loaded == hash_activity_loaded)
+  hash_2 <- m$hash
+  expect_false(hash_2 == hash_new_instance)
+  expect_false(hash_2 == hash_1)
 
   # Loading DiseasyObservables
   m$load_module(obs)
-  hash_activity_season_observables_loaded <- m$hash                                                                     # nolint: object_length_linter
-  expect_false(hash_activity_season_observables_loaded == hash_new_instance)
-  expect_false(hash_activity_season_observables_loaded == hash_activity_loaded)
-  expect_false(hash_activity_season_observables_loaded == hash_activity_season_loaded)
+  hash_3 <- m$hash
+  expect_false(hash_3 == hash_new_instance)
+  expect_false(hash_3 == hash_1)
+  expect_false(hash_3 == hash_2)
+
+  # Loading DiseasyVariant
+  m$load_module(var)
+  hash_4 <- m$hash
+  expect_false(hash_4 == hash_new_instance)
+  expect_false(hash_4 == hash_1)
+  expect_false(hash_4 == hash_2)
+  expect_false(hash_4 == hash_3)
 
 
   # Check reloading modules works
   m$load_module(act)
-  expect_equal(m$hash, hash_activity_season_observables_loaded)
+  expect_equal(m$hash, hash_4)
 
   m$load_module(s)
-  expect_equal(m$hash, hash_activity_season_observables_loaded)
+  expect_equal(m$hash, hash_4)
 
   m$load_module(obs)
-  expect_equal(m$hash, hash_activity_season_observables_loaded)
+  expect_equal(m$hash, hash_4)
+
+  m$load_module(var)
+  expect_equal(m$hash, hash_4)
+
 
   # Check loading of altered module changes the hash
   act_alt <- DiseasyActivity$new()
   act_alt$set_activity_units(dk_activity_units)
   act_alt$change_activity(head(scenario_1, 3))
   m$load_module(act_alt)
-  expect_false(m$hash == hash_activity_season_observables_loaded)
+  expect_false(m$hash == hash_4)
+  m$load_module(act) # Reset to original
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
-  m$load_module(act)
-  expect_equal(m$hash, hash_activity_season_observables_loaded)
+  expect_equal(m$hash, hash_4)
   m$load_module(s_alt)
-  expect_false(m$hash == hash_activity_season_observables_loaded)
+  expect_false(m$hash == hash_4)
+  m$load_module(s) # Reset to original
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
-  m$load_module(s)
-  expect_equal(m$hash, hash_activity_season_observables_loaded)
+  expect_equal(m$hash, hash_4)
   m$load_module(obs_alt)
-  expect_false(m$hash == hash_activity_season_observables_loaded)
+  expect_false(m$hash == hash_4)
+  m$load_module(obs) # Reset to original
 
-  rm(m, s, act, obs, s_alt, act_alt, obs_alt)
+  var_alt <- DiseasyVariant$new()
+  var_alt$add_variant(name = "WT")
+  expect_equal(m$hash, hash_4)
+  m$load_module(var_alt)
+  expect_false(m$hash == hash_4)
+  m$load_module(var) # Reset to original
+
+  rm(m, s, act, obs, var, s_alt, act_alt, obs_alt, var_alt)
 
 })
 
@@ -313,6 +338,24 @@ test_that("active binding: season works", {
   expect_identical(tryCatch(m$season <- DiseasySeason$new(), error = \(e) e),                                           # nolint: implicit_assignment_linter
                    simpleError("`$season` is read only"))
   expect_null(m %.% season)
+
+  rm(m)
+})
+
+
+test_that("active binding: variant works", {
+
+  # Creating an empty module
+  m <- DiseasyModel$new()
+
+  # Retrieve the variant
+  expect_null(m %.% variant)
+
+  # Try to set variant through the binding
+  # test_that cannot capture this error, so we have to hack it
+  expect_identical(tryCatch(m$variant <- DiseasyVariant$new(), error = \(e) e),                                         # nolint: implicit_assignment_linter
+                   simpleError("`$variant` is read only"))
+  expect_null(m %.% variant)
 
   rm(m)
 })

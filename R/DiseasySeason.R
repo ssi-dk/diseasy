@@ -460,7 +460,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description `r rd_describe`
     describe = function() {
-      printr("# Season model ###############################################")
+      printr("# DiseasySeason ##############################################")
       printr(glue::glue("Season model: {attr(self$model_t, 'name')}"))
       printr(glue::glue("{attr(self$model_t, 'description')}"))
       if (!is.null(attr(self$model_t, "dots"))) {
