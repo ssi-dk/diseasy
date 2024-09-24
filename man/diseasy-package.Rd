@@ -4,11 +4,11 @@
 \name{diseasy-package}
 \alias{diseasy}
 \alias{diseasy-package}
-\title{diseasy: Disease Ensemble Modelling Made Easy}
+\title{diseasy: Ensemble Disease Modelling Made Easy}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package facilitates creation of an ensemble of models through modular construction and combinatorics.
+Modules, models and tools to create ensembles of disease models through modular construction and combinatorics. Using the data pipeline provided by the 'diseasystore' package, 'diseasy' enables ensembles of disease models to be run across multiple diseases. By using the global activity matrices from the 'contactdata' package, the models can run on almost all countries.
 }
 \seealso{
 Useful links:
@@ -23,13 +23,16 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID})
   \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID})
-  \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID})
 }
 
 Other contributors:
 \itemize{
+  \item Carsten Kirkeby \email{ckir@sund.ku.dk} (\href{https://orcid.org/0000-0001-9292-5526}{ORCID}) [contributor]
+  \item Frederik Plesner Lyngse \email{frederik.lyngse@sund.ku.dk} (\href{https://orcid.org/0000-0002-0584-6115}{ORCID}) [contributor]
+  \item Adam Mielke \email{admi@dtu.dk} (\href{https://orcid.org/0000-0001-8605-2167}{ORCID}) [contributor]
+  \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID}) [contributor]
+  \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID}) [contributor]
   \item Statens Serum Institut, SSI [copyright holder, funder]
 }
 
