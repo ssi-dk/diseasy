@@ -7,6 +7,8 @@ CCW
 backends
 bitemporal
 
+catalog
+cdot
 classname
 cloneable
 CMD
@@ -24,6 +26,7 @@ dbi
 DBIConnection
 DBIDriver
 dbplyr
+dI
 diseasy
 diseasystore
 DiseasystoreBase
@@ -33,11 +36,15 @@ DiseasyActivity
 DiseasyBaseModule
 DiseasyObservables
 DiseasySeason
+DiseasyVariant
 dk
 DMI
 doi
 dplyr
+dR
 ds
+dS
+dt
 dtplyr
 DuckDB
 
@@ -52,6 +59,7 @@ fn
 fns
 FeatureHandler
 FeatureHandlers
+frac
 
 github
 gov
@@ -66,6 +74,7 @@ Jit
 
 Klepac
 Kirkeby
+kt
 
 Lasse
 linter
