@@ -534,16 +534,20 @@ DiseasyActivity <- R6::R6Class(                                                 
           dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
           dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
           dplyr::pull("population")
-        N <- outer(population, rep(1, length(population))) # Store as a matrix with N repeated as columns               # nolint: object_name_linter
+        N_new <- outer(population, rep(1, length(population))) # Store as a square matrix with N_new repeated as columns               # nolint: object_name_linter
 
         # Determine the population in the old age groups
-        N_i <- self$contact_basis$population                                                                            # nolint: object_name_linter
-        N_i <- outer(N_i, rep(1, length(N_i))) # Store as a matrix with N_i repeated repeated as columns                # nolint: object_name_linter
+        N_old <- self$contact_basis$population                                                                            # nolint: object_name_linter
+        N_old <- outer(N_old, rep(1, length(N_old))) # Store as a matrix with N_old repeated repeated as columns                # nolint: object_name_linter
 
         # For each contact matrix, m, in the scenario, we perform the transformation
-        # (p %*% (m * N_i) %*% t(p)) / N_n                                                                              # nolint: commented_code_linter
+        # (p %*% (m * N_old) %*% t(p)) / N_new                                                                      # nolint: commented_code_linter
+        # As m is the number of contacts from each individual m * N_old scales to all contacts between age groups.
+        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups. 
+        # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
+        #
         # The elements of this matrix has the following form:
-        # (m_{i  ,j} * N_i     + m_{i,  j+1} * N_i     + ... + m_{i,  j+k} * N_i +
+        # (m_{i  ,j} * N_old     + m_{i,  j+1} * N_old     + ... + m_{i,  j+k} * N_old +    # These lines need fixing
         #  m_{i+1,j} * N_{i+1} + m_{i+1,j+1} * N_{i+1} + ... + m_{i+1,j+k} * N_{i+1} +
         # ... +
         #  m_{i+k,j} * N_{i+k} + m_{i+k,j+1} * N_{i+k} + ... + m_{i+1,j+k} * N_{i+k}) /
@@ -552,7 +556,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         # (NB: the above is only if the new age groups are just aggregations of the old (i.e p has only 0 and 1 values)
         # if there is a split, the fractional values in p enter in the above equations.
         scenario_contacts <- scenario_contacts |>
-          lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_i) %*% t(p)) / N))
+          lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_old) %*% t(p)) / N_new))
 
       }
 
