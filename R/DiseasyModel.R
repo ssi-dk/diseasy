@@ -176,21 +176,25 @@ DiseasyModel <- R6::R6Class(                                                    
       # Input validation
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(observable, add = coll)
-      checkmate::assert_number(self %.% parameters %.% training_length, add = coll)
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
       checkmate::assert_choice(period, c("training", "testing", "validation"), add = coll)
       checkmate::reportAssertions(coll)
 
       # Get the observable at the stratification level
-      start_date <- purrr::pluck(self, glue::glue("{period}_period"), "start")
-      end_date   <- purrr::pluck(self, glue::glue("{period}_period"), "end")
+      period_duration <- purrr::pluck(self, glue::glue("{period}_period"))
+      start_date <- period_duration %.% start
+      end_date   <- period_duration %.% end
 
       if (is.null(start_date) || is.null(end_date)) {
         stop("Requested period is not configured! Check the corresponding `$<period>_period`.")
       }
 
       data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
-        dplyr::mutate(t = lubridate::interval(max(zoo::as.Date(date)), zoo::as.Date(date)) / lubridate::days(1))
+        dplyr::mutate(t = lubridate::interval(
+            !!self %.% observables %.% last_queryable_date,
+            zoo::as.Date(date)
+          ) / lubridate::days(1)
+        )
 
       return(data)
     }
