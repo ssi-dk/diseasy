@@ -528,35 +528,27 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (!is.null(age_cuts_lower)) {
         p <- private$population_transform_matrix(age_cuts_lower)
 
-        # To perform the projection, we need the number of persons in the new and old age groups
+        # To perform the projection, we need the number of persons in the new and original age groups
         # Determine the population in the new age groups
         population <- self$contact_basis$demography |>
           dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
           dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
           dplyr::pull("population")
-        N_new <- outer(population, rep(1, length(population))) # Store as a square matrix with N_new repeated as columns               # nolint: object_name_linter
 
-        # Determine the population in the old age groups
-        N_old <- self$contact_basis$population                                                                            # nolint: object_name_linter
-        N_old <- outer(N_old, rep(1, length(N_old))) # Store as a matrix with N_old repeated repeated as columns                # nolint: object_name_linter
+        # Store as a square matrix with the new population repeated as columns
+        N_new <- outer(population, rep(1, length(population)))                                                          # nolint: object_name_linter
+
+        # Determine the population in the original age groups and store as a matrix with population repeated as columns
+        N_original <- self$contact_basis$population                                                                     # nolint: object_name_linter
+        N_original <- outer(N_original, rep(1, length(N_original)))                                                     # nolint: object_name_linter
 
         # For each contact matrix, m, in the scenario, we perform the transformation
-        # (p %*% (m * N_old) %*% t(p)) / N_new                                                                      # nolint: commented_code_linter
-        # As m is the number of contacts from each individual m * N_old scales to all contacts between age groups.
-        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups. 
+        # (p %*% (m * N_original) %*% t(p)) / N_new                                                                     # nolint: commented_code_linter
+        # As m is the number of contacts from each individual m * N_original scales to all contacts between age groups.
+        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
         # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
-        #
-        # The elements of this matrix has the following form:
-        # (m_{i  ,j} * N_old     + m_{i,  j+1} * N_old     + ... + m_{i,  j+k} * N_old +    # These lines need fixing
-        #  m_{i+1,j} * N_{i+1} + m_{i+1,j+1} * N_{i+1} + ... + m_{i+1,j+k} * N_{i+1} +
-        # ... +
-        #  m_{i+k,j} * N_{i+k} + m_{i+k,j+1} * N_{i+k} + ... + m_{i+1,j+k} * N_{i+k}) /
-        # (N_i + N_{i+1} + ... N_{i+k})
-        # Where k is the number of basis age_groups being aggregated
-        # (NB: the above is only if the new age groups are just aggregations of the old (i.e p has only 0 and 1 values)
-        # if there is a split, the fractional values in p enter in the above equations.
         scenario_contacts <- scenario_contacts |>
-          lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_old) %*% t(p)) / N_new))
+          lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
 
       }
 
