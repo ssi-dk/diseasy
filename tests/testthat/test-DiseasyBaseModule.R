@@ -13,7 +13,7 @@ test_that("initialize works", {
 })
 
 
-test_that("set_moduleowner works", {
+test_that("$set_moduleowner() works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()
@@ -31,7 +31,7 @@ test_that("set_moduleowner works", {
 })
 
 
-test_that("hash works", {
+test_that("$hash works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()
@@ -43,7 +43,7 @@ test_that("hash works", {
 
   # Try to set the hash
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$hash <- "test", error = \(e) e),
+  expect_identical(tryCatch(m$hash <- "test", error = \(e) e),                                                          # nolint: implicit_assignment_linter
                    simpleError("`$hash` is read only"))
   expect_equal(m$hash, hash_new_instance)
 
@@ -51,7 +51,7 @@ test_that("hash works", {
 })
 
 
-test_that("cache works", {
+test_that("$cache works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()
@@ -92,15 +92,15 @@ test_that("errors work", {
                class = "simpleError",
                regex = "Not implemented: test1")
 
-  expect_error(private$not_implemented_error(c("test1", "test2")),
+  expect_error(private$not_implemented_error("test1", "test2"),
                class = "simpleError",
-               regex = "Not implemented: test1test2")
+               regex = "Not implemented: test1 test2")
 
   rm(m)
 })
 
 
-test_that("stratification_to_string works", {
+test_that("$stratification_to_string() works", {
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()

@@ -15,7 +15,7 @@ rd_stratification <- function(type = "param") {
 }
 
 
-rd_diseasystore <- function(type = "param") {
+rd_diseasystore_label <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",
@@ -75,9 +75,17 @@ rd_scale <- function(type = "param") {
 }
 
 
+rd_conn <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`DBIConnection`)\\cr",
+        "A database connection",
+        ifelse(type == "field", " Read only.", ""))
+}
+
+
 rd_source_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("source_conn\\cr",
+  paste("(`DBIConnection` or `file path`)\\cr",
         "Used to specify where data is located.",
         ifelse(type == "field", " Read only.", ""),
         "Can be `DBIConnection` or file path depending on the `diseasystore`.")
@@ -92,12 +100,22 @@ rd_target_conn <- function(type = "param") {
 }
 
 
+
+rd_schema <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`character`)\\cr",
+        "A database schema",
+        ifelse(type == "field", " Read only.", ""),
+        "If the database backend does not support schema, the tables will be prefixed with <schema>.")
+}
+
+
 rd_target_schema <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "The schema to place the feature store in.",
         ifelse(type == "field", " Read only.", ""),
-        "If the database backend does not support schema, the tables will be prefixed with target_schema.")
+        "If the database backend does not support schema, the tables will be prefixed with <target_schema>.")
 }
 
 
@@ -109,10 +127,17 @@ rd_training_length <- function(type = "param") {
 }
 
 
-rd_start_date <- function(type = "param") {
+rd_start_date <- function(type = "param", minimum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date`)\\cr",
-        "Study period start.",
+        paste0(ifelse(minimum, "(Minimum)", ""), "Study period start."),
+        ifelse(type == "field", " Read only.", ""))
+}
+
+rd_end_date <- function(type = "param", maximum = FALSE) {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`Date`)\\cr",
+        paste0(ifelse(maximum, "(Maximum)", ""), "Study period end."),
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -120,28 +145,21 @@ rd_start_date <- function(type = "param") {
 rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
-        "Date or timestamp (parseable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
-        ifelse(type == "field", " Read only.", ""))
-}
-
-
-rd_end_date <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
-  paste("(`Date`)\\cr",
-        "Study period end.",
+        "Date or timestamp (parsable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
         ifelse(type == "field", " Read only.", ""))
 }
 
 
 rd_.data <- function(type = "param") {                                                                                  # nolint: object_name_linter
   checkmate::assert_choice(type, c("param", "field"))
-  paste(".data\\cr",
-        "The data object on which to perform the operation.",
+  paste("(`any`)\\cr",
+        "The data object to perform the operation on.",
         ifelse(type == "field", " Read only.", ""))
 }
 
 
 rd_describe <- "Prints a human readable report of the internal state of the module."
+
 
 rd_get_results_description <- paste(
   "The primary method used to request model results of a given observable at a given stratification"
@@ -155,33 +173,11 @@ rd_get_results_return <- paste(
   "  model (`character`) the name (classname) of the model used to provide the prediction."
 )
 
+
 rd_get_results_seealso <- "[diseasy::DiseasyObservables]"
-
-rd_observable <- paste(
-  "(`character`)\\cr",
-  "The observable to provide prediction for. Must match observable in `DiseasyObservables` [R6][R6::R6Class] class."
-)
-
-rd_prediction_length <- paste(
-  "(`numeric`)\\cr",
-  "The number of days to predict.",
-  "The prediction start is defined by `last_queryable_date` of the `DiseasyObservables` [R6][R6::R6Class] class."
-)
-
-rd_quantiles <- paste(
-  "(`list`(`numeric`))\\cr",
-  "Default NULL.",
-  "If given, results are returned at the quantiles given."
-)
-
-rd_training_length <- paste(
-  "(`numeric`)\\cr",
-  "The number of days that should be included in the training of the model."
-)
 
 
 rd_side_effects <- "NULL (called for side effects)"
-
 
 
 rd_age_cuts_lower <- paste(

@@ -30,7 +30,7 @@ attr(ref_scenario_1, "secret_hash") <- secret_hash
 
 
 
-test_that("$set_activity_units works", {
+test_that("$set_activity_units() works", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -52,7 +52,7 @@ test_that("$set_activity_units works", {
 })
 
 
-test_that("$set_activity_units fails when loading malformed activity units", {
+test_that("$set_activity_units() fails when loading malformed activity units", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -67,7 +67,7 @@ test_that("$set_activity_units fails when loading malformed activity units", {
 })
 
 
-test_that("$change_activity works with different ways of initializing", {
+test_that("$change_activity() works with different ways of initializing", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -127,7 +127,74 @@ test_that("$change_activity works with different ways of initializing", {
 })
 
 
-test_that("$change_risk's secret_hash works", {
+test_that("$change_activity() fails with malformed inputs", {
+
+  # Create a new instance of the activity module
+  act <- DiseasyActivity$new()
+  act$set_activity_units(dk_activity_units_subset)
+
+  # Test that changing activity fails when a missing activity unit is requested
+  malformed_scenario <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
+    dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",                         closing = NA) |>
+    dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,                                 closing = "baseline") |>
+    dplyr::add_row(date = as.Date("2020-03-12"), opening = "non_existing_activity_unit",       closing = NA) |>
+    dplyr::add_row(date = as.Date("2020-04-15"), opening = "secondary_education_phase_1_2020", closing = NA)
+
+  expect_error(act$change_activity(malformed_scenario),
+               class = "simpleError",
+               regexp = "non_existing_activity_unit")
+  expect_null(act %.% scenario_matrix) # Check the state is unchanged
+
+
+  rm(act)
+})
+
+
+test_that("$change_risk() works", {
+
+  # Create a new instance of the activity module
+  act <- DiseasyActivity$new()
+
+  # Store the current hash
+  hash_new_instance <- act$hash
+
+  # Then load activity units into the module
+  act$set_activity_units(dk_activity_units_subset)
+
+  act$change_activity(scenario_1)
+  hash_scenario_1_loaded <- act$hash
+
+  # Testing risk_matrix and related
+  expect_identical(colnames(act$risk_matrix), colnames(act$scenario_matrix))
+  expect_true(all(act$risk_matrix == 1))
+
+  # Now adjusting risks
+  act$change_risk(date = as.Date("2020-03-12"), type = c("work", "school"), risk = c(0.5, 0.8))
+
+  # hash should be different now that the risks are different
+  hash_new_risks <- act$hash
+  expect_false(hash_new_risks == hash_new_instance)
+  expect_false(hash_new_risks == hash_scenario_1_loaded)
+
+
+  # `$change_risk` fails when wrong type is given
+  expect_error(act$change_risk(date = as.Date("2020-03-15"), type = "workers", risk = 0.5),
+               class = "simpleError",
+               regexp = "workers")
+  expect_identical(act$hash, hash_new_risks)
+
+
+  # And works again with new properly formed risks
+  act$change_risk(date = as.Date("2020-06-12"), type = c("work", "school"), risk = c(0.7, 0.9))
+
+  expect_identical(colnames(act$risk_matrix), colnames(act$scenario_matrix))
+  expect_false(act$hash == hash_new_risks)
+
+  rm(act)
+})
+
+
+test_that("$change_risk()'s secret_hash works", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -157,95 +224,27 @@ test_that("$change_risk's secret_hash works", {
 })
 
 
-test_that("$change_activity fails with malformed inputs", {
-
-  # Create a new instance of the activity module
-  act <- DiseasyActivity$new()
-  act$set_activity_units(dk_activity_units_subset)
-
-  # Test that changing activity fails when a missing activity unit is requested
-  malformed_scenario <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
-    dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",                         closing = NA) |>
-    dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,                                 closing = "baseline") |>
-    dplyr::add_row(date = as.Date("2020-03-12"), opening = "non_existing_activity_unit",       closing = NA) |>
-    dplyr::add_row(date = as.Date("2020-04-15"), opening = "secondary_education_phase_1_2020", closing = NA)
-
-  expect_error(act$change_activity(malformed_scenario),
-               class = "simpleError",
-               regexp = "non_existing_activity_unit")
-  expect_identical(act$scenario_matrix, NULL) # Check the state is unchanged
-
-
-  rm(act)
-})
-
-
-test_that("$change_risk works", {
-
-  # Create a new instance of the activity module
-  act <- DiseasyActivity$new()
-
-  # Store the current hash
-  hash_new_instance <- act$hash
-
-  # Then load activity units into the module
-  act$set_activity_units(dk_activity_units_subset)
-
-  act$change_activity(scenario_1)
-  hash_scenario_1_loaded <- act$hash
-
-  # Testing risk_matrix and related
-  expect_identical(colnames(act$risk_matrix), colnames(act$scenario_matrix))
-  expect_true(all(act$risk_matrix == 1))
-
-  # Now adjusting risks
-  act$change_risk(date = as.Date("2020-03-12"), type = c("work", "school"), risk = c(0.5, 0.8))
-
-  # hash should be different now that the risks are different
-  hash_new_risks <- act$hash
-  expect_false(hash_new_risks == hash_new_instance)
-  expect_false(hash_new_risks == hash_scenario_1_loaded)
-
-
-  # `$change_risk` fails when wrong type is given
-  expect_error(act$change_risk(date = as.Date("2020-03-15"), type = c("workers"), risk = c(0.5)),
-               class = "simpleError",
-               regexp = "workers")
-  expect_identical(act$hash, hash_new_risks)
-
-
-  # And works again with new properly formed risks
-  act$change_risk(date = as.Date("2020-06-12"), type = c("work", "school"), risk = c(0.7, 0.9))
-
-  expect_identical(colnames(act$risk_matrix), colnames(act$scenario_matrix))
-  expect_false(act$hash == hash_new_risks)
-
-  rm(act)
-})
-
-
-test_that("get_scenario_openness works", {
+test_that("$get_scenario_openness() works", {
 
   # Test openness
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
   # With no scenario, we should get a empty list
-  expect_identical(act$get_scenario_openness(), list())
+  expect_identical(act$get_scenario_openness(), stats::setNames(list(), character(0)))
 
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
                       opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
                       closing      = c(NA,           "baseline",      NA))
 
-  expect_identical(length(act$get_scenario_openness()), 3L) # 3 dates in scenario
-  expect_identical(length(act$get_scenario_openness()[[1]]), 4L) # 4 arenas
-  expect_true(all(unlist(lapply(act$get_scenario_openness(), \(x) sapply(x, length))) == 16))
-  #TODO: Test if risks are applied
+  expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
+  expect_length(act$get_scenario_openness()[[1]], 4L) # 4 arenas
+  expect_true(all(unlist(lapply(act$get_scenario_openness(), lengths)) == 16))
 
   # Test with different age cuts
   expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0, 60)), 1, 1, length), 2L) # 2 age groups
-  expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0)), 1, 1, length), 1L) # 1 (no) age groups
+  expect_identical(purrr::pluck(act$get_scenario_openness(age_cuts_lower = 0), 1, 1, length), 1L) # 1 (no) age groups
 
   rm(act)
 })
@@ -262,14 +261,14 @@ test_that("contactdata: contact_basis works", {
                       closing      = c(NA,           "baseline",         NA))
 
   # Repeating a previous to see that methods are available
-  expect_identical(length(act$get_scenario_openness()), 3L) # 3 dates in scenario
+  expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
 
   # Checking dimension
   expect_identical(dim(act$get_scenario_contacts()[[1]][[1]]), c(16L, 16L))
 
   # Check dimensions with other age groups
   expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = c(0, 60))[[1]][[1]]), c(2L, 2L))
-  expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = c(0))[[1]][[1]]), c(1L, 1L))
+  expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = 0)[[1]][[1]]), c(1L, 1L))
 
   rm(act)
 })
@@ -279,19 +278,19 @@ test_that("dk_reference scenario works", {
 
   ## Test dk_reference scenario
   act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis %.% DK)
-  expect_identical(class(act$get_scenario_contacts(age_cuts_lower = c(0, 60))), "list")
+  checkmate::expect_class(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), "list")
   # More tests could be made ... but tested above. The length may change over time so mayby some particular dates.
 
   ## Test weighted contact types. Most meaningful for contact matrices
   tmp_list          <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
   tmp_list_weighted <- act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1))
-  expect_identical(length(tmp_list), length(tmp_list_weighted))
+  expect_length(tmp_list, length(tmp_list_weighted))
 
   rm(act)
 })
 
 
-test_that("set_contact_basis works", {
+test_that("$set_contact_basis() works", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new(base_scenario = "closed")
@@ -330,6 +329,21 @@ test_that("set_contact_basis works", {
   custom_basis <- contact_basis %.% DK
   expect_error(act$set_contact_basis(custom_basis[-5]), class = "simpleError",
                regexp = r"{missing.*elements.*\{'description'\}}")
+
+  rm(act)
+})
+
+
+test_that("$describe() works", {
+  act <- DiseasyActivity$new()
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+
+  act$set_contact_basis(contact_basis %.% DK)
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+
+  act$set_activity_units(dk_activity_units)
+  act$change_activity(scenario_1)
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
 
   rm(act)
 })

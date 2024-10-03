@@ -7,29 +7,43 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/diseasy)](https://CRAN.R-project.org/package=diseasy)
-[![R-CMD-check](https://github.com/ssi-dk/diseasy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ssi-dk/diseasy/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/ssi-dk/diseasy/graph/badge.svg?token=7RRVVVHOWR)](https://codecov.io/gh/ssi-dk/diseasy)
+[![CI
+tests](https://github.com/ssi-dk/diseasy/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/diseasy/actions/workflows/all-workflows.yaml)
+[![codecov](https://codecov.io/gh/ssi-dk/diseasy/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ssi-dk/diseasy)
 
 <!-- badges: end -->
 
 ## Overview
 
-Leveraging combinatorial building for ensemble forecasting in disease
-modelling
+The `diseasystore` package provides feature stores implemented in R
+specifically designed for serve disease data for epidemic preparedness.
 
-## The power of combinations
+What makes a `diseasystore` special, is that features can be
+automatically coupled and stratified within the `diseasystore` package.
+Consult the Quick start vignette to see it in action
+(`vignette("quick-start", package = "diseasystore")`).
 
-`diseasy` is framework for disease modelling that is built around the
-philosophy of combinatorial building. Even from a small number of
-modules, an ensemble consisting of a vast array of disease models can be
-constructed by combining individual modules.
+The package forms the data-backbone of the `{diseasy}` package.
 
-## The power of ensembles
+## Handling of diverse data sources
 
-Ensemble models of disease spread typically outperforms individual
-models in terms of robust and accurate forecasts. With `diseasy`,
-ensemble models are leveraged to support evidence-based decision-making
-and pandemic preparedness.
+Different data sources are handled by individual `diseasystores` which
+each facilitate access to the relevant disease data for the given data
+source.
+
+Data for different diseases will typically be structured in different
+ways. The `diseasystore` package currently implements the Google Health
+COVID-19 Open Repository with more one `diseasystores` the way.
+
+The `diseasystore` package is designed to handled both individual-level
+data (examples to come) and semi-aggregated (typically publicly
+available) data.
+
+If the data is at the individual-level, the feature store is fully
+dynamic and can adapt to (virtually) any stratification that the user
+specifies. If the data conversely is semi-aggregated, the data can only
+be stratified at the levels of the semi-aggregation (or at higher
+levels).
 
 ## Installation
 
@@ -44,4 +58,4 @@ devtools::install_github("ssi-dk/diseasy")
 
 ## Usage
 
-For basic usage examples, see `vignette("basic_principles")`.
+For basic usage examples, see `vignette("quick-start")`.

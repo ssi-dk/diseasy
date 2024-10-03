@@ -1,0 +1,14 @@
+group:
+  - repos: |
+      ssi-dk/diseasystore
+      ssi-dk/diseasy
+    files:
+      - .github/sync.yaml
+
+      - inst/WORDLIST
+
+      - R/0_R6_utils.R
+      - tests/testthat/test-0_R6_utils.R
+
+      - R/0_documentation.R
+      - tests/testthat/test-0_documentation.R

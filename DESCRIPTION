@@ -19,7 +19,7 @@ RoxygenNote: 7.3.2
 Language: en-GB
 LazyData: TRUE
 Depends:
-    diseasystore,
+    diseasystore (>= 0.2.2),
     R (>= 3.5.0)
 Imports:
     checkmate,
@@ -29,14 +29,20 @@ Imports:
     lgr,
     lintr,
     lubridate,
+    Matrix,
     pracma,
     purrr,
     R6,
     rlang,
     stringr
 Suggests:
+    contactdata,
+    countrycode,
+    curl,
     DBI,
     devtools,
+    duckdb,
+    jsonlite,
     knitr,
     readr,
     rmarkdown,
@@ -44,6 +50,8 @@ Suggests:
     SCDB,
     spelling,
     testthat (>= 3.0.0),
+    tibble,
+    withr,
     zoo
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy

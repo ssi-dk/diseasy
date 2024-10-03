@@ -15,6 +15,7 @@ will therefore depend on the data made available by the diseasystores.
 See vignette("diseasy-observables")
 }
 \examples{
+\dontshow{if (rlang::is_installed("RSQLite")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   # Create observables module using the Google COVID-19 data
   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
                                 conn = DBI::dbConnect(RSQLite::SQLite()))
@@ -30,6 +31,7 @@ See vignette("diseasy-observables")
                       end_date = as.Date("2020-03-05"))
   }
   rm(obs)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link{diseasystore}
@@ -38,6 +40,7 @@ See vignette("diseasy-observables")
 
 \link[SCDB:get_table]{SCDB::get_table}
 }
+\keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyObservables}
 }
@@ -65,8 +68,8 @@ The currently available observables in the loaded diseasystore. Read-only.}
 \item{\code{available_stratifications}}{(\code{character})\cr
 The currently available stratifications in the loaded diseasystore. Read-only.}
 
-\item{\code{slice_ts}}{(\code{Date})\cr
-The timestamp to slice database on. Read-only.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
+Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}. Read-only.}
 
 \item{\code{conn}}{(\code{DBIConnection})\cr
 The connection to the database on. Read-only.}
@@ -157,7 +160,8 @@ Set the case definition to get DiseasyObservables for.
 Text label of the disease to get DiseasyObservables for.\cr
 Must match case definition implemented in \code{diseasystore} package.}
 
-\item{\code{verbose}}{Should the \code{diseasystore} use verbose outputs?}
+\item{\code{verbose}}{(\code{logical})\cr
+Should the \code{diseasystore} use verbose outputs?}
 }
 \if{html}{\out{</div>}}
 }

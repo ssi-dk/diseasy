@@ -1,4 +1,4 @@
-test_that(r"{.Rd files have \Value}", {
+test_field_in_documentation <- function(field) {
 
   # Load .Rd files based on environment
   # When using R-CMD-Check the deployment is different from when using devtools::test().
@@ -8,16 +8,11 @@ test_that(r"{.Rd files have \Value}", {
   # Note that `devtools::test()`, `devtools::check()` and GitHub workflows all have different
   # folder structures during testing, so we need to account for these differences
 
-  # Platform independent regex search to find root folder
-  path_regex <- stringr::str_replace(r"{(.*\/\w*(.Rcheck)?)\/.*(?=\/testthat)}", "/", .Platform$file.sep)
-  pkg_path <- stringr::str_extract(getwd(), path_regex, group = 1)
-
-  # If path contains .Rcheck, we need to add the package name to the path
-  pkg_path <- stringr::str_replace(pkg_path, r"{(\w*)(\.Rcheck)}", paste0("\\1\\2", .Platform$file.sep, "\\1"))
-
   # Look for the source of .Rd files
-  help_dir <- file.path(pkg_path, "help")
-  man_dir  <- file.path(pkg_path, "man")
+  help_dir <- system.file("help", package = testthat::testing_package())
+  man_dir <- system.file("man", package = testthat::testing_package())
+
+  testthat::expect_true(any(dir.exists(c(help_dir, man_dir))))
 
   if (checkmate::test_directory_exists(help_dir)) {
 
@@ -25,8 +20,9 @@ test_that(r"{.Rd files have \Value}", {
     rd_envir <- new.env()
     lazyLoad(stringr::str_remove(rdx_file, ".rdx$"), envir = rd_envir)
     rd_names <- ls(rd_envir)
-    rd_files <- purrr::map(rd_names, ~ as.character(eval(purrr::pluck(rd_envir, .)))) |>
-      purrr::map(~ paste(., collapse = ""))
+    rd_files <- rd_names |>
+      purrr::map(~ as.character(eval(purrr::pluck(rd_envir, .)))) |>
+      purrr::map_chr(~ paste(., collapse = ""))
     names(rd_files) <- paste0(rd_names, ".Rd")
 
   } else if (checkmate::test_directory_exists(man_dir)) {
@@ -46,11 +42,21 @@ test_that(r"{.Rd files have \Value}", {
   rd_files <- rd_files[!stringr::str_detect(names(rd_files), "-package.[Rr][Dd]$")]
 
   # Skip the "data" files
-  rd_files <- purrr::discard(rd_files, ~ any(stringr::str_detect(., r"{\\keyword\{data\}}")))
+  rd_files <- purrr::discard(rd_files, ~ any(stringr::str_detect(., r"{\\+keyword\\?\{data\\?\}}")))                    # nolint: absolute_path_linter
 
   # Check renaming
   for (rd_id in seq_along(rd_files)) {
-    has_value <- any(stringr::str_detect(rd_files[[rd_id]], r"{\\value}"))
-    expect_true(has_value, label = paste("File:", names(rd_files)[[rd_id]]))
+    has_field <- any(stringr::str_detect(rd_files[[rd_id]], paste0(r"{\\}", field)))
+    testthat::expect_true(has_field, label = paste("File:", names(rd_files)[[rd_id]]))
   }
+}
+
+
+test_that(r"{.Rd files have \examples}", {
+  test_field_in_documentation("example")
+})
+
+
+test_that(r"{.Rd files have \value}", {
+  test_field_in_documentation("value")
 })

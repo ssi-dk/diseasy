@@ -1,5 +1,5 @@
-if (require(contactdata) && require(countrycode) && require(curl) && require(usethis) && require(tibble) &&             # nolint: cyclocomp_linter
-      require(diseasystore)) {
+if (rlang::is_installed("contactdata") && rlang::is_installed("countrycode") && rlang::is_installed("curl") &&
+      rlang::is_installed("usethis") && rlang::is_installed("tibble") && rlang::is_installed("diseasystore")) {
 
   # We express all contact data by default in 16 5-year age groups
   # (the default age groups of the `contactdata` package)
@@ -52,10 +52,9 @@ if (require(contactdata) && require(countrycode) && require(curl) && require(use
   demography <- idb1yr |>
     dplyr::rename_with(tolower) |>
     dplyr::filter(`#yr` == 2020, .data$sex == 0) |>
-    dplyr::transmute("key_country" = stringr::str_sub(geo_id, -2, -1),
-                     .data$age,
-                     "population" = .data$pop,
-                     "proportion" = .data$pop / sum(.data$pop))
+    dplyr::group_by("key_country" = stringr::str_sub(geo_id, -2, -1)) |>
+    dplyr::transmute(.data$age, "population" = .data$pop, "proportion" = .data$pop / sum(.data$pop)) |>
+    dplyr::ungroup()
 
   # Project into 5-year age-groups
   populations <- demography |>
