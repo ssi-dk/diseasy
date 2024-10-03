@@ -351,7 +351,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #   }                                                                                                               # nolint end
     default_parameters = function() {
       list(
-        "training_length" = c("training" = -Inf, "testing" = 0, "validation" = 0)
+        "training_length" = c("training" = Inf, "testing" = 0, "validation" = 0)
       )
     },
 
@@ -364,6 +364,7 @@ DiseasyModel <- R6::R6Class(                                                    
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(
         self %.% parameters %.% training_length,
+        lower = 0,
         add = coll
       )
       checkmate::assert_names(
