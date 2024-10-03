@@ -177,19 +177,19 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Check structure of contact_basis
       checkmate::assert_list(contact_basis, add = coll)
       checkmate::assert_set_equal(names(contact_basis),
-                                  c("counts", "population", "proportion", "demography", "description"),
+                                  c("contacts", "population", "proportion", "demography", "description"),
                                   add = coll)
 
-      # Checks on contact_basis counts
-      checkmate::assert_list(purrr::pluck(contact_basis, "counts"), min.len = 1, add = coll)
-      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "counts")), private$activity_types, add = coll)
-      checkmate::assert_matrix(purrr::pluck(contact_basis, "counts", 1), min.rows = 1, min.cols = 1, add = coll)
+      # Checks on contact_basis contacts
+      checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
+      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "contacts")), private$activity_types, add = coll)
+      checkmate::assert_matrix(purrr::pluck(contact_basis, "contacts", 1), min.rows = 1, min.cols = 1, add = coll)
 
       # - Check for consistency of the number of age groups in the contact matrices
       # All matrices should be square matrices with of the same dimensions
-      n_age_groups <- purrr::pluck(contact_basis, "counts", 1, dim, 1) # Get first dimensions of the first matrix
+      n_age_groups <- purrr::pluck(contact_basis, "contacts", 1, dim, 1) # Get first dimensions of the first matrix
       purrr::walk(
-        purrr::pluck(contact_basis, "counts"),
+        purrr::pluck(contact_basis, "contacts"),
         ~ checkmate::assert_matrix(., ncols = n_age_groups, nrows = n_age_groups, add = coll)
       )
 
@@ -212,8 +212,8 @@ DiseasyActivity <- R6::R6Class(                                                 
                                   c("age", "population", "proportion"), add = coll)
 
       # Check for dimension mismatch
-      checkmate::assert_number(unique(c(nrow(purrr::pluck(contact_basis, "counts", 1)),
-                                        ncol(purrr::pluck(contact_basis, "counts", 1)),
+      checkmate::assert_number(unique(c(nrow(purrr::pluck(contact_basis, "contacts", 1)),
+                                        ncol(purrr::pluck(contact_basis, "contacts", 1)),
                                         length(purrr::pluck(contact_basis, "proportion")))), add = coll)
 
       # End checks
@@ -497,10 +497,12 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
+      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
+                                lower = 0, unique = TRUE, add = coll)
       checkmate::assert_class(self$contact_basis, "list", add = coll)
       checkmate::reportAssertions(coll)
 
-      contacts <- openness <- self$get_scenario_openness()
+      scenario_contacts <- openness <- self$get_scenario_openness()
 
       # Apply the age-stratified restrictions to the age-stratified contact matrices
       for (dd in seq_along(openness)) { # looping over dates
@@ -515,7 +517,8 @@ DiseasyActivity <- R6::R6Class(                                                 
           # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
           # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
           # non-commutative.
-          contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) * self$contact_basis$counts[[tt]]
+          scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
+            self$contact_basis$contacts[[tt]]
         }
       }
 
@@ -523,13 +526,34 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (!is.null(age_cuts_lower)) {
         p <- private$population_transform_matrix(age_cuts_lower)
 
-        contacts <- lapply(contacts, \(x) lapply(x, \(z) p %*% z %*% t(p)))
+        # To perform the projection, we need the number of persons in the new and original age groups
+        # Determine the population in the new age groups
+        population <- self$contact_basis$demography |>
+          dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
+          dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
+          dplyr::pull("population")
+
+        # Store as a square matrix with the new population repeated as columns
+        N_new <- outer(population, rep(1, length(population)))                                                          # nolint: object_name_linter
+
+        # Determine the population in the original age groups and store as a matrix with population repeated as columns
+        N_original <- self$contact_basis$population                                                                     # nolint: object_name_linter
+        N_original <- outer(N_original, rep(1, length(N_original)))                                                     # nolint: object_name_linter
+
+        # For each contact matrix, m, in the scenario, we perform the transformation
+        # (p %*% (m * N_original) %*% t(p)) / N_new                                                                     # nolint: commented_code_linter
+        # As m is the number of contacts from each individual m * N_original scales to all contacts between age groups.
+        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
+        # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
+        scenario_contacts <- scenario_contacts |>
+          lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
+
       }
 
       # Weight if weights are given
-      contacts <- private$weight_activities(contacts, weights, normalise = FALSE)
+      scenario_contacts <- private$weight_activities(scenario_contacts, weights)
 
-      return(contacts)
+      return(scenario_contacts)
     },
 
     #' Rescale contact matrices to population contact rates
