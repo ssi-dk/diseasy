@@ -354,6 +354,100 @@ test_that("$get_results() gives error", {
 })
 
 
+test_that("$get_data() works", {
+
+  # Use a random diseasystore for the tests
+  obs <- DiseasyObservables$new(diseasystore = case_defs[[1]])
+
+  # Set the last queryable date relative to the minimum start date
+  last_queryable_offset <- 20
+  obs$set_last_queryable_date(obs %.% ds %.% min_start_date + lubridate::days(last_queryable_offset))
+
+
+
+  # Test the returned data
+
+  # -- Default parameters -- all available data is training data
+  m <- DiseasyModel$new(observables = obs)
+  training_data <- m$get_data("n_positive")
+
+  # The default argument for period is "training", but check that the data is the same
+  expect_identical(m$get_data("n_positive"), m$get_data("n_positive", period = "training"))
+
+  # Check the format of the returned data
+  checkmate::expect_data_frame(training_data)
+  checkmate::expect_names(names(training_data), must.include = c("date", "n_positive", "t"))
+
+  # Check the returned data falls in the training period
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+
+  expect_identical(min(training_data$t), -last_queryable_offset)
+  expect_identical(max(training_data$t), 0)
+  rm(m)
+
+
+
+  # -- Using a non-default training period
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10))
+  )
+  training_data <- m$get_data("n_positive", period = "training")
+
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_identical(min(training_data$t), -10 + 1)
+  expect_identical(max(training_data$t), 0)
+  rm(m)
+
+
+  # -- Using a  non-default training and testing period
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5))
+  )
+  training_data <- m$get_data("n_positive", period = "training")
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_identical(min(training_data$t), -10 - 5 + 1)
+  expect_identical(max(training_data$t), -5)
+
+  testing_data <- m$get_data("n_positive", period = "testing")
+  expect_identical(min(testing_data$date), m %.% testing_period %.% start)
+  expect_identical(max(testing_data$date), m %.% testing_period %.% end)
+  expect_identical(min(testing_data$t), -5 + 1)
+  expect_identical(max(testing_data$t), 0)
+  rm(m)
+
+
+  # -- Using a  non-default training, testing and validation period
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
+  )
+  training_data <- m$get_data("n_positive", period = "training")
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_identical(min(training_data$t), -10 - 5 - 2 + 1)
+  expect_identical(max(training_data$t), -5 - 2)
+
+  testing_data <- m$get_data("n_positive", period = "testing")
+  expect_identical(min(testing_data$date), m %.% testing_period %.% start)
+  expect_identical(max(testing_data$date), m %.% testing_period %.% end)
+  expect_identical(min(testing_data$t), -5 - 2 + 1)
+  expect_identical(max(testing_data$t), -2)
+
+  validation_data <- m$get_data("n_positive", period = "validation")
+  expect_identical(min(validation_data$date), m %.% validation_period %.% start)
+  expect_identical(max(validation_data$date), m %.% validation_period %.% end)
+  expect_identical(min(validation_data$t), -2 + 1)
+  expect_identical(max(validation_data$t), 0)
+  rm(m)
+
+})
+
+
 test_that("parameter validation works", {
 
   expect_error(
