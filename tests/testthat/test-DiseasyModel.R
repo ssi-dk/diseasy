@@ -478,16 +478,29 @@ test_that("active binding: training_period, testing_period and validation_period
 
 
   # Creating a fully configured module
-  obs$set_last_queryable_date(as.Date("2020-03-01"))
+  last_queryable_date <- obs %.% ds %.% min_start_date + lubridate::days(20)
+  obs$set_last_queryable_date(last_queryable_date)
+
+  # - with defaults
+  m <- DiseasyModel$new(observables = obs)
+  expect_identical(
+    m %.% training_period,
+    list("start" = m %.% observables %.% ds %.% min_start_date, "end" = last_queryable_date)
+  )
+  expect_identical(m %.% testing_period,    list("start" = NULL, "end" = NULL))
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+  rm(m)
 
   # - with only training period
   m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10)))
   expect_identical(
     m %.% training_period,
-    list("start" = as.Date("2020-03-01") - 10, "end" = as.Date("2020-03-01"))
+    list("start" = last_queryable_date - 10 + 1, "end" = last_queryable_date)
   )
   expect_identical(m %.% testing_period,    list("start" = NULL, "end" = NULL))
   expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+
+  expect_length(seq(from = m %.% training_period %.% start, to = m %.% training_period %.% end, by = "1 day"), 10)
   rm(m)
 
 
@@ -495,13 +508,16 @@ test_that("active binding: training_period, testing_period and validation_period
   m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10, "testing" = 5)))
   expect_identical(
     m %.% training_period,
-    list("start" = as.Date("2020-03-01") - 10 - 5, "end" = as.Date("2020-03-01") - 5)
+    list("start" = last_queryable_date - 10 - 5 + 1, "end" = last_queryable_date - 5)
   )
   expect_identical(
     m %.% testing_period,
-    list("start" = as.Date("2020-03-01") - 5, "end" = as.Date("2020-03-01"))
+    list("start" = last_queryable_date - 5 + 1, "end" = last_queryable_date)
   )
   expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+
+  expect_length(seq(from = m %.% training_period %.% start, to = m %.% training_period %.% end, by = "1 day"), 10)
+  expect_length(seq(from = m %.% testing_period %.% start,  to = m %.% testing_period %.% end,  by = "1 day"), 5)
   rm(m)
 
 
@@ -512,16 +528,20 @@ test_that("active binding: training_period, testing_period and validation_period
   )
   expect_identical(
     m$training_period,
-    list("start" = as.Date("2020-03-01") - 10 - 5 - 2, "end" = as.Date("2020-03-01") - 5 - 2)
+    list("start" = last_queryable_date - 10 - 5 - 2 + 1, "end" = last_queryable_date - 5 - 2)
   )
   expect_identical(
     m %.% testing_period,
-    list("start" = as.Date("2020-03-01") - 5 - 2, "end" = as.Date("2020-03-01") - 2)
+    list("start" = last_queryable_date - 5 - 2 + 1, "end" = last_queryable_date - 2)
   )
   expect_identical(
     m %.% validation_period,
-    list("start" = as.Date("2020-03-01") - 2, "end" = as.Date("2020-03-01"))
+    list("start" = last_queryable_date - 2 + 1, "end" = last_queryable_date)
   )
+
+  expect_length(seq(from = m %.% training_period %.% start,   to = m %.% training_period %.% end,   by = "1 day"), 10)
+  expect_length(seq(from = m %.% testing_period %.% start,    to = m %.% testing_period %.% end,    by = "1 day"), 5)
+  expect_length(seq(from = m %.% validation_period %.% start, to = m %.% validation_period %.% end, by = "1 day"), 2)
   rm(m)
 
 
