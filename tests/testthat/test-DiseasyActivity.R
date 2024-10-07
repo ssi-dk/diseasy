@@ -480,7 +480,7 @@ test_that("$set_contact_basis() works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis %.% DK
-  custom_basis$counts <- custom_basis$counts[-1]
+  custom_basis$contacts <- custom_basis$contacts[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
                regexp = r"{missing.*elements.*\{'home'\}}")
 
@@ -497,6 +497,21 @@ test_that("$set_contact_basis() works", {
   custom_basis <- contact_basis %.% DK
   expect_error(act$set_contact_basis(custom_basis[-5]), class = "simpleError",
                regexp = r"{missing.*elements.*\{'description'\}}")
+
+  rm(act)
+})
+
+
+test_that("$describe() works", {
+  act <- DiseasyActivity$new()
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+
+  act$set_contact_basis(contact_basis %.% DK)
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+
+  act$set_activity_units(dk_activity_units)
+  act$change_activity(scenario_1)
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
 
   rm(act)
 })

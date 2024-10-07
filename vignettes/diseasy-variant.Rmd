@@ -1,0 +1,92 @@
+---
+title: "DiseasyVariant"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyVariant}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r options, include = FALSE}
+options("digits" = 2)
+options("tibble.print_min" = 5)
+options("diseasy.logging" = FALSE)
+```
+
+# Introduction
+The `DiseasyVariant` is the module responsible for the implementation of variants.
+
+# Configuring the module
+The module can be initialized without setting any parameters.
+```{r initialization}
+variant <- DiseasyVariant$new()
+```
+
+By default, the module initializes with no variant scenario, and produces non-informative outputs.
+```{r null_scenario}
+variant$variants
+```
+
+To define a variant scenario, we manually add the variants of interest and their characteristics.
+In the example below, we add the wild-type variant and a mutant variant named "Alpha".
+```{r simple_configuration}
+variant$add_variant(name = "WT")
+variant$add_variant(
+  name = "Alpha",
+  characteristics = list(
+    "relative_infection_risk" = 1.5,
+    "introduction_date" = as.Date("2020-12-01")
+  )
+)
+
+variant$variants
+```
+
+In the above example, there is perfect cross immunity between the variants (since we did not specify otherwise).
+These interactions are in `DiseasyVariant` captured via `$cross_immunity`, a matrix showing the overlap in immunity
+between the variants.
+
+We can inspect the cross immunity matrix via `$cross_immunity`.
+```{r simple_configuration_cross_immunity}
+variant$cross_immunity
+```
+
+## Cross immunity interactions
+If the variants have different levels of cross immunity, we can specify this in the `cross_immunity` characteristic
+during initialisation.
+
+Here we add a variant which has 85% cross immunity with the wild-type and the Alpha variant.
+That is, when the Delta variant infects a host previously infected with the wild-type or Alpha variant, protection
+provided the natural immunity in the host is reduced by 15%.
+
+This cross immunity is asymmetric, meaning that when the wild-type or Alpha variant infects a host previously infected
+with the Delta variant, the protection provided by the immunisation with the Delta variant is not reduced.
+```{r cross_immunity_configuration}
+variant$add_variant(
+  name = "Delta",
+  characteristics = list(
+    "introduction_date" = as.Date("2021-05-01"),
+    "cross_immunity" = list("WT" = 0.85, "Alpha" = 0.85)
+  )
+)
+
+variant$cross_immunity
+```
+
+
+# Summarising the scenario
+As with other `diseasy` modules, the `$describe()` method can be used to get a human readable summary of the scenario.
+```{r inspect_describe}
+variant$describe()
+```

@@ -119,18 +119,24 @@ rd_target_schema <- function(type = "param") {
 }
 
 
-rd_training_length <- function(type = "param") {
+rd_diseasymodel_parameters <- paste(
+  "* `training_length` (`named numeric`)\\cr",
+  "  The number of days that should be included in the training splits of the data for the model.",
+  "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
+)
+
+
+rd_start_date <- function(type = "param", minimum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`numeric`)\\cr",
-        "The number of days that should be included in the training of the model.",
+  paste("(`Date`)\\cr",
+        paste0(ifelse(minimum, "(Minimum)", ""), "Study period start."),
         ifelse(type == "field", " Read only.", ""))
 }
 
-
-rd_start_date <- function(type = "param") {
+rd_end_date <- function(type = "param", maximum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date`)\\cr",
-        "Study period start.",
+        paste0(ifelse(maximum, "(Maximum)", ""), "Study period end."),
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -139,14 +145,6 @@ rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
         "Date or timestamp (parsable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
-        ifelse(type == "field", " Read only.", ""))
-}
-
-
-rd_end_date <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
-  paste("(`Date`)\\cr",
-        "Study period end.",
         ifelse(type == "field", " Read only.", ""))
 }
 

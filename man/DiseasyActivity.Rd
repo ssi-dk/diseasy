@@ -58,6 +58,7 @@ See vignette("diseasy-activity") for examples of use.
 \seealso{
 \link{dk_activity_units}
 }
+\keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyActivity}
 }
