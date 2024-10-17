@@ -100,7 +100,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase", .default = NULL) {
 #'   This function takes a flexible connection `conn` and parses it.
 #'   If type is "target_conn", the output must be `DBIConnection`.
 #'   If type is "source_conn", the output must be `DBIConnection` or `character`.
-#'   If a `function` to conn, it will be evaluated and its output evaulated against above rules.
+#'   If a `function` to conn, it will be evaluated and its output evaluated against above rules.
 #' @noRd
 parse_diseasyconn <- function(conn, type = "source_conn") {
   coll <- checkmate::makeAssertCollection()
@@ -113,19 +113,26 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   checkmate::assert_choice(type, c("source_conn", "target_conn"), add = coll)
   checkmate::reportAssertions(coll)
 
+  # First we have simple cases.
+  # We allow conn to either be NULL or a function that generates a connection
   if (is.null(conn)) {
     return(conn)
   } else if (is.function(conn)) {
     conn <- tryCatch(
       conn(),
-      error = \(e) stop(glue::glue("`conn` could not be parsed! ({e$message})"))
+      error = \(e) stop(glue::glue("`{type}` could not be parsed! ({e$message})"))
     )
     return(conn)
-  } else if (type == "target_conn" && inherits(conn, "DBIConnection")) {
+  }
+
+  # From here, we need to consider the type of connection
+  # "target_conn" must be a valid DBI conn while source_conn can be whatever
+  if (type == "target_conn" && inherits(conn, "DBIConnection")) {
     return(conn)
   } else if (type == "source_conn") {
     return(conn)
-  } else {
-    stop("`conn` could not be parsed!")
   }
+
+  # Catch all other cases
+  stop(glue::glue("`{type}` could not be parsed!"))
 }
