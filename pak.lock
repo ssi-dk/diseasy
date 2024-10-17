@@ -7,7 +7,7 @@
     {
       "ref": "askpass",
       "package": "askpass",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -19,10 +19,10 @@
         "RemoteRef": "askpass",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.2.0"
+        "RemoteSha": "1.2.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/askpass_1.2.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/askpass_1.2.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/askpass_1.2.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/askpass_1.2.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -434,14 +434,21 @@
       "params": [],
       "install_args": "",
       "sysreqs": "xclip (https://github.com/astrand/xclip) or xsel\n        (http://www.vergenet.net/~conrad/software/xsel/) for accessing\n        the X11 clipboard, or wl-clipboard\n        (https://github.com/bugaevc/wl-clipboard) for systems using\n        Wayland.",
-      "sysreqs_packages": {},
+      "sysreqs_packages": [
+        {
+          "sysreq": "x11",
+          "packages": "libx11-dev",
+          "pre_install": {},
+          "post_install": {}
+        }
+      ],
       "needscompilation": false,
       "repotype": "cranlike"
     },
     {
       "ref": "commonmark",
       "package": "commonmark",
-      "version": "1.9.1",
+      "version": "1.9.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -453,10 +460,10 @@
         "RemoteRef": "commonmark",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.9.1"
+        "RemoteSha": "1.9.2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/commonmark_1.9.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/commonmark_1.9.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/commonmark_1.9.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/commonmark_1.9.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -565,7 +572,7 @@
     {
       "ref": "credentials",
       "package": "credentials",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -577,10 +584,10 @@
         "RemoteRef": "credentials",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.0.1"
+        "RemoteSha": "2.0.2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/credentials_2.0.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/credentials_2.0.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/credentials_2.0.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/credentials_2.0.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -957,7 +964,7 @@
     {
       "ref": "duckdb",
       "package": "duckdb",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -969,10 +976,10 @@
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.1.0"
+        "RemoteSha": "1.1.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.1.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/duckdb_1.1.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.1.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/duckdb_1.1.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1019,7 +1026,7 @@
     {
       "ref": "evaluate",
       "package": "evaluate",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1031,10 +1038,10 @@
         "RemoteRef": "evaluate",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.0.0"
+        "RemoteSha": "1.0.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/evaluate_1.0.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/evaluate_1.0.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/evaluate_1.0.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/evaluate_1.0.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1212,7 +1219,7 @@
     {
       "ref": "gert",
       "package": "gert",
-      "version": "2.1.2",
+      "version": "2.1.4",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1224,10 +1231,10 @@
         "RemoteRef": "gert",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.1.2"
+        "RemoteSha": "2.1.4"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/gert_2.1.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/gert_2.1.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/gert_2.1.4.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/gert_2.1.4.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1549,7 +1556,7 @@
     {
       "ref": "hunspell",
       "package": "hunspell",
-      "version": "3.0.4",
+      "version": "3.0.5",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1561,10 +1568,10 @@
         "RemoteRef": "hunspell",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "3.0.4"
+        "RemoteSha": "3.0.5"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/hunspell_3.0.4.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/hunspell_3.0.4.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/hunspell_3.0.5.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/hunspell_3.0.5.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3116,7 +3123,7 @@
     {
       "ref": "rstudioapi",
       "package": "rstudioapi",
-      "version": "0.16.0",
+      "version": "0.17.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3128,10 +3135,10 @@
         "RemoteRef": "rstudioapi",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.16.0"
+        "RemoteSha": "0.17.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rstudioapi_0.16.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rstudioapi_0.16.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rstudioapi_0.17.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rstudioapi_0.17.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3340,7 +3347,7 @@
     {
       "ref": "spelling",
       "package": "spelling",
-      "version": "2.3.0",
+      "version": "2.3.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3352,10 +3359,10 @@
         "RemoteRef": "spelling",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.3.0"
+        "RemoteSha": "2.3.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/spelling_2.3.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/spelling_2.3.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/spelling_2.3.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/spelling_2.3.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3440,7 +3447,7 @@
     {
       "ref": "sys",
       "package": "sys",
-      "version": "3.4.2",
+      "version": "3.4.3",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3452,10 +3459,10 @@
         "RemoteRef": "sys",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "3.4.2"
+        "RemoteSha": "3.4.3"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/sys_3.4.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/sys_3.4.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/sys_3.4.3.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/sys_3.4.3.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4289,8 +4296,8 @@
     "version": "22.04",
     "url": {},
     "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install git libcurl4-openssl-dev libssl-dev make libgit2-dev zlib1g-dev pandoc libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
+    "install_scripts": "apt-get -y install libx11-dev git libcurl4-openssl-dev libssl-dev make libgit2-dev zlib1g-dev pandoc libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
     "post_install": {},
-    "packages": ["git", "libcurl4-openssl-dev", "libssl-dev", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
+    "packages": ["libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
   }
 }
