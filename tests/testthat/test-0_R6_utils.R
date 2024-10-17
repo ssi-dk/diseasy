@@ -111,8 +111,11 @@ test_that("parse_diseasyconn works", {
   DBI::dbDisconnect(conn)
 
 
-  expect_error(parse_diseasyconn(invalid_function_conn, type = "source_conn"),
-               class = "simpleError", regexp = "`conn` could not be parsed!")
+  expect_error(
+    parse_diseasyconn(invalid_function_conn, type = "source_conn"),
+    class = "simpleError",
+    regexp = "`source_conn` could not be parsed!"
+  )
 
 
   conn <- expect_no_condition(parse_diseasyconn(valid_dbi_conn, type = "source_conn"))
@@ -134,8 +137,11 @@ test_that("parse_diseasyconn works", {
   DBI::dbDisconnect(conn)
 
 
-  expect_error(parse_diseasyconn(invalid_function_conn, type = "target_conn"),
-               class = "simpleError", regexp = "`conn` could not be parsed!")
+  expect_error(
+    parse_diseasyconn(invalid_function_conn, type = "target_conn"),
+    class = "simpleError",
+    regexp = "`target_conn` could not be parsed!"
+  )
 
 
   conn <- expect_no_condition(parse_diseasyconn(valid_dbi_conn, type = "target_conn"))
@@ -143,8 +149,11 @@ test_that("parse_diseasyconn works", {
   checkmate::expect_class(conn, "DBIConnection")
 
 
-  expect_error(parse_diseasyconn(valid_str_conn, type = "target_conn"),
-               class = "simpleError", regexp = "`conn` could not be parsed!")
+  expect_error(
+    parse_diseasyconn(valid_str_conn, type = "target_conn"),
+    class = "simpleError",
+    regexp = "`target_conn` could not be parsed!"
+  )
 
 
   conn <- expect_no_condition(parse_diseasyconn(null_conn, type = "target_conn"))
