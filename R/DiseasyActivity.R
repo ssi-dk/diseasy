@@ -929,20 +929,9 @@ DiseasyActivity <- R6::R6Class(                                                 
     # @param obj `list`(`list`( `numeric()` or `matrix` `array` ))\cr
     #   Nested object to perform weighting on.
     # @param weights `r rd_activity_weights`
-    # @param normalise (`logical`)\cr
+    # @param normalise (`logical(1)`)\cr
     #   Should the weights be normalised before applying?
     weight_activities = function(obj, weights, normalise = FALSE) {
-
-      # Early return
-      # .. if no object is given
-      if (is.null(obj) || (length(obj) == 0) || missing(obj)) {
-        return(obj)
-      }
-
-      # .. if no weights are given
-      if (is.null(weights)) {
-        return(obj)
-      }
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -956,6 +945,11 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_numeric(weights, len = 4, null.ok = TRUE, add = coll)
       checkmate::assert_logical(normalise, add = coll)
       checkmate::reportAssertions(coll)
+
+      # Early return if no weights are given
+      if (!checkmate::test_numeric(weights, len = 4)) {
+        return(obj)
+      }
 
       if (normalise) weights <- weights / sum(weights)
 
