@@ -568,7 +568,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would
             # be reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
             # non-commutative.
-            scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
+            scenario_contacts[[dd]][[tt]] <- private$vector_to_herringbone(openness[[dd]][[tt]]) *
               self$contact_basis$contacts[[tt]]
           }
         }
@@ -857,7 +857,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #   [v3 v3 v3]
     # @param vector (`numeric()`)\cr
     #   Vector to transform.
-    vector_to_matrix = function(vector) {
+    vector_to_herringbone = function(vector) {
       n <- length(vector)
       if (n == 1) return(vector)
       h <- diag(vector)
