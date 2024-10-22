@@ -20,7 +20,11 @@ The \code{activity_units} projects restrictions, guidelines and other changes in
 independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
 (in)active.
 
-The \code{scenario} contains information on when different \code{activity_units} are opened and closed
+The \code{scenario} contains information on when different \code{activity_units} are opened and closed.
+
+If no scenario is provided, the module will provide non-informative activity information:
+- Openness is always 1.
+- The contact matrices are uniform and, when summed, the largest eigenvalue is 1.
 
 See vignette("diseasy-activity") for examples of use.
 }
