@@ -27,9 +27,9 @@ rd_contact_basis <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`list(list())`)\\cr",
         "A nested list with all the needed information for the contact_basis\\cr",
-        "* `counts` contains the age stratified contact counts across the arenas of the basis",
+        "* `contacts` contains the age stratified contact matrices across the arenas of the basis",
         "  (e.g. 'work', 'home', 'school', 'other')\\cr",
-        "* `proportion` contains a list of the proportion of population in each age-group\\cr",
+        "* `proportion` contains a list of the proportion of population in 5-year age-groups\\cr",
         "* `demography` contains a `data.frame` with the columns\\cr",
         "  * `age` (`integer()`) 1-year age group\\cr",
         "  * `population` (`numeric()`) size of population in age group\\cr",
