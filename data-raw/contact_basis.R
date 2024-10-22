@@ -51,10 +51,10 @@ if (rlang::is_installed("contactdata") && rlang::is_installed("countrycode") && 
   # country code (last two characters of GEO_ID)
   demography <- idb1yr |>
     dplyr::rename_with(tolower) |>
-    dplyr::filter(`#yr` == 2020, .data$sex == 0) |>
-    dplyr::group_by("key_country" = stringr::str_sub(geo_id, -2, -1)) |>
-    dplyr::transmute(.data$age, "population" = .data$pop, "proportion" = .data$pop / sum(.data$pop)) |>
-    dplyr::ungroup()
+    dplyr::filter(.data$`#yr` == 2020, .data$sex == 0) |>
+    dplyr::mutate("key_country" = stringr::str_sub(.data$geo_id, -2, -1)) |>
+    dplyr::summarise("population" = sum(.data$pop), .by = c("key_country", "age")) |>
+    dplyr::mutate("proportion" = .data$population / sum(.data$population), .by = "key_country")
 
   # Project into 5-year age-groups
   populations <- demography |>
@@ -91,7 +91,7 @@ if (rlang::is_installed("contactdata") && rlang::is_installed("countrycode") && 
   # Transform the matrices from the contactdata package
   contact_basis <- purrr::map(contact_basis, \(basis) {
 
-    # Store proportion as the vector w
+    # Store population as the vector N
     N <- basis$demography |>                                                                                            # nolint: object_name_linter
       dplyr::mutate(age_group = cut(age, c(age_cuts, Inf), right = FALSE, labels = age_labels)) |>
       dplyr::summarise(population = sum(population), .by = "age_group") |>
