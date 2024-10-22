@@ -497,22 +497,40 @@ test_that("$set_contact_basis() works", {
   # Check malformed inputs
   custom_basis <- contact_basis %.% DK
   custom_basis$contacts <- custom_basis$contacts[-1]
-  expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = r"{missing.*elements.*\{'home'\}}")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis)),
+    class = "simpleError",
+    regexp = r"{Must be a set equal to \{'home','work','school','other'\}, but is missing elements \{'home'\}}"
+  )
 
   custom_basis <- contact_basis %.% DK
   custom_basis$proportion <- custom_basis$proportion[-1]
-  expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = "* has length 15")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis)),
+    class = "simpleError",
+    regexp = "Must have length 16, but has length 15"
+  )
 
   custom_basis <- contact_basis %.% DK
   custom_basis$extra_element <- "some string"
-  expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = r"{extra.*elements.*\{'extra_element'\}}")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis)),
+    class = "simpleError",
+    regexp = paste(
+      r"{Must be a permutation of set \{'contacts','population','proportion','demography','description'\},}",
+      r"{but has extra elements \{'extra_element'\}}"
+    )
+  )
 
   custom_basis <- contact_basis %.% DK
-  expect_error(act$set_contact_basis(custom_basis[-5]), class = "simpleError",
-               regexp = r"{missing.*elements.*\{'description'\}}")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis[-5])),
+    class = "simpleError",
+    regexp = paste(
+      r"{Must be a set equal to \{'contacts','population','proportion','demography','description'\},}",
+      r"{but is missing elements \{'description'\}.}"
+    )
+  )
 
   rm(act)
 })
