@@ -809,7 +809,7 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
                     c(3, 1, 9, 3))),
       other = 0.025 * 0.07,
       risk = 1
-    ) # FAST
+    )
 
   dk_activity_units <- dk_activity_units |>
     add_activity(
@@ -875,8 +875,8 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
       school = (0.025 * rep(c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+ years old,
                             c(3, 1, 9, 3))),    # also reduced among children to adults
       other = 0.025 * 0.03,
-      risk = 1
-    ) # FAST
+      risk = risk_test_school
+    )
 
   dk_activity_units <- dk_activity_units |>
     add_activity(
@@ -922,9 +922,6 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
 
 } # EndOf: risk_test_school
 options(OutDec = ".") # Reset the decimal separator
-
-# The above loop introduces duplicated rows. Remove those here (when risk is always 1)
-dk_activity_units <- dk_activity_units |> dplyr::distinct()
 
 
 dk_activity_units <- dk_activity_units |>
