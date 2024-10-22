@@ -85,13 +85,29 @@ test_that("$change_activity() works with different ways of initializing", {
   expect_false(hash_new_instance == hash_scenario_1_loaded)
 
   # Check scenario matrix is correctly configured inside the module
-  expect_identical(act$scenario_matrix, ref_scenario_1)
+  scenario_matrix <- act$scenario_matrix
+  expect_identical(ref_scenario_1, scenario_matrix)
+
+  # if we change one of the activity units, the hash should not give the same value
+  tmp_activity_units <- dk_activity_units_subset
+  names(tmp_activity_units) <- c(names(tmp_activity_units[1:3]),
+                                 names(tmp_activity_units[10]),
+                                 names(tmp_activity_units[5:9]),
+                                 names(tmp_activity_units[4]))
+
+  act$set_activity_units(tmp_activity_units)
+  act$change_activity(scenario_1)
+  expect_false(identical(act$scenario_matrix, ref_scenario_1))
+  expect_identical(as.matrix(act$scenario_matrix), as.matrix(ref_scenario_1)) # The matrix it-self should be the same
+  expect_false(act$hash == hash_scenario_1_loaded) # hash should now be different since the activity units have changed
+
 
 
 
   # Try another way of defining the same scenario:
   # The scenario is the same, but written more compactly
   act$reset_scenario() # resets the scenario matrix
+  act$set_activity_units(dk_activity_units_subset) # resets the activity units
   scenario_1_alt <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
     dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",                         closing = NA) |>
     dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020",                    closing = "baseline") |>
