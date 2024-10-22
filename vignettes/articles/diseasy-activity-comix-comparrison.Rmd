@@ -1,0 +1,146 @@
+---
+title: "DiseasyActivity: Comparrison with CoMix data"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r options, include = FALSE}
+options("digits" = 2)
+options("tibble.print_min" = 5)
+options("diseasy.logging" = FALSE)
+```
+
+Our comparison data is Danish survey data from the CoMix study
+```{r survey_data_download, include = FALSE}
+# We use this hidden chunk to cache the data
+data_dir <- "articledata"
+if (!checkmate::test_directory_exists(data_dir)) {
+  dir.create(data_dir, recursive = TRUE)
+}
+
+comix_survey_dk_path <- file.path(data_dir, "dk_survey.rds")
+if (!checkmate::test_file_exists(comix_survey_dk_path)) {
+  comix_survey_dk <- socialmixr::get_survey("https://doi.org/10.5281/zenodo.5040530")
+  saveRDS(comix_survey_dk, comix_survey_dk_path)
+}
+
+comix_survey_dk <- readRDS(comix_survey_dk_path)
+```
+
+```{r survey_data, eval = FALSE}
+comix_survey_dk <- socialmixr::get_survey("https://doi.org/10.5281/zenodo.5040530")
+```
+
+```{r survey_data_citation, message = FALSE}
+socialmixr::get_citation(comix_survey_dk)
+```
+Which we handle using the `socialmixr` R-package
+```{r socialmixr_citation}
+print(citation("socialmixr"), style = "text")
+```
+
+The CoMix data is temporally distributed and covers varying age groups over time.
+```{r inspecting_survey_round, include = TRUE}
+ggplot2::ggplot(comix_survey_dk$participants, ggplot2::aes(x = as.Date(sday_id, "%Y.%m.%d"), y = part_age, color = factor(survey_round))) +
+  ggplot2::geom_point() + 
+  ggplot2::scale_color_brewer(palette = "Set1") +
+  ggplot2::labs(y = "Age of participant", x = "date", colour = "survey round")
+```
+
+
+We can group the CoMix survey data further by the restrictions active in the `dk_reference_scenario`.
+That is, every time the `dk_reference_scenario` has a change, we assign the date of this change as the grouping id for the participants.
+
+```{r inspecting_alt}
+restriction_intervals <- tibble::tibble(
+  restriction_change = as.Date(unique(dk_reference_scenario$date)),
+  next_restriction_change = dplyr::lead(restriction_change)
+) 
+
+auto_grouping <- tibble::tibble(comix_survey_dk$participants) |>
+  dplyr::mutate(date = as.Date(sday_id, "%Y.%m.%d")) |>
+  dplyr::left_join(
+    restriction_intervals,
+    by = dplyr::join_by(between(date, restriction_change, next_restriction_change))
+  ) |>
+  dplyr::mutate(restrictions = factor(restriction_change)) |>
+  tidyr::unite(group, survey_round, restrictions) |>
+  dplyr::select(!"next_restriction_change")
+
+ggplot2::ggplot(auto_grouping, ggplot2::aes(x = date, y = part_age, color = group)) +
+  ggplot2::geom_point() + 
+  ggplot2::scale_color_discrete(type = c(RColorBrewer::brewer.pal(8, "Set1"), RColorBrewer::brewer.pal(8, "Dark2"))) +
+  ggplot2::labs(y = "Age of participant",
+                colour = "Current restrictions")
+```
+
+For each of these groups we get the contact matrices (with bootstrapping).
+```{r comix_matrices, message = FALSE}
+n_bootstraps <- 1
+
+comix_matrices <- purrr::map2(
+  comix_split,
+  unique(auto_grouping$group),
+  \(comix, group) {
+    purrr::map(
+      seq(n_bootstraps), 
+      \(bootstrap_id) {
+       contact_info <- socialmixr::contact_matrix(
+         comix,
+         filter = list("group" = group),
+         weigh.dayofweek = TRUE,
+         sample.participants = n_bootstraps > 1
+        )
+      }
+    )
+  }
+)
+names(comix_matrices) <- unique(auto_grouping$group)
+```
+
+
+For the analysis we load the `dk_reference_scenario` into the activity module
+```{r initialization}
+act <- DiseasyActivity$new(activity_units = dk_activity_units,
+                           contact_basis = contact_basis$DK,
+                           base_scenario = "dk_reference")
+```
+
+We compare the eigenvalues of the contact matrices
+```{r eigenvalues}
+eigen_values <- purrr::map(comix_matrices, ~ purrr::map2_dbl(., seq(n_bootstraps), ~ max(abs(eigen(.x$matrix)$values))))
+mean_eigen_value <- purrr::map_dbl(eigen_values, mean)
+sd_eigen_value   <- purrr::map_dbl(eigen_values, sd)
+
+comix_eigen_values <- tibble::tibble(group = names(mean_eigen_value),  mean = mean_eigen_value, sd = sd_eigen_value, source = "CoMix") |>
+  tidyr::separate()
+
+
+diseasy_eigen_values <- purrr::map_dbl(act$get_scenario_contacts(age_cuts_lower = age_cuts, weights = c(1,1,1,1)), ~ max(abs(eigen(.)$values)))
+  
+tt <- tibble::tibble(date = names(diseasy_eigen_values), mean = diseasy_eigen_values, sd = NA, source = "DiseasyActivity") |>
+  dplyr::union_all(comix_eigen_values) |>
+  dplyr::group_by(date) |>
+  dplyr::filter("CoMix" %in% source) |>
+  dplyr::ungroup() |>
+  dplyr::arrange(source)
+
+ggplot2::ggplot(tt, ggplot2::aes(x = as.Date(date), ymin = mean - sd, ymax = mean + sd, y = mean, color = source)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_linerange() +
+  ggplot2::labs(y = "Eigenvalue", x = "date") +
+  ggplot2::theme_bw() +
+  ggplot2::scale_x_date(limits = as.Date(c(min(comix_eigen_values$date), max(comix_eigen_values$date))))
+
+```
+
+
