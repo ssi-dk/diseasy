@@ -585,15 +585,17 @@ DiseasyActivity <- R6::R6Class(                                                 
             dplyr::pull("population")
 
           # Store as a square matrix with the new population repeated as columns
-          N_new <- outer(population, rep(1, length(population)))                                                          # nolint: object_name_linter
+          N_new <- outer(population, rep(1, length(population)))                                                        # nolint: object_name_linter
 
-          # Determine the population in the original age groups and store as a matrix with population repeated as columns
-          N_original <- self$contact_basis$population                                                                     # nolint: object_name_linter
-          N_original <- outer(N_original, rep(1, length(N_original)))                                                     # nolint: object_name_linter
+          # Determine the population in the original age groups and store as a matrix with population repeated
+          # as columns
+          N_original <- self$contact_basis$population                                                                   # nolint: object_name_linter
+          N_original <- outer(N_original, rep(1, length(N_original)))                                                   # nolint: object_name_linter
 
           # For each contact matrix, m, in the scenario, we perform the transformation
-          # (p %*% (m * N_original) %*% t(p)) / N_new                                                                     # nolint: commented_code_linter
-          # As m is the number of contacts from each individual m * N_original scales to all contacts between age groups.
+          # (p %*% (m * N_original) %*% t(p)) / N_new                                                                   # nolint: commented_code_linter
+          # As m is the number of contacts from each individual m * N_original scales to all contacts between
+          # age groups.
           # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
           # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
           scenario_contacts <- scenario_contacts |>
