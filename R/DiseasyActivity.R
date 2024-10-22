@@ -575,6 +575,10 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Project into new age_groups if given
         if (!is.null(age_cuts_lower)) {
+
+          # Get the transformation matrix p
+          # This matrix is (n_new_age_groups) x (n_basis_age_groups) and contains values between 0 and 1 which indicate
+          # the fraction of basis age groups that fall in the new age groups.
           p <- private$population_transform_matrix(age_cuts_lower)
 
           # To perform the projection, we need the number of persons in the new and original age groups
