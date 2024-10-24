@@ -3,7 +3,7 @@
 {% block body %}
 ## Overview
 Leveraging combinatorial building for ensemble forecasting in disease
-modelling
+modelling.
 
 ## The power of combinations
 `diseasy` is framework for disease modelling that is built around the
