@@ -144,7 +144,7 @@ rd_end_date <- function(type = "param", maximum = FALSE) {
 rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
-        "Date or timestamp (parsable by `as.POSIXct`) to slice the (historical) data on.",
+        "Date or timestamp (parsable by `as.POSIXct`) to slice the (time-versioned) data on.",
         ifelse(type == "field", "Read only.", ""))
 }
 
