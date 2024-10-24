@@ -43,19 +43,18 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Study period end (default values for get_observation).
     #' @param last_queryable_date (`Date`)\cr
     #'   Enforce a limit on data that can be pulled (not after this date).
-    #' @param conn (`DBIConnection`)\cr
-    #'   A database connection object (inherits from DBIConnection)
+    #' @param conn `r rd_conn()`
     #' @param slice_ts (`Date` or `character`)\cr
     #'   Date to slice the database on. See [SCDB::get_table()]
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
-    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+    #'   A new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
     initialize = function(diseasystore = NULL,
                           start_date = NULL,
                           end_date = NULL,
                           last_queryable_date = NULL,
-                          conn = NULL,
+                          conn = diseasyoption("conn", class = "DiseasyObservables"),
                           slice_ts = NULL,
                           ...) {
 
@@ -63,11 +62,7 @@ DiseasyObservables <- R6::R6Class(                                              
       super$initialize(...)
 
       # Set the db connection
-      if (is.null(conn)) {
-        private$.conn <- parse_diseasyconn(options() %.% diseasy.conn) # Open a new connection to the DB
-      } else {
-        private$.conn <- conn # User provided
-      }
+      private$.conn <- parse_diseasyconn(conn) # Open a new connection to the DB
       checkmate::assert_class(self %.% conn, "DBIConnection")
 
       # Initialize based on input
@@ -346,8 +341,7 @@ DiseasyObservables <- R6::R6Class(                                              
     ),
 
 
-    #' @field conn (`DBIConnection`)\cr
-    #' The connection to the database on. Read-only.
+    #' @field conn `r rd_conn("field")`
     conn = purrr::partial(
       .f = active_binding,
       name = "conn",

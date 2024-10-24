@@ -71,8 +71,7 @@ The currently available stratifications in the loaded diseasystore. Read-only.}
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
 Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}. Read-only.}
 
-\item{\code{conn}}{(\code{DBIConnection})\cr
-The connection to the database on. Read-only.}
+\item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -109,7 +108,7 @@ Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} cl
   start_date = NULL,
   end_date = NULL,
   last_queryable_date = NULL,
-  conn = NULL,
+  conn = diseasyoption("conn", class = "DiseasyObservables"),
   slice_ts = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -130,8 +129,7 @@ Study period end (default values for get_observation).}
 \item{\code{last_queryable_date}}{(\code{Date})\cr
 Enforce a limit on data that can be pulled (not after this date).}
 
-\item{\code{conn}}{(\code{DBIConnection})\cr
-A database connection object (inherits from DBIConnection)}
+\item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection}
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
 Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}}
@@ -141,7 +139,7 @@ Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
+A new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}
