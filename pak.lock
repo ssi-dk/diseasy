@@ -1995,7 +1995,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["diseasystore", "checkmate", "digest", "dplyr", "glue", "lgr", "lintr", "lubridate", "Matrix", "pracma", "purrr", "R6", "rlang", "stringr"],
+      "dependencies": ["diseasystore", "checkmate", "digest", "dplyr", "glue", "lgr", "lubridate", "Matrix", "pracma", "purrr", "R6", "rlang", "stringr"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",

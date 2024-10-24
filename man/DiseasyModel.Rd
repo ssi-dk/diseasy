@@ -160,13 +160,13 @@ The primary method used to request model results of a given observable at a give
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide prediction for. Must match observable in \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
 \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
 
 \item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr Default NULL. If given, results are returned at the quantiles given.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 }
 \if{html}{\out{</div>}}
 }
@@ -187,9 +187,9 @@ the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide prediction for. Must match observable in \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 }
 \if{html}{\out{</div>}}
 }

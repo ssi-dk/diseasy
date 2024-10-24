@@ -84,8 +84,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Sets the scale for the active season model.
-    #' @param scale (`numeric`)\cr
-    #'   The scale of the season effect (relative to climate normal).
+    #' @param scale `r rd_scale("field")`
     set_scale = function(scale) {
       checkmate::assert_number(scale)
 
