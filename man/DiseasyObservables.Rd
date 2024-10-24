@@ -66,7 +66,7 @@ The currently available observables in the loaded diseasystore. Read-only.}
 \item{\code{available_stratifications}}{(\code{character})\cr
 The currently available stratifications in the loaded diseasystore. Read-only.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (historical) data on. Read only.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
 
 \item{\code{conn}}{(\code{DBIConnection})\cr A database connection. Read only.}
 }
@@ -128,7 +128,7 @@ Enforce a limit on data that can be pulled (not after this date).}
 
 \item{\code{conn}}{(\code{DBIConnection})\cr A database connection.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (historical) data on.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
@@ -209,7 +209,7 @@ Set the slice_ts to get data for
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (historical) data on.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
 }
 \if{html}{\out{</div>}}
 }
