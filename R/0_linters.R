@@ -336,10 +336,9 @@ documentation_template_linter <- function() {
         line_number = seq_along(detection_info)
       )
 
-      # Remove non param/field lines and determine the type
+      # Remove non param/field lines
       detection_info <- detection_info |>
-        dplyr::filter(!is.na(.data$rd_line)) |>
-        dplyr::mutate(rd_type = stringr::str_extract(.data$rd_line, r"{@(param|field)}"))
+        dplyr::filter(!is.na(.data$rd_line))
 
       # Remove triple-dot-ellipsis params
       detection_info <- detection_info |>
@@ -361,7 +360,7 @@ documentation_template_linter <- function() {
 
       purrr::pmap(
         detection_info,
-        \(rd_line, line_number, rd_type, rd_template) {
+        \(rd_line, line_number, rd_template) {
           lintr::Lint(
             filename = source_expression$filename,
             line_number = line_number,
