@@ -14,6 +14,7 @@ This package facilitates creation of an ensemble of models through modular const
 Useful links:
 \itemize{
   \item \url{https://github.com/ssi-dk/diseasy}
+  \item \url{https://ssi-dk.github.io/diseasy/}
   \item Report bugs at \url{https://github.com/ssi-dk/diseasy/issues}
 }
 
