@@ -196,12 +196,11 @@ test_that("$use_covid_season_v2() works", {
                            observables = observables)
 
     # Default scale
-    models <- s$get_covid_season_v1()
-    s$use_covid_season_v1()
+    models <- s$get_covid_season_v2()
+    s$use_covid_season_v2()
 
     expect_equal(s$model_t,    models$model_t)                                                                          # nolint: expect_identical_linter. Functions have different environments
     expect_equal(s$model_date, models$model_date)                                                                       # nolint: expect_identical_linter. Functions have different environments
-    s$use_covid_season_v2()
 
     expect_identical(s$model_t(0), 1)
     expect_false(s$model_t(1) == 1)
