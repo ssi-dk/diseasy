@@ -405,10 +405,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # Later, we will need the inversion functions also
         inv_p_01 <- \(p) {
-          pmin(
-            log(p) - log(1 - p), # Inverse mapping of p_01
-            1e15 # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead of infinity
-          )
+          (log(p) - log(1 - p)) |> # Inverse mapping of p_01
+            pmax(-1e30) |>
+            pmin(1e30) # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead of infinity
         }
         inv_p_0inf <- \(p) log(exp(p) - 1)
 
