@@ -716,7 +716,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Store in cache
         private$cache(
           hash,
-          modifyList(
+          utils::modifyList(
             res,
             list(
               "gamma" = gamma,
