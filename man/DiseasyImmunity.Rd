@@ -28,7 +28,8 @@ See the vignette("diseasy-immunity") for examples of use.
   rm(im)
 }
 \seealso{
-\link{vignette("diseasy-immunity")}, \link[nloptr:nloptr]{nloptr::nloptr}, \link[optimx:polyopt]{optimx::polyopt}
+\link{vignette("diseasy-immunity")}, \link[stats:optim]{stats::optim}, \link[stats:nlm]{stats::nlm}, \link[stats:nlminb]{stats::nlminb}, \link[nloptr:nloptr]{nloptr::nloptr},
+\link[optimx:optimr]{optimx::optimr}
 }
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyImmunity}
@@ -311,11 +312,12 @@ transition rates and associated risk of infection for each compartment such the 
 best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
-  method = c("free_gamma", "free_delta", "all_free"),
+  method = c("free_gamma", "free_delta", "all_free", "all_free_combi",
+    "free_gamma_recursive", "free_delta_recursive", "all_free_recursive"),
   N = NULL,
   monotonous = TRUE,
   individual_level = TRUE,
-  optim_control = data.frame(method = "nlnm", maxit = 10, maxeval = 100, maxfeval = 100),
+  optim_control = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -337,34 +339,37 @@ If a numeric value supplied, it is used as a penalty factor.}
 Should the approximation penalise rapid changes in immunity levels?
 If a numeric value supplied, it is used as a penalty factor.}
 
-\item{\code{optim_control}}{(\code{data.frame(1)} or \code{list()})\cr
-Controls for the optimisers. The optimiser to use is inferred from the input.
+\item{\code{optim_control}}{(\code{list()})\cr
+Optional controls for the optimisers.
+Each method has their own default controls for the optimiser.
+A \code{optim_method} entry must be supplied which is used to infer the optimiser.
+
+In order, the \code{optim_method} entry is matched against the following optimisers and remaining \code{optim_control}
+entries are passed as argument to the optimiser as described below.
+
+If \code{optim_method} matches any of the methods in \code{stats::optim}:
 \itemize{
-\item \code{stats::optim}: passed as \code{control} argument.
-\item \verb{nloptr::<algorithm>}: passed as \code{control} argument.
-\item \code{optimx::polyopt}: passed as \code{methcontrol} argument.
+\item Additional \code{optim_control} arguments passed as \code{control} to \code{stats::optim} using the chosen \code{optim_method}.
 }
 
-For \code{stats::optim} a \code{list} with entries:
+If \code{optim_method} is "nlm":
 \itemize{
-\item \code{method} (\code{character()}): The optimisation method to use.
-\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization. Optional.
-\item ... Additional \code{control} arguments to be passed to \code{stats::optim}.
+\item Additional \code{optim_control} arguments passed as arguments to \code{stats::nlm}.
 }
 
-For \verb{nloptr::<algorithm>} a \code{list} with entries:
+If \code{optim_method} is "nlminb":":
 \itemize{
-\item \code{algorithm} (\code{character(1)}): The name of the \code{nloptr} algorithm to use.
-\item \code{maxeval} (\code{integer(1)}): Maximum number of function evaluations for the optimization. Optional.
-\item ... Additional \code{control} arguments to be passed to \verb{nloptr::<algorithm>}.
+\item Additional \code{optim_control} arguments passed as \code{control} to \code{stats::nlminb}.
 }
 
-For \code{optimx::polyopt} a \code{data.frame} with columns:
+If \code{optim_method} matches any of the algorithms in \code{nloptr}:
 \itemize{
-\item \code{method} (\code{character()}): The optimisation method to use.
-\item \code{maxit} (\code{integer()}): Maximum number of iterations for the optimization. Optional.
-\item \code{maxeval} (\code{integer()}): Maximum number of function evaluations for the optimization. Optional.
-\item \code{maxfeval} (\code{integer()}): Maximum number of function evaluations for the optimization. Optional.
+\item Additional \code{optim_control} arguments passed as \code{control} to \verb{nloptr::<method>}.
+}
+
+If \code{optim_method} matches any of the methods in \code{optimx::optimr}:
+\itemize{
+\item Additional \code{optim_control} arguments passed as \code{control} to \code{stats::optimr} using the chosen \code{method}.
 }}
 
 \item{\code{...}}{Additional arguments to be passed to the optimiser.}
@@ -382,21 +387,27 @@ The function implements three methods for approximating the waning immunity curv
 - "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
 (N free parameters).
 - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
+- "all_free_combi": As "all_free" but uses the "free_gamma" solution as starting point for the optimiser.
 
 The optimisation minimises the square root of the squared differences between the target waning and the
 approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
 if the approximation is non-monotonous or if the immunity levels or transition rates change rapidly across
 compartments.
 
-The minimisation is performed using the either \code{stats::optim}, \verb{nloptr::<optimiser>} or \code{optimx::polyopt}
-optimisers.
-By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
-most efficient (see \code{vignette("diseasy-immunity")}).
+The minimisation is performed using the either \code{stats::optim}, \code{stats::nlm}, \code{stats::nlminb},
+\verb{nloptr::<optimiser>} or \code{optimx::optimr} optimisers.
+
+By default, the optimisation algorithm is determined on a per-method basis dependent on the size of the
+problem. Our analysis show that the chosen algorithms in general were the most most efficient but performance
+may be better in any specific case when using a different algorithm (see \code{vignette("diseasy-immunity")}).
+
 Optimiser defaults can be changed via the \code{optim_control} argument.
+NOTE: for the "all_free_combi" method, changing the optimiser controls does not influence the starting point
+which uses the "free_gamma" default optimiser to determine the starting point.
 }
 
 \subsection{Returns}{
-Returns the rates and objective value (invisibly).
+Returns the results from the optimisation with the approximated rates and execution time.
 }
 }
 \if{html}{\out{<hr>}}
