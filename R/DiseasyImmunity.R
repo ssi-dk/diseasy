@@ -604,7 +604,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Run the optimisation
-          optimx_methods <- optimx::ctrldefault(1)$allmeth
+          optimx_methods <- switch(rlang::is_installed("optimx") + 1, list(), optimx::ctrldefault(1)$allmeth)
 
           # Infer and call the optimiser
           if (optim_control %.% optim_method %in% eval(formals(stats::optim)$method)) {
@@ -614,7 +614,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               par = c(p_gamma_0, p_delta_0),
               fn = \(p) sum(obj_function(p)),
               method = optim_control$optim_method,
-              control = within(optim_control, rm("optim_method")),
+              control = purrr::discard_at(optim_control, "optim_method"),
               ...
             )
 
@@ -623,7 +623,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             res <- purrr::partial(
               getExportedValue("stats", optim_control %.% optim_method),
-              !!!within(optim_control, rm("optim_method"))
+              !!!purrr::discard_at(optim_control, "optim_method")
             )(
               f = \(p) sum(obj_function(p)),
               p = c(p_gamma_0, p_delta_0),
@@ -640,33 +640,48 @@ DiseasyImmunity <- R6::R6Class(                                                 
             res <- getExportedValue("stats", optim_control %.% optim_method)(
               start = c(p_gamma_0, p_delta_0),
               objective = \(p) sum(obj_function(p)),
-              control = within(optim_control, rm("optim_method")),
+              control = purrr::discard_at(optim_control, "optim_method"),
               ...
             )
 
           } else if (optim_control %.% optim_method %in% getNamespaceExports("nloptr")) {
             # Optimiser is `nloptr::<method>`
 
-            res <- getExportedValue("nloptr", optim_control %.% optim_method)(
+            optimiser <- getExportedValue("nloptr", optim_control %.% optim_method)
+
+            # `nloptr::auglag` has two local args that need individual passing
+            if (optim_control %.% optim_method == "auglag") {
+              optimiser <- purrr::partial(optimiser, !!!purrr::keep_at(optim_control, c("localsolver", "localtol")))
+              optim_control <- purrr::discard_at(optim_control, c("localsolver", "localtol"))
+            }
+
+            res <- optimiser(
               x0 = c(p_gamma_0, p_delta_0),
               fn = \(p) sum(obj_function(p)),
-              control = within(optim_control, rm("optim_method")),
+              control = purrr::discard_at(optim_control, "optim_method"),
               ...
             )
 
           } else if (optim_control %.% optim_method %in% optimx_methods) {
             # Optimiser is `optimx::optimr`
 
-            res <- optimx::optimr(
-              par = c(p_gamma_0, p_delta_0),
-              fn = \(p) sum(obj_function(p)),
-              method = optim_control %.% optim_method,
-              control = within(optim_control, rm("optim_method")),
-              ...
+            capture.output(
+              res <- optimx::optimr(
+                par = c(p_gamma_0, p_delta_0),
+                fn = \(p) sum(obj_function(p)),
+                method = optim_control %.% optim_method,
+                control = purrr::discard_at(optim_control, "optim_method"),
+                ...
+              )
             )
 
           } else {
-            stop("`optim_control` format matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::polyopt`!")
+            stop(
+              glue::glue(
+                "`optim_control` format ({dput(optim_control)}) ",
+                "matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::optimr`!"
+              )
+            )
           }
 
           # Get the full metrics for the best solution
