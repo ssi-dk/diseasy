@@ -310,7 +310,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   The optimisation minimises the square root of the squared differences between the target waning and the
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
-    #'   if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
+    #'   if the approximation is non-monotonous or if the immunity levels or transition rates change rapidly across
+    #'   compartments.
     #'
     #'   The minimisation is performed using the either `stats::optim`, `stats::nlm`, `stats::nlminb`,
     #'   `nloptr::<optimiser>` or `optimx::optimr` optimisers.
@@ -485,13 +486,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
               )
 
 
-              # Penalise non-monotone solutions
+              ## Penalise non-monotone solutions
               penalty <- monotonous * sum(purrr::keep(diff(gamma), ~ . > 0))
 
-              # Penalise spread of gamma and delta
+              ## Penalise spread of gamma and delta
+
               # Compute sd of equidistant gamma
               sd_0_gamma <- sd(seq(from = self$model[[model_id]](0), to = gamma[N], length.out = N))
-              penalty <- penalty + individual_level * (abs(sd(gamma) - sd_0_gamma) + sd(delta))
+
+              # Compute penalty spread of gamma and delta
+              gamma_penalty <- ifelse(length(gamma) > 1, abs(sd(gamma) - sd_0_gamma), 0)
+              delta_penalty <- ifelse(length(delta) > 1, sd(delta), 0)
+
+              penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)
 
               return(list("value" = value, "penalty" = penalty))
             }

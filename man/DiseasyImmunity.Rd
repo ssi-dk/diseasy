@@ -385,7 +385,8 @@ The function implements three methods for approximating the waning immunity curv
 
 The optimisation minimises the square root of the squared differences between the target waning and the
 approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
-if the approximation is non-monotonous or if the immunity levels change rapidly across compartments.
+if the approximation is non-monotonous or if the immunity levels or transition rates change rapidly across
+compartments.
 
 The minimisation is performed using the either \code{stats::optim}, \verb{nloptr::<optimiser>} or \code{optimx::polyopt}
 optimisers.
