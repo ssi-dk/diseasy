@@ -102,3 +102,37 @@ NULL
 #' @author Lasse Engbo Christiansen \email{lsec@ssi.dk}
 #' @keywords data
 NULL
+
+
+#' diseasy_immunity_optimiser_results
+#'
+#' This data set contains a summery of the tested optimiser for `DiseasyImmunity`s `$approximate_comparmental()` method.
+#'
+#' The data set consists of a `tibble` with columns:
+#'  - `optim_method`: A human-readable label of the optimiser configuration.
+#'  - `target`: The name of the target function being approximated
+#'  - `variation`: Indicating the variation on the target function. One of:
+#'    - "Base": using a time scale of 20.
+#'    - "Non-zero asymptote": asymptotically approaching 0.2 instead of 0.
+#'    - "Twice the time scale": using a time scale of 40.
+#'  - `target_label`: A shorthand combination of `target` and `variation`.
+#'  - `method_label`: The method of parametrising the approximation. One of:
+#'    - "free_delta", "free_gamma", "all_free", "all_free_combi",
+#'       "free_delta_recursive", "free_gamma_recursive" or "all_free_recursive".
+#'    See `?DiseasyImmunity` for details.
+#'  - `method`: The underlying method of parametrising the approximation. One of:
+#'    - "free_delta", "free_gamma", "all_free",
+#'  - `method_variation`: The strategy employed for optimisation. One of:
+#'    - NA, "recursive" or "combi".
+#'  - `N`: The number of compartments.
+#'  - `penalty`: Were unit penalties (`monotonous` and `individual_level`) added to the objective function?
+#'    See `?DiseasyImmunity` for details.
+#'  - `value`: The smallest determined value of the objective function for the optimiser.
+#'  - `execution_time`: The time spent by the optimiser.
+#'
+#' @name diseasy_immunity_optimiser_results
+#' @seealso [DiseasyImmunity]
+#' @docType data
+#' @author Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
+#' @keywords data
+NULL
