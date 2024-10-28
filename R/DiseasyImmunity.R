@@ -316,8 +316,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The minimisation is performed using the either `stats::optim`, `stats::nlm`, `stats::nlminb`,
     #'   `nloptr::<optimiser>` or `optimx::optimr` optimisers.
     #'
-    #'   By default, the optimisation is performed using a non-linear Nelder-Mead method which was found to be the
-    #'   most efficient (see `vignette("diseasy-immunity")`).
+    #'   By default, the optimisation algorithm is determined on a per-method basis dependent on the size of the
+    #'   problem. Our analysis show that the chosen algorithms in general were the most most efficient but performance
+    #'   may be better in any specific case when using a different algorithm (see `vignette("diseasy-immunity")`).
+    #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for "all_free_combi", changing the optimiser controls does not influence the starting point which uses
     #'   the "free_gamma" defaults.
@@ -512,9 +514,21 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # Set default optimisation controls
         default_optim_controls <- list(
-          "free_delta" = list("method" = "tnewton"),
-          "free_gamma" = list("method" = "nlm"),
-          "all_free"   = list("method" = "nlm")
+          "free_delta"     = \(N) switch( # We have to use base::switch since base::ifelse is drops names....
+            (N >= 5) + 1, # Switch uses zero indexing, so we offset by 1
+            list("optim_method" = "ucminf"),
+            list("optim_method" = "newuoa")
+          ),
+          "free_gamma"     = \(N) switch(
+            (N >= 5) + 1,
+            list("optim_method" = "neldermead"),
+            list("optim_method" = "BFGS")
+          ),
+          "all_free"       = \(N) switch(
+            (N >= 5) + 1,
+            list("optim_method" = "bobyqa"),
+            list("optim_method" = "auglag", "localsolver" = "COBYLA")
+          )
         )
 
 
@@ -585,7 +599,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               N = N,                                                                                                    # nolint: object_name_linter
               monotonous = monotonous,
               individual_level = individual_level,
-              optim_control = purrr::pluck(default_optim_controls, "free_gamma"),
+              optim_control = purrr::pluck(default_optim_controls, "free_gamma")(N),
               ...
             ) |>
               purrr::pluck("gamma") |>
@@ -600,7 +614,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Check optimiser is configured
-          if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
+          if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)(N)
 
 
           # Run the optimisation
