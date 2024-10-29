@@ -25,7 +25,7 @@ options("diseasy.logging" = FALSE)
 ```
 
 # Introduction
-The `DiseasyImmunity` is a module designed to implement various models for the waning of immunity against a disease.
+The `?DiseasyImmunity` is a module designed to implement various models for the waning of immunity against a disease.
 
 # Configuring the module
 The module can be initialized without setting any parameters, with the following code:
@@ -57,7 +57,7 @@ The input for the predefined waning models include:
 - `time_scale`: A characteristic time scale, which defines the period until when the immunity is significantly waning.
   Note that the `no_waning` model does not have a time scale parameter.
 
-The name of the chosen target is arbitrary within the context of the `DiseasyImmunity` module, but models within the
+The name of the chosen target is arbitrary within the context of the `?DiseasyImmunity` module, but models within the
 `diseasy` framework may expect named targets such as "infection", "hospitalisation", or "death".
 
 Here is an example of how to set the exponential waning model.
@@ -67,7 +67,7 @@ im$set_exponential_waning(time_scale = 20, target = "infection")
 To inspect that the model has been set correctly use `im$model`
 
 To visualize the model, the plot function provided by the module can be used:
-```{r plot_1}
+```{r plot_1, fig.alt = "Visualisation of a exponentially waning immunity against infection."}
 plot(im)
 ```
 
@@ -90,12 +90,12 @@ im$set_custom_waning(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time
 ```
 
 To visualize all the functions in the model, use the same plot function as above:
-```{r plot_2}
+```{r plot_2, fig.alt = "Visualing the additional custom (sigmoid) waning immunity against hospitalisation."}
 plot(im)
 ```
 
 ## Setting the waning model programmatically
-`DiseasyImmunity` also provides the `$set_waning_model()` function which allows greater flexibility when configuring
+`?DiseasyImmunity` also provides the `$set_waning_model()` function which allows greater flexibility when configuring
 various waning models within the module.
 
 `$set_waning_model()` provides a single entry-point for setting the predefined waning models or a custom waning
@@ -124,11 +124,11 @@ functions associated with the named targets.
 
 Following is an example of how to change the time scale for the two targets in the current models.
 ```{r setting the time scale}
-im$set_time_scales(list("infection" = 30, "hospitalisation" = 100))
+im$set_time_scales(list("infection" = 30, "hospitalisation" = 60))
 ```
 
 # Approximating to a compartmental model
-`DiseasyImmunity` can also provide the approximations of the waning models for compartmental ODE models.
+`?DiseasyImmunity` can also provide the approximations of the waning models for compartmental ODE models.
 (e.g. the Susceptible-Infected-Recovered-Susceptible (SEIR) models).
 
 The approximation assumes the model has a number of sequential R compartments and then provides the transition rates
@@ -143,30 +143,33 @@ Some definitions:
 Three approaches are available for determining the transition rates, $\delta_n$, and protective effect, $\gamma_n$,
 that best approximates the set waning functions:
 
-- Approach 1: (`rate_equal`) - $\gamma_n$ values are allowed to vary freely, while the $\delta_n$ rates are equal
+- Method 1 (`rate_equal`): $\gamma_n$ values are allowed to vary freely, while the $\delta_n$ rates are equal
   between compartments ($\delta_n = \delta$).
-- Approach 2: (`gamma_fixed_step`) - $\gamma_n$ values are monotonously decreasing ($\gamma_n = (n-1)/(N-1)$),
+- Method 2 (`gamma_fixed_step`): $\gamma_n$ values are monotonously decreasing ($\gamma_n = (n-1)\;/\;(N-1)$),
   and $\delta_n$ are allowed to vary freely.
-- Approach 3: (`all_free`) -  Both $\gamma_n$ and $\delta_n$ are allowed to vary freely.
+- Method 3 (`all_free`): Both $\gamma_n$ and $\delta_n$ are allowed to vary freely.
 
 These methods help approximate all the models in the current instance of the module.
 
 The input for the `$approximate_compartmental()` function includes:
 
-- `approach`: One of the approaches from above - "rate_equal", "gamma_fixed_step" or "all_free".
+- `method`: One of the methods from above - "rate_equal", "gamma_fixed_step" or "all_free".
 - `N`: The number of compartments to use for the approximation.
+- `optim_control`: A configuration of the optimiser. The approximation to the compartmental model is a hard
+  optimisation problem where the choice of the optimiser can have a significant impact on the quality of the fit.
+  See `vignette("diseasy-immunity-optimisation")` for more information on the optimiser configuration.
 
 In this example the module contains the infection and hospitalisation targets defined earlier, which will be
 approximated.
 ```{r approximate compartmental}
-im$approximate_compartmental(method = "free_gamma", N = 5)
+im$approximate_compartmental(method = "all_free", N = 4)
 ```
 
 To visualize how the approximations compare to the target functions, the plot function can be used.
 Simply specify the approach and the number of compartments (`N`).
 The plot will display both the approximations and the target functions for comparison.
-```{r plot approximation}
-im$plot(method = "free_gamma", N = 5)
+```{r plot approximation, fig.alt = "Visualisation of the approximations of the waning models."}
+im$plot(method = "all_free", N = 4)
 ```
 
 # Compartment selection (elbow curve method)
@@ -174,13 +177,14 @@ The accuracy of the approximation can be influenced by the number of compartment
 Therefore it is crucial to select the right N as too few compartments can lead to poor approximation,
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
 The elbow curve method is employed to determine the appropriate N for the models.
-Each approach is executed across a range of N values, and the resulting objective function values are returned as `value` from the approximate_compartmental function.
+Each approach is executed across a range of N values, and the resulting objective function values are returned as
+`value` from the approximate_compartmental function.
 
-```{r elbow curve method}
+```{r elbow curve method, fig.alt = "Increasing number of compartments has diminising returns on the error."}
 # Prepare the data
-N_seq <- seq(from = 2, to = 7, by = 1)                                                                                  # nolint: object_name_linter
-methods <- c("free_gamma", "free_delta", "all_free")
-im$set_heaviside_waning(time_scale = 20, target = "infection")
+N_seq <- seq(from = 2, to = 5, by = 1)                                                                                  # nolint: object_name_linter
+methods <- c("free_gamma", "free_delta", "all_free", "all_free_combi")
+im$set_sigmoidal_waning(time_scale = 20, target = "infection")
 
 # Run each function
 results <- tidyr::expand_grid(
@@ -189,7 +193,7 @@ results <- tidyr::expand_grid(
 ) |>
   purrr::pmap(
     \(method, N) {                                                                                                      # nolint: object_name_linter
-      im$approximate_compartmental(method = method, N = N, optim_control = data.frame("method" = "nlm", "maxit" = 100))
+      im$approximate_compartmental(method = method, N = N)
     },
     .progress = interactive()
   ) |>
@@ -201,7 +205,7 @@ ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = method)) +
   ggplot2::geom_line() +
   ggplot2::geom_point(ggplot2::aes(shape = convergence == 0)) +
   #ggplot2::xlim(1, max(results$N)) +
-  ggplot2::scale_y_log10() +
+  #ggplot2::scale_y_log10() +
   ggplot2::labs(x = "N", y = "Error") +
   ggplot2::theme_minimal()
 ```
