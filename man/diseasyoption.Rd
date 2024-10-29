@@ -4,7 +4,7 @@
 \alias{diseasyoption}
 \title{Helper function to get options related to diseasy}
 \usage{
-diseasyoption(option, class = "DiseasystoreBase", .default = NULL)
+diseasyoption(option, class = NULL, namespace = NULL, .default = NULL)
 }
 \arguments{
 \item{option}{(\code{character(1)})\cr
@@ -13,11 +13,17 @@ Name of the option to get.}
 \item{class}{(\code{character(1)} or \verb{R6::R6class Diseasy* instance})\cr
 Either the classname or the object the option applies to.}
 
+\item{namespace}{(\code{character(1)})\cr
+The namespace of the option (e.g. "diseasy" or "diseasystore").}
+
 \item{.default}{(\code{any})\cr
 The default value to return if no option is set.}
 }
 \value{
-The most specific option within the diseasy framework for the given option and class
+\itemize{
+\item If \code{option} is given, the most specific option within the \code{diseasy} framework for the given option and class.
+\item If \code{option} is missing, all options related to \code{diseasy} packages.
+}
 }
 \description{
 Helper function to get options related to diseasy
