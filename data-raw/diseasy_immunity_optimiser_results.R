@@ -78,16 +78,20 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
           # Unpack model
           model_zip <- combination[[1]][[1]]
-          method <- combination[[1]][[2]]
-          N <- combination[[1]][[3]]
-          optim_config <- combination[[1]][[4]]
-
           model <- model_zip[[1]]
           model_name <- model_zip[[2]]
           time_scale <- model_zip[[3]]
 
+          # Unpack method / strategy
+          method <- combination[[1]][[2]]
+          strategy <- combination[[1]][[3]]
+
+          # Unpack problem size and optimisation algorithm
+          N <- combination[[1]][[4]]
+          optim_control <- combination[[1]][[5]]
+
           # Determine the "label" for the optimisation algorithm
-          mc <- optim_config |>
+          mc <- optim_control |>
             as.data.frame() |>
             tidyr::unite("label", tidyselect::everything())
 
@@ -101,7 +105,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
 
           # Generate approximations and store them
-          key <- glue::glue("{method}-{optim_label}-{monotonous}-{individual_level}-{N}")
+          key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{N}")
 
           # Get the results up until now
           current_approxes <- cache$get(key = key)
@@ -113,10 +117,11 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
               {
                 approx <- im_p$approximate_compartmental(
                   method = method,
+                  strategy = strategy,
                   N = N,
                   monotonous = monotonous,
                   individual_level = individual_level,
-                  optim_control = optim_config
+                  optim_control = optim_control
                 )
 
                 # Get cache again
@@ -165,12 +170,13 @@ for (penalty in c(0, 1)) {
   if (summery_file_exists) {
     current_results <- diseasy_immunity_optimiser_results |>
       dplyr::filter(.data$penalty == !!penalty) |>
-      dplyr::select("optim_method", "target_label", "method_label", "N")
+      dplyr::select("optim_method", "target_label", "method", "strategy", "N")
   } else {
     current_results <- tibble::tibble(
       "optim_method" = character(0),
       "target_label" = character(0),
-      "method_label" = character(0),
+      "method" = character(0),
+      "strategy" = character(0),
       "N" = numeric(0)
     )
   }
@@ -268,10 +274,15 @@ for (penalty in c(0, 1)) {
     "optim_method" = optim_labels,
     "target_label" = model_names,
     "method_label" = c(
-      "free_delta", "free_gamma", "all_free", "all_free_combi",
-      "free_delta_recursive", "free_gamma_recursive", "all_free_recursive"
+      "free_delta-naive", "free_gamma-naive", "all_free-naive", "all_free-combination",
+      "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
     )
-  )
+  ) |>
+    tidyr::separate_wider_delim(
+      "method_label",
+      delim = "-",
+      names = c("method", "strategy")
+    )
 
   # Define a helper to construct combinations
   zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
@@ -283,20 +294,25 @@ for (penalty in c(0, 1)) {
     combinations <- tidyr::expand_grid(
       "model" = zip(models, model_names, time_scales),
       "method_label" = c(
-        "free_delta", "free_gamma", "all_free", "all_free_combi",
-        "free_delta_recursive", "free_gamma_recursive", "all_free_recursive"
+        "free_delta-naive", "free_gamma-naive", "all_free-naive", "all_free-combination",
+        "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
       ),
       "N" = N,
       "optim_method" = optim_labels,
     ) |>
       dplyr::mutate("target_label" = purrr::map_chr(.data$model, ~ purrr::pluck(., 2))) |>
-      dplyr::inner_join(candidates, by = c("optim_method", "target_label", "method_label")) |>
-      dplyr::anti_join(current_results, by = c("optim_method", "target_label", "method_label", "N")) |>
+      tidyr::separate_wider_delim(
+        "method_label",
+        delim = "-",
+        names = c("method", "strategy")
+      ) |>
+      dplyr::inner_join(candidates, by = c("optim_method", "target_label", "method", "strategy")) |>
+      dplyr::anti_join(current_results, by = c("optim_method", "target_label", "method", "strategy", "N")) |>
       dplyr::left_join(optim_configs, by = "optim_method")
 
     # Run the approximations for the round
     combinations_zip <- combinations |>
-      purrr::pmap(~ zip(list(..1), ..2, ..3, list(..6)))
+      purrr::pmap(~ zip(list(..1), ..2, ..3, ..4, list(..7)))
 
     # Since we have very uneven workloads, we need to balance the load on the workers
     if (N == 2) {
@@ -305,8 +321,8 @@ for (penalty in c(0, 1)) {
     } else {
       # After the first round, we use the results from the previous round to balance the load
       combinations_w_time <- round_results |>
-        dplyr::select("optim_method", "target_label", "method_label", "execution_time") |>
-        dplyr::right_join(combinations, by = c("optim_method", "target_label", "method_label"))
+        dplyr::select("optim_method", "target_label", "method", "strategy", "execution_time") |>
+        dplyr::right_join(combinations, by = c("optim_method", "target_label", "method", "strategy"))
 
       # Order by execution time high to low
       index <- rev(order(combinations_w_time$execution_time))
@@ -339,7 +355,7 @@ for (penalty in c(0, 1)) {
         tmp |>
           purrr::imap(\(approx, target_label) {
             approx |>
-              purrr::keep_at(c("method", "N", "value", "execution_time")) |>
+              purrr::keep_at(c("method", "strategy", "N", "value", "execution_time")) |>
               modifyList(list("target_label" = target_label))
           }) |>
           purrr::list_transpose() |>
@@ -347,23 +363,20 @@ for (penalty in c(0, 1)) {
           dplyr::mutate(
             "optim_method" = stringr::str_extract(
               !!file,
-              r"{(?<=free_delta-|free_delta_recursive-|free_gamma-|free_gamma_recursive-|all_free-|all_free_recursive-|all_free_combi-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
+              r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
             )
           )
       }) |>
       purrr::list_rbind() |>
-      dplyr::mutate(
-        "execution_time" = as.numeric(.data$execution_time, units = "secs"),
-        "method_label" = .data$method
-      ) |>
-      dplyr::select("optim_method", "target_label", "method_label", dplyr::everything())
+      dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
+      dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
 
 
     # Eliminate too slow candidates
     candidates <- round_results |>
       dplyr::filter(.data$execution_time < 60 * !!N) |>
-      dplyr::select("optim_method", "target_label", "method_label")
+      dplyr::select("optim_method", "target_label", "method", "strategy")
   }
 }
 
@@ -378,7 +391,7 @@ results <- list.files(path) |>
     tmp |>
       purrr::imap(\(approx, target) {
         approx |>
-          purrr::keep_at(c("method", "N", "value", "execution_time")) |>
+          purrr::keep_at(c("method", "strategy", "N", "value", "execution_time")) |>
           modifyList(list("target_label" = target))
       }) |>
       purrr::list_transpose() |>
@@ -386,14 +399,18 @@ results <- list.files(path) |>
       dplyr::mutate(
         "optim_method" = stringr::str_extract(
           !!file,
-          r"{(?<=free_delta-|free_delta_recursive-|free_gamma-|free_gamma_recursive-|all_free-|all_free_recursive-|all_free_combi-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
+          r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
         ),
         "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}")
       )
   }) |>
   purrr::list_rbind() |>
   dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
-  dplyr::select("optim_method", "target_label", "method_label" = .data$method, dplyr::everything()) |>
+  dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
+
+
+# Unpack target label to target and variation
+results <- results |>
   tidyr::separate_wider_delim(
     cols = "target_label",
     delim = "-",
@@ -406,52 +423,47 @@ results <- list.files(path) |>
     .data$variation == "c" ~ "Non-zero asymptote"
   ))
 
+
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
   dplyr::filter(.data$execution_time > 60 * .data$N) |>
-  dplyr::slice_min(N, by = c("optim_method", "target", "variation", "method_label", "penalty")) |>
+  dplyr::slice_min(N, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::transmute(
     .data$optim_method,
     .data$target,
     .data$variation,
-    .data$method_label,
+    .data$method,
+    .data$strategy,
     .data$penalty,
     "N_eliminated" = .data$N
   )
 
 should_have_been_eliminated <- results |>
-  dplyr::left_join(round_eliminated, by = c("optim_method", "target", "variation", "method_label", "penalty")) |>
-  dplyr::filter(.data$N_eliminated < .data$N, .by = c("optim_method", "target", "variation", "method_label", "penalty"))
+  dplyr::left_join(round_eliminated, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::filter(
+    .data$N_eliminated < .data$N,
+    .by = c("optim_method", "target", "variation", "method", "strategy", "penalty")
+  )
 
 print(should_have_been_eliminated)
 
 results <- dplyr::anti_join(
   results,
-  dplyr::select(should_have_been_eliminated, "optim_method", "target", "variation", "method_label", "penalty", "N"),
-  by = c("optim_method", "target", "variation", "method_label", "penalty", "N")
+  dplyr::select(
+    should_have_been_eliminated,
+    "optim_method", "target", "variation", "method", "strategy", "penalty", "N"
+  ),
+  by = c("optim_method", "target", "variation", "method", "strategy", "penalty", "N")
 )
 
 
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
-  dplyr::slice_max(.data$N, by = c("optim_method", "target", "variation", "method_label", "penalty")) |>
+  dplyr::slice_max(.data$N, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::filter(.data$execution_time < 60 * .data$N, .data$N < 10)
 
 print(should_not_have_been_eliminated)
-
-
-# Unpack method into method and strategy
-results <- results |>
-  dplyr::mutate(
-    "strategy" = stringr::str_extract(.data$method_label, "recursive|combi"),
-    "method" = stringr::str_remove(.data$method_label, "_recursive|_combi"),
-    .after = "method_label"
-  )
-
-# Fix the missing strategy labels
-results <- results |>
-  dplyr::mutate("strategy" = ifelse(is.na(.data$strategy), "naiive", .data$strategy))
 
 
 # Re-arrange the columns
@@ -459,7 +471,15 @@ results <- results |>
   dplyr::select(
     "target", "variation", "method", "strategy", "penalty", "N", "value", "execution_time", dplyr::everything()
   ) |>
-  dplyr::arrange(.data$optim_method, .data$N, .data$penalty, .data$target, .data$variation, .data$method, .data$strategy)
+  dplyr::arrange(
+    .data$optim_method,
+    .data$N,
+    .data$penalty,
+    .data$target,
+    .data$variation,
+    .data$method,
+    .data$strategy
+  )
 
 # Store results
 diseasy_immunity_optimiser_results <- results
