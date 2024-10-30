@@ -109,7 +109,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
           # Compute next values
           if (!(model_name %in% names(current_approxes))) {
 
-            #try(
+            try(
               {
                 approx <- im_p$approximate_compartmental(
                   method = method,
@@ -136,7 +136,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
                 # Store to cache
                 cache$set(key = key, current_approxes)
               }
-            #)
+            )
           }
 
           p()
@@ -417,12 +417,12 @@ round_eliminated <- results |>
     .data$variation,
     .data$method_label,
     .data$penalty,
-    "N_elminated" = .data$N
+    "N_eliminated" = .data$N
   )
 
 should_have_been_eliminated <- results |>
   dplyr::left_join(round_eliminated, by = c("optim_method", "target", "variation", "method_label", "penalty")) |>
-  dplyr::filter(.data$N_elminated < .data$N, .by = c("optim_method", "target", "variation", "method_label", "penalty"))
+  dplyr::filter(.data$N_eliminated < .data$N, .by = c("optim_method", "target", "variation", "method_label", "penalty"))
 
 print(should_have_been_eliminated)
 
@@ -436,18 +436,30 @@ results <- dplyr::anti_join(
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
   dplyr::slice_max(.data$N, by = c("optim_method", "target", "variation", "method_label", "penalty")) |>
-  dplyr::filter(.data$execution_time < 60 *.data$N & .data$N < 10)
+  dplyr::filter(.data$execution_time < 60 * .data$N, .data$N < 10)
 
 print(should_not_have_been_eliminated)
 
 
-# Unpack method into method and method_variation
+# Unpack method into method and strategy
 results <- results |>
   dplyr::mutate(
-    "method_variation" = stringr::str_extract(.data$method_label, "recursive|combi"),
+    "strategy" = stringr::str_extract(.data$method_label, "recursive|combi"),
     "method" = stringr::str_remove(.data$method_label, "_recursive|_combi"),
     .after = "method_label"
   )
+
+# Fix the missing strategy labels
+results <- results |>
+  dplyr::mutate("strategy" = ifelse(is.na(.data$strategy), "naiive", .data$strategy))
+
+
+# Re-arrange the columns
+results <- results |>
+  dplyr::select(
+    "target", "variation", "method", "strategy", "penalty", "N", "value", "execution_time", dplyr::everything()
+  ) |>
+  dplyr::arrange(.data$optim_method, .data$N, .data$penalty, .data$target, .data$variation, .data$method, .data$strategy)
 
 # Store results
 diseasy_immunity_optimiser_results <- results
