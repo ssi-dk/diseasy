@@ -521,21 +521,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # Set default optimisation controls
         default_optim_controls <- list(
-          "free_delta"     = \(N) switch( # We have to use base::switch since base::ifelse is drops names....
-            (N >= 5) + 1, # Switch uses zero indexing, so we offset by 1
-            list("optim_method" = "ucminf"),
-            list("optim_method" = "newuoa")
-          ),
-          "free_gamma"     = \(N) switch(
-            (N >= 5) + 1,
-            list("optim_method" = "neldermead"),
-            list("optim_method" = "BFGS")
-          ),
-          "all_free"       = \(N) switch(
-            (N >= 5) + 1,
-            list("optim_method" = "bobyqa"),
-            list("optim_method" = "auglag", "localsolver" = "COBYLA")
-          )
+          "free_delta" = list("optim_method" = "ucminf"),
+          "free_gamma" = list("optim_method" = "spg"),
+          "all_free"   = list("optim_method" = "bobyqa")
         )
 
 
@@ -709,7 +697,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               N = N,                                                                                                    # nolint: object_name_linter
               monotonous = monotonous,
               individual_level = individual_level,
-              optim_control = purrr::pluck(default_optim_controls, "free_gamma")(N),
+              optim_control = purrr::pluck(default_optim_controls, "free_gamma"),
               ...
             ) |>
               purrr::pluck("delta") |>
@@ -721,7 +709,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               N = N,                                                                                                    # nolint: object_name_linter
               monotonous = monotonous,
               individual_level = individual_level,
-              optim_control = purrr::pluck(default_optim_controls, "free_gamma")(N),
+              optim_control = purrr::pluck(default_optim_controls, "free_gamma"),
               ...
             ) |>
               purrr::pluck("gamma") |>
@@ -736,7 +724,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Check optimiser is configured
-          if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)(N)
+          if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
 
 
           # Run the optimisation
