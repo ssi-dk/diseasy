@@ -38,7 +38,8 @@ Imports:
     purrr,
     R6,
     rlang,
-    stringr
+    stringr,
+    ucminf
 Suggests:
     contactdata,
     countrycode,
