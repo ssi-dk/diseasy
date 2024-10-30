@@ -301,12 +301,23 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The transition rates between the compartments and the risk associated with each compartment are optimized to
     #'   approximate the configured waning immunity scenario.
     #'
-    #'   The function implements three methods for approximating the waning immunity curves:
-    #'     - "free_gamma": All transition rates are equal and risks are free to vary (N+1 free parameters).
-    #'     - "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
+    #'   The function implements three methods for parametrising the waning immunity curves:
+    #'     - "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
+    #'     - "free_delta": Transition rates are free to vary and risks are fixed to (n - 1) / (N - 1)
     #'       (N free parameters).
-    #'     - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
-    #'     - "all_free_combi": As "all_free" but uses the "free_gamma" solution as starting point for the optimiser.
+    #'     - "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+    #'
+    #'   In addition, this function implements three strategies for optimising the transition rates and risks.
+    #'   These strategies modify the initial guess for the transition rates and risks:
+    #'     - "naive"
+    #'        Transitions rates are initially set as the inverse of the median time scale.
+    #'        Risks are initially set as linearly distributed values between 1 and $f(\infty)$.
+    #'
+    #'     - "recursive"
+    #'        Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
+    #'
+    #'     - "combination" (only for "all_free" method)
+    #'        Initial transition rates and risks are set from the "free_gamma" solution for $N$.
     #'
     #'   The optimisation minimises the square root of the squared differences between the target waning and the
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
@@ -316,16 +327,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The minimisation is performed using the either `stats::optim`, `stats::nlm`, `stats::nlminb`,
     #'   `nloptr::<optimiser>` or `optimx::optimr` optimisers.
     #'
-    #'   By default, the optimisation algorithm is determined on a per-method basis dependent on the size of the
-    #'   problem. Our analysis show that the chosen algorithms in general were the most most efficient but performance
-    #'   may be better in any specific case when using a different algorithm (see `vignette("diseasy-immunity")`).
+    #'   By default, the optimisation algorithm is determined on a per-method basis dependent.
+    #'   Our analysis show that the chosen algorithms in general were the most most efficient but performance
+    #'   may be better in any specific case when using a different algorithm
+    #'   (see `vignette("diseasy-immunity-optimisation")`).
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
-    #'   NOTE: for the "all_free_combi" method, changing the optimiser controls does not influence the starting point
+    #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
     #'   which uses the "free_gamma" default optimiser to determine the starting point.
     #'
     #' @param method (`character(1)`)\cr
-    #'   Specifies the method to be used from the available methods. See details.
+    #'   Specifies the parametrisation method to be used from the available methods. See details.
+    #' @param strategy (`character(1)`)\cr
+    #'   Specifies the optimisation strategy to be used from the available strategies. See details.
     #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
     #' @param monotonous (`logical(1)` or `numeric(1)`)\cr
@@ -364,10 +378,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @seealso [vignette("diseasy-immunity")], [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
     #'  [optimx::optimr]
     approximate_compartmental = function(
-      method = c(
-        "free_gamma", "free_delta", "all_free", "all_free_combi",
-        "free_gamma_recursive", "free_delta_recursive", "all_free_recursive"
-      ),
+      method = c("free_gamma", "free_delta", "all_free"),
+      strategy = c("naive", "recursive", "combination"),
       N = NULL,                                                                                                         # nolint: object_name_linter
       monotonous = TRUE,
       individual_level = TRUE,
@@ -382,10 +394,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
+      checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
       checkmate::assert_choice(
-        method,
-        c("free_gamma", "free_delta", "all_free", "all_free_combi",
-          "free_gamma_recursive", "free_delta_recursive", "all_free_recursive"),
+        strategy,
+        c("naive", "recursive", switch(method == "all_free", "combination")),
         add = coll
       )
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
@@ -424,7 +436,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # We need to know the number of models the gamma's belong to
         n_models <- length(self$model)
 
-        if (method %in% c("free_gamma", "free_gamma_recursive")) {
+        if (method  == "free_gamma") {
           # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
           # The last parameter is the delta rate which is identical for all compartments
           n_free_parameters <- (N - 1) * n_models + 1
@@ -437,14 +449,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
             )
           }
 
-        } else if (method %in% c("free_delta", "free_delta_recursive")) {
+        } else if (method == "free_delta") {
           # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
           n_free_parameters <- N - 1
 
           par_to_delta <- \(par) p_0inf(par) # All parameters are delta
           par_to_gamma <- \(par, model_id, f_inf) seq(from = 1, to = f_inf, length.out = N) # gammas: 1 to f_inf
 
-        } else if (method %in% c("all_free", "all_free_recursive", "all_free_combi")) {
+        } else if (method == "all_free") {
           # All parameters are free to vary
           # The first n_models * (N-1) parameters are the gamma rates  (N-1 for each model)
           # The last N-1 parameters are the delta rates
@@ -526,7 +538,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
           "all_free"   = list("optim_method" = "bobyqa")
         )
 
-
+        # Set default strategy
+        default_optim_strategy <- list(
+          "free_delta" = "recursive",
+          "free_gamma" = "naive",
+          "all_free"   = "combination"
+        )
 
         # If we have no free parameters we return the default rates
         if (n_free_parameters == 0) {
@@ -545,178 +562,208 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # Account for the differences in methods
           if (method == "free_delta")  {
 
-            # Uniform delta using time scale as (N - 1) / delta
-            delta_0 <- rep((N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1), N - 1)
-
             # free_delta has no free gamma parameters (uses linearly distributed values)
             gamma_0 <- numeric(0)
 
-          } else if (method == "free_delta_recursive") {
+            if (strategy == "naive") {
 
-            # Initially using time scale as 1 / delta, then using linear interpolation of 1 / delta from
-            # N - 1 solution to get starting guess for N solution
-            if (N == 2) {
+              # Uniform delta using time scale as (N - 1) / delta
+              delta_0 <- rep(
+                (N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1),
+                N - 1
+              )
 
-              delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+            } else if (strategy == "recursive") {
 
-            } else {
+              # Initially using time scale as 1 / delta, then using linear interpolation of 1 / delta from
+              # N - 1 solution to get starting guess for N solution
+              if (N == 2) {
 
-              delta_0 <- self$approximate_compartmental(
-                method = method,
-                N = N - 1,                                                                                                    # nolint: object_name_linter
-                monotonous = monotonous,
-                individual_level = individual_level,
-                optim_control = optim_control
-              ) |>
-                purrr::pluck("delta")
+                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
 
-              # Linearly interpolate from N - 1 to N
-              if (N == 3) {
-                delta_0 <- c(delta_0, delta_0) * 2
               } else {
-                delta_0 <- 1 / approx(seq(1, 0, length.out = N - 2), 1 / delta_0, seq(1, 0, length.out = N - 1))$y
-              }
-            }
 
-            # free_delta has no free gamma parameters (uses linearly distributed values)
-            gamma_0 <- numeric(0)
+                # Get the N - 1 solution for delta
+                delta_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("delta")
+
+                # Linearly interpolate from N - 1 to N
+                if (N == 3) { # For N == 3 we cannot use approx so we manually interpolate
+                  delta_0 <- c(delta_0, delta_0) * 2
+                } else { # Interpolate the time spent in each compartment
+                  delta_0 <- 1 / approx(seq(1, 0, length.out = N - 2), 1 / delta_0, seq(1, 0, length.out = N - 1))$y
+                }
+              }
+
+            }
 
           } else if (method == "free_gamma") {
 
-            # Uniform delta using time scale as N / delta
-            delta_0 <- (N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+            if (strategy == "naive") {
 
-            # Use linearly distributed gamma values as starting guess
-            gamma_0 <- private$.model |>
-              purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = N), N - 1)) |>
-              purrr::reduce(c)
+              # Uniform delta using time scale as N / delta
+              delta_0 <- (N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
 
-          } else if (method == "free_gamma_recursive") {
-
-            # Initially using time scale as 1 / delta, then using N - 1 solution to get starting guess for
-            # N solution for both delta and gamma.
-            # This effectively adds an additional compartment after the last with the same gamma value
-            if (N == 2) {
-
-              delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
-              gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
-
-            } else {
-
-              delta_0 <- self$approximate_compartmental(
-                method = method,
-                N = N - 1,                                                                                                    # nolint: object_name_linter
-                monotonous = monotonous,
-                individual_level = individual_level,
-                optim_control = optim_control
-              ) |>
-                purrr::pluck("delta")
-
-              delta_0 <- delta_0 * (N - 1) / (N - 2)
-
-              gamma_0 <- self$approximate_compartmental(
-                method = method,
-                N = N - 1,                                                                                                    # nolint: object_name_linter
-                monotonous = monotonous,
-                individual_level = individual_level,
-                optim_control = optim_control
-              ) |>
-                purrr::pluck("gamma") |>
-                purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
+              # Use linearly distributed gamma values as starting guess
+              gamma_0 <- private$.model |>
+                purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = N), N - 1)) |>
                 purrr::reduce(c)
+
+            } else if (strategy == "recursive") {
+
+              # Initially using time scale as 1 / delta, then using N - 1 solution to get starting guess for
+              # N solution for both delta and gamma.
+              # This effectively adds an additional compartment after the last with the same gamma value
+              if (N == 2) {
+
+                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+                gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
+
+              } else {
+
+                # Get the N - 1 solution for delta
+                delta_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("delta")
+
+                # Adjust for the increase in the number of compartments
+                delta_0 <- delta_0 * (N - 1) / (N - 2)
+
+                # Get the N - 1 solution for gamma
+                gamma_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control
+                ) |>
+                  purrr::pluck("gamma")
+
+                # Repeat the last gamma level from the N-1 solution to form the N initial guess
+                gamma_0 <-  gamma_0 |>
+                  purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
+                  purrr::reduce(c)
+              }
+
             }
 
           } else if (method == "all_free") {
 
-            # Uniform delta using time scale as N / delta
-            delta_0 <- rep((N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1), N - 1)
+            if (strategy == "naive") {
 
-            # Use linearly distributed gamma values as starting guess
-            gamma_0 <- private$.model |>
-              purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = N), N - 1)) |>
-              purrr::reduce(c)
+              # Uniform delta using time scale as N / delta
+              delta_0 <- rep((N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1), N - 1)
 
-          } else if (method == "all_free_recursive") {
+              # Use linearly distributed gamma values as starting guess
+              gamma_0 <- private$.model |>
+                purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = N), N - 1)) |>
+                purrr::reduce(c)
 
-            # Initially using time scale as 1 / delta, then using N - 1 solution to get starting guess for
-            # N solution for both delta and gamma.
-            # This effectively adds an additional compartment after the last with the same gamma value
-            if (N == 2) {
+            } else if (strategy == "recursive") {
 
-              delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
-              gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
+              # Initially using time scale as 1 / delta, then using N - 1 solution to get starting guess for
+              # N solution for both delta and gamma.
+              # This effectively adds an additional compartment after the last with the same gamma value
+              if (N == 2) {
 
-            } else {
+                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+                gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
 
+              } else {
+
+                # Get the N - 1 solution for delta
+                delta_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("delta")
+
+                # Get the N - 1 solution for gamma
+                gamma_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("gamma")
+
+
+                # Interpolate gamma from N - 1 to N
+                if (N == 3) { # By repeating the last value when we cannot use approx
+                  gamma_0 <- gamma_0 |>
+                    purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
+                    purrr::reduce(c)
+                } else { # And by creating a mapping from time (cumsum(1 / delta)) to gamma
+                  gammas_from_delta <- purrr::map(gamma_0, ~ approxfun(cumsum(1 / delta_0), head(.x, -1), rule = 2))
+                }
+
+                # Interpolate delta from N - 1 to N
+                if (N == 3) { # For N == 3 we cannot use approx so we manually interpolate
+                  delta_0 <- c(delta_0, delta_0) * 2
+                } else { # Interpolate the time spent in each compartment
+                  delta_0 <- 1 / approx(seq(1, 0, length.out = N - 2), 1 / delta_0, seq(1, 0, length.out = N - 1))$y
+                }
+
+                # Now, with delta computed, we must use the mapping that was created for N > 3 to get the gamma values
+                if (N > 3) {
+                  gamma_0 <- purrr::map(gammas_from_delta, ~ .x(cumsum(1 / delta_0))) |>
+                    purrr::reduce(c)
+                }
+
+              }
+
+            } else if (strategy == "combination") {
+
+              # Use free_gamma solution as starting point
               delta_0 <- self$approximate_compartmental(
-                method = method,
-                N = N - 1,                                                                                                    # nolint: object_name_linter
+                method = "free_gamma",
+                strategy = purrr::pluck(default_optim_strategy, "free_gamma"),
+                N = N,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
                 individual_level = individual_level,
-                optim_control = optim_control
+                optim_control = purrr::pluck(default_optim_controls, "free_gamma")
               ) |>
-                purrr::pluck("delta")
+                purrr::pluck("delta") |>
+                rep(N - 1)
 
+              # Use free_gamma solution as starting point
               gamma_0 <- self$approximate_compartmental(
-                method = method,
-                N = N - 1,                                                                                                    # nolint: object_name_linter
+                method = "free_gamma",
+                strategy = purrr::pluck(default_optim_strategy, "free_gamma"),
+                N = N,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
                 individual_level = individual_level,
-                optim_control = optim_control
+                optim_control = purrr::pluck(default_optim_controls, "free_gamma")
               ) |>
-                purrr::pluck("gamma")
-
-
-              # Interpolate from N - 1 to N
-              if (N == 3) {
-                gamma_0 <- gamma_0 |>
-                  purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
-                  purrr::reduce(c)
-              } else {
-                # Approx fun delta -> gamma
-                gammas_from_delta <- purrr::map(gamma_0, ~ approxfun(cumsum(1 / delta_0), head(.x, -1), rule = 2))
-              }
-
-              if (N == 3) {
-                delta_0 <- c(delta_0, delta_0) * 2
-              } else {
-                delta_0 <- 1 / approx(seq(1, 0, length.out = N - 2), 1 / delta_0, seq(1, 0, length.out = N - 1))$y
-              }
-
-              if (N > 3) {
-                gamma_0 <- purrr::map(gammas_from_delta, ~ .x(cumsum(1 / delta_0))) |>
-                  purrr::reduce(c)
-              }
-
+                purrr::pluck("gamma") |>
+                purrr::map(~ utils::head(., N - 1)) |> # Drop last value since it is fixed in the method
+                purrr::reduce(c)
             }
-          } else if (method == "all_free_combi") {
-
-            # Use free_gamma solution as starting point
-            delta_0 <- self$approximate_compartmental(
-              method = "free_gamma",
-              N = N,                                                                                                    # nolint: object_name_linter
-              monotonous = monotonous,
-              individual_level = individual_level,
-              optim_control = purrr::pluck(default_optim_controls, "free_gamma"),
-              ...
-            ) |>
-              purrr::pluck("delta") |>
-              rep(N - 1)
-
-            # Use free_gamma solution as starting point
-            gamma_0 <- self$approximate_compartmental(
-              method = "free_gamma",
-              N = N,                                                                                                    # nolint: object_name_linter
-              monotonous = monotonous,
-              individual_level = individual_level,
-              optim_control = purrr::pluck(default_optim_controls, "free_gamma"),
-              ...
-            ) |>
-              purrr::pluck("gamma") |>
-              purrr::map(~ utils::head(., N - 1)) |> # Drop last value since it is fixed in the method
-              purrr::reduce(c)
           }
-
 
           # Inverse mapping of parameters to optimiser space
           p_delta_0 <- inv_p_0inf(delta_0)
@@ -820,18 +867,37 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
+        # For the recursive and combination strategies, we need to add the execution time from the previous
+        # optimisations
+        if (strategy == "recursive" && N > 2) {
 
-        # If the all_free_combi method is used, add the execution time from the free_gamma method
-        if (method == "all_free_combi") {
+          execution_time_offset <- seq(from = 2, to = N - 1, by = 1) |>
+            purrr::map(~ {
+              self$approximate_compartmental(
+                method = method,
+                strategy = strategy,
+                N = .,                                                                                                  # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level,
+                optim_control = optim_control,
+                ...
+              ) |>
+              purrr::pluck("execution_time")
+            }) |>
+            sum()
+
+        } else if (strategy == "combination") {
+
           execution_time_offset <- self$approximate_compartmental(
             method = "free_gamma",
+            strategy = purrr::pluck(default_optim_strategy, "free_gamma"),
             N = N,                                                                                                      # nolint: object_name_linter
             monotonous = monotonous,
             individual_level = individual_level,
-            optim_control = optim_control,
-            ...
+            purrr::pluck(default_optim_controls, "free_gamma")
           ) |>
             purrr::pluck("execution_time")
+
         } else {
           execution_time_offset <- 0
         }
@@ -846,6 +912,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "gamma" = gamma,
               "delta" = delta,
               "method" = method,
+              "strategy" = strategy,
               "N" = N,
               "sqrt_integral" = purrr::pluck(metrics, "value"),
               "penalty" = purrr::pluck(metrics, "penalty"),

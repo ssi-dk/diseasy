@@ -312,8 +312,8 @@ transition rates and associated risk of infection for each compartment such the 
 best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
-  method = c("free_gamma", "free_delta", "all_free", "all_free_combi",
-    "free_gamma_recursive", "free_delta_recursive", "all_free_recursive"),
+  method = c("free_gamma", "free_delta", "all_free"),
+  strategy = c("naive", "recursive", "combination"),
   N = NULL,
   monotonous = TRUE,
   individual_level = TRUE,
@@ -326,7 +326,10 @@ best matches the waning immunity curves set in the module.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{method}}{(\code{character(1)})\cr
-Specifies the method to be used from the available methods. See details.}
+Specifies the parametrisation method to be used from the available methods. See details.}
+
+\item{\code{strategy}}{(\code{character(1)})\cr
+Specifies the optimisation strategy to be used from the available strategies. See details.}
 
 \item{\code{N}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
@@ -382,12 +385,24 @@ is a phase-type distribution (with Erlang distribution as a special case when al
 The transition rates between the compartments and the risk associated with each compartment are optimized to
 approximate the configured waning immunity scenario.
 
-The function implements three methods for approximating the waning immunity curves:
-- "free_gamma": All transition rates are equal and risks are free to vary (N+1 free parameters).
-- "free_delta": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
+The function implements three methods for parametrising the waning immunity curves:
+- "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
+- "free_delta": Transition rates are free to vary and risks are fixed to (n - 1) / (N - 1)
 (N free parameters).
-- "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
-- "all_free_combi": As "all_free" but uses the "free_gamma" solution as starting point for the optimiser.
+- "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+
+In addition, this function implements three strategies for optimising the transition rates and risks.
+These strategies modify the initial guess for the transition rates and risks:
+- "naive"
+Transitions rates are initially set as the inverse of the median time scale.
+Risks are initially set as linearly distributed values between 1 and $f(\infty)$.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{- "recursive"
+   Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
+
+- "combination" (only for "all_free" method)
+   Initial transition rates and risks are set from the "free_gamma" solution for $N$.
+}\if{html}{\out{</div>}}
 
 The optimisation minimises the square root of the squared differences between the target waning and the
 approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
@@ -397,12 +412,13 @@ compartments.
 The minimisation is performed using the either \code{stats::optim}, \code{stats::nlm}, \code{stats::nlminb},
 \verb{nloptr::<optimiser>} or \code{optimx::optimr} optimisers.
 
-By default, the optimisation algorithm is determined on a per-method basis dependent on the size of the
-problem. Our analysis show that the chosen algorithms in general were the most most efficient but performance
-may be better in any specific case when using a different algorithm (see \code{vignette("diseasy-immunity")}).
+By default, the optimisation algorithm is determined on a per-method basis dependent.
+Our analysis show that the chosen algorithms in general were the most most efficient but performance
+may be better in any specific case when using a different algorithm
+(see \code{vignette("diseasy-immunity-optimisation")}).
 
 Optimiser defaults can be changed via the \code{optim_control} argument.
-NOTE: for the "all_free_combi" method, changing the optimiser controls does not influence the starting point
+NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
 which uses the "free_gamma" default optimiser to determine the starting point.
 }
 
