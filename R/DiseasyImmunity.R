@@ -271,16 +271,36 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Capture the expression of custom_function to preserve its environment
       model <- custom_function
 
-      # Option 2: Clone the environment of custom function.
-      # Will copy .GlobalEnv often .. not the best solution
-      rlang::fn_env(model) <- rlang::new_environment(
-        data = list(time_scale = time_scale),
-        parent = rlang::env_clone(rlang::fn_env(custom_function))
-      )
-
-      # Set the attributes
+      # Set the name attributes
       attr(model, "name") <- name
-      attr(model, "dots") <- list(time_scale = time_scale)
+
+      # Detect all variables in the model expression
+      model_vars <- all.vars(rlang::fn_body(model))
+
+      # Copy the function environment
+      custom_function_env <- rlang::fn_env(custom_function)
+
+      # Keep only variables used in the model expression
+      model_env <- custom_function_env |>
+        as.list() |>
+        purrr::keep_at(model_vars) |>
+        as.environment()
+
+
+      # Add the time_scale variable to the function environment
+      if ("time_scale" %in% model_vars) {
+
+        model_env <- rlang::new_environment(
+          data = list(time_scale = time_scale),
+          parent = rlang::env_clone(model_env)
+        )
+
+        # Set the attributes
+        attr(model, "dots") <- list(time_scale = time_scale)
+      }
+
+      # Commit the new environment to the custom function
+      rlang::fn_env(model) <- model_env
 
       # Set the model
       private$.model[[target]] <- model
