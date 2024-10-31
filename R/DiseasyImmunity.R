@@ -279,12 +279,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Copy the function environment
       custom_function_env <- rlang::fn_env(custom_function)
-
-      # Keep only variables used in the model expression
-      model_env <- custom_function_env |>
-        as.list() |>
-        purrr::keep_at(model_vars) |>
-        as.environment()
+      model_env <- custom_function_env
 
 
       # Add the time_scale variable to the function environment
@@ -292,7 +287,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         model_env <- rlang::new_environment(
           data = list(time_scale = time_scale),
-          parent = rlang::env_clone(model_env)
+          parent = custom_function_env
         )
 
         # Set the attributes
