@@ -312,9 +312,9 @@ transition rates and associated risk of infection for each compartment such the 
 best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
+  N,
   method = c("free_gamma", "free_delta", "all_free"),
   strategy = NULL,
-  N = NULL,
   monotonous = TRUE,
   individual_level = TRUE,
   optim_control = NULL,
@@ -325,14 +325,14 @@ best matches the waning immunity curves set in the module.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{N}}{(\code{integer(1)})\cr
+Number of compartments to be used in the model.}
+
 \item{\code{method}}{(\code{character(1)})\cr
 Specifies the parametrisation method to be used from the available methods. See details.}
 
 \item{\code{strategy}}{(\code{character(1)})\cr
 Specifies the optimisation strategy ("naive", "recursive" or "combination"). See details.}
-
-\item{\code{N}}{(\code{integer(1)})\cr
-Number of compartments to be used in the model.}
 
 \item{\code{monotonous}}{(\code{logical(1)} or \code{numeric(1)})\cr
 Should non-monotonous approximations be penalised?
