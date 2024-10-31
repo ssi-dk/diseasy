@@ -313,7 +313,7 @@ best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
   method = c("free_gamma", "free_delta", "all_free"),
-  strategy = c("naive", "recursive", "combination"),
+  strategy = NULL,
   N = NULL,
   monotonous = TRUE,
   individual_level = TRUE,
@@ -329,7 +329,7 @@ best matches the waning immunity curves set in the module.
 Specifies the parametrisation method to be used from the available methods. See details.}
 
 \item{\code{strategy}}{(\code{character(1)})\cr
-Specifies the optimisation strategy to be used from the available strategies. See details.}
+Specifies the optimisation strategy ("naive", "recursive" or "combination"). See details.}
 
 \item{\code{N}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
