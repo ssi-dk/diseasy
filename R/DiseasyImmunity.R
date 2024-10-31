@@ -973,9 +973,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
       if (is.null(t_max)) t_max <- 3 * purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
       t <- seq(from = 0, to = t_max, length.out = 100)
 
+      # Adds extra space on the right
+      if (interactive()) par(mar = c(5, 4, 4, 12) + 0.1)
 
       # Create an empty plot
-      par(mar = c(5, 4, 4, 12) + 0.1) # Adds extra space on the right
       plot(
         t,
         type = "n",
