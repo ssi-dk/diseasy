@@ -895,17 +895,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
         if (strategy == "recursive" && N > 2) {
 
           execution_time_offset <- seq(from = 2, to = N - 1, by = 1) |>
-            purrr::map(~ {
+            purrr::map_dbl(\(N) {
               self$approximate_compartmental(
                 method = method,
                 strategy = strategy,
-                N = .,                                                                                                  # nolint: object_name_linter
+                N = N,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
                 ...
               ) |>
-                purrr::pluck("execution_time")
+                purrr::pluck("execution_time") |>
+                as.numeric(unit = "secs")
             }) |>
             sum()
 
