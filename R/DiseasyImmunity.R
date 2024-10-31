@@ -401,7 +401,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         add = coll
       )
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
-      checkmate::assert_number(as.numeric( monotonous), add = coll)
+      checkmate::assert_number(as.numeric(monotonous), add = coll)
       checkmate::assert_number(as.numeric(individual_level), add = coll)
       checkmate::assert_list(optim_control, types = c("character", "numeric"), null.ok = TRUE)
       if (!is.null(optim_control)) {
@@ -428,7 +428,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         inv_p_01 <- \(p) {
           (log(p) - log(1 - p)) |> # Inverse mapping of p_01
             pmax(-1e30) |>
-            pmin(1e30) # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead of infinity
+            pmin(1e30) # p_01 is 1 at infinity, which the optimiser doesn't like, so we use a large value instead
         }
         inv_p_0inf <- \(p) log(exp(p) - 1)
 
@@ -668,7 +668,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
             if (strategy == "naive") {
 
               # Uniform delta using time scale as N / delta
-              delta_0 <- rep((N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1), N - 1)
+              delta_0 <- (N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1) |>
+                rep(N - 1)
 
               # Use linearly distributed gamma values as starting guess
               gamma_0 <- private$.model |>
@@ -836,8 +837,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
           } else if (optim_control %.% optim_method %in% optimx_methods) {
             # Optimiser is `optimx::optimr`
 
-            capture.output(
-              res <- optimx::optimr(
+            capture.output( # Suppress output from optimx
+              res <- optimx::optimr(                                                                                    # nolint: implicit_assignment_linter
                 par = c(p_gamma_0, p_delta_0),
                 fn = \(p) sum(obj_function(p)),
                 method = optim_control %.% optim_method,
@@ -882,7 +883,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 optim_control = optim_control,
                 ...
               ) |>
-              purrr::pluck("execution_time")
+                purrr::pluck("execution_time")
             }) |>
             sum()
 
