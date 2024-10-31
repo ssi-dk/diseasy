@@ -356,7 +356,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param method (`character(1)`)\cr
     #'   Specifies the parametrisation method to be used from the available methods. See details.
     #' @param strategy (`character(1)`)\cr
-    #'   Specifies the optimisation strategy to be used from the available strategies. See details.
+    #'   Specifies the optimisation strategy ("naive", "recursive" or "combination"). See details.
     #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
     #' @param monotonous (`logical(1)` or `numeric(1)`)\cr
@@ -396,7 +396,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'  [optimx::optimr]
     approximate_compartmental = function(
       method = c("free_gamma", "free_delta", "all_free"),
-      strategy = c("naive", "recursive", "combination"),
+      strategy = NULL,
       N = NULL,                                                                                                         # nolint: object_name_linter
       monotonous = TRUE,
       individual_level = TRUE,
@@ -415,6 +415,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_choice(
         strategy,
         c("naive", "recursive", switch(method == "all_free", "combination")),
+        null.ok = TRUE,
         add = coll
       )
       checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
@@ -561,6 +562,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
           "free_gamma" = "naive",
           "all_free"   = "combination"
         )
+
+        # Choose strategy if not set
+        if (is.null(strategy)) strategy <- purrr::pluck(default_optim_strategy, method)
+
 
         # If we have no free parameters we return the default rates
         if (n_free_parameters == 0) {
