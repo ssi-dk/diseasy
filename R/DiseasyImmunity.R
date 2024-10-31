@@ -1000,7 +1000,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Only plots the approximations if N was given as input
       if (!is.null(N)) {
-        approximation <- self$approximate_compartmental(method, N, ...)
+        approximation <- self$approximate_compartmental(N, method = method, ...)
         gamma <- approximation$gamma
         delta <- approximation$delta
 
