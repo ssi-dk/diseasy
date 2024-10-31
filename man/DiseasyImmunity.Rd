@@ -13,7 +13,7 @@ dependencies of the disease.
 The module implements a number immunity models with different functional forms and allows the user to set
 their own, custom waning function.
 
-See the vignette("diseasy-immunity") for examples of use.
+See the \code{vignette("diseasy-immunity")} for examples of use.
 }
 \examples{
 
@@ -28,7 +28,7 @@ See the vignette("diseasy-immunity") for examples of use.
   rm(im)
 }
 \seealso{
-\link{vignette("diseasy-immunity")}, \link[stats:optim]{stats::optim}, \link[stats:nlm]{stats::nlm}, \link[stats:nlminb]{stats::nlminb}, \link[nloptr:nloptr]{nloptr::nloptr},
+\code{vignette("diseasy-immunity")}, \link[stats:optim]{stats::optim}, \link[stats:nlm]{stats::nlm}, \link[stats:nlminb]{stats::nlminb}, \link[nloptr:nloptr]{nloptr::nloptr},
 \link[optimx:optimr]{optimx::optimr}
 }
 \section{Super class}{
@@ -44,7 +44,7 @@ The waning models implemented in \code{DiseasyImmunity}. Read only.}
 The list of models currently being used in the module. Read-only.}
 
 \item{\code{available_methods}}{(\code{character})\cr
-The list of available methods}
+The list of available methods. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -360,7 +360,7 @@ If \code{optim_method} is "nlm":
 \item Additional \code{optim_control} arguments passed as arguments to \code{stats::nlm}.
 }
 
-If \code{optim_method} is "nlminb":":
+If \code{optim_method} is "nlminb":
 \itemize{
 \item Additional \code{optim_control} arguments passed as \code{control} to \code{stats::nlminb}.
 }
@@ -386,23 +386,24 @@ The transition rates between the compartments and the risk associated with each 
 approximate the configured waning immunity scenario.
 
 The function implements three methods for parametrising the waning immunity curves:
-- "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
-- "free_delta": Transition rates are free to vary and risks are fixed to (n - 1) / (N - 1)
-(N free parameters).
-- "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+\itemize{
+\item "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
+\item "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
+f(infinity) (N free parameters).
+\item "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+}
 
 In addition, this function implements three strategies for optimising the transition rates and risks.
 These strategies modify the initial guess for the transition rates and risks:
-- "naive"
+\itemize{
+\item "naive":
 Transitions rates are initially set as the inverse of the median time scale.
-Risks are initially set as linearly distributed values between 1 and $f(\infty)$.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{- "recursive"
-   Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
-
-- "combination" (only for "all_free" method)
-   Initial transition rates and risks are set from the "free_gamma" solution for $N$.
-}\if{html}{\out{</div>}}
+Risks are initially set as linearly distributed values between f(0) and f(infinity).
+\item "recursive":
+Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
+\item "combination" (only for "all_free" method):
+Initial transition rates and risks are set from the "free_gamma" solution for $N$.
+}
 
 The optimisation minimises the square root of the squared differences between the target waning and the
 approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function

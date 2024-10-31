@@ -7,7 +7,7 @@
 #'   The module implements a number immunity models with different functional forms and allows the user to set
 #'   their own, custom waning function.
 #'
-#'   See the vignette("diseasy-immunity") for examples of use.
+#'   See the `vignette("diseasy-immunity")` for examples of use.
 #' @return
 #'   A new instance of the `DiseasyImmunity` [R6][R6::R6Class] class.
 #' @export
@@ -322,22 +322,24 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   approximate the configured waning immunity scenario.
     #'
     #'   The function implements three methods for parametrising the waning immunity curves:
-    #'     - "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
-    #'     - "free_delta": Transition rates are free to vary and risks are fixed to (n - 1) / (N - 1)
-    #'       (N free parameters).
-    #'     - "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+    #'
+    #'   - "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
+    #'   - "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
+    #'     f(infinity) (N free parameters).
+    #'   - "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
     #'
     #'   In addition, this function implements three strategies for optimising the transition rates and risks.
     #'   These strategies modify the initial guess for the transition rates and risks:
-    #'     - "naive"
-    #'        Transitions rates are initially set as the inverse of the median time scale.
-    #'        Risks are initially set as linearly distributed values between 1 and $f(\infty)$.
     #'
-    #'     - "recursive"
-    #'        Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
+    #'   - "naive":
+    #'      Transitions rates are initially set as the inverse of the median time scale.
+    #'      Risks are initially set as linearly distributed values between f(0) and f(infinity).
     #'
-    #'     - "combination" (only for "all_free" method)
-    #'        Initial transition rates and risks are set from the "free_gamma" solution for $N$.
+    #'   - "recursive":
+    #'      Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
+    #'
+    #'   - "combination" (only for "all_free" method):
+    #'      Initial transition rates and risks are set from the "free_gamma" solution for $N$.
     #'
     #'   The optimisation minimises the square root of the squared differences between the target waning and the
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
@@ -382,7 +384,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   If `optim_method` is "nlm":
     #'   - Additional `optim_control` arguments passed as arguments to `stats::nlm`.
     #'
-    #'   If `optim_method` is "nlminb":":
+    #'   If `optim_method` is "nlminb":
     #'   - Additional `optim_control` arguments passed as `control` to `stats::nlminb`.
     #'
     #'   If `optim_method` matches any of the algorithms in `nloptr`:
@@ -395,7 +397,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Additional arguments to be passed to the optimiser.
     #' @return
     #'   Returns the results from the optimisation with the approximated rates and execution time.
-    #' @seealso [vignette("diseasy-immunity")], [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
+    #' @seealso `vignette("diseasy-immunity")`, [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
     #'  [optimx::optimr]
     approximate_compartmental = function(
       method = c("free_gamma", "free_delta", "all_free"),
@@ -1072,7 +1074,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     ),
 
     #' @field available_methods (`character`)\cr
-    #'   The list of available methods
+    #'   The list of available methods. Read-only.
     available_methods = purrr::partial(
       .f = active_binding,
       name = "available_methods",
