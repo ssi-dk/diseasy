@@ -83,10 +83,12 @@ The input for the custom waning function includes:
 
 Here is an example of setting a custom waning function:
 ```{r custom waning function}
-im$set_custom_waning(custom_function = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
-                     time_scale = 30,
-                     target = "hospitalisation",
-                     name = "custom_waning")
+im$set_custom_waning(
+  custom_function = \(t) exp(- (t / time_scale)^2),
+  time_scale = 30,
+  target = "hospitalisation",
+  name = "gaussian_waning"
+)
 ```
 
 To visualize all the functions in the model, use the same plot function as above:
@@ -111,10 +113,12 @@ An example of how to set they two model examples from above, using the `?Diseasy
 follows:
 ```{r set waning models function}
 im$set_waning_model(model = "exponential_waning", time_scale = 20, target = "infection")
-im$set_waning_model(model = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
-                    time_scale = 30,
-                    target = "hospitalisation",
-                    name = "custom_waning")
+im$set_waning_model(
+  model = \(t) exp(- (t / time_scale)^2),
+  time_scale = 30,
+  target = "hospitalisation",
+  name = "gaussian_waning"
+)
 ```
 
 # Changing the time scale
