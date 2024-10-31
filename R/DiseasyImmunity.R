@@ -55,7 +55,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Check if the model has a time_scale attribute
         dots <- attr(private$.model[[.y]], "dots")
         if (!("time_scale" %in% names(dots))) {
-          stop(dots, " does not use time_scale argument")
+          stop("Model for ", .y, " (\"", attr(private$.model[[.y]], "name"), "\") does not use time_scale argument!")
         }
 
         # Update the time_scale for the model
