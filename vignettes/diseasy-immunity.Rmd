@@ -62,7 +62,7 @@ The name of the chosen target is arbitrary within the context of the `?DiseasyIm
 
 Here is an example of how to set the exponential waning model.
 ```{r setting the models}
-im$set_exponential_waning(time_scale = 20, target = "infection")
+im$set_sigmoidal_waning(time_scale = 20, target = "infection")
 ```
 To inspect that the model has been set correctly use `im$model`
 
@@ -85,7 +85,7 @@ Here is an example of setting a custom waning function:
 ```{r custom waning function}
 im$set_custom_waning(
   custom_function = \(t) exp(- (t / time_scale)^2),
-  time_scale = 30,
+  time_scale = 40,
   target = "hospitalisation",
   name = "gaussian_waning"
 )
@@ -112,10 +112,10 @@ as additional arguments.
 An example of how to set they two model examples from above, using the `?DiseasyImmunity$set_waning_model()` is as
 follows:
 ```{r set waning models function}
-im$set_waning_model(model = "exponential_waning", time_scale = 20, target = "infection")
+im$set_waning_model(model = "sigmoidal_waning", time_scale = 20, target = "infection")
 im$set_waning_model(
   model = \(t) exp(- (t / time_scale)^2),
-  time_scale = 30,
+  time_scale = 40,
   target = "hospitalisation",
   name = "gaussian_waning"
 )
