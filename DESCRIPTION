@@ -23,6 +23,7 @@ Depends:
     diseasystore,
     R (>= 3.5.0)
 Imports:
+    BB,
     checkmate,
     digest,
     dplyr,
