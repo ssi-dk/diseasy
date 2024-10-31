@@ -1,4 +1,6 @@
-linters: c(
+linters: {
+  devtools::load_all()
+  c(
     diseasy_code_linters(),
     all_linters(
       # We allow for longer function and variable names
@@ -17,6 +19,7 @@ linters: c(
       expect_identical_linter = NULL      # Seems a little aggressive to require this.
     )
   )
+  }
 exclude_linter: r"{^ *: *([\w, ]*)(.|$)}"
 exclusions: list(
     "R/0_linters.R" = list(
