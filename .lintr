@@ -1,6 +1,9 @@
 linters: c(
     diseasy_code_linters(),
     all_linters(
+      # We allow for longer function and variable names
+      object_length_linter = lintr::object_length_linter(40L),
+      # Disable other linters
       namespace_linter = NULL,
       line_length_linter = NULL,          # We use 120, nolint-aware line length linter instead
       cyclocomp_linter = NULL,            # Not required in diseasy style guide
