@@ -212,7 +212,12 @@ total_results |>
     values_from = c("strategy", "optim_method", "value"),
     values_fn = list
   ) |>
-  dplyr::select("penalty", dplyr::ends_with("free_delta"), dplyr::ends_with("free_gamma"), dplyr::ends_with("all_free")) |>
+  dplyr::select(
+    "penalty",
+    dplyr::ends_with("free_delta"),
+    dplyr::ends_with("free_gamma"),
+    dplyr::ends_with("all_free")
+  ) |>
   tidyr::unnest_longer(!"penalty") |>
   gt::gt() |>
   gt::tab_spanner(
@@ -319,7 +324,13 @@ gt_tables <- split_data |>
         values_from = c("strategy", "optim_method", "value"),
         values_fn = list
       ) |>
-      dplyr::select("target", "penalty", dplyr::ends_with("free_delta"), dplyr::ends_with("free_gamma"), dplyr::ends_with("all_free")) |>
+      dplyr::select(
+        "target",
+        "penalty",
+        dplyr::ends_with("free_delta"),
+        dplyr::ends_with("free_gamma"),
+        dplyr::ends_with("all_free")
+      ) |>
       tidyr::unnest_longer(!c("target", "penalty")) |>
       gt::gt() |>
       gt::tab_spanner(
@@ -349,7 +360,7 @@ gt_tables <- split_data |>
         style = gt::cell_borders(
           sides = "left",
           weight = gt::px(3),
-          color = "grey40",
+          color = "grey40"
         ),
         locations = gt::cells_body(
           columns = dplyr::starts_with("strategy")
