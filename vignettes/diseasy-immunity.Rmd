@@ -95,19 +95,20 @@ plot(im)
 ```
 
 ## Setting the waning model programmatically
-`?DiseasyImmunity` also provides the `$set_waning_model()` function which allows greater flexibility when configuring
-various waning models within the module.
+`?DiseasyImmunity` also provides the `?DiseasyImmunity$set_waning_model()` function which allows greater flexibility
+when configuring various waning models within the module.
 
-`$set_waning_model()` provides a single entry-point for setting the predefined waning models or a custom waning
-function based on the specified `model` and `target`.
+`?DiseasyImmunity$set_waning_model()` provides a single entry-point for setting the predefined waning models or a
+custom waning function based on the specified `model` and `target`.
 
-If `model` is a `function`, it will be set as a custom waning function via `$set_custom_waning()`.
+If `model` is a `function`, it will be set as a custom waning function via `?DiseasyImmunity$set_custom_waning()`.
 If instead it is `character`, the corresponding to `$set_<model>()` method will be used to set the waning model.
 
-Input for both predefined models and custom waning functions can be passed to the `$set_waning_model()` as additional
-arguments.
+Input for both predefined models and custom waning functions can be passed to the `?DiseasyImmunity$set_waning_model()`
+as additional arguments.
 
-An example of how to set they two model examples from above, using the `$set_waning_model()` is as follows:
+An example of how to set they two model examples from above, using the `?DiseasyImmunity$set_waning_model()` is as
+follows:
 ```{r set waning models function}
 im$set_waning_model(model = "exponential_waning", time_scale = 20, target = "infection")
 im$set_waning_model(model = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
@@ -119,8 +120,8 @@ im$set_waning_model(model = \(t) 1 / (1 + exp((t - time_scale) / time_scale)),
 # Changing the time scale
 It is also possible to change the characteristic time scale after setting the model.
 
-This is done via the method `$set_time_scales()` which takes a named list as input and changes time scales of waning
-functions associated with the named targets.
+This is done via the method `?DiseasyImmunity$set_time_scales()` which takes a named list as input and changes time
+scales of waning functions associated with the named targets.
 
 Following is an example of how to change the time scale for the two targets in the current models.
 ```{r setting the time scale}
@@ -151,7 +152,7 @@ that best approximates the set waning functions:
 
 These methods help approximate all the models in the current instance of the module.
 
-The input for the `$approximate_compartmental()` function includes:
+The input for the `?DiseasyImmunity$approximate_compartmental()` function includes:
 
 - `method`: One of the methods from above - "rate_equal", "gamma_fixed_step" or "all_free".
 - `N`: The number of compartments to use for the approximation.
@@ -178,7 +179,7 @@ Therefore it is crucial to select the right N as too few compartments can lead t
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
 The elbow curve method is employed to determine the appropriate N for the models.
 Each approach is executed across a range of N values, and the resulting objective function values are returned as
-`value` from the approximate_compartmental function.
+`value` from the `?DiseasyImmunity$approximate_compartmental()` function.
 
 ```{r elbow curve method, fig.alt = "Increasing number of compartments has diminising returns on the error."}
 # Prepare the data
