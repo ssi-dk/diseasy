@@ -49,10 +49,10 @@ time_scales <- c(rep(20, length(f)), rep(20, length(g)), rep(40, length(h)))
 ## Optimisation helper
 
 # Below we implement a optimisation helper that:
-# 1: Unpacks the problem configuration (N, method, opitimisation algorithm, etc)
+# 1: Unpacks the problem configuration (N, method, optimisation algorithm, etc)
 # 2: Configures the `DiseasyImmunity` instance
 # 3: Runs and stores the approximation to disk
-optimiser <- function(combinations, monotonous, individual_level, cache, ordering, future.scheduling = 1) {
+optimiser <- function(combinations, monotonous, individual_level, cache, ordering, future_scheduling = 1) {
 
   # Run approximations with a progress bar
   progressr::with_progress(
@@ -68,7 +68,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
       invisible(future.apply::future_lapply(
         combinations,
         future.seed = TRUE,
-        future.scheduling = future.scheduling,
+        future.scheduling = future_scheduling,
         FUN = \(combination) {
 
           # Ensure monotonous and individual_level settings are copied to parallel workers
@@ -87,7 +87,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
           strategy <- combination[[1]][[3]]
 
           # Unpack problem size and optimisation algorithm
-          N <- combination[[1]][[4]]
+          N <- combination[[1]][[4]]                                                                                    # nolint: object_name_linter
           optim_control <- combination[[1]][[5]]
 
           # Determine the "label" for the optimisation algorithm
@@ -96,7 +96,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
             tidyr::unite("label", tidyselect::everything())
 
           optim_label <- tolower(paste(mc$label, collapse = "_")) |>
-            stringr::str_replace("1e-", "r1e")
+            stringr::str_replace(stringr::fixed("1e-"), "r1e")
 
 
           # Configure `DiseasyImmunity`
@@ -108,10 +108,10 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
           key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{N}")
 
           # Get the results up until now
-          current_approxes <- cache$get(key = key)
+          current_approximations <- cache$get(key = key)
 
           # Compute next values
-          if (!(model_name %in% names(current_approxes))) {
+          if (!(model_name %in% names(current_approximations))) {
 
             try(
               {
@@ -125,21 +125,21 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
                 )
 
                 # Get cache again
-                current_approxes <- cache$get(key = key)
+                current_approximations <- cache$get(key = key)
 
 
                 # Generate initial list if needed
-                if (cachem::is.key_missing(current_approxes)) {
-                  current_approxes <- list()
+                if (cachem::is.key_missing(current_approximations)) {
+                  current_approximations <- list()
                 }
 
 
                 # Append approximation to existing results for the algorithm
-                current_approxes <- modifyList(current_approxes, stats::setNames(list(approx), model_name))
+                current_approximations <- modifyList(current_approximations, stats::setNames(list(approx), model_name))
 
 
                 # Store to cache
-                cache$set(key = key, current_approxes)
+                cache$set(key = key, current_approximations)
               }
             )
           }
@@ -154,7 +154,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 }
 
 
-# Run the optmisation
+# Run the optimisation
 path <- devtools::package_file("data-raw/diseasy_immunity_optimiser_results/")
 cache <- cachem::cache_disk(dir = path, max_size = Inf)
 
@@ -256,13 +256,13 @@ for (penalty in c(0, 1)) {
 
   # Set labels for the methods
   optim_labels <- optim_configs$config |>
-    purrr::map_chr( ~ {
+    purrr::map_chr(~ {
       .x |>
         as.data.frame() |>
         tidyr::unite("label", tidyselect::everything()) |>
         dplyr::pull("label") |>
         paste(collapse = "_") |>
-        stringr::str_replace("1e-", "r1e")
+        stringr::str_replace(stringr::fixed("1e-"), "r1e")
     }) |>
     tolower()
 
@@ -298,7 +298,7 @@ for (penalty in c(0, 1)) {
         "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
       ),
       "N" = N,
-      "optim_method" = optim_labels,
+      "optim_method" = optim_labels
     ) |>
       dplyr::mutate("target_label" = purrr::map_chr(.data$model, ~ purrr::pluck(., 2))) |>
       tidyr::separate_wider_delim(
@@ -328,12 +328,13 @@ for (penalty in c(0, 1)) {
       index <- rev(order(combinations_w_time$execution_time))
 
       # Use matrix to distribute across workers
-      ordering <- as.numeric(matrix(index[1:(ceiling(length(index) / workers) * workers)], ncol = workers, byrow = T))
+      ordering <- matrix(index[1:(ceiling(length(index) / workers) * workers)], ncol = workers, byrow = TRUE) |>
+        as.numeric()
       ordering <- ordering[!is.na(ordering)]
     }
 
-    future.scheduling <- 1
-    attr(future.scheduling, "ordering") <- ordering
+    future_scheduling <- 1
+    attr(future_scheduling, "ordering") <- ordering
 
 
     # Run the optimisation problem for the configurations
@@ -342,7 +343,7 @@ for (penalty in c(0, 1)) {
       monotonous = monotonous,
       individual_level = individual_level,
       cache = cache,
-      future.scheduling = future.scheduling
+      future_scheduling = future_scheduling
     )
 
 
