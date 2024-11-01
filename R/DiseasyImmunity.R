@@ -454,16 +454,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # We need to know the number of models the gamma's belong to
         n_models <- length(self$model)
 
+        # We pre-compute the value for the last gamma values
+        f_inf <- purrr::map(self$model, \(model) model(Inf))
+
         if (method  == "free_gamma") {
           # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
           # The last parameter is the delta rate which is identical for all compartments
-          n_free_parameters <- (N - 1) * n_models + 1
+          n_free_parameters <- (N - 1) * n_models + as.numeric(N > 1)
 
-          par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - 1)]) # Last parameter is delta
-          par_to_gamma <- \(par, model_id, f_inf) {
+          par_to_delta <- \(par) p_0inf(par[-seq_len(max(0, n_free_parameters - 1))]) # Last parameter is delta
+          par_to_gamma <- \(par, model_id) {
             c(
               p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
-              f_inf # And inject the fixed end-point
+              f_inf[[model_id]] # And inject the fixed end-point
             )
           }
 
@@ -471,8 +474,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
           n_free_parameters <- N - 1
 
+          f_0 <- purrr::map(self$model, \(model) model(0))
+
           par_to_delta <- \(par) p_0inf(par) # All parameters are delta
-          par_to_gamma <- \(par, model_id, f_inf) seq(from = 1, to = f_inf, length.out = N) # gammas: 1 to f_inf
+
+          # gammas: f_0 to f_inf. Has to be in reverse order for N = 1, since then only the from
+          # value is generated. This needs to be f_inf to make the integral difference go to zero
+          # as we integrate to infinity
+          par_to_gamma <- \(par, model_id) rev(seq(from = f_inf[[model_id]], to = f_0[[model_id]], length.out = N))
 
         } else if (method == "all_free") {
           # All parameters are free to vary
@@ -481,13 +490,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
           n_free_parameters <- (N - 1) * n_models + N - 1
 
           par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - (N - 1))]) # Last N-1 parameters are the deltas
-          par_to_gamma <- \(par, model_id, f_inf) {
+          par_to_gamma <- \(par, model_id) {
             c(
               p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
-              f_inf # And inject the fixed end-point
+              f_inf[[model_id]] # And inject the fixed end-point
             )
           }
-
         }
 
         # For the optimisation, we define the objective function which loops over each model and computes the total
@@ -498,7 +506,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           metrics <- purrr::map(seq_along(self$model), \(model_id) {
 
             delta <- par_to_delta(par)
-            gamma <- par_to_gamma(par, model_id, self$model[[model_id]](Inf))
+            gamma <- par_to_gamma(par, model_id)
 
             # Some optimisers yield non-finite delta
             if (any(is.infinite(delta)) || anyNA(delta) || anyNA(gamma)) {
@@ -572,8 +580,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
           gamma <- purrr::map(private$.model, \(model) model(Inf)) |>
             stats::setNames(names(private$.model))
           delta <- numeric(0)
-          value <- obj_function(numeric(0))
-          res <- list()
+
+          # Get the metrics for the solution
+          par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          metrics <- obj_function(par)
+          res <- list("value" = sum(metrics), "message" = "No free parameters to optimise")
 
         } else {
           # We provide a starting guess for the rates
@@ -883,7 +894,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           # Map optimised parameters to rates
           gamma <- purrr::map2(private$.model, seq_along(private$.model), ~ {
-            par_to_gamma(res$par, .y, .x(Inf))
+            par_to_gamma(res$par, .y)
           }) |> stats::setNames(names(private$.model))
 
           delta <- par_to_delta(res$par)
@@ -892,7 +903,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # For the recursive and combination strategies, we need to add the execution time from the previous
         # optimisations
-        if (strategy == "recursive" && N > 2) {
+        if (N == 1) {
+
+          execution_time_offset <- 0
+
+        } else if (strategy == "recursive" && N > 2) {
 
           execution_time_offset <- seq(from = 2, to = N - 1, by = 1) |>
             purrr::map_dbl(\(N) {
