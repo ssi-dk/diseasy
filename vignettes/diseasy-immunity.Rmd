@@ -50,7 +50,6 @@ im$available_waning_models
 ```
 
 # Setting a waning model in the module
-
 The input for the predefined waning models include:
 
 - `target`: The specific aspect towards which immunity is waning, such as "infection".
@@ -152,10 +151,10 @@ that best approximates the set waning functions:
 
 - Method 1 (`free_gamma`): $\gamma_n$ values are allowed to vary freely, while the $\delta_n$ rates are equal
   between compartments ($\delta_n = \delta$).
-  
+
 - Method 2 (`free_delta`): $\gamma_n$ values are linearly distributed from $f(0)$ to $f(\infty)$,
   and $\delta_n$ are allowed to vary freely.
-  
+
 - Method 3 (`all_free`): Both $\gamma_n$ and $\delta_n$ are allowed to vary freely.
 
 These methods help approximate all the models in the current instance of the module.
