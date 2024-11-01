@@ -34,6 +34,7 @@ ones <- \(shape) matrix(rep(1, shape))
 #'   qhypo(0.75, shape = 2, rate = c(1, 2))
 #'   qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
 #' @name HypoDist
+#' @export
 dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
   # For the first compartment, the problem is simply an exponential distribution
@@ -55,6 +56,7 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
 
 #' @rdname HypoDist
+#' @export
 phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {                                              # nolint: object_name_linter
 
   # For the first compartment, the problem is simply an exponential distribution
@@ -78,6 +80,7 @@ phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 
 
 #' @rdname HypoDist
+#' @export
 qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {                                              # nolint: object_name_linter
 
   # For the first compartment, the problem is simply an exponential distribution
