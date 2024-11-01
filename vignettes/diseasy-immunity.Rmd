@@ -150,17 +150,20 @@ Some definitions:
 Three approaches are available for determining the transition rates, $\delta_n$, and protective effect, $\gamma_n$,
 that best approximates the set waning functions:
 
-- Method 1 (`rate_equal`): $\gamma_n$ values are allowed to vary freely, while the $\delta_n$ rates are equal
+- Method 1 (`free_gamma`): $\gamma_n$ values are allowed to vary freely, while the $\delta_n$ rates are equal
   between compartments ($\delta_n = \delta$).
-- Method 2 (`gamma_fixed_step`): $\gamma_n$ values are monotonously decreasing ($\gamma_n = (n-1)\;/\;(N-1)$),
+  
+- Method 2 (`free_delta`): $\gamma_n$ values are linearly distributed from $f(0)$ to $f(\infty)$,
   and $\delta_n$ are allowed to vary freely.
+  
 - Method 3 (`all_free`): Both $\gamma_n$ and $\delta_n$ are allowed to vary freely.
 
 These methods help approximate all the models in the current instance of the module.
 
 The input for the `?DiseasyImmunity$approximate_compartmental()` function includes:
 
-- `method`: One of the methods from above - "rate_equal", "gamma_fixed_step" or "all_free".
+- `method`: One of the methods from above - "free_gamma", "free_delta" or "all_free".
+- `strategy`: How initial values for the optimisation should be chosen - "naive", "recursive" or "combination".
 - `N`: The number of compartments to use for the approximation.
 - `optim_control`: A configuration of the optimiser. The approximation to the compartmental model is a hard
   optimisation problem where the choice of the optimiser can have a significant impact on the quality of the fit.
@@ -190,7 +193,7 @@ Each approach is executed across a range of N values, and the resulting objectiv
 ```{r elbow curve method, fig.alt = "Increasing number of compartments has diminising returns on the error."}
 # Prepare the data
 N_seq <- seq(from = 2, to = 5, by = 1)                                                                                  # nolint: object_name_linter
-methods <- c("free_gamma", "free_delta", "all_free", "all_free_combi")
+methods <- c("free_gamma", "free_delta", "all_free")
 im$set_sigmoidal_waning(time_scale = 20, target = "infection")
 
 # Run each function
