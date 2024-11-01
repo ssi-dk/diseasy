@@ -1011,12 +1011,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
       # Create palette with different colours to use in plot
-      colors <- palette()
+      colours <- palette()
 
 
       # Plot lines for each model
       purrr::walk2(private$.model, seq_along(private$.model), ~ {
-        lines(t, purrr::map_dbl(t, .x), col = colors[1 + .y])
+        lines(t, purrr::map_dbl(t, .x), col = colours[1 + .y])
       })
 
 
@@ -1027,7 +1027,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         delta <- approximation$delta
 
         purrr::walk2(gamma, seq_along(private$.model), ~ {
-          lines(t, private$get_approximation(.x, delta, N)(t), col = colors[1 + .y], lty = "dashed")
+          lines(t, private$get_approximation(.x, delta, N)(t), col = colours[1 + .y], lty = "dashed")
         })
       }
 
@@ -1039,7 +1039,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         legend(
           "topright",
           legend = names(private$.model),
-          col = purrr::map_chr(seq_along(private$.model), ~ colors[1 + .x]),
+          col = purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]),
           lty = 1,
           inset = c(0, 0),
           bty = "n",
@@ -1059,8 +1059,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
           "topright",
           legend = combined_legend,
           col = c(
-            purrr::map_chr(seq_along(private$.model), ~ colors[1 + .x]),
-            purrr::map_chr(seq_along(private$.model), ~ colors[1 + .x])
+            purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]),
+            purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x])
           ),
           lty = combined_lty,
           inset = c(0, 0),
