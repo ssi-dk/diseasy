@@ -394,6 +394,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Returns the results from the optimisation with the approximated rates and execution time.
     #' @seealso `vignette("diseasy-immunity")`, [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
     #'  [optimx::optimr]
+    #' @import nloptr
+    #' @importFrom optimx optimr
+    #' @importFrom BB spg
+    #' @importFrom ucminf ucminf
     approximate_compartmental = function(
       N,                                                                                                                # nolint: object_name_linter
       method = c("free_gamma", "free_delta", "all_free"),
