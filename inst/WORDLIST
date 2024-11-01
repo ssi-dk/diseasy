@@ -1,6 +1,10 @@
+aes
+alt
 antiphase
 AR
 ARI
+
+bobyqa
 
 CCW
 
@@ -58,10 +62,10 @@ Engbo
 epiverse
 erviss
 
-fn
-fns
 FeatureHandler
 FeatureHandlers
+fn
+fns
 frac
 
 github
@@ -98,6 +102,7 @@ Myrup
 
 Nelder
 nlm
+nlminb
 nloptr
 nolint
 normalise
@@ -108,6 +113,7 @@ ORCID
 org
 
 param
+parameterise
 parsable
 PascalCase
 pcbi
@@ -136,6 +142,7 @@ SEIR
 sigmoidal
 simulist
 Skytte
+spg
 SSI
 Statens
 sql
@@ -151,6 +158,7 @@ TODOs
 ts
 
 u
+ucminf
 
 walkthrough
 www
