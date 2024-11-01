@@ -1,3 +1,6 @@
 # diseasy 0.0.0.9000
 
-* Added a `NEWS.md` file to track changes to the package.
+## Features:
+
+* `DiseasyImmunity`: A functional module to implement scenarios for waning immunity (#101).
+  For examples of usage, see `vignette("diseasy-immunity")`
