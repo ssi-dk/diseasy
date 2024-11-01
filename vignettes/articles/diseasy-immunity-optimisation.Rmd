@@ -26,7 +26,6 @@ im <- DiseasyImmunity$new()
 
 
 # Motivation
-
 From our testing, we have learned that method used to express the waning immunity in a compartmental model[^1]
 is a hard optimisation problem. Depending on the choice of optimisation algorithm, the quality of the approximation
 will vary wildly as well as the time it takes for the algorithm to converge.
@@ -34,7 +33,7 @@ will vary wildly as well as the time it takes for the algorithm to converge.
 To mitigate this issue, we here investigate the effect of optimisation algorithm to find the optimisation algorithms
 that finish in reasonable time and provide the best approximation of the target waning immunity.
 
-`?DiseasyImmunity` can internally employ the optimisation algorithms of `stats::optim`, `{nloptr}` and
+`?DiseasyImmunity` can internally employ the optimisation algorithms of `{stats}`, `{nloptr}` and
 `optimx::optimr()`, which means that we have around 30 different algorithms to test.
 
 Note that the nature of the optimisation problem also changes dependent on the method used to approximate
@@ -43,7 +42,6 @@ algorithm that performs well for one method will not necessarily perform well on
 
 
 # Setup
-
 Since we are searching for a "general" best choice of optimisation algorithm, we will define a setup that tests
 a wide range of waning immunity targets.
 
@@ -52,13 +50,13 @@ These start at 1 and go to 0 within a time scale, $\tau$.
 
 These targets are:
 
-| Function            | Functional form                                                                                 |
-| ------------------- | ----------------------------------------------------------------------------------------------- |
-| Exponential         | $\exp\!\!(-t / \tau)$                                                                           |
-| Sigmoidal           | $\exp\!\!(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6))$                               |
-| Heaviside           | $\Theta(\tau - t)$                                                                              |
-| Sum of exponentials | $\frac{1}{3}\left(\!\exp\!\!(-t / \tau) + \exp\!\!(-2t / \tau) + \exp\!\!(-3t / \tau)\right)$ |
-| Linear              | $\sup\!\!(\{1 - t/\tau, 0\})$                                                                   |
+| Function            | Functional form                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Exponential         | $\exp\!\!(-t / \tau)$                                                                          |
+| Sigmoidal           | $\exp\!\!(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6))$                              |
+| Heaviside           | $\Theta(\tau - t)$                                                                             |
+| Sum of exponentials | $\frac{1}{3}\left(\!\exp\!\!(-t / \tau) + \exp\!\!(-2t / \tau) + \exp\!\!(-3t / \tau)\right)$  |
+| Linear              | $\sup\!\!(\{1 - t/\tau, 0\})$                                                                  |
 
 We then construct more target functions from this family of functions:
 
@@ -68,7 +66,6 @@ We then construct more target functions from this family of functions:
 
 
 # The optimisation
-
 As stated above, the optimisation algorithms vary wildly in the time it takes to complete the optimisation.
 To conduct this test in a reasonable time frame (and to determine algorithms that are reasonably efficient), we setup
 a testing schema consisting of a number of "rounds" where we incrementally increase the number of compartments in the
@@ -84,14 +81,13 @@ the reduced set of algorithms.
 The entire optimisation process is run both without penalty (`monotonous = 0` and `individual_level = 0`) and with a
 penalty (`monotonous = 1` and `individual_level = 1`).
 
-The results of the optimisation round in stored in the `diseasy_immunity_optimiser_results` data-set.
+The results of the optimisation round in stored in the `?diseasy_immunity_optimiser_results` data-set.
 
 ```{r}
 results <- diseasy_immunity_optimiser_results
 
 results
 ```
-
 
 
 ```{r, include = F}
@@ -247,7 +243,7 @@ total_results |>
     style = gt::cell_borders(
       sides = "left",
       weight = gt::px(3),
-      color = "grey40"
+      colour = "grey40"
     ),
     locations = gt::cells_body(
       columns = dplyr::starts_with("strategy")
@@ -257,7 +253,7 @@ total_results |>
     style = gt::cell_borders(
       sides = "right",
       weight = gt::px(3),
-      color = "grey40"
+      colour = "grey40"
     ),
     locations = gt::cells_body(
       columns = dplyr::starts_with("value")
@@ -267,7 +263,7 @@ total_results |>
     style = gt::cell_borders(
       sides = "top",
       weight = gt::px(3),
-      color = "grey40"
+      colour = "grey40"
     ),
     locations = gt::cells_body(
       rows = 6
@@ -282,13 +278,13 @@ In total, we find that the choice for best, general optimiser/strategy combinati
 we include the penalty for the optimisation. The best optimiser/strategy combination varies only by the method
 employed to parameterise the waning immunity.
 
-As a result, we emply the following optimiser/strategy combinations as defaults for the `DiseasyImmunity` class:
+As a result, we employ the following optimiser/strategy combinations as defaults for the `?DiseasyImmunity` class:
 
-| Method     | Strategy  | Optimiser |
-|------------|-----------|-----------|
-| free_delta | recursive | ucminf    |
-| free_gamma | naiive    | spg       |
-| all_free   | combi     | bobyqa    |
+| Method     | Strategy    | Optimiser |
+|------------|-------------|-----------|
+| free_delta | recursive   | ucminf    |
+| free_gamma | naive       | spg       |
+| all_free   | combination | bobyqa    |
 
 However, as we see in the [Per target results](#per-target-results) section below, the choice of optimiser/strategy
 can be improved when accounting for the specific target function.
@@ -360,7 +356,7 @@ gt_tables <- split_data |>
         style = gt::cell_borders(
           sides = "left",
           weight = gt::px(3),
-          color = "grey40"
+          colour = "grey40"
         ),
         locations = gt::cells_body(
           columns = dplyr::starts_with("strategy")
@@ -370,7 +366,7 @@ gt_tables <- split_data |>
         style = gt::cell_borders(
           sides = "right",
           weight = gt::px(3),
-          color = "grey40"
+          colour = "grey40"
         ),
         locations = gt::cells_body(
           columns = dplyr::starts_with("value")
@@ -380,7 +376,7 @@ gt_tables <- split_data |>
         style = gt::cell_borders(
           sides = "top",
           weight = gt::px(3),
-          color = "grey40"
+          colour = "grey40"
         ),
         locations = gt::cells_body(
           rows = 4
