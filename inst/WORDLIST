@@ -1,11 +1,16 @@
+aes
+alt
 antiphase
 AR
+
+bobyqa
 
 CCW
 
 backends
 bitemporal
 
+cdot
 classname
 cloneable
 CMD
@@ -44,10 +49,11 @@ Eggo
 endblock
 Engbo
 
-fn
-fns
 FeatureHandler
 FeatureHandlers
+fn
+fns
+frac
 
 github
 gov
@@ -75,9 +81,11 @@ md
 medrxiv
 Mielke
 moduleowner
+Myrup
 
 Nelder
 nlm
+nlminb
 nloptr
 nolint
 normalise
@@ -87,6 +95,7 @@ OO
 ORCID
 org
 
+parameterise
 parsable
 PascalCase
 pcbi
@@ -113,6 +122,7 @@ Schou
 SEIR
 sigmoidal
 Skytte
+spg
 SSI
 Statens
 sql
@@ -125,6 +135,7 @@ TODOs
 ts
 
 u
+ucminf
 
 www
 
