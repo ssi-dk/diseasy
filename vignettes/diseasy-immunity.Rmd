@@ -137,7 +137,9 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 (e.g. the Susceptible-Infected-Recovered-Susceptible (SEIR) models).
 
 The approximation assumes the model has a number of sequential R compartments and then provides the transition rates
-and associated risks for each compartment that best approximates set waning functions.
+and associated risks for each compartment that best approximates set waning functions (see Figure 1 for a illustration).
+
+![Figure 1: Illustration of the comparmental model strucutre.](vignette_data/diseasy-immunity-model-structure.png)
 
 Some definitions:
 
