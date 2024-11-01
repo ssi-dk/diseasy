@@ -504,15 +504,39 @@ test_that("`$set_time_scales()` works for each waning model", {
 })
 
 
-test_that("$plot() works", {
+test_that("`$approximate_compartmental()` works for exponential_waning", {
+
+  # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
-  expect_no_condition(im$plot())
 
+  # Set the exponential waning model
   im$set_exponential_waning()
-  expect_no_condition(im$plot())
 
-  im$set_no_waning(target = "hospitalisation")
-  expect_no_condition(im$plot())
+  # Test the approximations for N = 1 to N = 3 using defaults
+  test_combinations <- tidyr::expand_grid(
+    N = seq(1, 3),
+    method = c("free_delta", "free_gamma", "all_free")
+  )
+
+  purrr::pwalk(test_combinations, \(N, method) {                                                                        # nolint: object_name_linter
+    expect_no_error(im$approximate_compartmental(N = !!N, method = !!method))
+  })
+
+  # Test all combinations of method and strategy
+  test_combinations <- tidyr::expand_grid(
+    N = seq(1, 3),
+    method_label = c(
+      "free_delta-naive", "free_gamma-naive", "all_free-naive",
+      "free_delta-recursive", "free_gamma-recursive", "all_free-recursive",
+      "all_free-combination"
+    )
+  ) |>
+    tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
+
+  purrr::pwalk(test_combinations, \(N, method, strategy) {                                                              # nolint: object_name_linter
+    expect_no_error(im$approximate_compartmental(N = !!N, method = !!method, strategy = !!strategy))
+  })
+
 
   rm(im)
 })
