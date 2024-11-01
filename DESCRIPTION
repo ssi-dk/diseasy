@@ -58,6 +58,7 @@ Suggests:
     spelling,
     testthat (>= 3.0.0),
     tibble,
+    tidyr,
     withr,
     zoo
 VignetteBuilder: knitr,
