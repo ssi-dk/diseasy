@@ -462,6 +462,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # We pre-compute the value for the last gamma values
         f_inf <- purrr::map(self$model, \(model) model(Inf))
+        stopifnot("The waning function(s) must have finite values at infinity."={purrr::every(f_inf, is.finite)})
+
 
         if (method  == "free_gamma") {
           # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
