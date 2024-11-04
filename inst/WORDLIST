@@ -2,6 +2,7 @@ aes
 alt
 antiphase
 AR
+ARI
 
 bobyqa
 
@@ -10,6 +11,7 @@ CCW
 backends
 bitemporal
 
+catalog
 cdot
 classname
 cloneable
@@ -28,6 +30,7 @@ dbi
 DBIConnection
 DBIDriver
 dbplyr
+dI
 diseasy
 diseasystore
 DiseasystoreBase
@@ -38,16 +41,24 @@ DiseasyBaseModule
 DiseasyImmunity
 DiseasyObservables
 DiseasySeason
+DiseasyVariant
 dk
 DMI
 doi
 dplyr
+dR
 ds
+dS
+dt
 dtplyr
+DuckDB
 
+ecdc
+ECDC
 Eggo
 endblock
 Engbo
+erviss
 
 FeatureHandler
 FeatureHandlers
@@ -63,6 +74,7 @@ Heaviside
 hyopexponential
 
 ij
+ILI
 Institut
 
 ji
@@ -70,6 +82,7 @@ Jit
 
 Klepac
 Kirkeby
+kt
 
 Lasse
 linter
@@ -95,16 +108,16 @@ OO
 ORCID
 org
 
+param
 parameterise
 parsable
 PascalCase
 pcbi
+pid
 Plesner
 PLoS
 POSIXct
-pid
-
-param
+PostgreSQL
 
 quos
 
@@ -126,6 +139,7 @@ spg
 SSI
 Statens
 sql
+SQLite
 
 tbl
 Telkamp

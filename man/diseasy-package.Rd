@@ -6,6 +6,8 @@
 \alias{diseasy-package}
 \title{diseasy: Disease Ensemble Modelling Made Easy}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 This package facilitates creation of an ensemble of models through modular construction and combinatorics.
 }
 \seealso{

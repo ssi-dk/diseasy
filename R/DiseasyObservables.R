@@ -7,7 +7,7 @@
 #'   will therefore depend on the data made available by the diseasystores.
 #'
 #'   See vignette("diseasy-observables")
-#' @examples
+#' @examplesIf rlang::is_installed("RSQLite")
 #'   # Create observables module using the Google COVID-19 data
 #'   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
 #'                                 conn = DBI::dbConnect(RSQLite::SQLite()))
@@ -25,6 +25,7 @@
 #'   rm(obs)
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
+#' @keywords functional-module
 #' @export
 DiseasyObservables <- R6::R6Class(                                                                                      # nolint: object_name_linter
   classname = "DiseasyObservables",
@@ -148,7 +149,12 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Date to slice the database on
     #' @seealso [SCDB::get_table]
     set_slice_ts = function(slice_ts) {
-      checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE)
+      checkmate::assert(
+        checkmate::check_character(
+          slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE
+        ),
+        checkmate::check_date(slice_ts, any.missing = FALSE)
+      )
       private$.slice_ts <- slice_ts
       private$lg$info("slice_ts set to {self$slice_ts}")
     },
@@ -220,7 +226,7 @@ DiseasyObservables <- R6::R6Class(                                              
 
     #' @description `r rd_describe`
     describe = function() {
-      printr("# DiseasyObservables interface ######################################")
+      printr("# DiseasyObservables #########################################")
 
       printr(
         ifelse(
@@ -331,8 +337,8 @@ DiseasyObservables <- R6::R6Class(                                              
     ),
 
 
-    #' @field slice_ts (`Date`)\cr
-    #' The timestamp to slice database on. Read-only.
+    #' @field slice_ts (`Date` or `character`)\cr
+    #'   Date to slice the database on. See [SCDB::get_table()]. Read-only.
     slice_ts = purrr::partial(
       .f = active_binding,
       name = "slice_ts",
@@ -350,7 +356,7 @@ DiseasyObservables <- R6::R6Class(                                              
   ),
 
   private = list(
-    .diseasystore         = NULL,
+    .diseasystore        = NULL,
     .start_date          = NULL,
     .end_date            = NULL,
     .last_queryable_date = NULL,

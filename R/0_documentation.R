@@ -134,18 +134,24 @@ rd_target_schema <- function(type = "param") {
 }
 
 
-rd_training_length <- function(type = "param") {
+rd_diseasymodel_parameters <- paste(
+  "* `training_length` (`named numeric`)\\cr",
+  "  The number of days that should be included in the training splits of the data for the model.",
+  "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
+)
+
+
+rd_start_date <- function(type = "param", minimum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`numeric`)\\cr",
-        "The number of days that should be included in the training of the model.",
+  paste("(`Date`)\\cr",
+        paste0(ifelse(minimum, "(Minimum)", ""), "Study period start."),
         ifelse(type == "field", " Read only.", ""))
 }
 
-
-rd_start_date <- function(type = "param") {
+rd_end_date <- function(type = "param", maximum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date`)\\cr",
-        "Study period start.",
+        paste0(ifelse(maximum, "(Maximum)", ""), "Study period end."),
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -154,14 +160,6 @@ rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
         "Date or timestamp (parsable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
-        ifelse(type == "field", " Read only.", ""))
-}
-
-
-rd_end_date <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
-  paste("(`Date`)\\cr",
-        "Study period end.",
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -176,6 +174,7 @@ rd_.data <- function(type = "param") {                                          
 
 rd_describe <- "Prints a human readable report of the internal state of the module."
 
+
 rd_get_results_description <- paste(
   "The primary method used to request model results of a given observable at a given stratification"
 )
@@ -188,33 +187,11 @@ rd_get_results_return <- paste(
   "  model (`character`) the name (classname) of the model used to provide the prediction."
 )
 
+
 rd_get_results_seealso <- "[diseasy::DiseasyObservables]"
-
-rd_observable <- paste(
-  "(`character`)\\cr",
-  "The observable to provide prediction for. Must match observable in `DiseasyObservables` [R6][R6::R6Class] class."
-)
-
-rd_prediction_length <- paste(
-  "(`numeric`)\\cr",
-  "The number of days to predict.",
-  "The prediction start is defined by `last_queryable_date` of the `DiseasyObservables` [R6][R6::R6Class] class."
-)
-
-rd_quantiles <- paste(
-  "(`list`(`numeric`))\\cr",
-  "Default NULL.",
-  "If given, results are returned at the quantiles given."
-)
-
-rd_training_length <- paste(
-  "(`numeric`)\\cr",
-  "The number of days that should be included in the training of the model."
-)
 
 
 rd_side_effects <- "NULL (called for side effects)"
-
 
 
 rd_age_cuts_lower <- paste(

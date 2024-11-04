@@ -13,14 +13,30 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-options("tibble.print_min" = 5)
+# Create a cache for this vignette since the examples take a long time to generate
+# We will destroy the cache if the source code for `DiseasyObservables` changes
+cache <- cachem::cache_disk(dir = "vignette_data/cache/DiseasyObservables")
+source_code_hash <- digest::digest(DiseasyObservables)
+if (!identical(source_code_hash, cache$get("source-code-hash"))) {
+  cache$reset()
+  cache$set("source-code-hash", source_code_hash)
+}
+
+opts <- options(
+  "tibble.print_min" = 5,
+  "diseasy.logging" = FALSE,
+  "diseasy.DiseasyObservables.cache" = cache # Cache for 24 hours
+)
+
+# We have a "hard" dependency for RSQLite to render this vignette
+suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 ```{r setup}
 library(diseasy)
 ```
 
-```{r download, include = FALSE}
+```{r download, include = FALSE, eval = suggests_available}
 # Download the first n rows of the Google data set of interest
 tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
 remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
@@ -33,7 +49,6 @@ purrr::walk(google_files, \(file_name) {
 })
 options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir)
 options("diseasystore.DiseasystoreGoogleCovid19.verbose" = FALSE)
-options("diseasy.logging" = FALSE)
 ```
 
 # Introduction
@@ -44,7 +59,7 @@ The module is primarily a wrapper around `diseasystores` which means the availab
 # Configuring the module
 The module needs some configuration to be initialized. Some of these can be set through options.
 Primarily, we need to specify the `diseasystore`
-```{r initialization}
+```{r initialization, eval = suggests_available}
 obs <- DiseasyObservables$new(
   conn = DBI::dbConnect(RSQLite::SQLite())
 )
@@ -54,22 +69,22 @@ obs$set_diseasystore(diseasystore = "Google COVID-19")
 ```
 
 To see the data that comes with the underlying `diseasystore` we can query the module.
-```{r available_observables}
+```{r available_observables, eval = suggests_available}
 obs$available_observables
 ```
 
-```{r available_stratifications}
+```{r available_stratifications, eval = suggests_available}
 obs$available_stratifications
 ```
 
 To check the current status of the module, the `$describe()` method can be used:
-```{r describe}
+```{r describe, eval = suggests_available}
 obs$describe()
 ```
 
 # Getting observations
 We can query the model to give the data for a given observable in a given time frame:
-```{r example_1}
+```{r example_1, eval = suggests_available}
 obs$get_observation(observable = "n_population",
                     start_date = as.Date("2020-03-01"),
                     end_date = as.Date("2020-05-01"))
@@ -81,7 +96,7 @@ obs$get_observation(observable = "n_population",
 If we want to stratify our data, we supply the stratification argument.
 This argument is designed to be flexible, but it means they need to be wrapped in `rlang::quos()`.
 We will see below, why that is.
-```{r example_2}
+```{r example_2, eval = suggests_available}
 obs$get_observation(observable = "n_hospital",
                     stratification = rlang::quos(age_group),
                     start_date = as.Date("2020-03-01"),
@@ -89,7 +104,7 @@ obs$get_observation(observable = "n_hospital",
 ```
 
 Since the stratification is flexible, we can programmatically stratify:
-```{r example_3}
+```{r example_3, eval = suggests_available}
 obs$get_observation(observable = "n_hospital",
                     stratification = rlang::quos(young_age_groups =
                                                    age_group %in% c("00-09", "10-19")),
@@ -99,3 +114,8 @@ obs$get_observation(observable = "n_hospital",
 # NOTE: "target_conn" is a SQLite data base which has "numeric" as the "boolean" type.
 ```
 
+```{r cleanup, include = FALSE}
+if (exists("obs")) rm(obs)
+gc()
+options(opts)
+```

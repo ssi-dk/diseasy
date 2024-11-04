@@ -20,10 +20,11 @@ RoxygenNote: 7.3.2
 Language: en-GB
 LazyData: TRUE
 Depends:
-    diseasystore,
+    diseasystore (>= 0.2.2),
     R (>= 3.5.0)
 Imports:
     BB,
+    cachem,
     checkmate,
     digest,
     dplyr,
@@ -44,6 +45,7 @@ Imports:
 Suggests:
     contactdata,
     countrycode,
+    curl,
     DBI,
     devtools,
     duckdb,
