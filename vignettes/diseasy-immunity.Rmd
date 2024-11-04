@@ -189,6 +189,11 @@ The elbow curve method is employed to determine the appropriate N for the models
 Each approach is executed across a range of N values, and the resulting objective function values are returned as
 `value` from the `?DiseasyImmunity$approximate_compartmental()` function.
 
+In the example below, we have a case where the "all_free" method out performs the other methods, but
+this is not generally true. We find that the "all_free" method can be the best if the problem contains
+multiple time scales, but often performs no better than "free_gamma". 
+For more examples, see the optimisation vignette (`vignette("diseasy-immunity-optimisation")`).
+
 ```{r elbow curve method, fig.alt = "Increasing number of compartments has diminishing returns on the error."}
 # Prepare the data
 N_seq <- seq(from = 1, to = 5, by = 1)                                                                                  # nolint: object_name_linter
