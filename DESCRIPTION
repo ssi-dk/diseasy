@@ -22,6 +22,7 @@ Depends:
     diseasystore (>= 0.2.2),
     R (>= 3.5.0)
 Imports:
+    cachem,
     checkmate,
     digest,
     dplyr,
