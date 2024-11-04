@@ -145,9 +145,7 @@ diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NUL
       purrr::map(\(opt_regex) purrr::keep_at(options(), ~ stringr::str_detect(., opt_regex))) |>
       purrr::map(\(opts) purrr::discard(opts, ~ is.null(.) | identical(., ""))) |>
       purrr::discard(~ length(.) == 0) |>
-      purrr::map(unlist) |>
-      purrr::pluck(1, .default = .default) |>
-      unlist()
+      purrr::pluck(1)
 
     # Check options are non-ambiguous
     if (length(options) > 1) {
@@ -155,7 +153,7 @@ diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NUL
     }
 
     # Then remove the name from the option
-    options <- purrr::pluck(options, 1)
+    options <- purrr::pluck(options, 1, .default = .default)
   }
 
   return(options)
