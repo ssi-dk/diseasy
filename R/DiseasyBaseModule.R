@@ -260,6 +260,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     # @return
     #   (`NULL`) if object is given\cr
     #   (`object`) if no object is given
+    #' @import cachem
     cache = function(hash, obj) {
       if (missing(obj)) {
 
