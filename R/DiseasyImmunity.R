@@ -393,7 +393,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @return
     #'   Returns the results from the optimisation with the approximated rates and execution time.
     #' @seealso `vignette("diseasy-immunity")`, [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
-    #'  [optimx::optimr]
+    #'  [optimx::optimr], [ucminf::ucminf], [BB::spg], [nloptr::bobyqa]
     #' @import nloptr
     #' @importFrom optimx optimr
     #' @importFrom BB spg
