@@ -29,7 +29,7 @@ See the \code{vignette("diseasy-immunity")} for examples of use.
 }
 \seealso{
 \code{vignette("diseasy-immunity")}, \link[stats:optim]{stats::optim}, \link[stats:nlm]{stats::nlm}, \link[stats:nlminb]{stats::nlminb}, \link[nloptr:nloptr]{nloptr::nloptr},
-\link[optimx:optimr]{optimx::optimr}
+\link[optimx:optimr]{optimx::optimr}, \link[ucminf:ucminf]{ucminf::ucminf}, \link[BB:spg]{BB::spg}, \link[nloptr:bobyqa]{nloptr::bobyqa}
 }
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyImmunity}
