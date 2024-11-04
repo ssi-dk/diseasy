@@ -1,3 +1,11 @@
+# Store the current options (for later conservation test -- see test-zzz.R)
+diseasy_opts <- purrr::keep(names(options()), ~ startsWith(., "diseasystore.")) |>
+  purrr::map(options) |>
+  purrr::reduce(c)
+
+# Store the current files (for later conservation test -- see test-zzz.R)
+current_files <- dir(recursive = TRUE)
+
 # Disable logging while testing
 lgr::suspend_logging()
 
