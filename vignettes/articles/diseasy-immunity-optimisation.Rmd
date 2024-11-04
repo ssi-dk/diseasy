@@ -20,7 +20,6 @@ library(diseasy)
 
 
 ```{r reset}
-if (exists("im")) rm(im)
 im <- DiseasyImmunity$new()
 ```
 
