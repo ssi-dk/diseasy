@@ -472,20 +472,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         stopifnot("The waning function(s) must have finite values at infinity."={purrr::every(f_inf, is.finite)})
 
 
-        if (method  == "free_gamma") {
-          # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
-          # The last parameter is the delta rate which is identical for all compartments
-          n_free_parameters <- (N - 1) * n_models + as.numeric(N > 1)
-
-          par_to_delta <- \(par) p_0inf(par[-seq_len(max(0, n_free_parameters - 1))]) # Last parameter is delta
-          par_to_gamma <- \(par, model_id) {
-            c(
-              p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
-              f_inf[[model_id]] # And inject the fixed end-point
-            )
-          }
-
-        } else if (method == "free_delta") {
+        if (method == "free_delta") {
           # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
           n_free_parameters <- N - 1
 
@@ -497,6 +484,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # value is generated. This needs to be f_inf to make the integral difference go to zero
           # as we integrate to infinity
           par_to_gamma <- \(par, model_id) rev(seq(from = f_inf[[model_id]], to = f_0[[model_id]], length.out = N))
+
+        } else if (method  == "free_gamma") {
+          # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
+          # The last parameter is the delta rate which is identical for all compartments
+          n_free_parameters <- (N - 1) * n_models + as.numeric(N > 1)
+
+          par_to_delta <- \(par) p_0inf(par[-seq_len(max(0, n_free_parameters - 1))]) # Last parameter is delta
+          par_to_gamma <- \(par, model_id) {
+            c(
+              p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
+              f_inf[[model_id]] # And inject the fixed end-point
+            )
+          }
 
         } else if (method == "all_free") {
           # All parameters are free to vary
