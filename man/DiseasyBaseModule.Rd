@@ -65,7 +65,7 @@ This module is typically not constructed directly but rather through derived cla
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$new(
   moduleowner = class(self)[1],
   logging = diseasyoption("logging", self),
-  cache = cachem::cache_mem(max_size = Inf)
+  cache = diseasyoption("cache", self, .default = cachem::cache_mem(max_size = Inf))
 )}\if{html}{\out{</div>}}
 }
 

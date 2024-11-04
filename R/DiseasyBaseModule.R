@@ -45,7 +45,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     initialize = function(
       moduleowner = class(self)[1],
       logging = diseasyoption("logging", self),
-      cache = cachem::cache_mem(max_size = Inf)
+      cache = diseasyoption("cache", self, .default = cachem::cache_mem(max_size = Inf))
     ) {
 
       private$logging <- logging
