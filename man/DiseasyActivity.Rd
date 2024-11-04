@@ -67,7 +67,7 @@ A reduced view of the internal state of restrictions (showing only used activity
 \item{\code{risk_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.  Read only.}
+\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis. Read only.}
 }
 \if{html}{\out{</div>}}
 }

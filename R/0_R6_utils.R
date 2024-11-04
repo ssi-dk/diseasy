@@ -163,7 +163,7 @@ diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NUL
 
 
 #' Parse a connection option/object
-#' @param conn (`function` or `DBIConnection` or `character`)\cr
+#' @param conn (`function` or `DBIConnection` or `character`)\cr                                                        # nolint: documentation_template_linter
 #'   The "connection" to parse.
 #' @param type (`character`)\cr
 #'   Either "source_conn" or "target_conn"

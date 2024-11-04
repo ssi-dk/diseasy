@@ -2,7 +2,7 @@ rd_activity_units <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`list(list())`)\\cr",
         "A nested list of all possible 'units' of activity that can be opened or closed.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -10,8 +10,9 @@ rd_stratification <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`list`(`quosures`))\\cr",
         "Default NULL.",
+        "Use `rlang::quos(...)` to specify stratification.",
         "If given, expressions in stratification evaluated to give the stratification level.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -19,7 +20,7 @@ rd_diseasystore_label <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -35,16 +36,15 @@ rd_contact_basis <- function(type = "param") {
         "  * `population` (`numeric()`) size of population in age group\\cr",
         "  * `proportion` (`numeric()`) proportion of total population in age group\\cr",
         "* `description` contains information about the source of the contact basis.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
 rd_observable <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
-        "The observable to provide prediction for.",
-        "Must match observable in `DiseasyObservables` [R6][R6::R6Class] class.",
-        ifelse(type == "field", " Read only.", ""))
+        "The observable to provide data or prediction for.",
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -53,7 +53,7 @@ rd_prediction_length <- function(type = "param") {
   paste("(`numeric`)\\cr",
         "The number of days to predict.",
         "The prediction start is defined by `last_queryable_date` of the `DiseasyObservables` [R6][R6::R6Class] class.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -62,7 +62,7 @@ rd_quantiles <- function(type = "param") {
   paste("(`list`(`numeric`))\\cr",
         "Default NULL.",
         "If given, results are returned at the quantiles given.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -71,15 +71,15 @@ rd_scale <- function(type = "param") {
   paste("(`numeric`)\\cr",
         "Sets the scale of the season model.",
         "The scale is the percent wise difference between most active and least active period.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
 rd_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`DBIConnection`)\\cr",
-        "A database connection",
-        ifelse(type == "field", " Read only.", ""))
+        "A database connection.",
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -87,7 +87,7 @@ rd_source_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`DBIConnection` or `file path`)\\cr",
         "Used to specify where data is located.",
-        ifelse(type == "field", " Read only.", ""),
+        ifelse(type == "field", "Read only.", ""),
         "Can be `DBIConnection` or file path depending on the `diseasystore`.")
 }
 
@@ -96,7 +96,7 @@ rd_target_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`DBIConnection`)\\cr",
         "A database connection to store the computed features in.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -105,7 +105,7 @@ rd_schema <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A database schema",
-        ifelse(type == "field", " Read only.", ""),
+        ifelse(type == "field", "Read only.", ""),
         "If the database backend does not support schema, the tables will be prefixed with <schema>.")
 }
 
@@ -114,7 +114,7 @@ rd_target_schema <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "The schema to place the feature store in.",
-        ifelse(type == "field", " Read only.", ""),
+        ifelse(type == "field", "Read only.", ""),
         "If the database backend does not support schema, the tables will be prefixed with <target_schema>.")
 }
 
@@ -130,22 +130,22 @@ rd_start_date <- function(type = "param", minimum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date`)\\cr",
         paste0(ifelse(minimum, "(Minimum)", ""), "Study period start."),
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 rd_end_date <- function(type = "param", maximum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date`)\\cr",
         paste0(ifelse(maximum, "(Maximum)", ""), "Study period end."),
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
 rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
-        "Date or timestamp (parsable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
-        ifelse(type == "field", " Read only.", ""))
+        "Date or timestamp (parsable by `as.POSIXct`) to slice the (time-versioned) data on.",
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -153,7 +153,7 @@ rd_.data <- function(type = "param") {                                          
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`any`)\\cr",
         "The data object to perform the operation on.",
-        ifelse(type == "field", " Read only.", ""))
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
