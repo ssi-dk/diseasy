@@ -540,3 +540,34 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
 
   rm(im)
 })
+
+
+test_that("Waning models must not be divergent in `$approximate_compartmental()`", {
+
+  # Initialize the DiseasyImmunity instance
+  im <- DiseasyImmunity$new()
+
+  # Set the a divergent waning model
+  im$set_custom_waning(custom_function = \(t) exp(t), target = "infection")
+
+  # Check we get error
+  expect_error(
+    im$approximate_compartmental(N = 3, method = "free_delta"),
+    "The waning function(s) must have finite values at infinity",
+    fixed = TRUE
+  )
+
+
+  # Set the a divergent waning model at index 2
+  im$set_exponential_waning()
+  im$set_custom_waning(custom_function = \(t) exp(t), target = "hospitalisation")
+
+  # Check we get error
+  expect_error(
+    im$approximate_compartmental(N = 3, method = "free_delta"),
+    "The waning function(s) must have finite values at infinity",
+    fixed = TRUE
+  )
+
+  rm(im)
+})
