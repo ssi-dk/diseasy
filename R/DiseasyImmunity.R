@@ -448,13 +448,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # Later, we will need the inversion functions also
         inv_p_01 <- \(p) {
-          (log(p) - log(1 - p)) |> # Inverse mapping of p_01
-            pmax(log(.Machine$double.eps)) |> # As we near the machine precision, we need to avoid the Inf and -Inf
-            pmin(-log(.Machine$double.eps))   # values from the mapping. The optimiser cannot handle these values.
+          # As we near the machine precision, we need to avoid the Inf and -Inf
+          # values from the mapping. The optimiser cannot handle these values.
+          p <- pmax(p, .Machine$double.eps)
+          pm <- pmax(1 - p, .Machine$double.eps)
+
+          log(p) - log(pm)  # Inverse mapping of p_01
         }
-        inv_p_0inf <- \(p) log(exp(p) - 1) |>
-          pmax(log(exp(.Machine$double.eps) - 1)) |>
-          pmin(log(.Machine$double.xmax))
+        inv_p_0inf <- \(p) {
+          p <- p |>
+            pmin(log(.Machine$double.xmax)) |> # Prevent exp(p) = Inf
+            pmax(.Machine$double.eps) # Prevent exp(p) = 1
+
+          log(exp(p) - 1)
+        }
 
 
         # We need to know the number of models the gamma's belong to
