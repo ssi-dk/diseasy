@@ -5,39 +5,28 @@
 \alias{diseasy_immunity_optimiser_results}
 \title{diseasy_immunity_optimiser_results}
 \description{
-This data set contains a summery of the tested optimiser for \code{DiseasyImmunity}s \verb{$approximate_comparmental()} method.
+This data set contains a summery of the tested optimiser for \code{?DiseasyImmunity$approximate_compartmental()} method.
 }
 \details{
 The data set consists of a \code{tibble} with columns:
 \itemize{
-\item \code{optim_method}: A human-readable label of the optimiser configuration.
-\item \code{target}: The name of the target function being approximated
+\item \code{target}: The name of the target function being approximated.
 \item \code{variation}: Indicating the variation on the target function. One of:
 \itemize{
 \item "Base": using a time scale of 20.
 \item "Non-zero asymptote": asymptotically approaching 0.2 instead of 0.
 \item "Twice the time scale": using a time scale of 40.
+\item \code{method}: The method of parametrising the approximation.
+One of: "free_delta", "free_gamma" or "all_free".
+\item \code{strategy}: The strategy employed for optimisation.
+One of: "naive", "recursive" or "combination".
 }
-\item \code{target_label}: A shorthand combination of \code{target} and \code{variation}.
-\item \code{method_label}: The method of parametrising the approximation. One of:
-\itemize{
-\item "free_delta", "free_gamma", "all_free", "all_free_combi",
-"free_delta_recursive", "free_gamma_recursive" or "all_free_recursive".
-See \code{?DiseasyImmunity} for details.
-}
-\item \code{method}: The underlying method of parametrising the approximation. One of:
-\itemize{
-\item "free_delta", "free_gamma", "all_free",
-}
-\item \code{method_variation}: The strategy employed for optimisation. One of:
-\itemize{
-\item NA, "recursive" or "combi".
-}
-\item \code{N}: The number of compartments.
 \item \code{penalty}: Were unit penalties (\code{monotonous} and \code{individual_level}) added to the objective function?
-See \code{?DiseasyImmunity} for details.
+\item \code{N}: The number of compartments.
 \item \code{value}: The smallest determined value of the objective function for the optimiser.
 \item \code{execution_time}: The time spent by the optimiser.
+\item \code{optim_method}: A human-readable label of the optimiser configuration.
+\item \code{target_label}: A short-hand combination of target and variation.
 }
 }
 \seealso{
