@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 # Create a cache for this vignette since the examples take a long time to generate
 # We will destroy the cache if the source code for `DiseasyObservables` changes
-cache <- cachem::cache_disk(dir = "vignette_data/cache/DiseasyObservables")
+cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-observables")
 source_code_hash <- digest::digest(DiseasyObservables)
 if (!identical(source_code_hash, cache$get("source-code-hash"))) {
   cache$reset()
