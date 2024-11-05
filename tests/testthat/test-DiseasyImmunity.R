@@ -542,6 +542,52 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
 })
 
 
+test_that("`$approximate_compartmental()` uses cache optimally", {
+
+  # In this test, we check that the "recursive" and "combination" strategies
+  # uses the cache optimally by checking that we have the cache hits we expect.
+  # Internally, these strategies calls "$approximate_compartmental()" for a
+  # different configuration. For example the recursive strategy calls for N - 1.
+  # If our cache hits are working as expected, we should not need to recompute for N - 1
+  # if we already have computed for this value.
+
+  # To check that this works as expected, we create a new cache and runs the approximations
+  # from N = 2 to N = 3. We then check that the number of items in the cache is as expected.
+  # If we did not hit a cache, we will have more items in the cache than optimally
+
+  # Create a temporary cache
+  cache <- cachem::cache_mem()
+
+  # Initialize the DiseasyImmunity instance
+  im <- DiseasyImmunity$new(cache = cache)
+
+  # Set the exponential waning model
+  im$set_exponential_waning()
+
+  # Test all combinations of method and strategy
+  test_combinations <- tidyr::expand_grid(
+    N = seq(2, 3),
+    method_label = c("free_delta-recursive", "free_gamma-recursive", "all_free-recursive", "all_free-combination")
+  ) |>
+    tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
+
+  purrr::pwalk(test_combinations, \(N, method, strategy) {                                                              # nolint: object_name_linter
+    im$approximate_compartmental(N = N, method = method, strategy = strategy)
+  })
+
+  # "free_delta-recursive": generates 2 items in the cache (N = 2 and N = 3)
+  # "free_gamma-recursive": generates 2 items in the cache (N = 2 and N = 3)
+  # "all_free-recursive":   generates 2 items in the cache (N = 2 and N = 3)
+  # "all_free-combination": generates 2 items in the cache (N = 2 and N = 3) and generates two
+  #                         corresponding free_gamma items in the cache with the "naive" strategy ("free_gamma" default)
+  # In total, we expect 10 items in the cache
+  # If we have more, a cache have been missed
+  expect_length(cache$keys(), 10)
+
+  rm(im)
+})
+
+
 test_that("Waning models must not be divergent in `$approximate_compartmental()`", {
 
   # Initialize the DiseasyImmunity instance
