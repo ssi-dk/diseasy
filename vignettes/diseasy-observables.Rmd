@@ -19,10 +19,10 @@ library(diseasy)
 ```
 
 ```{r vignette configuration}
-# Create a cache for this vignette since the examples take a long time to generate
-# We will destroy the cache if the source code for `DiseasyObservables` changes
+# Create a cache for this vignette since the examples takes time to generate.
+# We will destroy the cache if the source code for `DiseasyObservables` or `diseasystore` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-observables")
-source_code_hash <- digest::digest(DiseasyObservables)
+source_code_hash <- digest::digest(list(DiseasyObservables, packageVersion("diseasystore")))
 if (!identical(source_code_hash, cache$get("source-code-hash"))) {
   cache$reset()
   cache$set("source-code-hash", source_code_hash)
