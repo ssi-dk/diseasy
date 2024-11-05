@@ -431,6 +431,37 @@ DiseasyImmunity <- R6::R6Class(                                                 
       }
       checkmate::reportAssertions(coll)
 
+      # For a small optimisation, we want to match the function call as often as possible so that we can
+      # utilise the cache as much as possible. Therefore, if the approximate_compartmental call uses the defaults,
+      # we evaluate the defaults before computing the hash. Then calling with the default strategy directly or
+      # implicitly, will match the same hash and utilise the cache.
+
+      # Set default optimisation controls
+      default_optim_controls <- list(
+        "free_delta" = list("optim_method" = "ucminf"),
+        "free_gamma" = list("optim_method" = "spg"),
+        "all_free"   = list("optim_method" = "bobyqa")
+      )
+
+      # Choose optimiser controls if not set
+      if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
+
+
+      # Set default strategy
+      default_optim_strategy <- list(
+        "free_delta" = "recursive",
+        "free_gamma" = "naive",
+        "all_free"   = "combination"
+      )
+
+      # Choose strategy if not set
+      if (is.null(strategy)) strategy <- purrr::pluck(default_optim_strategy, method)
+
+
+      # Convert N to integer (integer and numeric have different hash values)
+      N <- as.integer(N)
+
+
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
@@ -572,24 +603,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
 
-        # Set default optimisation controls
-        default_optim_controls <- list(
-          "free_delta" = list("optim_method" = "ucminf"),
-          "free_gamma" = list("optim_method" = "spg"),
-          "all_free"   = list("optim_method" = "bobyqa")
-        )
-
-        # Set default strategy
-        default_optim_strategy <- list(
-          "free_delta" = "recursive",
-          "free_gamma" = "naive",
-          "all_free"   = "combination"
-        )
-
-        # Choose strategy if not set
-        if (is.null(strategy)) strategy <- purrr::pluck(default_optim_strategy, method)
-
-
         # If we have no free parameters we return the default rates
         if (n_free_parameters == 0) {
           gamma <- purrr::map(self$model, \(model) numeric(0)) |>
@@ -699,7 +712,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   N = N - 1,                                                                                            # nolint: object_name_linter
                   monotonous = monotonous,
                   individual_level = individual_level,
-                  optim_control = optim_control
+                  optim_control = optim_control,
+                  ...
                 ) |>
                   purrr::pluck("gamma")
 
@@ -790,11 +804,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Use free_gamma solution as starting point
               delta_0 <- self$approximate_compartmental(
                 method = "free_gamma",
-                strategy = purrr::pluck(default_optim_strategy, "free_gamma"),
                 N = N,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
-                individual_level = individual_level,
-                optim_control = purrr::pluck(default_optim_controls, "free_gamma")
+                individual_level = individual_level
               ) |>
                 purrr::pluck("delta") |>
                 rep(N - 1)
@@ -802,11 +814,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Use free_gamma solution as starting point
               gamma_0 <- self$approximate_compartmental(
                 method = "free_gamma",
-                strategy = purrr::pluck(default_optim_strategy, "free_gamma"),
                 N = N,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
-                individual_level = individual_level,
-                optim_control = purrr::pluck(default_optim_controls, "free_gamma")
+                individual_level = individual_level
               ) |>
                 purrr::pluck("gamma") |>
                 purrr::map(~ utils::head(., N - 1)) |> # Drop last value since it is fixed in the method
@@ -817,10 +827,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # Inverse mapping of parameters to optimiser space
           p_delta_0 <- inv_p_0inf(delta_0)
           p_gamma_0 <- inv_p_01(gamma_0)
-
-
-          # Check optimiser is configured
-          if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
 
 
           # Run the optimisation
@@ -944,11 +950,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           execution_time_offset <- self$approximate_compartmental(
             method = "free_gamma",
-            strategy = purrr::pluck(default_optim_strategy, "free_gamma"),
             N = N,                                                                                                      # nolint: object_name_linter
             monotonous = monotonous,
-            individual_level = individual_level,
-            purrr::pluck(default_optim_controls, "free_gamma")
+            individual_level = individual_level
           ) |>
             purrr::pluck("execution_time")
 
