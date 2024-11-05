@@ -37,16 +37,14 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Creates a new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
     #' @param diseasystore (`character`)\cr
     #'   A character string that controls which feature store to get data from.
-    #' @param start_date (`Date`)\cr
-    #'   Study period start (default values for get_observation).
-    #' @param end_date (`Date`)\cr
-    #'   Study period end (default values for get_observation).
+    #' @param start_date `r rd_start_date()`
+    #'   Used as default values for `get_observation`.
+    #' @param end_date `r rd_end_date()`
+    #'   Used as default values for `get_observation`.
     #' @param last_queryable_date (`Date`)\cr
     #'   Enforce a limit on data that can be pulled (not after this date).
-    #' @param conn (`DBIConnection`)\cr
-    #'   A database connection object (inherits from DBIConnection)
-    #' @param slice_ts (`Date` or `character`)\cr
-    #'   Date to slice the database on. See [SCDB::get_table()]
+    #' @param conn `r rd_conn()`
+    #' @param slice_ts `r rd_slice_ts()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
@@ -126,10 +124,8 @@ DiseasyObservables <- R6::R6Class(                                              
 
     #' @description
     #'   Set the (default) time period to get observations from.
-    #' @param start_date (`Date`)\cr
-    #'   Start date to get DiseasyObservables for (including).
-    #' @param end_date (`Date`)\cr
-    #'   End date to get DiseasyObservables for (including).
+    #' @param start_date `r rd_start_date()`
+    #' @param end_date `r rd_end_date()`
     set_study_period = function(start_date, end_date) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, any.missing = FALSE,
@@ -145,8 +141,7 @@ DiseasyObservables <- R6::R6Class(                                              
 
     #' @description
     #'   Set the slice_ts to get data for
-    #' @param slice_ts (`Date` or `character`)\cr
-    #'   Date to slice the database on
+    #' @param slice_ts `r rd_slice_ts()`
     #' @seealso [SCDB::get_table]
     set_slice_ts = function(slice_ts) {
       checkmate::assert(
@@ -165,15 +160,10 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   By default, the internal values for start_date and end_date are used to return data,
     #'   but these can be overwritten.\cr
     #'   The results are cached for faster retrieval at subsequent calls.
-    #' @param observable (`character`)\cr
-    #'   The requested observable. Should follow the pattern 'n_*'.
-    #' @param stratification (`list`(`quosures`))\cr
-    #'   Default `NULL`. If given, expressions in stratification evaluated to give the stratification level.\cr
-    #'   Use rlang::quos(...) to specify stratification.
-    #' @param start_date (`Date`)\cr
-    #'   Start date to get DiseasyObservables for (including).
-    #' @param end_date (`Date`)\cr
-    #'   End date to get DiseasyObservables for (including).
+    #' @param observable `r rd_observable()`
+    #' @param stratification `r rd_stratification()`
+    #' @param start_date `r rd_start_date()`
+    #' @param end_date `r rd_end_date()`
     #' @return
     #'   If the observable is found, the function returns the corresponding data at the stratification level.\cr
     #'   Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
@@ -185,11 +175,11 @@ DiseasyObservables <- R6::R6Class(                                              
       # Input checks
       coll <- checkmate::makeAssertCollection()
       if (is.null(self$ds)) {
-        coll$push("Diseasystore not initialized. call `$set_diseasystore` before getting observations")
+        coll$push("Diseasystore not initialized. call `$set_diseasystore()` before getting observations")
         checkmate::reportAssertions(coll)
       }
       if (is.null(start_date) || is.null(end_date)) {
-        coll$push("start_date/end_date not set. call `$set_study_period` before getting observations")
+        coll$push("start_date/end_date not set. call `$set_study_period()` before getting observations")
         coll$push("Alternatively, specify dates manually in the call")
       }
       checkmate::assert_date(start_date, any.missing = FALSE,
@@ -278,16 +268,14 @@ DiseasyObservables <- R6::R6Class(                                              
     ),
 
 
-    #' @field start_date (`Date`)\cr
-    #'   The start date of the study period. Read-only.
+    #' @field start_date `r rd_start_date("field")`
     start_date = purrr::partial(
       .f = active_binding,
       name = "start_date",
       expr = return(private %.% .start_date)
     ),
 
-    #' @field end_date (`Date`)\cr
-    #'   The end date of the study period. Read-only.
+    #' @field end_date `r rd_end_date("field")`
     end_date = purrr::partial(
       .f = active_binding,
       name = "end_date",
@@ -337,8 +325,7 @@ DiseasyObservables <- R6::R6Class(                                              
     ),
 
 
-    #' @field slice_ts (`Date` or `character`)\cr
-    #'   Date to slice the database on. See [SCDB::get_table()]. Read-only.
+    #' @field slice_ts `r rd_slice_ts("field")`
     slice_ts = purrr::partial(
       .f = active_binding,
       name = "slice_ts",
@@ -346,8 +333,7 @@ DiseasyObservables <- R6::R6Class(                                              
     ),
 
 
-    #' @field conn (`DBIConnection`)\cr
-    #' The connection to the database on. Read-only.
+    #' @field conn `r rd_conn("field")`
     conn = purrr::partial(
       .f = active_binding,
       name = "conn",

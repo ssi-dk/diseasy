@@ -2,6 +2,11 @@
 
 ## Features:
 
+* `DiseasyBaseModule`: The base line for all `diseasy` modules.
+
+  Key features:
+  * A caching system using `{cachem}` where computation can be stored in memory or on disk for persistence (#130).
+
 * `DiseasyImmunity`: A functional module to implement scenarios for waning immunity (#101).
   For examples of usage, see `vignette("diseasy-immunity")`.
 
