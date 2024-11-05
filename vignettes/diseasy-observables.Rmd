@@ -12,7 +12,13 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+```
 
+```{r setup}
+library(diseasy)
+```
+
+```{r vignette configuration}
 # Create a cache for this vignette since the examples take a long time to generate
 # We will destroy the cache if the source code for `DiseasyObservables` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-observables")
@@ -30,10 +36,6 @@ opts <- options(
 
 # We have a "hard" dependency for RSQLite to render this vignette
 suggests_available <- rlang::is_installed("RSQLite")
-```
-
-```{r setup}
-library(diseasy)
 ```
 
 ```{r download, include = FALSE, eval = suggests_available}
