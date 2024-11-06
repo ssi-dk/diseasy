@@ -641,7 +641,7 @@
     {
       "ref": "curl",
       "package": "curl",
-      "version": "5.2.3",
+      "version": "6.0.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -653,10 +653,10 @@
         "RemoteRef": "curl",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "5.2.3"
+        "RemoteSha": "6.0.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/curl_5.2.3.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/curl_5.2.3.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/curl_6.0.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/curl_6.0.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -664,7 +664,7 @@
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
-      "sysreqs": "libcurl: libcurl-devel (rpm) or\n        libcurl4-openssl-dev (deb).",
+      "sysreqs": "libcurl (>= 7.62): libcurl-devel (rpm) or\n        libcurl4-openssl-dev (deb)",
       "sysreqs_packages": [
         {
           "sysreq": "libcurl",
