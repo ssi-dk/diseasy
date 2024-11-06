@@ -2,7 +2,7 @@
 
 ## Features:
 
-* `DiseasyBaseModule`: The base line for all `diseasy` modules.
+* `DiseasyBaseModule`: The baseline for all `diseasy` modules.
 
   Key features:
   * A caching system using `{cachem}` where computation can be stored in memory or on disk for persistence (#130).
