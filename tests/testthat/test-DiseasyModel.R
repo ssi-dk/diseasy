@@ -355,6 +355,7 @@ test_that("$get_results() gives error", {
 
 
 test_that("$get_data() works", {
+  skip_if_not_installed("RSQLite")
 
   # Use a random diseasystore for the tests
   obs <- DiseasyObservables$new(diseasystore = case_defs[[1]])
