@@ -350,6 +350,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   may be better in any specific case when using a different algorithm
     #'   (see `vignette("diseasy-immunity-optimisation")`).
     #'
+    #'   The default configurations are:
+    #'
+    #'   - For "free_delta", we use the "recursive" strategy with the "ucminf" optimiser.
+    #'   - For "free_gamma", we use the "naive" strategy with the "spg" optimiser.
+    #'   - For "all_free", we use the "combination" strategy with the "bobyqa" optimiser.
+    #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
     #'   which uses the "free_gamma" default optimiser to determine the starting point.
