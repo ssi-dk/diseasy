@@ -53,6 +53,8 @@ Suggests:
     tibble,
     withr,
     zoo
+Remotes:
+    ssi-dk/diseasystore@rc-v0.3
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy
 BugReports: https://github.com/ssi-dk/diseasy/issues
