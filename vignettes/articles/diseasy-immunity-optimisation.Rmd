@@ -32,7 +32,7 @@ will vary wildly as well as the time it takes for the algorithm to converge.
 To mitigate this issue, we here investigate the effect of optimisation algorithm to find the optimisation algorithms
 that finish in reasonable time and provide the best approximation of the target waning immunity.
 
-`?DiseasyImmunity` can internally employ the optimisation algorithms of `{stats}`, `{nloptr}` and
+`?DiseasyImmunity` can internally employ the optimisation algorithms of `stats`, `{nloptr}` and
 `optimx::optimr()`, which means that we have around 30 different algorithms to test.
 
 Note that the nature of the optimisation problem also changes dependent on the method used to approximate
@@ -89,7 +89,7 @@ results
 ```
 
 
-```{r, include = F}
+```{r, include = FALSE}
 # Aggregate results for optimiser across variations of the problem
 best_optim_results <- results |>
   dplyr::summarise(
@@ -175,6 +175,12 @@ add_footnote <- function(gt_table) {
   if ("auglag_lbfgs" %in% optimisers) {
     caption <- c(caption, "auglag_lbfgs: auglag with LBFGS as local solver.")
   }
+  if ("auglag_slsqp" %in% optimisers) {
+    caption <- c(caption, "auglag_lbfgs: auglag with SLSQP as local solver.")
+  }
+  if ("auglag_mma" %in% optimisers) {
+    caption <- c(caption, "auglag_lbfgs: auglag with MMA as local solver.")
+  }
   if ("sbplx_10000" %in% optimisers) {
     caption <- c(caption, "sbplx_10000: sbplx with `maxeval = 10000`.")
   }
@@ -198,7 +204,7 @@ total_results <- best_optim_results |>
     "value" = round(.data$value, 2)
   ) |>
   dplyr::slice_max(.data$n_targets, by = c("penalty", "method")) |>
-  dplyr::slice_min(.data$value, n = 5, by = c("penalty", "method"))
+  dplyr::slice_min(.data$value, n = 5, with_ties = FALSE, by = c("penalty", "method"))
 
 total_results |>
   tidyr::pivot_wider(
@@ -214,6 +220,7 @@ total_results |>
     dplyr::ends_with("all_free")
   ) |>
   tidyr::unnest_longer(!"penalty") |>
+  dplyr::select(!dplyr::ends_with("_id")) |>
   gt::gt() |>
   gt::tab_spanner(
     label = "free_delta",
@@ -242,7 +249,7 @@ total_results |>
     style = gt::cell_borders(
       sides = "left",
       weight = gt::px(3),
-      colour = "grey40"
+      color = "grey40"
     ),
     locations = gt::cells_body(
       columns = dplyr::starts_with("strategy")
@@ -252,7 +259,7 @@ total_results |>
     style = gt::cell_borders(
       sides = "right",
       weight = gt::px(3),
-      colour = "grey40"
+      color = "grey40"
     ),
     locations = gt::cells_body(
       columns = dplyr::starts_with("value")
@@ -262,7 +269,7 @@ total_results |>
     style = gt::cell_borders(
       sides = "top",
       weight = gt::px(3),
-      colour = "grey40"
+      color = "grey40"
     ),
     locations = gt::cells_body(
       rows = 6
@@ -327,6 +334,7 @@ gt_tables <- split_data |>
         dplyr::ends_with("all_free")
       ) |>
       tidyr::unnest_longer(!c("target", "penalty")) |>
+      dplyr::select(!dplyr::ends_with("_id")) |>
       gt::gt() |>
       gt::tab_spanner(
         label = "free_delta",
@@ -355,7 +363,7 @@ gt_tables <- split_data |>
         style = gt::cell_borders(
           sides = "left",
           weight = gt::px(3),
-          colour = "grey40"
+          color = "grey40"
         ),
         locations = gt::cells_body(
           columns = dplyr::starts_with("strategy")
@@ -365,7 +373,7 @@ gt_tables <- split_data |>
         style = gt::cell_borders(
           sides = "right",
           weight = gt::px(3),
-          colour = "grey40"
+          color = "grey40"
         ),
         locations = gt::cells_body(
           columns = dplyr::starts_with("value")
@@ -375,7 +383,7 @@ gt_tables <- split_data |>
         style = gt::cell_borders(
           sides = "top",
           weight = gt::px(3),
-          colour = "grey40"
+          color = "grey40"
         ),
         locations = gt::cells_body(
           rows = 4
