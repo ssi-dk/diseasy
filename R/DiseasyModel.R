@@ -186,7 +186,7 @@ DiseasyModel <- R6::R6Class(                                                    
       end_date   <- period_duration %.% end
 
       if (is.null(start_date) || is.null(end_date)) {
-        stop("Requested period is not configured! Check the corresponding `$<period>_period`.")
+        stop(glue::glue("Requested period is not configured! Check the corresponding `${period}_period`."))
       }
 
       data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
