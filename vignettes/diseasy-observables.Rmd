@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(diseasy)
 ```
 
-```{r vignette configuration}
+```{r vignette configuration, include = FALSE}
 # Create a cache for this vignette since the examples takes time to generate.
 # We will destroy the cache if the source code for `DiseasyObservables` or `diseasystore` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-observables")
