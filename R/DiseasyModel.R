@@ -190,7 +190,8 @@ DiseasyModel <- R6::R6Class(                                                    
       }
 
       data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
-        dplyr::mutate(t = lubridate::interval(
+        dplyr::mutate(
+          t = lubridate::interval(
             !!self %.% observables %.% last_queryable_date,
             zoo::as.Date(date)
           ) / lubridate::days(1)
