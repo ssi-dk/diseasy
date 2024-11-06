@@ -131,7 +131,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     finalize = function() {
       # Look for contained Diseasy* classes and call finalize on these
       private |>
-        as.list() |>
+        as.list(all.names = TRUE) |>
         purrr::keep(~ inherits(., "DiseasyBaseModule")) |>
         purrr::discard(~ isTRUE(attr(., "clone"))) |>
         purrr::walk(~ .$finalize())
