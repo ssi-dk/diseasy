@@ -1015,25 +1015,27 @@ DiseasyImmunity <- R6::R6Class(                                                 
       if (is.null(t_max)) t_max <- 3 * purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
       t <- seq(from = 0, to = t_max, length.out = 100)
 
-      # Adds extra space on the right
-      if (interactive()) par(mar = c(5, 4, 4, 12) + 0.1)
+      # Modify the margins
+      if (interactive()) par(mar = c(3, 3.25, 2, 1))
 
       # Create an empty plot
       plot(
         t,
         type = "n",
-        xlab = "Time",
-        ylab = expression(gamma),
+        xlab = "t",
+        ylab = "f(t)",
         main = "Waning functions",
         ylim = c(0, 1),
         xlim = c(0, t_max),
         yaxs = "i",
-        xaxs = "i"
+        xaxs = "i",
+        mgp = c(2, 0.75, 0),
+        cex.lab = 1.25
       )
 
 
       # Create palette with different colours to use in plot
-      colours <- palette()
+      colours <- palette("dark")
 
 
       # Plot lines for each model
@@ -1068,8 +1070,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         lwd = 2,
         inset = c(0, 0),
         bty = "n",
-        xpd = TRUE,
-        cex = 0.8
+        xpd = TRUE
       )
 
     }
