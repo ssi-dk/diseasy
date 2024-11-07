@@ -352,10 +352,20 @@ documentation_template_linter <- function() {
       detection_info <- detection_info |>
         dplyr::mutate("param" = stringr::str_extract(.data$rd_line, r"{(@(param|field) +)([\.\w]+)}", group = 3))
 
+      # Load the current templates
+      if (testthat::is_testing()) {
+        package_name <- testthat::testing_package()
+      } else {
+        package_name <- devtools::as.package(".")$package
+      }
+      rd_templates <- as.list(base::getNamespace(package_name)) |>
+        names() |>
+        purrr::keep(startsWith("rd_"))
+
       # Detect if template exists
       detection_info <- detection_info |>
         dplyr::mutate("rd_template" = paste0("rd_", .data$param)) |>
-        dplyr::filter(.data$rd_template %in% names(as.list(base::getNamespace(devtools::as.package(".")$package)))) |>
+        dplyr::filter(.data$rd_template %in% rd_templates) |>
         dplyr::select(!"param")
 
       purrr::pmap(
