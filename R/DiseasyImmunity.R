@@ -1054,44 +1054,23 @@ DiseasyImmunity <- R6::R6Class(                                                 
       }
 
 
-      # Add legend to the plot
-      if (is.null(N)) {
+      # Get legend labels, colors and line type for models and approximation (if N is given)
+      legend_names <- c(names(private$.model), switch(!is.null(N), paste("app.", names(private$.model))))
+      legend_colors <- rep(purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]), 1 + !is.null(N))
+      legend_lty <- c(rep("solid", length(private$.model)), rep("dashed", !is.null(N) * length(private$.model)))
 
-        # Only legend for models
-        legend(
-          "topright",
-          legend = names(private$.model),
-          col = purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]),
-          lty = 1,
-          lwd = 2,
-          inset = c(0, 0),
-          bty = "n",
-          xpd = TRUE,
-          cex = 0.8
-        )
-
-      } else {
-        # Get legend labels for models and approximation
-        combined_legend <- c(names(private$.model), paste("app.", names(private$.model)))
-
-        # Specify line types for models and approximation
-        combined_lty <- c(rep("solid", length(private$.model)), rep("dashed", length(private$.model)))
-
-        # Combined legend (models and approximation)
-        legend(
-          "topright",
-          legend = combined_legend,
-          col = c(
-            purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]),
-            purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x])
-          ),
-          lty = combined_lty,
-          inset = c(0, 0),
-          bty = "n",
-          xpd = TRUE,
-          cex = 0.8
-        )
-      }
+      # Render legend
+      legend(
+        "topright",
+        legend = legend_names,
+        col = legend_colors,
+        lty = legend_lty,
+        lwd = 2,
+        inset = c(0, 0),
+        bty = "n",
+        xpd = TRUE,
+        cex = 0.8
+      )
 
     }
   ),
