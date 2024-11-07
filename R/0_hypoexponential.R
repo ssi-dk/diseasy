@@ -11,9 +11,9 @@ ones <- \(shape) matrix(rep(1, shape))
 
 
 #' @title
-#'   The hyopexponential distribution
+#'   The hypoexponential distribution
 #' @description
-#'   Density, distribution function ad quantile function for the hyopexponential distribution with
+#'   Density, distribution function and quantile function for the hypoexponential distribution with
 #'   parameters shape and rate.
 #' @inherit stats::dgamma
 #' @name HypoDist

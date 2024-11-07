@@ -5,34 +5,7 @@
 \alias{dhypo}
 \alias{phypo}
 \alias{qhypo}
-\title{The hyopexponential distribution}
-\source{
-\code{dgamma} is computed via the Poisson density, using code contributed
-  by Catherine Loader (see \code{\link[stats]{dbinom}}).
-
-  \code{pgamma} uses an unpublished (and not otherwise documented)
-  algorithm \sQuote{mainly by Morten Welinder}.
-
-  \code{qgamma} is based on a C translation of
-
-  Best, D. J. and D. E. Roberts (1975).
-  Algorithm AS91. Percentage points of the chi-squared distribution.
-  \emph{Applied Statistics},  \bold{24}, 385--388.
-
-  plus a final Newton step to improve the approximation.
-
-  \code{rgamma} for \code{shape >= 1} uses
-
-  Ahrens, J. H. and Dieter, U. (1982).
-  Generating gamma variates by a modified rejection technique.
-  \emph{Communications of the ACM}, \bold{25}, 47--54,
-
-  and for \code{0 < shape < 1} uses
-
-  Ahrens, J. H. and Dieter, U. (1974).
-  Computer methods for sampling from gamma, beta, Poisson and binomial
-  distributions. \emph{Computing}, \bold{12}, 223--246.
-}
+\title{The hypoexponential distribution}
 \usage{
 dhypo(x, shape = 1, rate = rep(1, shape))
 
@@ -67,7 +40,7 @@ qhypo(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE)
   arguments are used.
 }
 \description{
-Density, distribution function ad quantile function for the hyopexponential distribution with
+Density, distribution function and quantile function for the hypoexponential distribution with
 parameters shape and rate.
 }
 \details{

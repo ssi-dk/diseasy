@@ -73,12 +73,14 @@ gov
 Gruson
 
 Heaviside
-hyopexponential
+hypoexponential
 
 ij
 ILI
-io
+infty
 Institut
+int
+io
 
 ji
 Jit
@@ -152,6 +154,7 @@ Tamayo
 tbl
 Telkamp
 textrm
+th
 tibble
 tidyselect
 TODOs
@@ -159,6 +162,8 @@ ts
 
 u
 ucminf
+
+vec
 
 walkthrough
 www
