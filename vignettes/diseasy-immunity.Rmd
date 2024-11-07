@@ -156,6 +156,15 @@ Some definitions:
 - Flow between compartments: The transition rate between compartments $n$ and $n+1$ is defined as $\delta_n$.
 - Risk associated with compartments: The protective effect associated with compartment $n$ is defined as $\gamma_n$,
   which represents the probability of not becoming infected when exposed to an infected individual.
+- In `DiseasyImmunity` we operate with multiple targets, so we have a set of `\gamma_n` values for each target, but
+  only a single set of transition rates `\delta_n`.
+  
+Combined, these rates and risks define a population level waning immunity. From the waiting time distributions, hypoexponential in general, Erlang distributed if all rates are equal, we can compute the probability to occupy each
+compartment at time $t$ after entering the first compartment at $t = 0$. We denote this probability as $\textrm{P}_n(t \;|\;\vec{\delta})$. Given this occupancy probability, we can parametrise the approximated waning immunity of the $k$th target as:
+
+$$
+\tilde{f}^k(t) \equiv \sum_{n = 1}^N \gamma_n^k\; \textrm{P}_n(t\;|\;\vec{\delta})
+$$
 
 Three approaches are available for determining the transition rates, $\delta_n$, and protective effect, $\gamma_n$,
 that best approximates the set waning functions:
