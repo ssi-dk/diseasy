@@ -188,6 +188,23 @@ In addition, there are three strategies for the initial guess of the parameters:
   its corresponding default strategy.
 
 
+The parameters of the approximation are then determined through the use of an optimiser
+(controllable via the `optim_control` argument), which minimises the sum of the square roots of the differences between
+the target and approximation functions plus additional penalties for the parameters:
+
+$$
+ \textrm{obj} = \sum_{k = 1}^K \sqrt{\int_0^\infty \left( f^k(t) - \tilde{f}^k(t) \right)^2} + \textrm{penalty}
+$$
+
+where the penalties are controllable via the `monotonous` and `individual_level` arguments:
+
+- `monotonous`: A penalty for non-monotonous $\gamma_n$ values is added.
+
+- `individual_level`: A penalty variation in $\gamma_n$ and $\delta_n$ values are added.
+   The population level waning immunity may be smoothly changing for a set of parameters, but the instantaneous change
+   in immunity between two neighbouring compartments may be large. This penalty can be added to avoid such behaviour.
+
+
 The input for the `?DiseasyImmunity$approximate_compartmental()` function includes:
 
 - `method`: One of the methods from above - "free_gamma", "free_delta" or "all_free".
