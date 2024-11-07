@@ -16,6 +16,8 @@ qhypo(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE)
 \arguments{
 \item{x, q}{vector of quantiles.}
 
+\item{shape}{shape parameter}
+
 \item{rate}{an alternative way to specify the scale.}
 
 \item{lower.tail}{logical; if TRUE (default), probabilities are
