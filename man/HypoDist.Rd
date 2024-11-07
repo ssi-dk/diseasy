@@ -5,7 +5,7 @@
 \alias{dhypo}
 \alias{phypo}
 \alias{qhypo}
-\title{The hyopexponential distribution}
+\title{The hypoexponential distribution}
 \usage{
 dhypo(x, shape = 1, rate = rep(1, shape))
 
@@ -31,7 +31,7 @@ qhypo(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE)
 }
 }
 \description{
-Density, distribution function and quantile function for the hyopexponential distribution with
+Density, distribution function and quantile function for the hypoexponential distribution with
 parameters shape and rate.
 }
 \details{

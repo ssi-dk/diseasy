@@ -71,11 +71,13 @@ gov
 Gruson
 
 Heaviside
-hyopexponential
+hypoexponential
 
 ij
 ILI
+infty
 Institut
+int
 
 ji
 Jit
@@ -143,6 +145,8 @@ SQLite
 
 tbl
 Telkamp
+textrm
+th
 tibble
 tidyselect
 TODOs
@@ -150,6 +154,8 @@ ts
 
 u
 ucminf
+
+vec
 
 www
 
