@@ -373,8 +373,8 @@ DiseasyBaseModule <- R6::R6Class(                                               
 #'
 #'   rm(immunity)
 #' @export
-plot.DiseasyBaseModule <- function(obj, ...) {
-  obj$plot(...)
+plot.DiseasyBaseModule <- function(x, ...) {
+  x$plot(...)
 }
 
 
