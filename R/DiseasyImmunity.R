@@ -1023,10 +1023,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
         t,
         type = "n",
         xlab = "Time",
-        ylab = "\\gamma",
+        ylab = expression(gamma),
         main = "Waning functions",
         ylim = c(0, 1),
-        xlim = c(0, t_max)
+        xlim = c(0, t_max),
+        yaxs = "i",
+        xaxs = "i"
       )
 
 
@@ -1036,7 +1038,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Plot lines for each model
       purrr::walk2(private$.model, seq_along(private$.model), ~ {
-        lines(t, purrr::map_dbl(t, .x), col = colours[1 + .y])
+        lines(t, purrr::map_dbl(t, .x), col = colours[1 + .y], lwd = 2)
       })
 
 
@@ -1047,7 +1049,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         delta <- approximation$delta
 
         purrr::walk2(gamma, seq_along(private$.model), ~ {
-          lines(t, private$get_approximation(.x, delta, N)(t), col = colours[1 + .y], lty = "dashed")
+          lines(t, private$get_approximation(.x, delta, N)(t), col = colours[1 + .y], lty = "dashed", lwd = 2)
         })
       }
 
@@ -1061,6 +1063,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           legend = names(private$.model),
           col = purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]),
           lty = 1,
+          lwd = 2,
           inset = c(0, 0),
           bty = "n",
           xpd = TRUE,
