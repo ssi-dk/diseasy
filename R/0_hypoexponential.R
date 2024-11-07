@@ -17,7 +17,8 @@ ones <- \(shape) matrix(rep(1, shape))
 #'   parameters shape and rate.
 #' @details
 #'   Note that `qhypo` has poorer precision (\eqn{~ 10^{-3}}) than `dhypo` and `phypo` (\eqn{~ 10^{-6}}).
-#' @inheritParams stats::dgamma
+#' @inheritParams stats::GammaDist
+#' @param shape shape parameter
 #' @return
 #'   - `dhypo` gives the density.
 #'   - `phypo` gives the distribution function.
