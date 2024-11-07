@@ -177,18 +177,27 @@ that best approximates the set waning functions:
 
 - Method 3 (`all_free`): Both $\gamma_n$ and $\delta_n$ are allowed to vary freely.
 
-These methods help approximate all the models in the current instance of the module.
+In addition, there are three strategies for the initial guess of the parameters:
+
+- Strategy 1 (`naive`): The initial guess that `\gamma_n` values are linearly distributed from $f(0)$ to $f(\infty)$,
+  while the `\delta_n` values are assumed to be set by the reciprocal of the median time scale of the targets.
+  
+- Strategy 2 (`recursive`): The initial guess is based on the previous optimisation results for `N - 1`.
+
+- Strategy 3 (`combination` - only for the `all_free` method): The initial guess uses the `free_gamma` solution using 
+  its corresponding default strategy.
+
 
 The input for the `?DiseasyImmunity$approximate_compartmental()` function includes:
 
 - `method`: One of the methods from above - "free_gamma", "free_delta" or "all_free".
-- `strategy`: How initial values for the optimisation should be chosen - "naive", "recursive" or "combination".
+- `strategy`: One of the strategies from above - "naive", "recursive" or "combination" (optional).
 - `N`: The number of compartments to use for the approximation.
-- `optim_control`: A configuration of the optimiser. The approximation to the compartmental model is a hard
+- `optim_control`: A configuration of the optimiser (optional). The approximation to the compartmental model is a hard
   optimisation problem where the choice of the optimiser can have a significant impact on the quality of the fit.
   See `vignette("diseasy-immunity-optimisation")` for more information on the optimiser configuration.
 
-In this example the module contains the infection and hospitalisation targets defined earlier, which will be
+In this example, the module contains the infection and hospitalisation targets defined earlier, which will be
 approximated.
 ```{r approximate compartmental}
 im$approximate_compartmental(method = "all_free", N = 3)
