@@ -194,15 +194,15 @@ im$plot(method = "all_free", N = 3)
 
 # Compartment selection (elbow curve method)
 The accuracy of the approximation can be influenced by the number of compartments (`N`) used in the model.
-Therefore it is crucial to select the right N as too few compartments can lead to poor approximation,
+Therefore it is crucial to select the right `N` as too few compartments can lead to poor approximation,
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
-The elbow curve method is employed to determine the appropriate N for the models.
-Each approach is executed across a range of N values, and the resulting objective function values are returned as
+The elbow curve method is employed to determine the appropriate `N` for the models.
+Each approach is executed across a range of `N` values, and the resulting objective function values are returned as
 `value` from the `?DiseasyImmunity$approximate_compartmental()` function.
 
 In the example below, we have a case where the "all_free" method out performs the other methods, but
 this is not generally true. We find that the "all_free" method can be the best if the problem contains
-multiple time scales, but often performs no better than "free_gamma". 
+multiple time scales, but often performs no better than "free_gamma".
 For more examples, see the optimisation vignette (`vignette("diseasy-immunity-optimisation")`).
 
 ```{r elbow curve method, fig.alt = "Increasing number of compartments has diminishing returns on the error."}
