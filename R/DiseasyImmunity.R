@@ -666,8 +666,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 # Linearly interpolate from N - 1 to N
                 if (N == 3) { # For N == 3 we cannot use approx so we manually interpolate
                   delta_0 <- c(delta_0, delta_0) * 2
-                } else { # Interpolate the time spent in each compartment
-                  delta_0 <- 1 / approx(seq(1, 0, length.out = N - 2), 1 / delta_0, seq(1, 0, length.out = N - 1))$y
+                } else {  # Interpolate the time spent in each compartment
+                  t <- approx(
+                    x = seq(0, 1, length.out = N - 2), # Progress along compartments (N - 1 solution)
+                    y = cumsum(1 / delta_0), # Time to reach compartments (N - 1 solution)
+                    xout = seq(0, 1, length.out = N - 1) # Progress along compartments (N solution)
+                  ) |>
+                    purrr::pluck("y") # Time to reach compartments (N solution)
+
+                  # Convert to rates
+                  delta_0 <- c(delta_0[[1]], 1 / diff(t))
                 }
               }
 
@@ -795,7 +803,15 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 if (N == 3) { # For N == 3 we cannot use approx so we manually interpolate
                   delta_0 <- c(delta_0, delta_0) * 2
                 } else { # Interpolate the time spent in each compartment
-                  delta_0 <- 1 / approx(seq(1, 0, length.out = N - 2), 1 / delta_0, seq(1, 0, length.out = N - 1))$y
+                  t <- approx(
+                    x = seq(0, 1, length.out = N - 2), # Progress along compartments (N - 1 solution)
+                    y = cumsum(1 / delta_0), # Time to reach compartments (N - 1 solution)
+                    xout = seq(0, 1, length.out = N - 1) # Progress along compartments (N solution)
+                  ) |>
+                    purrr::pluck("y") # Time to reach compartments (N solution)
+
+                  # Convert to rates
+                  delta_0 <- c(delta_0[[1]], 1 / diff(t))
                 }
 
                 # Now, with delta computed, we must use the mapping that was created for N > 3 to get the gamma values
