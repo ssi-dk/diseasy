@@ -610,7 +610,7 @@
     {
       "ref": "curl",
       "package": "curl",
-      "version": "6.0.0",
+      "version": "6.0.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -622,10 +622,10 @@
         "RemoteRef": "curl",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "6.0.0"
+        "RemoteSha": "6.0.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/curl_6.0.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/curl_6.0.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/curl_6.0.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/curl_6.0.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1119,7 +1119,7 @@
     {
       "ref": "fontawesome",
       "package": "fontawesome",
-      "version": "0.5.2",
+      "version": "0.5.3",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1131,10 +1131,10 @@
         "RemoteRef": "fontawesome",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.5.2"
+        "RemoteSha": "0.5.3"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/fontawesome_0.5.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/fontawesome_0.5.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/fontawesome_0.5.3.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/fontawesome_0.5.3.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1798,7 +1798,7 @@
     {
       "ref": "knitr",
       "package": "knitr",
-      "version": "1.48",
+      "version": "1.49",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1810,10 +1810,10 @@
         "RemoteRef": "knitr",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.48"
+        "RemoteSha": "1.49"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/knitr_1.48.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/knitr_1.48.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/knitr_1.49.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/knitr_1.49.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2209,7 +2209,7 @@
     {
       "ref": "parallelly",
       "package": "parallelly",
-      "version": "1.38.0",
+      "version": "1.39.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2221,10 +2221,10 @@
         "RemoteRef": "parallelly",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.38.0"
+        "RemoteSha": "1.39.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.38.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.38.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.39.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.39.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3061,7 +3061,7 @@
     {
       "ref": "RSQLite",
       "package": "RSQLite",
-      "version": "2.3.7",
+      "version": "2.3.8",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3073,10 +3073,10 @@
         "RemoteRef": "RSQLite",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.3.7"
+        "RemoteSha": "2.3.8"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/RSQLite_2.3.7.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/RSQLite_2.3.7.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/RSQLite_2.3.8.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/RSQLite_2.3.8.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3913,7 +3913,7 @@
     {
       "ref": "waldo",
       "package": "waldo",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3925,10 +3925,10 @@
         "RemoteRef": "waldo",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.6.0"
+        "RemoteSha": "0.6.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/waldo_0.6.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/waldo_0.6.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/waldo_0.6.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/waldo_0.6.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
