@@ -195,7 +195,7 @@ add_footnote <- function(gt_table) {
 
 ```{r, echo = FALSE, results = "asis"}
 total_results <- best_optim_results |>
-  dplyr::filter(!(.data$target %in% c("Heaviside", "Linear"))) |>
+  #dplyr::filter(!(.data$target %in% c("Heaviside", "Linear"))) |>
   dplyr::summarise(
     "value" = sum(.data$value),
     "n_targets" = sum(.data$n_targets),
