@@ -73,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasy: quick start guide</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasy/blob/main/vignettes/diseasy.Rmd" class="external-link"><code>vignettes/diseasy.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasy/blob/feature/cachem-cache/vignettes/diseasy.Rmd" class="external-link"><code>vignettes/diseasy.Rmd</code></a></small>
       <div class="d-none name"><code>diseasy.Rmd</code></div>
     </div>
 
@@ -150,6 +150,24 @@ disease models.</p>
 <span><span class="co">#&gt; character(0)</span></span></code></pre></div>
 <p>Presently, no models are included in the package. These will come in
 the following releases.</p>
+</div>
+<div class="section level3">
+<h3 id="configuring">Configuring<a class="anchor" aria-label="anchor" href="#configuring"></a>
+</h3>
+<p>All <code>diseasy</code> modules are build on top of the
+<code>DiseasyBaseModule</code> class. This class provides a number of
+features that are common to all modules, such as logging and
+caching.</p>
+<div class="section level4">
+<h4 id="caching">Caching<a class="anchor" aria-label="anchor" href="#caching"></a>
+</h4>
+<p>Internally, the modules may use <a href="https://cachem.r-lib.org/" class="external-link">cachem</a> to cache
+computations either in memory or on disk. To control how this caching is
+done, you can provide the <code>cache</code> argument to the module
+constructor containing a <code>cachem</code> cache object, or you can
+set the option <code>diseasy.cache</code> to a <code>cachem</code> cache
+object. See <code><a href="../reference/DiseasyBaseModule.html">DiseasyBaseModule</a></code> for more information.</p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

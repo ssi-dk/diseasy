@@ -41,14 +41,19 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ssi-dk/diseasy/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ssi-dk/diseasy/blob/feature/cachem-cache/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.0.9000" id="diseasy-0009000">diseasy 0.0.0.9000<a class="anchor" aria-label="anchor" href="#diseasy-0009000"></a></h2>
 <div class="section level3">
 <h3 id="features-0-0-0-9000">Features:<a class="anchor" aria-label="anchor" href="#features-0-0-0-9000"></a></h3>
-<ul><li><p><code>DiseasyVariant</code>: A functional module to implement scenarios for disease variants (<a href="https://github.com/ssi-dk/diseasy/issues/111" class="external-link">#111</a>).</p></li>
+<ul><li>
+<p><code>DiseasyBaseModule</code>: The baseline for all <code>diseasy</code> modules.</p>
+<p>Key features:</p>
+<ul><li>A caching system using <a href="https://cachem.r-lib.org/" class="external-link">cachem</a> where computation can be stored in memory or on disk for persistence (<a href="https://github.com/ssi-dk/diseasy/issues/130" class="external-link">#130</a>).</li>
+</ul></li>
+<li><p><code>DiseasyVariant</code>: A functional module to implement scenarios for disease variants (<a href="https://github.com/ssi-dk/diseasy/issues/111" class="external-link">#111</a>).</p></li>
 <li>
 <p><code>DiseasyModel</code>: A base class for the model templates (<a href="https://github.com/ssi-dk/diseasy/issues/36" class="external-link">#36</a>).</p>
 <ul><li><p>R6 class that defines the interface for the models and empower the flexible configuration of models from the functional modules.</p></li>
