@@ -262,20 +262,27 @@ DiseasyModel <- R6::R6Class(                                                    
       expr = {
         # We work backwards from the `last_queryable_date` and remove the testing and validation periods
         # to determine the end of the training period
+        last_queryable_date <- purrr::pluck(self, "observables", "last_queryable_date", .default = as.Date(NA))
+
         training_length <- purrr::pluck(self %.% parameters %.% training_length, "training", .default = 0)
 
-        training_period_end <- purrr::pluck(self, "observables", "last_queryable_date", .default = as.Date(NA)) -
-          lubridate::days(sum(self %.% parameters %.% training_length) - training_length)
+        # If training day is infinite, compute the max duration from `ds$min_start_date`
+        if (is.infinite(training_length)) {
+          training_length <- as.numeric(
+            lubridate::interval(
+              start = self %.% observables %.% ds %.% min_start_date,
+              end = last_queryable_date
+            ),
+            unit = "days"
+          )
+        }
 
-        # The start of the training period is the maximum of the minimum start date of the observables (if set)
-        # and the training length
-        training_period_start <- dplyr::coalesce(
-          max(
-            purrr::pluck(self, "observables", "ds", "min_start_date", .default = as.Date(NA)),
-            training_period_end - lubridate::days(training_length)
-          ),
-          training_period_end - lubridate::days(training_length)
-        )
+        # Calculate the training period from the `last_queryable_date` reservering data for the testing and validation
+        # periods
+        training_period_end <- last_queryable_date -
+          lubridate::days(sum(purrr::discard_at(self %.% parameters %.% training_length, "training")))
+
+        training_period_start <- training_period_end - lubridate::days(training_length)
 
         return(list("start" = training_period_start, "end" = training_period_end))
       }
