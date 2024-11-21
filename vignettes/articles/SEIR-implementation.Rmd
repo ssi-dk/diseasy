@@ -19,7 +19,7 @@ This vignette is a companion to the implementation of the SEIR ode model `?Disea
 Here, we outline the mathematical implementation of the model and connect it to the code.
 
 # Indexes and accents
-To begin, here we define a set meaning to the different indices and accents used in the vignette:
+To begin, here we define a fixed meaning to the different indices and accents used in the vignette:
 
 | Symbol  | Description                |
 |---------|----------------------------|
@@ -30,7 +30,7 @@ To begin, here we define a set meaning to the different indices and accents used
 | $V,a,b$ | Variants                   |
 | $^\sim$ | Non-normalised quantity    |
 
-Where uppercase letters denote the number of such elements and lowercase letters denote a specific element.
+Where upper case letters denote the number of such elements and lower case letters denote a specific element.
 
 # The model structure
 
@@ -44,7 +44,7 @@ they are moved down the track through infection and eventually into recovery.
 
 Schematically, the model can be represented as in the figure below:
 
-```{r echo = FALSE, fig.align = "center", fig.cap = "SEIR Model overview for a two variant model", out.width = "120%"}
+```{r echo = FALSE, fig.align = "center", fig.cap = "SEIR Model overview for a two variant model with multiple age groups", out.width = "120%"}
 knitr::include_graphics(devtools::package_file("vignettes/articles/SEIR-implementation-model.png"))
 ```
 
@@ -59,13 +59,16 @@ then in variants.
 Finally, the susceptible states are placed at the end of the state vector.
 
 $$
-\overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Age group 1, Variant 1}}\\
+\overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Age group 1, Variant 1}}
+$$
+$$
 \underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Age group 2, Variant 1}}
-\; \cdots \\
+\; \cdots
+$$
+$$
 \underbrace{\begin{matrix} E_{A,V}^1 \, \cdots \, E_{A,V}^K \;\;\; I_{A,V}^1 \, \cdots \, I_{A,V}^L \;\;\; R_{A,V}^1 \, \cdots \, R_{A,V}^M \end{matrix}}_{\text{Age group A, Variant V}}
 \;\; S_1 \, \cdots \, S_A]
 $$
-
 NOTE: State vector uses normalised populations.
 
 # Contact matrix
@@ -77,15 +80,25 @@ In the model, these are normalised to the "per capita" contact matrix $\overline
 $c_{ij} = \frac{\tilde{c}_{ij}}{N_j}$ where $\tilde{N}_i$ is the population of age group $i$.
 
 This way, when used in the model, the equations' infections terms becomes $\frac{\tilde{c}_{ij}}{\tilde{N}_j} \sum_l I_j^l S_i$
-and the equations can be normalised via the transformations $S_a = \frac{\tilde{S}_a}{\tilde{N}_a}$.
+and the equations can be normalised via the transformations $\phi_a = \frac{\tilde{S}_a}{\tilde{N}_a}$.
 
 NOTE: Shouldn't we then have $c_{ij} = \tilde{c}_{ij} \tilde{N}_j$ instead?
 
 $$
-\dot{\tilde{I}} = \tilde{\beta}\, \tilde{I} \tilde{S} - r_I \tilde{I} \Rightarrow\\
-\frac{\dot{\tilde{I}}}{N} = \frac{\tilde{\beta}\, \tilde{I} \tilde{S}}{N} - \frac{ r_I \tilde{I}}{N} \Rightarrow\\
-\dot{I} = \tilde{\beta}\, I \tilde{S} - r_I I \Rightarrow\\
-\dot{I} = N\tilde{\beta}\, I \frac{\tilde{S}}{N} - r_I I \Rightarrow\\
+\dot{\tilde{I}} = \tilde{\beta}\, \tilde{I} \tilde{S} - r_I \tilde{I} \Rightarrow
+$$
+$$
+\frac{\dot{\tilde{I}}}{N} = \frac{\tilde{\beta}\, \tilde{I} \tilde{S}}{N} - \frac{ r_I \tilde{I}}{N} \Rightarrow
+$$
+$$
+\dot{I} = \tilde{\beta}\, I \tilde{S} - r_I I \Rightarrow
+$$
+
+$$
+\dot{I} = N\tilde{\beta}\, I \frac{\tilde{S}}{N} - r_I I \Rightarrow
+$$
+
+$$
 \dot{I} = \underbrace{N\tilde{\beta}}_{\beta}\, I S - r_I I
 $$
 
@@ -117,7 +130,7 @@ $$
 \end{bmatrix}
 $$
 
-That is, the element $(\overline{\overline{C}}\; \overline{\overline{I}})_{i, a}$ contains the rate of contact for age
+That is, the element $(\overline{\overline{CI}})_{i, a}$ contains the rate of contact for age
 group $i$ with persons infected with variant $a$ across all age groups.
 
 # The `infection_rate` matrix
@@ -146,28 +159,38 @@ $$
 NOTE: In the code, `private$indexed_variant_infection_risk` is $\overline{\overline{\mathcal{E}}}$ in vector form.
 
 # The `infection_matrix`
-For the final computation of infections of the right-hand side, we construct the matrix `infection_matrix` ($\overline{\overline{f}}$).
-For this purpose, we first expand the `infection_rate` matrix ($\overline{\overline{T}}$) to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the
-rows of the `infection_rate` matrix.
-
-Each element, $e$, in the state vector, $\psi$ has a corresponding age group which we can write as $i|e$.
+For the final computation of infections of the right-hand side, we construct the matrix `infection_matrix` 
+($\overline{\overline{f}}$).
 
 Since only $R$ and $S$ compartments are susceptible to infection, we need only to consider the $RS$ states to compute
 the new infections in the model.
 
-We are therefore interested in the reduced state vector $\overline{\psi}_{RS}$ whose elements $e^*$ are the $R$ and $S$ elements
-of the full state vector $\overline{\psi}$. That is, $\overline{\psi}_{RS} = \{\psi_{e^*} \mid e^* \in \{R, S\}\}$.
+The new `infection_matrix` therefore does not need to contain the `K` exposed states and the `L` infected states, 
+but only the `M` recovered states and the $A$ susceptible states.
 
-Therefore, we construct the matrix $\overline{\overline{U}}$ which has a row for all states in $R$ or $S$ compartments,
-and column for each variant $v$.
+We are therefore interested in the reduced state vector $\overline{\psi}_{RS}$ whose elements $e^*$ are the $R$ and $S$ 
+elements of the full state vector $\overline{\psi}$. 
+That is, $\overline{\psi}_{RS} = \{\psi_{e^*} \mid e^* \in \{R, S\}\}$.
+
+
+We now create an intermediate matrix $\overline{\overline{U}}$ by expanding the `infection_rate` matrix 
+($\overline{\overline{T}}$) to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the rows of the `infection_rate`
+matrix. 
+This repeating is done by matching the age group of the `infection_rate` matrix to the age group of the reduced state
+vector. Each element, $e$, in the state vector, $\psi$ has a corresponding age group which we can write as $i|e$.
+
+The intermediate matrix $\overline{\overline{U}}$, has a row for all states in $R$ or $S$ compartments and column for
+each variant. The form is as follows:
 $$
 \overline{\overline{U}} = \begin{bmatrix}
-  t_{i|e^*=1, 1} & \cdots & t_{i|e^*=1, V} \\
-  t_{i|e^*=2, 1} & \cdots & t_{i|e^*=2, V} \\
-  \vdots & \vdots &\vdots
+  t_{i|e^*_1, 1} & \cdots & t_{i|e^*_1, V} \\
+  t_{i|e^*_2, 1} & \cdots & t_{i|e^*_2, V} \\
+  \vdots & \vdots &\vdots \\
+  t_{i|e^*_{A \cdot (V \cdot M + 1)}, 1} & \cdots & t_{i|e^*_{A \cdot (V \cdot M + 1)}, V} \\
 \end{bmatrix}
 $$
-We now have a matrix, whose elements are the infection rate for each variant matched to the $R$ and $S$ elements of the state vector.
+We now have a matrix, whose elements are the infection rate for each variant matched to the $R$ and $S$ elements of the
+state vector.
 
 In this space, we can now account for:
 
@@ -210,7 +233,7 @@ $$
 $$
 Where $\overline{1}_A$ is a ones vector of length $A$.
 
-In $\overline{\overline{\rho}}$, the matrices of the form:
+In $\overline{\overline{\rho}}$, the sub-matrices of the form:
 $$
 \begin{bmatrix}
   1 - \chi_{a\leftarrow b} (1 - \overline{\gamma}) \\
@@ -320,11 +343,12 @@ With two variants, we need to also account for the relative infectivity of the v
 Then, for $K = 1$ and $L = 1$, the transmission matrix is:
 $$
 \overline{\overline{G}}_\beta = \beta\left[
-\begin{array}{cc|cc}
-  0 & \epsilon_1\hat{\rho}_{1}\,c & 0 & 0 \\
-  0 & 0 & 0 & 0 \\ \hline
-  0 & 0 & \epsilon_2\hat{\rho}_{2}\,c & 0 \\
-  0 & 0 & 0 & 0
+\begin{array}{ccccc}
+  0 & \epsilon_1\hat{\rho}_{1}\,c & | & 0 & 0 \\
+  0 & 0 & | & 0 & 0 \\
+  - & - & + & -& - \\
+  0 & 0 & | & \epsilon_2\hat{\rho}_{2}\,c & 0 \\
+  0 & 0 & | & 0 & 0
 \end{array}
 \right]
 $$
@@ -343,13 +367,14 @@ that a contact between an infectious and non-infected person is an infectious co
 Then, for $K = 1$ and $L = 2$, the transmission matrix is:
 $$
 \overline{\overline{G}}_\beta = \beta\left[
-\begin{array}{ccc|ccc}
-  0 & \epsilon_1\hat{\rho}_{1}\,c & \epsilon_1\hat{\rho}_{1}\,c & 0 & 0 & 0 \\
-  0 & 0 & 0 & 0 & 0 & 0 \\
-  0 & 0 & 0 & 0 & 0 & 0 \\\hline
-  0 & 0 & 0 & 0 & \epsilon_2\hat{\rho}_{2}\,c & \epsilon_2\hat{\rho}_{2}\,c \\
-  0 & 0 & 0 & 0 & 0 & 0 \\
-  0 & 0 & 0 & 0 & 0 & 0 \\
+\begin{array}{ccccccc}
+  0 & \epsilon_1\hat{\rho}_{1}\,c & \epsilon_1\hat{\rho}_{1}\,c & | & 0 & 0 & 0 \\
+  0 & 0 & 0 & | & 0 & 0 & 0 \\
+  0 & 0 & 0 & | & 0 & 0 & 0 \\
+  - & - & - & + & - & - & - \\
+  0 & 0 & 0 & | & 0 & \epsilon_2\hat{\rho}_{2}\,c & \epsilon_2\hat{\rho}_{2}\,c \\
+  0 & 0 & 0 & | & 0 & 0 & 0 \\
+  0 & 0 & 0 & | & 0 & 0 & 0 \\
 \end{array}
 \right]
 $$
@@ -365,15 +390,16 @@ $$
 For $K = 1$ and $L = 1$, the transmission matrix is:
 $$
 \overline{\overline{G}}_\beta = \beta\left[
-\begin{array}{cccc|cccc}
-  0 & \epsilon_1\hat{\rho}_{1,1}\,c_{1\leftarrow 1} & 0 & \epsilon_1\hat{\rho}_{1,1}\,c_{1\leftarrow 2} & 0 & 0 & 0 & 0 \\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
-  0 & \epsilon_1\hat{\rho}_{2,1}\,c_{2\leftarrow 1} & 0 & \epsilon_1\hat{\rho}_{2,1}\,c_{2\leftarrow 2} & 0 & 0 & 0 & 0 \\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ \hline
-  0 & 0 & 0 & 0 & 0 & \epsilon_2\hat{\rho}_{1,2}\,c_{1\leftarrow 1} & 0 & \epsilon_2\hat{\rho}_{1,2}\,c_{1\leftarrow 2} \\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-  0 & 0 & 0 & 0 & 0 & \epsilon_2\hat{\rho}_{2,2}\,c_{2\leftarrow 1} & 0 & \epsilon_2\hat{\rho}_{2,2}\,c_{2\leftarrow 2} \\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\begin{array}{cccccccc}
+  0 & \epsilon_1\hat{\rho}_{1,1}\,c_{1\leftarrow 1} & 0 & \epsilon_1\hat{\rho}_{1,1}\,c_{1\leftarrow 2} & | & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & | & 0 & 0 & 0 & 0\\
+  0 & \epsilon_1\hat{\rho}_{2,1}\,c_{2\leftarrow 1} & 0 & \epsilon_1\hat{\rho}_{2,1}\,c_{2\leftarrow 2} & | & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & | & 0 & 0 & 0 & 0 \\
+  - & - & - & - & + & - & - & - & - \\
+  0 & 0 & 0 & 0 & | & 0 & \epsilon_2\hat{\rho}_{1,2}\,c_{1\leftarrow 1} & 0 & \epsilon_2\hat{\rho}_{1,2}\,c_{1\leftarrow 2} \\
+  0 & 0 & 0 & 0 & | & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & | & 0 & \epsilon_2\hat{\rho}_{2,2}\,c_{2\leftarrow 1} & 0 & \epsilon_2\hat{\rho}_{2,2}\,c_{2\leftarrow 2} \\
+  0 & 0 & 0 & 0 & | & 0 & 0 & 0 & 0
 \end{array}
 \right]
 $$
