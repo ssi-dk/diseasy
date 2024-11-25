@@ -549,7 +549,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
     #' @field immunity
-    #'   Placeholder for the immunity module
+    #'   Place holder for the immunity module
     immunity = list("approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N) {
       c(rep(0.95, N), rep(1, N - 1))
     })
@@ -562,7 +562,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     default_parameters = function() {
       modifyList(
-        super$default_parameters(), # Obtain parameters from the superclasses
+        super$default_parameters(), # Obtain parameters from the super-classes
         # Overwrite with model-specific parameters
         list(
           # Structural model parameters
@@ -704,7 +704,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Step 4, determine the infective interactions
-      # We use the pre compted immunity_matrix to account for waning and cross-immunity
+      # We use the pre computed immunity_matrix to account for waning and cross-immunity
       infection_matrix <- private$immunity_matrix * state_vector[private$rs_state_indices] *
         infection_rate[private$rs_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
 

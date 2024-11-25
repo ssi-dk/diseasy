@@ -48,7 +48,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{immunity}}{Placeholder for the immunity module}
+\item{\code{immunity}}{Place holder for the immunity module}
 }
 \if{html}{\out{</div>}}
 }
