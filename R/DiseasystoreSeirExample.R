@@ -11,8 +11,9 @@
 #'   rm(ds)
 #' @return
 #'   A new instance of the `DiseasystoreSeirExample` [R6][R6::R6Class] class.
-#' @export
 #' @importFrom R6 R6Class
+#' @keywords data
+#' @export
 DiseasystoreSeirExample <- R6::R6Class(                                                                                 # nolint: object_name_linter, object_length_linter
   classname = "DiseasystoreSeirExample",
   inherit = diseasystore::DiseasystoreBase,

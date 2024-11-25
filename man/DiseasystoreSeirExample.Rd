@@ -19,6 +19,7 @@ This \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} brings support the SEI
   rm(ds)
 \dontshow{\}) # examplesIf}
 }
+\keyword{data}
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreSeirExample}
 }
