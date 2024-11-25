@@ -58,6 +58,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \item \href{#method-DiseasyModelOdeSeir-new}{\code{DiseasyModelOdeSeir$new()}}
 \item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
 \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
+\item \href{#method-DiseasyModelOdeSeir-initialize_state_vector}{\code{DiseasyModelOdeSeir$initialize_state_vector()}}
 \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
 }
 }
@@ -198,6 +199,46 @@ The Malthusian growth rate is therefore not dependent on factors such as cross-i
 \subsection{Returns}{
 (\code{numeric(1)})\cr
 The Malthusian growth rate for the model.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-initialize_state_vector"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-initialize_state_vector}{}}}
+\subsection{Method \code{initialize_state_vector()}}{
+Infer the state_vector from incidence data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$initialize_state_vector(
+  incidence_data,
+  method = c("derivative", "eigen-value")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{incidence_data}}{(\code{data.frame})\cr
+Incidence observations as a \code{data.frame} with columns
+\itemize{
+\item \code{date}: The date of the observations
+\item \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format)
+\item \code{variant}: The variant of the incidence observation.
+\item \code{incidence}: The incidence in the age group at the given date
+}}
+
+\item{\code{method}}{(\code{character(1)})\cr
+The method to use for initialising the state vector.
+\itemize{
+\item \code{derivative}: Directly infers the EI compartments from derivatives of the incidence signal.
+\item \code{eigen-value}: Uses the eigenvalues of the generator matrix to infer the state vector.
+}
+
+See the article \code{SEIR-initialisation} in the online documentation for more information.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(\code{numeric()})\cr
+The initial state vector for the model (invisibly).
 }
 }
 \if{html}{\out{<hr>}}
