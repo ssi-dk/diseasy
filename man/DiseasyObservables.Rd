@@ -117,14 +117,14 @@ Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} cl
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{diseasystore}}{(\code{character})\cr
-A character string that controls which feature store to get data from.}
+\item{\code{diseasystore}}{(\code{character} or \code{diseasystore})\cr
+Either the name of or an instance of the feature store to get data from.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.
-Used as default values for \code{get_observation}.}
+Used as default values for \verb{$get_observation()}.}
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.
-Used as default values for \code{get_observation}.}
+Used as default values for \verb{$get_observation()}.}
 
 \item{\code{last_queryable_date}}{(\code{Date})\cr
 Enforce a limit on data that can be pulled (not after this date).}
