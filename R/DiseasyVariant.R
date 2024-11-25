@@ -73,6 +73,9 @@ DiseasyVariant <- R6::R6Class(                                                  
       # Add the variant
       private$.variants[[name]] <- characteristics
 
+      # Sort the variants by name
+      private$.variants <- private$.variants[order(names(private$.variants))]
+
     },
 
 
