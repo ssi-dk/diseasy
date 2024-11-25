@@ -20,7 +20,7 @@ reference:
     - has_keyword("model-template")
 
   - title: Data sets
-    desc: Data for the functional modules
+    desc: Data for the functional modules and model templates.
     contents:
     - has_keyword("data")
 
