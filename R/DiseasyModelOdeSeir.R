@@ -353,6 +353,201 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
 
+    #' @description
+    #'   Infer the state_vector from incidence data
+    #' @param incidence_data (`data.frame`)\cr
+    #'   Incidence observations as a `data.frame` with columns
+    #'   - `date`: The date of the observations
+    #'   - `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)
+    #'   - `variant`: The variant of the incidence observation.
+    #'   - `incidence`: The incidence in the age group at the given date
+    #' @param method (`character(1)`)\cr
+    #'   The method to use for initialising the state vector.
+    #'   - `derivative`: Directly infers the EI compartments from derivatives of the incidence signal.
+    #'   - `eigen-value`: Uses the eigenvalues of the generator matrix to infer the state vector.
+    #'
+    #'   See the article `SEIR-initialisation` in the online documentation for more information.
+    #' @return (`numeric()`)\cr
+    #'   The initial state vector for the model (invisibly).
+    initialize_state_vector = function(incidence_data, method = c("derivative", "eigen-value")) {
+      method <- match.arg(method)
+
+      coll <- checkmate::makeAssertCollection()
+
+      # Check data.frame input
+      checkmate::assert_data_frame(incidence_data, add = coll)
+      checkmate::assert_names(
+        colnames(incidence_data),
+        must.include = c("age_group", "variant", "date", "incidence"),
+        add = coll
+      )
+
+      # Check age_group column
+      checkmate::assert_character(incidence_data$age_group, any.missing = FALSE, add = coll)
+
+      # Check variant column
+      if (length(unique(incidence_data$variant)) > 1) {
+        if (is.null(self %.% variant %.% variants)) {
+          stop("DiseasyVariant must be configured in the model when using incidence data for multiple variants!")
+        }
+        checkmate::assert_subset(
+          unique(incidence_data$variant),
+          choices = names(self %.% variant %.% variants)
+        )
+      }
+
+      # Check date column
+      checkmate::assert_date(incidence_data$date, any.missing = FALSE, add = coll)
+
+      # Check incidence column
+      checkmate::assert_numeric(incidence_data$incidence, lower = 0, upper = 1, any.missing = FALSE, add = coll)
+
+      checkmate::reportAssertions(coll)
+
+
+      # We first compute the time relative to the training period end date
+      incidence_data <- incidence_data |>
+        dplyr::mutate("t" = as.numeric(.data$date - self %.% training_period %.% end, units = "days"))
+
+      # Now we need to fit the polynomials to each age-group / variant in the model, so we group by these
+      # and extract the subsets.
+      # We also need to ensure the variants are ordered as the state vector is
+      incidence_subsets <- incidence_data |>
+        dplyr::arrange(.data$variant, .data$age_group) |>
+        dplyr::group_by(.data$variant, .data$age_group) |>
+        dplyr::group_split()
+
+
+      # Now we train the polynomial fit according to the parameters of the model
+      polynomial_order <- self %.% parameters %.% incidence_polynomial_order
+      polynomial_training_length <- self %.% parameters %.% incidence_polynomial_training_length
+
+      incidence_polyfits <- incidence_subsets |>
+        purrr::map(
+          ~ {
+            stats::lm(
+              incidence ~ poly(t, polynomial_order, raw = TRUE),
+              data = dplyr::filter(., - polynomial_training_length < .data$t, .data$t <= 0)
+            )
+          }
+        )
+
+
+      ##### This block is validation only
+      incidence_data <- purrr::map2(
+        incidence_subsets,
+        incidence_polyfits,
+        ~ dplyr::mutate(.x, "incidence_polyfit" = !!stats::predict(.y, newdata = .x))
+      ) |>
+        purrr::list_rbind()
+
+
+      incidence_data |>
+        dplyr::filter(.data$t <= 30) |>
+        tidyr::pivot_longer(
+          cols = starts_with("incidence"),
+          names_prefix = "^incidence_?",
+          names_to = "incidence_type",
+          values_to = "incidence"
+        ) |>
+        dplyr::mutate("incidence_type" = dplyr::if_else(.data$incidence_type == "", "Estimated", "Polyfit")) |>
+        ggplot2::ggplot(ggplot2::aes(x = t, y = incidence, color = incidence_type)) +
+          ggplot2::geom_line(linewidth = 1.5) +
+          ggplot2::facet_grid(variant ~ age_group) +
+          ggplot2::ylim(0, 1.2 * max(incidence_data$incidence)) +
+          ggplot2::theme_bw()
+      ##### End validation block
+
+
+      # Compute the derivatives of the signal ("signal" vector)
+      max_order_derivative <- self %.% parameters %.% incidence_max_order_derivatives
+
+      # Create human readable labels
+      derivative_names <- max_order_derivative |>
+        seq.int() |>
+        purrr::map(~ stringr::str_remove_all(paste0("d^", ., " I^*/d t^", .), r"{\^1}")) |>
+        purrr::reduce(c, .init = "I^*")
+
+      # Extract derivatives
+      incidence_signal_derivatives <- purrr::map(
+        incidence_polyfits,
+        ~ stats::setNames(
+          .x$coefficients[1:(max_order_derivative + 1)] * pmax(1, seq(max_order_derivative + 1) - 1),
+          derivative_names
+        )
+      )
+
+
+      # Compute the per-compartment progression rates
+      K <- private %.% compartment_structure %.% E
+      L <- private %.% compartment_structure %.% I
+
+      re <- (private %.% disease_progression_rates %.% E) * K
+      ri <- (private %.% disease_progression_rates %.% I) * L
+
+
+      # Generate the matrix to compute the states from the derivatives
+      # (See article on SEIR-initialisation)
+      M <- matrix(rep(0, K * (K + 1)), nrow = K)
+      active_row <- c(ri, 1)
+
+      for (k in seq(K)) {
+        if (k > 1) {
+          active_row <- c(0, active_row) + re * c(active_row, 0)
+        }
+
+        M[k, seq(k + 1)] <- active_row
+      }
+
+
+      # Generate the labels for each subset (age_group/ variant combination in the data)
+      incidence_subset_labels <- purrr::map(incidence_subsets, ~ dplyr::distinct(., .data$age_group, .data$variant))
+
+      # For each age_group / variant combination, compute the E_k and I_l states
+      estimated_initial_states <- purrr::map(
+        seq_along(incidence_subset_labels),
+        \(group_id) {
+
+          # Define the vector for the matrix multiplication
+          ss <- incidence_signal_derivatives[[group_id]][seq.int(K + 1)]
+          ss[is.na(ss)] <- 0
+
+          # Compute E states from derivatives
+          E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))
+
+          # Compute I states from polynomial fit
+          I_star <- stats::predict(
+            incidence_polyfits[[group_id]],
+            newdata = data.frame(t = -(seq(L) - 1) / ri)
+          )
+          I_l <- as.numeric(I_star) / ri
+
+          # Combine to output
+          dplyr::cross_join(
+            incidence_subset_labels[[group_id]],
+            data.frame(
+              "state" = c(paste0("E", seq.int(K)), paste0("I", seq.int(L))),
+              "initial_condition" = pmax(0, c(E_k, I_l))
+            )
+          )
+        }
+      ) |>
+      purrr::list_rbind()
+
+
+      # Impute zeros for missing states
+      initial_state_vector <- tidyr::expand_grid(
+        "variant" = names(self %.% variant %.% variants),
+        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+        "state" = c(paste0("E", seq.int(K)), paste0("I", seq.int(L))),
+        "initial_condition" = 0
+      ) |>
+        dplyr::rows_update(estimated_initial_states, by = c("variant", "age_group", "state"))
+
+      return(invisible(initial_state_vector))
+    },
+
+
     #' @field immunity
     #'   Placeholder for the immunity module
     immunity = list("approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N) {
@@ -379,6 +574,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # Parameters for fitting polynomials to the incidence curves
           "incidence_polynomial_order" = 3,
           "incidence_polynomial_training_length" = 21,
+          "incidence_max_order_derivatives" = 2,
 
           # Defaults for functional modules
           "activity.weights" = c(1, 1, 1, 1),
