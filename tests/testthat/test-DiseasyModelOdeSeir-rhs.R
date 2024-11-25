@@ -630,10 +630,10 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
     matrix(
       c(#v1 v2
         # Variant 1
-        fr, 1 - 0.5 * (1 - fr), # R
+        fr, 1 - 0.75 * (1 - fr), # R
 
         # Variant 2
-        1 - 0.75 * (1 - fr), fr, # R
+        1 - 0.5 * (1 - fr), fr, # R
 
         # S
         1,  1
@@ -681,16 +681,16 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
     matrix(
       c(#v1 v2
         # Age group 1, Variant 1
-        fr, 1 - 0.5 * (1 - fr), # R
+        fr, 1 - 0.75 * (1 - fr), # R
 
         # Age group 2, Variant 1
-        fr, 1 - 0.5 * (1 - fr), # R
+        fr, 1 - 0.75 * (1 - fr), # R
 
         # Age group 1, Variant 2
-        1 - 0.75 * (1 - fr), fr, # R
+        1 - 0.5 * (1 - fr), fr, # R
 
         # Age group 2, Variant 2
-        1 - 0.75 * (1 - fr), fr, # R
+        1 - 0.5 * (1 - fr), fr, # R
 
         # S
         1,  1,  # Age group 1
