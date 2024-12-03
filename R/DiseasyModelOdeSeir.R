@@ -369,7 +369,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   See the article `SEIR-initialisation` in the online documentation for more information.
     #' @return (`numeric()`)\cr
     #'   The initial state vector for the model (invisibly).
-    initialize_state_vector = function(incidence_data, method = c("derivative", "eigen-value")) {
+    initialise_state_vector = function(incidence_data, method = c("derivative", "eigen-value")) {
       method <- match.arg(method)
 
       coll <- checkmate::makeAssertCollection()
