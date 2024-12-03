@@ -58,7 +58,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \item \href{#method-DiseasyModelOdeSeir-new}{\code{DiseasyModelOdeSeir$new()}}
 \item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
 \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
-\item \href{#method-DiseasyModelOdeSeir-initialize_state_vector}{\code{DiseasyModelOdeSeir$initialize_state_vector()}}
+\item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
 \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
 }
 }
@@ -239,6 +239,33 @@ See the article \code{SEIR-initialisation} in the online documentation for more 
 \subsection{Returns}{
 (\code{numeric()})\cr
 The initial state vector for the model (invisibly).
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-rhs"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-rhs}{}}}
+\subsection{Method \code{rhs()}}{
+The vectorised right hand side (RHS) function of the system of differential equations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$rhs(t, state_vector, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{(\code{numeric(1)})\cr
+The time to solve for.}
+
+\item{\code{state_vector}}{(\code{numeric()})\cr
+The state vector to compute the RHS from.}
+
+\item{\code{...}}{Additional parameters to comply with deSolve::ode format.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(\code{numeric()})\cr
+The rate of change for the differential equations.
 }
 }
 \if{html}{\out{<hr>}}

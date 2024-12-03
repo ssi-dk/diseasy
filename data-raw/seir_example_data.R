@@ -68,8 +68,8 @@ y0[private$e1_state_indices] <- activity * 0.002
 y0[private$s_state_indices] <- population_proportion - y0[private$e1_state_indices]
 
 
-# Run solver across scenario change to check for long-term leakage
-tt <- deSolve::ode(y = y0, times = seq(0, 150), func = private %.% rhs)
+  # Run solver across scenario change to check for long-term leakage
+  tt <- deSolve::ode(y = y0, times = seq(0, 150), func = m %.% rhs)
 
 
 # Extract the maximal test positive signal from the I1 states

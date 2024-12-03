@@ -534,17 +534,113 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ) |>
       purrr::list_rbind()
 
+    },
 
-      # Impute zeros for missing states
-      initial_state_vector <- tidyr::expand_grid(
-        "variant" = names(self %.% variant %.% variants),
-        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
-        "state" = c(paste0("E", seq.int(K)), paste0("I", seq.int(L))),
-        "initial_condition" = 0
-      ) |>
-        dplyr::rows_update(estimated_initial_states, by = c("variant", "age_group", "state"))
 
-      return(invisible(initial_state_vector))
+    #' @description
+    #' The vectorised right hand side (RHS) function of the system of differential equations
+    #'
+    #' @param t (`numeric(1)`)\cr
+    #'   The time to solve for.
+    #' @param state_vector (`numeric()`)\cr
+    #'   The state vector to compute the RHS from.
+    #' @param ...
+    #'   Additional parameters to comply with deSolve::ode format.
+    #' @return (`numeric()`)\cr
+    #'   The rate of change for the differential equations.
+    rhs = function(t, state_vector, ...) {
+
+      # Compute the flow from infections
+      # Each variant attempts to infect the population
+
+      ## Step 1, determine the number of infected by age group and variant
+
+      # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
+      infected <- vapply(
+        private$i_state_indices,
+        \(idx) sum(state_vector[idx]),
+        FUN.VALUE = numeric(1),
+        USE.NAMES = FALSE
+      )
+
+
+      # microbenchmark::microbenchmark( # Microseconds
+      #   purrr::map_dbl(i_state_indices, \(indices) sum(state_vector[indices])),
+      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices])),
+      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices]), USE.NAMES = FALSE),
+      #   vapply(
+      #     private$i_state_indices,
+      #     \(indices) sum(state_vector[indices]),
+      #     FUN.VALUE = numeric(1),
+      #     USE.NAMES = FALSE
+      #   ),
+      #   check = "equal", times = 1000L
+      # )
+
+      # Add any forcing of infections
+      infected <- private$infected_forcing(t, infected)
+
+      # Reshape the infected vector to a matrix for later computation
+      infected <- matrix(infected, nrow = private$n_age_groups)
+
+      # microbenchmark::microbenchmark( # Nanoseconds
+      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower), ncol = length(self$variant$variants)),
+      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower)),
+      #   matrix(infected, nrow = private$n_age_groups),
+      #   matrix(infected, nrow = private$n_age_groups, ncol = private$n_variants),
+      #   check = "equal", times = 1000L
+      # )
+
+
+      ## Step 2, determine their contacts with other age groups (beta * I)
+      infected_contact_rate <- private$contact_matrix(t) %*% infected
+
+
+      ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
+      # rr * beta * beta_v * I * s(t)
+      infection_rate <- infected_contact_rate *
+        self$season$model_t(t) *
+        self$parameters[["overall_infection_risk"]] *
+        private$indexed_variant_infection_risk
+
+
+      ## Step 4, determine the infective interactions
+      # We use the pre computed immunity_matrix to account for waning and cross-immunity
+      infection_matrix <- private$immunity_matrix * state_vector[private$rs_state_indices] *
+        infection_rate[private$rs_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
+
+      # Then we can compute the loss from each compartment
+      loss_due_to_infections <- rowSums(infection_matrix)
+
+      # Now we need to compute the flow into the exposed compartments
+      # For this, we use the pre-computed infection_matrix_to_rs_indices map
+      # new_infections <- purrr::map_dbl(private$infection_matrix_to_rs_indices, ~ sum(infection_matrix[.]))
+      new_infections <- vapply(
+        private$infection_matrix_to_rs_indices,
+        \(idx) sum(infection_matrix[idx]),
+        FUN.VALUE = numeric(1),
+        USE.NAMES = FALSE
+      )
+
+
+      ## Step 5, compute the disease progression flow in the model
+      progression_flow <- private$progression_flow_rates * state_vector
+
+
+      ## Combine into final RHS computation
+      # Disease progression flow between compartments
+      dy_dt <- c(0, progression_flow[-private$n_states]) - progression_flow
+
+      # Combined loss to infections (across all variants)
+      dy_dt[private$rs_state_indices] <- dy_dt[private$rs_state_indices] - loss_due_to_infections
+
+      # Add the inflow from infections
+      dy_dt[private$e1_state_indices] <- dy_dt[private$e1_state_indices] + new_infections
+
+      # Add the forcing of the states
+      dy_dt <- private$state_vector_forcing(t, dy_dt)
+
+      return(list(dy_dt))
     },
 
 
@@ -647,100 +743,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     infected_forcing = NULL,
     state_vector_forcing = NULL,
 
-    rhs = function(t, state_vector, ...) {
-
-      # Compute the flow from infections
-      # Each variant attempts to infect the population
-
-      ## Step 1, determine the number of infected by age group and variant
-
-      # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
-      infected <- vapply(
-        private$i_state_indices,
-        \(idx) sum(state_vector[idx]),
-        FUN.VALUE = numeric(1),
-        USE.NAMES = FALSE
-      )
-
-
-      # microbenchmark::microbenchmark( # Microseconds
-      #   purrr::map_dbl(i_state_indices, \(indices) sum(state_vector[indices])),
-      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices])),
-      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices]), USE.NAMES = FALSE),
-      #   vapply(
-      #     private$i_state_indices,
-      #     \(indices) sum(state_vector[indices]),
-      #     FUN.VALUE = numeric(1),
-      #     USE.NAMES = FALSE
-      #   ),
-      #   check = "equal", times = 1000L
-      # )
-
-      # Add any forcing of infections
-      infected <- private$infected_forcing(t, infected)
-
-      # Reshape the infected vector to a matrix for later computation
-      infected <- matrix(infected, nrow = private$n_age_groups)
-
-      # microbenchmark::microbenchmark( # Nanoseconds
-      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower), ncol = length(self$variant$variants)),
-      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower)),
-      #   matrix(infected, nrow = private$n_age_groups),
-      #   matrix(infected, nrow = private$n_age_groups, ncol = private$n_variants),
-      #   check = "equal", times = 1000L
-      # )
-
-
-      ## Step 2, determine their contacts with other age groups (beta * I)
-      infected_contact_rate <- private$contact_matrix(t) %*% infected
-
-
-      ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
-      # rr * beta * beta_v * I * s(t)
-      infection_rate <- infected_contact_rate *
-        self$season$model_t(t) *
-        self$parameters[["overall_infection_risk"]] *
-        private$indexed_variant_infection_risk
-
-
-      ## Step 4, determine the infective interactions
-      # We use the pre computed immunity_matrix to account for waning and cross-immunity
-      infection_matrix <- private$immunity_matrix * state_vector[private$rs_state_indices] *
-        infection_rate[private$rs_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
-
-      # Then we can compute the loss from each compartment
-      loss_due_to_infections <- rowSums(infection_matrix)
-
-      # Now we need to compute the flow into the exposed compartments
-      # For this, we use the pre-computed infection_matrix_to_rs_indices map
-      # new_infections <- purrr::map_dbl(private$infection_matrix_to_rs_indices, ~ sum(infection_matrix[.]))
-      new_infections <- vapply(
-        private$infection_matrix_to_rs_indices,
-        \(idx) sum(infection_matrix[idx]),
-        FUN.VALUE = numeric(1),
-        USE.NAMES = FALSE
-      )
-
-
-      ## Step 5, compute the disease progression flow in the model
-      progression_flow <- private$progression_flow_rates * state_vector
-
-
-      ## Combine into final RHS computation
-      # Disease progression flow between compartments
-      dy_dt <- c(0, progression_flow[-private$n_states]) - progression_flow
-
-      # Combined loss to infections (across all variants)
-      dy_dt[private$rs_state_indices] <- dy_dt[private$rs_state_indices] - loss_due_to_infections
-
-      # Add the inflow from infections
-      dy_dt[private$e1_state_indices] <- dy_dt[private$e1_state_indices] + new_infections
-
-      # Add the forcing of the states
-      dy_dt <- private$state_vector_forcing(t, dy_dt)
-
-      return(list(dy_dt))
-    },
 
     # @description
     #  Configure the contact matrix helper in the model.

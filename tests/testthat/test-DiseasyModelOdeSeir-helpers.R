@@ -444,8 +444,8 @@ test_that("forcing functions can be configured as expected (SIR single variant /
   m$set_forcing_functions(infected_forcing = \(t, infected) t)
   expect_identical(private$infected_forcing, \(t, infected) t)
 
-  m$set_forcing_functions(state_vector_forcing = \(t, dy_dt, new_infections) t)
-  expect_identical(private$state_vector_forcing, \(t, dy_dt, new_infections) t)
+  m$set_forcing_functions(state_vector_forcing = \(t, dy_dt) t)
+  expect_identical(private$state_vector_forcing, \(t, dy_dt) t)
 
   rm(m)
 })
