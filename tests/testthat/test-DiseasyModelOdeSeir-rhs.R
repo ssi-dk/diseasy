@@ -231,7 +231,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
-  #With no infected, we should just get the passive flow through the states
+  # With no infected, we should just get the passive flow through the states
   y0 <- runif(private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- 0
 
