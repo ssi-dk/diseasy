@@ -56,6 +56,8 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
 \item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively.  Read only.}
+
+\item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments.  Read only.}
 }
 \if{html}{\out{</div>}}
 }

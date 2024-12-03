@@ -210,3 +210,13 @@ rd_compartment_structure <- function(type = "param") {
   )
 }
 
+rd_disease_progression_rates <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`named numeric()`)\\cr",
+    "The overall progression rates for the disease states.",
+    "The reciprocal of each rate is the average time spent in the all of the corresponding compartments.",
+    switch(type == "param", "The exposed compartments can optionally be omitted."),
+    switch(type == "field", "Read only.")
+  )
+}

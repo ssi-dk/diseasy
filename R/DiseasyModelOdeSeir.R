@@ -133,7 +133,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Store the given model configuration
       private$.compartment_structure <- compartment_structure
-      private$disease_progression_rates <- disease_progression_rates
+      private$.disease_progression_rates <- disease_progression_rates
 
 
       ## Time-varying contact matrices projected onto target age-groups
@@ -482,8 +482,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)
       L <- self %.% compartment_structure %.% I
 
-      re <- (private %.% disease_progression_rates %.% E) * K
-      ri <- (private %.% disease_progression_rates %.% I) * L
+      re <- (purrr::pluck(self %.% disease_progression_rates, "E", .default = 0)) * K
+      ri <- (self %.% disease_progression_rates %.% I) * L
 
 
       # Generate the matrix to compute the states from the derivatives
@@ -562,6 +562,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       .f = active_binding,
       name = "compartment_structure",
       expr = return(private %.% .compartment_structure)
+    ),
+
+    #' @field disease_progression_rates `r rd_disease_progression_rates("field")`
+    disease_progression_rates = purrr::partial(
+      .f = active_binding,
+      name = "disease_progression_rates",
+      expr = return(private %.% .disease_progression_rates)
     )
   ),
 
@@ -625,7 +632,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
     .compartment_structure = NULL,
-    disease_progression_rates = NULL,
+    .disease_progression_rates = NULL,
 
     progression_flow_rates = NULL,
 
@@ -849,8 +856,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # The diagonal elements of the transition matrix is just (minus) the progression flow rates
       progression_flow_rates <- c(
-        rep(K * purrr::pluck(private %.% disease_progression_rates, "E", .default = 0), K),
-        rep(L * purrr::pluck(private %.% disease_progression_rates, "I"), L)
+        rep(K * purrr::pluck(self %.% disease_progression_rates, "E", .default = 0), K),
+        rep(L * purrr::pluck(self %.% disease_progression_rates, "I"), L)
       )
       transition_matrix <- diag(
         - rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
@@ -961,7 +968,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # except that it uses only a single age group
       reference_model <- DiseasyModelOdeSeir$new(
         compartment_structure = c("E" = 0L, "I" = 1L, "R" = 1L),
-        disease_progression_rates = purrr::discard_at(private %.% disease_progression_rates, ~ . == "E"),
+        disease_progression_rates = purrr::discard_at(self %.% disease_progression_rates, ~ . == "E"),
         malthusian_matching = FALSE,
         activity = self %.% activity,
         observables = self %.% observables,
