@@ -544,12 +544,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   The time to solve for.
     #' @param state_vector (`numeric()`)\cr
     #'   The state vector to compute the RHS from.
-    #' @param ...
-    #'   Additional parameters to comply with deSolve::ode format.
+    #' @param parms (`list`)\cr
+    #'   Argument to comply with `deSolve::ode` format. Not used.
+    #' @param overall_infection_risk `r rd_overall_infection_risk`
     #' @return (`numeric()`)\cr
     #'   The rate of change for the differential equations.
-    rhs = function(t, state_vector, ...) {
-
+    rhs = function(
+      t,
+      state_vector,
+      parms = NULL,
+      overall_infection_risk = self %.% parameters %.% overall_infection_risk
+    ) {
       # Compute the flow from infections
       # Each variant attempts to infect the population
 
@@ -600,7 +605,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # rr * beta * beta_v * I * s(t)
       infection_rate <- infected_contact_rate *
         self$season$model_t(t) *
-        self$parameters[["overall_infection_risk"]] *
+        overall_infection_risk *
         private$indexed_variant_infection_risk
 
 
