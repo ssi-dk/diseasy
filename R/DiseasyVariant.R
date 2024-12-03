@@ -35,7 +35,9 @@ DiseasyVariant <- R6::R6Class(                                                  
     #'   The name of the variant.
     #' @param characteristics (`list`)\cr
     #'   A named list of characteristics of the variant.
+    #'
     #'   Characteristics can be:
+    #'
     #'     - `relative_infection_risk` (`numeric(1)`): The relative infection risk of the variant.
     #'     - `cross_immunity` (`named vector`): The overlap in immunity of when the named variant attempts to infect
     #'       a host previously infected by the current variant. If not specified, the default is 1.
