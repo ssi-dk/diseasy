@@ -199,6 +199,11 @@ rd_diseasy_module <- paste(
   "instance will not reflect in the copy that is added to `DiseasyModel`."
 )
 
+rd_overall_infection_risk <- paste(
+  "(`numeric`)\\cr",
+  "The overall multiplier for the infection risk for the model."
+)
+
 rd_compartment_structure <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste(

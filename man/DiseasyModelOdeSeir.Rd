@@ -219,6 +219,8 @@ Infer the state_vector from incidence data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$initialise_state_vector(
   incidence_data,
+  overall_infection_risk = self \%.\% parameters \%.\% overall_infection_risk,
+  ei_rs_balance = 1,
   method = c("derivative", "eigen-value")
 )}\if{html}{\out{</div>}}
 }
@@ -235,6 +237,11 @@ Incidence observations as a \code{data.frame} with columns
 \item \code{incidence}: The incidence in the age group at the given date
 }}
 
+\item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
+
+\item{\code{ei_rs_balance}}{(\code{numeric(1)})\cr
+Which estimate should be priorities when normalising? See details.}
+
 \item{\code{method}}{(\code{character(1)})\cr
 The method to use for initialising the state vector.
 \itemize{
@@ -246,9 +253,55 @@ See the article \code{SEIR-initialisation} in the online documentation for more 
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Details}{
+The inference of the state_vector from incidence data is two-fold: EI states are inferred with one method and
+the RS states are inferred with another. The methods are described in detail in the initialisation article
+\code{vignette("SEIR-initialisation")}.
+
+When these estimates are combined, there is a degree of freedom in how to weight the estimates when
+normalising the state vector. This is controlled by the \code{ei_rs_balance} parameter.
+If \code{ei_rs_balance = 1}, the estimate for EI states are prioritised, and only the RS states are modified.
+If \code{ei_rs_balance = 0}, the estimate for RS states are prioritised.
+}
+
 \subsection{Returns}{
 (\code{numeric()})\cr
 The initial state vector for the model (invisibly).
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-rhs"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-rhs}{}}}
+\subsection{Method \code{rhs()}}{
+The vectorised right hand side (RHS) function of the system of differential equations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$rhs(
+  t,
+  state_vector,
+  parms = NULL,
+  overall_infection_risk = self \%.\% parameters \%.\% overall_infection_risk
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{(\code{numeric(1)})\cr
+The time to solve for.}
+
+\item{\code{state_vector}}{(\code{numeric()})\cr
+The state vector to compute the RHS from.}
+
+\item{\code{parms}}{(\code{list})\cr
+Argument to comply with \code{deSolve::ode} format. Not used.}
+
+\item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(\code{numeric()})\cr
+The rate of change for the differential equations.
 }
 }
 \if{html}{\out{<hr>}}
