@@ -61,7 +61,8 @@ combinations |>
         variant = DiseasyVariant$new(),
         compartment_structure = c("E" = K, "I" = L, "R" = 1),
         disease_progression_rates = c("E" = rE, "I" = rI),
-        parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6)
+        parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6),
+        malthusian_matching = match
       )
 
       # Generate a uniform initial state_vector that sums to 1
@@ -72,7 +73,7 @@ combinations |>
       sol <- deSolve::ode(
         y = y0,
         times = seq(0, tmax),
-        func = m$.__enclos_env__$private %.% rhs,
+        func = m %.% rhs,
         parms = NULL
       )
 
