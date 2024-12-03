@@ -25,9 +25,12 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 }
 \examples{
 \dontshow{if (rlang::is_installed("RSQLite")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-  The model can be instantiated almost without arguments, but a observables modules needs to be specified.
-  obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
-                                conn = DBI::dbConnect(RSQLite::SQLite()))
+  # The model can be instantiated almost without arguments,
+  # but a observables modules needs to be specified.
+  obs <- DiseasyObservables$new(
+    diseasystore = "Google COVID-19",
+    conn = DBI::dbConnect(RSQLite::SQLite())
+  )
 
   # We create a default instance which has:
   # * 1 age group (0+)
@@ -38,7 +41,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 
   # TODO: Continue this minimal example once module is complete
 
-  rm(m)
+  rm(m, obs)
 \dontshow{\}) # examplesIf}
 }
 \keyword{model-template}
