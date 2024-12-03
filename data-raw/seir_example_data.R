@@ -61,10 +61,10 @@ activity_proportion <- cbind(
 activity <- population_proportion * activity_proportion
 activity <- activity / sum(activity)
 
-# 0.2% are newly infected
-y0[private$e1_state_indices] <- activity * 0.002
+# 0.05% are newly infected
+y0[private$e1_state_indices] <- activity * 0.0005
 
-# 99.8% are susceptible
+# 99.95% are susceptible
 y0[private$s_state_indices] <- population_proportion - y0[private$e1_state_indices]
 
 
