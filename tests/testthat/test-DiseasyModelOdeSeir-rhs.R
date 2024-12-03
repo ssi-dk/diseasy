@@ -1,7 +1,6 @@
 # For these tests to be more readable, we define some short hand here and explain their value
 rE <- 1 / 2 # Overall disease progression rate from E to I
 rI <- 1 / 4 # Overall disease progression rate from I to R
-fr <- 0.05 # R compartments have their infection risk reduced by this factor
 fv <- 0.01 # Whenever two variants are in use, the second has a relative infection risk of this factor
 
 
@@ -429,6 +428,12 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  # Get the immunity information
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.1 # Infections with both variants
@@ -466,6 +471,12 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
+
+  # Get the immunity information
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
 
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
@@ -624,6 +635,12 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  # Get the immunity information
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   # Check risk matrix is correctly set
   expect_equal(
     private %.% immunity_matrix,
@@ -674,6 +691,12 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
+
+  # Get the immunity information
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
 
   # Check risk matrix is correctly set
   expect_equal(
