@@ -832,7 +832,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @field immunity
     #'   Place holder for the immunity module
     immunity = list("approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N) {
-      c(rep(0.95, N), rep(1, N - 1))
+      c(rev(seq(from = 0.9, to = 0.05, length.out = N)), rep(1, N - 1))
     })
   ),
 

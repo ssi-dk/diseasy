@@ -1,7 +1,6 @@
 # For these tests to be more readable, we define some short hand here and explain their value
 rE <- 1 / 2 # Overall disease progression rate from E to I
 rI <- 1 / 4 # Overall disease progression rate from I to R
-fr <- 0.05 # R compartments have their infection risk reduced by this factor
 
 
 test_that("helpers works (SR single variant / single age group)", {
@@ -41,6 +40,11 @@ test_that("helpers works (SR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(0, 0))
 
   # Check risk matrix is correctly set
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   expect_equal(
     private %.% immunity_matrix,
     matrix(
@@ -89,6 +93,11 @@ test_that("helpers works (SIR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
 
   # Check risk matrix is correctly set
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   expect_equal(
     private %.% immunity_matrix,
     matrix(
@@ -154,6 +163,11 @@ test_that("helpers works (SIR double variant / double age group)", {
   )
 
   # Check risk matrix is correctly set
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   expect_equal(
     private %.% immunity_matrix,
     matrix(
@@ -206,6 +220,11 @@ test_that("helpers works (SEIR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
 
   # Check risk matrix is correctly set
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   expect_equal(
     private %.% immunity_matrix,
     matrix(
@@ -258,12 +277,16 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
   )
 
   # Check risk matrix is correctly set
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   expect_equal(
     private %.% immunity_matrix,
     matrix(
       c(
-        fr, # R1
-        fr, # R2
+        fr, # R1, R2
         1   # S
       ),
       ncol = 1,
@@ -326,14 +349,19 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
   )
 
   # Check risk matrix is correctly set
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   expect_equal(
     private %.% immunity_matrix,
     matrix(
       c(#v1 v2
-        fr, fr, # R1, Variant 1
-        fr, fr, # R2, Variant 1
-        fr, fr, # R1, Variant 2
-        fr, fr, # R2. Variant 2
+        fr[1], fr[1], # R1, Variant 1
+        fr[2], fr[2], # R2, Variant 1
+        fr[1], fr[1], # R1, Variant 2
+        fr[2], fr[2], # R2, Variant 2
         1,  1   # S
       ),
       ncol = 2,
@@ -399,18 +427,23 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   )
 
   # Check risk matrix is correctly set
+  fr <- 1 - purrr::keep_at(
+    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    seq_len(m %.% compartment_structure %.% R)
+  )
+
   expect_equal(
     private %.% immunity_matrix,
     matrix(
       c(#v1 v2
-        fr, fr, # R1, Age group 1, Variant 1
-        fr, fr, # R2, Age group 1, Variant 1
-        fr, fr, # R1, Age group 2, Variant 1
-        fr, fr, # R2, Age group 2, Variant 1
-        fr, fr, # R1, Age group 1, Variant 2
-        fr, fr, # R2, Age group 1, Variant 2
-        fr, fr, # R1, Age group 2, Variant 2
-        fr, fr, # R2, Age group 2, Variant 2
+        fr[1], fr[1], # R1, Age group 1, Variant 1
+        fr[2], fr[2], # R2, Age group 1, Variant 1
+        fr[1], fr[1], # R1, Age group 2, Variant 1
+        fr[2], fr[2], # R2, Age group 2, Variant 1
+        fr[1], fr[1], # R1, Age group 1, Variant 2
+        fr[2], fr[2], # R2, Age group 1, Variant 2
+        fr[1], fr[1], # R1, Age group 2, Variant 2
+        fr[2], fr[2], # R2, Age group 2, Variant 2
         1,  1,  # S, Age group 1
         1,  1   # S, Age group 2
       ),
