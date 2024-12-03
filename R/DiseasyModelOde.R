@@ -1,8 +1,14 @@
 #' @title Meta module for the regression class of models
 #'
 #' @description TODO
+#' @examples
+#'   # Normally, you would not want to create this module directly, but it is possible.
+#'   module <- DiseasyModelOde$new()
+#'
+#'   rm(module)
+#' @return
+#'   A new instance of the `DiseasyModelOde` [R6][R6::R6Class] class.
 #' @export
-#' @noRd
 DiseasyModelOde <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyModelOde",
   inherit = DiseasyModel,
