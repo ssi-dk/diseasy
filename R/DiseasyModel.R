@@ -270,14 +270,14 @@ DiseasyModel <- R6::R6Class(                                                    
         if (is.infinite(training_length)) {
           training_length <- as.numeric(
             lubridate::interval(
-              start = self %.% observables %.% ds %.% min_start_date,
+              start = purrr::pluck(self, "observables", "ds", "min_start_date", .default = last_queryable_date),
               end = last_queryable_date
             ),
             unit = "days"
           )
         }
 
-        # Calculate the training period from the `last_queryable_date` reservering data for the testing and validation
+        # Calculate the training period from the `last_queryable_date` reserving data for the testing and validation
         # periods
         training_period_end <- last_queryable_date -
           lubridate::days(sum(purrr::discard_at(self %.% parameters %.% training_length, "training")))
