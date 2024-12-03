@@ -13,7 +13,11 @@ linters: c(
       expect_identical_linter = NULL      # Seems a little aggressive to require this.
     )
   )
-exclude_linter: r"{^ *: *([\w, ]*)(.|$)}"
+exclude_linter: paste0(
+    "^ *: *(", # Any number of spaces before and after the colon
+    paste(c(names(lintr::all_linters()), names(diseasy_code_linters())), collapse = "|"), # Any of our linters
+    ",| )+(\\.|$)" # As a comma separated list (with optional spaces) followed by a period or end of line
+  )
 exclusions: c(
     list(
       "R/0_linters.R" = list(
