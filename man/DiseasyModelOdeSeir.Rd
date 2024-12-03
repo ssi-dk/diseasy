@@ -58,7 +58,8 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \item \href{#method-DiseasyModelOdeSeir-new}{\code{DiseasyModelOdeSeir$new()}}
 \item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
 \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
-\item \href{#method-DiseasyModelOdeSeir-initialize_state_vector}{\code{DiseasyModelOdeSeir$initialize_state_vector()}}
+\item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
+\item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
 \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
 }
 }
@@ -202,12 +203,12 @@ The Malthusian growth rate for the model.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModelOdeSeir-initialize_state_vector"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-initialize_state_vector}{}}}
-\subsection{Method \code{initialize_state_vector()}}{
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-initialise_state_vector"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-initialise_state_vector}{}}}
+\subsection{Method \code{initialise_state_vector()}}{
 Infer the state_vector from incidence data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$initialize_state_vector(
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$initialise_state_vector(
   incidence_data,
   method = c("derivative", "eigen-value")
 )}\if{html}{\out{</div>}}
