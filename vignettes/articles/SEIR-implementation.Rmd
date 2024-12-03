@@ -159,23 +159,23 @@ $$
 NOTE: In the code, `private$indexed_variant_infection_risk` is $\overline{\overline{\mathcal{E}}}$ in vector form.
 
 # The `infection_matrix`
-For the final computation of infections of the right-hand side, we construct the matrix `infection_matrix` 
+For the final computation of infections of the right-hand side, we construct the matrix `infection_matrix`
 ($\overline{\overline{f}}$).
 
 Since only $R$ and $S$ compartments are susceptible to infection, we need only to consider the $RS$ states to compute
 the new infections in the model.
 
-The new `infection_matrix` therefore does not need to contain the `K` exposed states and the `L` infected states, 
+The new `infection_matrix` therefore does not need to contain the `K` exposed states and the `L` infected states,
 but only the `M` recovered states and the $A$ susceptible states.
 
-We are therefore interested in the reduced state vector $\overline{\psi}_{RS}$ whose elements $e^*$ are the $R$ and $S$ 
-elements of the full state vector $\overline{\psi}$. 
+We are therefore interested in the reduced state vector $\overline{\psi}_{RS}$ whose elements $e^*$ are the $R$ and $S$
+elements of the full state vector $\overline{\psi}$.
 That is, $\overline{\psi}_{RS} = \{\psi_{e^*} \mid e^* \in \{R, S\}\}$.
 
 
-We now create an intermediate matrix $\overline{\overline{U}}$ by expanding the `infection_rate` matrix 
+We now create an intermediate matrix $\overline{\overline{U}}$ by expanding the `infection_rate` matrix
 ($\overline{\overline{T}}$) to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the rows of the `infection_rate`
-matrix. 
+matrix.
 This repeating is done by matching the age group of the `infection_rate` matrix to the age group of the reduced state
 vector. Each element, $e$, in the state vector, $\psi$ has a corresponding age group which we can write as $i|e$.
 

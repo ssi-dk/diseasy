@@ -175,7 +175,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$e1_state_indices <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
         sum(compartment_structure) + 1
 
-      # Then we store the indices for just the first compartment
+      # Then we store the indices for just the first infected compartment
       private$i1_state_indices <- private %.% e1_state_indices + purrr::pluck(compartment_structure, "E", .default = 0)
 
       # Store the indices of the first recovered compartments
