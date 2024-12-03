@@ -24,13 +24,18 @@ The model implements the following features:
 See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to use this model.
 }
 \examples{
-\dontshow{if (rlang::is_installed("RSQLite")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("duckdb")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   # The model can be instantiated almost without arguments,
   # but a observables modules needs to be specified.
   obs <- DiseasyObservables$new(
-    diseasystore = "Google COVID-19",
-    conn = DBI::dbConnect(RSQLite::SQLite())
+    diseasystore = DiseasystoreSeirExample,
+    conn = DBI::dbConnect(duckdb::duckdb())
   )
+
+  # The observables module also defines the time if interest via
+  # the `last_queryable_date` field. Data before this date are
+  # used to train the models, and predictions start on this date.
+  obs$set_last_queryable_date(as.Date("2020-02-15"))
 
   # We create a default instance which has:
   # * 1 age group (0+)
