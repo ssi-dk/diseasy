@@ -15,9 +15,12 @@
 #'
 #'    See `vignette(diseasy-model-ode-seir)` for a detailed examples of how to use this model.
 #' @examplesIf rlang::is_installed("RSQLite")
-#'   The model can be instantiated almost without arguments, but a observables modules needs to be specified.
-#'   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
-#'                                 conn = DBI::dbConnect(RSQLite::SQLite()))
+#'   # The model can be instantiated almost without arguments,
+#'   # but a observables modules needs to be specified.
+#'   obs <- DiseasyObservables$new(
+#'     diseasystore = "Google COVID-19",
+#'     conn = DBI::dbConnect(RSQLite::SQLite())
+#'   )
 #'
 #'   # We create a default instance which has:
 #'   # * 1 age group (0+)
@@ -28,7 +31,7 @@
 #'
 #'   # TODO: Continue this minimal example once module is complete
 #'
-#'   rm(m)
+#'   rm(m, obs)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
