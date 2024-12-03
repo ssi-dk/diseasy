@@ -132,7 +132,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
       # Store the given model configuration
-      private$compartment_structure <- compartment_structure
+      private$.compartment_structure <- compartment_structure
       private$disease_progression_rates <- disease_progression_rates
 
 
@@ -479,8 +479,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Compute the per-compartment progression rates
-      K <- private %.% compartment_structure %.% E
-      L <- private %.% compartment_structure %.% I
+      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)
+      L <- self %.% compartment_structure %.% I
 
       re <- (private %.% disease_progression_rates %.% E) * K
       ri <- (private %.% disease_progression_rates %.% I) * L
@@ -556,6 +556,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
   ),
 
 
+  active = list(
+    #' @field compartment_structure `r rd_compartment_structure("field")`
+    compartment_structure = purrr::partial(
+      .f = active_binding,
+      name = "compartment_structure",
+      expr = return(private %.% .compartment_structure)
+    )
+  ),
+
+
   private = list(
 
     .parameters = NULL,
@@ -614,7 +624,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       super$validate_parameters() # Validate inherited parameters
     },
 
-    compartment_structure = NULL,
+    .compartment_structure = NULL,
     disease_progression_rates = NULL,
 
     progression_flow_rates = NULL,
@@ -814,14 +824,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       t = 0,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(
-        rep(0, private %.% n_age_groups * private %.% n_variants * private %.% compartment_structure %.% R),
+        rep(0, private %.% n_age_groups * private %.% n_variants * self %.% compartment_structure %.% R),
         private$population_proportion
       )
     ) {
 
 
-      K <- purrr::pluck(private %.% compartment_structure, "E", .default = 0)
-      L <- private %.% compartment_structure %.% I
+      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)
+      L <- self %.% compartment_structure %.% I
 
       # Early return if no disease compartments
       if (K + L == 0) {

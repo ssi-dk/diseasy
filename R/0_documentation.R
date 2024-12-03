@@ -198,3 +198,15 @@ rd_diseasy_module <- paste(
   "instance. This copy is a \"clone\" of the instance at the time it is added and any subsequent changes to the",
   "instance will not reflect in the copy that is added to `DiseasyModel`."
 )
+
+rd_compartment_structure <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`named integer()`)\\cr",
+    "The structure of the compartments in the model.",
+    "The names should be `E`, `I`, and `R` for the exposed, infectious, and recovered compartments, respectively.",
+    switch(type == "param", "The exposed compartments can optionally be omitted."),
+    switch(type == "field", "Read only.")
+  )
+}
+
