@@ -187,7 +187,10 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Checks on contact_basis contacts
       checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
       checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "contacts")), private$activity_types, add = coll)
-      checkmate::assert_matrix(purrr::pluck(contact_basis, "contacts", 1), min.rows = 1, min.cols = 1, add = coll)
+      purrr::walk(
+        contact_basis$contacts,
+        \(contacts) checkmate::assert_matrix(contacts, min.rows = 1, min.cols = 1, any.missing = FALSE, add = coll)
+      )
 
       # - Check for consistency of the number of age groups in the contact matrices
       # All matrices should be square matrices with of the same dimensions
