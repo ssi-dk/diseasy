@@ -355,12 +355,26 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Infer the state_vector from incidence data
+    #'
+    #' @details
+    #'   The inference of the state_vector from incidence data is two-fold: EI states are inferred with one method and
+    #'   the RS states are inferred with another. The methods are described in detail in the initialisation article
+    #'   `vignette("SEIR-initialisation")`.
+    #'
+    #'   When these estimates are combined, there is a degree of freedom in how to weight the estimates when
+    #'   normalising the state vector. This is controlled by the `ei_rs_balance` parameter.
+    #'   If `ei_rs_balance = 1`, the estimate for EI states are prioritised, and only the RS states are modified.
+    #'   If `ei_rs_balance = 0`, the estimate for RS states are prioritised.
+    #'
     #' @param incidence_data (`data.frame`)\cr
     #'   Incidence observations as a `data.frame` with columns
     #'   - `date`: The date of the observations
     #'   - `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)
     #'   - `variant`: The variant of the incidence observation.
     #'   - `incidence`: The incidence in the age group at the given date
+    #' @param overall_infection_risk `r rd_overall_infection_risk`
+    #' @param ei_rs_balance (`numeric(1)`)\cr
+    #'   Which estimate should be priorities when normalising? See details.
     #' @param method (`character(1)`)\cr
     #'   The method to use for initialising the state vector.
     #'   - `derivative`: Directly infers the EI compartments from derivatives of the incidence signal.
@@ -369,7 +383,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   See the article `SEIR-initialisation` in the online documentation for more information.
     #' @return (`numeric()`)\cr
     #'   The initial state vector for the model (invisibly).
-    initialise_state_vector = function(incidence_data, method = c("derivative", "eigen-value")) {
+    initialise_state_vector = function(
+      incidence_data,
+      overall_infection_risk = self %.% parameters %.% overall_infection_risk,
+      ei_rs_balance = 1,
+      method = c("derivative", "eigen-value")
+    ) {
       method <- match.arg(method)
 
       coll <- checkmate::makeAssertCollection()
@@ -383,7 +402,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Check age_group column
-      checkmate::assert_character(incidence_data$age_group, any.missing = FALSE, add = coll)
+      checkmate::assert_character(
+        incidence_data$age_group,
+        any.missing = FALSE,
+        pattern = paste(diseasystore::age_labels(self %.% parameters %.% age_cuts_lower), collapse = "|"),
+        add = coll
+      )
 
       # Check variant column
       if (length(unique(incidence_data$variant)) > 1) {
@@ -491,7 +515,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       M <- matrix(rep(0, K * (K + 1)), nrow = K)
       active_row <- c(ri, 1)
 
-      for (k in seq(K)) {
+      for (k in seq_len(K)) {
         if (k > 1) {
           active_row <- c(0, active_row) + re * c(active_row, 0)
         }
@@ -504,12 +528,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       incidence_subset_labels <- purrr::map(incidence_subsets, ~ dplyr::distinct(., .data$age_group, .data$variant))
 
       # For each age_group / variant combination, compute the E_k and I_l states
-      estimated_initial_states <- purrr::map(
+      estimated_exposed_infected_states <- purrr::map(
         seq_along(incidence_subset_labels),
         \(group_id) {
 
           # Define the vector for the matrix multiplication
-          ss <- incidence_signal_derivatives[[group_id]][seq.int(K + 1)]
+          ss <- incidence_signal_derivatives[[group_id]][seq_len(K + 1)]
           ss[is.na(ss)] <- 0
 
           # Compute E states from derivatives
@@ -526,7 +550,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           dplyr::cross_join(
             incidence_subset_labels[[group_id]],
             data.frame(
-              "state" = c(paste0("E", seq.int(K)), paste0("I", seq.int(L))),
+              "state" = c(
+                purrr::map_chr(seq_len(K), ~ paste0("E", .)),
+                purrr::map_chr(seq_len(L), ~ paste0("I", .))
+              ),
               "initial_condition" = pmax(0, c(E_k, I_l))
             )
           )
@@ -534,6 +561,149 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ) |>
       purrr::list_rbind()
 
+      # Report negative values
+      if (purrr::some(estimated_exposed_infected_states$initial_condition, ~ . < 0)) {
+        warning("Negative values in estimated exposed and infected states. Setting to zero.")
+        estimated_exposed_infected_states <- estimated_exposed_infected_states |>
+          dplyr::mutate("initial_condition" = pmax(0, .data$initial_condition))
+      }
+
+      # Impute zeros for missing states
+      estimated_exposed_infected_states <- tidyr::expand_grid(
+        "variant" = names(self %.% variant %.% variants),
+        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+        "state" = c(
+          purrr::map_chr(seq_len(K), ~ paste0("E", .)),
+          purrr::map_chr(seq_len(L), ~ paste0("I", .))
+        ),
+        "initial_condition" = 0
+      ) |>
+        dplyr::rows_update(estimated_exposed_infected_states, by = c("variant", "age_group", "state"))
+
+
+      # Now we use the forcing method to generate the initial R and s states
+      # To this purpose, we generate the reduced model with no R states and one less I state.
+      compartment_structure <- c(
+        "I" = self %.% compartment_structure %.% I - 1,
+        "R" = self %.% compartment_structure %.% R
+      )
+
+      disease_progression_rates <- self %.% disease_progression_rates |>
+        purrr::keep_at("I") * self %.% compartment_structure %.% I /  compartment_structure %.% I
+
+      m_forcing <- DiseasyModelOdeSeir$new(
+        observables = self %.% observables,
+        activity = self %.% activity,
+        variant = self %.% variant,
+        disease_progression_rates = disease_progression_rates,
+        compartment_structure = compartment_structure,
+        parameters = self %.% parameters,
+        malthusian_matching = FALSE
+      )
+
+
+      # Approximate the signal within each group
+      # .. and ensure we have a signal for each group in the model
+      signal_approximations <- tidyr::expand_grid(
+        "date" = seq.Date(from = min(incidence_data$date), to = obs$last_queryable_date, by = "1 day"),
+        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+        "variant" = names(self %.% variant %.% variants)
+      ) |>
+        dplyr::left_join(incidence_data, by = c("date", "age_group", "variant")) |>
+        dplyr::group_by(.data$variant, .data$age_group) |>
+        dplyr::group_map(~ {
+          stats::approxfun(
+            x = as.numeric(.x$date - max(.x$date), unit = "days"),
+            y = .x$incidence,
+            method = "constant",
+            rule = 2
+          )
+        })
+
+      # Collapse to a single vector for the model
+      signal <- \(t) purrr::map_dbl(signal_approximations, ~ .(t))
+
+      # We also need some state index helpers for the forcing model
+      # (Taken from $initialize())
+      i1_state_indices <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) * sum(compartment_structure) + 1
+      r1_state_indices <- i1_state_indices + purrr::pluck(compartment_structure, "I")
+      s_state_indices <- seq(private %.% n_age_groups) +
+        sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
+      rs_state_indices <- r1_state_indices |>
+        purrr::map(~ . + seq_len(purrr::pluck(compartment_structure, "R")) - 1) |>
+        purrr::reduce(c, .init = s_state_indices, .dir = "backward")
+
+
+
+      # Use the interpolated signal as a forcing function for I1
+      m_forcing$set_forcing_functions(
+        infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
+        state_vector_forcing = \(t, dy_dt) {
+          dy_dt[i1_state_indices] <- dy_dt[i1_state_indices] - signal(t) # Use signal as forcing for out of I1
+          return(dy_dt)
+        }
+      )
+
+
+      # Run the simulation forward to estimate the R and S states
+      sol <- deSolve::ode(
+        y = c(
+          rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
+          private %.% population_proportion # S states
+        ),
+        times = rev(seq(0, min(incidence_data$date) - self %.% observables %.% last_queryable_date)),
+        func = m_forcing %.% rhs,
+        parms = list("overall_infection_risk" = overall_infection_risk)
+      )
+
+
+      # Get R and S states from the last row
+      estimated_recovered_susceptible_states <- tidyr::expand_grid(
+        "variant" = names(self %.% variant %.% variants),
+        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+        "state" = paste0("R", seq.int(self %.% compartment_structure %.% R))
+      ) |>
+        dplyr::add_row(
+          "variant" = NA,
+          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+          "state" = "S"
+        ) |>
+        dplyr::mutate(
+          "initial_condition" = sol[nrow(sol), rs_state_indices + 1]
+        )
+
+      # Report negative values
+      if (purrr::some(estimated_recovered_susceptible_states$initial_condition, ~ . < 0)) {
+        warning("Negative values in estimated recovered and susceptible states. Setting to zero.")
+        estimated_recovered_susceptible_states <- estimated_recovered_susceptible_states |>
+          dplyr::mutate("initial_condition" = pmax(0, .data$initial_condition))
+      }
+
+
+      # Combine to single output
+      initial_state_vector <- dplyr::union_all(
+        estimated_exposed_infected_states,
+        estimated_recovered_susceptible_states
+      ) |>
+        dplyr::arrange(.data$variant, .data$age_group, .data$state)
+
+
+      # Normalise
+      initial_state_vector <- initial_state_vector |>
+        dplyr::mutate(
+          "weight" = dplyr::case_when(
+            stringr::str_starts(.data$state, "E") ~ 1 - ei_rs_balance,
+            stringr::str_starts(.data$state, "I") ~ 1 - ei_rs_balance,
+            stringr::str_starts(.data$state, "R") ~ ei_rs_balance,
+            stringr::str_starts(.data$state, "S") ~ ei_rs_balance,
+          ) * .data$initial_condition,
+          "initial_condition" = .data$initial_condition +
+            .data$weight * (1 - sum(.data$initial_condition)) / sum(.data$weight),
+        ) |>
+        dplyr::select(!"weight")
+
+      return(invisible(initial_state_vector))
+    },
 
       # Impute zeros for missing states
       initial_state_vector <- tidyr::expand_grid(
