@@ -549,10 +549,11 @@ DiseasyActivity <- R6::R6Class(                                                 
           scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
             self$contact_basis$contacts[[tt]]
         }
+      }
 
-        # Project into new age_groups if given
-        if (!is.null(age_cuts_lower)) {
-          p <- private$population_transform_matrix(age_cuts_lower)
+      # Project into new age_groups if given
+      if (!is.null(age_cuts_lower)) {
+        p <- private$population_transform_matrix(age_cuts_lower)
 
         # To perform the projection, we need the number of persons in the new and original age groups
         # Determine the population in the new age groups
