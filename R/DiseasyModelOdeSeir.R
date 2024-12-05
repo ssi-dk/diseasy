@@ -49,14 +49,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param compartment_structure (`named integer()`)\cr
-    #'   The structure of the compartments in the model.
-    #'   The names should be `E`, `I`, and `R` for the exposed, infectious, and recovered compartments, respectively.
-    #'   The exposed compartments can optionally be omitted.
-    #' @param disease_progression_rates (`named numeric()`)\cr
-    #'   The overall progression rates for the disease states.
-    #'   The reciprocal of each rate is the average time spent in the all of the corresponding compartments.
-    #'   The exposed compartments can optionally be omitted.
+    #' @param compartment_structure `r rd_compartment_structure()`
+    #' @param disease_progression_rates `r rd_disease_progression_rates()`
     #' @param malthusian_matching (`logical(1)`)\cr
     #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
     #' @param activity,season,variant `r rd_diseasy_module`
@@ -815,7 +809,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
 
-    #' @field immunity
+    #' @field immunity (`diseasy::DiseasyImmunity`)\cr
     #'   Place holder for the immunity module
     immunity = list(
       "approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), M = NULL) {            # nolint: object_name_linter
