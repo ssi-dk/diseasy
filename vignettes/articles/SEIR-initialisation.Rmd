@@ -477,7 +477,7 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   return(m)
 }
 
-m <- generate_model(2, 1, 1)
+m <- generate_model(2, 1, 1) # Use the configuration from example data
 ```
 
 
