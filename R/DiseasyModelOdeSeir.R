@@ -1122,10 +1122,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       ## Compute the transmissions component
 
-      # Ensure the RS_states sums to 1
-      RS_states <- RS_states / sum(RS_states)                                                                           # nolint: object_name_linter
-
-
       # Retrieve the active contact matrix
       contact_matrix <- private %.% contact_matrix(t)
 
@@ -1139,8 +1135,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Compute the "cross-section" of the contacts
-      # The pre-computed "immunity_matrix" contains what we need
-      rho <- private %.% immunity_matrix * RS_states
+      # The pre-computed "immunity_matrix" contains what we need.
+      # However, we need to ensure the RS_states sums to 1
+      rho <- private %.% immunity_matrix * (RS_states / sum(RS_states))
       rho <- purrr::map_dbl(private %.% infection_matrix_to_rs_indices, ~ sum(rho[.])) |>
         matrix(nrow = private %.% n_age_groups, ncol = private %.% n_variants)
 
