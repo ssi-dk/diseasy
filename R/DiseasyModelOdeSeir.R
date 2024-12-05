@@ -704,10 +704,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       initial_state_vector <- initial_state_vector |>
         dplyr::mutate(
           "weight" = dplyr::case_when(
-            stringr::str_starts(.data$state, stringr::fixed("E")) ~ 1 - ei_rs_balance,
-            stringr::str_starts(.data$state, stringr::fixed("I")) ~ 1 - ei_rs_balance,
-            stringr::str_starts(.data$state, stringr::fixed("R")) ~ ei_rs_balance,
-            stringr::str_starts(.data$state, stringr::fixed("S")) ~ ei_rs_balance
+            startsWith(.data$state, "E") ~ 1 - ei_rs_balance,
+            startsWith(.data$state, "I") ~ 1 - ei_rs_balance,
+            startsWith(.data$state, "R") ~ ei_rs_balance,
+            startsWith(.data$state, "S") ~ ei_rs_balance
           ) * .data$initial_condition,
           "initial_condition" = .data$initial_condition +
             .data$weight * (1 - sum(.data$initial_condition)) / sum(.data$weight)
