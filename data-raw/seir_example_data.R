@@ -1,4 +1,4 @@
-if (rlang::is_installed("deSolve")) {
+if (rlang::is_installed(c("deSolve", "usethis"))) {
 
   # Generate synthetic disease data for testing from a simple SEIR model with some noise added
   set.seed(4260)
