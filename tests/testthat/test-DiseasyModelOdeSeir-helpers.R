@@ -1,6 +1,6 @@
 # For these tests to be more readable, we define some short hand here and explain their value
-rE <- 1 / 2 # Overall disease progression rate from E to I
-rI <- 1 / 4 # Overall disease progression rate from I to R
+rE <- 1 / 2 # Overall disease progression rate from E to I                                                              # nolint: object_name_linter
+rI <- 1 / 4 # Overall disease progression rate from I to R                                                              # nolint: object_name_linter
 
 
 test_that("helpers works (SR single variant / single age group)", {
