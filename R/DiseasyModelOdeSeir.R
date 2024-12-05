@@ -243,7 +243,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Get risks and accompanying rates from DiseasyImmunity
       immunity_approx <- self %.% immunity %.% approximate_compartmental(
         method = self %.% parameters %.% immunity.method,
-        N = compartment_structure[["R"]]
+        M = compartment_structure[["R"]]
       )
       immunity_risks <- 1 - immunity_approx[1:compartment_structure[["R"]]]
       immunity_rates <- immunity_approx[-(1:compartment_structure[["R"]])]
@@ -818,8 +818,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @field immunity
     #'   Place holder for the immunity module
     immunity = list(
-      "approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N = NULL) {            # nolint: object_name_linter
-        c(rev(seq(from = 0.9, to = 0.05, length.out = N)), rep(1, N - 1))
+      "approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), M = NULL) {            # nolint: object_name_linter
+        c(rev(seq(from = 0.9, to = 0.05, length.out = M)), rep(1, M - 1))
       }
     )
   ),
