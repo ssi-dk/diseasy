@@ -95,7 +95,7 @@ In addition, it provides useful utilities for the implementation of the model su
 The `DiseasyModel` class contains slots for instances of functional modules:
 
 ```{r generate_list_of_functional_modules, echo = FALSE, results = 'asis'}
-# We dynamically update this list, as new functional modules are added to DiseasyModel
+# We dynamically update this list as new functional modules are added to DiseasyModel
 purrr::keep(names(DiseasyModel$private_fields), ~ startsWith(., ".Diseasy")) |>
   purrr::map_chr(~ stringr::str_remove(., stringr::fixed(".Diseasy"))) |>
   purrr::map_chr(~

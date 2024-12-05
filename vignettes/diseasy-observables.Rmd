@@ -25,7 +25,11 @@ library(diseasy)
 
 ```{r download, include = FALSE, eval = suggests_available}
 # Download the first n rows of the Google data set of interest
-tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
+tmp_dir <- stringr::str_replace_all(
+  tempdir(),
+  stringr::fixed(r"{\\}"),
+  .Platform$file.sep
+)
 remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 
@@ -73,32 +77,40 @@ obs$describe()
 # Getting observations
 We can query the model to give the data for a given observable in a given time frame:
 ```{r example_1, eval = suggests_available}
-obs$get_observation(observable = "n_population",
-                    start_date = as.Date("2020-03-01"),
-                    end_date = as.Date("2020-05-01"))
+obs$get_observation(
+  observable = "n_population",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-05-01")
+)
 
 # NOTE: "target_conn" is a SQLite data base which has "numeric" as the "date" type.
-# NOTE: The population here is not stratified, so covers all countries in the Google data
+# NOTE: The population here is not stratified by country.
 ```
 
 If we want to stratify our data, we supply the stratification argument.
 This argument is designed to be flexible, but it means they need to be wrapped in `rlang::quos()`.
 We will see below, why that is.
 ```{r example_2, eval = suggests_available}
-obs$get_observation(observable = "n_hospital",
-                    stratification = rlang::quos(age_group),
-                    start_date = as.Date("2020-03-01"),
-                    end_date = as.Date("2020-05-01"))
+obs$get_observation(
+  observable = "n_hospital",
+  stratification = rlang::quos(age_group),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-05-01")
+)
 ```
 
 Since the stratification is flexible, we can programmatically stratify:
 ```{r example_3, eval = suggests_available}
-obs$get_observation(observable = "n_hospital",
-                    stratification = rlang::quos(young_age_groups =
-                                                   age_group %in% c("00-09", "10-19")),
-                    start_date = as.Date("2020-03-01"),
-                    end_date = as.Date("2020-05-01"))
+obs$get_observation(
+  observable = "n_hospital",
+  stratification = rlang::quos(
+    young_age_groups = age_group %in% c("00-09", "10-19")
+  ),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-05-01")
+)
 
-# NOTE: "target_conn" is a SQLite data base which has "numeric" as the "boolean" type.
+# NOTE: "target_conn" is a SQLite data base which has "numeric"
+# as the "boolean" type.
 ```
 
