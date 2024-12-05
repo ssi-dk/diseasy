@@ -399,9 +399,18 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_data_frame(incidence_data, add = coll)
       checkmate::assert_names(
         colnames(incidence_data),
-        must.include = c("age_group", "variant", "date", "incidence"),
+        must.include = c("date", "incidence"),
         add = coll
       )
+
+      # Add defaults for missing age_group and variant columns
+      if (!"age_group" %in% colnames(incidence_data)) {
+        incidence_data <- dplyr::mutate(incidence_data, "age_group" = "0+")
+      }
+      if (!"variant" %in% colnames(incidence_data)) {
+        incidence_data <- dplyr::mutate(incidence_data, "variant" = "WT")
+      }
+
 
       # Check age_group column
       checkmate::assert_character(
@@ -572,7 +581,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Impute zeros for missing states
       estimated_exposed_infected_states <- tidyr::expand_grid(
-        "variant" = names(self %.% variant %.% variants),
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
@@ -609,7 +618,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       signal_approximations <- tidyr::expand_grid(
         "date" = seq.Date(from = min(incidence_data$date), to = obs$last_queryable_date, by = "1 day"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
-        "variant" = names(self %.% variant %.% variants)
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT")
       ) |>
         dplyr::left_join(incidence_data, by = c("date", "age_group", "variant")) |>
         dplyr::group_by(.data$variant, .data$age_group) |>
@@ -665,7 +674,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
-        "variant" = names(self %.% variant %.% variants),
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = paste0("R", seq.int(self %.% compartment_structure %.% R))
       ) |>
@@ -1085,7 +1094,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # The diagonal elements of the transition matrix is just (minus) the progression flow rates
       progression_flow_rates <- c(
         rep(K * purrr::pluck(self %.% disease_progression_rates, "E", .default = 0), K),
-        rep(L * purrr::pluck(self %.% disease_progression_rates, "I"), L)
+        rep(L * purrr::pluck(self %.% disease_progression_rates, "I", .default = 0), L)
       )
       transition_matrix <- diag(
         - rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
