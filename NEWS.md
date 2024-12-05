@@ -2,6 +2,11 @@
 
 ## Features:
 
+* `DiseasyBaseModule`: The baseline for all `diseasy` modules.
+
+  Key features:
+  * A caching system using `{cachem}` where computation can be stored in memory or on disk for persistence (#130).
+
 * `DiseasyVariant`: A functional module to implement scenarios for disease variants (#111).
 
 * `DiseasyModel`: A base class for the model templates (#36).

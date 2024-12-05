@@ -12,15 +12,20 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-
-options("tibble.print_min" = 5)
-
-# We have a "hard" dependency for RSQLite to render this vignette
-suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 ```{r setup}
 library(diseasy)
+```
+
+```{r vignette configuration, include = FALSE}
+opts <- options(
+  "tibble.print_min" = 5,
+  "diseasy.logging" = FALSE
+)
+
+# We have a "hard" dependency for RSQLite to render this vignette
+suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 ```{r download, include = FALSE, eval = suggests_available}
@@ -36,7 +41,6 @@ purrr::walk(google_files, \(file_name) {
 })
 options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir)
 options("diseasystore.DiseasystoreGoogleCovid19.verbose" = FALSE)
-options("diseasy.logging" = FALSE)
 ```
 
 # Introduction
@@ -102,3 +106,8 @@ obs$get_observation(observable = "n_hospital",
 # NOTE: "target_conn" is a SQLite data base which has "numeric" as the "boolean" type.
 ```
 
+```{r cleanup, include = FALSE}
+if (exists("obs")) rm(obs)
+gc()
+options(opts)
+```
