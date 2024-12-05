@@ -177,7 +177,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Store the indices of the first compartments for later RHS computation
-      private$e1_state_indices <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
+      private$e1_state_indices <- (seq_len(private %.% n_variants * private %.% n_age_groups) - 1) *
         sum(compartment_structure) + 1
 
       # Then we store the indices for just the first infected compartment
@@ -194,7 +194,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Store the indices of the susceptible states
-      private$s_state_indices <- seq(private %.% n_age_groups) +
+      private$s_state_indices <- seq_len(private %.% n_age_groups) +
         sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
 
 
@@ -219,10 +219,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # that element in the state_vector corresponds to.
       # The state vector is assumed to be ordered as follows:
       # [ [E, I, R]_age_group_1_variant_1, [E, I, R]_age_group_2_variant_1, ..., S ]
-      private$rs_age_group <- seq(private %.% n_age_groups) |> # Starting with the number of age groups
+      private$rs_age_group <- seq_len(private %.% n_age_groups) |> # Starting with the number of age groups
         purrr::map(~ rep(., purrr::pluck(compartment_structure, "R"))) |> # We repeat for each R state
         rep(private %.% n_variants) |> # And since we have multiple variants, this is repeated
-        purrr::reduce(c, .init = seq(private %.% n_age_groups), .dir = "backward") # We collapse and add the S states
+        purrr::reduce(c, .init = seq_len(private %.% n_age_groups), .dir = "backward") # Collapse and add the S states
 
       # We now expand the previous map to also include an id for variant.
       # This map is used later in the RHS where we have a n x v matrix called BI_av, where n is the length of the
@@ -504,7 +504,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       incidence_signal_derivatives <- purrr::map(
         incidence_poly_fits,
         ~ stats::setNames(
-          .x$coefficients[1:(max_order_derivative + 1)] * pmax(1, seq(max_order_derivative + 1) - 1),
+          .x$coefficients[1:(max_order_derivative + 1)] * pmax(1, seq_len(max_order_derivative + 1) - 1),
           derivative_names
         )
       )
@@ -528,7 +528,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           active_row <- c(0, active_row) + re * c(active_row, 0)
         }
 
-        M[k, seq(k + 1)] <- active_row
+        M[k, seq_len(k + 1)] <- active_row                                                                              # nolint: object_name_linter
       }
 
 
@@ -550,7 +550,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # Compute I states from polynomial fit
           I_star <- stats::predict(                                                                                     # nolint: object_name_linter
             incidence_poly_fits[[group_id]],
-            newdata = data.frame(t = -(seq(L) - 1) / ri)
+            newdata = data.frame(t = -(seq_len(L) - 1) / ri)
           )
           I_l <- as.numeric(I_star) / ri                                                                                # nolint: object_name_linter
 
@@ -633,12 +633,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We also need some state index helpers for the forcing model
       # (Taken from $initialize())
-      i1_state_indices <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
+      i1_state_indices <- (seq_len(private %.% n_variants * private %.% n_age_groups) - 1) *
         sum(compartment_structure) + 1
 
       r1_state_indices <- i1_state_indices + purrr::pluck(compartment_structure, "I")
 
-      s_state_indices <- seq(private %.% n_age_groups) +
+      s_state_indices <- seq_len(private %.% n_age_groups) +
         sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
 
       rs_state_indices <- r1_state_indices |>
@@ -663,7 +663,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
           private %.% population_proportion # S states
         ),
-        times = rev(seq(0, min(incidence_data$date) - self %.% observables %.% last_queryable_date)),
+        times = rev(seq(from = 0, to = min(incidence_data$date) - self %.% observables %.% last_queryable_date)),
         func = m_forcing %.% rhs,
         parms = list("overall_infection_risk" = overall_infection_risk)
       )
@@ -1158,9 +1158,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       transmission_matrix <- 0 * transition_matrix
 
       # Then fill in with beta elements
-      for (a in seq(private %.% n_variants)) { # This has to be a nested for loop for the referencing to work
-        for (i in seq(private %.% n_age_groups)) {
-          for (j in seq(private %.% n_age_groups)) {
+      for (a in seq_len(private %.% n_variants)) { # This has to be a nested for loop for the referencing to work
+        for (i in seq_len(private %.% n_age_groups)) {
+          for (j in seq_len(private %.% n_age_groups)) {
             transmission_matrix[
               #                                   Block offset
               1 + (i - 1) * (K + L)               + (a - 1) * (K + L) * private %.% n_age_groups,
