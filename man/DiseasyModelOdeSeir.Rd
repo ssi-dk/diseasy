@@ -56,7 +56,8 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{immunity}}{Place holder for the immunity module}
+\item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
+Place holder for the immunity module}
 }
 \if{html}{\out{</div>}}
 }
@@ -112,15 +113,9 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{compartment_structure}}{(\verb{named integer()})\cr
-The structure of the compartments in the model.
-The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively.
-The exposed compartments can optionally be omitted.}
+\item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.}
 
-\item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr
-The overall progression rates for the disease states.
-The reciprocal of each rate is the average time spent in the all of the corresponding compartments.
-The exposed compartments can optionally be omitted.}
+\item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.}
 
 \item{\code{malthusian_matching}}{(\code{logical(1)})\cr
 Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?}
