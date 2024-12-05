@@ -14,13 +14,13 @@
 #'   # Season module with an constant season
 #'   s1 <- DiseasySeason$new()
 #'
-#'   x <- 0:365
-#'   plot(x, purrr::map_dbl(x, s1$model_t))
+#'   t <- 0:365
+#'   plot(t, purrr::map_dbl(t, s1$model_t), ylab = "Effect")
 #'
-#'   # Season module with an consine season
+#'   # Season module with an cosine season
 #'   s2 <- DiseasySeason$new(reference_date = Sys.Date())
 #'   s2$use_cosine_season()
-#'   plot(x, purrr::map_dbl(x, s2$model_t))
+#'   plot(t, purrr::map_dbl(t, s2$model_t), ylab = "Effect")
 #'
 #'   rm(s1, s2)
 #' @return
