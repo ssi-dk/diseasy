@@ -410,5 +410,46 @@ $$
 \right]
 $$
 
+
+# Notes on optimisations
+
+It is important that the implementation is somewhat optimised for the simulations to run in reasonable time.
+To that end, we here show micro-benchmarks of different implementations of the same steps to highlight why a given
+implementation was chosen.
+
+These benchmarks assume a simple SEIR model with only tree age group and one variant.
+
+## "infected" sum computation
+```{r}
+## Step 1, determine the number of infected by age group and variant
+i_state_indices <- list(2, 5, 8)
+state_vector <- rep(0, 9)
+
+# Benchmark possible approaches
+microbenchmark::microbenchmark( # Microseconds
+  "purrr::map_dbl" = purrr::map_dbl(
+    i_state_indices,
+    \(indices) sum(state_vector[indices])
+  ),
+  "sapply" = sapply(
+    i_state_indices,
+    \(indices) sum(state_vector[indices])
+  ),
+  "sapply - USE.NAMES" = sapply(
+    i_state_indices,
+    \(indices) sum(state_vector[indices]),
+    USE.NAMES = FALSE
+  ),
+  "vapply" = vapply(
+    i_state_indices,
+    \(indices) sum(state_vector[indices]),
+    FUN.VALUE = numeric(1),
+    USE.NAMES = FALSE
+  ),
+  check = "equal", times = 1000L
+)
+```
+
+
 [^1]: Other age groups are implicitly included in the shown model, but the infections between age groups
 are not schematically shown.
