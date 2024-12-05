@@ -468,32 +468,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
 
 
-      ##### This block is validation only
-      incidence_data <- purrr::map2(
-        incidence_subsets,
-        incidence_poly_fits,
-        ~ dplyr::mutate(.x, "incidence_poly_fit" = !!stats::predict(.y, newdata = .x))
-      ) |>
-        purrr::list_rbind()
-
-
-      incidence_data |>
-        dplyr::filter(.data$t <= 30) |>
-        tidyr::pivot_longer(
-          cols = starts_with("incidence"),
-          names_prefix = "^incidence_?",
-          names_to = "incidence_type",
-          values_to = "incidence"
-        ) |>
-        dplyr::mutate("incidence_type" = dplyr::if_else(.data$incidence_type == "", "Estimated", "Polyfit")) |>
-        ggplot2::ggplot(ggplot2::aes(x = t, y = incidence, color = incidence_type)) +
-          ggplot2::geom_line(linewidth = 1.5) +
-          ggplot2::facet_grid(variant ~ age_group) +
-          ggplot2::ylim(0, 1.2 * max(incidence_data$incidence)) +
-          ggplot2::theme_bw()
-      ##### End validation block
-
-
       # Compute the derivatives of the signal ("signal" vector)
       max_order_derivative <- self %.% parameters %.% incidence_max_order_derivatives
 
