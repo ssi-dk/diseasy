@@ -1,8 +1,7 @@
 # For these tests to be more readable, we define some short hand here and explain their value
-rE <- 1 / 2 # Overall disease progression rate from E to I
-rI <- 1 / 4 # Overall disease progression rate from I to R
+rE <- 1 / 2 # Overall disease progression rate from E to I                                                              # nolint: object_name_linter
+rI <- 1 / 4 # Overall disease progression rate from I to R                                                              # nolint: object_name_linter
 fv <- 0.01 # Whenever two variants are in use, the second has a relative infection risk of this factor
-
 
 
 test_that("RHS does not leak and solution is non-negative (SEIR single variant / single age group)", {

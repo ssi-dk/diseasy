@@ -349,7 +349,10 @@ dir.create("cache/SEIR-initialisation", showWarnings = FALSE)
 conn <- duckdb::duckdb(dbdir = "cache/SEIR-initialisation/ds.duckdb") |>
   DBI::dbConnect()
 
-obs <- DiseasyObservables$new(diseasystore = DiseasystoreSeirExample, conn = conn)
+obs <- DiseasyObservables$new(
+  diseasystore = DiseasystoreSeirExample,
+  conn = conn
+)
 
 obs$set_study_period( # Use all available data
   start_date = obs$ds$min_start_date,
@@ -385,16 +388,32 @@ model_data
 ```{r}
 # Visualise the example data
 ggplot2::ggplot(model_data) +
-  ggplot2::geom_line(ggplot2::aes(x = date, y = n_infected, color = "Infected"), linewidth = 1) +
-  ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
-  ggplot2::geom_line(ggplot2::aes(x = date, y = n_positive_simple, color = "Test positive (simple)"), linewidth = 1) +
+  ggplot2::geom_line(
+    ggplot2::aes(x = date, y = n_infected, color = "Infected"),
+    linewidth = 1
+  ) +
+  ggplot2::geom_point(
+    ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")
+  ) +
+  ggplot2::geom_line(
+    ggplot2::aes(
+      x = date, y = n_positive_simple,
+      color = "Test positive (simple)"
+    ),
+    linewidth = 1
+  ) +
   ggplot2::facet_wrap(~ age_group) +
   ggplot2::ylab("Test positive / Infected") +
   ggplot2::scale_color_manual(
-    values = c("Infected" = "deepskyblue3", "Test positive (simple)" = "orange", "Test positive (realistic)" = "seagreen")
+    values = c(
+      "Infected"                  = "deepskyblue3",
+      "Test positive (simple)"    = "orange",
+      "Test positive (realistic)" = "seagreen"
+    )
   ) +
   ggplot2::labs(colour = "Model output")
 ```
+
 These different levels of detail allows us to test the initialisation from incidence data in different cases.
 
 
@@ -402,9 +421,15 @@ The method relies on having incidence data, so we scale the model outputs by the
 ```{r}
 # Scale test / infected information to incidence data
 incidence_data <- model_data |>
-  tidyr::pivot_longer(dplyr::starts_with("n_"), names_to = "source", values_to = "model_output") |>
+  tidyr::pivot_longer(
+    cols = dplyr::starts_with("n_"),
+    names_to = "source",
+    values_to = "model_output"
+  ) |>
   dplyr::mutate(
-    "incidence" = .data$model_output / (sum(contact_basis$DK$population) * dplyr::if_else(.data$source == "n_infected", 1, 0.65))
+    "reporting_percentage" = dplyr::if_else(.data$source == "n_infected", 1, 0.65),
+    "incidence" = .data$model_output /
+      (sum(contact_basis$DK$population) * .data$reporting_percentage)
   )
 ```
 
@@ -443,7 +468,10 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
     activity = act,
     compartment_structure = c("E" = K, "I" = L, "R" = M),
     disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 30, 60), "overall_infection_risk" = 0.025)
+    parameters = list(
+      "age_cuts_lower" = c(0, 30, 60),
+      "overall_infection_risk" = 0.025
+    )
   )
 
   return(m)
@@ -458,7 +486,9 @@ This method relies on fitting a polynomial to the latest period, so we here visu
 # Extract the most recent signal
 poly_fit_data <- incidence_data |>
   dplyr::filter(source == !!source) |>
-  dplyr::mutate("t" = as.numeric(.data$date - !!obs$last_queryable_date, units = "days"))
+  dplyr::mutate(
+    "t" = as.numeric(.data$date - !!obs$last_queryable_date, units = "days")
+  )
 
 poly_fit_projection <- poly_fit_data |>
   dplyr::group_by(.data$age_group, .data$variant) |>
@@ -488,9 +518,9 @@ incidence_data |>
     ggplot2::geom_point(
       color = switch(
         source,
-        "n_infected" = "orange",
+        "n_infected"        = "orange",
         "n_positive_simple" = "deepskyblue3",
-        "n_positive" = "seagreen"
+        "n_positive"        = "seagreen"
       )
     ) +
     ggplot2::geom_line(data = poly_fit_projection, color = "red", linewidth = 1) +
@@ -499,12 +529,16 @@ incidence_data |>
       linetype = 2, linewidth = 1, color = "red"
     ) +
     ggplot2::geom_vline(
-      xintercept = obs$last_queryable_date - m$parameters$incidence_polynomial_training_length,
+      xintercept = obs$last_queryable_date -
+        m$parameters$incidence_polynomial_training_length,
       linetype = 2, linewidth = 1, color = "red"
     ) +
     ggplot2::ylim(
       0,
-      1.1*max(dplyr::pull(dplyr::filter(incidence_data, source == !!source), "incidence"))
+      incidence_data |>
+        dplyr::filter(source == !!source) |>
+        dplyr::pull("incidence") |>
+        max() * 1.1
     ) +
     ggplot2::facet_wrap(~ age_group) +
     ggplot2::theme_bw()
@@ -522,7 +556,12 @@ psi
 
 And we now test the initial conditions by solving the model using these starting conditions.
 ```{r}
-get_prediction <- function(model, psi, reporting_percentage = 1, signal = "incidence") {
+get_prediction <- function(
+    model,
+    psi,
+    reporting_percentage = 1,
+    signal = "incidence"
+  ) {
 
   # Integrate the ODE system with deSolve
   sol <- deSolve::ode(
@@ -555,29 +594,40 @@ get_prediction <- function(model, psi, reporting_percentage = 1, signal = "incid
       dplyr::select(!"state") |>
       dplyr::mutate(
         "date" = .data$time + model$observables$last_queryable_date,
-        "n_model" = model$disease_progression_rates[["I"]] * model$compartment_structure[["I"]] * .data$value * reporting_percentage * sum(model$activity$contact_basis$population)
+        "n_model" = model$disease_progression_rates[["I"]] *
+            model$compartment_structure[["I"]] *
+            .data$value * reporting_percentage *
+            sum(model$activity$contact_basis$population)
       )
   } else if (signal == "prevalence") {
     out <- sol_long |>
-      dplyr::filter(stringr::str_starts(.data$state, "I1")) |>
+      dplyr::filter(stringr::str_starts(.data$state, stringr::fixed("I1"))) |>
       dplyr::select(!"state") |>
       dplyr::summarise(
         "date" = dplyr::first(.data$time) + model$observables$last_queryable_date,
         "n_model" = sum(.data$value),
-        .by = c("time")
+        .by = "time"
       )
   }
 
   # Add the model configuration
   out <- out |>
     dplyr::mutate(
-      "model_configuration" = paste0(names(model$compartment_structure), model$compartment_structure, collapse = "")
+      "model_configuration" = paste0(
+        names(model$compartment_structure),
+        model$compartment_structure,
+        collapse = ""
+      )
     )
 
   return(out)
 }
 
-prediction <- get_prediction(m, psi, reporting_percentage = ifelse(source == "n_infected", 1, 0.65))
+prediction <- get_prediction(
+  model = m,
+  psi = psi,
+  reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
+)
 
 prediction
 ```
@@ -589,9 +639,9 @@ ggplot2::ggplot() +
     ggplot2::aes(x = date, y = model_output),
     color = switch(
       source,
-      "n_infected" = "orange",
+      "n_infected"        = "orange",
       "n_positive_simple" = "deepskyblue3",
-      "n_positive" = "seagreen"
+      "n_positive"        = "seagreen"
     )
   ) +
   ggplot2::geom_line(
@@ -599,9 +649,13 @@ ggplot2::ggplot() +
     ggplot2::aes(x = date, y = n_model, color = model_configuration),
     linewidth = 1.5
   ) +
-  ggplot2::geom_vline(xintercept = obs$last_queryable_date, linetype = 2, color = "black") +
+  ggplot2::geom_vline(
+    xintercept = obs$last_queryable_date,
+    linetype = 2,
+    color = "black"
+  ) +
   ggplot2::facet_grid(source ~ age_group, scales = "free") +
-  ggplot2::labs(y = "Model ouput", color = "Model Configuration")
+  ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```
 
 ### Misspecified model
@@ -623,7 +677,11 @@ predictions <- models |>
         dplyr::filter(.data$source == !!source)
     )
 
-    get_prediction(m, psi, reporting_percentage = ifelse(source == "n_infected", 1, 0.65))
+    get_prediction(
+      model = m,
+      psi = psi,
+      reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
+    )
   }) |>
   purrr::reduce(rbind, .init = prediction)
 
@@ -634,9 +692,9 @@ ggplot2::ggplot() +
     ggplot2::aes(x = date, y = model_output),
     color = switch(
       source,
-      "n_infected" = "orange",
+      "n_infected"        = "orange",
       "n_positive_simple" = "deepskyblue3",
-      "n_positive" = "seagreen"
+      "n_positive"        = "seagreen"
     )
   ) +
   ggplot2::geom_line(
@@ -644,7 +702,11 @@ ggplot2::ggplot() +
     ggplot2::aes(x = date, y = n_model, color = model_configuration),
     linewidth = 1.5
   ) +
-  ggplot2::geom_vline(xintercept = obs$last_queryable_date, linetype = 2, color = "black") +
+  ggplot2::geom_vline(
+    xintercept = obs$last_queryable_date,
+    linetype = 2,
+    color = "black"
+  ) +
   ggplot2::facet_grid(source ~ age_group, scales = "free") +
-  ggplot2::labs(y = "Model ouput", color = "Model Configuration")
+  ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```

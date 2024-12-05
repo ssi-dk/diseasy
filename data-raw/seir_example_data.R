@@ -1,12 +1,11 @@
 if (rlang::is_installed("deSolve")) {
 
   # Generate synthetic disease data for testing from a simple SEIR model with some noise added
-
   set.seed(4260)
 
   # Set the time scales of the problem
-  rE <- 1 / 2.1
-  rI <- 1 / 4.5
+  rE <- 1 / 2.1                                                                                                         # nolint: object_name_linter
+  rI <- 1 / 4.5                                                                                                         # nolint: object_name_linter
 
   overall_infection_risk <- 0.025
 
@@ -14,9 +13,9 @@ if (rlang::is_installed("deSolve")) {
   age_cuts_lower <- c(0, 30, 60)
 
   # Setup the number of compartments for the generating model
-  K <- 2
+  K <- 2                                                                                                                # nolint start: object_name_linter
   L <- 1
-  M <- 1
+  M <- 1                                                                                                                # nolint end
 
   # Build model
   act <- DiseasyActivity$new()

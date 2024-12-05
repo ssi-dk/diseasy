@@ -454,7 +454,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       polynomial_order <- self %.% parameters %.% incidence_polynomial_order
       polynomial_training_length <- self %.% parameters %.% incidence_polynomial_training_length
 
-      incidence_polyfits <- incidence_subsets |>
+      incidence_poly_fits <- incidence_subsets |>
         purrr::map(
           ~ {
             stats::lm(
@@ -468,8 +468,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ##### This block is validation only
       incidence_data <- purrr::map2(
         incidence_subsets,
-        incidence_polyfits,
-        ~ dplyr::mutate(.x, "incidence_polyfit" = !!stats::predict(.y, newdata = .x))
+        incidence_poly_fits,
+        ~ dplyr::mutate(.x, "incidence_poly_fit" = !!stats::predict(.y, newdata = .x))
       ) |>
         purrr::list_rbind()
 
@@ -497,12 +497,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Create human readable labels
       derivative_names <- max_order_derivative |>
         seq.int() |>
-        purrr::map(~ stringr::str_remove_all(paste0("d^", ., " I^*/d t^", .), r"{\^1}")) |>
+        purrr::map(~ stringr::str_remove_all(paste0("d^", ., " I^*/d t^", .), stringr::fixed(r"{\^1}"))) |>
         purrr::reduce(c, .init = "I^*")
 
       # Extract derivatives
       incidence_signal_derivatives <- purrr::map(
-        incidence_polyfits,
+        incidence_poly_fits,
         ~ stats::setNames(
           .x$coefficients[1:(max_order_derivative + 1)] * pmax(1, seq(max_order_derivative + 1) - 1),
           derivative_names
@@ -511,8 +511,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Compute the per-compartment progression rates
-      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)
-      L <- self %.% compartment_structure %.% I
+      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)                                              # nolint: object_name_linter
+      L <- self %.% compartment_structure %.% I                                                                         # nolint: object_name_linter
 
       re <- (purrr::pluck(self %.% disease_progression_rates, "E", .default = 0)) * K
       ri <- (self %.% disease_progression_rates %.% I) * L
@@ -520,7 +520,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Generate the matrix to compute the states from the derivatives
       # (See article on SEIR-initialisation)
-      M <- matrix(rep(0, K * (K + 1)), nrow = K)
+      M <- matrix(rep(0, K * (K + 1)), nrow = K)                                                                        # nolint: object_name_linter
       active_row <- c(ri, 1)
 
       for (k in seq_len(K)) {
@@ -545,14 +545,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           ss[is.na(ss)] <- 0
 
           # Compute E states from derivatives
-          E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))
+          E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))                                                 # nolint: object_name_linter
 
           # Compute I states from polynomial fit
-          I_star <- stats::predict(
-            incidence_polyfits[[group_id]],
+          I_star <- stats::predict(                                                                                     # nolint: object_name_linter
+            incidence_poly_fits[[group_id]],
             newdata = data.frame(t = -(seq(L) - 1) / ri)
           )
-          I_l <- as.numeric(I_star) / ri
+          I_l <- as.numeric(I_star) / ri                                                                                # nolint: object_name_linter
 
           # Combine to output
           dplyr::cross_join(
@@ -567,7 +567,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           )
         }
       ) |>
-      purrr::list_rbind()
+        purrr::list_rbind()
 
       # Report negative values
       if (purrr::some(estimated_exposed_infected_states$initial_condition, ~ . < 0)) {
@@ -633,10 +633,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We also need some state index helpers for the forcing model
       # (Taken from $initialize())
-      i1_state_indices <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) * sum(compartment_structure) + 1
+      i1_state_indices <- (seq(private %.% n_variants * private %.% n_age_groups) - 1) *
+        sum(compartment_structure) + 1
+
       r1_state_indices <- i1_state_indices + purrr::pluck(compartment_structure, "I")
+
       s_state_indices <- seq(private %.% n_age_groups) +
         sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
+
       rs_state_indices <- r1_state_indices |>
         purrr::map(~ . + seq_len(purrr::pluck(compartment_structure, "R")) - 1) |>
         purrr::reduce(c, .init = s_state_indices, .dir = "backward")
@@ -700,13 +704,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       initial_state_vector <- initial_state_vector |>
         dplyr::mutate(
           "weight" = dplyr::case_when(
-            stringr::str_starts(.data$state, "E") ~ 1 - ei_rs_balance,
-            stringr::str_starts(.data$state, "I") ~ 1 - ei_rs_balance,
-            stringr::str_starts(.data$state, "R") ~ ei_rs_balance,
-            stringr::str_starts(.data$state, "S") ~ ei_rs_balance,
+            stringr::str_starts(.data$state, stringr::fixed("E")) ~ 1 - ei_rs_balance,
+            stringr::str_starts(.data$state, stringr::fixed("I")) ~ 1 - ei_rs_balance,
+            stringr::str_starts(.data$state, stringr::fixed("R")) ~ ei_rs_balance,
+            stringr::str_starts(.data$state, stringr::fixed("S")) ~ ei_rs_balance
           ) * .data$initial_condition,
           "initial_condition" = .data$initial_condition +
-            .data$weight * (1 - sum(.data$initial_condition)) / sum(.data$weight),
+            .data$weight * (1 - sum(.data$initial_condition)) / sum(.data$weight)
         ) |>
         dplyr::select(!"weight")
 
@@ -787,7 +791,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
-      # rr * beta * beta_v * I * s(t)
+      # rr * beta * beta_v * I * s(t)                                                                                   # nolint: commented_code_linter
       infection_rate <- infected_contact_rate *
         self$season$model_t(t) *
         overall_infection_risk *
@@ -804,7 +808,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Now we need to compute the flow into the exposed compartments
       # For this, we use the pre-computed infection_matrix_to_rs_indices map
-      # new_infections <- purrr::map_dbl(private$infection_matrix_to_rs_indices, ~ sum(infection_matrix[.]))
       new_infections <- vapply(
         private$infection_matrix_to_rs_indices,
         \(idx) sum(infection_matrix[idx]),
@@ -836,9 +839,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @field immunity
     #'   Place holder for the immunity module
-    immunity = list("approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N) {
-      c(rev(seq(from = 0.9, to = 0.05, length.out = N)), rep(1, N - 1))
-    })
+    immunity = list(
+      "approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), N = NULL) {            # nolint: object_name_linter
+        c(rev(seq(from = 0.9, to = 0.05, length.out = N)), rep(1, N - 1))
+      }
+    )
   ),
 
 
@@ -1063,40 +1068,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # We can then create a switch that selects the correct contact matrix at the given point in time
       contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrices)
       private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
-
-      # f1 <- \(t) dplyr::case_when(
-      #   !!!purrr::imap(rev(activity_matrix_changes), ~ as.formula(glue::glue("t >= {.x} ~ {6 - .y}")))
-      # )
-      #
-      # f2h <- purrr::partial(switch, !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes))
-      # f2 <- \(t) f2h(sum(activity_matrix_changes <= t))
-      #
-      # f3h <- purrr::partial(
-      #   switch,
-      #   !!!stats::setNames(rev(seq_along(activity_matrix_changes)), rev(activity_matrix_changes))
-      # )
-      # f3 <- \(t) f3h(sum(activity_matrix_changes > t) + 1)
-      #
-      # f4 <- \(t) purrr::partial(
-      #   switch,
-      #   !!!stats::setNames(seq_along(activity_matrix_changes), activity_matrix_changes)
-      # )(sum(activity_matrix_changes <= t))
-      #
-      # microbenchmark::microbenchmark( # Microseconds!
-      #   f1(50),
-      #   f2(50),
-      #   f3(50),
-      #   f4(50),
-      #   check = "equal", times = 100L
-      # )
-      #
-      # microbenchmark::microbenchmark( # Microseconds!
-      #   f1(-1400),
-      #   f2(-1400),
-      #   f3(-1400),
-      #   f4(-1400),
-      #   check = "equal", times = 100L
-      # )
     },
 
 
@@ -1116,15 +1087,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     generator_matrix = function(
       t = 0,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
-      RS_states = c(
+      RS_states = c(                                                                                                    # nolint: object_name_linter
         rep(0, private %.% n_age_groups * private %.% n_variants * self %.% compartment_structure %.% R),
         private$population_proportion
       )
     ) {
 
-
-      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)
-      L <- self %.% compartment_structure %.% I
+      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)                                              # nolint: object_name_linter
+      L <- purrr::pluck(self %.% compartment_structure, "I", .default = 0)                                              # nolint: object_name_linter
 
       # Early return if no disease compartments
       if (K + L == 0) {
@@ -1175,7 +1145,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Compute the transmissions component
 
       # Ensure the RS_states sums to 1
-      RS_states <- RS_states / sum(RS_states)
+      RS_states <- RS_states / sum(RS_states)                                                                           # nolint: object_name_linter
 
 
       # Retrieve the active contact matrix

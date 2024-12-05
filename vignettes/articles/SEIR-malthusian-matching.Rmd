@@ -36,8 +36,8 @@ growth than the SEIR model with the same contact rate $\beta$.
 
 ```{r, fig.alt = "Including Malthusian matching in SEIR models increasing comparability between models."}
 # Set the time scales of the problem
-rE = 1 / 2
-rI = 1 / 4
+rE <- 1 / 2
+rI <- 1 / 4
 
 tmax <- 45
 
@@ -91,19 +91,19 @@ combinations |>
           )
         ) |>
         dplyr::filter(t > 0)
-      }) |>
-    purrr::list_rbind()
+    }) |>
+      purrr::list_rbind()
 
   }) |>
   purrr::list_rbind() |>
   ggplot2::ggplot(ggplot2::aes(x = t, y = incidence, color = model_configuration)) +
-  ggplot2::geom_line(linewidth = 1) +
-  ggplot2::scale_y_continuous(transform = "log10") +
-  ggplot2::facet_wrap(
-    ~ factor(malthusian_matching, levels = c("No matching", "Matched growth rates"))
-  ) +
-  ggplot2::xlab("Time") +
-  ggplot2::ylab("Incidence (relative to t = 5)") +
-  ggplot2::guides(color = "none") +
-  ggplot2::theme_bw()
+    ggplot2::geom_line(linewidth = 1) +
+    ggplot2::scale_y_continuous(transform = "log10") +
+    ggplot2::facet_wrap(
+      ~ factor(malthusian_matching, levels = c("No matching", "Matched growth rates"))
+    ) +
+    ggplot2::xlab("Time") +
+    ggplot2::ylab("Incidence (relative to t = 5)") +
+    ggplot2::guides(color = "none") +
+    ggplot2::theme_bw()
 ```
