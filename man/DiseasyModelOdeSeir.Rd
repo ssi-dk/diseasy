@@ -24,9 +24,12 @@ The model implements the following features:
 See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to use this model.
 }
 \examples{
-\dontshow{if (rlang::is_installed("duckdb")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-  # The model can be instantiated almost without arguments,
-  # but a observables modules needs to be specified.
+\dontshow{if (rlang::is_installed(c("duckdb", "deSolve"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+  # The model can be instantiated almost without arguments, but
+  # to illustrate its use, we configure a simple model:
+
+  # First, we add a observables modules with example data bundled
+  # with the package.
   obs <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
     conn = DBI::dbConnect(duckdb::duckdb())
@@ -35,16 +38,70 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   # The observables module also defines the time if interest via
   # the `last_queryable_date` field. Data before this date are
   # used to train the models, and predictions start on this date.
-  obs$set_last_queryable_date(as.Date("2020-02-15"))
+  obs$set_last_queryable_date(as.Date("2020-02-29"))
+
+  # The example data uses a simple activity scenario for Denmark,
+  # which we replicate here
+  act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
+  act$set_activity_units(dk_activity_units)
+  act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
   # We create a default instance which has:
   # * 1 age group (0+)
   # * 1 variant
   # * No season scaling
   # * No activity scenarios
-  m <- DiseasyModelOdeSeir$new(observables = obs)
+  m <- DiseasyModelOdeSeir$new(
+    observables = obs,
+    activity = act,
+    disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
+    parameters = list("overall_infection_risk" = 0.025)
+  )
 
-  # TODO: Continue this minimal example once module is complete
+  # We need the initial state for the system, which we infer from
+  # the incidence data (see `vignette("SEIR-initialisation")`).
+  # We compute this here from the example data which uses a 65 \%
+  # change of testing when infected
+  incidence_data <- m$observables$get_observation(
+    observable = "n_positive",
+    start_date = obs$ds$min_start_date,
+    end_date = obs$last_queryable_date
+  ) |>
+    dplyr::mutate(
+      "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
+    )
+
+  psi <- m$initialise_state_vector(incidence_data)
+
+  # The model now has a configured right-hand-side function that
+  # can be used to simulate the model in conjunction with deSolve.
+  sol <- deSolve::ode(
+    y = psi$initial_condition,
+    times = seq(from = 0, to = 100, by = 1),
+    func = m$rhs
+  )
+
+  # Extract the incidence outcome from the solution
+  time <- sol[, 1]
+  model_incidence <- sol[, 3] * 1 / 4
+
+  plot(
+    x = time + obs$last_queryable_date,
+    y = model_incidence,
+    col = "red",
+    lty = 2,
+    xlim = c(as.Date("2020-01-01"), obs$last_queryable_date + max(time)),
+    xlab = "Date",
+    ylab = "Incidence"
+  )
+  points(incidence_data$date, incidence_data$incidence, col = "black")
+
+  legend(
+    x = "topright",
+    legend = c("Model", "Data"),
+    col = c("red", "black"),
+    lty = c(2, 1)
+  )
 
   rm(m, obs)
 \dontshow{\}) # examplesIf}
@@ -99,7 +156,7 @@ Place holder for the immunity module}
 Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$new(
-  compartment_structure = c(E = 2L, I = 3L, R = 2L),
+  compartment_structure = c(E = 1L, I = 1L, R = 1L),
   disease_progression_rates = c(E = 1, I = 1),
   malthusian_matching = TRUE,
   activity = TRUE,
