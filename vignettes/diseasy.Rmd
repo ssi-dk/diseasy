@@ -42,7 +42,12 @@ The currently available functional modules are:
 ```{r vignette_string, echo = FALSE}
 functional_modules <- ls("package:diseasy") |>
   purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(Base|Model))"))
-vignette_string <- paste0("\`vignette(\"", functional_modules, "\")\`", collapse = ", ")
+vignette_string <- paste0(
+  "\`vignette(\"",
+  functional_modules,
+  "\")\`",
+  collapse = ", "
+)
 ```
 
 ```{r available_functional_modules}

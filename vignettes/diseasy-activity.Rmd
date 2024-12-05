@@ -68,9 +68,14 @@ act$get_scenario_activities()
 
 Calls to `$change_activity` are cumulative, which means that we can expand our existing scenario:
 ```{r configure_lockdown}
-act$change_activity(date = as.Date("2020-03-11"), opening = "lockdown_2020", closing = "baseline")
-# NOTE: we also have to "close" the "baseline" activity unit. The activity described by this unit is
-# no longer in effect while the "lockdown_2020" activity unit is active.
+act$change_activity(
+  date = as.Date("2020-03-11"),
+  opening = "lockdown_2020",
+  closing = "baseline"
+)
+# NOTE: we also have to "close" the "baseline" activity unit.
+# The activity described by this unit is no longer in effect
+# while the "lockdown_2020" activity unit is active.
 
 act$get_scenario_activities()
 ```
@@ -139,14 +144,18 @@ Several disease models uses contact matrices to structure the populations.
 
 To retrieve the contact matrices from the module, we use the `$get_scenario_contacts()` method:
 ```{r scenario_contacts}
-# We can project the matrices into custom age-groups by providing the "age_cuts_lower" argument
+# We can project the matrices into custom age-groups by providing the
+# "age_cuts_lower" argument
 act$get_scenario_contacts(age_cuts_lower = c(0, 60))
 ```
 The `DiseasyActivity` module provides separate matrices for the four arenas: "home", "school", "work", and "other".
 These matrices can be combined by supplying a `weights` argument to the `$get_scenario_contacts()` method.
 
 ```{r scenario_contacts_weighted}
-act$get_scenario_contacts(age_cuts_lower = c(0, 20, 40, 60, 80), weights = c(1, 1, 1, 1))
+act$get_scenario_contacts(
+  age_cuts_lower = c(0, 20, 40, 60, 80),
+  weights = c(1, 1, 1, 1)
+)
 ```
 
 ## Societal openness
@@ -160,7 +169,10 @@ act$get_scenario_openness()
 
 The degree of openness can be queried similarly to the contact matrices:
 ```{r scenario_openness_weighted}
-act$get_scenario_openness(age_cuts_lower = c(0, 20, 40, 60, 80), weights = c(1, 1, 1, 1))
+act$get_scenario_openness(
+  age_cuts_lower = c(0, 20, 40, 60, 80),
+  weights = c(1, 1, 1, 1)
+)
 ```
 
 
