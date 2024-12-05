@@ -55,6 +55,7 @@ Suggests:
     spelling,
     testthat (>= 3.0.0),
     tibble,
+    usethis,
     withr,
     zoo
 Remotes:
