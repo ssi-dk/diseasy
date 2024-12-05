@@ -757,33 +757,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         USE.NAMES = FALSE
       )
 
-
-      # microbenchmark::microbenchmark( # Microseconds
-      #   purrr::map_dbl(i_state_indices, \(indices) sum(state_vector[indices])),
-      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices])),
-      #   sapply(private$i_state_indices, \(indices) sum(state_vector[indices]), USE.NAMES = FALSE),
-      #   vapply(
-      #     private$i_state_indices,
-      #     \(indices) sum(state_vector[indices]),
-      #     FUN.VALUE = numeric(1),
-      #     USE.NAMES = FALSE
-      #   ),
-      #   check = "equal", times = 1000L
-      # )
-
       # Add any forcing of infections
       infected <- private$infected_forcing(t, infected)
 
       # Reshape the infected vector to a matrix for later computation
       infected <- matrix(infected, nrow = private$n_age_groups)
-
-      # microbenchmark::microbenchmark( # Nanoseconds
-      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower), ncol = length(self$variant$variants)),
-      #   matrix(infected, nrow = length(self$parameters$age_cuts_lower)),
-      #   matrix(infected, nrow = private$n_age_groups),
-      #   matrix(infected, nrow = private$n_age_groups, ncol = private$n_variants),
-      #   check = "equal", times = 1000L
-      # )
 
 
       ## Step 2, determine their contacts with other age groups (beta * I)
