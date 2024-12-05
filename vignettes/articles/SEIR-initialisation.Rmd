@@ -601,7 +601,7 @@ get_prediction <- function(
       )
   } else if (signal == "prevalence") {
     out <- sol_long |>
-      dplyr::filter(stringr::str_starts(.data$state, stringr::fixed("I1"))) |>
+      dplyr::filter(startsWith(.data$state, "I1")) |>
       dplyr::select(!"state") |>
       dplyr::summarise(
         "date" = dplyr::first(.data$time) + model$observables$last_queryable_date,
