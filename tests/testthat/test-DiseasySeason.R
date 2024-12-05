@@ -48,12 +48,12 @@ test_that("$get- and $use_season_model() works with known model", {
   s <- DiseasySeason$new(reference_date = Sys.Date())
 
   models <- expect_no_error(s$get_season_model("cosine_season"))
-  expect_equal(models$model_t,    s$get_cosine_season()$model_t)
-  expect_equal(models$model_date, s$get_cosine_season()$model_date)
+  expect_equal(models$model_t,    s$get_cosine_season()$model_t)                                                        # nolint: expect_identical_linter. Functions have different environments
+  expect_equal(models$model_date, s$get_cosine_season()$model_date)                                                     # nolint: expect_identical_linter. Functions have different environments
 
   expect_no_error(s$use_season_model("cosine_season"))
-  expect_equal(s$model_t,    s$get_cosine_season()$model_t)
-  expect_equal(s$model_date, s$get_cosine_season()$model_date)
+  expect_equal(s$model_t,    s$get_cosine_season()$model_t)                                                             # nolint: expect_identical_linter. Functions have different environments
+  expect_equal(s$model_date, s$get_cosine_season()$model_date)                                                          # nolint: expect_identical_linter. Functions have different environments
 
   rm(s)
 
@@ -81,8 +81,8 @@ test_that("$get- and $use_constant_season() works", {
   models <- s$get_constant_season()
   s$use_constant_season()
 
-  expect_equal(s$model_t,    models$model_t)
-  expect_equal(s$model_date, models$model_date)
+  expect_equal(s$model_t,    models$model_t)                                                                            # nolint: expect_identical_linter. Functions have different environments
+  expect_equal(s$model_date, models$model_date)                                                                         # nolint: expect_identical_linter. Functions have different environments
 
   expect_identical(s$model_t(0), 1)
   expect_identical(s$model_t(1), 1)
@@ -111,8 +111,8 @@ test_that("$get- and $use_cosine_season() works", {
   models <- s$get_cosine_season()
   s$use_cosine_season()
 
-  expect_equal(s$model_t,    models$model_t)
-  expect_equal(s$model_date, models$model_date)
+  expect_equal(s$model_t,    models$model_t)                                                                            # nolint: expect_identical_linter. Functions have different environments
+  expect_equal(s$model_date, models$model_date)                                                                         # nolint: expect_identical_linter. Functions have different environments
 
   expect_identical(s$model_t(0), 1)
   expect_false(s$model_t(1) == 1)
@@ -153,8 +153,8 @@ test_that("$use_covid_season_v1() works", {
   models <- s$get_covid_season_v1()
   s$use_covid_season_v1()
 
-  expect_equal(s$model_t,    models$model_t)
-  expect_equal(s$model_date, models$model_date)
+  expect_equal(s$model_t,    models$model_t)                                                                            # nolint: expect_identical_linter. Functions have different environments
+  expect_equal(s$model_date, models$model_date)                                                                         # nolint: expect_identical_linter. Functions have different environments
 
   expect_identical(s$model_t(0), 1)
   expect_false(s$model_t(1) == 1)
@@ -196,12 +196,11 @@ test_that("$use_covid_season_v2() works", {
                            observables = observables)
 
     # Default scale
-    models <- s$get_covid_season_v1()
-    s$use_covid_season_v1()
-
-    expect_equal(s$model_t,    models$model_t)
-    expect_equal(s$model_date, models$model_date)
+    models <- s$get_covid_season_v2()
     s$use_covid_season_v2()
+
+    expect_equal(s$model_t,    models$model_t)                                                                          # nolint: expect_identical_linter. Functions have different environments
+    expect_equal(s$model_date, models$model_date)                                                                       # nolint: expect_identical_linter. Functions have different environments
 
     expect_identical(s$model_t(0), 1)
     expect_false(s$model_t(1) == 1)
@@ -342,13 +341,13 @@ test_that("active binding: model_t works", {
   s <- DiseasySeason$new()
 
   # Retrieve the model_t
-  expect_equal(s$model_t, s$get_season_model("constant_season")$model_t)
+  expect_equal(s$model_t, s$get_season_model("constant_season")$model_t)                                                # nolint: expect_identical_linter. Functions have different environments
 
   # Try to set the model_t
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(s$model_t <- \(t) t, error = \(e) e),                                                       # nolint: implicit_assignment_linter
                    simpleError("`$model_t` is read only"))
-  expect_equal(s$model_t, s$get_season_model("constant_season")$model_t)
+  expect_equal(s$model_t, s$get_season_model("constant_season")$model_t)                                                # nolint: expect_identical_linter. Functions have different environments
 
   rm(s)
 })
@@ -358,13 +357,13 @@ test_that("active binding: model_date works", {
   s <- DiseasySeason$new()
 
   # Retrieve the model_date
-  expect_equal(s$model_date, s$get_season_model("constant_season")$model_date)
+  expect_equal(s$model_date, s$get_season_model("constant_season")$model_date)                                          # nolint: expect_identical_linter. Functions have different environments
 
   # Try to set the model_date
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(s$model_date <- \(date) date, error = \(e) e),                                              # nolint: implicit_assignment_linter
                    simpleError("`$model_date` is read only"))
-  expect_equal(s$model_date, s$get_season_model("constant_season")$model_date)
+  expect_equal(s$model_date, s$get_season_model("constant_season")$model_date)                                          # nolint: expect_identical_linter. Functions have different environments
 
   rm(s)
 })
@@ -382,7 +381,7 @@ test_that("active binding: available_season_models works", {
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(s$available_season_models <- "unknown_season_model", error = \(e) e),                       # nolint: implicit_assignment_linter
                    simpleError("`$available_season_models` is read only"))
-  expect_equal(s$available_season_models, expected_season_models)
+  expect_identical(s$available_season_models, expected_season_models)
 
   rm(s)
 })

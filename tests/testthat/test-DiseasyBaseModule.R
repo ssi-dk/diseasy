@@ -39,13 +39,13 @@ test_that("$hash works", {
 
   # Change the hash
   m$set_moduleowner(moduleowner = "testmodule")
-  expect_equal(m$hash, hash_new_instance)
+  expect_identical(m$hash, hash_new_instance)
 
   # Try to set the hash
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(m$hash <- "test", error = \(e) e),                                                          # nolint: implicit_assignment_linter
                    simpleError("`$hash` is read only"))
-  expect_equal(m$hash, hash_new_instance)
+  expect_identical(m$hash, hash_new_instance)
 
   rm(m)
 })
@@ -60,7 +60,7 @@ test_that("$cache works", {
 
   # Cache an item
   private$cache("mtcars", mtcars)
-  expect_equal(m$hash, hash_new_instance)
+  expect_identical(m$hash, hash_new_instance)
 
   # Try to retrieve a hash that does not exist
   expect_error(private$cache("non_existent"),
@@ -107,11 +107,13 @@ test_that("$stratification_to_string() works", {
   private <- m$.__enclos_env__$private
 
   # Test the stratification_to_string with empty input
-  expect_equal(private$stratification_to_string(NULL), NA_character_)
+  expect_identical(private$stratification_to_string(NULL), NA_character_)
 
   # Test the stratification_to_string with a couple of permutations
-  expect_equal(private$stratification_to_string(rlang::quos(test = a + b, test_id)),
-               "test = a + b, test_id")
+  expect_identical(
+    private$stratification_to_string(rlang::quos(test = a + b, test_id)),
+    "test = a + b, test_id"
+  )
 
   rm(m)
 })
