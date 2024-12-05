@@ -429,7 +429,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
 
   # Get the immunity information
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -473,7 +473,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
 
   # Get the immunity information
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -636,7 +636,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
 
   # Get the immunity information
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -693,7 +693,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
 
   # Get the immunity information
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 

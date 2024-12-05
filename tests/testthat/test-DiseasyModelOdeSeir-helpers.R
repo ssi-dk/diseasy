@@ -41,7 +41,7 @@ test_that("helpers works (SR single variant / single age group)", {
 
   # Check risk matrix is correctly set
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -94,7 +94,7 @@ test_that("helpers works (SIR single variant / single age group)", {
 
   # Check risk matrix is correctly set
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -164,7 +164,7 @@ test_that("helpers works (SIR double variant / double age group)", {
 
   # Check risk matrix is correctly set
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -221,7 +221,7 @@ test_that("helpers works (SEIR single variant / single age group)", {
 
   # Check risk matrix is correctly set
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -278,7 +278,7 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
 
   # Check risk matrix is correctly set
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -350,7 +350,7 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
 
   # Check risk matrix is correctly set
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 
@@ -428,7 +428,7 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
 
   # Check risk matrix is correctly set
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
 

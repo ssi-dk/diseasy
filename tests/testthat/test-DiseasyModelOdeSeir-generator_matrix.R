@@ -29,7 +29,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
 
   # Then check where everyone is in R
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
   expect_equal(
@@ -116,7 +116,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   s <- r <- 1 / (2 * (1 + 2))
 
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
@@ -325,7 +325,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   s <- r <- 1 / (1 + 2 * 2)
 
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
@@ -462,7 +462,7 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   s <- r <- 1 / (2 + 2 * 2)
 
   fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(N = m %.% compartment_structure %.% R),
+    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
