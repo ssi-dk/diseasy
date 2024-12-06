@@ -605,7 +605,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Report negative values
       if (purrr::some(estimated_exposed_infected_states$initial_condition, ~ . < 0)) {
-        warning("Negative values in estimated exposed and infected states. Setting to zero.")
+        message("Negative values in estimated exposed and infected states. Setting to zero.")
+
         estimated_exposed_infected_states <- estimated_exposed_infected_states |>
           dplyr::mutate("initial_condition" = pmax(0, .data$initial_condition))
       }
