@@ -15,10 +15,10 @@ will therefore depend on the data made available by the diseasystores.
 See vignette("diseasy-observables")
 }
 \examples{
-\dontshow{if (rlang::is_installed("RSQLite")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("duckdb")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   # Create observables module using the Google COVID-19 data
   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
-                                conn = DBI::dbConnect(RSQLite::SQLite()))
+                                conn = DBI::dbConnect(duckdb::duckdb()))
 
   # See available observables
   print(obs$available_observables)
