@@ -263,13 +263,14 @@ It seems that the problem is singular whenever we have more than 1 $I$ state.
 Let's see if differences in infectivity can help break this degeneracy.
 In this case, the true signal becomes, $I^\dag = \sum_l w_l I_l$, with $w_i \neq w_j$.
 
-The derivative then becomes
+The derivative then becomes:
+
 $$
-\frac{d I^\dag}{d t} = w_1 r_e E_K - w_1 r_i I_1 \\
-+ w_2 r_i I_1 - w_2 r_i I_2 \\
-\dots \\
-+ w_L r_i I_{L-1}  - w_L r_i I_L
+\frac{d I^\dag}{d t} = \left(w_1 r_e E_K - w_1 r_i I_1\right) +
+\left(w_2 r_i I_1 - w_2 r_i I_2\right) + \dots +
+\left(w_L r_i I_{L-1}  - w_L r_i I_L\right)
 $$
+
 $$
 \begin{bmatrix}
 0         &  w_1 r_e                       &  (w_2-w_1) r_i               & -w_2 r_i \\
