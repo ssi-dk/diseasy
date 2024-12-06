@@ -34,6 +34,7 @@ See the vignette("diseasy-season") for examples of use.
 \seealso{
 \link{DiseasyObservables}
 }
+\keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasySeason}
 }
@@ -139,8 +140,7 @@ Sets the scale for the active season model.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scale}}{(\code{numeric})\cr
-The scale of the season effect (relative to climate normal).}
+\item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. Read only.}
 }
 \if{html}{\out{</div>}}
 }

@@ -7,9 +7,10 @@
 #'   The module implements a number immunity models with different functional forms and allows the user to set
 #'   their own, custom waning function.
 #'
-#'   See the vignette("diseasy-immunity") for examples of use.
+#'   See the `vignette("diseasy-immunity")` for examples of use.
 #' @return
 #'   A new instance of the `DiseasyImmunity` [R6][R6::R6Class] class.
+#' @keywords functional-module
 #' @export
 DiseasyImmunity <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyImmunity",
@@ -55,7 +56,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Check if the model has a time_scale attribute
         dots <- attr(private$.model[[.y]], "dots")
         if (!("time_scale" %in% names(dots))) {
-          stop(dots, " does not use time_scale argument")
+          stop("Model for ", .y, " (\"", attr(private$.model[[.y]], "name"), "\") does not use time_scale argument!")
         }
 
         # Update the time_scale for the model
@@ -115,7 +116,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting no waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -145,7 +146,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting exponential waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -179,7 +180,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting sigmoidal waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -197,7 +198,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::reportAssertions(coll)
 
       # Set the model
-      model <- \(t) max(1 - 0.5 / time_scale * t, 0)
+      model <- \(t) pmax(1 - t / time_scale, 0)
 
       # Set the attributes
       attr(model, "name") <- "linear_waning"
@@ -209,7 +210,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting linear waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -239,7 +240,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting heaviside waning model")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -249,7 +250,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   If the function has a time scale, it should be included in the function as `time_scale`.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
-    #' @param name
+    #' @param name (`character(1)`)\cr
     #'   Set the name of the custom waning function.
     #' @return
     #'   Returns the model (invisibly).
@@ -269,32 +270,33 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the model
       # Capture the expression of custom_function to preserve its environment
-      #model <- rlang::enexpr(custom_function)
       model <- custom_function
 
-      # Option 1: Attach env to function with time_scale only
-      #rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale))
-
-      # Option 2: Clone the environment of custom function.
-      # Will copy .GlobalEnv often .. not the best solution
-      rlang::fn_env(model) <- rlang::new_environment(data = list(time_scale = time_scale), parent = rlang::env_clone(rlang::fn_env(custom_function)))
-
-      # Option 3: Iterate and get only needed components of .GlobalEnv
-      # original_fn_env <- rlang::fn_env(custom_function)
-      # new_fn_env <- rlang::env()
-
-      # tryCatch(
-      #   custom_function(0),
-      #   error = function(e) {
-      #     missing_variable <- stringr::str_extract(e$message, r"{'(.*)'}", group = 1)
-      #     new_fn_env <- rlang::new_environment(data = stats::setNames(purrr::pluck(original_fn_env, missing_variable), missing_variable), parent = new_fn_env)
-      #     rlang::fn_env(custom_function) <- new_fn_env
-      #   }
-      # )
-
-      # Set the attributes
+      # Set the name attributes
       attr(model, "name") <- name
-      attr(model, "dots") <- list(time_scale = time_scale)
+
+      # Detect all variables in the model expression
+      model_vars <- all.vars(rlang::fn_body(model))
+
+      # Copy the function environment
+      custom_function_env <- rlang::fn_env(custom_function)
+      model_env <- custom_function_env
+
+
+      # Add the time_scale variable to the function environment
+      if ("time_scale" %in% model_vars) {
+
+        model_env <- rlang::new_environment(
+          data = list(time_scale = time_scale),
+          parent = custom_function_env
+        )
+
+        # Set the attributes
+        attr(model, "dots") <- list(time_scale = time_scale)
+      }
+
+      # Commit the new environment to the custom function
+      rlang::fn_env(model) <- model_env
 
       # Set the model
       private$.model[[target]] <- model
@@ -302,7 +304,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting custom waning function(s)")
 
-      invisible(return("model" = model))
+      invisible(return(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -315,91 +317,690 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The transition rates between the compartments and the risk associated with each compartment are optimized to
     #'   approximate the configured waning immunity scenario.
     #'
-    #'   The function implements three methods for approximating the waning immunity curves:
-    #'     - "rate_equal": All transition rates are equal and risks are free to vary (N+1 free parameters).
-    #'     - "gamma_fixed_step": Transition rates are free to vary and risks are fixed to (n-1)/(N-1)
-    #'       (N free parameters).
-    #'     - "all_free": All transition rates and risks are free to vary (2N-1 free parameters).
-    #' @param approach (`character(1)`)\cr
-    #'   Specifies the approach to be used from the available approaches. See details.
+    #'   The function implements three methods for parametrising the waning immunity curves:
+    #'
+    #'   - "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
+    #'   - "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
+    #'     f(infinity) (N free parameters).
+    #'   - "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+    #'
+    #'   In addition, this function implements three strategies for optimising the transition rates and risks.
+    #'   These strategies modify the initial guess for the transition rates and risks:
+    #'
+    #'   - "naive":
+    #'      Transitions rates are initially set as the inverse of the median time scale.
+    #'      Risks are initially set as linearly distributed values between f(0) and f(infinity).
+    #'
+    #'   - "recursive":
+    #'      Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
+    #'
+    #'   - "combination" (only for "all_free" method):
+    #'      Initial transition rates and risks are set from the "free_gamma" solution for $N$.
+    #'
+    #'   The optimisation minimises the square root of the squared differences between the target waning and the
+    #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
+    #'   if the approximation is non-monotonous or if the immunity levels or transition rates change rapidly across
+    #'   compartments.
+    #'
+    #'   The minimisation is performed using the either `stats::optim`, `stats::nlm`, `stats::nlminb`,
+    #'   `nloptr::<optimiser>` or `optimx::optimr` optimisers.
+    #'
+    #'   By default, the optimisation algorithm is determined on a per-method basis dependent.
+    #'   Our analysis show that the chosen algorithms in general were the most most efficient but performance
+    #'   may be better in any specific case when using a different algorithm
+    #'   (see `vignette("diseasy-immunity-optimisation")`).
+    #'
+    #'   The default configurations are:
+    #'
+    #'   - For "free_delta", we use the "recursive" strategy with the "ucminf" optimiser.
+    #'   - For "free_gamma", we use the "naive" strategy with the "spg" optimiser.
+    #'   - For "all_free", we use the "combination" strategy with the "bobyqa" optimiser.
+    #'
+    #'   Optimiser defaults can be changed via the `optim_control` argument.
+    #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
+    #'   which uses the "free_gamma" default optimiser to determine the starting point.
+    #'
+    #' @param method (`character(1)`)\cr
+    #'   Specifies the parametrisation method to be used from the available methods. See details.
+    #' @param strategy (`character(1)`)\cr
+    #'   Specifies the optimisation strategy ("naive", "recursive" or "combination"). See details.
     #' @param N (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
+    #' @param monotonous (`logical(1)` or `numeric(1)`)\cr
+    #'   Should non-monotonous approximations be penalised?
+    #'   If a numeric value supplied, it is used as a penalty factor.
+    #' @param individual_level (`logical(1)` or `numeric(1)`)\cr
+    #'   Should the approximation penalise rapid changes in immunity levels?
+    #'   If a numeric value supplied, it is used as a penalty factor.
+    #' @param optim_control (`list()`)\cr
+    #'   Optional controls for the optimisers.
+    #'   Each method has their own default controls for the optimiser.
+    #'   A `optim_method` entry must be supplied which is used to infer the optimiser.
+    #'
+    #'   In order, the `optim_method` entry is matched against the following optimisers and remaining `optim_control`
+    #'   entries are passed as argument to the optimiser as described below.
+    #'
+    #'   If `optim_method` matches any of the methods in `stats::optim`:
+    #'   - Additional `optim_control` arguments passed as `control` to `stats::optim` using the chosen `optim_method`.
+    #'
+    #'   If `optim_method` is "nlm":
+    #'   - Additional `optim_control` arguments passed as arguments to `stats::nlm`.
+    #'
+    #'   If `optim_method` is "nlminb":
+    #'   - Additional `optim_control` arguments passed as `control` to `stats::nlminb`.
+    #'
+    #'   If `optim_method` matches any of the algorithms in `nloptr`:
+    #'   - Additional `optim_control` arguments passed as `control` to `nloptr::<method>`.
+    #'
+    #'   If `optim_method` matches any of the methods in `optimx::optimr`:
+    #'   - Additional `optim_control` arguments passed as `control` to `stats::optimr` using the chosen `method`.
+    #'
+    #' @param ...
+    #'   Additional arguments to be passed to the optimiser.
     #' @return
-    #'   Returns the rates and objective value (invisibly).
-    approximate_compartmental = function(approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
+    #'   Returns the results from the optimisation with the approximated rates and execution time.
+    #' @seealso `vignette("diseasy-immunity")`, [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
+    #'  [optimx::optimr], [ucminf::ucminf], [BB::spg], [nloptr::bobyqa]
+    #' @import nloptr
+    #' @importFrom optimx optimr
+    #' @importFrom BB spg
+    #' @importFrom ucminf ucminf
+    approximate_compartmental = function(
+      N,                                                                                                                # nolint: object_name_linter
+      method = c("free_gamma", "free_delta", "all_free"),
+      strategy = NULL,
+      monotonous = TRUE,
+      individual_level = TRUE,
+      optim_control = NULL,
+      ...
+    ) {
+
+
+      # Determine the method to use
+      method <- match.arg(method)
+
+
       # Check parameters
       coll <- checkmate::makeAssertCollection()
-      #checkmate::assert_choice(approach, c("rate_equal", "gamma_fixed_step", "all_free"), add = coll)
-      checkmate::assert_integerish(N, lower = 1, add = coll)
+      checkmate::assert_choice(method, c("free_gamma", "free_delta", "all_free"), add = coll)
+      checkmate::assert_choice(
+        strategy,
+        c("naive", "recursive", switch(method == "all_free", "combination")),
+        null.ok = TRUE,
+        add = coll
+      )
+      checkmate::assert_integerish(N, lower = 1, len = 1, add = coll)
+      checkmate::assert_number(as.numeric(monotonous), add = coll)
+      checkmate::assert_number(as.numeric(individual_level), add = coll)
+      checkmate::assert_list(optim_control, types = c("character", "numeric"), null.ok = TRUE)
+      if (!is.null(optim_control)) {
+        checkmate::assert_names(names(optim_control), must.include = "optim_method", add = coll)
+      }
       checkmate::reportAssertions(coll)
+
+      # For a small optimisation, we want to match the function call as often as possible so that we can
+      # utilise the cache as much as possible. Therefore, if the approximate_compartmental call uses the defaults,
+      # we evaluate the defaults before computing the hash. Then calling with the default strategy directly or
+      # implicitly, will match the same hash and utilise the cache.
+
+      # Set default optimisation controls
+      default_optim_controls <- list(
+        "free_delta" = list("optim_method" = "ucminf"),
+        "free_gamma" = list("optim_method" = "spg"),
+        "all_free"   = list("optim_method" = "bobyqa")
+      )
+
+      # Choose optimiser controls if not set
+      if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
+
+
+      # Set default strategy
+      default_optim_strategy <- list(
+        "free_delta" = "recursive",
+        "free_gamma" = "naive",
+        "all_free"   = "combination"
+      )
+
+      # Choose strategy if not set
+      if (is.null(strategy)) strategy <- purrr::pluck(default_optim_strategy, method)
+
+
+      # Convert N to integer (integer and numeric have different hash values)
+      N <- as.integer(N)
+
 
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
-        approach_init <- private$approach_functions[[match.arg(approach)]]
-        # Extract median time_scale
-        time_scale <- purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
-        delta <- N / (3 * time_scale)
 
-        # Get params and initiation for each model
-        init_all <- purrr::map(private$.model, ~ approach_init(N, delta))
+        tic <- Sys.time()
 
-        # Extract the parameter scaling helper
-        rescale_params <- init_all[[1]]$rescale_params
+        # To perform the optimisation, we need to produce a vector of gamma and delta "rates" from
+        # the free parameters given to the optimiser.
+        # This map depends on the method used.
 
-        # Extract optimisation parameters
-        optim_par <- init_all[[1]]$optim_par
-        delta <- init_all[[1]]$init_par$delta
-        gamma <- purrr::map(init_all, ~ purrr::pluck(.x, "init_par", "gamma"))
-        init_par <- list(gamma = gamma, delta = delta)
-        to_optim <- unname(unlist(init_par[optim_par]))
-        non_optim <- unname(unlist(init_par[-match(optim_par, names(init_par))]))
+        # We need some helper functions that can map the optimiser parameters `par` to either
+        # [0, 1] or [0, Inf]
+        p_01 <- \(p) 1 / (1 + exp(-p)) # Sigmoid mapping of parameters from -Inf / Inf to 0 / 1
+        p_0inf <- \(p) log(1 + exp(p)) # Mapping of parameters from -Inf / Inf to 0 / Inf ("Softplus" function)
 
-        # Objective function
-        obj_function <- function(N, optim_par, models) {
+        # Later, we will need the inversion functions also
+        inv_p_01 <- \(p) {
+          # As we near the machine precision, we need to avoid the Inf and -Inf
+          # values from the mapping. The optimiser cannot handle these values.
+          p <- pmax(p, .Machine$double.eps)
+          pm <- pmax(1 - p, .Machine$double.eps)
 
-          results <- 0
-          for (i in seq_along(models)) {
-            # Extract the parameter subset corresponding to the ith model
-            params_model <- c(optim_par[(1:N) + (i - 1) * N], optim_par[-(1:(N * length(models)))])
-            # Scale the relevant parameters through a sigmoidal function to ensure values between 0-1.
-            # After scaling, the parameters are passed through "cumprod" to ensure monotonically decreasing values
-            # (For the relevant approaches)
-            # Finally, we impute the parameters with the fixed f(Inf) value for the last compartment
-            params_model <- rescale_params(params_model, models[[i]](Inf))
-            approx <- private$get_approximation(N, params_model)
-            integrate_sum <- private$get_integration(approx, models[[i]])
-            results <- results + integrate_sum
-          }
-          return(results)
+          log(p) - log(pm)  # Inverse mapping of p_01
+        }
+        inv_p_0inf <- \(p) {
+          p <- p |>
+            pmin(log(.Machine$double.xmax)) |> # Prevent exp(p) = Inf
+            pmax(.Machine$double.eps) # Prevent exp(p) = 1
+
+          log(exp(p) - 1)
         }
 
-        # Return the one obj value for special case when N = 1
-        if (N == 1) {
-          models <- length(private$.model)
-          params <- c(rep(1, models),0)
-          result <- list("value" = obj_function(N, params, private$.model))
+
+        # We need to know the number of models the gamma's belong to
+        n_models <- length(self$model)
+
+        # We pre-compute the value for the last gamma values
+        f_inf <- purrr::map(self$model, \(model) model(Inf))
+        stopifnot("The waning function(s) must have finite values at infinity."={purrr::every(f_inf, is.finite)})
+
+
+        if (method == "free_delta") {
+          # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
+          n_free_parameters <- N - 1
+
+          f_0 <- purrr::map(self$model, \(model) model(0))
+
+          par_to_delta <- \(par) p_0inf(par) # All parameters are delta
+
+          # gammas: f_0 to f_inf. Has to be in reverse order for N = 1, since then only the from
+          # value is generated. This needs to be f_inf to make the integral difference go to zero
+          # as we integrate to infinity
+          par_to_gamma <- \(par, model_id) rev(seq(from = f_inf[[model_id]], to = f_0[[model_id]], length.out = N))
+
+        } else if (method  == "free_gamma") {
+          # The first n_models * (N-1) parameters are the gamma rates (N-1 for each model)
+          # The last parameter is the delta rate which is identical for all compartments
+          n_free_parameters <- (N - 1) * n_models + as.numeric(N > 1)
+
+          par_to_delta <- \(par) p_0inf(par[-seq_len(max(0, n_free_parameters - 1))]) # Last parameter is delta
+          par_to_gamma <- \(par, model_id) {
+            c(
+              p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
+              f_inf[[model_id]] # And inject the fixed end-point
+            )
+          }
+
+        } else if (method == "all_free") {
+          # All parameters are free to vary
+          # The first n_models * (N-1) parameters are the gamma rates  (N-1 for each model)
+          # The last N-1 parameters are the delta rates
+          n_free_parameters <- (N - 1) * n_models + N - 1
+
+          par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - (N - 1))]) # Last N-1 parameters are the deltas
+          par_to_gamma <- \(par, model_id) {
+            c(
+              p_01(par[seq_len(N - 1) + (model_id - 1) * (N - 1)]), # The gamma parameters of the n'th model
+              f_inf[[model_id]] # And inject the fixed end-point
+            )
+          }
+        }
+
+        # For the optimisation, we define the objective function which loops over each model and computes the total
+        # square deviation from the target.
+        # The error is then the sum of these deviations across models
+        obj_function <- function(par) {
+
+          metrics <- purrr::map(seq_along(self$model), \(model_id) {
+
+            delta <- par_to_delta(par)
+            gamma <- par_to_gamma(par, model_id)
+
+            # Some optimisers yield non-finite delta
+            if (any(is.infinite(delta)) || anyNA(delta) || anyNA(gamma)) {
+
+              # We define the objective function as infinite in this case
+              return(list("value" = 1 / .Machine$double.eps, "penalty" = 1 / .Machine$double.eps))
+
+            } else {
+
+              approx <- private$get_approximation(gamma, delta, N)
+
+              # Finds diff from approximation and target function
+              integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
+
+              # Numerically integrate the differences
+              value <- tryCatch(
+                sqrt(stats::integrate(integrand, lower = 0, upper = Inf)$value),
+                error = function(e) {
+                  1 / (min(delta) + .Machine$double.eps) # If the any delta is too small, the integral looks divergent
+                  # (since we too approach the asymptote too slowly).
+                  # We use the 1 / delta to create a wall in the optimisation
+                }
+              )
+
+
+              ## Penalise non-monotone solutions
+              penalty <- monotonous * sum(purrr::keep(diff(gamma), ~ . > 0))
+
+              ## Penalise spread of gamma and delta
+
+              # Compute sd of equidistant gamma
+              sd_0_gamma <- sd(seq(from = self$model[[model_id]](0), to = gamma[N], length.out = N))
+
+              # Compute penalty spread of gamma and delta
+              gamma_penalty <- ifelse(length(gamma) > 1, abs(sd(gamma) - sd_0_gamma), 0)
+              delta_penalty <- ifelse(length(delta) > 1, sd(delta), 0)
+
+              penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)
+
+              return(list("value" = value, "penalty" = penalty))
+            }
+          }) |>
+            purrr::list_transpose() |>
+            purrr::map_dbl(sum)
+
+          return(metrics)
+        }
+
+
+
+        # If we have no free parameters we return the default rates
+        if (n_free_parameters == 0) {
+          gamma <- purrr::map(self$model, \(model) numeric(0)) |>
+            stats::setNames(names(self$model))
+          delta <- numeric(0)
+
+          # Get the metrics for the solution
+          par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          metrics <- obj_function(par)
+          res <- list("value" = sum(metrics), "message" = "No free parameters to optimise")
+
         } else {
-          result <- stats::optim(to_optim, \(x) obj_function(N, c(non_optim, x), private$.model), control = list(maxit = 1e3), method = "BFGS")
-          params <- c(non_optim, result$par)
-        }
-        # Save obj value
-        approach = match.arg(approach)
-        value <- setNames(list(result$value), paste(approach, N, sep = "_N_"))
+          # We provide a starting guess for the rates
 
-        # Scale optimised parameters
-        rates <- purrr::map2(private$.model, seq_along(private$.model), ~ {
-          params_model <- c(params[(1:N) + (.y - 1) * N], params[-(1:(N * (length(private$.model))))])
-          params_model <- rescale_params(params_model, .x(Inf))
-          if (length(params_model) != (N * 2) - 1) { # Ensure length of delta always is N-1 in rate output
-            params_model <- c(params_model[1:N], rep(params_model[-(N:1)], (N - 1)))
+          # Note that need to be "inverted" through the inverse of the mapping functions
+          # so they are are in the same parameter space as the optimisation occurs
+
+          # Account for the differences in methods
+          if (method == "free_delta")  {
+
+            # free_delta has no free gamma parameters (uses linearly distributed values)
+            gamma_0 <- numeric(0)
+
+            if (strategy == "naive") {
+
+              # Uniform delta using time scale as (N - 1) / delta
+              delta_0 <- rep(
+                (N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1),
+                N - 1
+              )
+
+            } else if (strategy == "recursive") {
+
+              # Initially using time scale as 1 / delta, then using linear interpolation of 1 / delta from
+              # N - 1 solution to get starting guess for N solution
+              if (N == 2) {
+
+                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+
+              } else {
+
+                # Get the N - 1 solution for delta
+                delta_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("delta")
+
+                # Linearly interpolate from N - 1 to N
+                if (N == 3) { # For N == 3 we cannot use approx so we manually interpolate
+                  delta_0 <- c(delta_0, delta_0) * 2
+                } else {  # Interpolate the time spent in each compartment
+                  t <- approx(
+                    x = seq(0, 1, length.out = N - 2), # Progress along compartments (N - 1 solution)
+                    y = cumsum(1 / delta_0), # Time to reach compartments (N - 1 solution)
+                    xout = seq(0, 1, length.out = N - 1) # Progress along compartments (N solution)
+                  ) |>
+                    purrr::pluck("y") # Time to reach compartments (N solution)
+
+                  # Convert to rates
+                  delta_0 <- c(delta_0[[1]], 1 / diff(t))
+                }
+              }
+
+            }
+
+          } else if (method == "free_gamma") {
+
+            if (strategy == "naive") {
+
+              # Uniform delta using time scale as N / delta
+              delta_0 <- (N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+
+              # Use linearly distributed gamma values as starting guess
+              gamma_0 <- private$.model |>
+                purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = N), N - 1)) |>
+                purrr::reduce(c)
+
+            } else if (strategy == "recursive") {
+
+              # Initially using time scale as 1 / delta, then using N - 1 solution to get starting guess for
+              # N solution for both delta and gamma.
+              # This effectively adds an additional compartment after the last with the same gamma value
+              if (N == 2) {
+
+                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+                gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
+
+              } else {
+
+                # Get the N - 1 solution for delta
+                delta_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("delta")
+
+                # Adjust for the increase in the number of compartments
+                delta_0 <- delta_0 * (N - 1) / (N - 2)
+
+                # Get the N - 1 solution for gamma
+                gamma_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("gamma")
+
+                # Repeat the last gamma level from the N-1 solution to form the N initial guess
+                gamma_0 <-  gamma_0 |>
+                  purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
+                  purrr::reduce(c)
+              }
+
+            }
+
+          } else if (method == "all_free") {
+
+            if (strategy == "naive") {
+
+              # Uniform delta using time scale as N / delta
+              delta_0 <- (N - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1) |>
+                rep(N - 1)
+
+              # Use linearly distributed gamma values as starting guess
+              gamma_0 <- private$.model |>
+                purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = N), N - 1)) |>
+                purrr::reduce(c)
+
+            } else if (strategy == "recursive") {
+
+              # Initially using time scale as 1 / delta, then using N - 1 solution to get starting guess for
+              # N solution for both delta and gamma.
+              # This effectively adds an additional compartment after the last with the same gamma value
+              if (N == 2) {
+
+                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+                gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
+
+              } else {
+
+                # Get the N - 1 solution for delta
+                delta_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("delta")
+
+                # Get the N - 1 solution for gamma
+                gamma_0 <- self$approximate_compartmental(
+                  method = method,
+                  strategy = strategy,
+                  N = N - 1,                                                                                            # nolint: object_name_linter
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control,
+                  ...
+                ) |>
+                  purrr::pluck("gamma")
+
+
+                # Interpolate gamma from N - 1 to N
+                if (N == 3) { # By repeating the last value when we cannot use approx
+                  gamma_0 <- gamma_0 |>
+                    purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
+                    purrr::reduce(c)
+                } else { # And by creating a mapping from time (cumsum(1 / delta)) to gamma
+                  gammas_from_delta <- purrr::map(gamma_0, ~ approxfun(cumsum(1 / delta_0), head(.x, -1), rule = 2))
+                }
+
+                # Interpolate delta from N - 1 to N
+                if (N == 3) { # For N == 3 we cannot use approx so we manually interpolate
+                  delta_0 <- c(delta_0, delta_0) * 2
+                } else { # Interpolate the time spent in each compartment
+                  t <- approx(
+                    x = seq(0, 1, length.out = N - 2), # Progress along compartments (N - 1 solution)
+                    y = cumsum(1 / delta_0), # Time to reach compartments (N - 1 solution)
+                    xout = seq(0, 1, length.out = N - 1) # Progress along compartments (N solution)
+                  ) |>
+                    purrr::pluck("y") # Time to reach compartments (N solution)
+
+                  # Convert to rates
+                  delta_0 <- c(delta_0[[1]], 1 / diff(t))
+                }
+
+                # Now, with delta computed, we must use the mapping that was created for N > 3 to get the gamma values
+                if (N > 3) {
+                  gamma_0 <- purrr::map(gammas_from_delta, ~ .x(cumsum(1 / delta_0))) |>
+                    purrr::reduce(c)
+                }
+
+              }
+
+            } else if (strategy == "combination") {
+
+              # Use free_gamma solution as starting point
+              delta_0 <- self$approximate_compartmental(
+                method = "free_gamma",
+                N = N,                                                                                                  # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level
+              ) |>
+                purrr::pluck("delta") |>
+                rep(N - 1)
+
+              # Use free_gamma solution as starting point
+              gamma_0 <- self$approximate_compartmental(
+                method = "free_gamma",
+                N = N,                                                                                                  # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level
+              ) |>
+                purrr::pluck("gamma") |>
+                purrr::map(~ utils::head(., N - 1)) |> # Drop last value since it is fixed in the method
+                purrr::reduce(c)
+            }
           }
-          return(params_model)
-        }) |>
-          stats::setNames(names(private$.model))
+
+          # Inverse mapping of parameters to optimiser space
+          p_delta_0 <- inv_p_0inf(delta_0)
+          p_gamma_0 <- inv_p_01(gamma_0)
+
+
+          # Run the optimisation
+          optimx_methods <- switch(rlang::is_installed("optimx") + 1, list(), optimx::ctrldefault(1)$allmeth)
+
+          # Infer and call the optimiser
+          if (optim_control %.% optim_method %in% eval(formals(stats::optim)$method)) {
+            # Optimiser is `stats::optim`
+
+            res <- stats::optim(
+              par = c(p_gamma_0, p_delta_0),
+              fn = \(p) sum(obj_function(p)),
+              method = optim_control$optim_method,
+              control = purrr::discard_at(optim_control, "optim_method"),
+              ...
+            )
+
+          } else if (optim_control %.% optim_method ==  "nlm") {
+            # Optimiser is `stats::nlm`
+
+            res <- purrr::partial(
+              getExportedValue("stats", optim_control %.% optim_method),
+              !!!purrr::discard_at(optim_control, "optim_method")
+            )(
+              f = \(p) sum(obj_function(p)),
+              p = c(p_gamma_0, p_delta_0),
+              ...
+            )
+
+            # "nlm" has a different naming convention.
+            res$par <- res$estimate
+            res$estimate <- NULL
+
+          } else if (optim_control %.% optim_method ==  "nlminb") {
+            # Optimiser is `stats::nlminb`
+
+            res <- getExportedValue("stats", optim_control %.% optim_method)(
+              start = c(p_gamma_0, p_delta_0),
+              objective = \(p) sum(obj_function(p)),
+              control = purrr::discard_at(optim_control, "optim_method"),
+              ...
+            )
+
+          } else if (optim_control %.% optim_method %in% getNamespaceExports("nloptr")) {
+            # Optimiser is `nloptr::<method>`
+
+            optimiser <- getExportedValue("nloptr", optim_control %.% optim_method)
+
+            # `nloptr::auglag` has two local args that need individual passing
+            if (optim_control %.% optim_method == "auglag") {
+              optimiser <- purrr::partial(optimiser, !!!purrr::keep_at(optim_control, c("localsolver", "localtol")))
+              optim_control <- purrr::discard_at(optim_control, c("localsolver", "localtol"))
+            }
+
+            res <- optimiser(
+              x0 = c(p_gamma_0, p_delta_0),
+              fn = \(p) sum(obj_function(p)),
+              control = purrr::discard_at(optim_control, "optim_method"),
+              ...
+            )
+
+          } else if (optim_control %.% optim_method %in% optimx_methods) {
+            # Optimiser is `optimx::optimr`
+
+            capture.output( # Suppress output from optimx
+              res <- optimx::optimr(                                                                                    # nolint: implicit_assignment_linter
+                par = c(p_gamma_0, p_delta_0),
+                fn = \(p) sum(obj_function(p)),
+                method = optim_control %.% optim_method,
+                control = purrr::discard_at(optim_control, "optim_method"),
+                ...
+              )
+            )
+
+          } else {
+            stop(
+              glue::glue(
+                "`optim_control` format ({dput(optim_control)}) ",
+                "matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::optimr`!"
+              )
+            )
+          }
+
+          # Get the full metrics for the best solution
+          metrics <- obj_function(res$par)
+
+          # Map optimised parameters to rates
+          gamma <- purrr::map2(private$.model, seq_along(private$.model), ~ {
+            par_to_gamma(res$par, .y)
+          }) |> stats::setNames(names(private$.model))
+
+          delta <- par_to_delta(res$par)
+        }
+
+
+        # For the recursive and combination strategies, we need to add the execution time from the previous
+        # optimisations
+        if (N == 1) {
+
+          execution_time_offset <- 0
+
+        } else if (strategy == "recursive" && N > 2) {
+
+          execution_time_offset <- seq(from = 2, to = N - 1, by = 1) |>
+            purrr::map_dbl(\(N) {
+              self$approximate_compartmental(
+                method = method,
+                strategy = strategy,
+                N = N,                                                                                                  # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level,
+                optim_control = optim_control,
+                ...
+              ) |>
+                purrr::pluck("execution_time") |>
+                as.numeric(unit = "secs")
+            }) |>
+            sum()
+
+        } else if (strategy == "combination") {
+
+          execution_time_offset <- self$approximate_compartmental(
+            method = "free_gamma",
+            N = N,                                                                                                      # nolint: object_name_linter
+            monotonous = monotonous,
+            individual_level = individual_level
+          ) |>
+            purrr::pluck("execution_time")
+
+        } else {
+          execution_time_offset <- 0
+        }
+
 
         # Store in cache
-        private$cache(hash, list("rates" = rates, "value" = value))
+        private$cache(
+          hash,
+          utils::modifyList(
+            res,
+            list(
+              "gamma" = gamma,
+              "delta" = delta,
+              "method" = method,
+              "strategy" = strategy,
+              "N" = N,
+              "sqrt_integral" = purrr::pluck(metrics, "value"),
+              "penalty" = purrr::pluck(metrics, "penalty"),
+              "execution_time" = Sys.time() - tic + execution_time_offset
+            )
+          )
+        )
       }
 
       # Write to the log
@@ -411,60 +1012,83 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     #' @description
     #    Plot the waning functions for the current instance.
-    #'   If desired to additionally plot the approximations, supply the `approach` and number of compartments (`N`)
+    #'   If desired to additionally plot the approximations, supply the `method` and number of compartments (`N`)
     #' @param t_max (`numeric`)\cr
-    #'  The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the accumulated time scales.
-    #' @param approach (`str` or `numeric`)\cr
-    #'   Specifies the approach to be used from the available approaches.
-    #'   It can be provided as a string with the approach name "rate_equal", "gamma_fixed_step" or "all_free".
-    #'   or as a numeric value representing the approach index 1, 2, or 3.
+    #'   The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the
+    #'   accumulated time scales.
+    #' @param method (`str` or `numeric`)\cr
+    #'   Specifies the method to be used from the available methods.
+    #'   It can be provided as a string with the method name "free_gamma", "free_delta" or "all_free".
+    #'   or as a numeric value representing the method index 1, 2, or 3.
     #' @param N (`numeric`)\cr
     #'   Number of compartments to be used in the model.
-    #'   By default, it is set to 5
-    plot = function(t_max = NULL, approach = c("rate_equal", "gamma_fixed_step", "all_free"), N = NULL) {
+    #' @param ...
+    #'   Additional arguments to be passed to `$approximate_compartmental()`.
+    plot = function(t_max = NULL, method = c("free_gamma", "free_delta", "all_free"), N = NULL, ...) {                  # nolint: object_name_linter
       checkmate::assert_number(t_max, lower = 0, null.ok = TRUE)
-      # Only plots the rates if N was given as input
-      if (is.null(N)) {
-        rates <- NULL
-      } else {
-        rates <- self$approximate_compartmental(approach, N)$rates
-      }
+
       # Set t_max if nothing is given
-      if (is.null(t_max)) t_max <- 3 * purrr::pluck(stats::median(unlist(private$get_time_scale())), .default = 1)
+      if (is.null(t_max)) t_max <- 3 * purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
       t <- seq(from = 0, to = t_max, length.out = 100)
+
+      # Modify the margins
+      if (interactive()) par(mar = c(3, 3.25, 2, 1))
+
       # Create an empty plot
-      par(mar = c(5, 4, 4, 12) + 0.1) # Adds extra space on the right
-      plot(t, type = "n", xlab = "Time", ylab = "Gamma", main = "Waning functions", ylim = c(0, 1), xlim = c(0, t_max))
-      # Create palette with different colors to use in plot
-      pcolors <- palette()
+      plot(
+        t,
+        type = "n",
+        xlab = "t",
+        ylab = "f(t)",
+        main = "Waning functions",
+        ylim = c(0, 1),
+        xlim = c(0, t_max),
+        yaxs = "i",
+        xaxs = "i",
+        mgp = c(2, 0.75, 0),
+        cex.lab = 1.25
+      )
+
+
+      # Create palette with different colours to use in plot
+      colours <- palette("dark")
+
+
       # Plot lines for each model
       purrr::walk2(private$.model, seq_along(private$.model), ~ {
-        lines(t, purrr::map_dbl(t, .x), col = pcolors[1 + .y])
+        lines(t, purrr::map_dbl(t, .x), col = colours[1 + .y], lwd = 2)
       })
-      # If rates have been approximated add them to the plot
-      if (!is.null(rates)) {
-        purrr::walk2(rates, seq_along(private$.model), ~ {
-          N <- (length(.x) + 1) / 2
-          lines(t, purrr::map_dbl(t, private$get_approximation(N, .x)), col = pcolors[1 + .y], lty = "dashed")
 
-          # Get legend labels for models and approximation
-          combined_legend <- c(names(private$.model), paste("app.", names(rates)))
 
-          # Specify line types for models and approximation
-          combined_lty <- c(rep("solid", length(private$.model)), rep("dashed", length(rates)))
+      # Only plots the approximations if N was given as input
+      if (!is.null(N)) {
+        approximation <- self$approximate_compartmental(N, method = method, ...)
+        gamma <- approximation$gamma
+        delta <- approximation$delta
 
-          # Combined legend (models and approximation)
-          legend("topright", legend = combined_legend, col = c(purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
-                                                               purrr::map_chr(seq_along(rates), ~ pcolors[1 + .x])),
-                 lty = combined_lty, inset = c(-0.9, 0), bty = "n", xpd = TRUE, cex = 0.8)
+        purrr::walk2(gamma, seq_along(private$.model), ~ {
+          lines(t, private$get_approximation(.x, delta, N)(t), col = colours[1 + .y], lty = "dashed", lwd = 2)
         })
-      } else {
-        # Only legend for models
-        legend("topright", legend = names(private$.model), col = purrr::map_chr(seq_along(private$.model), ~ pcolors[1 + .x]),
-               lty = 1, inset = c(-0.7, 0), bty = "n", xpd = TRUE, cex = 0.8)
       }
-      # Write to the log
-      private$lg$info("Plotting all models in the current instance, with approximations if given as input")
+
+
+      # Get legend labels, colors and line type for models and approximation (if N is given)
+      legend_names <- c(names(private$.model), switch(!is.null(N), paste("app.", names(private$.model))))
+      legend_colors <- rep(purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]), 1 + !is.null(N))
+      legend_lty <- c(rep("solid", length(private$.model)), rep("dashed", !is.null(N) * length(private$.model)))
+
+      # Render legend
+      legend(
+        "topright",
+        legend = legend_names,
+        col = legend_colors,
+        lty = legend_lty,
+        lwd = 2,
+        inset = c(0, 0),
+        bty = "n",
+        xpd = TRUE
+      )
+
     }
   ),
 
@@ -482,6 +1106,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         return(models)
       }
     ),
+
     #' @field model (`list(function())`)\cr
     #'   The list of models currently being used in the module. Read-only.
     model = purrr::partial(
@@ -489,80 +1114,31 @@ DiseasyImmunity <- R6::R6Class(                                                 
       name = "model",
       expr = return(private %.% .model)
     ),
-    #' @field available_approaches (`character`)\cr
-    #'   The list of available approaches
-    available_approaches = purrr::partial(
+
+    #' @field available_methods (`character`)\cr
+    #'   The list of available methods. Read-only.
+    available_methods = purrr::partial(
       .f = active_binding,
-      name = "available_approaches",
-      expr = {
-        approaches <- private$.approaches
-        return(approaches)
-      }
+      name = "available_methods",
+      expr = return(names(private$method_functions))
     )
   ),
 
   private = list(
+
     .model = NULL,
+
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
-      purrr::map(private$.model, ~ rlang::fn_env(.x)$time_scale)
+      return(purrr::map(self$model, ~ purrr::pluck(.x, rlang::fn_env, as.list, "time_scale", .default = NULL)))
     },
-    approach_functions = list(
-      rate_equal = function(N, delta) {
-        optim_par <- c("gamma", "delta")
-        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = delta)
-        rescale_params <- function(p, gamma_N) {
-          N <- length(p) - 1 # Infer N
-          p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmodial transform all parameters
-          p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monoticity and fixed end-point
-          return(p)
-        }
-        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
-      },
-      gamma_fixed_step = function(N, delta) {
-        optim_par <- "delta"
-        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
-        rescale_params <- function(p, gamma_N) {
-          if (length(p) == 2){
-            p <- c(gamma_N,  0) # Ensure fixed end-point and no delta rate
-          } else {
-            N <- (length(p) + 1) / 2 # Infer N
-            p <- c(p[1:N] * (1 - gamma_N) + gamma_N,  0.5 * (1 + p[-(1:N)] / (1 + abs(p[-(1:N)])))) # Ensure monoticity, fixed end-point, and Sigmodial transform the delta parameters
-          }
-          return(p)
-        }
-        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
-      },
-      all_free = function(N, delta) {
-        optim_par <- c("gamma", "delta")
-        init_par <- list(gamma = 1 - (seq(N) - 1) / (N - 1), delta = rep(delta, N - 1))
-        rescale_params <- function(p, gamma_N) {
-          if (length(p) == 2){
-            N <- 1
-            p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters (here only delta)
-            p <- c(gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
-          } else {
-            N <- (length(p) + 1) / 2 # Infer N
-            p <- 0.5 * (1 + p / (1 + abs(p))) # Sigmoidal transform all parameters
-            p <- c(cumprod(p[1:N - 1]), gamma_N, p[-(1:N)]) # Ensure monotonicity and fixed end-point
-          }
-          return(p)
-        }
-        return(list(optim_par = optim_par, init_par = init_par, rescale_params = rescale_params))
-      }
-    ),
-    get_approximation = function(N, params) {
-      gamma <- params[1:N]
-      delta <- params[-(1:N)]
-      approx <- \(t) do.call(cbind, private$occupancy_probability(delta, N, t)) %*% gamma
-    },
-    get_integration = function(approx, f_target) {
-      # Finds diff from approximation and target function
-      integrand <- \(t) (approx(t) - f_target(t))^2
 
-      # Numerically integrate the differences
-      result <- stats::integrate(integrand, lower = 0, upper = Inf)$value
+    get_approximation = function(gamma, delta, N) {                                                                     # nolint: object_name_linter
+      return(\(t) do.call(cbind, private$occupancy_probability(delta, N, t)) %*% gamma)
     },
+
+
+
     # Compute the probability of occupying each of K sequential compartments
     # @param rate (`numeric(1)` or `numeric(K-1)`)\cr
     #   The rate of transfer between each of the K compartments.
@@ -574,13 +1150,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
     # @return
     #   A `list()` with the k'th element containing the probability of occupying the k'th compartment over time.
     # @examples
-    #  occupancy_probability(0.1, 3, seq(0, 50))
-    #  occupancy_probability(c(0.1, 0.2), 3, seq(0, 50))
+    #  occupancy_probability(0.1, 3, seq(0, 50))                                                                        # nolint: commented_code_linter
+    #  occupancy_probability(c(0.1, 0.2), 3, seq(0, 50))                                                                # nolint: commented_code_linter
     occupancy_probability = function(rate, K, t) {                                                                      # nolint: object_name_linter
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
-        checkmate::check_number(rate),
-        checkmate::check_numeric(rate, lower = -1e14, any.missing = FALSE, len = K - 1),
+        checkmate::check_number(rate, lower = 0, finite = TRUE),
+        checkmate::check_numeric(rate, lower = 0, finite = TRUE, any.missing = FALSE, len = K - 1),
         add = coll
       )
       checkmate::assert_integerish(K, lower = 1, add = coll)
@@ -596,14 +1172,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
       if (length(rate) == 1) {
 
         # If a scalar rate is given, the problem reduces to the Erlang-distribution
-        prob_lt_k <- purrr::map(1:(K - 1), \(k) pgamma(t, shape = k, rate = rate, lower.tail = FALSE))
+        prob_lt_k <- purrr::map(seq_len(K - 1), \(k) pgamma(t, shape = k, rate = rate, lower.tail = FALSE))
 
       } else {
         # We can compute the waiting time distributions (hypoexponential distributions)
         # https://en.wikipedia.org/wiki/Hypoexponential_distribution
 
         # Retrieve each of the hypoexponential distributions
-        prob_lt_k <- purrr::map(1:(K - 1), \(k) phypo(t, shape = k, rate = rate[1:k], lower.tail = FALSE))
+        prob_lt_k <- purrr::map(seq_len(K - 1), \(k) phypo(t, shape = k, rate = rate[seq_len(k)], lower.tail = FALSE))
 
       }
 
@@ -625,89 +1201,3 @@ DiseasyImmunity <- R6::R6Class(                                                 
     }
   )
 )
-
-
-
-#' @param K (`integer(1)`)\cr
-    #'   The number of sequential compartments.
-    #' @param functions (`list`)\cr
-    #'   A list of target functions to optimisze for.
-    #' @param tmax ((`integer(1)`)\cr
-    #'   The maximum number of time steps.
-# Et DiseasyImmunity modul skal som udgangspunkt bare have ingen waning (konstant beskyttelse)
-
-
-# Familie af use_*_funktioner ligesom i DiseasySeason (enkel parameter - time_scale - der hvor den er halv (tau ændres))
-# Dette kunne så gemme funktionen i et privat field (fx $.model)
-# Eg. private$.model <- \(t) exp(-t / (tau * log(2)))
-
-# Syntax eksempel - simpel case
-# im <- DiseasyImmunity$new()
-# im$use_exponential_waning()
-# im$set_timescale(10)
-
-# Alternativt:
-# im$use_exponential_waning(scale = 10)
-
-# Begge måder skal gerne virke (se DiseasySeason for eksempel)
-
-
-# Det vil være en god ide at stjæle "$use_season_model("model")" fra DiseasySeason og lave en tilsvarende
-# "$use_waning_model("model")" her. Så kan vi meget nemmere interagere med modulet programatisk.
-
-
-
-
-# Så skal vi have en måde at approximere de valgte modeller givet en ODE kasse model med N R-kasser.
-# Fx. public$approximate_compartmental(N, t_max, method = "...")
-# Så er spørgsmålet, skal dette gemme raterne i modulet?
-# Altså, skal der være en private$.approximated_rates ?
-# Eller skal funktionen bare returnere det fittede rater?
-# En fordel ved at gemme dem, er at vi kan inkludere dem i et plot metode ($plot()) så det er nemmere at
-# inspicere modulets konfiguration.
-# Nå raterne gemmes som en liste, skal vi lige blive enige om formatet.
-# Rasmus foreslår at bruge en navngiven liste af vektorer.
-# Fx.
-# list(rates = c(d1, d2, d3, .. dn-1), infection_risk = c(g1, g2, g3, ..., gn))
-# Altså, at vi altid har "rates" først, og derefter en navngivet liste med de resterende fits.
-# Navnenne på det resterende kan så matche de navne der gives med "$use_costom_waning()".
-# Vores $use_* funktioner har i denne analogi så navnet "infection_risk" .
-# Altså, hvis man først kalder $use_costum_waning(list(infection_risk = \(t) exp(-t / 20), hospitalisation_risk = \(t) exp(-t/30)*0.8 + 0.2))))
-# så får man outputtet
-# list(rates = c(d1, d2, d3, .. dn-1), infection_risk = c(g1, g2, g3, ..., gn), hospitalisation_risk = c(g1, g2, g3, ..., gn))
-
-
-
-
-# approximate_compartmental kommer nok til at blive en kompliceret funktion med flere valgfrie argumenter
-# Til at starte med, synes jeg vi skal implementere en simpel udgave og så itererer derfra.
-# Vi starter med at "t_max" skal sættes (senere kan vi lave en implementation med t_max = NULL som prøver heuristisk at læse problemet)
-# Senere kan vi gøre så f(inf) også bliver givet til modellen (lige nu kan vi overveje bare at bruge f(t_max) some endepunkter)
-# men til at starte med sætter vi bare gamma_N = f(t_max).
-
-# Bemærk, at vi nok skal have en særlig logik når en konstant beskyttelse er sat, da modellen så ikke kan fitte problemet
-# (Det burde være degenereret)
-
-
-
-
-# Det skal også være muligt at give sine egne funktioner til modulet
-# Fx. kan vi lave en public$use_custom_waning(...)
-# Her kan det blive lidt komplekst.
-
-# I det simple tilfælde, skal den kunne tage en enkelt "target funktion" f(t) og en tilsvarende timescale for funktionen.
-# (Hvis vi kræver at timescale bliver givet med, så kan vi køre heuristiske elementer af programmet bedre tror jer)
-
-# Men vi vil gerne have mulighed for at kunne tage en liste af target funktioner og gemme dem i modulet.
-# Dette kommer til at have betydning for hvordan public$approximate_compartmental(..) skal fungere, da den så
-# skal kunne simultant fitte alle target funkioner når en liste er gemt i modulet.
-
-# Det vil sige, at der skal være noget logik i starten af funktionen ($approximate_compartmental) som tjekker om
-# $model() er en liste af funktioner eller bare en funktion.
-# Hvis det er en liste skal den så kunne håndtere dem også.
-# Alternativt, skal der laves en fancy implementering (fx med purrr) som er ligeglad om det en liste af 1 element eller en liste af flere.
-
-
-#' @inherit base::plot
-#' @export
-plot.DiseasyImmunity <- function(obj, ...) obj$plot(...)

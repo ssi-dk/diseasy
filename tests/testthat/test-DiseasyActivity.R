@@ -30,7 +30,7 @@ attr(ref_scenario_1, "secret_hash") <- secret_hash
 
 
 
-test_that("$set_activity_units works", {
+test_that("$set_activity_units() works", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -52,7 +52,7 @@ test_that("$set_activity_units works", {
 })
 
 
-test_that("$set_activity_units fails when loading malformed activity units", {
+test_that("$set_activity_units() fails when loading malformed activity units", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -67,7 +67,7 @@ test_that("$set_activity_units fails when loading malformed activity units", {
 })
 
 
-test_that("$change_activity works with different ways of initializing", {
+test_that("$change_activity() works with different ways of initializing", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -127,37 +127,7 @@ test_that("$change_activity works with different ways of initializing", {
 })
 
 
-test_that("$change_risk's secret_hash works", {
-
-  # Create a new instance of the activity module
-  act <- DiseasyActivity$new()
-  act$set_activity_units(dk_activity_units_subset)
-
-  # Set a scenario
-  act$change_activity(scenario_1)
-  hash_scenario_1_loaded <- act$hash
-
-
-  # if we change one of the activity units, the secret_hash should ensure that the hash is not the same
-  tmp_activity_units <- dk_activity_units_subset
-  names(tmp_activity_units) <- c(names(tmp_activity_units[1:3]),
-                                 names(tmp_activity_units[10]),
-                                 names(tmp_activity_units[5:9]),
-                                 names(tmp_activity_units[4]))
-
-  act$set_activity_units(tmp_activity_units)
-  act$change_activity(scenario_1) # setting of activity units resets the scenario, so we set it again
-
-  # The scenario matrices of the two cases should LOOk identical, but not actually be due to the secret hash
-  expect_false(identical(act$scenario_matrix, ref_scenario_1))
-  expect_identical(as.matrix(act$scenario_matrix), as.matrix(ref_scenario_1)) # The matrix it-self should be the same
-  expect_false(act$hash == hash_scenario_1_loaded) # hash should now be different since the activity units have changed
-
-  rm(act)
-})
-
-
-test_that("$change_activity fails with malformed inputs", {
+test_that("$change_activity() fails with malformed inputs", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -173,14 +143,14 @@ test_that("$change_activity fails with malformed inputs", {
   expect_error(act$change_activity(malformed_scenario),
                class = "simpleError",
                regexp = "non_existing_activity_unit")
-  expect_null(act$scenario_matrix) # Check the state is unchanged
+  expect_null(act %.% scenario_matrix) # Check the state is unchanged
 
 
   rm(act)
 })
 
 
-test_that("$change_risk works", {
+test_that("$change_risk() works", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new()
@@ -224,14 +194,44 @@ test_that("$change_risk works", {
 })
 
 
-test_that("get_scenario_openness works", {
+test_that("$change_risk()'s secret_hash works", {
+
+  # Create a new instance of the activity module
+  act <- DiseasyActivity$new()
+  act$set_activity_units(dk_activity_units_subset)
+
+  # Set a scenario
+  act$change_activity(scenario_1)
+  hash_scenario_1_loaded <- act$hash
+
+
+  # if we change one of the activity units, the secret_hash should ensure that the hash is not the same
+  tmp_activity_units <- dk_activity_units_subset
+  names(tmp_activity_units) <- c(names(tmp_activity_units[1:3]),
+                                 names(tmp_activity_units[10]),
+                                 names(tmp_activity_units[5:9]),
+                                 names(tmp_activity_units[4]))
+
+  act$set_activity_units(tmp_activity_units)
+  act$change_activity(scenario_1) # setting of activity units resets the scenario, so we set it again
+
+  # The scenario matrices of the two cases should LOOk identical, but not actually be due to the secret hash
+  expect_false(identical(act$scenario_matrix, ref_scenario_1))
+  expect_identical(as.matrix(act$scenario_matrix), as.matrix(ref_scenario_1)) # The matrix it-self should be the same
+  expect_false(act$hash == hash_scenario_1_loaded) # hash should now be different since the activity units have changed
+
+  rm(act)
+})
+
+
+test_that("$get_scenario_openness() works", {
 
   # Test openness
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
   # With no scenario, we should get a empty list
-  expect_identical(act$get_scenario_openness(), list())
+  expect_identical(act$get_scenario_openness(), stats::setNames(list(), character(0)))
 
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
@@ -290,7 +290,7 @@ test_that("dk_reference scenario works", {
 })
 
 
-test_that("set_contact_basis works", {
+test_that("$set_contact_basis() works", {
 
   # Create a new instance of the activity module
   act <- DiseasyActivity$new(base_scenario = "closed")
@@ -312,7 +312,7 @@ test_that("set_contact_basis works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis %.% DK
-  custom_basis$counts <- custom_basis$counts[-1]
+  custom_basis$contacts <- custom_basis$contacts[-1]
   expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
                regexp = r"{missing.*elements.*\{'home'\}}")
 
@@ -329,6 +329,21 @@ test_that("set_contact_basis works", {
   custom_basis <- contact_basis %.% DK
   expect_error(act$set_contact_basis(custom_basis[-5]), class = "simpleError",
                regexp = r"{missing.*elements.*\{'description'\}}")
+
+  rm(act)
+})
+
+
+test_that("$describe() works", {
+  act <- DiseasyActivity$new()
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+
+  act$set_contact_basis(contact_basis %.% DK)
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+
+  act$set_activity_units(dk_activity_units)
+  act$change_activity(scenario_1)
+  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
 
   rm(act)
 })

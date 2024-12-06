@@ -63,20 +63,44 @@ test_that("printr: printing to console works with max_width", {
 
 test_that("diseasyoption works", {
 
+  # Check that diseasy options are returned if no option is given
+  checkmate::expect_list(diseasyoption())
+  checkmate::expect_character(names(diseasyoption()), pattern = r"{^diseasy(?:store)?\..*}")
+
   # Check that diseasyoption works for default values
   expect_null(diseasyoption("non_existent_option"))
+  expect_true(diseasyoption("non_existent_option", .default = TRUE))
 
   withr::local_options("diseasystore.target_schema" = target_schema_1)
   expect_identical(diseasyoption("target_schema"), target_schema_1)
 
   # Check that it works for child classes
-  ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(RSQLite::SQLite()))
-  expect_identical(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), target_schema_1)
+  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+    classname = "DiseasystoreDummy",
+    inherit = DiseasystoreBase,
+    public = list(initialize = function(...) {})
+  )
+
+
+  ds <- DiseasystoreDummy$new()
+  withr::local_options("diseasystore.DiseasystoreDummy.target_schema" = target_schema_1)
+  expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_1)
   expect_identical(diseasyoption("target_schema", ds), target_schema_1)
 
-  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = target_schema_2)
-  expect_identical(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), target_schema_2)
+  withr::local_options("diseasystore.DiseasystoreDummy.target_schema" = target_schema_2)
+  expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_2)
   expect_identical(diseasyoption("target_schema", ds), target_schema_2)
+
+  withr::local_options("diseasystore.target_schema" = target_schema_1)
+  withr::local_options("diseasystore.DiseasystoreDummy.target_schema" = "")
+  expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_1)
+  expect_identical(diseasyoption("target_schema", ds), target_schema_1)
+
+  withr::local_options("diseasy.target_schema" = target_schema_1)
+  expect_error(
+    diseasyoption("target_schema"),
+    regex = r"{Multiple options found \(diseasy.target_schema, diseasystore.target_schema\)!}"
+  )
 
   rm(ds)
   invisible(gc())
@@ -84,6 +108,7 @@ test_that("diseasyoption works", {
 
 
 test_that("parse_diseasyconn works", {
+  skip_if_not_installed("RSQLite")
 
   # Define different types of conn
   valid_function_conn <- \() DBI::dbConnect(RSQLite::SQLite())
@@ -101,8 +126,11 @@ test_that("parse_diseasyconn works", {
   DBI::dbDisconnect(conn)
 
 
-  expect_error(parse_diseasyconn(invalid_function_conn, type = "source_conn"),
-               class = "simpleError", regexp = "`conn` could not be parsed!")
+  expect_error(
+    parse_diseasyconn(invalid_function_conn, type = "source_conn"),
+    class = "simpleError",
+    regexp = "`source_conn` could not be parsed!"
+  )
 
 
   conn <- expect_no_condition(parse_diseasyconn(valid_dbi_conn, type = "source_conn"))
@@ -124,8 +152,11 @@ test_that("parse_diseasyconn works", {
   DBI::dbDisconnect(conn)
 
 
-  expect_error(parse_diseasyconn(invalid_function_conn, type = "target_conn"),
-               class = "simpleError", regexp = "`conn` could not be parsed!")
+  expect_error(
+    parse_diseasyconn(invalid_function_conn, type = "target_conn"),
+    class = "simpleError",
+    regexp = "`target_conn` could not be parsed!"
+  )
 
 
   conn <- expect_no_condition(parse_diseasyconn(valid_dbi_conn, type = "target_conn"))
@@ -133,8 +164,11 @@ test_that("parse_diseasyconn works", {
   checkmate::expect_class(conn, "DBIConnection")
 
 
-  expect_error(parse_diseasyconn(valid_str_conn, type = "target_conn"),
-               class = "simpleError", regexp = "`conn` could not be parsed!")
+  expect_error(
+    parse_diseasyconn(valid_str_conn, type = "target_conn"),
+    class = "simpleError",
+    regexp = "`target_conn` could not be parsed!"
+  )
 
 
   conn <- expect_no_condition(parse_diseasyconn(null_conn, type = "target_conn"))

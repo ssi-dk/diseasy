@@ -25,6 +25,7 @@
 #'   rm(s1, s2)
 #' @return
 #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
+#' @keywords functional-module
 #' @export
 DiseasySeason <- R6::R6Class(                                                                                           # nolint: object_name_linter
   classname = "DiseasySeason",
@@ -83,8 +84,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Sets the scale for the active season model.
-    #' @param scale (`numeric`)\cr
-    #'   The scale of the season effect (relative to climate normal).
+    #' @param scale `r rd_scale("field")`
     set_scale = function(scale) {
       checkmate::assert_number(scale)
 
@@ -120,7 +120,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # First parse the dot arguments
       dots_to_string <- ifelse(
-        is.null(dots), "", glue::glue_collapse(purrr::map2(dots, names(dots), ~ glue::glue("{.y} = {.x}")), sep = ", ")
+        is.null(dots), "", glue::glue_collapse(purrr::imap(dots, ~ glue::glue("{.y} = {.x}")), sep = ", ")
       )
 
       # Then retrieve the requested model
@@ -140,7 +140,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # First parse the dot arguments
       dots_to_string <- ifelse(
-        is.null(dots), "", glue::glue_collapse(purrr::map2(dots, names(dots), ~ glue::glue("{.y} = {.x}")), sep = ", ")
+        is.null(dots), "", glue::glue_collapse(purrr::imap(dots, ~ glue::glue("{.y} = {.x}")), sep = ", ")
       )
 
       # Then reset the model
@@ -221,7 +221,7 @@ DiseasySeason <- R6::R6Class(                                                   
         "Simple seasonality model.",
         "Risk of infection highest at the `peak` days after new year"
       )
-      attr(model_date, "dots")        <- list(scale = scale)
+      attr(model_date, "dots")        <- list(scale = scale, peak = peak)
 
       attr(model_t, "name")         <- attr(model_date, "name")
       attr(model_t, "description")  <- attr(model_date, "description")
@@ -459,17 +459,14 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description `r rd_describe`
     describe = function() {
-      printr("# Season model ###############################################")
-      if (is.null(self$model_t)) {
-        printr("Season model not yet set")
-      } else {
-        printr(glue::glue("Season model: {attr(self$model_t, 'name')}"))
-        printr(glue::glue("{attr(self$model_t, 'description')}"))
-        if (!is.null(attr(self$model_t, "dots"))) {
-          printr("Parameters: ",
-                 stringr::str_extract(toString(list(attr(self$model_t, "dots"))), r"{(?<=list\().*(?=\))}"))
-        }
-
+      printr("# DiseasySeason ##############################################")
+      printr(glue::glue("Season model: {attr(self$model_t, 'name')}"))
+      printr(glue::glue("{attr(self$model_t, 'description')}"))
+      if (!is.null(attr(self$model_t, "dots"))) {
+        printr(
+          "Parameters: ",
+          stringr::str_extract(toString(list(attr(self$model_t, "dots"))), r"{(?<=list\().*(?=\))}")
+        )
       }
 
       if (is.null(self$reference_date)) {

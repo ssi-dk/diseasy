@@ -1,11 +1,18 @@
+aes
+alt
 antiphase
 AR
+ARI
+
+bobyqa
 
 CCW
 
 backends
 bitemporal
 
+catalog
+cdot
 classname
 cloneable
 CMD
@@ -23,6 +30,7 @@ dbi
 DBIConnection
 DBIDriver
 dbplyr
+dI
 diseasy
 diseasystore
 DiseasystoreBase
@@ -30,38 +38,53 @@ DiseasystoreGoogleCovid
 diseasystores
 DiseasyActivity
 DiseasyBaseModule
+DiseasyImmunity
 DiseasyObservables
 DiseasySeason
+DiseasyVariant
 dk
 DMI
 doi
 dplyr
+dR
 ds
+dS
+dt
 dtplyr
+DuckDB
 
+ecdc
+ECDC
 Eggo
 endblock
 Engbo
+erviss
 
-fn
-fns
 FeatureHandler
 FeatureHandlers
+fn
+fns
+frac
 
 github
 gov
 Gruson
 
-hyopexponential
+Heaviside
+hypoexponential
 
 ij
+ILI
+infty
 Institut
+int
 
 ji
 Jit
 
 Klepac
 Kirkeby
+kt
 
 Lasse
 linter
@@ -73,7 +96,12 @@ md
 medrxiv
 Mielke
 moduleowner
+Myrup
 
+Nelder
+nlm
+nlminb
+nloptr
 nolint
 normalise
 nrow
@@ -82,15 +110,16 @@ OO
 ORCID
 org
 
+param
+parameterise
 parsable
 PascalCase
 pcbi
+pid
 Plesner
 PLoS
 POSIXct
-pid
-
-param
+PostgreSQL
 
 quos
 
@@ -106,19 +135,27 @@ Rmd
 SCDB
 Schou
 SEIR
+sigmoidal
 Skytte
+spg
 SSI
 Statens
 sql
+SQLite
 
 tbl
 Telkamp
+textrm
+th
 tibble
 tidyselect
 TODOs
 ts
 
 u
+ucminf
+
+vec
 
 www
 

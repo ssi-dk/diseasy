@@ -15,6 +15,7 @@ will therefore depend on the data made available by the diseasystores.
 See vignette("diseasy-observables")
 }
 \examples{
+\dontshow{if (rlang::is_installed("RSQLite")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   # Create observables module using the Google COVID-19 data
   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
                                 conn = DBI::dbConnect(RSQLite::SQLite()))
@@ -30,6 +31,7 @@ See vignette("diseasy-observables")
                       end_date = as.Date("2020-03-05"))
   }
   rm(obs)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link{diseasystore}
@@ -38,6 +40,7 @@ See vignette("diseasy-observables")
 
 \link[SCDB:get_table]{SCDB::get_table}
 }
+\keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyObservables}
 }
@@ -47,11 +50,9 @@ See vignette("diseasy-observables")
 \item{\code{diseasystore}}{(\code{character})\cr
 The set diseasystore to get DiseasyObservables for. Read-only.}
 
-\item{\code{start_date}}{(\code{Date})\cr
-The start date of the study period. Read-only.}
+\item{\code{start_date}}{(\code{Date})\cr Study period start. Read only.}
 
-\item{\code{end_date}}{(\code{Date})\cr
-The end date of the study period. Read-only.}
+\item{\code{end_date}}{(\code{Date})\cr Study period end. Read only.}
 
 \item{\code{last_queryable_date}}{(\code{Date})\cr
 The latest date that can be queried. Read-only.}
@@ -65,11 +66,9 @@ The currently available observables in the loaded diseasystore. Read-only.}
 \item{\code{available_stratifications}}{(\code{character})\cr
 The currently available stratifications in the loaded diseasystore. Read-only.}
 
-\item{\code{slice_ts}}{(\code{Date})\cr
-The timestamp to slice database on. Read-only.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
 
-\item{\code{conn}}{(\code{DBIConnection})\cr
-The connection to the database on. Read-only.}
+\item{\code{conn}}{(\code{DBIConnection})\cr A database connection. Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -118,20 +117,18 @@ Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} cl
 \item{\code{diseasystore}}{(\code{character})\cr
 A character string that controls which feature store to get data from.}
 
-\item{\code{start_date}}{(\code{Date})\cr
-Study period start (default values for get_observation).}
+\item{\code{start_date}}{(\code{Date})\cr Study period start.
+Used as default values for \code{get_observation}.}
 
-\item{\code{end_date}}{(\code{Date})\cr
-Study period end (default values for get_observation).}
+\item{\code{end_date}}{(\code{Date})\cr Study period end.
+Used as default values for \code{get_observation}.}
 
 \item{\code{last_queryable_date}}{(\code{Date})\cr
 Enforce a limit on data that can be pulled (not after this date).}
 
-\item{\code{conn}}{(\code{DBIConnection})\cr
-A database connection object (inherits from DBIConnection)}
+\item{\code{conn}}{(\code{DBIConnection})\cr A database connection.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
-Date to slice the database on. See \code{\link[SCDB:get_table]{SCDB::get_table()}}}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
@@ -193,11 +190,9 @@ Set the (default) time period to get observations from.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{start_date}}{(\code{Date})\cr
-Start date to get DiseasyObservables for (including).}
+\item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
-\item{\code{end_date}}{(\code{Date})\cr
-End date to get DiseasyObservables for (including).}
+\item{\code{end_date}}{(\code{Date})\cr Study period end.}
 }
 \if{html}{\out{</div>}}
 }
@@ -214,8 +209,7 @@ Set the slice_ts to get data for
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
-Date to slice the database on}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
 }
 \if{html}{\out{</div>}}
 }
@@ -240,18 +234,13 @@ The results are cached for faster retrieval at subsequent calls.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observable}}{(\code{character})\cr
-The requested observable. Should follow the pattern 'n_*'.}
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr
-Default \code{NULL}. If given, expressions in stratification evaluated to give the stratification level.\cr
-Use rlang::quos(...) to specify stratification.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 
-\item{\code{start_date}}{(\code{Date})\cr
-Start date to get DiseasyObservables for (including).}
+\item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
-\item{\code{end_date}}{(\code{Date})\cr
-End date to get DiseasyObservables for (including).}
+\item{\code{end_date}}{(\code{Date})\cr Study period end.}
 }
 \if{html}{\out{</div>}}
 }
