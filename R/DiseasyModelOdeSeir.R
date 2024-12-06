@@ -408,7 +408,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @return (`numeric(1)`)\cr
     #'   The Malthusian growth rate for the model.
     malthusian_growth_rate = function(...) {
-      return(purrr::pluck(private$generator_matrix(...), eigen, "values", Re, max))
+      return(purrr::pluck(private %.% generator_matrix(...), eigen, "values", Re, max))
     },
 
 
