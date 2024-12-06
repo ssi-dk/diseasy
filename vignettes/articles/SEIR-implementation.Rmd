@@ -302,7 +302,7 @@ $$
 \end{bmatrix}
 $$
 Notice that the off-diagonal has zero-elements where the (reduced) state vector changes age groups
-($I_k^L \rightarrow E_{k+1}^1$).
+($I_i^L \rightarrow E_{i+1}^1$).
 
 The form of the transmission matrix is more difficult to write up.
 
@@ -352,8 +352,8 @@ $$
 \begin{array}{ccccc}
   0 & \epsilon_1\hat{\rho}_{1}\,c & | & 0 & 0 \\
   0 & 0 & | & 0 & 0 \\
-  - & - & + & -& - \\
-  0 & 0 & | & \epsilon_2\hat{\rho}_{2}\,c & 0 \\
+  - & - & + & - & - \\
+  0 & 0 & | & 0 & \epsilon_2\hat{\rho}_{2}\,c \\
   0 & 0 & | & 0 & 0
 \end{array}
 \right]
