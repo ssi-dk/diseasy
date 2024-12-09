@@ -406,7 +406,7 @@ model_data <- c("n_infected", "n_positive_simple", "n_positive") |>
 model_data
 ```
 
-```{r}
+```{r, example data, fig.alt = "Plots of the example data bundled with diseasy."}
 # Visualise the example data
 ggplot2::ggplot(model_data) +
   ggplot2::geom_line(
@@ -503,7 +503,7 @@ m <- generate_model(2, 1, 1) # Use the configuration from example data
 
 
 This method relies on fitting a polynomial to the latest period, so we here visualise this fitting.
-```{r}
+```{r, incidence fitting, fig.alt = "Fitting a polynomial to the incidence data to estimate derivatives."}
 # Extract the most recent signal
 poly_fit_data <- incidence_data |>
   dplyr::filter(source == !!source) |>
@@ -653,7 +653,7 @@ prediction <- get_prediction(
 prediction
 ```
 
-```{r}
+```{r correctly specified model, fig.alt = "Using a correctly specified model to initialise the SEIR model matches the true data near-perfectly."}
 ggplot2::ggplot() +
   ggplot2::geom_point(
     data = dplyr::filter(incidence_data, .data$source == !!source),
@@ -684,7 +684,7 @@ Correctly matching the model is the best case scenario. However, we can also the
 
 Note that we at this state does not modify the parameters of the model to match the development, we only estimate the initial state vector. Once we include model fitting, the discrepancy between the data and model predictions may diminish.
 
-```{r}
+```{r misspecified model, fig.alt = "Using a misspecified model to initialise the SEIR model matches the true data well."}
 models <- list(
   generate_model(1, 1, 1),
   generate_model(2, 2, 2),
