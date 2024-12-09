@@ -45,9 +45,12 @@ That is, we assume $I^* = r_i I_1$.
 If we take the equation for $I_1$ and multiply by $r_i$ we obtain.
 
 $$
-r_i\frac{d I_1}{d t} = r_i r_e E_K - r_i^2 I_1 \Rightarrow \\
+r_i\frac{d I_1}{d t} = r_i r_e E_K - r_i^2 I_1 \Rightarrow
+$$
+$$
 \frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
 $$
+
 If we take the second derivative, we find:
 $$
 \frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t} - r_i \frac{d I_l}{d t}
@@ -83,20 +86,37 @@ I^* \\
 $$
 
 
-The matrix $\overline{\overline{M_K}}$ can be computed via a simple recursion. To see why, start the equation for the
-derivative of $I^*(t)$:
+The matrix $\overline{\overline{M_K}}$ can be computed via a simple recursion.
 
+To see why, start the equation for the derivative of $I^*(t)$:
 $$
 \frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
 $$
+
+And separating the $E_k$ and $I*$ terms:
+$$
+r_i r_e E_K = r_i I^* + \frac{d I^*}{d t}
+$$
+
 In the above formulation, this corresponds to the matrix
 $\overline{\overline{M_1}} = \begin{bmatrix}r_i & 1\end{bmatrix}$.
 
 When taking the second derivative, we obtain:
 
-$$\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t}- r_i \frac{d I^*}{d t} \Rightarrow \\
-\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I^*}{d t} \Rightarrow \\
-\frac{d^2I^*}{d t^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{d I^*}{d t} + I^*\right)- r_i \frac{d I^*}{d t}$$
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t}- r_i \frac{d I^*}{d t} \Rightarrow
+$$
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I^*}{d t} \Rightarrow
+$$
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{d I^*}{d t} + I^*\right)- r_i \frac{d I^*}{d t}
+$$
+
+And separating the $E_k$ and $I*$ terms:
+$$
+r_i r_e^2 E_{k-1} = r_e\left(r_i \frac{d I^*}{d t} + I^*\right) + r_i \frac{d I^*}{d t} + \frac{d^2I^*}{d t^2}
+$$
 
 Which, in the matrix formulation corresponds to the sum of $r_e \overline{m_1}$ and the shifted $\overline{m_1}$,
 where $\overline{m_1}$ is the row vector of $\overline{\overline{M_1}}$.
