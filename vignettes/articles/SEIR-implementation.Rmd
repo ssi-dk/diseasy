@@ -330,15 +330,49 @@ The matrix can be decomposed into two contributions:
 The transition matrix is block-diagonal and has the form (here for $K = 1$ and $L = 1$ and $A + V > 2)$:
 
 $$
-\overline{\overline{G}}_T = \begin{bmatrix}
-  -r_e & 0 & 0 & 0 & \cdots & 0 & 0 \\
-  r_e & -r_i & 0 & 0 & \cdots & 0 &  0 \\
-  0 & 0 & -r_e & 0 & \cdots & 0 & 0 \\
-  0 & 0 & r_e & -r_i & \cdots & 0 & 0 \\
-  \vdots & \vdots & \vdots& \vdots & \ddots & \vdots & \vdots  \\
-  0 & 0 & 0 & 0 &  \cdots & -r_e & 0 \\
-  0 & 0 & 0 & 0 &  \cdots & r_e & -r_i
-\end{bmatrix}
+\overline{\overline{G}}_T =
+\left[\begin{array}{cccc}
+  \begin{bmatrix}
+    -r_e & 0 \\
+    r_e & -r_i
+  \end{bmatrix} &
+  \begin{matrix}
+    0 & 0 \\
+    0 & 0
+  \end{matrix} &
+  \cdots &
+  \begin{matrix}
+    0 & 0 \\
+    0 & 0
+  \end{matrix} \\
+  \begin{matrix}
+    0 & 0 \\
+    0 & 0
+  \end{matrix} &
+  \begin{bmatrix}
+    -r_e & 0 \\
+    r_e & -r_i
+  \end{bmatrix} &
+  \cdots &
+  \begin{matrix}
+    0 & 0 \\
+    0 & 0
+  \end{matrix} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  \begin{matrix}
+    0 & 0 \\
+    0 & 0
+  \end{matrix} &
+  \begin{matrix}
+    0 & 0 \\
+    0 & 0
+  \end{matrix} &
+  \cdots &
+  \begin{bmatrix}
+    -r_e & 0 \\
+    r_e & -r_i
+  \end{bmatrix}
+\end{array}\right]
 $$
 
 Notice that the off-diagonal has zero-elements where the (reduced) state vector changes age groups
