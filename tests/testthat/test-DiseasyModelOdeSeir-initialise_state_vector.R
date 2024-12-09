@@ -40,6 +40,7 @@ tidyr::expand_grid(
 ) |>
   purrr::pwalk(\(K, L, M) {                                                                                             # nolint: object_name_linter
 
+    # Generate label for the model being tested
     model_string <- c(
       "S",
       rep("E", K),
@@ -80,13 +81,11 @@ tidyr::expand_grid(
       model_incidence <- rI * rowSums(sol[, private$i1_state_indices + 1, drop = FALSE])
 
       # Check that the initialisation works "well" - always within 10% of the true incidence
-      expect_equal(
-        model_incidence,
-        incidence_data |>
-          dplyr::filter(date >= obs$last_queryable_date) |>
-          dplyr::pull("incidence"),
-        tolerance = 1e-1
-      )
+      true_incidence <- incidence_data |>
+        dplyr::filter(date >= obs$last_queryable_date) |>
+        dplyr::pull("incidence")
+
+      expect_equal(model_incidence, true_incidence, tolerance = 1e-1)
 
       rm(m)
     })
