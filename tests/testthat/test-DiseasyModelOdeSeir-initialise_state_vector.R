@@ -87,6 +87,13 @@ tidyr::expand_grid(
 
       expect_equal(model_incidence, true_incidence, tolerance = 1e-1)
 
+      # Check that the initialised solution has the same "tonocity" as the real solution
+      # (i.e. same number of turning points)
+      expect_equal(
+        sum(diff(sign(diff(model_incidence))) != 0),
+        sum(diff(sign(diff(true_incidence))) != 0)
+      )
+
       rm(m)
     })
   })
