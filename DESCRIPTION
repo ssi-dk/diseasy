@@ -33,7 +33,8 @@ Imports:
     purrr,
     R6,
     rlang,
-    stringr
+    stringr,
+    tidyr
 Suggests:
     contactdata,
     countrycode,

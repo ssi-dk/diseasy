@@ -121,6 +121,7 @@ DiseasyVariant <- R6::R6Class(                                                  
     #'   Index ij indicates the overlap in immunity when variant j infects variant i.
     #'   Thus, an overlap of 1 means immunisation with variant i protects against infection by variant j.
     #'   Read-only.
+    #' @importFrom tidyr expand_grid
     cross_immunity = purrr::partial(
       .f = active_binding,
       name = "cross_immunity",
