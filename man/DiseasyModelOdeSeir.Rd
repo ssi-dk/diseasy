@@ -65,7 +65,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   incidence_data <- m$observables$get_observation(
     observable = "n_positive",
     start_date = obs$ds$min_start_date,
-    end_date = obs$last_queryable_date
+    end_date = m$training_period$end
   ) |>
     dplyr::mutate(
       "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
@@ -86,11 +86,11 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   model_incidence <- sol[, 3] * 1 / 4
 
   plot(
-    x = time + obs$last_queryable_date,
+    x = time + m$training_period$end,
     y = model_incidence,
     col = "red",
     lty = 2,
-    xlim = c(as.Date("2020-01-01"), obs$last_queryable_date + max(time)),
+    xlim = c(as.Date("2020-01-01"), m$training_period$end + max(time)),
     xlab = "Date",
     ylab = "Incidence"
   )
@@ -124,6 +124,10 @@ Place holder for the immunity module}
 \item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively.  Read only.}
 
 \item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments.  Read only.}
+
+\item{\code{malthusian_scaling_factor}}{(numeric(1))\cr
+A scaling factor to apply to the contact matrices to account for structural differences
+in the model. Read only.}
 }
 \if{html}{\out{</div>}}
 }
