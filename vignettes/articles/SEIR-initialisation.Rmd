@@ -10,7 +10,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(diseasy)
+#library(diseasy)
+devtools::load_all()
 ```
 
 # Introduction
@@ -714,8 +715,10 @@ we only estimate the initial state vector.
 
 Once we include model fitting, the discrepancy between the data and model predictions may diminish.
 
-```{r misspecified model, fig.alt = "Using a misspecified model to initialise the SEIR model matches the true data well."}
+#### Misspecified model in periods of increasing infections
+```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing."}
 models <- list(
+  generate_model(2, 1, 1),
   generate_model(1, 1, 1),
   generate_model(2, 2, 2),
   generate_model(3, 2, 5)
@@ -734,7 +737,7 @@ predictions <- models |>
       reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
     )
   }) |>
-  purrr::reduce(rbind, .init = prediction)
+  purrr::reduce(rbind)
 
 
 ggplot2::ggplot() +
@@ -754,7 +757,65 @@ ggplot2::ggplot() +
     linewidth = 1.5
   ) +
   ggplot2::geom_vline(
-    xintercept = obs$last_queryable_date,
+    xintercept = models[[1]]$observables$last_queryable_date,
+    linetype = 2,
+    color = "black"
+  ) +
+  ggplot2::facet_grid(source ~ age_group, scales = "free") +
+  ggplot2::labs(y = "Model output", color = "Model Configuration")
+```
+
+#### Misspecified model in periods of decreasing infections
+```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing."}
+
+models <- list(
+  generate_model(2, 1, 1),
+  generate_model(1, 1, 1),
+  generate_model(2, 2, 2),
+  generate_model(3, 2, 5)
+)
+
+# Update the last queryable date to later starting point
+purrr::walk(models, \(m) {
+  m$observables$set_last_queryable_date(
+    m$observables$ds$max_end_date - lubridate::days(45)
+  )
+})
+
+predictions <- models |>
+  purrr::map(\(m) {
+    psi <- m$initialise_state_vector(
+      incidence_data |>
+        dplyr::filter(.data$source == !!source)
+    )
+
+    get_prediction(
+      model = m,
+      psi = psi,
+      reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
+    )
+  }) |>
+  purrr::reduce(rbind)
+
+
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = dplyr::filter(incidence_data, .data$source == !!source),
+    ggplot2::aes(x = date, y = model_output),
+    color = switch(
+      source,
+      "n_infected"        = "orange",
+      "n_positive_simple" = "deepskyblue3",
+      "n_positive"        = "seagreen"
+    )
+  ) +
+  ggplot2::geom_line(
+    data = predictions,
+    ggplot2::aes(x = date, y = n_model, color = model_configuration),
+    linewidth = 1.5
+  ) +
+  ggplot2::geom_vline(
+    xintercept = models[[1]]$observables$last_queryable_date,
     linetype = 2,
     color = "black"
   ) +
