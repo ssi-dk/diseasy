@@ -356,8 +356,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Set the default forcing functions (no forcing)
-      private$infected_forcing <- \(t, infected) infected
-      private$state_vector_forcing <- \(t, dy_dt) dy_dt
+      self %.% set_forcing_functions(
+        infected_forcing = \(t, infected) infected,
+        state_vector_forcing = \(t, dy_dt, loss_due_to_infections, new_infections) dy_dt
+      )
 
 
       # Finally, we want to adjust for the structure of the SEIR model such that the (Malthusian) growth rate
@@ -383,7 +385,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     set_forcing_functions = function(infected_forcing = NULL, state_vector_forcing = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_function(infected_forcing, args = c("t", "infected"), null.ok = TRUE, add = coll)
-      checkmate::assert_function(state_vector_forcing, args = c("t", "dy_dt"), null.ok = TRUE, add = coll)
+      checkmate::assert_function(
+        state_vector_forcing,
+        args = c("t", "dy_dt", "loss_due_to_infections", "new_infections"),
+        null.ok = TRUE,
+        add = coll
+      )
       checkmate::reportAssertions(coll)
 
       if (!is.null(infected_forcing)) {
@@ -631,17 +638,28 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         "R" = self %.% compartment_structure %.% R
       )
 
+      # Correct for the missing I state
+      # (we take the max with 1 to ensure non-inf values which triggers an error. If the reduced model
+      # has no I states, the disease_progression_rates$I value is not)
       disease_progression_rates <- self %.% disease_progression_rates |>
-        purrr::keep_at("I") * self %.% compartment_structure %.% I /  compartment_structure %.% I
+        purrr::keep_at("I") * self %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
 
+      # Generate the reduced model
       m_forcing <- DiseasyModelOdeSeir$new(
         observables = self %.% observables,
         activity = self %.% activity,
         variant = self %.% variant,
-        disease_progression_rates = disease_progression_rates,
+        season = self %.% season,
         compartment_structure = compartment_structure,
-        parameters = self %.% parameters,
-        malthusian_matching = FALSE
+        disease_progression_rates = disease_progression_rates,
+        malthusian_matching = FALSE, # Since we have different disease_progression_rates, we cannot directly match
+        parameters = modifyList(
+          self %.% parameters,
+          list( # ... but since we can scale the overall_infection_risk to achieve the same effect.
+            "overall_infection_risk" = self %.% parameters %.% overall_infection_risk *
+              self %.% malthusian_scaling_factor
+          )
+        )
       )
 
 
@@ -689,20 +707,51 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Use the interpolated signal as a forcing function for I1
       m_forcing$set_forcing_functions(
         infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
-        state_vector_forcing = \(t, dy_dt) {
-          dy_dt[i1_state_indices] <- dy_dt[i1_state_indices] - signal(t) # Use signal as forcing for out of I1
+        state_vector_forcing = \(t, dy_dt, loss_due_to_infections, new_infections) {
+
+          # Precompute the signal at the current time
+          s <- signal(t)
+
+          # Use signal as forcing into I2 (named "I1" in the reduced model)
+          # At this stage in the rhs computation we have:
+          # dI2/dt = new_infections - ri * I2                                                                           # nolint: commented_code_linter
+          # We want to have:
+          # dI2/dt = signal(t) - ri * I2                                                                                # nolint: commented_code_linter
+          dy_dt[i1_state_indices] <- dy_dt[i1_state_indices] + s - new_infections
+
+          # Having modified dy_dt, we need to rescale so that the sum of rates is zero (conserving population)
+          # In rhs, we have sum(new_infections) = sum(loss_due_to_infections)
+          # Since we now remove the new_infections contribution, we need to rescale the loss_due_to_infections
+          # to match the signal
+
+          # loss_due_to_infections per age group
+          loss_due_to_infections_per_age_group <- loss_due_to_infections |>
+            split(private$rs_age_group) |>
+            vapply(sum, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+
+          # Match the RS entries of the state_vector
+          tmp <- loss_due_to_infections_per_age_group[private$rs_age_group]
+
+          # Scale the loss to match the signal
+          # We first add the original loss due to infections (= no flow out of the RS states due to infections),
+          # then subtract the rescaled loss that matches the signal
+          dy_dt[rs_state_indices] <- dy_dt[rs_state_indices] +
+            loss_due_to_infections * (1 - s[private$rs_age_group] / tmp)
+
           return(dy_dt)
         }
       )
 
 
       # Run the simulation forward to estimate the R and S states
+      y0 <- c(
+        rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
+        private %.% population_proportion # S states
+      )
+
       sol <- deSolve::ode(
-        y = c(
-          rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
-          private %.% population_proportion # S states
-        ),
-        times = rev(seq(from = 0, to = min(incidence_data$date) - self %.% observables %.% last_queryable_date)),
+        y = y0,
+        times = rev(seq(from = 0, to = min(incidence_data$date) - self %.% training_period %.% end)),
         func = m_forcing %.% rhs,
         parms = list("overall_infection_risk" = overall_infection_risk)
       )
@@ -848,7 +897,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       dy_dt[private$e1_state_indices] <- dy_dt[private$e1_state_indices] + new_infections
 
       # Add the forcing of the states
-      dy_dt <- private$state_vector_forcing(t, dy_dt)
+      dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
 
       return(list(dy_dt))
     },
