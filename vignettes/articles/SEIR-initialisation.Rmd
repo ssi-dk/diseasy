@@ -75,7 +75,7 @@ r_e^{K-1} E_2 \\
 r_e^K E_1 \\
 \end{bmatrix}
 =
-\overline{\overline{M_K}} \cdot
+\overline{\overline{M}}_K \cdot
 \begin{bmatrix}
 I^* \\
 \frac{d I^*}{d t} \\
@@ -99,7 +99,7 @@ r_i r_e E_K = r_i I^* + \frac{d I^*}{d t}
 $$
 
 In the above formulation, this corresponds to the matrix
-$\overline{\overline{M_1}} = \begin{bmatrix}r_i & 1\end{bmatrix}$.
+$\overline{\overline{M}}_1 = \begin{bmatrix}r_i & 1\end{bmatrix}$.
 
 When taking the second derivative, we obtain:
 
@@ -118,17 +118,39 @@ $$
 r_i r_e^2 E_{k-1} = r_e\left(r_i \frac{d I^*}{d t} + I^*\right) + r_i \frac{d I^*}{d t} + \frac{d^2I^*}{d t^2}
 $$
 
-Which, in the matrix formulation corresponds to the sum of $r_e \overline{m_1}$ and the shifted $\overline{m_1}$,
-where $\overline{m_1}$ is the row vector of $\overline{\overline{M_1}}$.
+Which, in the matrix formulation corresponds to the sum of $r_e \overline{m}_1$ and the shifted $\overline{m}_1$,
+where $\overline{m}_1$ is the row vector of $\overline{\overline{M}_1}$.
 
-More precisely:
+That is, we can express the second derivative as:
 $$
-\overline{m_2} = r_e \begin{bmatrix}\overline{m_1} & 0 \end{bmatrix}+ \begin{bmatrix}0 & \overline{m_1}\end{bmatrix}
+\overline{m}_2 = r_e \begin{bmatrix}\overline{m}_1 & 0 \end{bmatrix}+ \begin{bmatrix}0 & \overline{m}_1\end{bmatrix}
 $$
-Which, combined with $\overline{m_1}$ yields the two level system:
+$$
+= \begin{bmatrix}r_i r_e & r_e & 0 \end{bmatrix} + \begin{bmatrix}0 & r_i & 1 \end{bmatrix}
+$$
+$$
+= \begin{bmatrix}r_i r_e & r_e + r_i & 1 \end{bmatrix}
+$$
+
+
+Which, combined with $\overline{m}_1$ yields the two level system:
 
 $$
-\overline{\overline{M_2}} = \begin{bmatrix}m_{11} & m_{12} & 0 \\ m_{21} & m_{22} & m_{23} \end{bmatrix}
+\overline{\overline{M}}_2 = \begin{bmatrix}m_{11} & m_{12} & 0 \\ m_{21} & m_{22} & m_{23} \end{bmatrix}
+$$
+$$
+= \begin{bmatrix} r_i & 1 & 0 \\ r_i r_e & r_e + r_i & 1 \end{bmatrix}
+$$
+
+In general, the rows can be computed by recursion:
+$$
+\overline{m}_{k} = r_e \begin{bmatrix}
+  \overline{m}_{k-1} & 0
+\end{bmatrix} +
+\begin{bmatrix}
+  0 & \overline{m}_{k-1}
+\end{bmatrix}\quad
+\overline{\overline{m}}_1 = \begin{bmatrix}r_i & 1\end{bmatrix}.
 $$
 
 The algorithmic implementation of the recursion is then:
@@ -149,8 +171,8 @@ for (k in seq(K)) {
 M
 ```
 
-Since we assume that the signal $I^*$ only relates to $I_1$, then we can determine the $I_{l>1}$ states by evaluating the
-signal at $I^*(t - (l - 1) / r_i)$.
+Since we assume that the signal $I^*$ only relates to $I_1$, then we can determine the $I_{l>1}$ states by
+evaluating the signal at $I^*(t - (l - 1) / r_i)$.
 
 
 ## Theory: Prevalence signal
@@ -181,7 +203,9 @@ I_2
 \frac{d^2I^\dag}{d t^2}
 \end{bmatrix}
 $$
-Which, with two additional constants, $I^\dag = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^\dag$, can be solved.
+Which can be solved with two additional constants:
+$I^\dag = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^\dag$.
+
 
 If we want more states, the problem seemingly becomes indeterminate:
 $$
@@ -319,7 +343,10 @@ The matrix generation is the same.
 
 
 # Initialising SR states
-The $SR$ states of the SEIR model should capture both the short and the long term developments of the signal we want to match. If a lot of infections have happened previously, we expect a larger proportion of the population to be in the $R$ states.
+The $SR$ states of the SEIR model should capture both the short and the long term developments of the signal
+we want to match.
+If a lot of infections have happened previously, we expect a larger proportion of the population to be in the
+$R$ states.
 
 As for initialising the $E$ and $I$ states, our treatment of the problem depends on the type of signal we have.
 
@@ -356,7 +383,8 @@ Here we would also need to start the system at a time where there are no new inf
 
 # Testing the methods
 
-We test the initialisation methods on a data set generated using the same `?DiseasyModelOdeSeir` model template that we are using in this vignette.
+We test the initialisation methods on a data set generated using the same `?DiseasyModelOdeSeir` model template
+that we are using in this vignette.
 
 
 ## Simple SEIR example data
@@ -385,11 +413,14 @@ The data set contains different data for the infected to test our initialisation
 
 The data are:
 
-- "n_infected": The true number of infected in the model, measured as the number of people transitioning out of the `I1`
-   state at any given date.
-- "n_positive_simple": A realisation of the number of test-positives in the model - using a 65 % probability of testing.
-- "n_positive": A realisation of the number of test-positives in the model - using a overall 65 % probability of
-   testing in conjunction with a reduced probability of testing during weekends.
+- "n_infected":
+  The true number of infected in the model, measured as the number of people transitioning out of the `I1`
+  state at any given date.
+- "n_positive_simple":
+  A realisation of the number of test-positives in the model - using a 65 % probability of testing.
+- "n_positive":
+  A realisation of the number of test-positives in the model - using a overall 65 % probability of
+  testing in conjunction with a reduced probability of testing during weekends.
 
 
 ```{r}
@@ -472,10 +503,6 @@ obs$set_last_queryable_date(obs$start_date + lubridate::days(45))
 
 generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
 
-  # Define variants in the scenario
-  variant <- DiseasyVariant$new()
-  variant$add_variant("WT")
-
   # Define the activity for the scenario
   act <- DiseasyActivity$new()
   act$set_contact_basis(contact_basis = contact_basis$DK)
@@ -485,7 +512,6 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   # Create a SEIR model to initialise
   m <- DiseasyModelOdeSeir$new(
     observables = obs,
-    variant = variant,
     activity = act,
     compartment_structure = c("E" = K, "I" = L, "R" = M),
     disease_progression_rates = c("E" = rE, "I" = rI),
@@ -680,9 +706,13 @@ ggplot2::ggplot() +
 ```
 
 ### Misspecified model
-Correctly matching the model is the best case scenario. However, we can also the method for a couple of cases where the model is misspecified.
+Correctly matching the model is the best case scenario.
+However, we can also the method for a couple of cases where the model is misspecified.
 
-Note that we at this state does not modify the parameters of the model to match the development, we only estimate the initial state vector. Once we include model fitting, the discrepancy between the data and model predictions may diminish.
+Note that we at this state does not modify the parameters of the model to match the development,
+we only estimate the initial state vector.
+
+Once we include model fitting, the discrepancy between the data and model predictions may diminish.
 
 ```{r misspecified model, fig.alt = "Using a misspecified model to initialise the SEIR model matches the true data well."}
 models <- list(
