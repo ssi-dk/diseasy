@@ -921,7 +921,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       expr = return(private %.% .disease_progression_rates)
     ),
 
-    #' @field malthusian_scaling_factor (numeric(1))\cr
+    #' @field malthusian_scaling_factor (`numeric(1)`)\cr
     #'   A scaling factor to apply to the contact matrices to account for structural differences
     #'   in the model. Read only.
     malthusian_scaling_factor = purrr::partial(

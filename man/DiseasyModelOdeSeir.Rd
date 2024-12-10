@@ -125,7 +125,7 @@ Place holder for the immunity module}
 
 \item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments.  Read only.}
 
-\item{\code{malthusian_scaling_factor}}{(numeric(1))\cr
+\item{\code{malthusian_scaling_factor}}{(\code{numeric(1)})\cr
 A scaling factor to apply to the contact matrices to account for structural differences
 in the model. Read only.}
 }
