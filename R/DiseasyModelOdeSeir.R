@@ -366,7 +366,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # To optimise, we perform the scaling here onto the contact matrices directly, since we then
       # have to do it only once.
       if (malthusian_matching) {
-        private$set_contact_matrix(private$malthusian_scaling_factor())
+        private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
+        private$set_contact_matrix(self$malthusian_scaling_factor)
       }
 
     },
@@ -869,6 +870,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       .f = active_binding,
       name = "disease_progression_rates",
       expr = return(private %.% .disease_progression_rates)
+    ),
+
+    #' @field malthusian_scaling_factor (numeric(1))\cr
+    #'   A scaling factor to apply to the contact matrices to account for structural differences
+    #'   in the model. Read only.
+    malthusian_scaling_factor = purrr::partial(
+      .f = active_binding,
+      name = "malthusian_scaling_factor",
+      expr = return(private %.% .malthusian_scaling_factor)
     )
   ),
 
@@ -876,6 +886,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
   private = list(
 
     .parameters = NULL,
+    .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
 
     default_parameters = function() {
       modifyList(
@@ -1126,7 +1137,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # @description
     #   This function computes the relative difference in growth rates between the current model and the SIR model.
     # @params ... Parameters passed to `$generator_matrix()`.
-    malthusian_scaling_factor = function(...) {
+    compute_malthusian_scaling_factor = function(...) {
 
       if (self %.% parameters %.% overall_infection_risk == 0) {
         stop("The overall_infection_risk parameter must be strictly positive matching malthusian growth rates.")
