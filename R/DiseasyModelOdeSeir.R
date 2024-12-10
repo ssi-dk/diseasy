@@ -55,7 +55,7 @@
 #'   incidence_data <- m$observables$get_observation(
 #'     observable = "n_positive",
 #'     start_date = obs$ds$min_start_date,
-#'     end_date = obs$last_queryable_date
+#'     end_date = m$training_period$end
 #'   ) |>
 #'     dplyr::mutate(
 #'       "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
@@ -76,11 +76,11 @@
 #'   model_incidence <- sol[, 3] * 1 / 4
 #'
 #'   plot(
-#'     x = time + obs$last_queryable_date,
+#'     x = time + m$training_period$end,
 #'     y = model_incidence,
 #'     col = "red",
 #'     lty = 2,
-#'     xlim = c(as.Date("2020-01-01"), obs$last_queryable_date + max(time)),
+#'     xlim = c(as.Date("2020-01-01"), m$training_period$end + max(time)),
 #'     xlab = "Date",
 #'     ylab = "Incidence"
 #'   )
@@ -650,7 +650,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       signal_approximations <- tidyr::expand_grid(
         "date" = seq.Date(
           from = min(incidence_data$date),
-          to = self %.% observables %.% last_queryable_date,
+          to = self %.% training_period %.% end,
           by = "1 day"
         ),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
@@ -1080,7 +1080,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: last_queryable_date from the observables module)
       activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrices)) -
-        self %.% observables %.% last_queryable_date
+        self %.% training_period %.% end
 
       # We can then create a switch that selects the correct contact matrix at the given point in time
       contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrices)
@@ -1213,7 +1213,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # We need to remove the effect from "in-active" variants since they are not yet introduced to the system
       active_variants <- self %.% variant %.% variants |>
         purrr::map(~ purrr::pluck(.x, "introduction_date", .default = as.Date(0))) |>
-        purrr::map_lgl(~ .x - (self %.% observables %.% last_queryable_date + t) <= 0)
+        purrr::map_lgl(~ .x - (self %.% training_period %.% end + t) <= 0)
 
       inactive_idx <- seq_len((K + L) * private %.% n_age_groups) +
         (K + L) * private %.% n_age_groups * (which(!active_variants) - 1)
