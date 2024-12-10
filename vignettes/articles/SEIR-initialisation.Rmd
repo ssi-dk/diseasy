@@ -17,28 +17,15 @@ library(diseasy)
 Let us begin by considering a general SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively,
 which are governed by the rates $r_e$ and $r_i$ respectively.
 
-Let us further assume that we have some signal for infections which we would like our model to match.
+Let us further assume that we have a incidence signal, $I^*(t)$, which we would like our model to match.
 
-For now, we operate with two possibilities:
-
-1) The signal is related to incidence: $I^*(t)$
-
-2) The signal is related to prevalence $I^\dag(t)$
-
-
-The general approach is to consider the derivatives of the signal and link these to the $E$ and $I$ states of the model.
-
-Dependent on the type of signal, there is some variation on how this link is established.
+The general approach is to consider the derivatives of the incidence and link these to the states of the model.
 
 
 # Initialising EI states
-The $EI$ states of the SEIR model should match the most recent developments of the signal of interest.
+The $EI$ states of the SEIR model should match the most recent developments of the incidence.
 
-How to match this signal depends on the type of signal we have.
-
-
-## Theory: Incidence signal
-If the signal is incidence, we can assume that signal occurs when exiting $I_1$ in the model.
+For this purpose, we assume that signal occurs when exiting $I_1$ in the model.
 
 That is, we assume $I^* = r_i I_1$.
 
@@ -175,183 +162,13 @@ Since we assume that the signal $I^*$ only relates to $I_1$, then we can determi
 evaluating the signal at $I^*(t - (l - 1) / r_i)$.
 
 
-## Theory: Prevalence signal
-If we instead have a measure of the true number of infected, $I^\dag = \sum_l I_l$, then the situation is more
-complicated since the derivative becomes:
-$$\frac{d I^\dag}{d t} = r_e E_K - r_i I_l$$
-
-If use the same method as before, we now have to consider the derivatives of both $I^\dag$ and $I_l$ and we cannot
-isolate easily.
-
-We can however, determine how the derivatives of $I^\dag$ relates to the state vector.
-
-For example, if we have 2 $E$ and 2 $I$ states, we can write:
-$$
-\begin{bmatrix}
-0 & r_e & 0 & -r_i \\
-r_e^2 & -r_e^2 & -r_i^2 & r_i^2 \\
-\end{bmatrix} \cdot
-\begin{bmatrix}
-E_1 \\
-E_2 \\
-I_1 \\
-I_2
-\end{bmatrix}
-=
-\begin{bmatrix}
-\frac{d I^\dag}{d t} \\
-\frac{d^2I^\dag}{d t^2}
-\end{bmatrix}
-$$
-Which can be solved with two additional constants:
-$I^\dag = I_1 + I_2$ and $E_1 + E_2 + I_1 + I_2 = 1 - \beta S I^\dag$.
-
-
-If we want more states, the problem seemingly becomes indeterminate:
-$$
-\begin{bmatrix}
-0 & 0 & r_e & 0 & 0 & -r_i \\
-0 & r_e^2 & -r_e^2 & 0 & -r_i^2 & r_i^2 \\
-r_e^3 & -2r_e^3 & r_e^3 & r_i^3 & -2r_i^3 & r_i^3 \\
-\end{bmatrix} \cdot
-\begin{bmatrix}
-E_1 \\
-E_2 \\
-E_3 \\
-I_1 \\
-I_2 \\
-I_3
-\end{bmatrix}
-=
-\begin{bmatrix}
-\frac{d I^\dag}{d t} \\
-\frac{d^2I^\dag}{d t^2} \\
-\frac{d^3I^\dag}{d t^3}
-\end{bmatrix}
-$$
-Which now requires three additional constraints.
-
-If the number of states is uneven, we can still solve some cases:
-
-2 $E$ states and 1 $I$ states
-
-$$
-\begin{bmatrix}
-0 & r_e & -r_i \\
-r_e^2 & -r_e^2-r_er_i & r_i^2 \\
-\end{bmatrix} \cdot
-\begin{bmatrix}
-E_1 \\
-E_2 \\
-I
-\end{bmatrix}
-=
-\begin{bmatrix}
-\frac{d I^\dag}{d t} \\
-\frac{d^2I^\dag}{d t^2}
-\end{bmatrix}
-$$
-With the additional constraint $I^\dag = I_1 + I_2$ the system should be solvable.
-
-The above rate-matrices can also be implemented via recursion algorithmically:
-```{r}
-K <- L <- 2
-ri <- 0.9
-re <- 0.8
-
-M <- matrix(rep(0, (K + L) * K), ncol = K + L) # Pre-allocate
-active_row <- c(rep(0, K - 1), re, rep(0, L - 1), -ri)
-progression_rates <- c(rep(re, K), rep(ri, L))
-
-for (k in seq(K)) {
-
-  if (k > 1) {
-    stopifnot(active_row[[1]] == 0) # We cannot iterate too deeply
-
-    # Implement branching process which picks up the progression rate
-    # factors as it branches down.
-    active_row <- active_row |>
-      purrr::imap(
-        \(r, idx) {
-          c(
-            rep(0, max(0, idx - 2)), # left pad with zeros
-            progression_rates[idx - 1] * r,
-            - progression_rates[idx] * r,
-            rep(0, K + L - idx) # right pad with zeros
-          )
-        }
-      ) |>
-      purrr::reduce(`+`)
-  }
-
-  M[k, ] <- active_row
-}
-
-M
-```
-
-
-<!-- Another method for gaining additional constraints on the problem is to keep some in reserve for the fititng. -->
-<!-- By that, I mean that if we instead of initialising the state vector for time $t_0$, we initialise it for time $t_0' \equiv t_0 - 1 / r_i$.  -->
-
-<!-- In this case, we can consider what the signal $I^\dag(t + 1/r_i)$ corresponds to in the model. -->
-<!-- If we assume that $r_e <= r_i$, we can write: -->
-<!-- $$ -->
-<!-- I^\dag(t + 1/r_i) = \sum_l^{L-1}I_l(t) + \frac{r_e}{r_i}E_K(t) -->
-<!-- $$ -->
-<!-- If instead $r_e > r_i$, we need to account for additional $E_k$ states. -->
-
-
-It seems that the problem is singular whenever we have more than 1 $I$ state.
-
-Let's see if differences in infectivity can help break this degeneracy.
-In this case, the true signal becomes, $I^\dag = \sum_l w_l I_l$, with $w_i \neq w_j$.
-
-The derivative then becomes:
-
-$$
-\frac{d I^\dag}{d t} = \left(w_1 r_e E_K - w_1 r_i I_1\right) +
-\left(w_2 r_i I_1 - w_2 r_i I_2\right) + \dots +
-\left(w_L r_i I_{L-1}  - w_L r_i I_L\right)
-$$
-
-$$
-\begin{bmatrix}
-0         &  w_1 r_e                       &  (w_2-w_1) r_i               & -w_2 r_i \\
-w_1 r_e^2 & -w_1 r_e^2 + (w_2-w_1) r_i r_e & -(w_2-w_1) r_i^2 - w_2 r_i^2 &  w_2 r_i^2
-\end{bmatrix} \cdot
-\begin{bmatrix}
-E_1 \\
-E_2 \\
-I_1 \\
-I_2
-\end{bmatrix}
-=
-\begin{bmatrix}
-\frac{d I^\dag}{d t} \\
-\frac{d^2I^\dag}{d t^2}
-\end{bmatrix}
-$$
-
-The matrix generation is the same.
-
-<!-- The matrix is still singular when using the offset method. Perhaps if we can estimate S and R. -->
-
-<!-- Constraining the population to be 1 does not seem to fix the underlying issues. The balance of the states is way off. -->
-
-<!-- Perhaps if we go one stage further and use the infection pressure "beta S I"? -->
-
-
 # Initialising SR states
-The $SR$ states of the SEIR model should capture both the short and the long term developments of the signal
+The $SR$ states of the SEIR model should capture both the short and the long term developments of the incidence signal
 we want to match.
 If a lot of infections have happened previously, we expect a larger proportion of the population to be in the
 $R$ states.
 
-As for initialising the $E$ and $I$ states, our treatment of the problem depends on the type of signal we have.
-
-## Theory: Incidence signal
-If the signal, $I^*$, is test data, we again assume $I^* = r_i I_1$.
+We again assume $I^* = r_i I_1$.
 
 We can modify the SEIR equation to take this signal as a forcing function with no $E$ states and one less $I$ state
 (no $I_1$ state).
@@ -366,19 +183,6 @@ $$
 $$
 If we start this system at a time where there are no new infections, we can initialize $I_l = 0$, and run the
 simulation forward to estimate the $S$ and $R$ populations at the point of interest.
-
-## Theory: Prevalence signal
-
-If we instead have a measure of the true number of infected, $I^\dag = \sum_l I_l$, then we only need to force the
-infection pressure:
-
-$$
-I = I^\dag
-$$
-Here we would also need to start the system at a time where there are no new infections ($I_l = 0$).
-
-...
-
 
 
 # Testing the methods
