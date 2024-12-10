@@ -449,6 +449,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   See the article `SEIR-initialisation` in the online documentation for more information.
     #' @return (`numeric()`)\cr
     #'   The initial state vector for the model (invisibly).
+    #' @importFrom tidyr expand_grid
     initialise_state_vector = function(
       incidence_data,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
