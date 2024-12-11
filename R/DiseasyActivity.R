@@ -440,12 +440,19 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value[[date]][[type]]
+    #' @importFrom pkgcond pkg_warning
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()
 
       # If no scenario is defined, we provide non-informative openness
       if (length(scenario_activities) == 0) {
+
+        # Check and warn if configuration has started (it is not complete since length(scenario_activities) == 0)
+        if (!is.null(private$activity_units)) {
+          misconfigured_diseasyactivity_warning <- "Activity scenario configuration started but not completed."
+          pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
+        }
 
         # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
         age_labels <- age_cuts_lower |>
@@ -532,6 +539,12 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # If no scenario is defined, we provide non-informative contact matrices
       if (length(self$get_scenario_activities()) == 0) {
+
+        # Check and warn if configuration has started (it is not complete since length(scenario_activities) == 0)
+        if (!is.null(private$activity_units)) {
+          misconfigured_diseasyactivity_warning <- "Activity scenario configuration started but not completed."
+          pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
+        }
 
         # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
         age_labels <- age_cuts_lower |>

@@ -9,6 +9,7 @@
 #' @noRd
 diseasy_code_linters <- function() {
   linters <- list(
+    "object_length_linter" = lintr::object_length_linter(length = 40L),  # We allow for longer object names
     nolint_position_linter(120),
     nolint_line_length_linter(120),
     non_ascii_linter(),

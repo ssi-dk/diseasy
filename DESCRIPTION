@@ -30,6 +30,7 @@ Imports:
     lintr,
     lubridate,
     Matrix,
+    pkgcond,
     pracma,
     purrr,
     R6,

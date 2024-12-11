@@ -418,6 +418,34 @@ test_that("$get_scenario_contacts() works with given scenario", {
 })
 
 
+test_that("Check warnings are thrown for misconfigured scenarios", {
+
+  # With default parameters, we should not get a warning (configuration has not been attempted)
+  act <- DiseasyActivity$new()
+  expect_no_error(act$get_scenario_openness())
+  expect_no_error(act$get_scenario_contacts())
+  rm(act)
+
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  expect_no_error(act$get_scenario_openness())
+  expect_no_error(act$get_scenario_contacts())
+  rm(act)
+
+  # Starting and aborting a configuration should throw a warning
+  act <- DiseasyActivity$new()
+  act$set_activity_units(dk_activity_units)
+  expect_warning(act$get_scenario_openness(), "Activity scenario configuration started but not completed.")
+  expect_warning(act$get_scenario_contacts(), "Activity scenario configuration started but not completed.")
+  rm(act)
+
+  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act$set_activity_units(dk_activity_units)
+  expect_warning(act$get_scenario_openness(), "Activity scenario configuration started but not completed.")
+  expect_warning(act$get_scenario_contacts(), "Activity scenario configuration started but not completed.")
+  rm(act)
+})
+
+
 test_that("contactdata: contact_basis works", {
 
   # Test contactdata contacts
