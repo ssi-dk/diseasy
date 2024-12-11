@@ -50,10 +50,12 @@ rd_observable <- function(type = "param") {
 
 rd_prediction_length <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`numeric`)\\cr",
-        "The number of days to predict.",
-        "The prediction start is defined by `last_queryable_date` of the `DiseasyObservables` [R6][R6::R6Class] class.",
-        ifelse(type == "field", "Read only.", ""))
+  paste(
+    "(`numeric`)\\cr",
+    "The number of days to predict.",
+    "The prediction start is defined by `last_queryable_date` of the `?DiseasyObservables` [R6][R6::R6Class] class.",
+    ifelse(type == "field", "Read only.", "")
+  )
 }
 
 
