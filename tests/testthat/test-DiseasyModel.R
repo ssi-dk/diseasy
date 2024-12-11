@@ -354,6 +354,101 @@ test_that("$get_results() gives error", {
 })
 
 
+test_that("$get_data() works", {
+  skip_if_not_installed("RSQLite")
+
+  # Use a random diseasystore for the tests
+  obs <- DiseasyObservables$new(diseasystore = case_defs[[1]])
+
+  # Set the last queryable date relative to the minimum start date
+  last_queryable_offset <- 20
+  obs$set_last_queryable_date(obs %.% ds %.% min_start_date + lubridate::days(last_queryable_offset))
+
+
+
+  # Test the returned data
+
+  # -- Default parameters -- all available data is training data
+  m <- DiseasyModel$new(observables = obs)
+  training_data <- m$get_data("n_positive")
+
+  # The default argument for period is "training", but check that the data is the same
+  expect_identical(m$get_data("n_positive"), m$get_data("n_positive", period = "training"))
+
+  # Check the format of the returned data
+  checkmate::expect_data_frame(training_data)
+  checkmate::expect_names(names(training_data), must.include = c("date", "n_positive", "t"))
+
+  # Check the returned data falls in the training period
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+
+  expect_identical(min(training_data$t), -last_queryable_offset)
+  expect_identical(max(training_data$t), 0)
+  rm(m)
+
+
+
+  # -- Using a non-default training period
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10))
+  )
+  training_data <- m$get_data("n_positive", period = "training")
+
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_identical(min(training_data$t), -10 + 1)
+  expect_identical(max(training_data$t), 0)
+  rm(m)
+
+
+  # -- Using a  non-default training and testing period
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5))
+  )
+  training_data <- m$get_data("n_positive", period = "training")
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_identical(min(training_data$t), -10 - 5 + 1)
+  expect_identical(max(training_data$t), -5)
+
+  testing_data <- m$get_data("n_positive", period = "testing")
+  expect_identical(min(testing_data$date), m %.% testing_period %.% start)
+  expect_identical(max(testing_data$date), m %.% testing_period %.% end)
+  expect_identical(min(testing_data$t), -5 + 1)
+  expect_identical(max(testing_data$t), 0)
+  rm(m)
+
+
+  # -- Using a  non-default training, testing and validation period
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
+  )
+  training_data <- m$get_data("n_positive", period = "training")
+  expect_identical(min(training_data$date), m %.% training_period %.% start)
+  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_identical(min(training_data$t), -10 - 5 - 2 + 1)
+  expect_identical(max(training_data$t), -5 - 2)
+
+  testing_data <- m$get_data("n_positive", period = "testing")
+  expect_identical(min(testing_data$date), m %.% testing_period %.% start)
+  expect_identical(max(testing_data$date), m %.% testing_period %.% end)
+  expect_identical(min(testing_data$t), -5 - 2 + 1)
+  expect_identical(max(testing_data$t), -2)
+
+  validation_data <- m$get_data("n_positive", period = "validation")
+  expect_identical(min(validation_data$date), m %.% validation_period %.% start)
+  expect_identical(max(validation_data$date), m %.% validation_period %.% end)
+  expect_identical(min(validation_data$t), -2 + 1)
+  expect_identical(max(validation_data$t), 0)
+  rm(m)
+
+})
+
+
 test_that("parameter validation works", {
 
   expect_error(
@@ -449,9 +544,115 @@ test_that("active binding: parameters works", {
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$parameters <- list(test = 2), error = \(e) e),                                            # nolint: implicit_assignment_linter
+  expect_identical(tryCatch(m$parameters <- c("test" = 2), error = \(e) e),                                             # nolint: implicit_assignment_linter
                    simpleError("`$parameters` is read only"))
   checkmate::expect_list(m %.% parameters)
+
+  rm(m)
+})
+
+
+test_that("active binding: training_period, testing_period and validation_period works", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a empty module
+  m <- DiseasyModel$new()
+  expect_error(m %.% training_period,   "Observables module is not loaded!")
+  expect_error(m %.% testing_period,    "Observables module is not loaded!")
+  expect_error(m %.% validation_period, "Observables module is not loaded!")
+  rm(m)
+
+  # Creating a module with an observables module without a `last_queryable_date`
+  obs <- DiseasyObservables$new("Google COVID-19", conn = DBI::dbConnect(RSQLite::SQLite()))
+  m <- DiseasyModel$new(observables = obs)
+  expect_error(m %.% training_period,   r"{`\$last_queryable_date` not configured in observables module!}")
+  expect_error(m %.% testing_period,    r"{`\$last_queryable_date` not configured in observables module!}")
+  expect_error(m %.% validation_period, r"{`\$last_queryable_date` not configured in observables module!}")
+  rm(m)
+
+
+
+  # Creating a fully configured module
+  last_queryable_date <- obs %.% ds %.% min_start_date + lubridate::days(20)
+  obs$set_last_queryable_date(last_queryable_date)
+
+  # - with defaults
+  m <- DiseasyModel$new(observables = obs)
+  expect_identical(
+    m %.% training_period,
+    list("start" = m %.% observables %.% ds %.% min_start_date, "end" = last_queryable_date)
+  )
+  expect_identical(m %.% testing_period,    list("start" = NULL, "end" = NULL))
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+  rm(m)
+
+  # - with only training period
+  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10)))
+  expect_identical(
+    m %.% training_period,
+    list("start" = last_queryable_date - 10 + 1, "end" = last_queryable_date)
+  )
+  expect_identical(m %.% testing_period,    list("start" = NULL, "end" = NULL))
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+
+  expect_length(seq(from = m %.% training_period %.% start, to = m %.% training_period %.% end, by = "1 day"), 10)
+  rm(m)
+
+
+  # - with training and testing periods
+  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10, "testing" = 5)))
+  expect_identical(
+    m %.% training_period,
+    list("start" = last_queryable_date - 10 - 5 + 1, "end" = last_queryable_date - 5)
+  )
+  expect_identical(
+    m %.% testing_period,
+    list("start" = last_queryable_date - 5 + 1, "end" = last_queryable_date)
+  )
+  expect_identical(m %.% validation_period, list("start" = NULL, "end" = NULL))
+
+  expect_length(seq(from = m %.% training_period %.% start, to = m %.% training_period %.% end, by = "1 day"), 10)
+  expect_length(seq(from = m %.% testing_period %.% start,  to = m %.% testing_period %.% end,  by = "1 day"), 5)
+  rm(m)
+
+
+  # - with training, testing and validation periods.
+  m <- DiseasyModel$new(
+    observables = obs,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
+  )
+  expect_identical(
+    m$training_period,
+    list("start" = last_queryable_date - 10 - 5 - 2 + 1, "end" = last_queryable_date - 5 - 2)
+  )
+  expect_identical(
+    m %.% testing_period,
+    list("start" = last_queryable_date - 5 - 2 + 1, "end" = last_queryable_date - 2)
+  )
+  expect_identical(
+    m %.% validation_period,
+    list("start" = last_queryable_date - 2 + 1, "end" = last_queryable_date)
+  )
+
+  expect_length(seq(from = m %.% training_period %.% start,   to = m %.% training_period %.% end,   by = "1 day"), 10)
+  expect_length(seq(from = m %.% testing_period %.% start,    to = m %.% testing_period %.% end,    by = "1 day"), 5)
+  expect_length(seq(from = m %.% validation_period %.% start, to = m %.% validation_period %.% end, by = "1 day"), 2)
+  rm(m)
+
+
+
+  # Try to set training_period through the binding
+  # test_that cannot capture this error, so we have to hack it
+  m <- DiseasyModel$new()
+
+  expect_identical(tryCatch(m$training_period <- c("start" = Sys.Date()), error = \(e) e),                              # nolint: implicit_assignment_linter
+                   simpleError("`$training_period` is read only"))
+
+  expect_identical(tryCatch(m$testing_period <- c("start" = Sys.Date()), error = \(e) e),                               # nolint: implicit_assignment_linter
+                   simpleError("`$testing_period` is read only"))
+
+  expect_identical(tryCatch(m$validation_period <- c("start" = Sys.Date()), error = \(e) e),                            # nolint: implicit_assignment_linter
+                   simpleError("`$validation_period` is read only"))
 
   rm(m)
 })
