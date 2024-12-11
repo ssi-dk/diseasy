@@ -450,7 +450,10 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Check and warn if configuration has started (it is not complete since length(scenario_activities) == 0)
         if (!is.null(private$activity_units)) {
-          misconfigured_diseasyactivity_warning <- "Activity scenario configuration started but not completed."
+          misconfigured_diseasyactivity_warning <- paste(
+            "Activity scenario configuration started but not completed.",
+            "Providing default (non-informative) scenario openness."
+          )
           pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
         }
 
@@ -542,7 +545,10 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Check and warn if configuration has started (it is not complete since length(scenario_activities) == 0)
         if (!is.null(private$activity_units)) {
-          misconfigured_diseasyactivity_warning <- "Activity scenario configuration started but not completed."
+          misconfigured_diseasyactivity_warning <- paste(
+            "Activity scenario configuration started but not completed.",
+            "Providing default (non-informative) scenario contacts."
+          )
           pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
         }
 
