@@ -8,12 +8,28 @@
 #' @return A list of linters
 #' @noRd
 diseasy_code_linters <- function() {
-  linters <- list(
-    "object_length_linter" = lintr::object_length_linter(length = 40L),  # We allow for longer object names
-    nolint_position_linter(120),
-    nolint_line_length_linter(120),
-    non_ascii_linter(),
-    param_and_field_linter()
+  linters <- c(
+    list(
+      "object_length_linter" = lintr::object_length_linter(length = 40L),  # We allow for longer object names
+      "nolint_position_linter" = nolint_position_linter(120),
+      "nolint_line_length_linter" = nolint_line_length_linter(120),
+      "non_ascii_linter" = non_ascii_linter(),
+      "param_and_field_linter" = param_and_field_linter(),
+      "documentation_template_linter" = documentation_template_linter()
+    ),
+    lintr::all_linters(
+      object_length_linter = NULL,        # We allow for longer object names
+      line_length_linter = NULL,          # We use 120, nolint-aware line length linter instead
+      cyclocomp_linter = NULL,            # Not required in diseasy style guide
+      keyword_quote_linter = NULL,        # Not required in diseasy style guide
+      implicit_integer_linter = NULL,     # Not required in diseasy style guide
+      extraction_operator_linter = NULL,  # Fails for .data$*
+      nonportable_path_linter = NULL,     # Any \\ is flagged. Therefore fails when escaping backslashes
+      undesirable_function_linter = NULL, # Library calls in vignettes are flagged and any call to options
+      unnecessary_lambda_linter = NULL,   # Fails for purrr::map with additional function arguments
+      strings_as_factors_linter = NULL,   # Seems to be some backwards compatibility stuff.
+      expect_identical_linter = NULL      # Seems a little aggressive to require this.
+    )
   )
 
   return(linters)
@@ -212,7 +228,7 @@ non_ascii_linter <- function() {
 #'
 #' # okay
 #' lintr::lint(
-#'   text = "#' @param (`numeric()`)\cr",
+#'   text = "#' @param test (`numeric()`)\cr",
 #'   linters = param_and_field_linter()
 #' )
 #' @importFrom rlang .data
@@ -288,6 +304,88 @@ param_and_field_linter <- function() {
       )
 
       return(c(backtick_lints, cr_lints))
+    }
+  )
+}
+
+
+#' @rdname diseasy_linters
+#' @description
+#' documentation_template_linter: Ensure documentation templates are used if available.
+#'
+#' @examples
+#' ## documentation_template_linter
+#' rd_parameter <- "(`character`)\cr Description of parameter" # Create a template for the "parameter" parameter
+#'
+#' # will produce lints
+#' lintr::lint(
+#'   text = "#' @param parameter (`character`)\cr Description of parameter",                                            # nolint: documentation_template_linter
+#'   linters = documentation_template_linter()
+#' )
+#'
+#' # okay
+#' lintr::lint(
+#'   text = "#' @param parameter `r rd_parameter`",
+#'   linters = documentation_template_linter()
+#' )
+#'
+#' @importFrom rlang .data
+#' @noRd
+documentation_template_linter <- function() {
+  general_msg <- paste("Documentation templates should used if available.")
+
+  lintr::Linter(
+    function(source_expression) {
+
+      # Only go over complete file
+      if (!lintr::is_lint_level(source_expression, "file")) {
+        return(list())
+      }
+
+      # Find all @param and @field lines. All other lines become NA
+      detection_info <- source_expression$file_lines |>
+        stringr::str_extract(r"{#' ?@(param|field).*}")
+
+      # Convert to data.frame and determine line number
+      detection_info <- data.frame(
+        rd_line = detection_info,
+        line_number = seq_along(detection_info)
+      )
+
+      # Remove non param/field lines
+      detection_info <- detection_info |>
+        dplyr::filter(!is.na(.data$rd_line))
+
+      # Remove triple-dot-ellipsis params
+      detection_info <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, "@param +\\.{3}"))
+
+      # Remove auto-generated documentation
+      detection_info <- detection_info |>
+        dplyr::filter(!stringr::str_detect(.data$rd_line, r"{@(param|field) +[\.\w]+ +`r }"))
+
+      # Extract the parameter
+      detection_info <- detection_info |>
+        dplyr::mutate("param" = stringr::str_extract(.data$rd_line, r"{(@(param|field) +)([\.\w]+)}", group = 3))
+
+      # Detect if template exists
+      detection_info <- detection_info |>
+        dplyr::mutate("rd_template" = paste0("rd_", .data$param)) |>
+        dplyr::filter(.data$rd_template %in% names(as.list(base::getNamespace(devtools::as.package(".")$package)))) |>
+        dplyr::select(!"param")
+
+      purrr::pmap(
+        detection_info,
+        \(rd_line, line_number, rd_template) {
+          lintr::Lint(
+            filename = source_expression$filename,
+            line_number = line_number,
+            type = "style",
+            message = paste(general_msg, "Template", rd_template, "available."),
+            line = source_expression$file_lines[line_number]
+          )
+        }
+      )
     }
   )
 }
