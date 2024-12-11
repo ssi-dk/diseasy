@@ -162,7 +162,7 @@ The primary method used to request model results of a given observable at a give
 \describe{
 \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
+\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
 
 \item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr Default NULL. If given, results are returned at the quantiles given.}
 
