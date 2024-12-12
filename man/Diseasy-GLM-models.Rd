@@ -3,8 +3,14 @@
 \name{Diseasy-GLM-models}
 \alias{Diseasy-GLM-models}
 \alias{DiseasyModelGLM}
+\alias{DiseasyModelG0}
+\alias{DiseasyModelG1}
 \title{Meta module for the GLM class of models}
 \description{
+TODO
+
+TODO
+
 TODO
 }
 \keyword{model-template}
@@ -36,6 +42,124 @@ TODO
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelGLM$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}
+\section{Super classes}{
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelRegression]{diseasy::DiseasyModelRegression}} -> \code{\link[diseasy:DiseasyModelGLM]{diseasy::DiseasyModelGLM}} -> \code{diseasy::NA} -> \code{DiseasyModelG0}
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-DiseasyModelG0-new}{\code{DiseasyModelG0$new()}}
+\item \href{#method-DiseasyModelG0-clone}{\code{DiseasyModelG0$clone()}}
+}
+}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>diseasy::DiseasyModelRegression$get_results()</code></a></span></li>
+</ul>
+</details>
+}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelG0-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelG0-new}{}}}
+\subsection{Method \code{new()}}{
+Creates a new instance of the \code{DiseasyModelG0} \link[R6:R6Class]{R6} class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelG0$new(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{parameters sent to \code{DiseasyModelG_} \link[R6:R6Class]{R6} constructor}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new instance of the \code{DiseasyModelG1} \link[R6:R6Class]{R6} class.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelG0-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelG0-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelG0$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}
+\section{Super classes}{
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelRegression]{diseasy::DiseasyModelRegression}} -> \code{\link[diseasy:DiseasyModelGLM]{diseasy::DiseasyModelGLM}} -> \code{diseasy::NA} -> \code{DiseasyModelG1}
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-DiseasyModelG1-new}{\code{DiseasyModelG1$new()}}
+\item \href{#method-DiseasyModelG1-clone}{\code{DiseasyModelG1$clone()}}
+}
+}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>diseasy::DiseasyModelRegression$get_results()</code></a></span></li>
+</ul>
+</details>
+}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelG1-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelG1-new}{}}}
+\subsection{Method \code{new()}}{
+Creates a new instance of the \code{DiseasyModelG1} \link[R6:R6Class]{R6} class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelG1$new(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{parameters sent to \code{DiseasyModelG_} \link[R6:R6Class]{R6} constructor}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new instance of the \code{DiseasyModelG1} \link[R6:R6Class]{R6} class.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelG1-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelG1-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelG1$clone(deep = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
