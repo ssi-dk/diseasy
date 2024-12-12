@@ -20,6 +20,7 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 \seealso{
 \link{DiseasyObservables}
 }
+\keyword{model-template-builder}
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{DiseasyModelOde}
 }

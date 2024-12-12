@@ -11,6 +11,7 @@
 #'   # inherit from when creating a new model class.
 #' @return
 #'   A new instance of the `DiseasyModelOde` [R6][R6::R6Class] class.
+#' @keywords model-template-builder
 #' @export
 DiseasyModelOde <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyModelOde",
