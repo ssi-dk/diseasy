@@ -3130,6 +3130,37 @@
       "repotype": "cranlike"
     },
     {
+      "ref": "RSQLite",
+      "package": "RSQLite",
+      "version": "2.3.9",
+      "type": "standard",
+      "direct": false,
+      "binary": true,
+      "dependencies": ["bit64", "blob", "DBI", "memoise", "pkgconfig", "rlang"],
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "RSQLite",
+        "RemoteType": "standard",
+        "RemoteRef": "RSQLite",
+        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+        "RemoteSha": "2.3.9"
+      },
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/RSQLite_2.3.9.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/RSQLite_2.3.9.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
+      "directpkg": false,
+      "license": "LGPL (>= 2.1)",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "",
+      "sysreqs": "",
+      "sysreqs_packages": {},
+      "needscompilation": false,
+      "repotype": "cranlike"
+    },
+    {
       "ref": "rstudioapi",
       "package": "rstudioapi",
       "version": "0.17.1",
