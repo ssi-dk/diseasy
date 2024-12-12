@@ -905,21 +905,21 @@
       "version": "0.3.0",
       "type": "standard",
       "direct": false,
-      "binary": false,
+      "binary": true,
       "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "diseasystore",
         "RemoteType": "standard",
         "RemoteRef": "diseasystore",
-        "RemoteRepos": "https://cran.rstudio.com",
-        "RemotePkgPlatform": "source",
+        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
         "RemoteSha": "0.3.0"
       },
-      "sources": ["https://cran.rstudio.com/src/contrib/diseasystore_0.3.0.tar.gz", "https://cran.rstudio.com/src/contrib/Archive/diseasystore/diseasystore_0.3.0.tar.gz"],
-      "target": "src/contrib/diseasystore_0.3.0.tar.gz",
-      "platform": "source",
-      "rversion": "*",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/diseasystore_0.3.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/diseasystore_0.3.0.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
       "directpkg": false,
       "license": "GPL (>= 3)",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -928,9 +928,7 @@
       "sysreqs": "",
       "sysreqs_packages": {},
       "needscompilation": false,
-      "repotype": "cran",
-      "sha256": "b60b87623556b3da108bed07089c9c91393627aecb67018ae23a8be16c079aba",
-      "filesize": 879342
+      "repotype": "cranlike"
     },
     {
       "ref": "downlit",
@@ -2035,7 +2033,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["diseasystore", "checkmate", "digest", "dplyr", "glue", "lgr", "lubridate", "Matrix", "pracma", "purrr", "R6", "rlang", "stringr"],
+      "dependencies": ["diseasystore", "cachem", "checkmate", "digest", "dplyr", "glue", "lgr", "lubridate", "Matrix", "pracma", "purrr", "R6", "rlang", "stringr"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",
