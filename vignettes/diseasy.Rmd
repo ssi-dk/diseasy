@@ -31,7 +31,7 @@ The `diseasy` package is large in scope as it aims to provide the infrastructure
 disease models.
 
 This building of disease models is achieved via a modular design philosophy. To that end, we have a number of
-"functional" modules that feed into "model" modules.
+"functional" modules that feed into "model" templates to form individual models.
 
 ## Functional modules
 The functional modules are smaller modules meant for defined purposes. These modules are "atomic" and form the building
@@ -39,10 +39,13 @@ blocks of the ensembles.
 
 The currently available functional modules are:
 
-```{r vignette_string, echo = FALSE}
+```{r vignette_string_functional_modules, echo = FALSE}
 functional_modules <- ls("package:diseasy") |>
-  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(Base|Model))"))
-vignette_string <- paste0(
+  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(Base|Model))")) |>
+  purrr::map_chr(~ stringr::str_replace(., r"{(?<=[a-z])([A-Z])}", r"{-\1}")) |>
+  tolower()
+
+vignette_string_functional_modules <- paste0(
   "\`vignette(\"",
   functional_modules,
   "\")\`",
@@ -50,15 +53,17 @@ vignette_string <- paste0(
 )
 ```
 
-```{r available_functional_modules}
+```{r available_functional_modules, echo = FALSE, results = "asis"}
 ls("package:diseasy") |>
-  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(BaseModule|Model.*))"))
+  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(BaseModule|Model.*))")) |>
+  toString() |>
+  cat()
 ```
 
 Each functional module is restricted to covering a single functionality for use in the models
 (and sometimes for other functional modules).
 
-For example, `DiseasySeason` defines a number of models for the season dependency of the disease.
+For example, `?DiseasySeason` defines a number of models for the season dependency of the disease.
 This module has a single defined purpose (modelling the effect of season) but it provides a number of different models
 of describing possible season dependencies:
 
@@ -74,24 +79,35 @@ This way, when we create a disease model, we can use the module to implement dif
 the disease models easily.
 
 The other modules have other functionality they implement.
-For example, the module `DiseasyObservables` is responsible for providing data to the models and modules.
-For `DiseasySeason`, this means that some models of season dependency can use real-world data, such as temperature, in
+For example, the module `?DiseasyObservables` is responsible for providing data to the models and modules.
+For `?DiseasySeason`, this means that some models of season dependency can use real-world data, such as temperature, in
 the season models.
 
 
 The use of these modules is varied and each module comes with their own vignette describing their usage:
-`r vignette_string`.
+`r vignette_string_functional_modules`.
 
 
-## Model modules
-As stated above, the functional modules provide functionality for the disease models.
+## Model templates
+As stated above, the functional modules provide functionality for the disease models via the use of model templates.
 
 The currently available model templates are:
-```{r available_model_modules}
-ls("package:diseasy", pattern = "DiseasyModel.+")
+```{r available_model_templates, echo = FALSE, results = "asis"}
+ls("package:diseasy", pattern = "DiseasyModel.+") |>
+  toString() |>
+  cat()
 ```
 
-See their associated vignettes for an introduction to the models.
+```{r vignette_string_model_templates, echo = FALSE}
+model_templates <- ls("package:diseasy") |>
+  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(Base|Model))")) |>
+  purrr::map_chr(~ stringr::str_replace(., r"{(?<=[a-z])([A-Z])}", r"{-\1}")) |>
+  tolower()
+vignette_string_model_templates <- paste0("\`vignette(\"", model_templates, "\")\`", collapse = ", ")
+```
+
+To see the model templates in action, you can consult their respective vignettes, such as
+`vignette("diseasy-model-regression")`.
 
 
 ## Configuring
