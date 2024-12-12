@@ -3,6 +3,8 @@
 export(DiseasyActivity)
 export(DiseasyBaseModule)
 export(DiseasyModel)
+export(DiseasyModelBRM)
+export(DiseasyModelGLM)
 export(DiseasyModelOde)
 export(DiseasyModelOdeSeir)
 export(DiseasyModelRegression)
