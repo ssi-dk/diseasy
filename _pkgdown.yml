@@ -14,23 +14,33 @@ reference:
     contents:
     - has_keyword("functional-module")
 
+  - title: Model templates
+    desc: Templates that construct individual models.
+    contents:
+    - has_keyword("model-template")
+
   - title: Data sets
     desc: Data for the functional modules
     contents:
     - has_keyword("data")
 
   - title: Developer functions
-    desc: Functions to create model templates.
+    desc: Functions to create model templates and functional modules.
     contents:
     - DiseasyBaseModule
-    - DiseasyModel
+    - has_keyword("model-template-builder")
     - diseasyoption
 
 articles:
 - title: Functional modules
   navbar: Functional modules
   contents:
-  - starts_with("diseasy")
+  - matches(r"{^diseasy-\w*$}") # I would do a negative lookahead for "-model", but perl is not allowed here
+
+- title: Model templates
+  navbar: Model templates
+  contents:
+  - starts_with("diseasy-model")
 
 - title: Developer guides
   navbar: Developer guides

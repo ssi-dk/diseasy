@@ -47,6 +47,7 @@ These functions define the "API" of the models and ensure the models can take pa
 
 \link{DiseasyVariant}
 }
+\keyword{model-template-builder}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyModel}
 }
