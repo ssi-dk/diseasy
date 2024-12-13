@@ -159,40 +159,40 @@ and associated risks for each compartment that best approximates set waning func
 
 Some definitions:
 
-- Flow between compartments: The transition rate between compartments $n$ and $n+1$ is defined as $\delta_n$.
-- Risk associated with compartments: The protective effect associated with compartment $n$ is defined as $\gamma_n$,
+- Flow between compartments: The transition rate between compartments $m$ and $m+1$ is defined as $\delta_m$.
+- Risk associated with compartments: The protective effect associated with compartment $m$ is defined as $\gamma_m$,
   which represents the probability of not becoming infected when exposed to an infected individual.
-- In `?DiseasyImmunity` we operate with multiple targets, so we have a set of `\gamma_n` values for each target, but
-  only a single set of transition rates `\delta_n`.
+- In `?DiseasyImmunity` we operate with multiple targets, so we have a set of `\gamma_m` values for each target, but
+  only a single set of transition rates `\delta_m`.
 
 Combined, these rates and risks define a population level waning immunity. From the waiting time distributions,
 hypoexponential in general, Erlang distributed if all rates are equal, we can compute the probability to occupy each
 compartment at time $t$ after entering the first compartment at $t = 0$. We denote this probability as
-$\textrm{P}_n(t \;|\;\vec{\delta})$. Given this occupancy probability, we can parametrise the approximated waning
+$\textrm{P}_m(t \;|\;\vec{\delta})$. Given this occupancy probability, we can parametrise the approximated waning
 immunity of the $k$th target as:
 
 $$
-\tilde{f}^k(t) \equiv \sum_{n = 1}^N \gamma_n^k\; \textrm{P}_n(t\;|\;\vec{\delta})
+\tilde{f}^k(t) \equiv \sum_{m = 1}^M \gamma_m^k\; \textrm{P}_m(t\;|\;\vec{\delta})
 $$
 
-Three approaches are available for determining the transition rates, $\delta_n$, and protective effect, $\gamma_n$,
+Three approaches are available for determining the transition rates, $\delta_m$, and protective effect, $\gamma_m$,
 that best approximates the set waning functions:
 
-- Method 1 (`free_gamma`): $\gamma_n$ values are allowed to vary freely, while the $\delta_n$ rates are equal
-  between compartments ($\delta_n = \delta$).
+- Method 1 (`free_gamma`): $\gamma_m$ values are allowed to vary freely, while the $\delta_m$ rates are equal
+  between compartments ($\delta_m = \delta$).
 
-- Method 2 (`free_delta`): $\gamma_n$ values are linearly distributed from $f(0)$ to $f(\infty)$,
-  and $\delta_n$ are allowed to vary freely.
+- Method 2 (`free_delta`): $\gamma_m$ values are linearly distributed from $f(0)$ to $f(\infty)$,
+  and $\delta_m$ are allowed to vary freely.
 
-- Method 3 (`all_free`): Both $\gamma_n$ and $\delta_n$ are allowed to vary freely.
+- Method 3 (`all_free`): Both $\gamma_m$ and $\delta_m$ are allowed to vary freely.
 
 
 In addition, there are three strategies for the initial guess of the parameters:
 
-- Strategy 1 (`naive`): The initial guess that `\gamma_n` values are linearly distributed from $f(0)$ to $f(\infty)$,
-  while the `\delta_n` values are assumed to be set by the reciprocal of the median time scale of the targets.
+- Strategy 1 (`naive`): The initial guess that `\gamma_m` values are linearly distributed from $f(0)$ to $f(\infty)$,
+  while the `\delta_m` values are assumed to be set by the reciprocal of the median time scale of the targets.
 
-- Strategy 2 (`recursive`): The initial guess is based on the previous optimisation results for `N - 1`.
+- Strategy 2 (`recursive`): The initial guess is based on the previous optimisation results for `M - 1`.
 
 - Strategy 3 (`combination` - only for the `all_free` method): The initial guess uses the `free_gamma` solution using
   its corresponding default strategy.
@@ -208,9 +208,9 @@ $$
 
 where the penalties are controllable via the `monotonous` and `individual_level` arguments:
 
-- `monotonous`: A penalty for non-monotonous $\gamma_n$ values is added.
+- `monotonous`: A penalty for non-monotonous $\gamma_m$ values is added.
 
-- `individual_level`: A penalty variation in $\gamma_n$ and $\delta_n$ values are added.
+- `individual_level`: A penalty variation in $\gamma_m$ and $\delta_m$ values are added.
    The population level waning immunity may be smoothly changing for a set of parameters, but the instantaneous change
    in immunity between two neighbouring compartments may be large. This penalty can be added to avoid such behaviour.
 
@@ -219,7 +219,7 @@ The input for the `?DiseasyImmunity$approximate_compartmental()` function includ
 
 - `method`: One of the methods from above - "free_gamma", "free_delta" or "all_free".
 - `strategy`: One of the strategies from above - "naive", "recursive" or "combination" (optional).
-- `N`: The number of compartments to use for the approximation.
+- `M`: The number of compartments to use for the approximation.
 - `optim_control`: A configuration of the optimiser (optional). The approximation to the compartmental model is a hard
   optimisation problem where the choice of the optimiser can have a significant impact on the quality of the fit.
   See `vignette("diseasy-immunity-optimisation")` for more information on the optimiser configuration.
@@ -227,22 +227,22 @@ The input for the `?DiseasyImmunity$approximate_compartmental()` function includ
 In this example, the module contains the infection and hospitalisation targets defined earlier, which will be
 approximated.
 ```{r approximate compartmental}
-im$approximate_compartmental(method = "all_free", N = 3)
+im$approximate_compartmental(method = "free_gamma", M = 4)
 ```
 
 To visualize how the approximations compare to the target functions, the plot function can be used.
-Simply specify the approach and the number of compartments (`N`).
+Simply specify the approach and the number of compartments (`M`).
 The plot will display both the approximations and the target functions for comparison.
 ```{r plot approximation, fig.alt = "Visualisation of the approximations of the waning models."}
-im$plot(method = "all_free", N = 3)
+im$plot(method = "free_gamma", M = 4)
 ```
 
 # Compartment selection (elbow curve method)
-The accuracy of the approximation can be influenced by the number of compartments (`N`) used in the model.
-Therefore it is crucial to select the right `N` as too few compartments can lead to poor approximation,
+The accuracy of the approximation can be influenced by the number of compartments (`M`) used in the model.
+Therefore it is crucial to select the right `M` as too few compartments can lead to poor approximation,
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
-The elbow curve method is employed to determine the appropriate `N` for the models.
-Each approach is executed across a range of `N` values, and the resulting objective function values are returned as
+The elbow curve method is employed to determine the appropriate `M` for the models.
+Each approach is executed across a range of `M` values, and the resulting objective function values are returned as
 `value` from the `?DiseasyImmunity$approximate_compartmental()` function.
 
 In the example below, we have a case where the "all_free" method out performs the other methods, but
@@ -252,7 +252,7 @@ For more examples, see the optimisation vignette (`vignette("diseasy-immunity-op
 
 ```{r elbow curve method, fig.alt = "Increasing number of compartments has diminishing returns on the error."}
 # Prepare the data
-N_seq <- seq(from = 1, to = 5, by = 1)                                                                                  # nolint: object_name_linter
+M_seq <- seq(from = 1, to = 5, by = 1)
 methods <- c("free_gamma", "free_delta", "all_free")
 im$set_custom_waning(
   custom_function = \(t) sum(exp(- (1:3) * t / time_scale)) / 3,
@@ -263,11 +263,11 @@ im$set_custom_waning(
 # Run each function
 results <- tidyr::expand_grid(
   method = methods,
-  N = N_seq
+  M = M_seq
 ) |>
   purrr::pmap(
-    \(method, N) {                                                                                                      # nolint: object_name_linter
-      im$approximate_compartmental(method = method, N = N)
+    \(method, M) {
+      im$approximate_compartmental(method = method, M = M)
     },
     .progress = interactive()
   ) |>
@@ -275,10 +275,10 @@ results <- tidyr::expand_grid(
   tibble::as_tibble()
 
 # Plot
-ggplot2::ggplot(results, ggplot2::aes(x = N, y = value, color = method)) +
+ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
   ggplot2::geom_line(linewidth = 1) +
-  ggplot2::labs(x = "N", y = "Error") +
-  ggplot2::coord_cartesian(xlim = c(1, max(results$N)), expand = FALSE)
+  ggplot2::labs(x = "M", y = "Error") +
+  ggplot2::coord_cartesian(xlim = c(1, max(results$M)), expand = FALSE)
 ```
 
 

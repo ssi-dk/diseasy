@@ -308,12 +308,12 @@ Returns the model (invisibly).
 \if{html}{\out{<a id="method-DiseasyImmunity-approximate_compartmental"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-approximate_compartmental}{}}}
 \subsection{Method \code{approximate_compartmental()}}{
-Assuming a compartmental disease model with N recovered compartments, this function approximates the
+Assuming a compartmental disease model with M recovered compartments, this function approximates the
 transition rates and associated risk of infection for each compartment such the effective immunity
 best matches the waning immunity curves set in the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$approximate_compartmental(
-  N,
+  M,
   method = c("free_gamma", "free_delta", "all_free"),
   strategy = NULL,
   monotonous = TRUE,
@@ -326,7 +326,7 @@ best matches the waning immunity curves set in the module.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{N}}{(\code{integer(1)})\cr
+\item{\code{M}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
 
 \item{\code{method}}{(\code{character(1)})\cr
@@ -381,16 +381,16 @@ If \code{optim_method} matches any of the methods in \code{optimx::optimr}:
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-Due to the N recovered compartments being sequential, the waiting time distribution between compartments
+Due to the M recovered compartments being sequential, the waiting time distribution between compartments
 is a phase-type distribution (with Erlang distribution as a special case when all transition rates are equal).
 The transition rates between the compartments and the risk associated with each compartment are optimized to
 approximate the configured waning immunity scenario.
 
 The function implements three methods for parametrising the waning immunity curves:
 \itemize{
-\item "free_gamma": All transition rates are equal and risks are free to vary (N + 1 free parameters).
+\item "free_gamma": All transition rates are equal and risks are free to vary (M + 1 free parameters).
 \item "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
-f(infinity) (N free parameters).
+f(infinity) (M free parameters).
 \item "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
 }
 
@@ -401,9 +401,9 @@ These strategies modify the initial guess for the transition rates and risks:
 Transitions rates are initially set as the inverse of the median time scale.
 Risks are initially set as linearly distributed values between f(0) and f(infinity).
 \item "recursive":
-Initial transition rates and risks are linearly interpolated from the $N - 1$ solution.
+Initial transition rates and risks are linearly interpolated from the $M - 1$ solution.
 \item "combination" (only for "all_free" method):
-Initial transition rates and risks are set from the "free_gamma" solution for $N$.
+Initial transition rates and risks are set from the "free_gamma" solution for $M$.
 }
 
 The optimisation minimises the square root of the squared differences between the target waning and the
@@ -439,12 +439,12 @@ Returns the results from the optimisation with the approximated rates and execut
 \if{html}{\out{<a id="method-DiseasyImmunity-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-plot}{}}}
 \subsection{Method \code{plot()}}{
-If desired to additionally plot the approximations, supply the \code{method} and number of compartments (\code{N})
+If desired to additionally plot the approximations, supply the \code{method} and number of compartments (\code{M})
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$plot(
   t_max = NULL,
   method = c("free_gamma", "free_delta", "all_free"),
-  N = NULL,
+  M = NULL,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -461,7 +461,7 @@ Specifies the method to be used from the available methods.
 It can be provided as a string with the method name "free_gamma", "free_delta" or "all_free".
 or as a numeric value representing the method index 1, 2, or 3.}
 
-\item{\code{N}}{(\code{numeric})\cr
+\item{\code{M}}{(\code{numeric})\cr
 Number of compartments to be used in the model.}
 
 \item{\code{...}}{Additional arguments to be passed to \verb{$approximate_compartmental()}.}
