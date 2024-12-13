@@ -4,6 +4,7 @@ antiphase
 AR
 ARI
 
+BB
 bobyqa
 
 CCW
@@ -110,6 +111,9 @@ nolint
 normalise
 nrow
 
+optim
+optimr
+optimx
 OO
 ORCID
 org
