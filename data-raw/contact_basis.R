@@ -1,5 +1,4 @@
-if (rlang::is_installed("contactdata") && rlang::is_installed("countrycode") && rlang::is_installed("curl") &&
-      rlang::is_installed("usethis") && rlang::is_installed("tibble") && rlang::is_installed("diseasystore")) {
+if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibble"))) {
 
   # We express all contact data by default in 16 5-year age groups
   # (the default age groups of the `contactdata` package)
