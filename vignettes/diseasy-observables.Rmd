@@ -12,16 +12,20 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-
-options("tibble.print_min" = 5)
-options("diseasy.logging" = FALSE)
-
-# We have a "hard" dependency for duckdb to render this vignette
-suggests_available <- rlang::is_installed("duckdb")
 ```
 
 ```{r setup}
 library(diseasy)
+```
+
+```{r vignette configuration, include = FALSE}
+opts <- options(
+  "tibble.print_min" = 5,
+  "diseasy.logging" = FALSE
+)
+
+# We have a "hard" dependency for duckdb to render this vignette
+suggests_available <- rlang::is_installed("duckdb")
 ```
 
 # Introduction
@@ -88,4 +92,10 @@ obs$get_observation(
   start_date = as.Date("2020-03-01"),
   end_date = as.Date("2020-04-30")
 )
+```
+
+```{r cleanup, include = FALSE}
+if (exists("obs")) rm(obs)
+gc()
+options(opts)
 ```

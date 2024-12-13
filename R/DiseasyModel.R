@@ -167,23 +167,35 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   the `last_queryable_date` of the `DiseasyObservables` module.
     #' @param observable `r rd_observable()`
     #' @param stratification `r rd_stratification()`
+    #' @param period (`character`)\cr
+    #'   The period to return data for. That is, the training, testing or validation period.
     #' @return The output of `DiseasyObservables$get_observation` constrained to the training period.
-    get_training_data = function(observable, stratification = NULL) {
+    get_data = function(observable, stratification = NULL, period = c("training", "testing", "validation")) {
+      period <- match.arg(period)
 
       # Input validation
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(observable, add = coll)
-      checkmate::assert_number(self %.% parameters %.% training_length, add = coll)
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
+      checkmate::assert_choice(period, c("training", "testing", "validation"), add = coll)
       checkmate::reportAssertions(coll)
 
       # Get the observable at the stratification level
-      start_date <- self %.% observables %.% last_queryable_date -
-        lubridate::days(self %.% parameters %.% training_length)
-      end_date   <- self %.% observables %.% last_queryable_date # Only within the training period
+      period_duration <- purrr::pluck(self, glue::glue("{period}_period"))
+      start_date <- period_duration %.% start
+      end_date   <- period_duration %.% end
+
+      if (is.null(start_date) || is.null(end_date)) {
+        stop(glue::glue("Requested period is not configured! Check the corresponding `${period}_period`."))
+      }
 
       data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
-        dplyr::mutate(t = lubridate::interval(max(zoo::as.Date(date)), zoo::as.Date(date)) / lubridate::days(1))
+        dplyr::mutate(
+          t = lubridate::interval(
+            !!self %.% observables %.% last_queryable_date,
+            zoo::as.Date(date)
+          ) / lubridate::days(1)
+        )
 
       return(data)
     }
@@ -243,6 +255,100 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "parameters",
       expr = return(private %.% .parameters)
+    ),
+
+
+    #' @field training_period (`list`(`Date`))\cr
+    #'   The start and end dates of the training period. Read-only.
+    #' @importFrom diseasystore `%.%`
+    training_period = purrr::partial(
+      .f = active_binding,
+      name = "training_period",
+      expr = {
+        if (is.null(self %.% observables)) {
+          stop("Observables module is not loaded!")
+        }
+        if (is.null(self %.% observables %.% last_queryable_date)) {
+          stop("`$last_queryable_date` not configured in observables module!")
+        }
+
+        training_length <- purrr::pluck(self %.% parameters %.% training_length, "training", .default = 0)
+        training_offset <- purrr::discard_at(self %.% parameters %.% training_length, "training") |>
+          purrr::reduce(sum, .init = 0)
+
+        training_period_end <- self %.% observables %.% last_queryable_date - lubridate::days(training_offset)
+
+        training_period_start <- max(
+          training_period_end - lubridate::days(max(training_length - 1, 0)),
+          self %.% observables %.% ds %.% min_start_date,
+          na.rm = TRUE
+        )
+
+        return(list("start" = training_period_start, "end" = training_period_end))
+      }
+    ),
+
+    #' @field testing_period (`list`(`Date`))\cr
+    #'   The start and end dates of the testing period. Read-only.
+    #' @importFrom diseasystore `%.%`
+    testing_period = purrr::partial(
+      .f = active_binding,
+      name = "testing_period",
+      expr = {
+        if (is.null(self %.% observables)) {
+          stop("Observables module is not loaded!")
+        }
+        if (is.null(self %.% observables %.% last_queryable_date)) {
+          stop("`$last_queryable_date` not configured in observables module!")
+        }
+
+        testing_length <- purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0)
+        testing_offset <- purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0)
+
+        if (testing_length == 0) {
+          return(list("start" = NULL, "end" = NULL))
+        }
+
+        testing_period_end <- self %.% observables %.% last_queryable_date - lubridate::days(testing_offset)
+
+        testing_period_start <- max(
+          testing_period_end - lubridate::days(max(testing_length - 1, 0)),
+          self %.% observables %.% ds %.% min_start_date
+        )
+
+        return(list("start" = testing_period_start, "end" = testing_period_end))
+      }
+    ),
+
+    #' @field validation_period (`list`(`Date`))\cr
+    #'   The start and end dates of the validation period. Read-only.
+    #' @importFrom diseasystore `%.%`
+    validation_period = purrr::partial(
+      .f = active_binding,
+      name = "validation_period",
+      expr = {
+        if (is.null(self %.% observables)) {
+          stop("Observables module is not loaded!")
+        }
+        if (is.null(self %.% observables %.% last_queryable_date)) {
+          stop("`$last_queryable_date` not configured in observables module!")
+        }
+
+        validation_length <- purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0)
+
+        if (validation_length == 0) {
+          return(list("start" = NULL, "end" = NULL))
+        }
+
+        validation_period_end <- self %.% observables %.% last_queryable_date
+
+        validation_period_start <- max(
+          validation_period_end - lubridate::days(max(validation_length - 1, 0)),
+          self %.% observables %.% ds %.% min_start_date
+        )
+
+        return(list("start" = validation_period_start, "end" = validation_period_end))
+      }
     )
   ),
 
@@ -270,7 +376,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #   }                                                                                                               # nolint end
     default_parameters = function() {
       list(
-        "training_length" = c("training" = -Inf, "testing" = 0, "validation" = 0)
+        "training_length" = c("training" = Inf, "testing" = 0, "validation" = 0)
       )
     },
 
@@ -283,6 +389,7 @@ DiseasyModel <- R6::R6Class(                                                    
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(
         self %.% parameters %.% training_length,
+        lower = 0,
         add = coll
       )
       checkmate::assert_names(

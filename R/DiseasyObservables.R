@@ -252,9 +252,8 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @description
     #'   Handles the clean-up of the class
     finalize = function() {
-
       # Close the connection, then do rest of clean-up
-      if (DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
+      if (!isTRUE(attr(self, "clone")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
       super$finalize()
     }
   ),

@@ -12,3 +12,5 @@ group:
 
       - R/0_documentation.R
       - tests/testthat/test-0_documentation.R
+
+      - 0_miscellaneous.R
