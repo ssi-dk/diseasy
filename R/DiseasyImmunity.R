@@ -576,7 +576,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
               # Numerically integrate the differences
               value <- tryCatch(
-                sqrt(stats::integrate(integrand, lower = 0, upper = Inf)$value),
+                stats::integrate(
+                  integrand,
+                  lower = 0,
+                  upper = Inf,
+                  subdivisions = 10000L,
+                  rel.tol = .Machine$double.eps^0.6
+                ) |>
+                  purrr::pluck("value", sqrt),
                 error = function(e) {
                   1 / (min(delta) + .Machine$double.eps) # If the any delta is too small, the integral looks divergent
                   # (since we too approach the asymptote too slowly).
