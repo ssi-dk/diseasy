@@ -24,23 +24,8 @@ opts <- options(
   "diseasy.logging" = FALSE
 )
 
-# We have a "hard" dependency for RSQLite to render this vignette
-suggests_available <- rlang::is_installed("RSQLite")
-```
-
-```{r download, include = FALSE, eval = suggests_available}
-# Download the first n rows of the Google data set of interest
-tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
-remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
-google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-
-purrr::walk(google_files, \(file_name) {
-  paste0(remote_conn, file_name) |>
-    readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-    readr::write_csv(file.path(tmp_dir, file_name))
-})
-options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir)
-options("diseasystore.DiseasystoreGoogleCovid19.verbose" = FALSE)
+# We have a "hard" dependency for duckdb to render this vignette
+suggests_available <- rlang::is_installed("duckdb")
 ```
 
 # Introduction
@@ -50,14 +35,15 @@ The module is primarily a wrapper around `diseasystores` which means the availab
 
 # Configuring the module
 The module needs some configuration to be initialized. Some of these can be set through options.
-Primarily, we need to specify the `diseasystore`
+Primarily, we need to specify the `diseasystore`:
+
 ```{r initialization, eval = suggests_available}
 obs <- DiseasyObservables$new(
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = DBI::dbConnect(duckdb::duckdb())
 )
 # NOTE: Alternatively we could set options("diseasy.conn" = ...)
 
-obs$set_diseasystore(diseasystore = "Google COVID-19")
+obs$set_diseasystore(diseasystore = "Simulist")
 ```
 
 To see the data that comes with the underlying `diseasystore` we can query the module.
@@ -77,33 +63,35 @@ obs$describe()
 # Getting observations
 We can query the model to give the data for a given observable in a given time frame:
 ```{r example_1, eval = suggests_available}
-obs$get_observation(observable = "n_population",
-                    start_date = as.Date("2020-03-01"),
-                    end_date = as.Date("2020-05-01"))
-
-# NOTE: "target_conn" is a SQLite data base which has "numeric" as the "date" type.
-# NOTE: The population here is not stratified, so covers all countries in the Google data
+obs$get_observation(
+  observable = "n_positive",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-04-30")
+)
 ```
 
 If we want to stratify our data, we supply the stratification argument.
 This argument is designed to be flexible, but it means they need to be wrapped in `rlang::quos()`.
 We will see below, why that is.
 ```{r example_2, eval = suggests_available}
-obs$get_observation(observable = "n_hospital",
-                    stratification = rlang::quos(age_group),
-                    start_date = as.Date("2020-03-01"),
-                    end_date = as.Date("2020-05-01"))
+obs$get_observation(
+  observable = "n_hospital",
+  stratification = rlang::quos(age),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-04-30")
+)
 ```
 
 Since the stratification is flexible, we can programmatically stratify:
 ```{r example_3, eval = suggests_available}
-obs$get_observation(observable = "n_hospital",
-                    stratification = rlang::quos(young_age_groups =
-                                                   age_group %in% c("00-09", "10-19")),
-                    start_date = as.Date("2020-03-01"),
-                    end_date = as.Date("2020-05-01"))
-
-# NOTE: "target_conn" is a SQLite data base which has "numeric" as the "boolean" type.
+obs$get_observation(
+  observable = "n_hospital",
+  stratification = rlang::quos(
+    young_age_groups = age < 20
+  ),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-04-30")
+)
 ```
 
 ```{r cleanup, include = FALSE}
