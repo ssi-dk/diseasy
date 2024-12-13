@@ -37,7 +37,7 @@ test_that("initialize works with functional modules", {
 
   # Check a label can be set
   m_label <- DiseasyModel$new(label = "test")
-  expect_equal(m_label$hash, m$hash) # label should not change the hash
+  expect_identical(m_label$hash, m$hash) # label should not change the hash
 
   rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_var_boolean, m_label)
 })
@@ -77,14 +77,14 @@ test_that("initialize works with model parameters", {
 
   # Test that parameters use the default value
   m <- DiseasyModelParameterTest$new()
-  expect_equal(m %.% parameters %.% a, 1)
-  expect_equal(m %.% parameters %.% b, 2)
+  expect_identical(m %.% parameters %.% a, 1)
+  expect_identical(m %.% parameters %.% b, 2)
   rm(m)
 
   # Test that parameters can be set during initialization
   m <- DiseasyModelParameterTest$new(parameters = list("a" = 3, "b" = 4))
-  expect_equal(m %.% parameters %.% a, 3)
-  expect_equal(m %.% parameters %.% b, 4)
+  expect_identical(m %.% parameters %.% a, 3)
+  expect_identical(m %.% parameters %.% b, 4)
   rm(m)
 
   # Check that setting non-existing parameters will give an error
@@ -208,16 +208,16 @@ test_that("$hash works", {
 
   # Check reloading modules works
   m$load_module(act)
-  expect_equal(m$hash, hash_4)
+  expect_identical(m$hash, hash_4)
 
   m$load_module(s)
-  expect_equal(m$hash, hash_4)
+  expect_identical(m$hash, hash_4)
 
   m$load_module(obs)
-  expect_equal(m$hash, hash_4)
+  expect_identical(m$hash, hash_4)
 
   m$load_module(var)
-  expect_equal(m$hash, hash_4)
+  expect_identical(m$hash, hash_4)
 
 
   # Check loading of altered module changes the hash
@@ -229,20 +229,20 @@ test_that("$hash works", {
   m$load_module(act) # Reset to original
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
-  expect_equal(m$hash, hash_4)
+  expect_identical(m$hash, hash_4)
   m$load_module(s_alt)
   expect_false(m$hash == hash_4)
   m$load_module(s) # Reset to original
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
-  expect_equal(m$hash, hash_4)
+  expect_identical(m$hash, hash_4)
   m$load_module(obs_alt)
   expect_false(m$hash == hash_4)
   m$load_module(obs) # Reset to original
 
   var_alt <- DiseasyVariant$new()
   var_alt$add_variant(name = "WT")
-  expect_equal(m$hash, hash_4)
+  expect_identical(m$hash, hash_4)
   m$load_module(var_alt)
   expect_false(m$hash == hash_4)
   m$load_module(var) # Reset to original
@@ -281,7 +281,7 @@ test_that("cloning works", {
 
   # Create a simple clone
   m_c <- m$clone()
-  expect_equal(m_c$hash, hash_loaded) # Hash should be the same
+  expect_identical(m_c$hash, hash_loaded) # Hash should be the same
 
 
 
@@ -290,49 +290,49 @@ test_that("cloning works", {
   act_alt$set_activity_units(dk_activity_units)
   act_alt$change_activity(head(scenario_1, 3))
   m_c$load_module(act_alt)
-  expect_equal(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
   m_c$load_module(act)
-  expect_equal(m_c$hash, hash_loaded) # Hash should now be reset
+  expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$load_module(s_alt)
-  expect_equal(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
   m_c$load_module(s)
-  expect_equal(m_c$hash, hash_loaded) # Hash should now be reset
+  expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$load_module(obs_alt)
-  expect_equal(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
 
 
   # If we change the module inside of one, it should not change in the other
   m_c$load_module(obs)
-  expect_equal(m_c$hash, hash_loaded) # Hash should now be reset
+  expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
 
 
   # - activity
   m_c$activity$reset_scenario()
-  expect_equal(m$hash,  hash_loaded)   # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(act$hash == m_c$activity$hash) # module hashes should also be different
 
   # - season
   m_c$load_module(act)
-  expect_equal(m_c$hash, hash_loaded) # Hash should now be reset
+  expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$season$set_reference_date(as.Date("2020-03-01"))
-  expect_equal(m$hash,  hash_loaded)   # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(s$hash == m_c$season$hash) # module hashes should also be different
 
   # - observables
   m_c$load_module(s)
-  expect_equal(m_c$hash, hash_loaded) # Hash should now be reset
+  expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$observables$set_last_queryable_date(as.Date("2020-03-01"))
-  expect_equal(m$hash,  hash_loaded)   # Hash "202should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded)   # Hash "202should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(obs$hash == m_c$observables$hash) # module hashes should also be different
 
