@@ -90,7 +90,7 @@ test_that("$get_training_data() works", { for (case_def in case_defs) {         
 
   # Test the get_results
   observable <- purrr::pluck(obs$available_observables, 1)
-  expect_no_error(training_data <- m$get_training_data(observable))                                                    # nolint: implicit_assignment_linter
+  expect_no_error(training_data <- m$get_training_data(observable))                                                     # nolint: implicit_assignment_linter
   expect_named(training_data, expected = c("date", observable, "t"))
 
 }})
@@ -99,54 +99,85 @@ test_that("$get_training_data() works", { for (case_def in case_defs) {         
 test_that("$get_results() gives error", {
 
   # Creating an empty module
-  obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
-                                last_queryable_date = as.Date("2021-01-01"))
-  m <- DiseasyModelRegression$new(formula = "{observable} ~ 0", family = stats::poisson(), training_length = 21,
-                                  observables = obs)
+  obs <- DiseasyObservables$new(
+    diseasystore = "Google COVID-19",
+    last_queryable_date = as.Date("2021-01-01")
+  )
+
+  m <- DiseasyModelRegression$new(
+    formula = "{observable} ~ 0",
+    family = stats::poisson(),
+    training_length = 21,
+    observables = obs
+  )
 
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$get_results(observable = "n_hospital", prediction_length = 14), error = \(e) e),
-                   simpleError("Not implemented: `$update_formula` must be implemented in inheriting class"))
+  expect_identical(
+    tryCatch(m$get_results(observable = "n_hospital", prediction_length = 14), error = \(e) e),
+    simpleError("Not implemented: `$update_formula` must be implemented in inheriting class")
+  )
 
   rm(m)
 })
 
 
 test_that("$fit_regression() gives error", {
-  m <- DiseasyModelRegression$new(formula = "{observable} ~ 0", family = stats::poisson(), training_length = 21)
+  m <- DiseasyModelRegression$new(
+    formula = "{observable} ~ 0",
+    family = stats::poisson(),
+    training_length = 21
+  )
 
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$.__enclos_env__$private$fit_regression(), error = \(e) e),
-                   simpleError("Not implemented: `$fit_regression` must be implemented in inheriting class"))
+  expect_identical(
+    tryCatch(m$.__enclos_env__$private$fit_regression(), error = \(e) e),
+    simpleError("Not implemented: `$fit_regression` must be implemented in inheriting class")
+  )
 
   rm(m)
 })
 
 
 test_that("$get_prediction() gives error", {
-  m <- DiseasyModelRegression$new(formula = "{observable} ~ 0", family = stats::poisson(), training_length = 21)
+  m <- DiseasyModelRegression$new(
+    formula = "{observable} ~ 0",
+    family = stats::poisson(),
+    training_length = 21
+  )
 
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$.__enclos_env__$private$get_prediction(), error = \(e) e),
-                   simpleError("Not implemented: `$get_prediction` must be implemented in inheriting class"))
+  expect_identical(
+    tryCatch(m$.__enclos_env__$private$get_prediction(), error = \(e) e),
+    simpleError("Not implemented: `$get_prediction` must be implemented in inheriting class")
+  )
 
   rm(m)
 })
 
 
 test_that("update_formula gives error", {
-  m <- DiseasyModelRegression$new(formula = "{observable} ~ 0", family = stats::poisson(), training_length = 21)
+  m <- DiseasyModelRegression$new(
+    formula = "{observable} ~ 0",
+    family = stats::poisson(),
+    training_length = 21
+  )
 
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$.__enclos_env__$private$update_formula(), error = \(e) e),
-                   simpleError("Not implemented: `$update_formula` must be implemented in inheriting class"))
+  expect_identical(
+    tryCatch(m$.__enclos_env__$private$update_formula(), error = \(e) e),
+    simpleError("Not implemented: `$update_formula` must be implemented in inheriting class")
+  )
 
   rm(m)
 })
 
 
 test_that("active binding: formula works", {
-  m <- DiseasyModelRegression$new(formula = "{observable} ~ 0", family = stats::poisson(), training_length = 21)
+  m <- DiseasyModelRegression$new(
+    formula = "{observable} ~ 0",
+    family = stats::poisson(),
+    training_length = 21
+  )
 
   # Retrieve the formula
   expect_equal(m$formula, "{observable} ~ 0")
@@ -154,7 +185,7 @@ test_that("active binding: formula works", {
   # Try to set the formula
   # test_that cannot capture this error, so we have to hack it
   expect_identical(
-    tryCatch(m$formula <- "{observable} ~ 1", error = \(e) e),
+    tryCatch(m$formula <- "{observable} ~ 1", error = \(e) e),                                                          # nolint: implicit_assignment_linter
     simpleError("`$formula` is read only")
   )
   expect_equal(m$formula, "{observable} ~ 0")
@@ -164,7 +195,11 @@ test_that("active binding: formula works", {
 
 
 test_that("active binding: family works", {
-  m <- DiseasyModelRegression$new(formula = "{observable} ~ 0", family = stats::poisson(), training_length = 21)
+  m <- DiseasyModelRegression$new(
+    formula = "{observable} ~ 0",
+    family = stats::poisson(),
+    training_length = 21
+  )
 
   # Retrieve the family
   expect_equal(m$family, stats::poisson())
@@ -172,7 +207,7 @@ test_that("active binding: family works", {
   # Try to set the family
   # test_that cannot capture this error, so we have to hack it
   expect_identical(
-    tryCatch(m$family <- stats::quasipoisson(), error = \(e) e),
+    tryCatch(m$family <- stats::quasipoisson(), error = \(e) e),                                                        # nolint: implicit_assignment_linter
     simpleError("`$family` is read only")
   )
   expect_equal(m$family, stats::poisson())

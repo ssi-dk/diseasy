@@ -22,35 +22,47 @@ test_that("g0 / b0 works", {
     # Check that formula updates works as expected
     observable <- "n_observable"
     update_formula <- m$.__enclos_env__$private$update_formula
-    formula <- stats::as.formula(glue::glue(m$formula)) |> update_formula(NULL)
+    formula <- stats::as.formula(glue::glue(m$formula)) |>
+      update_formula(NULL)
     expect_identical(formula, n_observable ~ 1)
 
-    formula <- stats::as.formula(glue::glue(m$formula)) |> update_formula(rlang::quos(feature_1))
+    formula <- stats::as.formula(glue::glue(m$formula)) |>
+      update_formula(rlang::quos(feature_1))
     expect_identical(formula, n_observable ~ feature_1)
 
-    formula <- stats::as.formula(glue::glue(m$formula)) |> update_formula(rlang::quos(feature_1, feature_2))
+    formula <- stats::as.formula(glue::glue(m$formula)) |>
+      update_formula(rlang::quos(feature_1, feature_2))
     expect_identical(formula, n_observable ~ feature_1 + feature_2 + feature_1:feature_2)
 
     # ... and with season
     observable <- "n_observable"
     update_formula <- m$.__enclos_env__$private$update_formula
-    formula <- stats::as.formula(glue::glue(stringr::str_replace(m$formula, "1", "season"))) |>
+
+    formula <- glue::glue(stringr::str_replace(m$formula, stringr::fixed("1"), "season")) |>
+      stats::as.formula() |>
       update_formula(NULL)
-    expect_identical(formula,
-                     n_observable ~ season)
+    expect_identical(
+      formula,
+      n_observable ~ season
+    )
 
-    formula <- stats::as.formula(glue::glue(stringr::str_replace(m$formula, "1", "season"))) |>
+    formula <- glue::glue(stringr::str_replace(m$formula, stringr::fixed("1"), "season")) |>
+      stats::as.formula() |>
       update_formula(rlang::quos(feature_1))
-    expect_identical(formula,
-                     n_observable ~ season + feature_1 +
-                       season:feature_1)
+    expect_identical(
+      formula,
+      n_observable ~ season + feature_1 + season:feature_1
+    )
 
-    formula <- stats::as.formula(glue::glue(stringr::str_replace(m$formula, "1", "season"))) |>
+    formula <- glue::glue(stringr::str_replace(m$formula, stringr::fixed("1"), "season")) |>
+      stats::as.formula() |>
       update_formula(rlang::quos(feature_1, feature_2))
-    expect_identical(formula,
-                     n_observable ~ season + feature_1 + feature_2 +
-                       season:feature_1 + season:feature_2 + feature_1:feature_2 +
-                       season:feature_1:feature_2)
+    expect_identical(
+      formula,
+      n_observable ~ season + feature_1 + feature_2 +
+        season:feature_1 + season:feature_2 + feature_1:feature_2 +
+        season:feature_1:feature_2
+    )
   })
 })
 

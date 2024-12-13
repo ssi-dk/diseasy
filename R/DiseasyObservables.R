@@ -59,8 +59,8 @@ DiseasyObservables <- R6::R6Class(                                              
       last_queryable_date = NULL,
       conn = diseasyoption("conn", class = "DiseasyObservables"),
       slice_ts = NULL,
-      ...)
-    {
+      ...
+    ) {
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
