@@ -203,16 +203,23 @@ total_results <- best_optim_results |>
   dplyr::filter(!(.data$target %in% c("Heaviside", "Linear"))) |>
   dplyr::summarise(
     "value" = sum(.data$value),
+    "execution_time" = sum(.data$execution_time) / 3600,
     "n_targets" = sum(.data$n_targets),
     .by = c("penalty", "method", "strategy", "optim_method")
   ) |>
   dplyr::mutate(
     "value" = round(.data$value, 2)
   ) |>
-  dplyr::slice_max(.data$n_targets, by = c("penalty", "method")) |>
-  dplyr::slice_min(.data$value, n = 5, with_ties = FALSE, by = c("penalty", "method"))
+  dplyr::slice_max(.data$n_targets, by = c("penalty", "method"))
 
 total_results |>
+  dplyr::slice_min(
+    .data$value,
+    n = 5,
+    with_ties = FALSE,
+    by = c("penalty", "method")
+  ) |>
+  dplyr::select(!"execution_time") |>
   tidyr::pivot_wider(
     names_from = "method",
     names_sep = "/",
@@ -288,17 +295,151 @@ total_results |>
   add_footnote()
 ```
 
-In total, we find that the choice for best, general optimiser/strategy combination is independent of whether
-we include the penalty for the optimisation. The best optimiser/strategy combination varies only by the method
-employed to parameterise the waning immunity.
+To better choose the default optimisers for `DiseasyImmunity`, we will also consider how fast the different optimisation
+methods are. For that purpose, we have also measured the time to run the optimisation for each problem.
 
-As a result, we employ the following optimiser/strategy combinations as defaults for the `?DiseasyImmunity` class:
+```{r}
+# Define the defaults for DiseasyImmunity
+chosen_defaults <- tibble::tibble(
+  "method" = character(0),
+  "penalty" = character(0),
+  "strategy" = character(0),
+  "optim_method" = character(0)
+) |>
+  tibble::add_row(
+    "method" = "free_delta", "penalty" = "no",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_delta", "penalty" = "yes",
+    "strategy" = "naive",
+    "optim_method" = "tnewton"
+  ) |>
+  tibble::add_row(
+    "method" = "free_gamma", "penalty" = "no",
+    "strategy" = "naive",
+    "optim_method" = "subplex"
+  ) |>
+  tibble::add_row(
+    "method" = "free_gamma", "penalty" = "yes",
+    "strategy" = "naive",
+    "optim_method" = "hjkb"
+  ) |>
+  tibble::add_row(
+    "method" = "all_free", "penalty" = "no",
+    "strategy" = "combination",
+    "optim_method" = "neldermead"
+  ) |>
+  tibble::add_row(
+    "method" = "all_free", "penalty" = "yes",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  )
+```
 
-| Method     | Strategy    | Optimiser |
-|------------|-------------|-----------|
-| free_delta | recursive   | ucminf    |
-| free_gamma | naive       | spg       |
-| all_free   | combination | bobyqa    |
+
+```{r, echo = FALSE}
+visualise_methods <- function(total_results, method) {
+  gg_data <- total_results |>
+    dplyr::slice_min(
+      .data$value,
+      n = 6,
+      with_ties = FALSE,
+      by = c("penalty", "method")
+    ) |>
+    dplyr::left_join(
+      dplyr::mutate(chosen_defaults, "default" = TRUE),
+      by = c("method", "penalty", "strategy", "optim_method")
+    ) |>
+    dplyr::mutate(
+      "default" = dplyr::if_else(!is.na(.data$default), "Yes", "No")
+    ) |>
+    dplyr::filter(.data$method == !!method) |>
+    tidyr::unite("optim_strategy", "strategy", "optim_method", sep = "-")
+
+  palette <- purrr::reduce(
+    purrr::map(
+      c("Dark2", "Set1", "Set2"),
+      ~ RColorBrewer::brewer.pal(8, .)
+    ),
+    c
+  ) |>
+    stats::setNames(unique(gg_data$optim_strategy))
+
+  # discard_at with is.na directly fails for whatever reason, so we need to do this
+  palette <- purrr::discard_at(palette, is.na(names(palette)))
+
+  ggplot2::ggplot() +
+    ggplot2::geom_point(
+      data = gg_data,
+      mapping = ggplot2::aes(
+        x = .data$execution_time,
+        y = .data$value,
+        color = .data$optim_strategy,
+        fill = .data$optim_strategy,
+        shape = .data$default
+      ),
+      size = 3
+    ) +
+    ggplot2::geom_hline(
+      data = dplyr::summarise(gg_data, "value" = min(.data$value), .by = "penalty"),
+      mapping = ggplot2::aes(yintercept = .data$value),
+      linetype = 2, color = "grey"
+    ) +
+    ggplot2::facet_wrap(
+      ~ penalty,
+      labeller = ggplot2::labeller(.cols = ggplot2::label_both),
+      scales = "free"
+    ) +
+    ggplot2::labs(
+      x = "Execution time (hours)",
+      y = "Total error",
+      title = glue::glue("Best optimisers for {method}"),
+      color = "strategy-optim_method",
+      fill = "strategy-optim_method",
+      shape = "Chosen as default?"
+    ) +
+    ggplot2::scale_color_manual(values = palette) +
+    ggplot2::scale_fill_manual(values = palette) +
+    ggplot2::scale_shape_manual(values = c("Yes" = 23, "No" = 21)) +
+    ggplot2::scale_x_log10()
+}
+```
+
+```{r overview free_delta, echo = FALSE, fig.alt = "Total error vs execution time for the free_delta method."}
+visualise_methods(total_results, "free_delta")
+```
+
+```{r overview free_gamma, echo = FALSE, fig.alt = "Total error vs execution time for the free_gamma method."}
+visualise_methods(total_results, "free_gamma")
+```
+
+```{r overview all_free, echo = FALSE, fig.alt = "Total error vs execution time for the all_free method."}
+visualise_methods(total_results, "all_free")
+```
+In total, we find that there is no clear choice for best, general optimiser/strategy combination.
+
+For the defaults, we have chose the optimiser/strategy combination dependent on the method of parametrisation and the
+inclusion of penalty.
+
+The following optimiser/strategy combinations acts as defaults for the `?DiseasyImmunity` class:
+
+```{r, echo = FALSE, results = "asis"}
+chosen_defaults |>
+  gt::gt() |>
+  gt::tab_style(
+    style = gt::cell_borders(
+      sides = "top",
+      weight = gt::px(2),
+      color = "grey40"
+    ),
+    locations = gt::cells_body(
+      rows = c(3, 5)
+    )
+  )
+```
+
 
 However, as we see in the [Per target results](#per-target-results) section below, the choice of optimiser/strategy
 can be improved when accounting for the specific target function.
