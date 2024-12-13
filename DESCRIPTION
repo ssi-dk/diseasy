@@ -55,5 +55,5 @@ Suggests:
     withr,
     zoo
 VignetteBuilder: knitr,
-URL: https://github.com/ssi-dk/diseasy
+URL: https://github.com/ssi-dk/diseasy, https://ssi-dk.github.io/diseasy/
 BugReports: https://github.com/ssi-dk/diseasy/issues
