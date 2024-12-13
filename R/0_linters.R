@@ -360,7 +360,7 @@ documentation_template_linter <- function() {
       }
       rd_templates <- as.list(base::getNamespace(package_name)) |>
         names() |>
-        purrr::keep(startsWith("rd_"))
+        purrr::keep(~ startsWith(., "rd_"))
 
       # Detect if template exists
       detection_info <- detection_info |>
