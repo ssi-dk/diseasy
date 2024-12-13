@@ -14,7 +14,11 @@
 #'   independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
 #'   (in)active.
 #'
-#'   The `scenario` contains information on when different `activity_units` are opened and closed
+#'   The `scenario` contains information on when different `activity_units` are opened and closed.
+#'
+#'   If no scenario is provided, the module will provide non-informative activity information:
+#'     - Openness is always 1.
+#'     - The contact matrices are uniform and, when summed, the largest eigenvalue is 1.
 #'
 #'   See vignette("diseasy-activity") for examples of use.
 #' @examples
@@ -436,46 +440,78 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value[[date]][[type]]
+    #' @importFrom pkgcond pkg_warning
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()
-      openness <- lapply(scenario_activities, private$add_activities)
 
-      # Apply the time-varying risks stored in risk_matrix
-      for (dd in seq_along(openness)) { # looping over dates
-        for (tt in private$activity_types) {
-          openness[[dd]][[tt]] <- openness[[dd]][[tt]] * self$risk_matrix[tt, dd]
-        }
-      }
+      # If no scenario is defined, we provide non-informative openness
+      if (length(scenario_activities) == 0) {
 
-      if (private$direction == "closing") {
-        openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
-      }
-
-      # Project into new age_groups if given
-      if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower) |>
-          t() |>          # To get the right dimensions
-          as.data.frame() # To enable the mapping below
-
-        # Get the population proportion in the new age groups
-        population <- private$map_population(age_cuts_lower)
-        proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
-
-        # Weight the population transformation matrix by the population proportion
-        p <- p * proportion
-
-        # Get the nested vectors, then compute the weighted average using `p` as weights
-        openness <- openness |>
-          purrr::map(
-            ~ purrr::map(
-              .,
-              ~ {
-                purrr::map2_dbl(as.data.frame(.), p, \(v, w) sum(v * w / sum(w))) |>
-                  stats::setNames(names(p))
-              }
-            )
+        # Check and warn if configuration has started (it is not complete since length(scenario_activities) == 0)
+        if (!is.null(private$activity_units)) {
+          misconfigured_diseasyactivity_warning <- paste(
+            "Activity scenario configuration started but not completed.",
+            "Providing default (non-informative) scenario openness."
           )
+          pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
+        }
+
+        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
+        age_labels <- age_cuts_lower |>
+          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = 0) |>
+          diseasystore::age_labels()
+
+
+        openness <- rep(1, length(age_labels)) |>    # All age groups are fully open
+          stats::setNames(age_labels) |>
+          list() |>
+          rep(length(private$activity_types)) |>     # ... across all arenas
+          stats::setNames(private$activity_types) |>
+          list() |>                                  # ... and nested to match output format
+          stats::setNames(as.Date(0))
+
+      } else { # otherwise, we compute the openness from the scenario
+
+        openness <- lapply(scenario_activities, private$add_activities)
+
+        # Apply the time-varying risks stored in risk_matrix
+        for (dd in seq_along(openness)) { # looping over dates
+          for (tt in private$activity_types) {
+            openness[[dd]][[tt]] <- openness[[dd]][[tt]] * self$risk_matrix[tt, dd]
+          }
+        }
+
+        if (private$direction == "closing") {
+          openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
+        }
+
+        # Project into new age_groups if given
+        if (!is.null(age_cuts_lower)) {
+          p <- private$population_transform_matrix(age_cuts_lower) |>
+            t() |>          # To get the right dimensions
+            as.data.frame() # To enable the mapping below
+
+          # Get the population proportion in the new age groups
+          population <- private$map_population(age_cuts_lower)
+          proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
+
+          # Weight the population transformation matrix by the population proportion
+          p <- p * proportion
+
+          # Get the nested vectors, then compute the weighted average using `p` as weights
+          openness <- openness |>
+            purrr::map(
+              ~ purrr::map(
+                .,
+                ~ {
+                  purrr::map2_dbl(as.data.frame(.), p, \(v, w) sum(v * w / sum(w))) |>
+                    stats::setNames(names(p))
+                }
+              )
+            )
+        }
       }
 
       # Weight if weights are given
@@ -499,55 +535,91 @@ DiseasyActivity <- R6::R6Class(                                                 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
                                 lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_class(self$contact_basis, "list", add = coll)
+      checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       scenario_contacts <- openness <- self$get_scenario_openness()
 
-      # Apply the age-stratified restrictions to the age-stratified contact matrices
-      for (dd in seq_along(openness)) { # looping over dates
-        for (tt in private$activity_types) {
-          # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a vector
-          # to a "herringbone" pattern matrix and multiplied element-wise to the baseline contact matrices.
-          # The choice of the "herringbone" pattern, is historical and ensures that openness matrices are additive.
-          # It means the order of adding activities and expanding from vector to matrix is commutative.
-          # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular
-          # age-group are applied for contacts from and to all younger age-groups.
-          # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
-          # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would be
-          # reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
-          # non-commutative.
-          scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
-            self$contact_basis$contacts[[tt]]
+      # If no scenario is defined, we provide non-informative contact matrices
+      if (length(self$get_scenario_activities()) == 0) {
+
+        # Check and warn if configuration has started (it is not complete since length(scenario_activities) == 0)
+        if (!is.null(private$activity_units)) {
+          misconfigured_diseasyactivity_warning <- paste(
+            "Activity scenario configuration started but not completed.",
+            "Providing default (non-informative) scenario contacts."
+          )
+          pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
         }
-      }
 
-      # Project into new age_groups if given
-      if (!is.null(age_cuts_lower)) {
-        p <- private$population_transform_matrix(age_cuts_lower)
+        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
+        age_labels <- age_cuts_lower |>
+          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = 0) |>
+          diseasystore::age_labels()
 
-        # To perform the projection, we need the number of persons in the new and original age groups
-        # Determine the population in the new age groups
-        population <- self$contact_basis$demography |>
-          dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
-          dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
-          dplyr::pull("population")
+        scenario_contacts <- matrix(
+          rep(
+            1 / (length(age_labels) * length(private$activity_types)), # Contacts are uniform across all age groups
+            length(age_labels) * length(age_labels)
+          ),
+          ncol = length(age_labels),
+          dimnames = list(age_labels, age_labels)
+        ) |>
+          list() |>
+          rep(length(private$activity_types)) |>     # ... across all arenas
+          stats::setNames(private$activity_types) |>
+          list() |>                                  # ... and nested to match output format
+          stats::setNames(as.Date(0))
 
-        # Store as a square matrix with the new population repeated as columns
-        N_new <- outer(population, rep(1, length(population)))                                                          # nolint: object_name_linter
+      } else { # otherwise, we compute the contact matrices from the scenario
 
-        # Determine the population in the original age groups and store as a matrix with population repeated as columns
-        N_original <- self$contact_basis$population                                                                     # nolint: object_name_linter
-        N_original <- outer(N_original, rep(1, length(N_original)))                                                     # nolint: object_name_linter
+        # Apply the age-stratified restrictions to the age-stratified contact matrices
+        for (dd in seq_along(openness)) { # looping over dates
+          for (tt in private$activity_types) {
+            # The openness (i.e. the fraction of contacts for each age-group that are active) are converted from a
+            # vector to a "herringbone" pattern matrix and multiplied element-wise to the baseline contact matrices.
+            # The choice of the "herringbone" pattern, is historical and ensures that openness matrices are additive.
+            # It means the order of adding activities and expanding from vector to matrix is commutative.
+            # The implication of the "herringbone" pattern is that age-stratified activity reductions for a particular
+            # age-group are applied for contacts from and to all younger age-groups.
+            # In contrast, one could assume that reductions are multiplicative in nature. E.g. if age-group i is
+            # restricted to 50 % and age-group j is restricted to 80 %, then contacts between age-groups i and j would
+            # be reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
+            # non-commutative.
+            scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
+              self$contact_basis$contacts[[tt]]
+          }
+        }
 
-        # For each contact matrix, m, in the scenario, we perform the transformation
-        # (p %*% (m * N_original) %*% t(p)) / N_new                                                                     # nolint: commented_code_linter
-        # As m is the number of contacts from each individual m * N_original scales to all contacts between age groups.
-        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-        # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
-        scenario_contacts <- scenario_contacts |>
-          lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
+        # Project into new age_groups if given
+        if (!is.null(age_cuts_lower)) {
+          p <- private$population_transform_matrix(age_cuts_lower)
 
+          # To perform the projection, we need the number of persons in the new and original age groups
+          # Determine the population in the new age groups
+          population <- self$contact_basis$demography |>
+            dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
+            dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
+            dplyr::pull("population")
+
+          # Store as a square matrix with the new population repeated as columns
+          N_new <- outer(population, rep(1, length(population)))                                                        # nolint: object_name_linter
+
+          # Determine the population in the original age groups and store as a matrix with population repeated
+          # as columns
+          N_original <- self$contact_basis$population                                                                   # nolint: object_name_linter
+          N_original <- outer(N_original, rep(1, length(N_original)))                                                   # nolint: object_name_linter
+
+          # For each contact matrix, m, in the scenario, we perform the transformation
+          # (p %*% (m * N_original) %*% t(p)) / N_new                                                                   # nolint: commented_code_linter
+          # As m is the number of contacts from each individual m * N_original scales to all contacts between
+          # age groups.
+          # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
+          # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
+          scenario_contacts <- scenario_contacts |>
+            lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
+        }
       }
 
       # Weight if weights are given
@@ -882,7 +954,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Early return
       # .. if no object is given
-      if (is.null(obj)) {
+      if (is.null(obj) || (length(obj) == 0) || missing(obj)) {
         return(obj)
       }
 
