@@ -67,6 +67,15 @@ The local copy of a variant module. Read-only.}
 
 \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
+
+\item{\code{training_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the training period. Read-only.}
+
+\item{\code{testing_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the testing period. Read-only.}
+
+\item{\code{validation_period}}{(\code{list}(\code{Date}))\cr
+The start and end dates of the validation period. Read-only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -75,7 +84,7 @@ The parameters used in the model. Read-only.}
 \itemize{
 \item \href{#method-DiseasyModel-new}{\code{DiseasyModel$new()}}
 \item \href{#method-DiseasyModel-get_results}{\code{DiseasyModel$get_results()}}
-\item \href{#method-DiseasyModel-get_training_data}{\code{DiseasyModel$get_training_data()}}
+\item \href{#method-DiseasyModel-get_data}{\code{DiseasyModel$get_data()}}
 \item \href{#method-DiseasyModel-clone}{\code{DiseasyModel$clone()}}
 }
 }
@@ -160,13 +169,13 @@ The primary method used to request model results of a given observable at a give
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide prediction for. Must match observable in \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
+\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
 
 \item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr Default NULL. If given, results are returned at the quantiles given.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 }
 \if{html}{\out{</div>}}
 }
@@ -175,21 +184,28 @@ A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the lev
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModel-get_training_data"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModel-get_training_data}{}}}
-\subsection{Method \code{get_training_data()}}{
+\if{html}{\out{<a id="method-DiseasyModel-get_data"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModel-get_data}{}}}
+\subsection{Method \code{get_data()}}{
 A method that returns training data for the models based on the model value of \code{training_length} and
 the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_training_data(observable, stratification = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_data(
+  observable,
+  stratification = NULL,
+  period = c("training", "testing", "validation")
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide prediction for. Must match observable in \code{DiseasyObservables} \link[R6:R6Class]{R6} class.}
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+
+\item{\code{period}}{(\code{character})\cr
+The period to return data for. That is, the training, testing or validation period.}
 }
 \if{html}{\out{</div>}}
 }

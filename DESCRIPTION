@@ -19,15 +19,15 @@ RoxygenNote: 7.3.2
 Language: en-GB
 LazyData: TRUE
 Depends:
-    diseasystore (>= 0.2.2),
+    diseasystore (>= 0.3),
     R (>= 3.5.0)
 Imports:
+    cachem,
     checkmate,
     digest,
     dplyr,
     glue,
     lgr,
-    lintr,
     lubridate,
     Matrix,
     pracma,
@@ -44,6 +44,7 @@ Suggests:
     duckdb,
     jsonlite,
     knitr,
+    lintr,
     readr,
     rmarkdown,
     RSQLite,

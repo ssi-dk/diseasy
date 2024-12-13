@@ -51,29 +51,57 @@ test_that("$hash works", {
 })
 
 
-test_that("$cache works", {
+caches <- list("default" = NULL, "manual" = cachem::cache_disk(), "option" = cachem::cache_disk())
+for (cache_id in seq_along(caches)) {
 
-  # Creating an empty module
-  m <- DiseasyBaseModule$new()
-  hash_new_instance <- m$hash
-  private <- m$.__enclos_env__$private
+  # Get the label for the test
+  cache_mode <- names(caches)[cache_id]
 
-  # Cache an item
-  private$cache("mtcars", mtcars)
-  expect_identical(m$hash, hash_new_instance)
+  # Configure the cache for the test
+  cache <- caches[[cache_id]]
 
-  # Try to retrieve a hash that does not exist
-  expect_error(private$cache("non_existent"),
-               class = "simpleError",
-               regex = "Hash not found in cache!")
+  if (cache_mode == "option") {
+    withr::local_options("diseasy.cache" = cache)
+    cache <- NULL
+  }
 
-  # Try to write to hash that exists
-  expect_error(private$cache("mtcars", utils::head(mtcars, 5)),
-               class = "simpleError",
-               regex = "Hash already found in cache!")
+  test_that(glue::glue("$cache works (with {cache_mode} cache)"), {
 
-  rm(m)
-})
+    # Creating an empty module
+    if (is.null(cache)) {
+      m <- DiseasyBaseModule$new()
+    } else {
+      m <- DiseasyBaseModule$new(cache = cache)
+    }
+    hash_new_instance <- m$hash
+    private <- m$.__enclos_env__$private
+
+    # Cache an item
+    private$cache("mtcars", mtcars)
+    expect_identical(m$hash, hash_new_instance)
+
+    # Try to retrieve a hash that does not exist
+    expect_error(
+      private$cache("non_existent"),
+      class = "simpleError",
+      regex = "Hash not found in cache!"
+    )
+
+    # Try to write to hash that exists
+    expect_error(
+      private$cache("mtcars", utils::head(mtcars, 5)),
+      class = "simpleError",
+      regex = "Hash already found in cache!"
+    )
+
+    # Empty cache after test
+    if (!is.null(cache)) {
+      m$.__enclos_env__$private$.cache$reset()
+    }
+
+    rm(m)
+  })
+}
 
 
 test_that("errors work", {
