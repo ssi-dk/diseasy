@@ -16,7 +16,7 @@ tests](https://github.com/ssi-dk/diseasy/actions/workflows/all-workflows.yaml/ba
 ## Overview
 
 Leveraging combinatorial building for ensemble forecasting in disease
-modelling
+modelling.
 
 ## The power of combinations
 
