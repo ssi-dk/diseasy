@@ -95,7 +95,7 @@ In addition, it provides useful utilities for the implementation of the model su
 The `DiseasyModel` class contains slots for instances of functional modules:
 
 ```{r generate_list_of_functional_modules, echo = FALSE, results = 'asis'}
-# We dynamically update this list, as new functional modules are added to DiseasyModel
+# We dynamically update this list as new functional modules are added to DiseasyModel
 purrr::keep(names(DiseasyModel$private_fields), ~ startsWith(., ".Diseasy")) |>
   purrr::map_chr(~ stringr::str_remove(., stringr::fixed(".Diseasy"))) |>
   purrr::map_chr(~
@@ -115,17 +115,17 @@ access the seasonal forcing $\sigma(t)$ via the call `self$season$model_t(t)`.
 stopifnot("model_t" %in% names(DiseasySeason$active))
 ```
 
-## Training data
-The `DiseasyModel` class also contains the method `$get_training_data()` that provides training data to the models.
+## Training, testing, and validation data
+The `DiseasyModel` class also contains the method `$get_data()` that provides training data to the models.
 
 This method interfaces with the `DiseasyObservables` module to provide data for an observable at some stratification
 level. The level of stratification is generally a flexible parameter that will be set by the user when requesting
 results from the model. For example, the user my request results at the country level or at the regional level.
 
-The helper method `$get_training_data()` will then provide the training data for the observable at the requested level.
-This data will contain one record for each time point in the training period, with columns for the date of the
-observation, the values of the different (optional) stratification, and the value of the observable on the date, and
-finally, an integer counter for the day relative to the end of the training period.
+The helper method `$get_data()` will then provide the training, testing, and validation data for the observable at the
+requested level. This data will contain one record for each time point in the corresponding period, with columns for the
+date of the observation, the values of the different (optional) stratification, and the value of the observable on the
+date, and finally, an integer counter for the day relative to the end of the period.
 
 ## Model-user interface
 Beyond providing access to the functional modules, `DiseasyModel` defines how the user will interface with the model.

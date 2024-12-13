@@ -138,7 +138,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     finalize = function() {
       # Look for contained Diseasy* classes and call finalize on these
       private |>
-        as.list() |>
+        as.list(all.names = TRUE) |>
         purrr::keep(~ inherits(., "DiseasyBaseModule")) |>
         purrr::discard(~ isTRUE(attr(., "clone"))) |>
         purrr::walk(~ .$finalize())
@@ -156,7 +156,13 @@ DiseasyBaseModule <- R6::R6Class(                                               
         # Capture module environment (parent of this environment)
         public_names <- ls(self) # public (fields and functions)
         public_names <- public_names[public_names != "hash"] # avoid recursion
-        public_env <- purrr::map(public_names, ~ purrr::pluck(self, .))
+        public_env <- public_names |>
+          purrr::map(~ {
+            # Some of the active bindings return informative errors when a module is
+            # not fully configured. This should not stop the hashing process, so we capture the
+            # errors and hash these instead
+            tryCatch(purrr::pluck(self, .), error = function(e) e)
+          })
         names(public_env) <- public_names
 
         # Iteratively map the public environment to hashes

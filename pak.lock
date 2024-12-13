@@ -36,6 +36,37 @@
       "repotype": "cranlike"
     },
     {
+      "ref": "assertthat",
+      "package": "assertthat",
+      "version": "0.2.1",
+      "type": "standard",
+      "direct": false,
+      "binary": true,
+      "dependencies": [],
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "assertthat",
+        "RemoteType": "standard",
+        "RemoteRef": "assertthat",
+        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+        "RemoteSha": "0.2.1"
+      },
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/assertthat_0.2.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/assertthat_0.2.1.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
+      "directpkg": false,
+      "license": "GPL-3",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "",
+      "sysreqs": "",
+      "sysreqs_packages": {},
+      "needscompilation": false,
+      "repotype": "cranlike"
+    },
+    {
       "ref": "backports",
       "package": "backports",
       "version": "1.5.0",
@@ -100,7 +131,7 @@
     {
       "ref": "bit",
       "package": "bit",
-      "version": "4.5.0",
+      "version": "4.5.0.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -112,10 +143,10 @@
         "RemoteRef": "bit",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "4.5.0"
+        "RemoteSha": "4.5.0.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/bit_4.5.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/bit_4.5.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/bit_4.5.0.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/bit_4.5.0.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -610,7 +641,7 @@
     {
       "ref": "curl",
       "package": "curl",
-      "version": "5.2.3",
+      "version": "6.0.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -622,10 +653,10 @@
         "RemoteRef": "curl",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "5.2.3"
+        "RemoteSha": "6.0.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/curl_5.2.3.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/curl_5.2.3.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/curl_6.0.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/curl_6.0.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -633,7 +664,7 @@
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
-      "sysreqs": "libcurl: libcurl-devel (rpm) or\n        libcurl4-openssl-dev (deb).",
+      "sysreqs": "libcurl (>= 7.62): libcurl-devel (rpm) or\n        libcurl4-openssl-dev (deb)",
       "sysreqs_packages": [
         {
           "sysreq": "libcurl",
@@ -871,11 +902,11 @@
     {
       "ref": "diseasystore",
       "package": "diseasystore",
-      "version": "0.2.2",
+      "version": "0.3.0",
       "type": "standard",
       "direct": false,
       "binary": true,
-      "dependencies": ["checkmate", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
+      "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "diseasystore",
@@ -883,10 +914,10 @@
         "RemoteRef": "diseasystore",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.2.2"
+        "RemoteSha": "0.3.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/diseasystore_0.2.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/diseasystore_0.2.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/diseasystore_0.3.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/diseasystore_0.3.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -964,10 +995,10 @@
     {
       "ref": "duckdb",
       "package": "duckdb",
-      "version": "1.1.2",
+      "version": "1.1.3-1",
       "type": "standard",
       "direct": false,
-      "binary": false,
+      "binary": true,
       "dependencies": "DBI",
       "vignettes": false,
       "metadata": {
@@ -975,24 +1006,29 @@
         "RemoteType": "standard",
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-        "RemotePkgPlatform": "source",
-        "RemoteSha": "1.1.2"
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+        "RemoteSha": "1.1.3-1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.1.2.tar.gz",
-      "target": "src/contrib/duckdb_1.1.2.tar.gz",
-      "platform": "source",
-      "rversion": "*",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.1.3-1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/duckdb_1.1.3-1.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
       "directpkg": false,
       "license": "MIT + file LICENSE",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
-      "sysreqs": "",
-      "sysreqs_packages": {},
-      "needscompilation": true,
-      "repotype": "cranlike",
-      "sha256": "1e14e39db3dc1c8b87ddd185c28deb4d11c3b073d3188852ab632339591c1825",
-      "filesize": 5222398
+      "sysreqs": "xz (for building from source)",
+      "sysreqs_packages": [
+        {
+          "sysreq": "xz",
+          "packages": "xz-utils",
+          "pre_install": {},
+          "post_install": {}
+        }
+      ],
+      "needscompilation": false,
+      "repotype": "cranlike"
     },
     {
       "ref": "ellipsis",
@@ -1121,7 +1157,7 @@
     {
       "ref": "fontawesome",
       "package": "fontawesome",
-      "version": "0.5.2",
+      "version": "0.5.3",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1133,10 +1169,10 @@
         "RemoteRef": "fontawesome",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.5.2"
+        "RemoteSha": "0.5.3"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/fontawesome_0.5.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/fontawesome_0.5.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/fontawesome_0.5.3.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/fontawesome_0.5.3.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1527,7 +1563,7 @@
     {
       "ref": "httr2",
       "package": "httr2",
-      "version": "1.0.5",
+      "version": "1.0.7",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1539,10 +1575,10 @@
         "RemoteRef": "httr2",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.0.5"
+        "RemoteSha": "1.0.7"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/httr2_1.0.5.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/httr2_1.0.5.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/httr2_1.0.7.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/httr2_1.0.7.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1800,7 +1836,7 @@
     {
       "ref": "knitr",
       "package": "knitr",
-      "version": "1.48",
+      "version": "1.49",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1812,10 +1848,10 @@
         "RemoteRef": "knitr",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.48"
+        "RemoteSha": "1.49"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/knitr_1.48.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/knitr_1.48.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/knitr_1.49.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/knitr_1.49.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1838,7 +1874,7 @@
     {
       "ref": "later",
       "package": "later",
-      "version": "1.3.2",
+      "version": "1.4.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1850,10 +1886,10 @@
         "RemoteRef": "later",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.3.2"
+        "RemoteSha": "1.4.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/later_1.3.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/later_1.3.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/later_1.4.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/later_1.4.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2018,7 +2054,7 @@
     {
       "ref": "lubridate",
       "package": "lubridate",
-      "version": "1.9.3",
+      "version": "1.9.4",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2030,10 +2066,10 @@
         "RemoteRef": "lubridate",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.9.3"
+        "RemoteSha": "1.9.4"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/lubridate_1.9.3.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/lubridate_1.9.3.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/lubridate_1.9.4.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/lubridate_1.9.4.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2211,7 +2247,7 @@
     {
       "ref": "parallelly",
       "package": "parallelly",
-      "version": "1.38.0",
+      "version": "1.40.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2223,10 +2259,10 @@
         "RemoteRef": "parallelly",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.38.0"
+        "RemoteSha": "1.40.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.38.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.38.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.40.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.40.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2293,6 +2329,37 @@
       "rversion": "4.4",
       "directpkg": false,
       "license": "MIT + file LICENSE",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "",
+      "sysreqs": "",
+      "sysreqs_packages": {},
+      "needscompilation": false,
+      "repotype": "cranlike"
+    },
+    {
+      "ref": "pkgcond",
+      "package": "pkgcond",
+      "version": "0.1.1",
+      "type": "standard",
+      "direct": false,
+      "binary": true,
+      "dependencies": "assertthat",
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "pkgcond",
+        "RemoteType": "standard",
+        "RemoteRef": "pkgcond",
+        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+        "RemoteSha": "0.1.1"
+      },
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/pkgcond_0.1.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/pkgcond_0.1.1.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
+      "directpkg": false,
+      "license": "GPL-2",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
@@ -2559,7 +2626,7 @@
     {
       "ref": "promises",
       "package": "promises",
-      "version": "1.3.0",
+      "version": "1.3.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2571,10 +2638,10 @@
         "RemoteRef": "promises",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.3.0"
+        "RemoteSha": "1.3.2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/promises_1.3.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/promises_1.3.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/promises_1.3.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/promises_1.3.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2861,37 +2928,6 @@
       "repotype": "cranlike"
     },
     {
-      "ref": "rematch2",
-      "package": "rematch2",
-      "version": "2.1.2",
-      "type": "standard",
-      "direct": false,
-      "binary": true,
-      "dependencies": "tibble",
-      "vignettes": false,
-      "metadata": {
-        "RemotePkgRef": "rematch2",
-        "RemoteType": "standard",
-        "RemoteRef": "rematch2",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.1.2"
-      },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rematch2_2.1.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rematch2_2.1.2.tar.gz",
-      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-      "rversion": "4.4",
-      "directpkg": false,
-      "license": "MIT + file LICENSE",
-      "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "params": [],
-      "install_args": "",
-      "sysreqs": "",
-      "sysreqs_packages": {},
-      "needscompilation": false,
-      "repotype": "cranlike"
-    },
-    {
       "ref": "remotes",
       "package": "remotes",
       "version": "2.5.0",
@@ -2994,7 +3030,7 @@
     {
       "ref": "rmarkdown",
       "package": "rmarkdown",
-      "version": "2.28",
+      "version": "2.29",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3006,10 +3042,10 @@
         "RemoteRef": "rmarkdown",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.28"
+        "RemoteSha": "2.29"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rmarkdown_2.28.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rmarkdown_2.28.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rmarkdown_2.29.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rmarkdown_2.29.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3094,7 +3130,7 @@
     {
       "ref": "RSQLite",
       "package": "RSQLite",
-      "version": "2.3.7",
+      "version": "2.3.9",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3106,10 +3142,10 @@
         "RemoteRef": "RSQLite",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.3.7"
+        "RemoteSha": "2.3.9"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/RSQLite_2.3.7.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/RSQLite_2.3.7.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/RSQLite_2.3.9.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/RSQLite_2.3.9.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3524,7 +3560,7 @@
     {
       "ref": "testthat",
       "package": "testthat",
-      "version": "3.2.1.1",
+      "version": "3.2.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3536,10 +3572,10 @@
         "RemoteRef": "testthat",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "3.2.1.1"
+        "RemoteSha": "3.2.2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/testthat_3.2.1.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/testthat_3.2.1.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/testthat_3.2.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/testthat_3.2.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3555,7 +3591,7 @@
     {
       "ref": "textshaping",
       "package": "textshaping",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3567,10 +3603,10 @@
         "RemoteRef": "textshaping",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.4.0"
+        "RemoteSha": "0.4.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/textshaping_0.4.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/textshaping_0.4.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/textshaping_0.4.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/textshaping_0.4.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3822,7 +3858,7 @@
     {
       "ref": "usethis",
       "package": "usethis",
-      "version": "3.0.0",
+      "version": "3.1.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3834,10 +3870,10 @@
         "RemoteRef": "usethis",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "3.0.0"
+        "RemoteSha": "3.1.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/usethis_3.0.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/usethis_3.0.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/usethis_3.1.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/usethis_3.1.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3946,11 +3982,11 @@
     {
       "ref": "waldo",
       "package": "waldo",
-      "version": "0.5.3",
+      "version": "0.6.1",
       "type": "standard",
       "direct": false,
       "binary": true,
-      "dependencies": ["cli", "diffobj", "glue", "rematch2", "rlang", "tibble"],
+      "dependencies": ["cli", "diffobj", "glue", "rlang"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "waldo",
@@ -3958,10 +3994,10 @@
         "RemoteRef": "waldo",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.5.3"
+        "RemoteSha": "0.6.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/waldo_0.5.3.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/waldo_0.5.3.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/waldo_0.6.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/waldo_0.6.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4298,8 +4334,8 @@
     "version": "22.04",
     "url": {},
     "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install libx11-dev git libcurl4-openssl-dev libssl-dev make libgit2-dev zlib1g-dev pandoc libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
+    "install_scripts": "apt-get -y install libx11-dev git libcurl4-openssl-dev libssl-dev xz-utils make libgit2-dev zlib1g-dev pandoc libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
     "post_install": {},
-    "packages": ["libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
+    "packages": ["libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "xz-utils", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
   }
 }

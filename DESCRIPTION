@@ -20,7 +20,7 @@ RoxygenNote: 7.3.2
 Language: en-GB
 LazyData: TRUE
 Depends:
-    diseasystore (>= 0.2.2),
+    diseasystore (>= 0.3),
     R (>= 3.5.0)
 Imports:
     BB,
@@ -63,5 +63,5 @@ Suggests:
     withr,
     zoo
 VignetteBuilder: knitr,
-URL: https://github.com/ssi-dk/diseasy
+URL: https://github.com/ssi-dk/diseasy, https://ssi-dk.github.io/diseasy/
 BugReports: https://github.com/ssi-dk/diseasy/issues

@@ -12,6 +12,7 @@ backends
 bitemporal
 
 catalog
+cetera
 cdot
 classname
 cloneable
@@ -58,6 +59,7 @@ ECDC
 Eggo
 endblock
 Engbo
+epiverse
 erviss
 
 FeatureHandler
@@ -78,6 +80,7 @@ ILI
 infty
 Institut
 int
+io
 
 ji
 Jit
@@ -87,6 +90,7 @@ Kirkeby
 kt
 
 Lasse
+linelist
 linter
 linters
 lintr
@@ -118,10 +122,12 @@ pcbi
 pid
 Plesner
 PLoS
+pnr
 POSIXct
 PostgreSQL
 
 quos
+quosures
 
 R's
 Randl
@@ -136,6 +142,7 @@ SCDB
 Schou
 SEIR
 sigmoidal
+simulist
 Skytte
 spg
 SSI
@@ -143,6 +150,7 @@ Statens
 sql
 SQLite
 
+Tamayo
 tbl
 Telkamp
 textrm
@@ -157,6 +165,7 @@ ucminf
 
 vec
 
+walkthrough
 www
 
 Zandvoort

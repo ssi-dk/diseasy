@@ -7,21 +7,24 @@
 #'   will therefore depend on the data made available by the diseasystores.
 #'
 #'   See vignette("diseasy-observables")
-#' @examplesIf rlang::is_installed("RSQLite")
-#'   # Create observables module using the Google COVID-19 data
-#'   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
-#'                                 conn = DBI::dbConnect(RSQLite::SQLite()))
+#' @examplesIf rlang::is_installed("duckdb")
+#'   # Create observables module using the Simulist data
+#'   obs <- DiseasyObservables$new(
+#'     diseasystore = "Simulist",
+#'     conn = DBI::dbConnect(duckdb::duckdb())
+#'   )
 #'
 #'   # See available observables
 #'   print(obs$available_observables)
 #'   print(obs$available_stratifications)
 #'
 #'   # Get data for one observable
-#'   \dontrun{
-#'   obs$get_observation("n_hospital",
-#'                       start_date = as.Date("2020-03-01"),
-#'                       end_date = as.Date("2020-03-05"))
-#'   }
+#'   obs$get_observation(
+#'     "n_hospital",
+#'     start_date = as.Date("2020-03-01"),
+#'     end_date = as.Date("2020-03-05")
+#'   )
+#'
 #'   rm(obs)
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
@@ -249,9 +252,8 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @description
     #'   Handles the clean-up of the class
     finalize = function() {
-
       # Close the connection, then do rest of clean-up
-      if (DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
+      if (!isTRUE(attr(self, "clone")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
       super$finalize()
     }
   ),
