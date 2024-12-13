@@ -119,7 +119,7 @@ NULL
 #'    - `strategy`: The strategy employed for optimisation.
 #'      One of: "naive", "recursive" or "combination".
 #'  - `penalty`: Were unit penalties (`monotonous` and `individual_level`) added to the objective function?
-#'  - `N`: The number of compartments.
+#'  - `M`: The number of compartments.
 #'  - `value`: The smallest determined value of the objective function for the optimiser.
 #'  - `execution_time`: The time spent by the optimiser.
 #'  - `optim_method`: A human-readable label of the optimiser configuration.

@@ -74,7 +74,7 @@ In addition, we allocate a time limit to each algorithm in each round. If the ex
 the algorithm is "eliminated" and no more computation is done for the algorithm. Note that this is done on per method
 basis as we know the optimisation algorithms fare differently on the different methods for approximation.
 
-Once the round is complete, we update the list of eliminated algorithms and the we run the optimisation of $N+1$ with
+Once the round is complete, we update the list of eliminated algorithms and the we run the optimisation of $M + 1$ with
 the reduced set of algorithms.
 
 The entire optimisation process is run both without penalty (`monotonous = 0` and `individual_level = 0`) and with a
@@ -119,7 +119,7 @@ To get an overview of the best performing optimisers, we present the an aggregat
 below.
 Here we present the top 5 "best" optimiser/strategy combination for each method and penalty setting.
 To define what it means to be the "best" we simply take the total integral difference between the approximation
-and the target function across all target functions and problem sizes ($N$).
+and the target function across all target functions and problem sizes ($M$).
 
 Note that we currently filter out the results from the Heaviside and Linear targets seems to be especially difficult
 for the optimisers to handle (see the [Per target results](#per-target-results) section below).

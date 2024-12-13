@@ -49,7 +49,7 @@ time_scales <- c(rep(20, length(f)), rep(20, length(g)), rep(40, length(h)))
 ## Optimisation helper
 
 # Below we implement a optimisation helper that:
-# 1: Unpacks the problem configuration (N, method, optimisation algorithm, etc)
+# 1: Unpacks the problem configuration (M, method, optimisation algorithm, etc)
 # 2: Configures the `DiseasyImmunity` instance
 # 3: Runs and stores the approximation to disk
 optimiser <- function(combinations, monotonous, individual_level, cache, ordering, future_scheduling = 1) {
@@ -87,7 +87,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
           strategy <- combination[[1]][[3]]
 
           # Unpack problem size and optimisation algorithm
-          N <- combination[[1]][[4]]                                                                                    # nolint: object_name_linter
+          M <- combination[[1]][[4]]                                                                                    # nolint: object_name_linter
           optim_control <- combination[[1]][[5]]
 
           # Determine the "label" for the optimisation algorithm
@@ -105,7 +105,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
 
           # Generate approximations and store them
-          key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{N}")
+          key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{M}")
 
           # Get the results up until now
           current_approximations <- cache$get(key = key)
@@ -118,7 +118,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
                 approx <- im_p$approximate_compartmental(
                   method = method,
                   strategy = strategy,
-                  N = N,
+                  M = M,
                   monotonous = monotonous,
                   individual_level = individual_level,
                   optim_control = optim_control
@@ -170,14 +170,14 @@ for (penalty in c(0, 1)) {
   if (summery_file_exists) {
     current_results <- diseasy_immunity_optimiser_results |>
       dplyr::filter(.data$penalty == !!penalty) |>
-      dplyr::select("optim_method", "target_label", "method", "strategy", "N")
+      dplyr::select("optim_method", "target_label", "method", "strategy", "M")
   } else {
     current_results <- tibble::tibble(
       "optim_method" = character(0),
       "target_label" = character(0),
       "method" = character(0),
       "strategy" = character(0),
-      "N" = numeric(0)
+      "M" = numeric(0)
     )
   }
 
@@ -288,8 +288,8 @@ for (penalty in c(0, 1)) {
   zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 
 
-  for (N in seq(from = 2, to = 10)) {
-    message(glue::glue("N = {N}"))
+  for (M in seq(from = 2, to = 10)) {
+    message(glue::glue("M = {M}"))
 
     combinations <- tidyr::expand_grid(
       "model" = zip(models, model_names, time_scales),
@@ -297,7 +297,7 @@ for (penalty in c(0, 1)) {
         "free_delta-naive", "free_gamma-naive", "all_free-naive", "all_free-combination",
         "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
       ),
-      "N" = N,
+      "M" = M,
       "optim_method" = optim_labels
     ) |>
       dplyr::mutate("target_label" = purrr::map_chr(.data$model, ~ purrr::pluck(., 2))) |>
@@ -307,7 +307,7 @@ for (penalty in c(0, 1)) {
         names = c("method", "strategy")
       ) |>
       dplyr::inner_join(candidates, by = c("optim_method", "target_label", "method", "strategy")) |>
-      dplyr::anti_join(current_results, by = c("optim_method", "target_label", "method", "strategy", "N")) |>
+      dplyr::anti_join(current_results, by = c("optim_method", "target_label", "method", "strategy", "M")) |>
       dplyr::left_join(optim_configs, by = "optim_method")
 
     # Run the approximations for the round
@@ -315,7 +315,7 @@ for (penalty in c(0, 1)) {
       purrr::pmap(~ zip(list(..1), ..2, ..3, ..4, list(..7)))
 
     # Since we have very uneven workloads, we need to balance the load on the workers
-    if (N == 2) {
+    if (M == 2) {
       # For the first round, we use no balancing
       ordering <- NULL
     } else {
@@ -348,7 +348,7 @@ for (penalty in c(0, 1)) {
 
 
     # Gather the results for the round and eliminate stragglers
-    round_results <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{N}.rds")) |>
+    round_results <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds")) |>
       purrr::map(\(file) {
         tmp <- file.path(path, file) |>
           readRDS()
@@ -356,7 +356,7 @@ for (penalty in c(0, 1)) {
         tmp |>
           purrr::imap(\(approx, target_label) {
             approx |>
-              purrr::keep_at(c("method", "strategy", "N", "value", "execution_time")) |>
+              purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
               modifyList(list("target_label" = target_label))
           }) |>
           purrr::list_transpose() |>
@@ -376,7 +376,7 @@ for (penalty in c(0, 1)) {
 
     # Eliminate too slow candidates
     candidates <- round_results |>
-      dplyr::filter(.data$execution_time < 60 * !!N) |>
+      dplyr::filter(.data$execution_time < 60 * !!M) |>
       dplyr::select("optim_method", "target_label", "method", "strategy")
   }
 }
@@ -392,7 +392,7 @@ results <- list.files(path) |>
     tmp |>
       purrr::imap(\(approx, target) {
         approx |>
-          purrr::keep_at(c("method", "strategy", "N", "value", "execution_time")) |>
+          purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
           modifyList(list("target_label" = target))
       }) |>
       purrr::list_transpose() |>
@@ -428,8 +428,8 @@ results <- results |>
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
-  dplyr::filter(.data$execution_time > 60 * .data$N) |>
-  dplyr::slice_min(N, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::filter(.data$execution_time > 60 * .data$M) |>
+  dplyr::slice_min(M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::transmute(
     .data$optim_method,
     .data$target,
@@ -437,13 +437,13 @@ round_eliminated <- results |>
     .data$method,
     .data$strategy,
     .data$penalty,
-    "N_eliminated" = .data$N
+    "M_eliminated" = .data$M
   )
 
 should_have_been_eliminated <- results |>
   dplyr::left_join(round_eliminated, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::filter(
-    .data$N_eliminated < .data$N,
+    .data$N_eliminated < .data$M,
     .by = c("optim_method", "target", "variation", "method", "strategy", "penalty")
   )
 
@@ -453,16 +453,16 @@ results <- dplyr::anti_join(
   results,
   dplyr::select(
     should_have_been_eliminated,
-    "optim_method", "target", "variation", "method", "strategy", "penalty", "N"
+    "optim_method", "target", "variation", "method", "strategy", "penalty", "M"
   ),
-  by = c("optim_method", "target", "variation", "method", "strategy", "penalty", "N")
+  by = c("optim_method", "target", "variation", "method", "strategy", "penalty", "M")
 )
 
 
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
-  dplyr::slice_max(.data$N, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
-  dplyr::filter(.data$execution_time < 60 * .data$N, .data$N < 10)
+  dplyr::slice_max(.data$M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10)
 
 print(should_not_have_been_eliminated)
 
@@ -470,11 +470,11 @@ print(should_not_have_been_eliminated)
 # Re-arrange the columns
 results <- results |>
   dplyr::select(
-    "target", "variation", "method", "strategy", "penalty", "N", "value", "execution_time", dplyr::everything()
+    "target", "variation", "method", "strategy", "penalty", "M", "value", "execution_time", dplyr::everything()
   ) |>
   dplyr::arrange(
     .data$optim_method,
-    .data$N,
+    .data$M,
     .data$penalty,
     .data$target,
     .data$variation,

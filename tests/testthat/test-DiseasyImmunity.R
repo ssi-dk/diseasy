@@ -512,19 +512,19 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   # Set the exponential waning model
   im$set_exponential_waning()
 
-  # Test the approximations for N = 1 to N = 3 using defaults
+  # Test the approximations for M = 1 to M = 3 using defaults
   test_combinations <- tidyr::expand_grid(
-    N = seq(1, 3),
+    M = seq(1, 3),
     method = c("free_delta", "free_gamma", "all_free")
   )
 
-  purrr::pwalk(test_combinations, \(N, method) {                                                                        # nolint: object_name_linter
-    expect_no_error(im$approximate_compartmental(N = !!N, method = !!method))
+  purrr::pwalk(test_combinations, \(M, method) {                                                                        # nolint: object_name_linter
+    expect_no_error(im$approximate_compartmental(M = !!M, method = !!method))
   })
 
   # Test all combinations of method and strategy
   test_combinations <- tidyr::expand_grid(
-    N = seq(1, 3),
+    M = seq(1, 3),
     method_label = c(
       "free_delta-naive", "free_gamma-naive", "all_free-naive",
       "free_delta-recursive", "free_gamma-recursive", "all_free-recursive",
@@ -533,8 +533,8 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   ) |>
     tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
 
-  purrr::pwalk(test_combinations, \(N, method, strategy) {                                                              # nolint: object_name_linter
-    expect_no_error(im$approximate_compartmental(N = !!N, method = !!method, strategy = !!strategy))
+  purrr::pwalk(test_combinations, \(M, method, strategy) {                                                              # nolint: object_name_linter
+    expect_no_error(im$approximate_compartmental(M = !!M, method = !!method, strategy = !!strategy))
   })
 
 
@@ -547,12 +547,12 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
   # In this test, we check that the "recursive" and "combination" strategies
   # uses the cache optimally by checking that we have the cache hits we expect.
   # Internally, these strategies calls "$approximate_compartmental()" for a
-  # different configuration. For example the recursive strategy calls for N - 1.
-  # If our cache hits are working as expected, we should not need to recompute for N - 1
+  # different configuration. For example the recursive strategy calls for M - 1.
+  # If our cache hits are working as expected, we should not need to recompute for M - 1
   # if we already have computed for this value.
 
   # To check that this works as expected, we create a new cache and runs the approximations
-  # from N = 2 to N = 3. We then check that the number of items in the cache is as expected.
+  # from M = 2 to M = 3. We then check that the number of items in the cache is as expected.
   # If we did not hit a cache, we will have more items in the cache than optimally
 
   # Create a temporary cache
@@ -566,19 +566,19 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
 
   # Test all combinations of method and strategy
   test_combinations <- tidyr::expand_grid(
-    N = seq(2, 3),
+    M = seq(2, 3),
     method_label = c("free_delta-recursive", "free_gamma-recursive", "all_free-recursive", "all_free-combination")
   ) |>
     tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
 
-  purrr::pwalk(test_combinations, \(N, method, strategy) {                                                              # nolint: object_name_linter
-    im$approximate_compartmental(N = N, method = method, strategy = strategy)
+  purrr::pwalk(test_combinations, \(M, method, strategy) {                                                              # nolint: object_name_linter
+    im$approximate_compartmental(M = M, method = method, strategy = strategy)
   })
 
-  # "free_delta-recursive": generates 2 items in the cache (N = 2 and N = 3)
-  # "free_gamma-recursive": generates 2 items in the cache (N = 2 and N = 3)
-  # "all_free-recursive":   generates 2 items in the cache (N = 2 and N = 3)
-  # "all_free-combination": generates 2 items in the cache (N = 2 and N = 3) and generates two
+  # "free_delta-recursive": generates 2 items in the cache (M = 2 and M = 3)
+  # "free_gamma-recursive": generates 2 items in the cache (M = 2 and M = 3)
+  # "all_free-recursive":   generates 2 items in the cache (M = 2 and M = 3)
+  # "all_free-combination": generates 2 items in the cache (M = 2 and M = 3) and generates two
   #                         corresponding free_gamma items in the cache with the "naive" strategy ("free_gamma" default)
   # In total, we expect 10 items in the cache
   # If we have more, a cache have been missed
@@ -598,7 +598,7 @@ test_that("Waning models must not be divergent in `$approximate_compartmental()`
 
   # Check we get error
   expect_error(
-    im$approximate_compartmental(N = 3, method = "free_delta"),
+    im$approximate_compartmental(M = 3, method = "free_delta"),
     "The waning function(s) must have finite values at infinity",
     fixed = TRUE
   )
@@ -610,7 +610,7 @@ test_that("Waning models must not be divergent in `$approximate_compartmental()`
 
   # Check we get error
   expect_error(
-    im$approximate_compartmental(N = 3, method = "free_delta"),
+    im$approximate_compartmental(M = 3, method = "free_delta"),
     "The waning function(s) must have finite values at infinity",
     fixed = TRUE
   )
