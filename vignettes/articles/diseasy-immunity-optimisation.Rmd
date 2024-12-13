@@ -98,7 +98,9 @@ best_optim_results <- results |>
     "n_targets" = dplyr::n(),
     .by = c("target", "method", "penalty", "optim_method", "strategy")
   ) |>
-  dplyr::filter(.data$n_targets == max(.data$n_targets), .by = c("target", "method", "penalty"))
+  dplyr::filter(
+    .data$n_targets == max(.data$n_targets), .by = c("target", "method", "penalty")
+  )
 
 
 # Adjust the labels
@@ -106,12 +108,15 @@ best_optim_results <- best_optim_results |>
   dplyr::mutate(
     "target" = factor(
       .data$target,
-      levels = c("exponential", "exp_sum", "sigmoidal", "linear", "heaviside"),
-      labels = c("Exponential", "Sum of exponentials", "Sigmoidal", "Linear", "Heaviside")
+      levels = c(
+        "exponential", "exp_sum", "sigmoidal", "linear", "heaviside"
+      ),
+      labels = c(
+        "Exponential", "Sum of exponentials", "Sigmoidal", "Linear", "Heaviside"
+      )
     ),
     "penalty" = dplyr::if_else(.data$penalty, "yes", "no")
   )
-
 ```
 
 ## Global results
@@ -275,7 +280,9 @@ total_results |>
       rows = 6
     )
   ) |>
-  gt::tab_caption("Table 1: Global results (excluding heaviside and linear targets)") |>
+  gt::tab_caption(
+    "Table 1: Global results (excluding heaviside and linear targets)"
+  ) |>
   bold_min_value() |>
   add_footnote()
 ```
@@ -311,8 +318,14 @@ per_target_results <- best_optim_results |>
 
 # Split per target
 split_data <- per_target_results |>
-  dplyr::slice_min(tibble::tibble(value, execution_time), n = 3, by = c("target", "method", "penalty")) |>
-  dplyr::select("target", "penalty", "method", "strategy", "value", "optim_method") |>
+  dplyr::slice_min(
+    tibble::tibble(value, execution_time),
+    n = 3,
+    by = c("target", "method", "penalty")
+  ) |>
+  dplyr::select(
+    "target", "penalty", "method", "strategy", "value", "optim_method"
+  ) |>
   dplyr::arrange(.data$target, .data$method, .data$value) |>
   dplyr::group_split(.data$target)
 
@@ -390,7 +403,9 @@ gt_tables <- split_data |>
         )
       ) |>
       gt::cols_hide("target") |>
-      gt::tab_caption(paste0("Table ", .y + 1, ": Results for ", .x$target[[1]], " target"))
+      gt::tab_caption(
+        paste0("Table ", .y + 1, ": Results for ", .x$target[[1]], " target")
+      )
   )
 
 purrr::walk(gt_tables, ~ print(add_footnote(bold_min_value(.x))))

@@ -20,9 +20,13 @@ library(diseasy)
 
 ```{r vignette configuration}
 # Create a cache for this vignette since the examples takes time to generate.
-# We will destroy the cache if the source code for `DiseasyObservables` or `diseasystore` changes
+# We will destroy the cache if the source code for `DiseasyObservables`
+# or `diseasystore` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-observables")
-source_code_hash <- digest::digest(list(DiseasyObservables, packageVersion("diseasystore")))
+source_code_hash <- digest::digest(
+  list(DiseasyObservables, packageVersion("diseasystore"))
+)
+
 if (!identical(source_code_hash, cache$get("source-code-hash"))) {
   cache$reset()
   cache$set("source-code-hash", source_code_hash)
@@ -31,7 +35,7 @@ if (!identical(source_code_hash, cache$get("source-code-hash"))) {
 opts <- options(
   "tibble.print_min" = 5,
   "diseasy.logging" = FALSE,
-  "diseasy.DiseasyObservables.cache" = cache # Cache for 24 hours
+  "diseasy.DiseasyObservables.cache" = cache
 )
 
 # We have a "hard" dependency for RSQLite to render this vignette
@@ -40,7 +44,11 @@ suggests_available <- rlang::is_installed("RSQLite")
 
 ```{r download, include = FALSE, eval = suggests_available}
 # Download the first n rows of the Google data set of interest
-tmp_dir <- stringr::str_replace_all(tempdir(), stringr::fixed(r"{\\}"), .Platform$file.sep)
+tmp_dir <- stringr::str_replace_all(
+  tempdir(),
+  stringr::fixed(r"{\\}"),
+  .Platform$file.sep
+)
 remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 
