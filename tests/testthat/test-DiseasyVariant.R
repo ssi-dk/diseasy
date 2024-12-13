@@ -101,13 +101,13 @@ test_that("active binding: cross_immunity works", {
   var <- DiseasyVariant$new()
 
   # Retrieve the cross_immunity
-  expect_equal(var %.% cross_immunity, matrix(1))
+  expect_identical(var %.% cross_immunity, matrix(1))
 
   # Try to set the cross_immunity
   # test_that cannot capture this error, so we have to hack it
   expect_identical(tryCatch(var$cross_immunity <- matrix(2), error = \(e) e),                                           # nolint: implicit_assignment_linter
                    simpleError("`$cross_immunity` is read only"))
-  expect_equal(var %.% cross_immunity, matrix(1))
+  expect_identical(var %.% cross_immunity, matrix(1))
 
   rm(var)
 })
