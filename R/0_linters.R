@@ -8,12 +8,26 @@
 #' @return A list of linters
 #' @noRd
 diseasy_code_linters <- function() {
-  linters <- list(
-    nolint_position_linter(length = 120L),
-    nolint_line_length_linter(length = 120L),
-    non_ascii_linter(),
-    param_and_field_linter(),
-    documentation_template_linter()
+  linters <- c(
+    list(
+      "nolint_position_linter" = nolint_position_linter(length = 120L),
+      "nolint_line_length_linter" = nolint_line_length_linter(length = 120L),
+      "non_ascii_linter" = non_ascii_linter(),
+      "param_and_field_linter" = param_and_field_linter(),
+      "documentation_template_linter" = documentation_template_linter()
+    ),
+    lintr::all_linters(
+      line_length_linter = NULL,          # We use 120, nolint-aware line length linter instead
+      cyclocomp_linter = NULL,            # Not required in diseasy style guide
+      keyword_quote_linter = NULL,        # Not required in diseasy style guide
+      implicit_integer_linter = NULL,     # Not required in diseasy style guide
+      extraction_operator_linter = NULL,  # Fails for .data$*
+      nonportable_path_linter = NULL,     # Any \\ is flagged. Therefore fails when escaping backslashes
+      undesirable_function_linter = NULL, # Library calls in vignettes are flagged and any call to options
+      unnecessary_lambda_linter = NULL,   # Fails for purrr::map with additional function arguments
+      strings_as_factors_linter = NULL,   # Seems to be some backwards compatibility stuff.
+      expect_identical_linter = NULL      # Seems a little aggressive to require this.
+    )
   )
 
   return(linters)
@@ -323,7 +337,7 @@ param_and_field_linter <- function() {
 #' @importFrom rlang .data
 #' @noRd
 documentation_template_linter <- function() {
-  general_msg <- paste("Documentation templates should used if available")
+  general_msg <- paste("Documentation templates should used if available.")
 
   lintr::Linter(
     function(source_expression) {
