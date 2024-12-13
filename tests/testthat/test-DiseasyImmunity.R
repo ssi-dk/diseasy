@@ -4,7 +4,7 @@ test_that("initialize works", {
   im <- DiseasyImmunity$new()
 
   # By default, not waning should be set
-  expect_equal(im$model, im$set_no_waning())
+  expect_equal(im$model, im$set_no_waning())                                                                            # nolint: expect_identical_linter. Functions have different environments
 
   rm(im)
 })
@@ -170,7 +170,7 @@ test_that("`$set_waning_model()` works for all available models", {
     expect_no_error(im_indirect$set_waning_model(model_name))
 
     # Check that the models are the same
-    expect_equal(im_direct$model, im_indirect$model)
+    expect_equal(im_direct$model, im_indirect$model)                                                                    # nolint: expect_identical_linter. Functions have different environments
   }
 
 
@@ -184,7 +184,7 @@ test_that("`$set_waning_model()` works for all available models", {
     expect_no_error(im_indirect$set_waning_model(model_name, target = "non_default_target"))
 
     # Check that the models are the same
-    expect_equal(im_direct$model, im_indirect$model)
+    expect_equal(im_direct$model, im_indirect$model)                                                                    # nolint: expect_identical_linter. Functions have different environments
   }
 
 
@@ -207,7 +207,7 @@ test_that("`$set_waning_model()` works for all available models", {
     expect_no_error(im_indirect$set_waning_model(model_name, time_scale = default_time_scale + 10))
 
     # Check that the models are the same
-    expect_equal(im_direct$model, im_indirect$model)
+    expect_equal(im_direct$model, im_indirect$model)                                                                    # nolint: expect_identical_linter. Functions have different environments
   }
 
   # Attempt to set with time scale for no_waning model
@@ -230,13 +230,13 @@ test_that("`$set_waning_model()` works for all available models", {
   expect_no_error(im_indirect$set_waning_model("custom_waning", custom_function = custom_function_1))
 
   # Check that the models are the same
-  expect_equal(im_direct$model, im_indirect$model)
+  expect_equal(im_direct$model, im_indirect$model)                                                                      # nolint: expect_identical_linter. Functions have different environments
 
 
   # Set the model via `$set_waning_model()` but supplying the function directly
   # this should internally call "$set_custom_waning()" as above
   expect_no_error(im_indirect$set_waning_model(custom_function_1))
-  expect_equal(im_direct$model, im_indirect$model)
+  expect_equal(im_direct$model, im_indirect$model)                                                                      # nolint: expect_identical_linter. Functions have different environments
 
 
   ## - with a different target
@@ -249,12 +249,12 @@ test_that("`$set_waning_model()` works for all available models", {
   )
 
   # Check that the models are the same
-  expect_equal(im_direct$model, im_indirect$model)
+  expect_equal(im_direct$model, im_indirect$model)                                                                      # nolint: expect_identical_linter. Functions have different environments
 
 
   # Set the model via `$set_waning_model()` but supplying the function directly
   expect_no_error(im_indirect$set_waning_model(custom_function_1, target = "non_default_target"))
-  expect_equal(im_direct$model, im_indirect$model)
+  expect_equal(im_direct$model, im_indirect$model)                                                                      # nolint: expect_identical_linter. Functions have different environments
 
 
   ## - with a different time_scale
@@ -267,12 +267,12 @@ test_that("`$set_waning_model()` works for all available models", {
   )
 
   # Check that the models are the same
-  expect_equal(im_direct$model, im_indirect$model)
+  expect_equal(im_direct$model, im_indirect$model)                                                                      # nolint: expect_identical_linter. Functions have different environments
 
 
   # Set the model via `$set_waning_model()` but supplying the function directly
   expect_no_error(im_indirect$set_waning_model(custom_function_1, time_scale = 40))
-  expect_equal(im_direct$model, im_indirect$model)
+  expect_equal(im_direct$model, im_indirect$model)                                                                      # nolint: expect_identical_linter. Functions have different environments
 
 
   # .. if our custom function does not have a time_scale
