@@ -22,8 +22,14 @@ library(diseasy)
 # Create a cache for this vignette since the examples take a long time to generate
 # We will destroy the cache if the source code for `DiseasyImmunity` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-immunity")
-source_code_hash <- c("public_methods", "public_fields", "private_methods", "private_fields", "active") |>
-  purrr::map( ~ purrr::pluck(DiseasyImmunity, .x)) |>
+source_code_hash <- c(
+  "public_methods",
+  "public_fields",
+  "private_methods",
+  "private_fields",
+  "active"
+) |>
+  purrr::map(~ purrr::pluck(DiseasyImmunity, .x)) |>
   purrr::reduce(c) |>
   purrr::map_if(checkmate::test_function, ~ deparse(rlang::fn_body(.))) |>
   digest::digest()
@@ -108,7 +114,7 @@ im$set_custom_waning(
 ```
 
 To visualize all the functions in the model, use the same plot function as above:
-```{r plot_2, fig.alt = "Visualing the additional custom (sigmoid) waning immunity against hospitalisation."}
+```{r plot_2, fig.alt = "Visualising the additional custom (sigmoid) waning immunity against hospitalisation."}
 plot(im)
 ```
 
