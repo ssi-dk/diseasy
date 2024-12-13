@@ -96,8 +96,8 @@ test_that("$set_study_period() works", {
   obs <- DiseasyObservables$new()
   obs$set_study_period(start_date = as.Date("2021-03-01"),
                        end_date   = as.Date("2021-03-03"))
-  expect_equal(obs$start_date, as.Date("2021-03-01"))
-  expect_equal(obs$end_date,   as.Date("2021-03-03"))
+  expect_identical(obs$start_date, as.Date("2021-03-01"))
+  expect_identical(obs$end_date,   as.Date("2021-03-03"))
 
   # Testing malformed inputs
 

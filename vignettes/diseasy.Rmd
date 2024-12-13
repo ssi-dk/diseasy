@@ -42,7 +42,12 @@ The currently available functional modules are:
 ```{r vignette_string, echo = FALSE}
 functional_modules <- ls("package:diseasy") |>
   purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(Base|Model))"))
-vignette_string <- paste0("\`vignette(\"", functional_modules, "\")\`", collapse = ", ")
+vignette_string <- paste0(
+  "\`vignette(\"",
+  functional_modules,
+  "\")\`",
+  collapse = ", "
+)
 ```
 
 ```{r available_functional_modules}
@@ -92,6 +97,18 @@ Presently, no models are included in the package. These will come in the followi
 # If the model are now included, please continue the writing of this vignette
 stopifnot(identical(ls("package:diseasy", pattern = "DiseasyModel.+"), character(0)))
 ```
+
+
+## Configuring
+All `diseasy` modules are build on top of the `DiseasyBaseModule` class.
+This class provides a number of features that are common to all modules, such as logging and caching.
+
+### Caching
+Internally, the modules may use `{cachem}` to cache computations either in memory or on disk.
+To control how this caching is done, you can provide the `cache` argument to the module constructor containing a
+`cachem` cache object, or you can set the option `diseasy.cache` to a `cachem` cache object.
+See `?DiseasyBaseModule` for more information.
+
 
 ```{r cleanup, include = FALSE}
 rm(s)

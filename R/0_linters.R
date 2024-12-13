@@ -11,8 +11,8 @@ diseasy_code_linters <- function() {
   linters <- c(
     list(
       "object_length_linter" = lintr::object_length_linter(length = 40L),  # We allow for longer object names
-      "nolint_position_linter" = nolint_position_linter(120),
-      "nolint_line_length_linter" = nolint_line_length_linter(120),
+      "nolint_position_linter" = nolint_position_linter(length = 120L),
+      "nolint_line_length_linter" = nolint_line_length_linter(length = 120L),
       "non_ascii_linter" = non_ascii_linter(),
       "param_and_field_linter" = param_and_field_linter(),
       "documentation_template_linter" = documentation_template_linter()
@@ -27,8 +27,7 @@ diseasy_code_linters <- function() {
       nonportable_path_linter = NULL,     # Any \\ is flagged. Therefore fails when escaping backslashes
       undesirable_function_linter = NULL, # Library calls in vignettes are flagged and any call to options
       unnecessary_lambda_linter = NULL,   # Fails for purrr::map with additional function arguments
-      strings_as_factors_linter = NULL,   # Seems to be some backwards compatibility stuff.
-      expect_identical_linter = NULL      # Seems a little aggressive to require this.
+      strings_as_factors_linter = NULL    # Seems to be some backwards compatibility stuff.
     )
   )
 
@@ -105,7 +104,9 @@ nolint_position_linter <- function(length = 80L) {
 #' nolint_line_length_linter: Ensure lines adhere to a given character limit, ignoring `nolint` statements
 #'
 #' @param length (`numeric`)\cr
-#'  Maximum line length allowed. Default is 80L (Hollerith limit)..
+#'  Maximum line length allowed.
+#' @param code_block_length (`numeric`)\cr
+#'  Maximum line length allowed for code blocks.
 #' @examples
 #' ## nolint_line_length_linter
 #' # will produce lints
@@ -122,8 +123,9 @@ nolint_position_linter <- function(length = 80L) {
 #'
 #' @importFrom rlang .data
 #' @noRd
-nolint_line_length_linter <- function(length = 80L) {
+nolint_line_length_linter <- function(length = 80L, code_block_length = 85L) {
   general_msg <- paste("Lines should not be more than", length, "characters.")
+  code_block_msg <- paste("Code blocks should not be more than", code_block_length, "characters.")
 
   lintr::Linter(
     function(source_expression) {
@@ -138,14 +140,18 @@ nolint_line_length_linter <- function(length = 80L) {
       file_lines_nolint_excluded <- source_expression$file_lines |>
         purrr::map_chr(\(s) stringr::str_remove(s, nolint_regex))
 
+      # Switch mode based on extension
+      # .Rmd uses code_block_length
+      code_block <- endsWith(tolower(source_expression$filename), ".rmd")
+
       line_lengths <- nchar(file_lines_nolint_excluded)
-      long_lines <- which(line_lengths > length)
+      long_lines <- which(line_lengths > ifelse(code_block, code_block_length, length))
       Map(function(long_line, line_length) {
         lintr::Lint(
           filename = source_expression$filename,
           line_number = long_line,
-          column_number = length + 1L, type = "style",
-          message = paste(general_msg, "This line is", line_length, "characters."),
+          column_number = ifelse(code_block, code_block_length, length) + 1L, type = "style",
+          message = paste(ifelse(code_block, code_block_msg, general_msg), "This line is", line_length, "characters."),
           line = source_expression$file_lines[long_line],
           ranges = list(c(1L, line_length))
         )
