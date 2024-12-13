@@ -103,7 +103,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
           dplyr::distinct_all()
 
         new_data <- purrr::map(
-          c(-(seq(self$parameters$training_length) - 1), seq(prediction_length)),                  # nolint: infix_spaces_linter
+          c(-(seq(self$parameters$training_length) - 1), seq(prediction_length)),                                       # nolint: infix_spaces_linter
           ~ {
             prototype_data |>
               dplyr::mutate(
