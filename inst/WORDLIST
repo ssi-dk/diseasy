@@ -35,6 +35,7 @@ DiseasystoreGoogleCovid
 diseasystores
 DiseasyActivity
 DiseasyBaseModule
+DiseasyImmunity
 DiseasyObservables
 DiseasySeason
 DiseasyVariant
@@ -67,6 +68,7 @@ github
 gov
 Gruson
 
+Heaviside
 hypoexponential
 
 ij
@@ -128,6 +130,7 @@ Rmd
 SCDB
 Schou
 SEIR
+sigmoidal
 simulist
 Skytte
 SSI
