@@ -99,3 +99,16 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 
   return(q$root)
 }
+
+
+#' @rdname HypoDist
+#' @export
+rhypo <- function(x, shape = 1, rate = rep(1, shape)) {
+
+  # Generate samples from the corresponding hypoexponential distribution
+  out <- rate |>
+    purrr::map(~ stats::rexp(x, rate = .)) |>
+    purrr::reduce(`+`)
+
+  return(out)
+}
