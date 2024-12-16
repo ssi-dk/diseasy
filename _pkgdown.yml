@@ -25,6 +25,7 @@ reference:
     - DiseasyBaseModule
     - DiseasyModel
     - diseasyoption
+    - HypoDist
 
 articles:
 - title: Functional modules
