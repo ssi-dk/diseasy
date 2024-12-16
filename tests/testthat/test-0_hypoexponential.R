@@ -22,7 +22,7 @@ test_that("qhypo matches Erlang distribution", {
 
 
 # For the non-edge-case, we compare numerically with different Poisson processes and check that they are close
-test_rates <- list(                                                                                                     # nolint start: object_name_linter
+test_rates <- list(
   "erlang case 1" = \(shape) 1,
   "erlang case 2" = \(shape) rep(1, shape),
   "increasing rates" = \(shape) 1 / seq(from = 1, to = 2, length.out = shape),
@@ -33,7 +33,7 @@ n_samples <- 1e6 # Number of Monte Carlo samples in the test
 
 # Test each scenario
 for (shape in c(1, 5)) { # Number of compartments
-  purrr::imap(test_rates, \(rates, rate_name) {                                                                             # nolint: object_name_linter
+  purrr::imap(test_rates, \(rates, rate_name) {
 
     test_that(glue::glue("`dhypo()` works for shape = {shape} and {rate_name} rates"), {
 
