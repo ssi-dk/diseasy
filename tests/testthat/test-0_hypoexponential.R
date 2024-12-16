@@ -1,20 +1,20 @@
 # In one limit, the hypoexponential is just the Erlang-distribution, so we check this limits works
 test_that("dhypo matches Erlang distribution", {
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_equal
     dhypo(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1),
     stats::dgamma(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1)
   )
 })
 
 test_that("phypo matches Erlang distribution", {
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_equal
     phypo(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1),
     stats::pgamma(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1)
   )
 })
 
 test_that("qhypo matches Erlang distribution", {
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_equal
     qhypo(seq(from = 0.05, to = 0.95, length.out = 5), shape = 1, rate = 1),
     stats::qgamma(seq(from = 0.05, to = 0.95, length.out = 5), shape = 1, rate = 1)
   )
