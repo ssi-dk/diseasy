@@ -619,6 +619,77 @@ test_that("Waning models must not be divergent in `$approximate_compartmental()`
 })
 
 
+
+# For the next test, we compare numerically with different Poisson processes and check that they are close to
+# the distribution given by `occupancy_probability`
+
+im <- DiseasyImmunity$new()
+private <- im$.__enclos_env__$private
+
+# Define test scenarios
+test_rates <- list(                                                                                                   # nolint start: object_name_linter
+  "erlang case 1" = \(M) 1,
+  "erlang case 2" = \(M) rep(1, M),
+  "increasing rates" = \(M) 1 / seq(from = 1, to = 2, length.out = M),
+  "decreasing rates" = \(M) 1 / seq(from = 2, to = 1, length.out = M)
+)                                                                                                                     # nolint end: object_name_linter
+
+n_samples <- 1e4 # Number of Monte Carlo samples in the test
+
+# Test each scenario
+for (M in c(1, 5)) { # Number of compartments
+  purrr::imap(test_rates, \(rates, rate_name) {                                                                             # nolint: object_name_linter
+
+    test_that(glue::glue("`$occupancy_probability()` works for M = {M} and {rate_name} rates"), {
+
+      # The Monte Carlo (mc) rates needs to be of length M
+      r <- rates(M - 1)
+      if (length(r) == 1) r <- rep(r, M - 1)
+
+      t <- seq(from = 0, to = 5 * sum(1 / r), length.out = 1e2)
+
+      # Sample from the Poisson process
+      depature_times_mc <- r |>
+        purrr::map(
+          ~ rexp(n_samples, rate = .)
+        ) |>
+        purrr::list_transpose() |> # Each element of the list is now the waiting times
+        purrr::map(cumsum) # Each element of the list is now the departure times
+
+      # Calculate the occupancy at each time point
+      occupancy_mc <- depature_times_mc |>
+        purrr::map(\(departure_times) purrr::map_dbl(t, ~ 1 + sum(. >= departure_times)))
+
+      # Calculate the occupancy probability
+      occupancy_mc_long <- occupancy_mc |>
+        purrr::list_transpose()
+
+      occupancy_probability_mc <- purrr::map(
+        seq_len(M),
+        \(m) purrr::map_dbl(occupancy_mc_long, \(occupancy) sum(occupancy == m) / n_samples)
+      )
+
+      # Account for the edge-case with 1 compartment
+      if (length(r) == 0) {
+        occupancy_probability_mc <- list(rep(1, length(t)))
+      }
+
+      # Check the implementation against the Monte Carlo expectation
+      expect_equal(
+        private %.% occupancy_probability(rates(M - 1), M, t),
+        occupancy_probability_mc
+      )
+
+      # Sanity checks for the occupancy probability
+      private %.% occupancy_probability(rates(M - 1), M, t) |>
+        purrr::map(~ checkmate::expect_numeric(., lower = 0, upper = 1))
+    })
+  })
+}
+
+rm(im)
+
+
 test_that("active binding: available_waning_models works", {
   im <- DiseasyImmunity$new()
 
@@ -655,3 +726,25 @@ test_that("active binding: model works", {
 
   rm(obs)
 })
+
+
+# test_that("$describe() works", {
+#   skip_if_not_installed("RSQLite")
+
+#   obs <- DiseasyObservables$new()
+#   expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
+
+#   obs$set_diseasystore(diseasystore = "Google COVID-19")
+#   expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
+
+#   obs$set_study_period(start_date = as.Date("2021-03-01"), end_date = as.Date("2021-03-03"))
+#   expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
+
+#   obs$set_last_queryable_date(last_queryable_date = as.Date("2021-03-03"))
+#   expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
+
+#   obs$set_slice_ts(slice_ts = "2021-03-04 09:00:00")
+#   expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
+
+#   rm(obs)
+# })

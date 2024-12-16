@@ -92,6 +92,7 @@ results
 ```{r, include = FALSE}
 # Aggregate results for optimiser across variations of the problem
 best_optim_results <- results |>
+  dplyr::filter(.data$M <= 5) |>
   dplyr::summarise(
     "value" = sum(.data$value),
     "execution_time" = sum(.data$execution_time),
