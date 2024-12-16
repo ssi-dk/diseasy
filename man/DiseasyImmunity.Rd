@@ -43,9 +43,6 @@ The waning models implemented in \code{DiseasyImmunity}. Read only.}
 
 \item{\code{model}}{(\verb{list(function())})\cr
 The list of models currently being used in the module. Read-only.}
-
-\item{\code{available_methods}}{(\code{character})\cr
-The list of available methods. Read-only.}
 }
 \if{html}{\out{</div>}}
 }

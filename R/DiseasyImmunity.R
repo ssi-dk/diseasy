@@ -1120,14 +1120,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
       .f = active_binding,
       name = "model",
       expr = return(private %.% .model)
-    ),
-
-    #' @field available_methods (`character`)\cr
-    #'   The list of available methods. Read-only.
-    available_methods = purrr::partial(
-      .f = active_binding,
-      name = "available_methods",
-      expr = return(names(private$method_functions))
     )
   ),
 
