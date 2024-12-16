@@ -1138,65 +1138,65 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
 
-    # Compute the probability of occupying each of K sequential compartments
-    # @param rate (`numeric(1)` or `numeric(K-1)`)\cr
-    #   The rate of transfer between each of the K compartments.
+    # Compute the probability of occupying each of M sequential compartments
+    # @param rate (`numeric(1)` or `numeric(M - 1)`)\cr
+    #   The rate of transfer between each of the M compartments.
     #   If scalar, the rate is identical across all compartments.
-    # @param K (`integer(1)`)\cr
+    # @param M (`integer(1)`)\cr
     #   The number of sequential compartments.
     # @param t (`numeric()`)\cr
     #   The time axis to compute occupancy probabilities for.
     # @return
-    #   A `list()` with the k'th element containing the probability of occupying the k'th compartment over time.
+    #   A `list()` with the m'th element containing the probability of occupying the m'th compartment over time.
     # @examples
     #  occupancy_probability(0.1, 3, seq(0, 50))                                                                        # nolint: commented_code_linter
     #  occupancy_probability(c(0.1, 0.2), 3, seq(0, 50))                                                                # nolint: commented_code_linter
-    occupancy_probability = function(rate, K, t) {                                                                      # nolint: object_name_linter
+    occupancy_probability = function(rate, M, t) {                                                                      # nolint: object_name_linter
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
         checkmate::check_number(rate, lower = 0, finite = TRUE),
-        checkmate::check_numeric(rate, lower = 0, finite = TRUE, any.missing = FALSE, len = K - 1),
+        checkmate::check_numeric(rate, lower = 0, finite = TRUE, any.missing = FALSE, len = M - 1),
         add = coll
       )
-      checkmate::assert_integerish(K, lower = 1, add = coll)
+      checkmate::assert_integerish(M, lower = 1, add = coll)
       checkmate::assert_numeric(t, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
 
-      # Handle the special case with K = 1
-      if (K == 1) {
+      # Handle the special case with M = 1
+      if (M == 1) {
         return(list(rep(1, length(t))))
       }
 
-      # Compute the probability of less than K events over time
+      # Compute the probability of less than M events over time
       if (length(rate) == 1) {
 
         # If a scalar rate is given, the problem reduces to the Erlang-distribution
-        prob_lt_k <- purrr::map(seq_len(K - 1), \(k) pgamma(t, shape = k, rate = rate, lower.tail = FALSE))
+        prob_lt_m <- purrr::map(seq_len(M - 1), \(m) pgamma(t, shape = m, rate = rate, lower.tail = FALSE))
 
       } else {
         # We can compute the waiting time distributions (hypoexponential distributions)
         # https://en.wikipedia.org/wiki/Hypoexponential_distribution
 
         # Retrieve each of the hypoexponential distributions
-        prob_lt_k <- purrr::map(seq_len(K - 1), \(k) phypo(t, shape = k, rate = rate[seq_len(k)], lower.tail = FALSE))
+        prob_lt_m <- purrr::map(seq_len(M - 1), \(m) phypo(t, shape = m, rate = rate[seq_len(m)], lower.tail = FALSE))
 
       }
 
-      # Compute the probability of occupying states k over time from the waiting time distributions
+      # Compute the probability of occupying states m over time from the waiting time distributions
       # i.e. the difference of the cumulative distribution function for between states
-      if (K == 2) {
-        prob_k <- prob_lt_k[1]
+      if (M == 2) {
+        prob_m <- prob_lt_m[1]
       } else {
-        prob_k <- purrr::map(2:(K - 1), \(k) {
-          prob_lt_k[[k]] - prob_lt_k[[k - 1]]
+        prob_m <- purrr::map(2:(M - 1), \(m) {
+          prob_lt_m[[m]] - prob_lt_m[[M - 1]]
         })
-        prob_k <- c(prob_lt_k[1], prob_k)
+        prob_m <- c(prob_lt_m[1], prob_m)
       }
 
       # Add absorbing state
-      prob_k <- c(prob_k, list(1 - purrr::reduce(prob_k, `+`)))
+      prob_m <- c(prob_m, list(1 - purrr::reduce(prob_m, `+`)))
 
-      return(prob_k)
+      return(prob_m)
     }
   )
 )
