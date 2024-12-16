@@ -1162,11 +1162,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
       checkmate::assert_numeric(t, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
 
-      # Handle the special case with M = 1
-      if (M == 1) {
-        return(list(rep(1, length(t))))
-      }
-
       # Compute the probability of less than M events over time
       if (length(rate) == 1) {
 
@@ -1182,19 +1177,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       }
 
+      # Add the absorbing state
+      prob_lt_m <- c(prob_lt_m, list(rep(1, length(t))))
+
+
       # Compute the probability of occupying states m over time from the waiting time distributions
       # i.e. the difference of the cumulative distribution function for between states
-      if (M == 2) {
-        prob_m <- prob_lt_m[1]
+      if (M == 1) {
+        prob_m <- prob_lt_m
       } else {
-        prob_m <- purrr::map(2:(M - 1), \(m) {
-          prob_lt_m[[m]] - prob_lt_m[[M - 1]]
+        prob_m <- purrr::map(seq(from = 2, to = M), \(m) {
+          prob_lt_m[[m]] - prob_lt_m[[m - 1]]
         })
         prob_m <- c(prob_lt_m[1], prob_m)
       }
-
-      # Add absorbing state
-      prob_m <- c(prob_m, list(1 - purrr::reduce(prob_m, `+`)))
 
       return(prob_m)
     }
