@@ -617,3 +617,41 @@ test_that("Waning models must not be divergent in `$approximate_compartmental()`
 
   rm(im)
 })
+
+
+test_that("active binding: available_waning_models works", {
+  im <- DiseasyImmunity$new()
+
+  # Retrieve the available_waning_models
+  expect_setequal(
+    im %.% available_waning_models,
+    c("custom_waning", "exponential_waning", "sigmoidal_waning", "heaviside_waning", "linear_waning", "no_waning")
+  )
+
+  # Try to set the available_waning_models
+  # test_that cannot capture this error, so we have to hack it
+  expect_identical(tryCatch(obs$available_waning_models <- "test", error = \(e) e),                                     # nolint: implicit_assignment_linter
+                   simpleError("`$available_waning_models` is read only"))
+  expect_setequal(
+    im %.% available_waning_models,
+    c("custom_waning", "exponential_waning", "sigmoidal_waning", "heaviside_waning", "linear_waning", "no_waning")
+  )
+
+  rm(obs)
+})
+
+
+test_that("active binding: model works", {
+  im <- DiseasyImmunity$new()
+
+  # Retrieve the model
+  expect_null(im %.% model)
+
+  # Try to set the model
+  # test_that cannot capture this error, so we have to hack it
+  expect_identical(tryCatch(obs$model <- "test", error = \(e) e),                                                       # nolint: implicit_assignment_linter
+                   simpleError("`$model` is read only"))
+  expect_null(im %.% model)
+
+  rm(obs)
+})
