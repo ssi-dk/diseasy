@@ -5,6 +5,7 @@
 \alias{dhypo}
 \alias{phypo}
 \alias{qhypo}
+\alias{rhypo}
 \title{The hypoexponential distribution}
 \usage{
 dhypo(x, shape = 1, rate = rep(1, shape))
@@ -12,6 +13,8 @@ dhypo(x, shape = 1, rate = rep(1, shape))
 phypo(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE)
 
 qhypo(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE)
+
+rhypo(x, shape = 1, rate = rep(1, shape))
 }
 \arguments{
 \item{x, q}{vector of quantiles.}

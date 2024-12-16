@@ -86,6 +86,13 @@ for (shape in c(1, 5)) { # Number of compartments
         t[hypo_ecdf < 0.95],
         tolerance = 1e-3
       )
+
+      # Check the number generation is the same
+      expect_equal(                                                                                                     # nolint: expect_equal
+        stats::ecdf(rhypo(1e4, shape = shape, rate = r))(t),
+        hypo_ecdf,
+        tolerance = 1e-3
+      )
     })
   })
 }
