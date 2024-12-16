@@ -13,7 +13,7 @@ ones <- \(shape) matrix(rep(1, shape))
 #' @title
 #'   The hypoexponential distribution
 #' @description
-#'   Density, distribution function and quantile function for the hypoexponential distribution with
+#'   Density, distribution, quantile and random generation functions for the hypoexponential distribution with
 #'   parameters shape and rate.
 #' @details
 #'   Note that `qhypo` has poorer precision (\eqn{~ 10^{-3}}) than `dhypo` and `phypo` (\eqn{~ 10^{-6}}).
@@ -24,6 +24,7 @@ ones <- \(shape) matrix(rep(1, shape))
 #'   - `dhypo` gives the density.
 #'   - `phypo` gives the distribution function.
 #'   - `qhypo` gives the quantile function.
+#'   - `rhypo` gives the random generation.
 #' @examples
 #'   dhypo(1:10, shape = 2)
 #'   dhypo(1:10, shape = 2, rate = c(1, 2))
@@ -35,7 +36,10 @@ ones <- \(shape) matrix(rep(1, shape))
 #'   qhypo(0.75, shape = 2)
 #'   qhypo(0.75, shape = 2, rate = c(1, 2))
 #'   qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
-#' @name HypoDist
+#'
+#'   rhypo(10, shape = 2)
+#'   rhypo(10, shape = 2, rate = c(1, 2))
+#' @name hypoexponential
 #' @export
 #' @importFrom expm expm
 dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
@@ -58,7 +62,7 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 }
 
 
-#' @rdname HypoDist
+#' @rdname hypoexponential
 #' @export
 phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {                                              # nolint: object_name_linter
 
@@ -82,7 +86,7 @@ phypo <- function(q, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 }
 
 
-#' @rdname HypoDist
+#' @rdname hypoexponential
 #' @export
 qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {                                              # nolint: object_name_linter
 
@@ -101,7 +105,7 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
 }
 
 
-#' @rdname HypoDist
+#' @rdname hypoexponential
 #' @export
 rhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
