@@ -11,9 +11,9 @@ ones <- \(shape) matrix(rep(1, shape))
 
 
 #' @title
-#'   The hyopexponential distribution
+#'   The hypoexponential distribution
 #' @description
-#'   Density, distribution function and quantile function for the hyopexponential distribution with
+#'   Density, distribution function and quantile function for the hypoexponential distribution with
 #'   parameters shape and rate.
 #' @details
 #'   Note that `qhypo` has poorer precision (\eqn{~ 10^{-3}}) than `dhypo` and `phypo` (\eqn{~ 10^{-6}}).
