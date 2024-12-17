@@ -6,12 +6,28 @@
 \alias{DiseasyModelG0}
 \alias{DiseasyModelG1}
 \title{Meta module for the GLM class of models}
+\value{
+A new instance of the \code{DiseasyModelRegression} \link[R6:R6Class]{R6} class.
+}
 \description{
-TODO
+The \code{DiseasyModelGLM} module implements common structure and functionality to GLM regression class of models
+beyond the model structure provided by \code{DiseasyModelRegression}.
+
+Most notably, the model module implements the \verb{$fit_regression()} and \verb{$get_prediction()} methods.
+
+The \verb{$update_formula()} method should update the formula based on the stratifications.
+If the model should flexibly adapt to different stratifications, this method should be implemented.
+See \code{DiseasyModelGLM} and \code{DiseasyModelBRM} for examples of how this can be done.
 
 TODO
 
 TODO
+}
+\examples{
+  # Normally, one would not want to create this module directly, but it is possible.
+  regression_template <- DiseasyModelRegression$new()
+
+  rm(regression_template)
 }
 \keyword{model-template}
 \section{Super classes}{
