@@ -10,10 +10,15 @@ DiseasyModelGLM <- R6::R6Class(                                                 
 
   private = list(
 
-    .parameters = list(
-      seed = 0,
-      n_realizations = 100
-    ),
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list("seed" = 0, "n_realizations" = 100),
+        keep.null = TRUE
+      )
+    },
+
 
     fit_regression = function(data, formula) {
       coll <- checkmate::makeAssertCollection()
