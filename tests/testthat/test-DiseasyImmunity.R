@@ -643,18 +643,18 @@ im <- DiseasyImmunity$new()
 private <- im$.__enclos_env__$private
 
 # Define test scenarios
-test_rates <- list(                                                                                                   # nolint start: object_name_linter
+test_rates <- list(                                                                                                     # nolint start: object_name_linter
   "erlang case 1" = \(M) 1,
   "erlang case 2" = \(M) rep(1, M),
   "increasing rates" = \(M) 1 / seq(from = 1, to = 2, length.out = M),
   "decreasing rates" = \(M) 1 / seq(from = 2, to = 1, length.out = M)
-)                                                                                                                     # nolint end: object_name_linter
+)                                                                                                                       # nolint end: object_name_linter
 
 n_samples <- 1e4 # Number of Monte Carlo samples in the test
 
 # Test each scenario
 for (M in c(1, 2, 5)) { # Number of compartments
-  purrr::imap(test_rates, \(rates, rate_name) {                                                                             # nolint: object_name_linter
+  purrr::imap(test_rates, \(rates, rate_name) {                                                                         # nolint: object_name_linter
 
     test_that(glue::glue("`$occupancy_probability()` works for M = {M} and {rate_name} rates"), {
 
@@ -666,7 +666,7 @@ for (M in c(1, 2, 5)) { # Number of compartments
 
       # Sample from the Poisson process
       set.seed(42)
-      depature_times_mc <- r |>
+      departure_times_mc <- r |>
         purrr::map(
           ~ rexp(n_samples, rate = .)
         ) |>
@@ -674,7 +674,7 @@ for (M in c(1, 2, 5)) { # Number of compartments
         purrr::map(cumsum) # Each element of the list is now the departure times
 
       # Calculate the occupancy at each time point
-      occupancy_mc <- depature_times_mc |>
+      occupancy_mc <- departure_times_mc |>
         purrr::map(\(departure_times) purrr::map_dbl(t, ~ 1 + sum(. >= departure_times)))
 
       # Calculate the occupancy probability

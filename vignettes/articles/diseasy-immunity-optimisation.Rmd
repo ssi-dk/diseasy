@@ -352,9 +352,10 @@ total_results <- total_results |>
   )
 
 visualise_methods <- function(total_results, method) {
-  gg_data <-total_results |>
+  gg_data <- total_results |>
     dplyr::slice_min(
-      .data$value - .data$min_value + .data$execution_time - .data$min_execution_time,
+      .data$value - .data$min_value +
+        .data$execution_time - .data$min_execution_time,
       n = 10,
       with_ties = FALSE,
       by = c("penalty", "method")
