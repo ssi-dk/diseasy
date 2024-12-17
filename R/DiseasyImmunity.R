@@ -322,7 +322,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   - "free_gamma": All transition rates are equal and risks are free to vary (M + 1 free parameters).
     #'   - "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
     #'     f(infinity) (M free parameters).
-    #'   - "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+    #'   - "all_free": All transition rates and risks are free to vary (2M - 1 free parameters).
     #'
     #'   In addition, this function implements three strategies for optimising the transition rates and risks.
     #'   These strategies modify the initial guess for the transition rates and risks:
@@ -350,11 +350,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   may be better in any specific case when using a different algorithm
     #'   (see `vignette("diseasy-immunity-optimisation")`).
     #'
-    #'   The default configurations are:
+    #'   The default configuration depends on the method used and whether or not a penalty was imposed on the
+    #'   objective function (`monotonous` and `individual_level`):
     #'
-    #'   - For "free_delta", we use the "recursive" strategy with the "ucminf" optimiser.
-    #'   - For "free_gamma", we use the "naive" strategy with the "spg" optimiser.
-    #'   - For "all_free", we use the "combination" strategy with the "bobyqa" optimiser.
+    #'   | method      | penalty  | strategy    | optimiser |
+    #'   |-------------|----------|-------------|-----------|
+    #'   | free_delta  | No       | naive       | ucminf    |
+    #'   | free_delta  | Yes      | naive       | tnewton   |
+    #'   | free_gamma  | No       | naive       | subplex   |
+    #'   | free_gamma  | Yes      | naive       | hjkb      |
+    #'   | all_free    | No       | combination | neldermead|
+    #'   | all_free    | Yes      | naive       | ucminf    |
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
@@ -400,10 +406,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @return
     #'   Returns the results from the optimisation with the approximated rates and execution time.
     #' @seealso `vignette("diseasy-immunity")`, [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
-    #'  [optimx::optimr], [ucminf::ucminf], [BB::spg], [nloptr::bobyqa]
+    #'  [optimx::optimr], [ucminf::ucminf], [dfoptim::hjkb], [subplex::subplex], [nloptr::bobyqa]
     #' @import nloptr
     #' @importFrom optimx optimr
-    #' @importFrom BB spg
+    #' @importFrom dfoptim hjkb
+    #' @importFrom subplex subplex
     #' @importFrom ucminf ucminf
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
@@ -445,9 +452,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default optimisation controls
       default_optim_controls <- list(
-        "free_delta" = list("optim_method" = "ucminf"),
-        "free_gamma" = list("optim_method" = "spg"),
-        "all_free"   = list("optim_method" = "bobyqa")
+        "free_delta" = list("optim_method" = ifelse(monotonous || individual_level, "tnewton", "ucminf")),
+        "free_gamma" = list("optim_method" = ifelse(monotonous || individual_level, "hjkb", "subplex")),
+        "all_free"   = list("optim_method" = ifelse(monotonous || individual_level, "ucminf", "neldermead"))
       )
 
       # Choose optimiser controls if not set
@@ -456,9 +463,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default strategy
       default_optim_strategy <- list(
-        "free_delta" = "recursive",
+        "free_delta" = "naive",
         "free_gamma" = "naive",
-        "all_free"   = "combination"
+        "all_free"   = ifelse(monotonous || individual_level, "naive", "combination")
       )
 
       # Choose strategy if not set

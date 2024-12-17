@@ -4,9 +4,6 @@ antiphase
 AR
 ARI
 
-BB
-bobyqa
-
 CCW
 
 backends
@@ -74,6 +71,7 @@ gov
 Gruson
 
 Heaviside
+hjkb
 hypoexponential
 
 ij
@@ -104,6 +102,7 @@ moduleowner
 Myrup
 
 Nelder
+neldermead
 nlm
 nlminb
 nloptr
@@ -148,9 +147,9 @@ SEIR
 sigmoidal
 simulist
 Skytte
-spg
 SSI
 Statens
+subplex
 sql
 SQLite
 
@@ -161,7 +160,7 @@ textrm
 th
 tibble
 tidyselect
-TODOs
+tnewton
 ts
 
 u

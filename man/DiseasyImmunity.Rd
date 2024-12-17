@@ -29,7 +29,7 @@ See the \code{vignette("diseasy-immunity")} for examples of use.
 }
 \seealso{
 \code{vignette("diseasy-immunity")}, \link[stats:optim]{stats::optim}, \link[stats:nlm]{stats::nlm}, \link[stats:nlminb]{stats::nlminb}, \link[nloptr:nloptr]{nloptr::nloptr},
-\link[optimx:optimr]{optimx::optimr}, \link[ucminf:ucminf]{ucminf::ucminf}, \link[BB:spg]{BB::spg}, \link[nloptr:bobyqa]{nloptr::bobyqa}
+\link[optimx:optimr]{optimx::optimr}, \link[ucminf:ucminf]{ucminf::ucminf}, \link[dfoptim:hookejeeves]{dfoptim::hjkb}, \link[subplex:subplex]{subplex::subplex}, \link[nloptr:bobyqa]{nloptr::bobyqa}
 }
 \keyword{functional-module}
 \section{Super class}{
@@ -388,7 +388,7 @@ The function implements three methods for parametrising the waning immunity curv
 \item "free_gamma": All transition rates are equal and risks are free to vary (M + 1 free parameters).
 \item "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
 f(infinity) (M free parameters).
-\item "all_free": All transition rates and risks are free to vary (2N - 1 free parameters).
+\item "all_free": All transition rates and risks are free to vary (2M - 1 free parameters).
 }
 
 In addition, this function implements three strategies for optimising the transition rates and risks.
@@ -416,12 +416,17 @@ Our analysis show that the chosen algorithms in general were the most most effic
 may be better in any specific case when using a different algorithm
 (see \code{vignette("diseasy-immunity-optimisation")}).
 
-The default configurations are:
-\itemize{
-\item For "free_delta", we use the "recursive" strategy with the "ucminf" optimiser.
-\item For "free_gamma", we use the "naive" strategy with the "spg" optimiser.
-\item For "all_free", we use the "combination" strategy with the "bobyqa" optimiser.
+The default configuration depends on the method used and whether or not a penalty was imposed on the
+objective function (\code{monotonous} and \code{individual_level}):\tabular{llll}{
+   method \tab penalty \tab strategy \tab optimiser \cr
+   free_delta \tab No \tab naive \tab ucminf \cr
+   free_delta \tab Yes \tab naive \tab tnewton \cr
+   free_gamma \tab No \tab naive \tab subplex \cr
+   free_gamma \tab Yes \tab naive \tab hjkb \cr
+   all_free \tab No \tab combination \tab neldermead \cr
+   all_free \tab Yes \tab naive \tab ucminf \cr
 }
+
 
 Optimiser defaults can be changed via the \code{optim_control} argument.
 NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point

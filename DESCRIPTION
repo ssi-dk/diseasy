@@ -23,9 +23,9 @@ Depends:
     diseasystore (>= 0.3),
     R (>= 3.5.0)
 Imports:
-    BB,
     cachem,
     checkmate,
+    dfoptim,
     digest,
     dplyr,
     expm,
@@ -40,6 +40,7 @@ Imports:
     R6,
     rlang,
     stringr,
+    subplex,
     ucminf
 Suggests:
     contactdata,
