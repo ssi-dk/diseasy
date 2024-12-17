@@ -96,12 +96,17 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
   }
 
   # Compute the upper tail of the cumulative distribution function
-  q <- stats::uniroot(
-    f = \(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p,
-    interval = c(0, 100 * sum(1 / rate))
+  q <- purrr::map_dbl(
+    p,
+    \(p) {
+      stats::uniroot(
+        f = \(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p,
+        interval = c(0, 100 * sum(1 / rate))
+      )$root
+    }
   )
 
-  return(q$root)
+  return(q)
 }
 
 
