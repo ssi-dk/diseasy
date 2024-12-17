@@ -15,8 +15,6 @@ ones <- \(shape) matrix(rep(1, shape))
 #' @description
 #'   Density, distribution, quantile and random generation functions for the hypoexponential distribution with
 #'   parameters shape and rate.
-#' @details
-#'   Note that `qhypo` has poorer precision (\eqn{~ 10^{-3}}) than `dhypo` and `phypo` (\eqn{~ 10^{-6}}).
 #' @inheritParams stats::GammaDist
 #' @param shape (`numeric(1)`)\cr
 #'   shape parameter
@@ -101,7 +99,8 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
     \(p) {
       stats::uniroot(
         f = \(q) phypo(q, shape = shape, rate = rate, lower.tail = lower.tail) - p,
-        interval = c(0, 100 * sum(1 / rate))
+        interval = c(0, 100 * sum(1 / rate)),
+        tol = .Machine$double.eps^0.5
       )$root
     }
   )
