@@ -52,7 +52,7 @@ Creates a new instance of the \code{DiseasyModelRegression} \link[R6:R6Class]{R6
 This module is typically not constructed directly but rather through \verb{DiseasyModel*} classes,
 such as \link{DiseasyModelG0}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelRegression$new(formula, family, parameters = NULL, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelRegression$new(formula, family, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -64,12 +64,12 @@ A \code{character} string that is passed to \code{stats::as.formula} via \code{g
 \item{\code{family}}{(\code{family})\cr
 \code{stats::family} object passed to the regression call.}
 
+\item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
+
 \item{\code{parameters}}{(\verb{named list()})\cr
 \itemize{
 \item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 }}
-
-\item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }

@@ -10,12 +10,15 @@ DiseasyModelBRM <- R6::R6Class(                                                 
 
   private = list(
 
-    .parameters = list(
-      seed = 0,
-      n_warmup = 1000,
-      n_iter = 500,
-      n_chains = 4
-    ),
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list("seed" = 0, "n_warmup" = 1000, "n_iter" = 500, "n_chains" = 4),
+        keep.null = TRUE
+      )
+    },
+
 
     fit_regression = function(data, formula) {
       coll <- checkmate::makeAssertCollection()
