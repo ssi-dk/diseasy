@@ -27,16 +27,25 @@ combineasy <- function(model_generators, modules = NULL, ...) {
       dplyr::mutate(dplyr::across(tidyselect::everything(), \(col) purrr::map_chr(col, ~ purrr::pluck(class(.), 1)))) |>
       unlist()
 
-    disallowed_module <- purrr::discard(module_classes,
-                                        ~ . %in% c("DiseasyObservables", "DiseasyActivity", "DiseasySeason"))
-    purrr::walk2(disallowed_module,
-                 names(disallowed_module),
-                 ~ coll$push(glue::glue("modules element {.y} has unaccepted class '{.x}'. ",
-                                        "Must be one of `DiseasyObservables`, `DiseasyActivity`, `DiseasySeason`")))
+    disallowed_module <- module_classes |>
+      purrr::discard( ~ . %in% c("DiseasyObservables", "DiseasyActivity", "DiseasySeason"))
+
+    purrr::walk2(
+      disallowed_module,
+      names(disallowed_module),
+      ~ {
+        coll$push(
+          glue::glue(
+            "modules element {.y} has unaccepted class '{.x}'. ",
+            "Must be one of `DiseasyObservables`, `DiseasyActivity`, `DiseasySeason`"
+          )
+        )
+      }
+    )
   }
 
   # Create empty instances of the models
-  models_empty <- purrr::map(model_generators, ~.x$new())
+  models_empty <- purrr::map(model_generators, ~ .x$new())
 
   # Determine available model parameters
   model_parameters <- purrr::map(models_empty, ~ names(.x$parameters))
@@ -53,8 +62,12 @@ combineasy <- function(model_generators, modules = NULL, ...) {
     purrr::walk(none, ~ coll$push(glue::glue("Parameter `{.x}` not found in any of the given model generators")))
 
     # 2) Parameters are in some of the models
-    some <- setdiff(purrr::discard(parameter_names, \(p) purrr::every(model_parameters, ~ p %in% .x)), none)
-    purrr::walk(some, ~ coll$push(glue::glue("Parameter `{.x}` only found in some, not all, of the given model generators")))
+    parameter_names |>
+      purrr::discard(\(p) purrr::every(model_parameters, ~ p %in% .x)) |>
+      setdiff(none) |>
+      purrr::walk(
+        ~ coll$push(glue::glue("Parameter `{.x}` only found in some, not all, of the given model generators"))
+      )
   }
 
   # Report assertions
@@ -65,19 +78,21 @@ combineasy <- function(model_generators, modules = NULL, ...) {
     purrr::map(\(model) { # We iterate over all models
 
       # And make an inner loop over the module combination to load
-      purrr::map(seq_len(nrow(modules)),
-                 \(module_combination) {
+      purrr::map(
+        seq_len(nrow(modules)),
+        \(module_combination) {
 
-                   # We must clone the model before loading new modules
-                   model <- model$clone()
+          # We must clone the model before loading new modules
+          model <- model$clone()
 
-                   # Then load each module in turn
-                   unlist(modules[module_combination, ]) |>
-                     purrr::walk(~ model$load_module(.))
+          # Then load each module in turn
+          unlist(modules[module_combination, ]) |>
+            purrr::walk(~ model$load_module(.))
 
-                   # Then return the model
-                   model
-                 })
+          # Then return the model
+          model
+        }
+      )
     }) |>
     purrr::flatten()
 
@@ -85,7 +100,9 @@ combineasy <- function(model_generators, modules = NULL, ...) {
   parameters <- tidyr::expand_grid(...)
 
   # Return early, if no parameters are to be set
-  if (ncol(parameters) == 0) return(models_modules_loaded)
+  if (ncol(parameters) == 0)  {
+    return(models_modules_loaded)
+  }
   # Apparently, the tibble output of expand_grid with no input thinks it has one record, even though it does not.
   # So we have to use ncol over nrow...
 
@@ -93,19 +110,21 @@ combineasy <- function(model_generators, modules = NULL, ...) {
     purrr::map(\(model) { # We iterate over all models
 
       # And make an inner loop over the parameter combination to load
-      purrr::map(seq_len(nrow(parameters)),
-                 \(parameter_combination) {
+      purrr::map(
+        seq_len(nrow(parameters)),
+        \(parameter_combination) {
 
-                   # We must clone the model before setting new parameters
-                   model <- model$clone()
+          # We must clone the model before setting new parameters
+          model <- model$clone()
 
-                   # Then load each module in turn
-                   params <- parameters[parameter_combination, ]
-                   purrr::walk2(params, names(params), \(p, np) model$.__enclos_env__$private$.parameters[np] <- p)
+          # Then load each module in turn
+          params <- parameters[parameter_combination, ]
+          purrr::walk2(params, names(params), \(p, np) model$.__enclos_env__$private$.parameters[np] <- p)
 
-                   # Then return the model
-                   model
-                 })
+          # Then return the model
+          model
+        }
+      )
     }) |>
     purrr::flatten()
 
