@@ -340,11 +340,22 @@ chosen_defaults <- tibble::tibble(
 
 
 ```{r, echo = FALSE}
+total_results <- total_results |>
+  dplyr::summarise(
+    "min_value" = min(.data$value, na.rm = TRUE),
+    "min_execution_time" = min(.data$execution_time, na.rm = TRUE),
+    .by = c("penalty", "method")
+  ) |>
+  dplyr::left_join(
+    total_results,
+    by = c("penalty", "method")
+  )
+
 visualise_methods <- function(total_results, method) {
-  gg_data <- total_results |>
+  gg_data <-total_results |>
     dplyr::slice_min(
-      .data$value,
-      n = 6,
+      .data$value - .data$min_value + .data$execution_time - .data$min_execution_time,
+      n = 10,
       with_ties = FALSE,
       by = c("penalty", "method")
     ) |>
@@ -377,10 +388,9 @@ visualise_methods <- function(total_results, method) {
         x = .data$execution_time,
         y = .data$value,
         color = .data$optim_strategy,
-        fill = .data$optim_strategy,
         shape = .data$default
       ),
-      size = 3
+      size = 4
     ) +
     ggplot2::geom_hline(
       data = dplyr::summarise(gg_data, "value" = min(.data$value), .by = "penalty"),
@@ -397,12 +407,15 @@ visualise_methods <- function(total_results, method) {
       y = "Total error",
       title = glue::glue("Best optimisers for {method}"),
       color = "strategy-optim_method",
-      fill = "strategy-optim_method",
       shape = "Chosen as default?"
     ) +
+    ggplot2::guides(
+      color = ggplot2::guide_legend(order  = 1, ncol = 2),
+      shape = ggplot2::guide_legend(order = 2)
+    ) +
+    ggplot2::theme(legend.text = ggplot2::element_text(size = 8)) +
     ggplot2::scale_color_manual(values = palette) +
-    ggplot2::scale_fill_manual(values = palette) +
-    ggplot2::scale_shape_manual(values = c("Yes" = 23, "No" = 21)) +
+    ggplot2::scale_shape_manual(values = c("Yes" = 18, "No" = 20)) +
     ggplot2::scale_x_log10()
 }
 ```
