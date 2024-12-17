@@ -355,12 +355,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   | method      | penalty  | strategy    | optimiser |
     #'   |-------------|----------|-------------|-----------|
-    #'   | free_delta  | No       | naive       | ucminf    |
-    #'   | free_delta  | Yes      | naive       | tnewton   |
+    #'   | free_delta  | No/Yes   | naive       | ucminf    |
     #'   | free_gamma  | No       | naive       | subplex   |
     #'   | free_gamma  | Yes      | naive       | hjkb      |
-    #'   | all_free    | No       | combination | neldermead|
-    #'   | all_free    | Yes      | naive       | ucminf    |
+    #'   | all_free    | No/Yes   | naive       | ucminf    |
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
@@ -452,9 +450,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default optimisation controls
       default_optim_controls <- list(
-        "free_delta" = list("optim_method" = ifelse(monotonous || individual_level, "tnewton", "ucminf")),
+        "free_delta" = list("optim_method" = "ucminf"),
         "free_gamma" = list("optim_method" = ifelse(monotonous || individual_level, "hjkb", "subplex")),
-        "all_free"   = list("optim_method" = ifelse(monotonous || individual_level, "ucminf", "neldermead"))
+        "all_free"   = list("optim_method" = "ucminf")
       )
 
       # Choose optimiser controls if not set
@@ -463,9 +461,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default strategy
       default_optim_strategy <- list(
-        "free_delta" = "naive",
+        "free_delta" = "recursive",
         "free_gamma" = "naive",
-        "all_free"   = ifelse(monotonous || individual_level, "naive", "combination")
+        "all_free"   = "naive"
       )
 
       # Choose strategy if not set

@@ -317,7 +317,7 @@ chosen_defaults <- tibble::tibble(
   tibble::add_row(
     "method" = "free_delta", "penalty" = "yes",
     "strategy" = "naive",
-    "optim_method" = "tnewton"
+    "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
     "method" = "free_gamma", "penalty" = "no",
@@ -331,8 +331,8 @@ chosen_defaults <- tibble::tibble(
   ) |>
   tibble::add_row(
     "method" = "all_free", "penalty" = "no",
-    "strategy" = "combination",
-    "optim_method" = "neldermead"
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
     "method" = "all_free", "penalty" = "yes",
