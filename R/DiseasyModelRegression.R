@@ -136,7 +136,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
 
           # Add to training data
           new_data <- new_data |>
-            dplyr::mutate(season = self$season$model_date(date))
+            dplyr::mutate("season" = self$season$model_date(.data$date))
         }
 
 
