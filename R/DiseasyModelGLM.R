@@ -104,9 +104,7 @@ DiseasyModelG_ <- R6::R6Class(                                                  
     #' @return
     #'   A new instance of the `DiseasyModelG_` [R6][R6::R6Class] class.
     initialize = function(...) {
-      super$initialize(formula = self$formula,
-                       family = stats::quasipoisson(),
-                       ...)
+      super$initialize(formula = self$formula, family = stats::quasipoisson(), ...)
     }
   ),
 
@@ -122,13 +120,17 @@ DiseasyModelG_ <- R6::R6Class(                                                  
         initial_operator <- ifelse(rlang::is_empty(labels(terms(formula))), "+", "*")
 
         # Now we can reduce with the operators set
-        purrr::pmap(tibble::lst(label = names(aggregation),
-                                aggregation = aggregation,
-                                operator = c(initial_operator, rep("*", length(label) - 1))),
-                    \(label, aggregation, operator) {
-                      glue::glue("~ . {operator} {ifelse(label != '', label, dplyr::as_label(aggregation))}") |>
-                        stats::as.formula()
-                    }) |>
+        purrr::pmap(
+          tibble::lst(
+            "label" = names(aggregation),
+            "aggregation" = aggregation,
+            "operator" = c(initial_operator, rep("*", length(label) - 1))
+          ),
+          \(label, aggregation, operator) {
+            glue::glue("~ . {operator} {ifelse(label != '', label, dplyr::as_label(aggregation))}") |>
+              stats::as.formula()
+          }
+        ) |>
           purrr::reduce(stats::update.formula, .init = formula)
 
       } else { # Do nothing

@@ -75,8 +75,11 @@ DiseasyModelBRM <- R6::R6Class(                                                 
       if (is.null(quantiles)) {
 
         # First we expand the combinations of draws
-        combinations <- tidyr::expand_grid(chain = seq(self$parameters$n_chains), iter = seq(self$parameters$n_iter)) |>
-          dplyr::mutate(index = dplyr::row_number())
+        combinations <- tidyr::expand_grid(
+          "chain" = seq(self$parameters$n_chains),
+          "iter" = seq(self$parameters$n_iter)
+        ) |>
+          dplyr::mutate("index" = dplyr::row_number())
 
         # Construct output tibble
         brm_samples <- purrr::pmap(
