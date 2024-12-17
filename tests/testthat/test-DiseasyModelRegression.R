@@ -150,7 +150,7 @@ test_that("active binding: formula works", {
   )
 
   # Retrieve the formula
-  expect_equal(m$formula, "{observable} ~ 0")
+  expect_identical(m$formula, "{observable} ~ 0")
 
   # Try to set the formula
   # test_that cannot capture this error, so we have to hack it
@@ -158,7 +158,7 @@ test_that("active binding: formula works", {
     tryCatch(m$formula <- "{observable} ~ 1", error = \(e) e),                                                          # nolint: implicit_assignment_linter
     simpleError("`$formula` is read only")
   )
-  expect_equal(m$formula, "{observable} ~ 0")
+  expect_identical(m$formula, "{observable} ~ 0")
 
   rm(m)
 })
@@ -172,7 +172,7 @@ test_that("active binding: family works", {
   )
 
   # Retrieve the family
-  expect_equal(m$family, stats::poisson())
+  expect_equal(m$family, stats::poisson())                                                                              # nolint: expect_identical_linter. Functions have different environments
 
   # Try to set the family
   # test_that cannot capture this error, so we have to hack it
@@ -180,7 +180,7 @@ test_that("active binding: family works", {
     tryCatch(m$family <- stats::quasipoisson(), error = \(e) e),                                                        # nolint: implicit_assignment_linter
     simpleError("`$family` is read only")
   )
-  expect_equal(m$family, stats::poisson())
+  expect_equal(m$family, stats::poisson())                                                                              # nolint: expect_identical_linter. Functions have different environments
 
   rm(m)
 })
