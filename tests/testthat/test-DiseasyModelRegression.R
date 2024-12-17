@@ -6,6 +6,7 @@ test_that("initialize works", {
     family = stats::poisson(),
     parameters = list("training_length" = c("training" = 21))
   )
+  hashes <- m1$hash
 
 
   m2 <- DiseasyModelRegression$new(
@@ -13,7 +14,8 @@ test_that("initialize works", {
     family = stats::poisson(),
     parameters = list("training_length" = c("training" = 21))
   )
-  expect_false(m2$hash == m1$hash)
+  checkmate::expect_disjunct(m2$hash, hashes)
+  hashes <- c(hashes, m2$hash)
 
 
   m3 <- DiseasyModelRegression$new(
@@ -21,8 +23,8 @@ test_that("initialize works", {
     family = stats::quasipoisson(),
     parameters = list("training_length" = c("training" = 21))
   )
-  expect_false(m3$hash == m1$hash)
-  expect_false(m3$hash == m2$hash)
+  checkmate::expect_disjunct(m3$hash, hashes)
+  hashes <- c(hashes, m3$hash)
 
 
   m4 <- DiseasyModelRegression$new(
@@ -30,9 +32,8 @@ test_that("initialize works", {
     family = stats::poisson(),
     parameters = list("training_length" = c("training" = 14))
   )
-  expect_false(m4$hash == m1$hash)
-  expect_false(m4$hash == m2$hash)
-  expect_false(m4$hash == m3$hash)
+  checkmate::expect_disjunct(m4$hash, hashes)
+  hashes <- c(hashes, m4$hash)
 
 
   m5 <- DiseasyModelRegression$new(
@@ -40,10 +41,8 @@ test_that("initialize works", {
     family = stats::quasipoisson(),
     parameters = list("training_length" = c("training" = 21))
   )
-  expect_false(m5$hash == m1$hash)
-  expect_false(m5$hash == m2$hash)
-  expect_false(m5$hash == m3$hash)
-  expect_false(m5$hash == m4$hash)
+  checkmate::expect_disjunct(m5$hash, hashes)
+  hashes <- c(hashes, m5$hash)
 
 
   m6 <- DiseasyModelRegression$new(
@@ -51,11 +50,8 @@ test_that("initialize works", {
     family = stats::quasipoisson(),
     parameters = list("training_length" = c("training" = 14))
   )
-  expect_false(m6$hash == m1$hash)
-  expect_false(m6$hash == m2$hash)
-  expect_false(m6$hash == m3$hash)
-  expect_false(m6$hash == m4$hash)
-  expect_false(m6$hash == m5$hash)
+  checkmate::expect_disjunct(m6$hash, hashes)
+  hashes <- c(hashes, m6$hash)
 
 
   m7 <- DiseasyModelRegression$new(
@@ -63,12 +59,8 @@ test_that("initialize works", {
     family = stats::quasipoisson(),
     parameters = list("training_length" = c("training" = 14))
   )
-  expect_false(m7$hash == m1$hash)
-  expect_false(m7$hash == m2$hash)
-  expect_false(m7$hash == m3$hash)
-  expect_false(m7$hash == m4$hash)
-  expect_false(m7$hash == m5$hash)
-  expect_false(m7$hash == m6$hash)
+  checkmate::expect_disjunct(m7$hash, hashes)
+  hashes <- c(hashes, m7$hash)
 
   rm(m1, m2, m3, m4, m5, m6, m7)
 })
