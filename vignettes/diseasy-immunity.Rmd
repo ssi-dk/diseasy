@@ -256,7 +256,7 @@ this is not generally true. We find that the "all_free" method can be the best i
 multiple time scales, but often performs no better than "free_gamma".
 For more examples, see the optimisation vignette (`vignette("diseasy-immunity-optimisation")`).
 
-```{r elbow curve method, fig.alt = "Increasing number of compartments has diminishing returns on the error."}
+```{r elbow curve method, fig.alt = "Increasing number of compartments has diminishing returns on the error.", eval = rlang::is_installed("ggplot2")}
 # Prepare the data
 M_seq <- seq(from = 1, to = 5, by = 1)
 methods <- c("free_gamma", "free_delta", "all_free")
@@ -277,8 +277,7 @@ results <- tidyr::expand_grid(
     },
     .progress = interactive()
   ) |>
-  purrr::list_transpose() |>
-  tibble::as_tibble()
+  purrr::list_transpose()
 
 # Plot
 ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
