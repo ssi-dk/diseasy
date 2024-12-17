@@ -243,13 +243,9 @@ for (penalty in c(0, 1)) {
       #list("optim_method" = "slsqp"), # Wrapper to nloptr::slsqp
       #list("optim_method" = "tnewt"), # Wrapper to nloptr::tnewton
       list("optim_method" = "anms"),
-      list("optim_method" = "pracmanm"),
+      list("optim_method" = "pracmanm")
       #list("optim_method" = "nlnm"), # Wrapper to nloptr::neldermead
       #list("optim_method" = "snewtm"), # Needs gradient/Hessian
-
-      # Fine tuning of good candidates
-      list("optim_method" = "sbplx", "maxeval" = 10 * purrr::pluck(nloptr::nl.opts(), "maxeval")), # 10x the evaluations
-      list("optim_method" = "BFGS", "reltol" = 1e-12) # 4 orders of magnitude lower than default tolerance
     )
   )
 
