@@ -515,11 +515,19 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   # Test the approximations for M = 1 to M = 3 using defaults
   test_combinations <- tidyr::expand_grid(
     M = seq(1, 3),
-    method = c("free_delta", "free_gamma", "all_free")
+    method = c("free_delta", "free_gamma", "all_free"),
+    penalty = c(TRUE, FALSE)
   )
 
-  purrr::pwalk(test_combinations, \(M, method) {                                                                        # nolint: object_name_linter
-    expect_no_error(im$approximate_compartmental(M = !!M, method = !!method))
+  purrr::pwalk(test_combinations, \(M, method, penalty) {                                                               # nolint: object_name_linter
+    expect_no_error(
+      im$approximate_compartmental(
+        M = !!M,
+        method = !!method,
+        monotonous = !!penalty,
+        individual_level = !!penalty
+      )
+    )
   })
 
   # Test all combinations of method and strategy
@@ -529,12 +537,21 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
       "free_delta-naive", "free_gamma-naive", "all_free-naive",
       "free_delta-recursive", "free_gamma-recursive", "all_free-recursive",
       "all_free-combination"
-    )
+    ),
+    penalty = c(TRUE, FALSE)
   ) |>
     tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
 
-  purrr::pwalk(test_combinations, \(M, method, strategy) {                                                              # nolint: object_name_linter
-    expect_no_error(im$approximate_compartmental(M = !!M, method = !!method, strategy = !!strategy))
+  purrr::pwalk(test_combinations, \(M, method, strategy, penalty) {                                                     # nolint: object_name_linter
+    expect_no_error(
+      im$approximate_compartmental(
+        M = !!M,
+        method = !!method,
+        strategy = !!strategy,
+        monotonous = !!penalty,
+        individual_level = !!penalty
+      )
+    )
   })
 
 
