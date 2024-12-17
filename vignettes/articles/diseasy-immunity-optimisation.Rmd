@@ -92,6 +92,7 @@ results
 ```{r, include = FALSE}
 # Aggregate results for optimiser across variations of the problem
 best_optim_results <- results |>
+  dplyr::filter(.data$M <= 5) |>
   dplyr::summarise(
     "value" = sum(.data$value),
     "execution_time" = sum(.data$execution_time),
@@ -129,6 +130,8 @@ and the target function across all target functions and problem sizes ($M$).
 
 Note that we currently filter out the results from the Heaviside and Linear targets seems to be especially difficult
 for the optimisers to handle (see the [Per target results](#per-target-results) section below).
+
+In addition, we only consider problems up to size $M = 5$ for the general results.
 
 ```{r helper functions for gt, include = FALSE}
 # Function to apply bold style to the smallest value in each section
