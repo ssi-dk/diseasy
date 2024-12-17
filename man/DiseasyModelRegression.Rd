@@ -2,9 +2,24 @@
 % Please edit documentation in R/DiseasyModelRegression.R
 \name{DiseasyModelRegression}
 \alias{DiseasyModelRegression}
-\title{Meta module for the regression class of models}
+\title{Base module for the regression class of models}
 \description{
-TODO
+The \code{DiseasyModelRegression} module implements common structure and functionality to regression class of models
+beyond the model structure provided by \code{?DiseasyModel}.
+
+Most notably, the model module implements the \verb{$get_results()} method.
+This implementation requires the subclass to implement the \verb{$fit_regression()}, \verb{$get_prediction()} and
+\verb{$update_formula()} methods.
+
+The \verb{$fit_regression()} method should fit the regression model to the training data.
+In the case of a GLM model, this would be a call to \code{stats::glm}.
+
+The \verb{$get_prediction()} method should predict the future values of the observable.
+In the case of a GLM model, this would be a call to \code{stats::predict}.
+
+The \verb{$update_formula()} method should update the formula based on the stratifications.
+If the model should flexibly adapt to different stratifications, this method should be implemented.
+See \code{DiseasyModelGLM} and \code{DiseasyModelBRM} for examples of how this can be done.
 }
 \seealso{
 \link[stats:family]{stats::family}, \link[stats:formula]{stats::as.formula}, \link{DiseasyModelG0}, \link{DiseasyModelG1}, \link{DiseasyModelB0}, \link{DiseasyModelG1}

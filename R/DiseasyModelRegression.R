@@ -1,6 +1,23 @@
-#' @title Meta module for the regression class of models
+#' @title Base module for the regression class of models
 #'
-#' @description TODO
+#' @description
+#'   The `DiseasyModelRegression` module implements common structure and functionality to regression class of models
+#'   beyond the model structure provided by `?DiseasyModel`.
+#'
+#'   Most notably, the model module implements the `$get_results()` method.
+#'   This implementation requires the subclass to implement the `$fit_regression()`, `$get_prediction()` and
+#'   `$update_formula()` methods.
+#'
+#'   The `$fit_regression()` method should fit the regression model to the training data.
+#'   In the case of a GLM model, this would be a call to `stats::glm`.
+#'
+#'   The `$get_prediction()` method should predict the future values of the observable.
+#'   In the case of a GLM model, this would be a call to `stats::predict`.
+#'
+#'   The `$update_formula()` method should update the formula based on the stratifications.
+#'   If the model should flexibly adapt to different stratifications, this method should be implemented.
+#'   See `DiseasyModelGLM` and `DiseasyModelBRM` for examples of how this can be done.
+#'
 #' @keywords model-template-builder
 #' @export
 DiseasyModelRegression <- R6::R6Class(                                                                                  # nolint: object_name_linter
