@@ -21,6 +21,30 @@ test_that("qhypo matches Erlang distribution", {
 })
 
 
+
+test_that("dhypo matches Erlang distribution", {
+  expect_equal(                                                                                                         # nolint: expect_equal
+    dhypo(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = rep(1, 5)),
+    stats::dgamma(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = 1)
+  )
+})
+
+test_that("phypo matches Erlang distribution", {
+  expect_equal(                                                                                                         # nolint: expect_equal
+    phypo(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = rep(1, 5)),
+    stats::pgamma(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = 1)
+  )
+})
+
+test_that("qhypo matches Erlang distribution", {
+  expect_equal(                                                                                                         # nolint: expect_equal
+    qhypo(seq(from = 0.05, to = 0.95, length.out = 5), shape = 5, rate = rep(1, 5)),
+    stats::qgamma(seq(from = 0.05, to = 0.95, length.out = 5), shape = 5, rate = 1)
+  )
+})
+
+
+
 # For the non-edge-case, we compare numerically with different Poisson processes and check that they are close
 test_rates <- list(
   "erlang case 1" = \(shape) 1,
