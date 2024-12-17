@@ -3,6 +3,9 @@
 \name{DiseasyModelRegression}
 \alias{DiseasyModelRegression}
 \title{Base module for the regression class of models}
+\value{
+A new instance of the \code{DiseasyModelRegression} \link[R6:R6Class]{R6} class.
+}
 \description{
 The \code{DiseasyModelRegression} module implements common structure and functionality to regression class of models
 beyond the model structure provided by \code{?DiseasyModel}.
@@ -20,6 +23,12 @@ In the case of a GLM model, this would be a call to \code{stats::predict}.
 The \verb{$update_formula()} method should update the formula based on the stratifications.
 If the model should flexibly adapt to different stratifications, this method should be implemented.
 See \code{DiseasyModelGLM} and \code{DiseasyModelBRM} for examples of how this can be done.
+}
+\examples{
+  # Normally, one would not want to create this module directly, but it is possible.
+  regression_template <- DiseasyModelRegression$new()
+
+  rm(regression_template)
 }
 \seealso{
 \link[stats:family]{stats::family}, \link[stats:formula]{stats::as.formula}, \link{DiseasyModelG0}, \link{DiseasyModelG1}, \link{DiseasyModelB0}, \link{DiseasyModelG1}

@@ -18,6 +18,13 @@
 #'   If the model should flexibly adapt to different stratifications, this method should be implemented.
 #'   See `DiseasyModelGLM` and `DiseasyModelBRM` for examples of how this can be done.
 #'
+#' @examples
+#'   # Normally, one would not want to create this module directly, but it is possible.
+#'   regression_template <- DiseasyModelRegression$new()
+#'
+#'   rm(regression_template)
+#' @return
+#'   A new instance of the `DiseasyModelRegression` [R6][R6::R6Class] class.
 #' @keywords model-template-builder
 #' @export
 DiseasyModelRegression <- R6::R6Class(                                                                                  # nolint: object_name_linter
