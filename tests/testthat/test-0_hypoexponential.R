@@ -59,7 +59,7 @@ n_samples <- 1e6 # Number of Monte Carlo samples in the test
 for (shape in c(1, 5)) { # Number of compartments
   purrr::imap(test_rates, \(rates, rate_name) {
 
-    test_that(glue::glue("`dhypo()` works for shape = {shape} and {rate_name} rates"), {
+    test_that(glue::glue("hypoexponential works for shape = {shape} and {rate_name} rates"), {
 
       # The Monte Carlo (mc) rates needs to be of length shape
       r <- rates(shape)
