@@ -31,12 +31,11 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #'   `update_formula(stratification)` function that accounts for changes in stratification.
     #' @seealso
     #'   [stats::family], [stats::as.formula], [DiseasyModelG0], [DiseasyModelG1], [DiseasyModelB0], [DiseasyModelG1]
-    initialize = function(formula, family, parameters = NULL, ...) {
+    initialize = function(formula, family, ...) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(formula, pattern = r"{\{observable\}\s*~.*}", add = coll)
       checkmate::assert_class(family, "family", add = coll)
-      checkmate::assert_number(training_length, add = coll)
       checkmate::reportAssertions(coll)
 
       # Store the given parameters
@@ -68,7 +67,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
       if (!private$is_cached(hash)) {
 
         # Get the observable at the stratification level
-        training_data <- self$get_training_data(observable, stratification)
+        training_data <- self$get_data(observable, stratification)
 
 
         # Add season

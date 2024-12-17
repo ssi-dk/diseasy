@@ -4,14 +4,14 @@ test_that("initialize works", {
   m1 <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
 
 
   m2 <- DiseasyModelRegression$new(
     formula = "{observable} ~ 1",
     family = stats::poisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
   expect_false(m2$hash == m1$hash)
 
@@ -19,7 +19,7 @@ test_that("initialize works", {
   m3 <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::quasipoisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
   expect_false(m3$hash == m1$hash)
   expect_false(m3$hash == m2$hash)
@@ -28,7 +28,7 @@ test_that("initialize works", {
   m4 <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 14
+    parameters = list("training_length" = c("training" = 14))
   )
   expect_false(m4$hash == m1$hash)
   expect_false(m4$hash == m2$hash)
@@ -38,7 +38,7 @@ test_that("initialize works", {
   m5 <- DiseasyModelRegression$new(
     formula = "{observable} ~ 1",
     family = stats::quasipoisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
   expect_false(m5$hash == m1$hash)
   expect_false(m5$hash == m2$hash)
@@ -49,7 +49,7 @@ test_that("initialize works", {
   m6 <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::quasipoisson(),
-    training_length = 14
+    parameters = list("training_length" = c("training" = 14))
   )
   expect_false(m6$hash == m1$hash)
   expect_false(m6$hash == m2$hash)
@@ -61,7 +61,7 @@ test_that("initialize works", {
   m7 <- DiseasyModelRegression$new(
     formula = "{observable} ~ 1",
     family = stats::quasipoisson(),
-    training_length = 14
+    parameters = list("training_length" = c("training" = 14))
   )
   expect_false(m7$hash == m1$hash)
   expect_false(m7$hash == m2$hash)
@@ -72,28 +72,6 @@ test_that("initialize works", {
 
   rm(m1, m2, m3, m4, m5, m6, m7)
 })
-
-
-test_that("$get_training_data() works", { for (case_def in case_defs) {                                                 # nolint: brace_linter
-
-  # Creating an empty module
-  obs <- DiseasyObservables$new(
-    diseasystore = "Google COVID-19",
-    last_queryable_date = as.Date("2021-01-01")
-  )
-  m <- DiseasyModelRegression$new(
-    formula = "{observable} ~ 0",
-    family = stats::poisson(),
-    training_length = 21,
-    observables = obs
-  )
-
-  # Test the get_results
-  observable <- purrr::pluck(obs$available_observables, 1)
-  expect_no_error(training_data <- m$get_training_data(observable))                                                     # nolint: implicit_assignment_linter
-  expect_named(training_data, expected = c("date", observable, "t"))
-
-}})
 
 
 test_that("$get_results() gives error", {
@@ -107,7 +85,7 @@ test_that("$get_results() gives error", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 21,
+    parameters = list("training_length" = c("training" = 21)),
     observables = obs
   )
 
@@ -125,7 +103,7 @@ test_that("$fit_regression() gives error", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
 
   # test_that cannot capture this error, so we have to hack it
@@ -142,7 +120,7 @@ test_that("$get_prediction() gives error", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
 
   # test_that cannot capture this error, so we have to hack it
@@ -159,7 +137,7 @@ test_that("update_formula gives error", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
 
   # test_that cannot capture this error, so we have to hack it
@@ -176,7 +154,7 @@ test_that("active binding: formula works", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
 
   # Retrieve the formula
@@ -198,7 +176,7 @@ test_that("active binding: family works", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
     family = stats::poisson(),
-    training_length = 21
+    parameters = list("training_length" = c("training" = 21))
   )
 
   # Retrieve the family
