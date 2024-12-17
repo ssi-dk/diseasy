@@ -364,7 +364,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
 #'   Plotting method for `diseasy` modules
 #' @description
 #'   Visualise `diseasy` modules.
-#' @param obj (`Diseasy*`)\cr
+#' @param x (`Diseasy*`)\cr
 #'   The module to generate visualisation for.
 #' @param ...
 #'   Parameters sent to the specific plotting methods.

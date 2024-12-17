@@ -8,11 +8,11 @@
 \method{plot}{DiseasyBaseModule}(x, ...)
 }
 \arguments{
+\item{x}{(\verb{Diseasy*})\cr
+The module to generate visualisation for.}
+
 \item{...}{Parameters sent to the specific plotting methods.
 See the \verb{$plot()} method for each module}
-
-\item{obj}{(\verb{Diseasy*})\cr
-The module to generate visualisation for.}
 }
 \value{
 NULL (called for side effects)
