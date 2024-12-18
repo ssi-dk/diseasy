@@ -473,7 +473,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           rep(length(private$activity_types)) |>     # ... across all arenas
           stats::setNames(private$activity_types) |>
           list() |>                                  # ... and nested to match output format
-          stats::setNames(as.Date(0))
+          stats::setNames(as.Date("1970-01-01"))
 
       } else { # otherwise, we compute the openness from the scenario
 
@@ -567,7 +567,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           rep(length(private$activity_types)) |>     # ... across all arenas
           stats::setNames(private$activity_types) |>
           list() |>                                  # ... and nested to match output format
-          stats::setNames(as.Date(0))
+          stats::setNames(as.Date("1970-01-01"))
 
       } else { # otherwise, we compute the contact matrices from the scenario
 

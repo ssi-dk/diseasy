@@ -1271,7 +1271,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We need to remove the effect from "in-active" variants since they are not yet introduced to the system
       active_variants <- self %.% variant %.% variants |>
-        purrr::map(~ purrr::pluck(.x, "introduction_date", .default = as.Date(0))) |>
+        purrr::map(~ purrr::pluck(.x, "introduction_date", .default = as.Date("1970-01-01"))) |>
         purrr::map_lgl(~ .x - (self %.% training_period %.% end + t) <= 0)
 
       inactive_idx <- seq_len((K + L) * private %.% n_age_groups) +
