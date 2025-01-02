@@ -1,6 +1,11 @@
+aes
+alt
 antiphase
 AR
 ARI
+
+BB
+bobyqa
 
 CCW
 
@@ -35,6 +40,7 @@ DiseasystoreGoogleCovid
 diseasystores
 DiseasyActivity
 DiseasyBaseModule
+DiseasyImmunity
 DiseasyObservables
 DiseasySeason
 DiseasyVariant
@@ -57,22 +63,25 @@ Engbo
 epiverse
 erviss
 
-fn
-fns
 FeatureHandler
 FeatureHandlers
+fn
+fns
 frac
 
 github
 gov
 Gruson
 
+Heaviside
 hypoexponential
 
 ij
 ILI
-io
+infty
 Institut
+int
+io
 
 ji
 Jit
@@ -94,15 +103,23 @@ Mielke
 moduleowner
 Myrup
 
+Nelder
+nlm
+nlminb
+nloptr
 nolint
 normalise
 nrow
 
+optim
+optimr
+optimx
 OO
 ORCID
 org
 
 param
+parameterise
 parsable
 PascalCase
 pcbi
@@ -128,8 +145,10 @@ Rmd
 SCDB
 Schou
 SEIR
+sigmoidal
 simulist
 Skytte
+spg
 SSI
 Statens
 sql
@@ -139,12 +158,16 @@ Tamayo
 tbl
 Telkamp
 textrm
+th
 tibble
 tidyselect
 TODOs
 ts
 
 u
+ucminf
+
+vec
 
 walkthrough
 www
