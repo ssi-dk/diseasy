@@ -89,10 +89,15 @@ tidyr::expand_grid(
 
       # Check that the initialised solution has the same "tonocity" as the real solution
       # (i.e. same number of turning points)
-      expect_equal(
-        sum(diff(sign(diff(model_incidence))) != 0),
-        sum(diff(sign(diff(true_incidence))) != 0)
-      )
+      # This will not generally be true, but should be true if the model we fit match the model
+      # used to generate the data. If there is a misspecification of the model, the initial
+      # behavior of the model output may be "noisy" and not have the same number of turning points
+      if (identical(c(K, L, M), c(2, 1, 1))) {
+        expect_equal(
+          sum(diff(sign(diff(model_incidence))) != 0),
+          sum(diff(sign(diff(true_incidence))) != 0)
+        )
+      }
 
       rm(m)
     })
