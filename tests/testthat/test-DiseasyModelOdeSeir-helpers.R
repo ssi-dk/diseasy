@@ -45,7 +45,7 @@ test_that("helpers works (SR single variant / single age group)", {
     seq_len(m %.% compartment_structure %.% R)
   )
 
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(
@@ -98,7 +98,7 @@ test_that("helpers works (SIR single variant / single age group)", {
     seq_len(m %.% compartment_structure %.% R)
   )
 
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(
@@ -168,7 +168,7 @@ test_that("helpers works (SIR double variant / double age group)", {
     seq_len(m %.% compartment_structure %.% R)
   )
 
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(#v1 v2
@@ -225,7 +225,7 @@ test_that("helpers works (SEIR single variant / single age group)", {
     seq_len(m %.% compartment_structure %.% R)
   )
 
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(
@@ -282,7 +282,7 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
     seq_len(m %.% compartment_structure %.% R)
   )
 
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(
@@ -354,7 +354,7 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
     seq_len(m %.% compartment_structure %.% R)
   )
 
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(#v1 v2
@@ -432,7 +432,7 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
     seq_len(m %.% compartment_structure %.% R)
   )
 
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(#v1 v2

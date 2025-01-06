@@ -85,15 +85,15 @@ tidyr::expand_grid(
         dplyr::filter(date >= obs$last_queryable_date) |>
         dplyr::pull("incidence")
 
-      expect_equal(model_incidence, true_incidence, tolerance = 1e-1)
+      expect_equal(model_incidence, true_incidence, tolerance = 1e-1)                                                   # nolint: expect_identical_linter
 
       # Check that the initialised solution has the same "tonocity" as the real solution
       # (i.e. same number of turning points)
       # This will not generally be true, but should be true if the model we fit match the model
       # used to generate the data. If there is a misspecification of the model, the initial
-      # behavior of the model output may be "noisy" and not have the same number of turning points
+      # behaviour of the model output may be "noisy" and not have the same number of turning points
       if (identical(c(K, L, M), c(2, 1, 1))) {
-        expect_equal(
+        expect_identical(
           sum(diff(sign(diff(model_incidence))) != 0),
           sum(diff(sign(diff(true_incidence))) != 0)
         )

@@ -22,7 +22,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   private <- m$.__enclos_env__$private
 
   # Check the case where everyone is in S
-  expect_equal(
+  expect_identical(
     private$generator_matrix(),
     matrix(1 - rI)
   )
@@ -32,7 +32,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
     m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
     seq_len(m %.% compartment_structure %.% R)
   )
-  expect_equal(
+  expect_identical(
     private$generator_matrix(RS_states = c(1, 0)),
     matrix(fr - rI)
   )
@@ -105,7 +105,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private$generator_matrix(),
     generator_matrix
   )
@@ -137,7 +137,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private$generator_matrix(RS_states = c(rep(r, 2 * 2), rep(0, 2), rep(s, 2))),
     generator_matrix
   )
@@ -164,7 +164,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private$generator_matrix(RS_states = c(rep(r, 3 * 2), rep(s, 2)), t = 1),
     generator_matrix
   )
@@ -199,7 +199,7 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_identical(
     private$generator_matrix(),
     generator_matrix
   )
@@ -314,7 +314,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_identical(
     private$generator_matrix(),
     generator_matrix
   )
@@ -349,7 +349,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_identical(
     private$generator_matrix(RS_states = c(rep(r, 2 * 2), rep(0, 2), rep(s, 1))),
     generator_matrix
   )
@@ -380,7 +380,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private$generator_matrix(RS_states = c(rep(r, 3 * 2), rep(s, 1)), t = 1),
     generator_matrix
   )
@@ -451,7 +451,7 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_identical(
     private$generator_matrix(),
     generator_matrix
   )
@@ -485,7 +485,7 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
     byrow = TRUE                                                                                                        # nolint end
   )
 
-  expect_equal(
+  expect_identical(
     private$generator_matrix(RS_states = c(rep(r, 2 * 2), rep(s, 2))),
     generator_matrix
   )

@@ -100,7 +100,10 @@ combinations |>
     ggplot2::geom_line(linewidth = 1) +
     ggplot2::scale_y_continuous(transform = "log10") +
     ggplot2::facet_wrap(
-      ~ factor(malthusian_matching, levels = c("No matching", "Matched growth rates"))
+      ~ factor(
+        malthusian_matching,
+        levels = c("No matching", "Matched growth rates")
+      )
     ) +
     ggplot2::xlab("Time") +
     ggplot2::ylab("Incidence (relative to t = 5)") +

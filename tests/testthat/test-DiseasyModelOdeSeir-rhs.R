@@ -38,11 +38,11 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   # Generate a uniform initial state_vector that sums to 1
   y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
-  expect_equal(sum(y0), 1)
+  expect_identical(sum(y0), 1)
 
 
   # Check that rhs function does not immediately leak
-  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
+  expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
   sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
@@ -86,11 +86,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   # Generate a uniform initial state_vector that sums to 1
   y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
-  expect_equal(sum(y0), 1)
+  expect_identical(sum(y0), 1)
 
 
   # Check that rhs function does not immediately leak
-  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
+  expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
   sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
@@ -121,11 +121,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   # Generate a uniform initial state_vector that sums to 1
   y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
-  expect_equal(sum(y0), 1)
+  expect_identical(sum(y0), 1)
 
 
   # Check that rhs function does not immediately leak
-  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
+  expect_identical(sum(m %.% rhs(0, y0)[[1]]), 0)
 
   # Run solver across scenario change to check for long-term leakage
   sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
@@ -169,11 +169,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   # Generate a uniform initial state_vector that sums to 1
   y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
-  expect_equal(sum(y0), 1)
+  expect_identical(sum(y0), 1)
 
 
   # Check that rhs function does not immediately leak
-  expect_equal(sum(private %.% rhs(0, y0)[[1]]), 0)
+  expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
   sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
@@ -348,8 +348,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.1 # Infections with both variants
   y0[private$s_state_indices] <- ss <- 0.8 # The rest are susceptible
-  expect_equal(
-    unname(private$rhs(0, y0)[[1]]),
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
+    unname(m %.% rhs(0, y0)[[1]]),
     c(
       si * ss,       -si * rI,  si * rI, # Variant 1
       si * ss * fv,  -si * rI,  si * rI, # Variant 2
@@ -389,8 +389,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
   y0[private$s_state_indices] <- ss <- 0.4 # The rest are susceptible
-  expect_equal(
-    unname(private$rhs(0, y0)[[1]]),
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
+    unname(m %.% rhs(0, y0)[[1]]),
     c(
       (si + si) * ss,      -si * rI,  si * rI, # Variant 1, age group 1
       (si + si) * ss,      -si * rI,  si * rI, # Variant 1, age group 2
@@ -437,8 +437,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.1 # Infections with both variants
   y0[private$r1_state_indices] <- sr <- 0.4 # The rest are previously infected
-  expect_equal(
-    unname(private$rhs(0, y0)[[1]]),
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
+    unname(m %.% rhs(0, y0)[[1]]),
     c(
       fr * si * (sr + sr),       -si * rI,  si * rI - fr * (si + si * fv) * sr, # Variant 1
       fr * si * (sr + sr) * fv,  -si * rI,  si * rI - fr * (si + si * fv) * sr, # Variant 2
@@ -481,8 +481,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
   y0[private$r1_state_indices] <- sr <- 0.4 # The rest are previously infected
-  expect_equal(
-    unname(private$rhs(0, y0)[[1]]),
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
+    unname(m %.% rhs(0, y0)[[1]]),
     c(
       fr * (4 * si) * sr,       -si * rI,  si * rI - fr * sr * (2 * si + 2 * si * fv), # Variant 1, age group 1
       fr * (4 * si) * sr,       -si * rI,  si * rI - fr * sr * (2 * si + 2 * si * fv), # Variant 1, age group 2
@@ -536,8 +536,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.1 # Infections with both variants
   y0[private$s_state_indices] <- ss <- 0.8 # The rest are susceptible
-  expect_equal(
-    unname(private$rhs(1, y0)[[1]]),
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
+    unname(m %.% rhs(1, y0)[[1]]),
     c(
       0.5 * si * ss,       -si * rI,  si * rI, # Variant 1
       0.5 * si * ss * fv,  -si * rI,  si * rI, # Variant 2
@@ -590,8 +590,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
   y0[private$s_state_indices] <- ss <- 0.4 # The rest are susceptible
-  expect_equal(
-    unname(private$rhs(1, y0)[[1]]),
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
+    unname(m %.% rhs(1, y0)[[1]]),
     c(
       0.5 * (si + si) * ss,       -si * rI,  si * rI, # Variant 1, age group 1
       0.5 * (si + si) * ss,       -si * rI,  si * rI, # Variant 1, age group 2
@@ -641,7 +641,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
   )
 
   # Check risk matrix is correctly set
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(#v1 v2
@@ -698,7 +698,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
   )
 
   # Check risk matrix is correctly set
-  expect_equal(
+  expect_identical(
     private %.% immunity_matrix,
     matrix(
       c(#v1 v2
