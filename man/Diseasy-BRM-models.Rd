@@ -6,12 +6,30 @@
 \alias{DiseasyModelB0}
 \alias{DiseasyModelB1}
 \title{Meta module for the BRM class of models}
+\value{
+A new instance of the \code{DiseasyModelGLM}, \code{DiseasyModelG0} or
+\code{DiseasyModelG1} \link[R6:R6Class]{R6} class.
+}
 \description{
-TODO
+The \code{DiseasyModelGLM} module implements common structure and functionality to
+GLM regression class of models beyond the model structure provided by \code{DiseasyModelRegression}.
 
-TODO
+Most notably, the model module implements the \verb{$fit_regression()} and \verb{$get_prediction()} methods using
+GLM.
 
-TODO
+\code{diseasy} includes two simple models that uses the \code{DiseasyModelGLM} module:
+\code{DiseasyModelG0} and \code{DiseasyModelG1}
+These models implements a constant predictor and a exponential model based on the previous 7 and 21 days
+of observations, respectively.
+
+When making a custom GLM model, the subclass should implement the \verb{$update_formula()} method.
+The \verb{$update_formula()} method should update the formula based on the stratifications.
+If the model should flexibly adapt to different stratifications, this method should be implemented.
+See \code{DiseasyModelG0} and \code{DiseasyModelG1} for
+examples of how this can be done.
+}
+\examples{
+`r diseasymodel_glm_brm_example("GLM")`
 }
 \keyword{model-template}
 \section{Super classes}{
