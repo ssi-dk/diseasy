@@ -73,7 +73,7 @@
 #'
 #'   # Extract the incidence outcome from the solution
 #'   time <- sol[, 1]
-#'   model_incidence <- sol[, 3] * 1 / 4
+#'   model_incidence <- sol[, 3] * m$disease_progression_rates[["I"]]
 #'
 #'   plot(
 #'     x = time + m$training_period$end,
