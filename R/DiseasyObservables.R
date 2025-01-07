@@ -87,7 +87,7 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Must match case definition implemented in `diseasystore` package.
     #' @param verbose (`logical`)\cr
     #'   Should the `diseasystore` use verbose outputs?
-    #' @seealso [diseasystore]
+    #' @seealso [diseasystore::diseasystore]
     set_diseasystore = function(diseasystore, verbose = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(diseasystore, add = coll)
