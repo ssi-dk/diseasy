@@ -4,6 +4,10 @@
 # We can therefore test that the initialisation works "well" and thereby guard ourselves against future,
 # unintended drops in performance.
 
+if (!rlang::is_installed("RSQLite")) {
+  return() # Skip these tests if RSQLite is not installed
+}
+
 # We here use the parameters of the generating model
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
@@ -30,7 +34,6 @@ incidence_data <- obs$get_observation(
 
 # Lock the observation data to a simulation start date (30 day period)
 obs$set_last_queryable_date(obs %.% ds %.% max_end_date - 30)
-
 
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
