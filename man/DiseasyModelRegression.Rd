@@ -25,10 +25,8 @@ If the model should flexibly adapt to different stratifications, this method sho
 See \code{?DiseasyModelGLM} and \code{?DiseasyModelBRM} for examples of how this can be done.
 }
 \examples{
-  # Normally, one would not want to create this module directly, but it is possible.
-  regression_template <- DiseasyModelRegression$new()
-
-  rm(regression_template)
+  # This module cannot be constructed directly but should instead be used to
+  # inherit from when creating a new model class.
 }
 \seealso{
 \link[stats:family]{stats::family}, \link[stats:formula]{stats::as.formula}, \link{DiseasyModelG0}, \link{DiseasyModelG1}, \link{DiseasyModelB0}, \link{DiseasyModelG1}
@@ -99,8 +97,8 @@ A \code{character} string that is passed to \code{stats::as.formula} via \code{g
 }
 \subsection{Details}{
 The observable will change at run time and we therefore cannot define a static formula.
-We can use "{observable}" in our formula which will then be translated at run time.
-For example, if the requested observable is "n_hospital" and the formula is "{observable} ~ 1",
+We can use "\{observable\}" in our formula which will then be translated at run time.
+For example, if the requested observable is "n_hospital" and the formula is "\{observable\} ~ 1",
 then at run time, the formula will translate to "n_hospital ~ 1".
 
 Furthermore the stratification can also change at run time, so the model should incorporate a

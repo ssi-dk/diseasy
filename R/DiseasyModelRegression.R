@@ -19,10 +19,8 @@
 #'   See `?DiseasyModelGLM` and `?DiseasyModelBRM` for examples of how this can be done.
 #'
 #' @examples
-#'   # Normally, one would not want to create this module directly, but it is possible.
-#'   regression_template <- DiseasyModelRegression$new()
-#'
-#'   rm(regression_template)
+#'   # This module cannot be constructed directly but should instead be used to
+#'   # inherit from when creating a new model class.
 #' @return
 #'   A new instance of the `DiseasyModelRegression` [R6][R6::R6Class] class.
 #' @keywords model-template-builder
@@ -47,8 +45,8 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #'   parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     #' @details
     #'   The observable will change at run time and we therefore cannot define a static formula.
-    #'   We can use "{observable}" in our formula which will then be translated at run time.
-    #'   For example, if the requested observable is "n_hospital" and the formula is "{observable} ~ 1",
+    #'   We can use "\{observable\}" in our formula which will then be translated at run time.
+    #'   For example, if the requested observable is "n_hospital" and the formula is "\{observable\} ~ 1",
     #'   then at run time, the formula will translate to "n_hospital ~ 1".
     #'
     #'   Furthermore the stratification can also change at run time, so the model should incorporate a
