@@ -67,6 +67,7 @@ test_that("initialize works", {
 
 
 test_that("$get_results() gives error", {
+  skip_if_not_installed("RSQLite")
 
   # Creating an empty module
   obs <- DiseasyObservables$new(
