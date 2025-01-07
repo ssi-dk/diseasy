@@ -55,7 +55,9 @@ vignette_string_functional_modules <- paste0(
 
 ```{r available_functional_modules, echo = FALSE, results = "asis"}
 ls("package:diseasy") |>
-  purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(BaseModule|Model.*))")) |>
+  purrr::keep(~ {
+    stringr::str_detect(., pattern = "Diseasy(?!(BaseModule|Model.*))")
+  }) |>
   toString() |>
   cat()
 ```
@@ -103,7 +105,9 @@ model_templates <- ls("package:diseasy") |>
   purrr::keep(~ stringr::str_detect(., pattern = "Diseasy(?!(Base|Model))")) |>
   purrr::map_chr(~ stringr::str_replace(., r"{(?<=[a-z])([A-Z])}", r"{-\1}")) |>
   tolower()
-vignette_string_model_templates <- paste0("\`vignette(\"", model_templates, "\")\`", collapse = ", ")
+vignette_string_model_templates <- paste0(
+  "\`vignette(\"", model_templates, "\")\`", collapse = ", "
+)
 ```
 
 To see the model templates in action, you can consult their respective vignettes, such as
