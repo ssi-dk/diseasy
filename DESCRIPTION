@@ -49,6 +49,7 @@ Suggests:
     jsonlite,
     knitr,
     lintr,
+    microbenchmark,
     readr,
     rmarkdown,
     RSQLite,
