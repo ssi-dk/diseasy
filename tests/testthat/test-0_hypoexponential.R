@@ -9,14 +9,14 @@ test_that("dhypo matches Erlang distribution", {
 test_that("phypo matches Erlang distribution", {
   expect_identical(
     phypo(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1),
-    stats::pexp(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1)
+    stats::pexp(seq(from = 0, to = 5, length.out = 5), rate = 1)
   )
 })
 
 test_that("qhypo matches Erlang distribution", {
   expect_equal(                                                                                                         # nolint: expect_identical_linter. We use root-finding rather than inversion to compute q which gives some deviation.
     qhypo(seq(from = 0.05, to = 0.95, length.out = 5), shape = 1, rate = 1),
-    stats::qexp(seq(from = 0.05, to = 0.95, length.out = 5), shape = 1, rate = 1)
+    stats::qexp(seq(from = 0.05, to = 0.95, length.out = 5), rate = 1)
   )
 })
 
