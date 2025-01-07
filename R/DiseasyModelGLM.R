@@ -1,9 +1,12 @@
 #' @title Meta module for the GLM class of models
 #' @name Diseasy-GLM-models
 #'
-#' @description `r diseasymodel_glm_brm_description("GLM")`
-#' @examples `r diseasymodel_glm_brm_example("GLM")`
-#' @return `r diseasymodel_glm_brm_return("GLM")`
+#' @description `r rd_diseasymodel_glm_brm_description("GLM")`
+#' @examples
+#'  model <- DiseasyModelG0$new()
+#'
+#'  rm(model)
+#' @return `r rd_diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export
 DiseasyModelGLM <- R6::R6Class(                                                                                         # nolint: object_name_linter
@@ -145,8 +148,6 @@ DiseasyModelG0 <- R6::R6Class(                                                  
   classname = "DiseasyModelG0",
   inherit = DiseasyModelG_,
   public = list(
-    #' @description
-    #'   Creates a new instance of the `DiseasyModelG0` [R6][R6::R6Class] class.
     #' @param ...
     #'   parameters sent to `DiseasyModelG_` [R6][R6::R6Class] constructor
     #' @return
@@ -174,8 +175,6 @@ DiseasyModelG1 <- R6::R6Class(                                                  
   classname = "DiseasyModelG1",
   inherit = DiseasyModelG_,
   public = list(
-    #' @description
-    #'   Creates a new instance of the `DiseasyModelG1` [R6][R6::R6Class] class.
     #' @param ...
     #'   parameters sent to `DiseasyModelG_` [R6][R6::R6Class] constructor
     #' @return

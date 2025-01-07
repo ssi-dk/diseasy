@@ -1,9 +1,12 @@
 #' @title Meta module for the BRM class of models
 #' @name Diseasy-BRM-models
 #'
-#' @description `r diseasymodel_glm_brm_description("GLM")`
-#' @examples `r diseasymodel_glm_brm_example("GLM")`
-#' @return `r diseasymodel_glm_brm_return("GLM")`
+#' @description `r rd_diseasymodel_glm_brm_description("GLM")`
+#' @examples
+#'  model <- DiseasyModelG0$new()
+#'
+#'  rm(model)
+#' @return `r rd_diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export
 #' @importFrom brms brm
@@ -164,8 +167,6 @@ DiseasyModelB0 <- R6::R6Class(                                                  
   classname = "DiseasyModelB0",
   inherit = DiseasyModelB_,
   public = list(
-    #' @description
-    #'   Creates a new instance of the `DiseasyModelB0` [R6][R6::R6Class] class.
     #' @param ...
     #'   parameters sent to `DiseasyModelB_` [R6][R6::R6Class] constructor
     #' @return
@@ -193,8 +194,6 @@ DiseasyModelB1 <- R6::R6Class(                                                  
   classname = "DiseasyModelB1",
   inherit = DiseasyModelB_,
   public = list(
-    #' @description
-    #'   Creates a new instance of the `DiseasyModelB1` [R6][R6::R6Class] class.
     #' @param ...
     #'   parameters sent to `DiseasyModelB_` [R6][R6::R6Class] constructor
     #' @return

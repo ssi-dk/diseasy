@@ -228,7 +228,7 @@ rd_disease_progression_rates <- function(type = "param") {
 }
 
 ## Templates for DiseasyModel Regression templates
-diseasymodel_glm_brm_description <- function(regression_class) {
+rd_diseasymodel_glm_brm_description <- function(regression_class) {
   glue::glue(
     .sep = "\n",
     "The `DiseasyModel{regression_class}` module implements common structure and functionality to",
@@ -250,16 +250,8 @@ diseasymodel_glm_brm_description <- function(regression_class) {
   )
 }
 
-diseasymodel_glm_brm_example <- function(regression_class) {
-  glue::glue(
-    .sep = "\n",
-    "model <- `DiseasyModel{substr(regression_class, 1, 1)}0`$new()",
-    "",
-    "rm(model)"
-  )
-}
 
-diseasymodel_glm_brm_return <- function(regression_class) {
+rd_diseasymodel_glm_brm_return <- function(regression_class) {
   glue::glue(
     .sep = "\n",
     "A new instance of the `DiseasyModel{regression_class}`, `DiseasyModel{substr(regression_class, 1, 1)}0` or ",

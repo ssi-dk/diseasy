@@ -29,7 +29,9 @@ See \code{DiseasyModelG0} and \code{DiseasyModelG1} for
 examples of how this can be done.
 }
 \examples{
-`r diseasymodel_glm_brm_example("GLM")`
+ model <- DiseasyModelG0$new()
+
+ rm(model)
 }
 \keyword{model-template}
 \section{Super classes}{
@@ -96,7 +98,6 @@ The objects of this class are cloneable with this method.
 \if{html}{\out{<a id="method-DiseasyModelG0-new"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelG0-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasyModelG0} \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelG0$new(...)}\if{html}{\out{</div>}}
 }
@@ -155,7 +156,6 @@ The objects of this class are cloneable with this method.
 \if{html}{\out{<a id="method-DiseasyModelG1-new"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelG1-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasyModelG1} \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelG1$new(...)}\if{html}{\out{</div>}}
 }
