@@ -6,6 +6,7 @@
 #' @return `r diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export
+#' @importFrom brms brm
 DiseasyModelBRM <- R6::R6Class(                                                                                         # nolint: object_name_linter
   classname = "DiseasyModelBRM",
   inherit = DiseasyModelRegression,
