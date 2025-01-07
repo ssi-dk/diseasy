@@ -1,7 +1,9 @@
 #' @title Meta module for the GLM class of models
 #' @name Diseasy-GLM-models
 #'
-#' @description TODO
+#' @description `r diseasymodel_glm_brm_description("GLM")`
+#' @examples `r diseasymodel_glm_brm_example("GLM")`
+#' @return `r diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export
 DiseasyModelGLM <- R6::R6Class(                                                                                         # nolint: object_name_linter
@@ -84,9 +86,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
 )
 
 
-#' @title Meta module for the simple, g* reference models models
-#'
-#' @description TODO
+# Meta module for the simple, g* reference models models
 #' @noRd
 DiseasyModelG_ <- R6::R6Class(                                                                                          # nolint: object_name_linter
   inherit = DiseasyModelGLM,
@@ -139,10 +139,7 @@ DiseasyModelG_ <- R6::R6Class(                                                  
 )
 
 
-#' @title Model module for the g0 reference model
 #' @rdname Diseasy-GLM-models
-#'
-#' @description TODO
 #' @export
 DiseasyModelG0 <- R6::R6Class(                                                                                          # nolint: object_name_linter
   classname = "DiseasyModelG0",
@@ -171,10 +168,7 @@ DiseasyModelG0 <- R6::R6Class(                                                  
 )
 
 
-#' @title Model module for the g1 reference model
 #' @rdname Diseasy-GLM-models
-#'
-#' @description TODO
 #' @export
 DiseasyModelG1 <- R6::R6Class(                                                                                          # nolint: object_name_linter
   classname = "DiseasyModelG1",
