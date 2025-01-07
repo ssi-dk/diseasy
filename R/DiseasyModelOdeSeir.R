@@ -14,7 +14,7 @@
 #'   - Asymmetric cross-immunity interactions between variants (via `DiseasyVariant`)
 #'
 #'   See `vignette(diseasy-model-ode-seir)` for a detailed examples of how to use this model.
-#' @examplesIf rlang::is_installed(c("duckdb", "deSolve"))
+#' @examplesIf rlang::is_installed(c("duckdb", "deSolve")) && (Sys.info()["sysname"] != "Darwin")
 #'   # The model can be instantiated almost without arguments, but
 #'   # to illustrate its use, we configure a simple model:
 #'

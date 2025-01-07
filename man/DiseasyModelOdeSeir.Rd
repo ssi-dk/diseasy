@@ -24,7 +24,7 @@ The model implements the following features:
 See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to use this model.
 }
 \examples{
-\dontshow{if (rlang::is_installed(c("duckdb", "deSolve"))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed(c("duckdb", "deSolve")) && (Sys.info()["sysname"] != "Darwin")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   # The model can be instantiated almost without arguments, but
   # to illustrate its use, we configure a simple model:
 
