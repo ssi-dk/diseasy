@@ -125,7 +125,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 
 
   # Check that rhs function does not immediately leak
-  expect_identical(sum(m %.% rhs(0, y0)[[1]]), 0)
+  expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
   sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)

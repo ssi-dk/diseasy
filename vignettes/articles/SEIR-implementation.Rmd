@@ -502,7 +502,7 @@ implementation was chosen.
 These benchmarks assume a simple SEIR model with only tree age group and one variant.
 
 ## "infected" sum computation
-```{r}
+```{r, eval = rlang::is_installed("microbenchmark")}
 ## Step 1, determine the number of infected by age group and variant
 i_state_indices <- list(2, 5, 8)
 state_vector <- rep(0, 9)
