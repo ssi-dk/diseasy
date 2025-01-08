@@ -29,6 +29,7 @@ dbi
 DBIConnection
 DBIDriver
 dbplyr
+dfoptim
 dI
 diseasy
 diseasystore
