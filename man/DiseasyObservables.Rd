@@ -37,7 +37,7 @@ See vignette("diseasy-observables")
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\link{diseasystore}
+\link[diseasystore:diseasystore-package]{diseasystore::diseasystore}
 
 \link[SCDB:get_table]{SCDB::get_table}
 

@@ -295,6 +295,9 @@ test_that("$get_scenario_openness() works with given scenario", {
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
+  # With no scenario, we should get a empty list
+  expect_identical(act$get_scenario_openness(), list())
+
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
                       opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),

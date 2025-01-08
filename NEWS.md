@@ -19,6 +19,9 @@
     * Parameters can easily be adjusted during model initialisation.
     * Parameters are inherited from super classes as needed.
 
+* A range of utility functions:
+  * The hypoexponential distribution: `dhypo()`, `phypo()`, `qhypo()`, and `rhypo()` (#146)
+
 ## Documentation:
 
 * The functions are fully documented.

@@ -20,12 +20,13 @@ Language: en-GB
 LazyData: TRUE
 Depends:
     diseasystore (>= 0.3),
-    R (>= 3.5.0)
+    R (>= 4.3.0)
 Imports:
     cachem,
     checkmate,
     digest,
     dplyr,
+    expm,
     glue,
     lgr,
     lubridate,
