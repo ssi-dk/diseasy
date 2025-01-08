@@ -22,6 +22,7 @@ library(diseasy)
 # Create a cache for this vignette since the examples take a long time to generate
 # We will destroy the cache if the source code for `DiseasyImmunity` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-immunity")
+stopifnot(cache$size() > 0)
 source_code_hash <- c(
   "public_methods",
   "public_fields",
