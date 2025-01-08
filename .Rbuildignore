@@ -10,3 +10,4 @@
 ^data-raw$
 .vscode
 ^pak.lock
+^pkg-build$
