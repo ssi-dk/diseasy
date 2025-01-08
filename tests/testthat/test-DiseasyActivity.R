@@ -231,7 +231,11 @@ test_that("$get_scenario_openness() works", {
   act$set_activity_units(dk_activity_units_subset)
 
   # With no scenario, we should get a empty list
-  expect_identical(act$get_scenario_openness(), stats::setNames(list(), character(0)))
+  if (paste(R.version$major, R.version$minor, sep = ".") < "4.4.0") {
+    expect_identical(act$get_scenario_openness(), list())
+  } else {
+    expect_identical(act$get_scenario_openness(), stats::setNames(list(), character(0)))
+  }
 
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
