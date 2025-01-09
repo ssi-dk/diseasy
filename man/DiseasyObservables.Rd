@@ -239,7 +239,7 @@ The results are cached for faster retrieval at subsequent calls.
 \describe{
 \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 

@@ -160,7 +160,7 @@ If a vector is provided, the vector must match the number of age groups in the c
 }
 
 \subsection{Returns}{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
@@ -184,7 +184,7 @@ Loads the given \code{contact_basis} into the module
 }
 
 \subsection{Returns}{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
@@ -213,7 +213,7 @@ Omitted if \code{data.frame} is given to date argument}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
@@ -241,7 +241,7 @@ Relative risk for the given type from the given date}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
@@ -265,7 +265,7 @@ All columns after this date are deleted}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
@@ -294,9 +294,9 @@ Return openness [0 ; 1] for all age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 
-\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done. The weights are normalized before applying.}
+\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done. The weights are normalized before applying.}
 }
 \if{html}{\out{</div>}}
 }
@@ -317,9 +317,9 @@ Return contacts across age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 
-\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If NULL (default), no weighting is done.}
+\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
 }
 \if{html}{\out{</div>}}
 }
@@ -364,7 +364,7 @@ NOTE: Called automatically when setting/changing activity units.
 }
 
 \subsection{Returns}{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
