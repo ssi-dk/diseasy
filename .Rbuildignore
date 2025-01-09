@@ -10,4 +10,5 @@
 ^data-raw$
 .vscode
 ^pak.lock
+^vignettes/articles$
 ^pkg-build$

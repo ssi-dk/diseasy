@@ -10,6 +10,7 @@
 diseasy_code_linters <- function() {
   linters <- c(
     list(
+      "object_length_linter" = lintr::object_length_linter(length = 40L), # We allow for longer object names
       "nolint_position_linter" = nolint_position_linter(length = 120L),
       "nolint_line_length_linter" = nolint_line_length_linter(length = 120L),
       "non_ascii_linter" = non_ascii_linter(),
@@ -17,6 +18,7 @@ diseasy_code_linters <- function() {
       "documentation_template_linter" = documentation_template_linter()
     ),
     lintr::all_linters(
+      object_length_linter = NULL,        # We allow for longer object names
       line_length_linter = NULL,          # We use 120, nolint-aware line length linter instead
       cyclocomp_linter = NULL,            # Not required in diseasy style guide
       keyword_quote_linter = NULL,        # Not required in diseasy style guide
@@ -25,7 +27,8 @@ diseasy_code_linters <- function() {
       nonportable_path_linter = NULL,     # Any \\ is flagged. Therefore fails when escaping backslashes
       undesirable_function_linter = NULL, # Library calls in vignettes are flagged and any call to options
       unnecessary_lambda_linter = NULL,   # Fails for purrr::map with additional function arguments
-      strings_as_factors_linter = NULL    # Seems to be some backwards compatibility stuff.
+      strings_as_factors_linter = NULL,   # Seems to be some backwards compatibility stuff.
+      literal_coercion_linter = NULL      # Fails for mlr3 style roxygen2 docs with (`integer(1)`)
     )
   )
 

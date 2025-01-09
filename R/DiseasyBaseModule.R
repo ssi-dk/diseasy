@@ -168,8 +168,34 @@ DiseasyBaseModule <- R6::R6Class(                                               
         # Iteratively map the public environment to hashes
         hash_list <-  public_env |>
           purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-          purrr::map_if(checkmate::test_function,        # For functions, we hash their attributes
-                        ~ digest::digest(attributes(.)))
+          purrr::map_if(
+            checkmate::test_function,        # For functions, we hash their attributes
+            ~ {
+              digest::digest(
+                list(
+                  "function_source" = deparse(rlang::fn_body(.)),
+                  "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+                )
+              )
+            }
+          ) |>
+          purrr::map_if(
+            checkmate::test_list,            # In some cases, we have lists of functions
+            ~ {
+              purrr::map_if(
+                .,
+                checkmate::test_function,
+                ~ {
+                  digest::digest(
+                    list(
+                      "function_source" = deparse(rlang::fn_body(.)),
+                      "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+                    )
+                  )
+                }
+              )
+            }
+          )
 
         # Add the class name to "salt" the hashes
         hash_list <- c(purrr::discard(hash_list, is.null), class = class(self)[1]) |>
@@ -355,6 +381,32 @@ DiseasyBaseModule <- R6::R6Class(                                               
     }
   )
 )
+
+
+#' @name plot
+#' @title
+#'   Plotting method for `diseasy` modules
+#' @description
+#'   Visualise `diseasy` modules.
+#' @param x (`Diseasy*`)\cr
+#'   The module to generate visualisation for.
+#' @param ...
+#'   Parameters sent to the specific plotting methods.
+#'   See the `$plot()` method for each module
+#' @return `r rd_side_effects`
+#' @examples
+#'   immunity <- DiseasyImmunity$new()
+#'   plot(immunity)
+#'
+#'   immunity$set_exponential_waning(target = "hospitalisation")
+#'   plot(immunity)
+#'
+#'   rm(immunity)
+#' @export
+plot.DiseasyBaseModule <- function(x, ...) {
+  x$plot(...)
+}
+
 
 # Set default options for the package related to DiseasyObservables
 rlang::on_load({

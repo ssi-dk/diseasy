@@ -1,3 +1,5 @@
+aes
+alt
 antiphase
 AR
 ARI
@@ -27,6 +29,7 @@ dbi
 DBIConnection
 DBIDriver
 dbplyr
+dfoptim
 dI
 diseasy
 diseasystore
@@ -35,6 +38,7 @@ DiseasystoreGoogleCovid
 diseasystores
 DiseasyActivity
 DiseasyBaseModule
+DiseasyImmunity
 DiseasyObservables
 DiseasySeason
 DiseasyVariant
@@ -57,22 +61,26 @@ Engbo
 epiverse
 erviss
 
-fn
-fns
 FeatureHandler
 FeatureHandlers
+fn
+fns
 frac
 
 github
 gov
 Gruson
 
+Heaviside
+hjkb
 hypoexponential
 
 ij
 ILI
-io
+infty
 Institut
+int
+io
 
 ji
 Jit
@@ -94,15 +102,24 @@ Mielke
 moduleowner
 Myrup
 
+Nelder
+neldermead
+nlm
+nlminb
+nloptr
 nolint
 normalise
 nrow
 
+optim
+optimr
+optimx
 OO
 ORCID
 org
 
 param
+parameterise
 parsable
 PascalCase
 pcbi
@@ -128,10 +145,12 @@ Rmd
 SCDB
 Schou
 SEIR
+sigmoidal
 simulist
 Skytte
 SSI
 Statens
+subplex
 sql
 SQLite
 
@@ -139,12 +158,16 @@ Tamayo
 tbl
 Telkamp
 textrm
+th
 tibble
 tidyselect
-TODOs
+tnewton
 ts
 
 u
+ucminf
+
+vec
 
 walkthrough
 www

@@ -1,0 +1,573 @@
+---
+title: "DiseasyImmunity optimisation"
+output: rmarkdown::html_vignette
+article: >
+  %\VignetteIndexEntry{DiseasyImmunity optimisation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+
+```{r reset}
+im <- DiseasyImmunity$new()
+```
+
+
+# Motivation
+From our testing, we have learned that method used to express the waning immunity in a compartmental model[^1]
+is a hard optimisation problem. Depending on the choice of optimisation algorithm, the quality of the approximation
+will vary wildly as well as the time it takes for the algorithm to converge.
+
+To mitigate this issue, we here investigate the effect of optimisation algorithm to find the optimisation algorithms
+that finish in reasonable time and provide the best approximation of the target waning immunity.
+
+`?DiseasyImmunity` can internally employ the optimisation algorithms of `stats`, `{nloptr}` and
+`optimx::optimr()`, which means that we have around 30 different algorithms to test.
+
+Note that the nature of the optimisation problem also changes dependent on the method used to approximate
+(i.e. "free_delta", "free_gamma", "all_free" - see `?DiseasyImmunity` documentation), which means that the
+algorithm that performs well for one method will not necessarily perform well on the other methods.
+
+
+# Setup
+Since we are searching for a "general" best choice of optimisation algorithm, we will define a setup that tests
+a wide range of waning immunity targets.
+
+We define a "family" of functions to test the optimisation algorithms against.
+These start at 1 and go to 0 within a time scale, $\tau$.
+
+These targets are:
+
+| Function            | Functional form                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Exponential         | $\exp\!\!(-t / \tau)$                                                                          |
+| Sigmoidal           | $\exp\!\!(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6))$                              |
+| Heaviside           | $\Theta(\tau - t)$                                                                             |
+| Sum of exponentials | $\frac{1}{3}\left(\!\exp\!\!(-t / \tau) + \exp\!\!(-2t / \tau) + \exp\!\!(-3t / \tau)\right)$  |
+| Linear              | $\sup\!\!(\{1 - t/\tau, 0\})$                                                                  |
+
+We then construct more target functions from this family of functions:
+
+- The unaltered functions ($f(t)$)
+- The functions but with non-zero asymptote ($g(t) = 0.8 \cdot f(t) + 0.2$)
+- The functions but with longer time scales ($h(t) = f(t / 2)$)
+
+
+# The optimisation
+As stated above, the optimisation algorithms vary wildly in the time it takes to complete the optimisation.
+To conduct this test in a reasonable time frame (and to determine algorithms that are reasonably efficient), we setup
+a testing schema consisting of a number of "rounds" where we incrementally increase the number of compartments in the
+problem (and thereby the number of degrees of freedom to optimise).
+
+In addition, we allocate a time limit to each algorithm in each round. If the execution time exceeds this time limit,
+the algorithm is "eliminated" and no more computation is done for the algorithm. Note that this is done on per method
+basis as we know the optimisation algorithms fare differently on the different methods for approximation.
+
+Once the round is complete, we update the list of eliminated algorithms and the we run the optimisation of $M + 1$ with
+the reduced set of algorithms.
+
+The entire optimisation process is run both without penalty (`monotonous = 0` and `individual_level = 0`) and with a
+penalty (`monotonous = 1` and `individual_level = 1`).
+
+The results of the optimisation round in stored in the `?diseasy_immunity_optimiser_results` data-set.
+
+```{r}
+results <- diseasy_immunity_optimiser_results
+
+results
+```
+
+
+```{r, include = FALSE}
+# Aggregate results for optimiser across variations of the problem
+best_optim_results <- results |>
+  dplyr::filter(.data$M <= 5) |>
+  dplyr::summarise(
+    "value" = sum(.data$value),
+    "execution_time" = sum(.data$execution_time),
+    "n_targets" = dplyr::n(),
+    .by = c("target", "method", "penalty", "optim_method", "strategy")
+  ) |>
+  dplyr::filter(
+    .data$n_targets == max(.data$n_targets),
+    .by = c("target", "method", "penalty")
+  )
+
+
+# Adjust the labels
+best_optim_results <- best_optim_results |>
+  dplyr::mutate(
+    "target" = factor(
+      .data$target,
+      levels = c(
+        "exponential", "exp_sum", "sigmoidal", "linear", "heaviside"
+      ),
+      labels = c(
+        "Exponential", "Sum of exponentials", "Sigmoidal", "Linear", "Heaviside"
+      )
+    ),
+    "penalty" = dplyr::if_else(.data$penalty, "yes", "no")
+  )
+```
+
+## Global results
+To get an overview of the best performing optimisers, we present the an aggregated view of the results in the table
+below.
+Here we present the top 5 "best" optimiser/strategy combination for each method and penalty setting.
+To define what it means to be the "best" we simply take the total integral difference between the approximation
+and the target function across all target functions and problem sizes ($M$).
+
+Note that we currently filter out the results from the Heaviside and Linear targets seems to be especially difficult
+for the optimisers to handle (see the [Per target results](#per-target-results) section below).
+
+In addition, we only consider problems up to size $M = 5$ for the general results.
+
+```{r helper functions for gt, include = FALSE}
+# Function to apply bold style to the smallest value in each section
+bold_min_value <- function(gt_table) {
+  min_value <- gt_table$`_data` |>
+    dplyr::select(dplyr::starts_with("value"), "penalty") |>
+    dplyr::mutate("row_id" = dplyr::row_number()) |>
+    tidyr::pivot_longer(!c("row_id", "penalty")) |>
+    dplyr::slice_min(.data$value, with_ties = FALSE, by = "penalty") |>
+    dplyr::mutate("name" = stringr::str_remove(.data$name, "^value/"))
+
+  gt_table |>
+    gt::tab_style(
+      style = list(
+        gt::cell_text(weight = "bold")
+      ),
+      locations = gt::cells_body(
+        columns = dplyr::ends_with(min_value$name[[1]]),
+        rows =  min_value$row_id[[1]]
+      )
+    ) |>
+    gt::tab_style(
+      style = list(
+        gt::cell_text(weight = "bold")
+      ),
+      locations = gt::cells_body(
+        columns = dplyr::ends_with(min_value$name[[2]]),
+        rows =  min_value$row_id[[2]]
+      )
+    )
+}
+
+
+# Add captions based on the optimisers
+add_footnote <- function(gt_table) {
+  optimisers <- gt_table$`_data` |>
+    dplyr::select(dplyr::starts_with("optim_method")) |>
+    tidyr::pivot_longer(dplyr::everything()) |>
+    dplyr::pull() |>
+    unique()
+
+
+  caption <- list()
+  if ("bfgs_r1e12" %in% optimisers) {
+    caption <- c(caption, "bfgs_r1e12: BFGS with relative tolerance of 1e-12.")
+  }
+  if ("auglag_cobyla" %in% optimisers) {
+    caption <- c(caption, "auglag_cobyla: auglag with COBYLA as local solver.")
+  }
+  if ("auglag_lbfgs" %in% optimisers) {
+    caption <- c(caption, "auglag_lbfgs: auglag with LBFGS as local solver.")
+  }
+  if ("auglag_slsqp" %in% optimisers) {
+    caption <- c(caption, "auglag_lbfgs: auglag with SLSQP as local solver.")
+  }
+  if ("auglag_mma" %in% optimisers) {
+    caption <- c(caption, "auglag_lbfgs: auglag with MMA as local solver.")
+  }
+  if ("sbplx_10000" %in% optimisers) {
+    caption <- c(caption, "sbplx_10000: sbplx with `maxeval = 10000`.")
+  }
+
+
+  # Add captions
+  purrr::reduce(caption, ~ gt::tab_footnote(.x, .y), .init = gt_table)
+}
+```
+
+
+```{r, echo = FALSE, results = "asis"}
+total_results <- best_optim_results |>
+  dplyr::filter(!(.data$target %in% c("Heaviside", "Linear"))) |>
+  dplyr::summarise(
+    "value" = sum(.data$value),
+    "execution_time" = sum(.data$execution_time) / 3600,
+    "n_targets" = sum(.data$n_targets),
+    .by = c("penalty", "method", "strategy", "optim_method")
+  ) |>
+  dplyr::mutate(
+    "value" = round(.data$value, 2)
+  ) |>
+  dplyr::slice_max(.data$n_targets, by = c("penalty", "method"))
+
+total_results |>
+  dplyr::slice_min(
+    .data$value,
+    n = 5,
+    with_ties = FALSE,
+    by = c("penalty", "method")
+  ) |>
+  dplyr::select(!"execution_time") |>
+  tidyr::pivot_wider(
+    names_from = "method",
+    names_sep = "/",
+    values_from = c("strategy", "optim_method", "value"),
+    values_fn = list
+  ) |>
+  dplyr::select(
+    "penalty",
+    dplyr::ends_with("free_delta"),
+    dplyr::ends_with("free_gamma"),
+    dplyr::ends_with("all_free")
+  ) |>
+  tidyr::unnest_longer(!"penalty") |>
+  dplyr::select(!dplyr::ends_with("_id")) |>
+  gt::gt() |>
+  gt::tab_spanner(
+    label = "free_delta",
+    columns = dplyr::ends_with("free_delta")
+  ) |>
+  gt::tab_spanner(
+    label = "free_gamma",
+    columns = dplyr::ends_with("free_gamma")
+  ) |>
+  gt::tab_spanner(
+    label = "all_free",
+    columns = dplyr::ends_with("all_free")
+  ) |>
+  gt::cols_label(
+    "value/free_delta"          = "value",
+    "strategy/free_delta"       = "strategy",
+    "optim_method/free_delta"   = "optimiser",
+    "value/free_gamma"          = "value",
+    "strategy/free_gamma"       = "strategy",
+    "optim_method/free_gamma"   = "optimiser",
+    "value/all_free"            = "value",
+    "strategy/all_free"         = "strategy",
+    "optim_method/all_free"     = "optimiser"
+  ) |>
+  gt::tab_style(
+    style = gt::cell_borders(
+      sides = "left",
+      weight = gt::px(3),
+      color = "grey40"
+    ),
+    locations = gt::cells_body(
+      columns = dplyr::starts_with("strategy")
+    )
+  ) |>
+  gt::tab_style(
+    style = gt::cell_borders(
+      sides = "right",
+      weight = gt::px(3),
+      color = "grey40"
+    ),
+    locations = gt::cells_body(
+      columns = dplyr::starts_with("value")
+    )
+  ) |>
+  gt::tab_style(
+    style = gt::cell_borders(
+      sides = "top",
+      weight = gt::px(3),
+      color = "grey40"
+    ),
+    locations = gt::cells_body(
+      rows = 6
+    )
+  ) |>
+  gt::tab_caption(
+    "Table 1: Global results (excluding heaviside and linear targets)"
+  ) |>
+  bold_min_value() |>
+  add_footnote()
+```
+
+To better choose the default optimisers for `DiseasyImmunity`, we will also consider how fast the different optimisation
+methods are. For that purpose, we have also measured the time to run the optimisation for each problem.
+
+```{r}
+# Define the defaults for DiseasyImmunity
+chosen_defaults <- tibble::tibble(
+  "method" = character(0),
+  "penalty" = character(0),
+  "strategy" = character(0),
+  "optim_method" = character(0)
+) |>
+  tibble::add_row(
+    "method" = "free_delta", "penalty" = "no",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_delta", "penalty" = "yes",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_gamma", "penalty" = "no",
+    "strategy" = "naive",
+    "optim_method" = "subplex"
+  ) |>
+  tibble::add_row(
+    "method" = "free_gamma", "penalty" = "yes",
+    "strategy" = "naive",
+    "optim_method" = "hjkb"
+  ) |>
+  tibble::add_row(
+    "method" = "all_free", "penalty" = "no",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "all_free", "penalty" = "yes",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  )
+```
+
+
+```{r, echo = FALSE}
+total_results <- total_results |>
+  dplyr::summarise(
+    "min_value" = min(.data$value, na.rm = TRUE),
+    "min_execution_time" = min(.data$execution_time, na.rm = TRUE),
+    .by = c("penalty", "method")
+  ) |>
+  dplyr::left_join(
+    total_results,
+    by = c("penalty", "method")
+  )
+
+visualise_methods <- function(total_results, method) {
+  gg_data <- total_results |>
+    dplyr::slice_min(
+      .data$value - .data$min_value +
+        .data$execution_time - .data$min_execution_time,
+      n = 10,
+      with_ties = FALSE,
+      by = c("penalty", "method")
+    ) |>
+    dplyr::left_join(
+      dplyr::mutate(chosen_defaults, "default" = TRUE),
+      by = c("method", "penalty", "strategy", "optim_method")
+    ) |>
+    dplyr::mutate(
+      "default" = dplyr::if_else(!is.na(.data$default), "Yes", "No")
+    ) |>
+    dplyr::filter(.data$method == !!method) |>
+    tidyr::unite("optim_strategy", "strategy", "optim_method", sep = "-")
+
+  palette <- purrr::reduce(
+    purrr::map(
+      c("Dark2", "Set1", "Set2"),
+      ~ RColorBrewer::brewer.pal(8, .)
+    ),
+    c
+  ) |>
+    stats::setNames(unique(gg_data$optim_strategy))
+
+  # discard_at with is.na directly fails for whatever reason, so we need to do this
+  palette <- purrr::discard_at(palette, is.na(names(palette)))
+
+  ggplot2::ggplot() +
+    ggplot2::geom_point(
+      data = gg_data,
+      mapping = ggplot2::aes(
+        x = .data$execution_time,
+        y = .data$value,
+        color = .data$optim_strategy,
+        shape = .data$default
+      ),
+      size = 4
+    ) +
+    ggplot2::geom_hline(
+      data = dplyr::summarise(gg_data, "value" = min(.data$value), .by = "penalty"),
+      mapping = ggplot2::aes(yintercept = .data$value),
+      linetype = 2, color = "grey"
+    ) +
+    ggplot2::facet_wrap(
+      ~ penalty,
+      labeller = ggplot2::labeller(.cols = ggplot2::label_both),
+      scales = "free"
+    ) +
+    ggplot2::labs(
+      x = "Execution time (hours)",
+      y = "Total error",
+      title = glue::glue("Best optimisers for {method}"),
+      color = "strategy-optim_method",
+      shape = "Chosen as default?"
+    ) +
+    ggplot2::guides(
+      color = ggplot2::guide_legend(order  = 1, ncol = 2),
+      shape = ggplot2::guide_legend(order = 2)
+    ) +
+    ggplot2::theme(legend.text = ggplot2::element_text(size = 8)) +
+    ggplot2::scale_color_manual(values = palette) +
+    ggplot2::scale_shape_manual(values = c("Yes" = 18, "No" = 20)) +
+    ggplot2::scale_x_log10()
+}
+```
+
+```{r overview free_delta, echo = FALSE, fig.alt = "Total error vs execution time for the free_delta method."}
+visualise_methods(total_results, "free_delta")
+```
+
+```{r overview free_gamma, echo = FALSE, fig.alt = "Total error vs execution time for the free_gamma method."}
+visualise_methods(total_results, "free_gamma")
+```
+
+```{r overview all_free, echo = FALSE, fig.alt = "Total error vs execution time for the all_free method."}
+visualise_methods(total_results, "all_free")
+```
+In total, we find that there is no clear choice for best, general optimiser/strategy combination.
+
+For the defaults, we have chose the optimiser/strategy combination dependent on the method of parametrisation and the
+inclusion of penalty.
+
+The following optimiser/strategy combinations acts as defaults for the `?DiseasyImmunity` class:
+
+```{r, echo = FALSE, results = "asis"}
+chosen_defaults |>
+  gt::gt() |>
+  gt::tab_style(
+    style = gt::cell_borders(
+      sides = "top",
+      weight = gt::px(2),
+      color = "grey40"
+    ),
+    locations = gt::cells_body(
+      rows = c(3, 5)
+    )
+  )
+```
+
+
+However, as we see in the [Per target results](#per-target-results) section below, the choice of optimiser/strategy
+can be improved when accounting for the specific target function.
+
+## Per target results
+
+Here we dive deeper into the performance of the optimisers on a per target basis.
+As before, we present best performing optimisers for the given targets in an aggregated view.
+
+We present the top 3 best optimiser/strategy combination for each method and penalty setting.
+
+```{r, echo = FALSE, results = "asis"}
+# Formatting the results
+per_target_results <- best_optim_results |>
+  dplyr::mutate(
+    "value" = round(.data$value, 2)
+  )
+
+# Split per target
+split_data <- per_target_results |>
+  dplyr::slice_min(
+    tibble::tibble(value, execution_time),
+    n = 3,
+    by = c("target", "method", "penalty")
+  ) |>
+  dplyr::select(
+    "target", "penalty", "method", "strategy", "value", "optim_method"
+  ) |>
+  dplyr::arrange(.data$target, .data$method, .data$value) |>
+  dplyr::group_split(.data$target)
+
+# Create tables for each target
+gt_tables <- split_data |>
+  purrr::imap(~
+    .x |>
+      tidyr::pivot_wider(
+        names_from = "method",
+        names_sep = "/",
+        values_from = c("strategy", "optim_method", "value"),
+        values_fn = list
+      ) |>
+      dplyr::select(
+        "target",
+        "penalty",
+        dplyr::ends_with("free_delta"),
+        dplyr::ends_with("free_gamma"),
+        dplyr::ends_with("all_free")
+      ) |>
+      tidyr::unnest_longer(!c("target", "penalty")) |>
+      dplyr::select(!dplyr::ends_with("_id")) |>
+      gt::gt() |>
+      gt::tab_spanner(
+        label = "free_delta",
+        columns = dplyr::ends_with("free_delta")
+      ) |>
+      gt::tab_spanner(
+        label = "free_gamma",
+        columns = dplyr::ends_with("free_gamma")
+      ) |>
+      gt::tab_spanner(
+        label = "all_free",
+        columns = dplyr::ends_with("all_free")
+      ) |>
+      gt::cols_label(
+        "value/free_delta"          = "value",
+        "strategy/free_delta"       = "strategy",
+        "optim_method/free_delta"   = "optimiser",
+        "value/free_gamma"          = "value",
+        "strategy/free_gamma"       = "strategy",
+        "optim_method/free_gamma"   = "optimiser",
+        "value/all_free"            = "value",
+        "strategy/all_free"         = "strategy",
+        "optim_method/all_free"     = "optimiser"
+      ) |>
+      gt::tab_style(
+        style = gt::cell_borders(
+          sides = "left",
+          weight = gt::px(3),
+          color = "grey40"
+        ),
+        locations = gt::cells_body(
+          columns = dplyr::starts_with("strategy")
+        )
+      ) |>
+      gt::tab_style(
+        style = gt::cell_borders(
+          sides = "right",
+          weight = gt::px(3),
+          color = "grey40"
+        ),
+        locations = gt::cells_body(
+          columns = dplyr::starts_with("value")
+        )
+      ) |>
+      gt::tab_style(
+        style = gt::cell_borders(
+          sides = "top",
+          weight = gt::px(3),
+          color = "grey40"
+        ),
+        locations = gt::cells_body(
+          rows = 4
+        )
+      ) |>
+      gt::cols_hide("target") |>
+      gt::tab_caption(
+        paste0("Table ", .y + 1, ": Results for ", .x$target[[1]], " target")
+      )
+  )
+
+purrr::walk(gt_tables, ~ print(add_footnote(bold_min_value(.x))))
+```
+
+[^1]: Manuscript in production.
