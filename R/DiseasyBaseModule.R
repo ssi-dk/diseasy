@@ -168,10 +168,34 @@ DiseasyBaseModule <- R6::R6Class(                                               
         # Iteratively map the public environment to hashes
         hash_list <-  public_env |>
           purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-          purrr::map_if(checkmate::test_function,        # For functions, we hash their attributes
-                        ~ digest::digest(deparse(rlang::fn_body(.)))) |>
-          purrr::map_if(checkmate::test_list,            # In some cases, we have lists of functions
-                        ~ purrr::map_if(., checkmate::test_function, ~ digest::digest(deparse(rlang::fn_body(.)))))
+          purrr::map_if(
+            checkmate::test_function,        # For functions, we hash their attributes
+            ~ {
+              digest::digest(
+                list(
+                  "function_source" = deparse(rlang::fn_body(.)),
+                  "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+                )
+              )
+            }
+          ) |>
+          purrr::map_if(
+            checkmate::test_list,            # In some cases, we have lists of functions
+            ~ {
+              purrr::map_if(
+                .,
+                checkmate::test_function,
+                ~ {
+                  digest::digest(
+                    list(
+                      "function_source" = deparse(rlang::fn_body(.)),
+                      "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+                    )
+                  )
+                }
+              )
+            }
+          )
 
         # Add the class name to "salt" the hashes
         hash_list <- c(purrr::discard(hash_list, is.null), class = class(self)[1]) |>
