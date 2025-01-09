@@ -174,8 +174,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
         hash_list <- hash_environment(public_env)
 
         # Add the class name to "salt" the hashes
-        hash_list <- c(purrr::discard(hash_list, is.null), class = class(self)[1]) |>
-          purrr::map_chr(rlang::hash)
+        hash_list <- c(hash_list, class = class(self)[1])
 
         # Reduce to single hash and return
         hash <- withr::with_locale(
@@ -300,17 +299,11 @@ DiseasyBaseModule <- R6::R6Class(                                               
     # @description
     #   Function that parses the given environment to a unique hash.
     # @param function_environment (`environment`)\cr
-    #   The environment of the function to hash
+    #   The environment of the function to hash.
     # @return (`character`)\cr
     #   The values in the function environment is hashed and combined with the classname and hash of the parent
     #   environment
     get_hash = function(function_environment = rlang::caller_env()) {
-      checkmate::assert_environment(function_environment)
-
-      # Process the function environment
-      function_environment <- as.list(function_environment)
-      function_environment <- function_environment |>
-        purrr::map_if(checkmate::test_formula, as.character)    # formulas are converted to character before hashing
 
       # Find all relevant hashes
       hash_list <- c(
@@ -326,6 +319,51 @@ DiseasyBaseModule <- R6::R6Class(                                               
       )
       return(substring(hash, 1, 10))
     },
+
+
+    # @description
+    #   Function that hashes the values of the environment,
+    #   handling special cases such as functions and formulae.
+    # @param environment (`environment`)\cr
+    #   The environment to hash.
+    # @return (`list`(`character`))\cr
+    #   A list of hashes for the environment
+    hash_environment = function(environment) {
+
+      if (checkmate::test_environment(environment)) environment <- as.list(environment)
+
+      hash_list <- environment |>
+        purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
+        purrr::map_if(checkmate::test_formula, as.character) |> # formulas are converted to character before hashing
+        purrr::map_if(
+          checkmate::test_function,        # For functions, we hash their attributes
+          ~ {
+            list(
+              "function_source" = deparse(rlang::fn_body(.)),
+              "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+            )
+          }
+        ) |>
+        purrr::map_if(
+          checkmate::test_list,            # In some cases, we have lists of functions
+          ~ {
+            purrr::map_if(
+              .,
+              checkmate::test_function,
+              ~ {
+                list(
+                  "function_source" = deparse(rlang::fn_body(.)),
+                  "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+                )
+              }
+            )
+          }
+        ) |>
+        purrr::map_chr(digest::digest)
+
+      return(hash_list)
+    },
+
 
     # Errors
     read_only_error = function(field) {
