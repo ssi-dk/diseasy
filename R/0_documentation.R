@@ -8,8 +8,7 @@ rd_activity_units <- function(type = "param") {
 
 rd_stratification <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`list`(`quosures`))\\cr",
-        "Default NULL.",
+  paste("(`list`(`quosures`) or `NULL`)\\cr",
         "Use `rlang::quos(...)` to specify stratification.",
         "If given, expressions in stratification evaluated to give the stratification level.",
         ifelse(type == "field", "Read only.", ""))
@@ -62,7 +61,6 @@ rd_prediction_length <- function(type = "param") {
 rd_quantiles <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`list`(`numeric`))\\cr",
-        "Default NULL.",
         "If given, results are returned at the quantiles given.",
         ifelse(type == "field", "Read only.", ""))
 }
@@ -106,7 +104,7 @@ rd_target_conn <- function(type = "param") {
 rd_schema <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
-        "A database schema",
+        "A database schema.",
         ifelse(type == "field", "Read only.", ""),
         "If the database backend does not support schema, the tables will be prefixed with <schema>.")
 }
@@ -178,15 +176,15 @@ rd_get_results_return <- paste(
 rd_get_results_seealso <- "[diseasy::DiseasyObservables]"
 
 
-rd_side_effects <- "NULL (called for side effects)"
+rd_side_effects <- "`NULL` (called for side effects)"
 
 
 rd_age_cuts_lower <- paste(
   "(`numeric`)\\cr",
-  "vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used."
+  "vector of ages defining the lower bound for each age group. If `NULL`, age groups of contact_basis is used."
 )
 
 rd_activity_weights <- paste(
   "(`numeric(4)`)\\cr",
-  "vector of weights for the four types of contacts. If NULL (default), no weighting is done."
+  "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
