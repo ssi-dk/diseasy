@@ -33,7 +33,7 @@ The module can be initialized without setting any parameters.
 act <- DiseasyActivity$new()
 ```
 
-By default, the module initializes with no activity scenario, and produces empty outputs.
+By default, the module initializes with no activity scenario, and produces non-informative outputs.
 (See [the interfacing section](#interfacing) for ways to get metrics from the module)
 ```{r null_scenario}
 act$get_scenario_openness()
@@ -62,7 +62,7 @@ act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 ```
 
 To get an overview of the loaded activities, we can use the `$get_scenario_activities()` method.
-```{r configure_baseline_exampe}
+```{r configure_baseline_example}
 act$get_scenario_activities()
 ```
 
