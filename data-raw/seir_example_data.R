@@ -103,37 +103,26 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
     )
 
 
-
-  # Visualise the example data
-  # ggplot2::ggplot(seir_example_data) +
-  #   ggplot2::geom_line(ggplot2::aes(x = date, y = n_infected, color = "Infected"), linewidth = 1) +
-  #   ggplot2::geom_line(ggplot2::aes(x = date, y = n_positive_simple, color = "Test positive (simple)"), linewidth = 1) +
-  #   ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
-  #   ggplot2::facet_wrap(~ age_group) +
-  #   ggplot2::ylab("Test positive / Infected") +
-  #   ggplot2::scale_color_manual(
-  #     values = c("Infected" = "black", "Test positive (simple)" = "blue", "Test positive (realistic)" = "red")
-  #   )
-
   # Reorder columns
   seir_example_data <- seir_example_data |>
     dplyr::select("date", dplyr::everything())
 
   # set parameters for hospitalization
-  risk_of_hospitalization <- c( 0.001, 0.01, .1)
-  frac_to_hosp_after_days <- c( 0, 0, .2, .3, .3, .1, .1) # must sum =1
+  risk_of_hospitalization <- c(0.001, 0.01, 0.1)
+  frac_to_hosp_after_days <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # must sum =1
 
   future_hospitalized <- t(t(true_infected) * risk_of_hospitalization)
 
-  hospitalized <- array(0., dim=dim(true_infected))
+  hospitalized <- array(0., dim = dim(true_infected))
 
-  for (i in 1:length(frac_to_hosp_after_days)) {
-    hospitalized <- hospitalized + rbind( array(0., dim=c(i,3)),
-                                          frac_to_hosp_after_days[i] *
-                                            future_hospitalized[ 1: (NROW(future_hospitalized) - i),]  )
+  for (i in seq_len(length(frac_to_hosp_after_days))) {
+    hospitalized <- hospitalized + rbind(
+      array(0., dim = c(i, 3)),
+      frac_to_hosp_after_days[i] * future_hospitalized[1: (NROW(future_hospitalized) - i), ]
+    )
   }
 
-  for (i in 1:3) hospitalized[,i] <- rpois(length(hospitalized[,i]), hospitalized[,i])
+  for (i in 1:3) hospitalized[, i] <- rpois(length(hospitalized[, i]), hospitalized[, i])
 
   # Convert to long format
   seir_example_data_hosp <- hospitalized |>
@@ -143,8 +132,7 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
     dplyr::select(!"t")
 
   # merge data
-
-  seir_example_data <- dplyr::left_join( seir_example_data, seir_example_data_hosp, by=c("date", "age_group") )
+  seir_example_data <- dplyr::left_join(seir_example_data, seir_example_data_hosp, by = c("date", "age_group"))
 
   # Visualise the example data
   ggplot2::ggplot(seir_example_data) +
