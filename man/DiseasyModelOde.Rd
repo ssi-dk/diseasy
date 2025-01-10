@@ -2,18 +2,20 @@
 % Please edit documentation in R/DiseasyModelOde.R
 \name{DiseasyModelOde}
 \alias{DiseasyModelOde}
-\title{Meta module for the regression class of models}
+\title{Base module for the ODE class of models}
 \value{
 A new instance of the \code{DiseasyModelOde} \link[R6:R6Class]{R6} class.
 }
 \description{
-TODO
+The \code{DiseasyModelOde} module implements common structure and functionality to regression class of models
+beyond the model structure provided by \code{?DiseasyModel}.
+
+Most notably, the model module implements the \verb{$get_results()} method.
+This implementation requires the subclass to implement the \verb{$rhs()} and \verb{$initialise_state_vector()} methods.
 }
 \examples{
-  # Normally, you would not want to create this module directly, but it is possible.
-  module <- DiseasyModelOde$new()
-
-  rm(module)
+  # This module should not be constructed directly but should instead be used to
+  # inherit from when creating a new model class.
 }
 \seealso{
 \link{DiseasyObservables}
