@@ -45,7 +45,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = m %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -93,7 +93,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = m %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -128,7 +128,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = m %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -176,7 +176,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   expect_equal(sum(m %.% rhs(0, y0)[[1]]), 0)                                                                           # nolint: expect_identical_linter
 
   # Run solver across scenario change to check for long-term leakage
-  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = private %.% rhs, atol = 1e-12, rtol = 1e-12)
+  sol <- deSolve::ode(y = y0, times = seq(0, 100, 10), func = m %.% rhs, atol = 1e-12, rtol = 1e-12)
   checkmate::expect_numeric(abs(rowSums(sol[, -1]) - sum(y0)), upper = 1e-8)
   checkmate::expect_numeric(sol[, -1], lower = -1e-8, upper = 1 + 1e-8)
 
@@ -207,7 +207,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
 
   flow <- y0 * private$progression_flow_rates
   expect_identical(
-    unname(private$rhs(0, y0)[[1]]),
+    unname(m %.% rhs(0, y0)[[1]]),
     c(0, flow[-private$n_states]) - flow
   )
 
@@ -236,7 +236,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
 
   flow <- y0 * private$progression_flow_rates
   expect_identical(
-    unname(private$rhs(0, y0)[[1]]),
+    unname(m %.% rhs(0, y0)[[1]]),
     c(0, flow[-private$n_states]) - flow
   )
 
@@ -269,7 +269,7 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- 1
   expect_identical(
-    unname(private$rhs(0, y0)[[1]]),
+    unname(m %.% rhs(0, y0)[[1]]),
     c(
       0, -rI, rI, # Variant 1
       0, -rI, rI, # Variant 2
@@ -306,7 +306,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- 1
   expect_identical(
-    unname(private$rhs(0, y0)[[1]]),
+    unname(m %.% rhs(0, y0)[[1]]),
     c(
       0, -rI, rI, # Variant 1, age group 1
       0, -rI, rI, # Variant 1, age group 2

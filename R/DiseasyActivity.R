@@ -555,6 +555,12 @@ DiseasyActivity <- R6::R6Class(                                                 
           pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
         }
 
+        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
+        age_labels <- age_cuts_lower |>
+          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = 0) |>
+          diseasystore::age_labels()
+
         scenario_contacts <- matrix(
           rep(
             1 / (length(age_labels) * length(private$activity_types)), # Contacts are uniform across all age groups
