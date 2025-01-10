@@ -35,7 +35,9 @@ DiseasyVariant <- R6::R6Class(                                                  
     #'   The name of the variant.
     #' @param characteristics (`list`)\cr
     #'   A named list of characteristics of the variant.
+    #'
     #'   Characteristics can be:
+    #'
     #'     - `relative_infection_risk` (`numeric(1)`): The relative infection risk of the variant.
     #'     - `cross_immunity` (`named vector`): The overlap in immunity of when the named variant attempts to infect
     #'       a host previously infected by the current variant. If not specified, the default is 1.
@@ -72,6 +74,9 @@ DiseasyVariant <- R6::R6Class(                                                  
 
       # Add the variant
       private$.variants[[name]] <- characteristics
+
+      # Sort the variants by name
+      private$.variants <- private$.variants[order(names(private$.variants))]
 
     },
 
@@ -116,6 +121,7 @@ DiseasyVariant <- R6::R6Class(                                                  
     #'   Index ij indicates the overlap in immunity when variant j infects variant i.
     #'   Thus, an overlap of 1 means immunisation with variant i protects against infection by variant j.
     #'   Read-only.
+    #' @importFrom tidyr expand_grid
     cross_immunity = purrr::partial(
       .f = active_binding,
       name = "cross_immunity",

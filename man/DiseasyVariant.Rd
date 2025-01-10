@@ -79,11 +79,14 @@ The name of the variant.}
 
 \item{\code{characteristics}}{(\code{list})\cr
 A named list of characteristics of the variant.
+
 Characteristics can be:
-- \code{relative_infection_risk} (\code{numeric(1)}): The relative infection risk of the variant.
-- \code{cross_immunity} (\verb{named vector}): The overlap in immunity of when the named variant attempts to infect
-a host previously infected by the current variant. If not specified, the default is 1.
-- \code{introduction_date} (\code{Date(1)}): The date the variant was introduced into the population.}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{- `relative_infection_risk` (`numeric(1)`): The relative infection risk of the variant.
+- `cross_immunity` (`named vector`): The overlap in immunity of when the named variant attempts to infect
+  a host previously infected by the current variant. If not specified, the default is 1.
+- `introduction_date` (`Date(1)`): The date the variant was introduced into the population.
+}\if{html}{\out{</div>}}}
 }
 \if{html}{\out{</div>}}
 }

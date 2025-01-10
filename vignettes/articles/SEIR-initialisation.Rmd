@@ -1,0 +1,627 @@
+---
+title: "SEIR: Initialising from incidence data"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+# Introduction
+Let us begin by considering a general SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively,
+which are governed by the rates $r_e$ and $r_i$ respectively.
+
+Let us further assume that we have a incidence signal, $I^*(t)$, which we would like our model to match.
+
+The general approach is to consider the derivatives of the incidence and link these to the states of the model.
+
+
+# Initialising EI states
+The $EI$ states of the SEIR model should match the most recent developments of the incidence.
+
+For this purpose, we assume that signal occurs when exiting $I_1$ in the model.
+
+That is, we assume $I^* = r_i I_1$.
+
+If we take the equation for $I_1$ and multiply by $r_i$ we obtain.
+
+$$
+r_i\frac{d I_1}{d t} = r_i r_e E_K - r_i^2 I_1 \Rightarrow
+$$
+$$
+\frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
+$$
+
+If we take the second derivative, we find:
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t} - r_i \frac{d I_l}{d t}
+$$
+From here, we can inject $\frac{d E_K}{d t}$ from the SEIR equations which in turn relates to $E_{k-1}$.
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I_l}{d t}
+$$
+
+This process can be iterated through the derivatives until all $E_K$ states are expressed in terms of $I^*(t)$ and
+its derivatives.
+
+In this case, we can relate the $E_k$ states to the rates and derivatives of the signal in a simple form:
+
+$$
+r_i
+\begin{bmatrix}
+r_e E_K \\
+r_e^2 E_{K-1} \\
+\dots \\
+r_e^{K-1} E_2 \\
+r_e^K E_1 \\
+\end{bmatrix}
+=
+\overline{\overline{M}}_K \cdot
+\begin{bmatrix}
+I^* \\
+\frac{d I^*}{d t} \\
+\dots \\
+\frac{d^K I^*}{d t^K} \\
+\frac{d^{K+1}I^*}{d t^{K+1}}
+\end{bmatrix}
+$$
+
+
+The matrix $\overline{\overline{M_K}}$ can be computed via a simple recursion.
+
+To see why, start the equation for the derivative of $I^*(t)$:
+$$
+\frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
+$$
+
+And separating the $E_k$ and $I*$ terms:
+$$
+r_i r_e E_K = r_i I^* + \frac{d I^*}{d t}
+$$
+
+In the above formulation, this corresponds to the matrix
+$\overline{\overline{M}}_1 = \begin{bmatrix}r_i & 1\end{bmatrix}$.
+
+When taking the second derivative, we obtain:
+
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t}- r_i \frac{d I^*}{d t} \Rightarrow
+$$
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I^*}{d t} \Rightarrow
+$$
+$$
+\frac{d^2I^*}{d t^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{d I^*}{d t} + I^*\right)- r_i \frac{d I^*}{d t}
+$$
+
+And separating the $E_k$ and $I*$ terms:
+$$
+r_i r_e^2 E_{k-1} = r_e\left(r_i \frac{d I^*}{d t} + I^*\right) + r_i \frac{d I^*}{d t} + \frac{d^2I^*}{d t^2}
+$$
+
+Which, in the matrix formulation corresponds to the sum of $r_e \overline{m}_1$ and the shifted $\overline{m}_1$,
+where $\overline{m}_1$ is the row vector of $\overline{\overline{M}_1}$.
+
+That is, we can express the second derivative as:
+$$
+\overline{m}_2 = r_e \begin{bmatrix}\overline{m}_1 & 0 \end{bmatrix}+ \begin{bmatrix}0 & \overline{m}_1\end{bmatrix}
+$$
+$$
+= \begin{bmatrix}r_i r_e & r_e & 0 \end{bmatrix} + \begin{bmatrix}0 & r_i & 1 \end{bmatrix}
+$$
+$$
+= \begin{bmatrix}r_i r_e & r_e + r_i & 1 \end{bmatrix}
+$$
+
+
+Which, combined with $\overline{m}_1$ yields the two level system:
+
+$$
+\overline{\overline{M}}_2 = \begin{bmatrix}m_{11} & m_{12} & 0 \\ m_{21} & m_{22} & m_{23} \end{bmatrix}
+$$
+$$
+= \begin{bmatrix} r_i & 1 & 0 \\ r_i r_e & r_e + r_i & 1 \end{bmatrix}
+$$
+
+In general, the rows can be computed by recursion:
+$$
+\overline{m}_{k} = r_e \begin{bmatrix}
+  \overline{m}_{k-1} & 0
+\end{bmatrix} +
+\begin{bmatrix}
+  0 & \overline{m}_{k-1}
+\end{bmatrix}\quad
+\overline{\overline{m}}_1 = \begin{bmatrix}r_i & 1\end{bmatrix}.
+$$
+
+The algorithmic implementation of the recursion is then:
+```{r}
+K <- 4
+ri <- 0.9
+re <- 0.8
+
+M <- matrix(rep(0, K * (K + 1)), nrow = K) # Pre-allocate
+active_row <- c(ri, 1)
+
+for (k in seq(K)) {
+  if (k > 1) active_row <- c(0, active_row) + re * c(active_row, 0)
+
+  M[k, seq(k + 1)] <- active_row
+}
+
+M
+```
+
+Since we assume that the signal $I^*$ only relates to $I_1$, then we can determine the $I_{l>1}$ states by
+evaluating the signal at $I^*(t - (l - 1) / r_i)$.
+
+
+# Initialising SR states
+The $SR$ states of the SEIR model should capture both the short and the long term developments of the incidence signal
+we want to match.
+If a lot of infections have happened previously, we expect a larger proportion of the population to be in the
+$R$ states.
+
+We again assume $I^* = r_i I_1$.
+
+We can modify the SEIR equation to take this signal as a forcing function with no $E$ states and one less $I$ state
+(no $I_1$ state).
+
+The equations are as normal expect for the following changes:
+$$
+I = \frac{I^*}{r_i} + \sum_{l=2}^L I_l
+$$
+
+$$
+\frac{d I_2}{d t} = I^* - r_i I_2
+$$
+If we start this system at a time where there are no new infections, we can initialize $I_l = 0$, and run the
+simulation forward to estimate the $S$ and $R$ populations at the point of interest.
+
+
+# Testing the methods
+
+We test the initialisation methods on a data set generated using the same `?DiseasyModelOdeSeir` model template
+that we are using in this vignette.
+
+
+## Simple SEIR example data
+
+For the first example, we use the SEIR model output where we know the parameters of the model used to generate the data.
+
+To begin, we configure the observables module to use this data set and to use all available data.
+```{r}
+# Connect to a database
+dir.create("cache/SEIR-initialisation", showWarnings = FALSE)
+conn <- duckdb::duckdb(dbdir = "cache/SEIR-initialisation/ds.duckdb") |>
+  DBI::dbConnect()
+
+obs <- DiseasyObservables$new(
+  diseasystore = DiseasystoreSeirExample,
+  conn = conn
+)
+
+obs$set_study_period( # Use all available data
+  start_date = obs$ds$min_start_date,
+  end_date = obs$ds$max_end_date
+)
+```
+
+The data set contains different data for the infected to test our initialisation method against.
+
+The data are:
+
+- "n_infected":
+  The true number of infected in the model, measured as the number of people transitioning out of the `I1`
+  state at any given date.
+- "n_positive_simple":
+  A realisation of the number of test-positives in the model - using a 65 % probability of testing.
+- "n_positive":
+  A realisation of the number of test-positives in the model - using a overall 65 % probability of
+  testing in conjunction with a reduced probability of testing during weekends.
+
+
+```{r}
+model_data <- c("n_infected", "n_positive_simple", "n_positive") |>
+  purrr::map(\(observable) {
+    obs$get_observation(
+      observable = observable,
+      stratification = rlang::quos(age_group)
+    )
+  }) |>
+  purrr::reduce(~ dplyr::full_join(.x, .y, by = c("date", "age_group"))) |>
+  dplyr::mutate("variant" = "WT", .after = "age_group")
+
+model_data
+```
+
+```{r, example data, fig.alt = "Plots of the example data bundled with diseasy."}
+# Visualise the example data
+ggplot2::ggplot(model_data) +
+  ggplot2::geom_line(
+    ggplot2::aes(x = date, y = n_infected, color = "Infected"),
+    linewidth = 1
+  ) +
+  ggplot2::geom_point(
+    ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")
+  ) +
+  ggplot2::geom_line(
+    ggplot2::aes(
+      x = date, y = n_positive_simple,
+      color = "Test positive (simple)"
+    ),
+    linewidth = 1
+  ) +
+  ggplot2::facet_wrap(~ age_group) +
+  ggplot2::ylab("Test positive / Infected") +
+  ggplot2::scale_color_manual(
+    values = c(
+      "Infected"                  = "deepskyblue3",
+      "Test positive (simple)"    = "orange",
+      "Test positive (realistic)" = "seagreen"
+    )
+  ) +
+  ggplot2::labs(colour = "Model output")
+```
+
+These different levels of detail allows us to test the initialisation from incidence data in different cases.
+
+
+The method relies on having incidence data, so we scale the model outputs by the population size.
+```{r}
+# Scale test / infected information to incidence data
+incidence_data <- model_data |>
+  tidyr::pivot_longer(
+    cols = dplyr::starts_with("n_"),
+    names_to = "source",
+    values_to = "model_output"
+  ) |>
+  dplyr::mutate(
+    "reporting_percentage" = dplyr::if_else(.data$source == "n_infected", 1, 0.65),
+    "incidence" = .data$model_output /
+      (sum(contact_basis$DK$population) * .data$reporting_percentage)
+  )
+```
+
+
+The simplest cases is using the "n_infected" signal which directly tracks the `I1` state in the model.
+While the most realistic case is the "n_positive" signal which has some real life inspired noise patterns.
+```{r}
+source <- "n_positive"
+```
+
+
+### Correctly specified model
+In any case, we first need to define the model that should initialise using the incidence data.
+We here use the model configuration used to generate the data to test the best case scenario:
+
+```{r}
+# Set the point in time to initialise from
+obs$set_last_queryable_date(obs$start_date + lubridate::days(45))
+
+generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
+
+  # Define the activity for the scenario
+  act <- DiseasyActivity$new()
+  act$set_contact_basis(contact_basis = contact_basis$DK)
+  act$set_activity_units(dk_activity_units)
+  act$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
+
+  # Create a SEIR model to initialise
+  m <- DiseasyModelOdeSeir$new(
+    observables = obs,
+    activity = act,
+    compartment_structure = c("E" = K, "I" = L, "R" = M),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list(
+      "age_cuts_lower" = c(0, 30, 60),
+      "overall_infection_risk" = 0.025
+    )
+  )
+
+  return(m)
+}
+
+m <- generate_model(2, 1, 1) # Use the configuration from example data
+```
+
+
+This method relies on fitting a polynomial to the latest period, so we here visualise this fitting.
+```{r, incidence fitting, fig.alt = "Fitting a polynomial to the incidence data to estimate derivatives."}
+# Extract the most recent signal
+poly_fit_data <- incidence_data |>
+  dplyr::filter(source == !!source) |>
+  dplyr::mutate(
+    "t" = as.numeric(.data$date - !!obs$last_queryable_date, units = "days")
+  )
+
+poly_fit_projection <- poly_fit_data |>
+  dplyr::group_by(.data$age_group, .data$variant) |>
+  dplyr::group_modify(
+    ~ {
+      poly_fit <- lm(
+        incidence ~ poly(t, m$parameters$incidence_polynomial_order, raw = TRUE),
+        data = dplyr::filter(
+          .x,
+          .data$t <= 0,
+          .data$t >= - m$parameters$incidence_polynomial_training_length
+        )
+      )
+
+      tibble::tibble(
+        "t" = .x$t,
+        incidence = predict(poly_fit, data.frame("t" = t))
+      ) |>
+        dplyr::mutate("date" = .x$date)
+    }
+  )
+
+
+incidence_data |>
+  dplyr::filter(source == !!source) |>
+  ggplot2::ggplot(ggplot2::aes(x = date, y = incidence)) +
+    ggplot2::geom_point(
+      color = switch(
+        source,
+        "n_infected"        = "orange",
+        "n_positive_simple" = "deepskyblue3",
+        "n_positive"        = "seagreen"
+      )
+    ) +
+    ggplot2::geom_line(data = poly_fit_projection, color = "red", linewidth = 1) +
+    ggplot2::geom_vline(
+      xintercept = obs$last_queryable_date,
+      linetype = 2, linewidth = 1, color = "red"
+    ) +
+    ggplot2::geom_vline(
+      xintercept = obs$last_queryable_date -
+        m$parameters$incidence_polynomial_training_length,
+      linetype = 2, linewidth = 1, color = "red"
+    ) +
+    ggplot2::ylim(
+      0,
+      incidence_data |>
+        dplyr::filter(source == !!source) |>
+        dplyr::pull("incidence") |>
+        max() * 1.1
+    ) +
+    ggplot2::facet_wrap(~ age_group) +
+    ggplot2::theme_bw()
+```
+
+We can now use the `?DiseasyModelOdeSeir$initialise_state_vector()` method to infer the initial state vector.
+
+```{r}
+psi <- incidence_data |>
+  dplyr::filter(.data$source == !!source) |>
+  m$initialise_state_vector()
+
+psi
+```
+
+And we now test the initial conditions by solving the model using these starting conditions.
+```{r}
+get_prediction <- function(
+    model,
+    psi,
+    reporting_percentage = 1,
+    signal = "incidence"
+  ) {
+
+  # Integrate the ODE system with deSolve
+  sol <- deSolve::ode(
+    y = psi$initial_condition,
+    times = seq(0, 50),
+    func = model$rhs
+  )
+
+  # Improve the names of the output
+  colnames(sol) <- c(
+    "time",
+    psi |>
+      tidyr::unite("label", "variant", "age_group", "state", sep = "/") |>
+      dplyr::pull("label")
+  )
+
+  # Convert to long format
+  sol_long <- sol |>
+    as.data.frame() |>
+    tidyr::pivot_longer(
+      !"time",
+      names_sep = "/",
+      names_to = c("variant", "age_group", "state")
+    )
+
+  # Extract the solution
+  if (signal == "incidence") {
+    out <- sol_long |>
+      dplyr::filter(.data$state == "I1") |>
+      dplyr::select(!"state") |>
+      dplyr::mutate(
+        "date" = .data$time + model$observables$last_queryable_date,
+        "n_model" = model$disease_progression_rates[["I"]] *
+            model$compartment_structure[["I"]] *
+            .data$value * reporting_percentage *
+            sum(model$activity$contact_basis$population)
+      )
+  } else if (signal == "prevalence") {
+    out <- sol_long |>
+      dplyr::filter(startsWith(.data$state, "I1")) |>
+      dplyr::select(!"state") |>
+      dplyr::summarise(
+        "date" = dplyr::first(.data$time) + model$observables$last_queryable_date,
+        "n_model" = sum(.data$value),
+        .by = "time"
+      )
+  }
+
+  # Add the model configuration
+  out <- out |>
+    dplyr::mutate(
+      "model_configuration" = paste0(
+        names(model$compartment_structure),
+        model$compartment_structure,
+        collapse = ""
+      )
+    )
+
+  return(out)
+}
+
+prediction <- get_prediction(
+  model = m,
+  psi = psi,
+  reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
+)
+
+prediction
+```
+
+```{r correctly specified model, fig.alt = "Using a correctly specified model to initialise the SEIR model matches the true data near-perfectly."}
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = dplyr::filter(incidence_data, .data$source == !!source),
+    ggplot2::aes(x = date, y = model_output),
+    color = switch(
+      source,
+      "n_infected"        = "orange",
+      "n_positive_simple" = "deepskyblue3",
+      "n_positive"        = "seagreen"
+    )
+  ) +
+  ggplot2::geom_line(
+    data = prediction,
+    ggplot2::aes(x = date, y = n_model, color = model_configuration),
+    linewidth = 1.5
+  ) +
+  ggplot2::geom_vline(
+    xintercept = obs$last_queryable_date,
+    linetype = 2,
+    color = "black"
+  ) +
+  ggplot2::facet_grid(source ~ age_group, scales = "free") +
+  ggplot2::labs(y = "Model output", color = "Model Configuration")
+```
+
+### Misspecified model
+Correctly matching the model is the best case scenario.
+However, we can also the method for a couple of cases where the model is misspecified.
+
+Note that we at this state does not modify the parameters of the model to match the development,
+we only estimate the initial state vector.
+
+Once we include model fitting, the discrepancy between the data and model predictions may diminish.
+
+#### Misspecified model in periods of increasing infections
+```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing."}
+models <- list(
+  generate_model(2, 1, 1),
+  generate_model(1, 1, 1),
+  generate_model(2, 2, 2),
+  generate_model(3, 2, 5)
+)
+
+predictions <- models |>
+  purrr::map(\(m) {
+    psi <- m$initialise_state_vector(
+      incidence_data |>
+        dplyr::filter(.data$source == !!source)
+    )
+
+    get_prediction(
+      model = m,
+      psi = psi,
+      reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
+    )
+  }) |>
+  purrr::reduce(rbind)
+
+
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = dplyr::filter(incidence_data, .data$source == !!source),
+    ggplot2::aes(x = date, y = model_output),
+    color = switch(
+      source,
+      "n_infected"        = "orange",
+      "n_positive_simple" = "deepskyblue3",
+      "n_positive"        = "seagreen"
+    )
+  ) +
+  ggplot2::geom_line(
+    data = predictions,
+    ggplot2::aes(x = date, y = n_model, color = model_configuration),
+    linewidth = 1.5
+  ) +
+  ggplot2::geom_vline(
+    xintercept = models[[1]]$observables$last_queryable_date,
+    linetype = 2,
+    color = "black"
+  ) +
+  ggplot2::facet_grid(source ~ age_group, scales = "free") +
+  ggplot2::labs(y = "Model output", color = "Model Configuration")
+```
+
+#### Misspecified model in periods of decreasing infections
+```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing."}
+
+models <- list(
+  generate_model(2, 1, 1),
+  generate_model(1, 1, 1),
+  generate_model(2, 2, 2),
+  generate_model(3, 2, 5)
+)
+
+# Update the last queryable date to later starting point
+purrr::walk(models, \(m) {
+  m$observables$set_last_queryable_date(
+    m$observables$ds$max_end_date - lubridate::days(45)
+  )
+})
+
+predictions <- models |>
+  purrr::map(\(m) {
+    psi <- m$initialise_state_vector(
+      incidence_data |>
+        dplyr::filter(.data$source == !!source)
+    )
+
+    get_prediction(
+      model = m,
+      psi = psi,
+      reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
+    )
+  }) |>
+  purrr::reduce(rbind)
+
+
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = dplyr::filter(incidence_data, .data$source == !!source),
+    ggplot2::aes(x = date, y = model_output),
+    color = switch(
+      source,
+      "n_infected"        = "orange",
+      "n_positive_simple" = "deepskyblue3",
+      "n_positive"        = "seagreen"
+    )
+  ) +
+  ggplot2::geom_line(
+    data = predictions,
+    ggplot2::aes(x = date, y = n_model, color = model_configuration),
+    linewidth = 1.5
+  ) +
+  ggplot2::geom_vline(
+    xintercept = models[[1]]$observables$last_queryable_date,
+    linetype = 2,
+    color = "black"
+  ) +
+  ggplot2::facet_grid(source ~ age_group, scales = "free") +
+  ggplot2::labs(y = "Model output", color = "Model Configuration")
+```

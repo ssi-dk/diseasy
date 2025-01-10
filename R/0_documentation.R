@@ -190,3 +190,38 @@ rd_activity_weights <- paste(
   "(`numeric(4)`)\\cr",
   "vector of weights for the four types of contacts. If NULL (default), no weighting is done."
 )
+
+rd_diseasy_module <- paste(
+  "(`boolean` or `R6::R6Class instance`)\\cr",
+  "If a boolean is given, it dictates whether to load a new instance module of this class.\\cr",
+  "If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`",
+  "instance. This copy is a \"clone\" of the instance at the time it is added and any subsequent changes to the",
+  "instance will not reflect in the copy that is added to `DiseasyModel`."
+)
+
+rd_overall_infection_risk <- paste(
+  "(`numeric`)\\cr",
+  "The overall multiplier for the infection risk for the model."
+)
+
+rd_compartment_structure <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`named integer()`)\\cr",
+    "The structure of the compartments in the model.",
+    "The names should be `E`, `I`, and `R` for the exposed, infectious, and recovered compartments, respectively.",
+    switch(type == "param", "The exposed compartments can optionally be omitted."),
+    switch(type == "field", "Read only.")
+  )
+}
+
+rd_disease_progression_rates <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`named numeric()`)\\cr",
+    "The overall progression rates for the disease states.",
+    "The reciprocal of each rate is the average time spent in the all of the corresponding compartments.",
+    switch(type == "param", "The exposed compartments can optionally be omitted."),
+    switch(type == "field", "Read only.")
+  )
+}

@@ -475,7 +475,7 @@ test_that("dk_reference scenario works", {
   ## Test dk_reference scenario
   act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis %.% DK)
   checkmate::expect_class(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), "list")
-  # More tests could be made ... but tested above. The length may change over time so mayby some particular dates.
+  # More tests could be made ... but tested above. The length may change over time so maybe some particular dates.
 
   ## Test weighted contact types. Most meaningful for contact matrices
   tmp_list          <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
@@ -509,22 +509,34 @@ test_that("$set_contact_basis() works", {
   # Check malformed inputs
   custom_basis <- contact_basis %.% DK
   custom_basis$contacts <- custom_basis$contacts[-1]
-  expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = r"{missing.*elements.*\{'home'\}}")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis)),
+    class = "simpleError",
+    regexp = r"{Must be a set equal to \{'home','work','school','other'\}, but is missing elements \{'home'\}}"
+  )
 
   custom_basis <- contact_basis %.% DK
   custom_basis$proportion <- custom_basis$proportion[-1]
-  expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = "* has length 15")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis)),
+    class = "simpleError",
+    regexp = "Must have length 16, but has length 15"
+  )
 
   custom_basis <- contact_basis %.% DK
   custom_basis$extra_element <- "some string"
-  expect_error(act$set_contact_basis(custom_basis), class = "simpleError",
-               regexp = r"{extra.*elements.*\{'extra_element'\}}")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis)),
+    class = "simpleError",
+    regexp = r"{Must be a permutation of set .+, but has extra elements \{'extra_element'\}}"
+  )
 
   custom_basis <- contact_basis %.% DK
-  expect_error(act$set_contact_basis(custom_basis[-5]), class = "simpleError",
-               regexp = r"{missing.*elements.*\{'description'\}}")
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis[-5])),
+    class = "simpleError",
+    regexp = r"{Must be a set equal to .+, but is missing elements \{'description'\}}"
+  )
 
   rm(act)
 })

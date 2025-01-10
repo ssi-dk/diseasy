@@ -1,43 +1,43 @@
 # In one limit, the hypoexponential is just the Erlang-distribution, so we check this limits works
 test_that("dhypo matches Erlang distribution", {
-  expect_equal(                                                                                                         # nolint: expect_equal
+  expect_identical(
     dhypo(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1),
     stats::dgamma(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1)
   )
 })
 
 test_that("phypo matches Erlang distribution", {
-  expect_equal(                                                                                                         # nolint: expect_equal
+  expect_identical(
     phypo(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1),
-    stats::pgamma(seq(from = 0, to = 5, length.out = 5), shape = 1, rate = 1)
+    stats::pexp(seq(from = 0, to = 5, length.out = 5), rate = 1)
   )
 })
 
 test_that("qhypo matches Erlang distribution", {
-  expect_equal(                                                                                                         # nolint: expect_equal
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. We use root-finding rather than inversion to compute q which gives some deviation.
     qhypo(seq(from = 0.05, to = 0.95, length.out = 5), shape = 1, rate = 1),
-    stats::qgamma(seq(from = 0.05, to = 0.95, length.out = 5), shape = 1, rate = 1)
+    stats::qexp(seq(from = 0.05, to = 0.95, length.out = 5), rate = 1)
   )
 })
 
 
 
 test_that("dhypo matches Erlang distribution", {
-  expect_equal(                                                                                                         # nolint: expect_equal
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. When the rate is a vector we use matrix exponentiation which has a small numerical error.
     dhypo(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = rep(1, 5)),
     stats::dgamma(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = 1)
   )
 })
 
 test_that("phypo matches Erlang distribution", {
-  expect_equal(                                                                                                         # nolint: expect_equal
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. When the rate is a vector we use matrix exponentiation which has a small numerical error.
     phypo(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = rep(1, 5)),
     stats::pgamma(seq(from = 0, to = 5, length.out = 5), shape = 5, rate = 1)
   )
 })
 
 test_that("qhypo matches Erlang distribution", {
-  expect_equal(                                                                                                         # nolint: expect_equal
+  expect_equal(                                                                                                         # nolint: expect_identical_linter. When the rate is a vector we use matrix exponentiation which has a small numerical error.
     qhypo(seq(from = 0.05, to = 0.95, length.out = 5), shape = 5, rate = rep(1, 5)),
     stats::qgamma(seq(from = 0.05, to = 0.95, length.out = 5), shape = 5, rate = 1)
   )
@@ -76,7 +76,7 @@ for (shape in c(1, 5)) { # Number of compartments
       hypo_ecdf <- stats::ecdf(rhypo_samples)(t)
 
       # Compute CDF from dhypo and check if close to the Monte Carlo results
-      expect_equal(
+      expect_equal(                                                                                                     # nolint: expect_identical_linter
         purrr::map_dbl(
           t,
           \(tp) {
@@ -95,14 +95,14 @@ for (shape in c(1, 5)) { # Number of compartments
 
 
       # Compute phypo and check if close to the Monte Carlo results
-      expect_equal(
+      expect_equal(                                                                                                     # nolint: expect_identical_linter
         purrr::map_dbl(t, \(t) phypo(t, shape = shape, rate = r)),
         hypo_ecdf,
         tolerance = 1e-3
       )
 
       # For the smaller quantiles in the Monte Carlo data, check if qhypo is close
-      expect_equal(
+      expect_equal(                                                                                                     # nolint: expect_identical_linter
         purrr::map_dbl(
           purrr::keep(hypo_ecdf, ~ . < 0.95),
           \(q) qhypo(q, shape = shape, rate = r)
@@ -112,7 +112,7 @@ for (shape in c(1, 5)) { # Number of compartments
       )
 
       # Check the number generation is the same
-      expect_equal(                                                                                                     # nolint: expect_equal
+      expect_equal(                                                                                                     # nolint: expect_identical_linter
         stats::ecdf(rhypo(1e6, shape = shape, rate = r))(t),
         hypo_ecdf,
         tolerance = 1e-3

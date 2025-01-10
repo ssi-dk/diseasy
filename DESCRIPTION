@@ -36,17 +36,21 @@ Imports:
     purrr,
     R6,
     rlang,
-    stringr
+    stringr,
+    tidyr
 Suggests:
     contactdata,
     countrycode,
     curl,
     DBI,
+    deSolve,
     devtools,
     duckdb,
+    ggplot2,
     jsonlite,
     knitr,
     lintr,
+    microbenchmark,
     readr,
     rmarkdown,
     RSQLite,
@@ -54,6 +58,7 @@ Suggests:
     spelling,
     testthat (>= 3.0.0),
     tibble,
+    usethis,
     withr,
     zoo
 VignetteBuilder: knitr,
