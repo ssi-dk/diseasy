@@ -40,6 +40,7 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
       "n_infected"        = "seir_example_infected",
       "n_positive_simple" = "seir_example_infected",
       "n_positive"        = "seir_example_infected",
+      "n_admission"      = "seir_example_infected",
       "age_group"         = "seir_example_infected"
     ),
     .label = "SEIR example season",
@@ -55,6 +56,7 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
             "n_infected" = .data$n_infected,
             "n_positive_simple" = .data$n_positive_simple,
             "n_positive" = .data$n_positive,
+            "n_admission" = .data$n_admission,
             "valid_from" = .data$date,
             "valid_until" = .data$date + lubridate::days(1)
           )
