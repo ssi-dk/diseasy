@@ -108,26 +108,26 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
     dplyr::select("date", dplyr::everything())
 
   # set parameters for hospitalization
-  risk_of_hospitalization <- c(0.001, 0.01, 0.1)
+  risk_of_admission <- c(0.001, 0.01, 0.1)
   frac_to_hosp_after_days <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # must sum =1
 
-  future_hospitalized <- t(t(true_infected) * risk_of_hospitalization)
+  future_admitted<- t(t(true_infected) * risk_of_admission)
 
-  hospitalized <- array(0., dim = dim(true_infected))
+  admitted <- array(0., dim = dim(true_infected))
 
   for (i in seq_len(length(frac_to_hosp_after_days))) {
-    hospitalized <- hospitalized + rbind(
+    admitted <- admitted + rbind(
       array(0., dim = c(i, 3)),
-      frac_to_hosp_after_days[i] * future_hospitalized[1: (NROW(future_hospitalized) - i), ]
+      frac_to_hosp_after_days[i] * future_admitted[1: (NROW(future_admitted) - i), ]
     )
   }
 
-  for (i in 1:3) hospitalized[, i] <- rpois(length(hospitalized[, i]), hospitalized[, i])
+  for (i in 1:3) admitted[, i] <- rpois(length(admitted[, i]), admitted[, i])
 
   # Convert to long format
-  seir_example_data_hosp <- hospitalized |>
+  seir_example_data_hosp <- admitted |>
     tibble::as_tibble(rownames = "t") |>
-    tidyr::pivot_longer(cols = !"t", names_to = "age_group", values_to = "n_hospitalized") |>
+    tidyr::pivot_longer(cols = !"t", names_to = "age_group", values_to = "n_admission") |>
     dplyr::mutate(date = as.Date("2020-01-01") + as.numeric(.data$t), .after = "t") |>
     dplyr::select(!"t")
 
@@ -139,13 +139,13 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
     ggplot2::geom_line(ggplot2::aes(x = date, y = n_infected, color = "Infected"), linewidth = 1) +
     ggplot2::geom_line(ggplot2::aes(x = date, y = n_positive_simple, color = "Test positive (simple)"), linewidth = 1) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
-    ggplot2::geom_point(ggplot2::aes(x = date, y = 10 * n_hospitalized, color = "Hospitalized * 10")) +
+    ggplot2::geom_point(ggplot2::aes(x = date, y = 10 * n_admission, color = "Admissions * 10")) +
     ggplot2::facet_wrap(~ age_group) +
     #ggplot2::scale_y_log10() +
-    ggplot2::ylab("Test positive / Infected / Hospitalized") +
+    ggplot2::ylab("Test positive / Infected / Admissions") +
     ggplot2::scale_color_manual(
       values = c("Infected" = "black", "Test positive (simple)" = "blue",
-                 "Test positive (realistic)" = "red", "Hospitalized * 10" = "darkgreen")
+                 "Test positive (realistic)" = "red", "Admissions * 10" = "darkgreen")
     )
 
   # Store data set
