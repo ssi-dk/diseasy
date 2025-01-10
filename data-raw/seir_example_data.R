@@ -108,16 +108,16 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
     dplyr::select("date", dplyr::everything())
 
   # set parameters for hospitalization
-  risk_of_admission <- c(0.001, 0.01, 0.1)
+  risk_of_admission <- c(0.001, 0.01, 0.1) # Risk per age group
   frac_to_hosp_after_days <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # must sum =1
 
-  future_admitted<- t(t(true_infected) * risk_of_admission)
+  future_admitted <- t(t(true_infected) * risk_of_admission)
 
-  admitted <- array(0., dim = dim(true_infected))
+  admitted <- array(0, dim = dim(true_infected))
 
   for (i in seq_len(length(frac_to_hosp_after_days))) {
     admitted <- admitted + rbind(
-      array(0., dim = c(i, 3)),
+      array(0, dim = c(i, 3)),
       frac_to_hosp_after_days[i] * future_admitted[1: (NROW(future_admitted) - i), ]
     )
   }
@@ -128,7 +128,7 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
   seir_example_data_hosp <- admitted |>
     tibble::as_tibble(rownames = "t") |>
     tidyr::pivot_longer(cols = !"t", names_to = "age_group", values_to = "n_admission") |>
-    dplyr::mutate(date = as.Date("2020-01-01") + as.numeric(.data$t), .after = "t") |>
+    dplyr::mutate("date" = as.Date("2020-01-01") + as.numeric(.data$t), .after = "t") |>
     dplyr::select(!"t")
 
   # merge data
@@ -141,7 +141,6 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
     ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = 10 * n_admission, color = "Admissions * 10")) +
     ggplot2::facet_wrap(~ age_group) +
-    #ggplot2::scale_y_log10() +
     ggplot2::ylab("Test positive / Infected / Admissions") +
     ggplot2::scale_color_manual(
       values = c("Infected" = "black", "Test positive (simple)" = "blue",

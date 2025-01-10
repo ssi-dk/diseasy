@@ -121,8 +121,8 @@ NULL
 #'   - `n_positive_simple`: A realisation of the number of test-positives with a 65% test probability.
 #'   - `n_positive_simple`: A realisation of the number of test-positives with a overall 65% test probability but with
 #'     a reduced test-probability in the weekend.
-#'   - `n_admission`: A realisation of admission to hospital delayed relative to incidence and
-#'     age dependent risk of admission.
+#'   - `n_admission`: A realisation of the number of admissions to hospital delayed relative to incidence and
+#'     accounting for a age dependent risk of admission.
 #'
 #' @name seir_example_data
 #' @docType data
