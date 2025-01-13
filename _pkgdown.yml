@@ -10,12 +10,17 @@ authors:
 
 reference:
   - title: Functional modules
-    desc: The building blocks of diseasy.
+    desc: The building blocks of `diseasy`.
     contents:
     - has_keyword("functional-module")
 
+  - title: Model templates
+    desc: Configurable disease models.
+    contents:
+    - has_keyword("model-template")
+
   - title: Data sets
-    desc: Data for the functional modules
+    desc: Data for the functional modules and model templates.
     contents:
     - has_keyword("data")
 
@@ -28,6 +33,7 @@ reference:
     contents:
     - DiseasyBaseModule
     - DiseasyModel
+    - DiseasyModelOde
     - diseasyoption
     - hypoexponential
 
@@ -35,12 +41,17 @@ articles:
 - title: Functional modules
   navbar: Functional modules
   contents:
-  - starts_with("diseasy")
+  - starts_with("diseasy-")
 
 - title: Developer guides
   navbar: Developer guides
   contents:
   - creating-a-model
+
+- title: Model notes
+  navbar: Model notes
+  contents:
+  - starts_with("articles/SEIR")
 
 - title: Additional information
   navbar: Additional information

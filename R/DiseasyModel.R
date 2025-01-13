@@ -20,9 +20,9 @@
 #'     These functions define the "API" of the models and ensure the models can take part in the ensemble.
 #' @examples
 #'   # Normally, one would not want to create this module directly, but it is possible.
-#'   Model_module <- DiseasyModel$new()
+#'   m <- DiseasyModel$new()
 #'
-#'   rm(Model_module)
+#'   rm(m)
 #' @return
 #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
 #' @export
@@ -36,12 +36,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param activity,observables,season,variant (`boolean` or `R6::R6Class instance`)\cr
-    #'   If a boolean is given, it dictates whether to load a new instance module of this class.
-    #'
-    #'   If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`
-    #'   instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
-    #'   instance will not reflect in the copy that is added to `DiseasyModel`.
+    #' @param activity,observables,season,variant `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -52,7 +47,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance.
     #' @param ...
-    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @details
     #'   The `DiseasyModel` is the main template that the individual models should inherit from since this defines the
     #'   set of methods the later framework expects from each model. In addition, it provides the main interface with
@@ -226,7 +221,7 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
-    #' @field season (`diseasy::season`)\cr
+    #' @field season (`diseasy::DiseasySeason`)\cr
     #'   The local copy of a season module. Read-only.
     #' @seealso [diseasy::DiseasySeason]
     #' @importFrom diseasystore `%.%`
@@ -237,7 +232,7 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
-    #' @field variant (`diseasy::variant`)\cr
+    #' @field variant (`diseasy::.DiseasyVariant`)\cr
     #'  The local copy of a variant module. Read-only.
     #' @seealso [diseasy::DiseasyVariant]
     #' @importFrom diseasystore `%.%`
@@ -272,15 +267,33 @@ DiseasyModel <- R6::R6Class(                                                    
           stop("`$last_queryable_date` not configured in observables module!")
         }
 
+        # We work backwards from the `last_queryable_date` and remove the testing and validation periods
+        # to determine the end of the training period
+        last_queryable_date <- purrr::pluck(self, "observables", "last_queryable_date", .default = as.Date(NA))
+
         training_length <- purrr::pluck(self %.% parameters %.% training_length, "training", .default = 0)
+
+        # If training day is infinite, compute the max duration from `ds$min_start_date`
+        if (is.infinite(training_length)) {
+          training_length <- as.numeric(
+            lubridate::interval(
+              start = purrr::pluck(self, "observables", "ds", "min_start_date", .default = last_queryable_date),
+              end = last_queryable_date
+            ),
+            unit = "days"
+          ) + 1
+        }
+
         training_offset <- purrr::discard_at(self %.% parameters %.% training_length, "training") |>
           purrr::reduce(sum, .init = 0)
 
+        # Calculate the training period from the `last_queryable_date` reserving data for the testing and validation
+        # periods
         training_period_end <- self %.% observables %.% last_queryable_date - lubridate::days(training_offset)
 
         training_period_start <- max(
           training_period_end - lubridate::days(max(training_length - 1, 0)),
-          self %.% observables %.% ds %.% min_start_date,
+          purrr::pluck(self %.% observables %.% ds, "min_start_date", .default = NA),
           na.rm = TRUE
         )
 
@@ -313,7 +326,7 @@ DiseasyModel <- R6::R6Class(                                                    
 
         testing_period_start <- max(
           testing_period_end - lubridate::days(max(testing_length - 1, 0)),
-          self %.% observables %.% ds %.% min_start_date
+          purrr::pluck(self %.% observables %.% ds, "min_start_date", .default = NA)
         )
 
         return(list("start" = testing_period_start, "end" = testing_period_end))
@@ -344,7 +357,7 @@ DiseasyModel <- R6::R6Class(                                                    
 
         validation_period_start <- max(
           validation_period_end - lubridate::days(max(validation_length - 1, 0)),
-          self %.% observables %.% ds %.% min_start_date
+          purrr::pluck(self %.% observables %.% ds, "min_start_date", .default = NA)
         )
 
         return(list("start" = validation_period_start, "end" = validation_period_end))
@@ -358,7 +371,6 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
-
     .parameters = NULL,
 
     # @field default_parameters (`list`)\cr

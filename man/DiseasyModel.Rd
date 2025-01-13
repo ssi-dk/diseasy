@@ -30,9 +30,9 @@ These functions define the "API" of the models and ensure the models can take pa
 }
 \examples{
   # Normally, one would not want to create this module directly, but it is possible.
-  Model_module <- DiseasyModel$new()
+  m <- DiseasyModel$new()
 
-  rm(Model_module)
+  rm(m)
 }
 \seealso{
 \link[lgr:lgr-package]{lgr}
@@ -59,10 +59,10 @@ The local copy of an activity module. Read-only.}
 \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
 The local copy of a DiseasyObservables module. Read-only.}
 
-\item{\code{season}}{(\code{diseasy::season})\cr
+\item{\code{season}}{(\code{diseasy::DiseasySeason})\cr
 The local copy of a season module. Read-only.}
 
-\item{\code{variant}}{(\code{diseasy::variant})\cr
+\item{\code{variant}}{(\code{diseasy::.DiseasyVariant})\cr
 The local copy of a variant module. Read-only.}
 
 \item{\code{parameters}}{(\code{list()})\cr
@@ -118,12 +118,7 @@ This module is typically not constructed directly but rather through \verb{Disea
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{activity, observables, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr
-If a boolean is given, it dictates whether to load a new instance module of this class.
-
-If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel}
-instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the
-instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+\item{\code{activity, observables, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
@@ -138,7 +133,7 @@ Common parameters are:
 \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance.}
 
-\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
 }
 \if{html}{\out{</div>}}
 }

@@ -38,12 +38,12 @@ DiseasyObservables <- R6::R6Class(                                              
 
     #' @description
     #'   Creates a new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
-    #' @param diseasystore (`character`)\cr
-    #'   A character string that controls which feature store to get data from.
+    #' @param diseasystore (`character` or `diseasystore`)\cr
+    #'   Either the name of or an instance of the feature store to get data from.
     #' @param start_date `r rd_start_date()`
-    #'   Used as default values for `get_observation`.
+    #'   Used as default values for `$get_observation()`.
     #' @param end_date `r rd_end_date()`
-    #'   Used as default values for `get_observation`.
+    #'   Used as default values for `$get_observation()`.
     #' @param last_queryable_date (`Date`)\cr
     #'   Enforce a limit on data that can be pulled (not after this date).
     #' @param conn `r rd_conn()`
@@ -90,23 +90,29 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @seealso [diseasystore::diseasystore]
     set_diseasystore = function(diseasystore, verbose = NULL) {
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_character(diseasystore, add = coll)
-      if (!diseasystore::diseasystore_exists(diseasystore)) {
+      checkmate::assert(
+        checkmate::check_character(diseasystore, len = 1),
+        checkmate::check_character(purrr::pluck(diseasystore, "classname"), pattern = "^Diseasystore"),
+        add = coll
+      )
+      if (checkmate::test_character(diseasystore) && !diseasystore::diseasystore_exists(diseasystore)) {
         coll$push(glue::glue("{diseasystore::to_diseasystore_case(diseasystore)} not found!"))
       }
       checkmate::assert_logical(verbose, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       # Determine the diseasystore to load
-      ds <- diseasystore::get_diseasystore(diseasystore)
+      if (checkmate::test_character(diseasystore)) diseasystore <- diseasystore::get_diseasystore(diseasystore)
 
       # Determine the verbosity
-      if (is.null(verbose)) verbose <- purrr::pluck(diseasyoption("verbose", ds), .default = FALSE)
+      if (is.null(verbose)) verbose <- purrr::pluck(diseasyoption("verbose", diseasystore), .default = FALSE)
 
       # Load and configure the feature store
-      private$.ds <- ds$new(slice_ts = self %.% slice_ts,
-                            verbose = verbose,
-                            target_conn = self %.% conn)
+      private$.ds <- diseasystore$new(
+        slice_ts = self %.% slice_ts,
+        verbose = verbose,
+        target_conn = self %.% conn
+      )
 
       private$.diseasystore <- private$.ds %.% label # Use the human readable from the diseasystore
 
@@ -331,7 +337,13 @@ DiseasyObservables <- R6::R6Class(                                              
     slice_ts = purrr::partial(
       .f = active_binding,
       name = "slice_ts",
-      expr = return(private %.% .slice_ts)
+      expr = {
+        if (is.null(private %.% .slice_ts)) {
+          return(glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"))
+        } else {
+          return(private %.% .slice_ts)
+        }
+      }
     ),
 
 
@@ -350,7 +362,7 @@ DiseasyObservables <- R6::R6Class(                                              
     .last_queryable_date = NULL,
     .ds                  = NULL,
 
-    .slice_ts = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
+    .slice_ts = NULL,
     .conn = NULL
   )
 )

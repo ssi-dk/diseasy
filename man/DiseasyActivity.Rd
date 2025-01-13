@@ -20,7 +20,11 @@ The \code{activity_units} projects restrictions, guidelines and other changes in
 independently "opened" or "closed". Opening (closing) a activity unit means the activity described in the unit is
 (in)active.
 
-The \code{scenario} contains information on when different \code{activity_units} are opened and closed
+The \code{scenario} contains information on when different \code{activity_units} are opened and closed.
+
+If no scenario is provided, the module will provide non-informative activity information:
+- Openness is always 1.
+- The contact matrices are uniform and, when summed, the largest eigenvalue is 1.
 
 See vignette("diseasy-activity") for examples of use.
 }
@@ -83,7 +87,8 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
 \item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
 \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
-\item \href{#method-DiseasyActivity-rescale_counts_to_rates}{\code{DiseasyActivity$rescale_counts_to_rates()}}
+\item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
+\item \href{#method-DiseasyActivity-rescale_contacts_to_rates}{\code{DiseasyActivity$rescale_contacts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
 \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
@@ -325,23 +330,48 @@ Return contacts across age groups and activities on all dates.
 }
 \subsection{Returns}{
 If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
+Map population between age groups
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyActivity-map_population"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-map_population}{}}}
+\subsection{Method \code{map_population()}}{
+The function computes the proportion of population in the new and old age groups.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$map_population(age_cuts_lower)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{data.frame} which maps the age groups from their reference in \code{contact_basis} to
+those supplied to the function.
 Rescale contact matrices to population contact rates
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-rescale_counts_to_rates"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_counts_to_rates}{}}}
-\subsection{Method \code{rescale_counts_to_rates()}}{
+\if{html}{\out{<a id="method-DiseasyActivity-rescale_contacts_to_rates"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_contacts_to_rates}{}}}
+\subsection{Method \code{rescale_contacts_to_rates()}}{
 Re-scale from contacts to rates per individual to fractional population.
+@details
+If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
+this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_counts_to_rates(input, population)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_contacts_to_rates(input, population)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
-Counts to be re-scaled.}
+Contacts to be re-scaled.}
 
 \item{\code{population}}{(\code{numeric})\cr
 Population vector to weight contacts by.
