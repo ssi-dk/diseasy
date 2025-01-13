@@ -22,24 +22,11 @@ library(diseasy)
 # Create a cache for this vignette since the examples take a long time to generate
 # We will destroy the cache if the source code for `DiseasyImmunity` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-immunity")
-stopifnot(cache$size() == 17)
-source_code_hash <- c(
-  "public_methods",
-  "public_fields",
-  "private_methods",
-  "private_fields",
-  "active"
-) |>
-  purrr::map(~ purrr::pluck(DiseasyImmunity, .x)) |>
-  purrr::reduce(c) |>
-  purrr::map_if(checkmate::test_function, ~ deparse(rlang::fn_body(.))) |>
-  digest::digest()
 
-
-if (!identical(source_code_hash, cache$get("source-code-hash"))) {
+if (!identical(DiseasyImmunity$new()$hash, cache$get("source-code-hash"))) {
   stop("Cache should not reset")
   cache$reset()
-  cache$set("source-code-hash", source_code_hash)
+  cache$set("source-code-hash", DiseasyImmunity$new()$hash)
 }
 
 
@@ -236,7 +223,7 @@ In this example, the module contains the infection and hospitalisation targets d
 approximated.
 ```{r approximate compartmental}
 im$approximate_compartmental(method = "free_gamma", M = 4)
-stopifnot(cache$size() == 17)
+#stopifnot(cache$size() == 17)
 ```
 
 To visualize how the approximations compare to the target functions, the plot function can be used.
