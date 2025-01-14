@@ -327,7 +327,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
           checkmate::test_function,        # For functions, we hash their attributes
           ~ {
             list(
-              "function_source" = deparse(rlang::fn_body(.)),
+              "function_source" = rlang::fn_body(.) |>
+                deparse() |>
+                stringr::str_remove_all(r"{[\s\"]}") |>
+                paste(collapse = ""),
               "function_attributes" = purrr::discard_at(attributes(.), "srcref")
             )
           }
@@ -340,7 +343,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
               checkmate::test_function,
               ~ {
                 list(
-                  "function_source" = deparse(rlang::fn_body(.)),
+                  "function_source" = rlang::fn_body(.) |>
+                    deparse() |>
+                    stringr::str_remove_all(r"{[\s\"]}") |>
+                    paste(collapse = ""),
                   "function_attributes" = purrr::discard_at(attributes(.), "srcref")
                 )
               }
