@@ -285,7 +285,7 @@ Infer the state_vector from incidence data
   incidence_data,
   overall_infection_risk = self \%.\% parameters \%.\% overall_infection_risk,
   ei_rs_balance = 1,
-  method = c("derivative", "eigen-value")
+  method = c("derivative", "eigenvalue", "bruteforce")
 )}\if{html}{\out{</div>}}
 }
 
