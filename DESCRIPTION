@@ -26,7 +26,6 @@ Imports:
     cachem,
     checkmate,
     dfoptim,
-    digest,
     dplyr,
     expm,
     glue,

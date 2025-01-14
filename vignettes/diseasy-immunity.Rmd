@@ -27,7 +27,7 @@ source_code_hash <- c(
   DiseasyBaseModule$new()$hash,
   DiseasyImmunity$new()$hash
 ) |>
-  digest::digest()
+  rlang::hash()
 
 if (!identical(source_code_hash, cache$get("source-code-hash"))) {
   stop("Cache should not reset")

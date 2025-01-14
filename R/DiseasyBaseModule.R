@@ -172,7 +172,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
         hash_list <- c(hash_list, class = class(self)[1])
 
         # Reduce to single hash and return
-        return(digest::digest(hash_list[order(names(hash_list))]))
+        return(rlang::hash(hash_list[order(names(hash_list))]))
       }
     )
   ),
@@ -304,7 +304,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
       )
 
       # Reduce to single hash and return
-      hash <- digest::digest(hash_list[order(names(hash_list))])
+      hash <- rlang::hash(hash_list[order(names(hash_list))])
       return(substring(hash, 1, 10))
     },
 
@@ -353,7 +353,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
             )
           }
         ) |>
-        purrr::map_chr(digest::digest)
+        purrr::map_chr(rlang::hash)
 
       return(hash_list)
     },
