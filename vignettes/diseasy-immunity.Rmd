@@ -23,16 +23,35 @@ library(diseasy)
 # We will destroy the cache if the source code for `DiseasyImmunity` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-immunity")
 
-source_code_hash <- c(
-  DiseasyBaseModule$new()$hash,
-  DiseasyImmunity$new()$hash
-) |>
+r6_hash <- \(r6_generator) {
+  c(
+    "public_methods",
+    "public_fields",
+    "private_methods",
+    "private_fields",
+    "active"
+  ) |>
+    purrr::map(~ purrr::pluck(r6_generator, .x)) |>
+    purrr::reduce(c) |>
+    hash_environment()
+}
+
+source_code_hash <- c(DiseasyBaseModule, DiseasyImmunity) |>
+  purrr::map(r6_hash) |>
   rlang::hash()
 
 if (!identical(source_code_hash, cache$get("source-code-hash"))) {
-  stop("Cache should not reset")
-  cache$reset()
-  cache$set("source-code-hash", source_code_hash)
+  if (interactive()) {
+    cache$reset()
+    cache$set("source-code-hash", source_code_hash)
+  } else {
+    stop(
+      glue::glue(
+        "Cache should not reset (source_code_hash: {source_code_hash})",
+        " - Please run `diseasy-immunity.Rmd` locally and commit the updated cache."
+      )
+    )
+  }
 }
 
 
@@ -229,7 +248,6 @@ In this example, the module contains the infection and hospitalisation targets d
 approximated.
 ```{r approximate compartmental}
 im$approximate_compartmental(method = "free_gamma", M = 2)
-stopifnot(cache$size() == 11)
 ```
 
 To visualize how the approximations compare to the target functions, the plot function can be used.
@@ -285,6 +303,10 @@ ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
 
 
 ```{r cleanup, include = FALSE}
+if (!interactive() && cache$size() > 8) {
+  stop(glue::glue("Extra cache items created (cache size: {cache$size()}) -- hashing issue?"))
+}
+
 if (exists("im")) rm(im)
 gc()
 ```
