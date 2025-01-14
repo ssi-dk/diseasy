@@ -166,7 +166,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
         names(public_env) <- public_names
 
         # Iteratively map the public environment to hashes
-        hash_list <- private$hash_environment(public_env)
+        hash_list <- hash_environment(public_env)
 
         # Add the class name to "salt" the hashes
         hash_list <- c(hash_list, class = class(self)[1])
@@ -299,63 +299,13 @@ DiseasyBaseModule <- R6::R6Class(                                               
       # Find all relevant hashes
       hash_list <- c(
         module_hash = self$hash, # Hash of the module (state of public fields)
-        private$hash_environment(function_environment), # hash everything in the function environment
+        hash_environment(function_environment), # hash everything in the function environment
         class = class(self)[1] # And add the module name to the hash
       )
 
       # Reduce to single hash and return
       hash <- rlang::hash(hash_list[order(names(hash_list))])
       return(substring(hash, 1, 10))
-    },
-
-
-    # @description
-    #   Function that hashes the values of the environment,
-    #   handling special cases such as functions and formulae.
-    # @param environment (`environment`)\cr
-    #   The environment to hash.
-    # @return (`list`(`character`))\cr
-    #   A list of hashes for the environment
-    hash_environment = function(environment) {
-
-      if (checkmate::test_environment(environment)) environment <- as.list(environment)
-
-      hash_list <- environment |>
-        purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-        purrr::map_if(checkmate::test_formula, as.character) |> # formulas are converted to character before hashing
-        purrr::map_if(
-          checkmate::test_function,        # For functions, we hash their attributes
-          ~ {
-            list(
-              "function_source" = rlang::fn_body(.) |>
-                deparse() |>
-                stringr::str_remove_all(r"{[\s\"]}") |>
-                paste(collapse = ""),
-              "function_attributes" = purrr::discard_at(attributes(.), "srcref")
-            )
-          }
-        ) |>
-        purrr::map_if(
-          checkmate::test_list,            # In some cases, we have lists of functions
-          ~ {
-            purrr::map_if(
-              .,
-              checkmate::test_function,
-              ~ {
-                list(
-                  "function_source" = rlang::fn_body(.) |>
-                    deparse() |>
-                    stringr::str_remove_all(r"{[\s\"]}") |>
-                    paste(collapse = ""),
-                  "function_attributes" = purrr::discard_at(attributes(.), "srcref")
-                )
-              }
-            )
-          }
-        ) |>
-        purrr::map_chr(rlang::hash)
-
-      return(hash_list)
     },
 
 
