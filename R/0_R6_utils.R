@@ -231,7 +231,7 @@ hash_environment <- function(environment) {
       ~ {
         list(
           "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(.)), r"{[\s\"]}"), collapse = ""),
-          "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+          "function_attributes" = attributes(rlang::zap_srcref(.))
         )
       }
     ) |>
@@ -244,7 +244,7 @@ hash_environment <- function(environment) {
           ~ {
             list(
               "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(.)), r"{[\s\"]}"), collapse = ""),
-              "function_attributes" = purrr::discard_at(attributes(.), "srcref")
+              "function_attributes" = attributes(rlang::zap_srcref(.))
             )
           }
         )
