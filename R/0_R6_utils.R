@@ -214,7 +214,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #' @param environment (`environment` or `list`)\cr
 #'   The environment to hash.
 #' @return (`list`(`character`))\cr
-#'   A list of hashes for the environment
+#'   A list of hashes for the environment.
 #' @examples
 #'   hash_environment(DiseasyActivity)
 #'   hash_environment(list(mtcars, iris))
@@ -230,7 +230,10 @@ hash_environment <- function(environment) {
       checkmate::test_function, # For functions, we hash their attributes
       ~ {
         list(
-          "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(.)), r"{[\s\"]}"), collapse = ""),
+          "function_source" = rlang::fn_body(.) |>
+            deparse() |>
+            stringr::str_remove_all(r"{[\s\"]}") |>
+            paste(collapse = ""),
           "function_attributes" = attributes(rlang::zap_srcref(.))
         )
       }
@@ -243,14 +246,17 @@ hash_environment <- function(environment) {
           checkmate::test_function,
           ~ {
             list(
-              "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(.)), r"{[\s\"]}"), collapse = ""),
+              "function_source" = rlang::fn_body(.) |>
+                deparse() |>
+                stringr::str_remove_all(r"{[\s\"]}") |>
+                paste(collapse = ""),
               "function_attributes" = attributes(rlang::zap_srcref(.))
             )
           }
         )
       }
     ) |>
-  purrr::map_chr(rlang::hash)
+    purrr::map_chr(rlang::hash)
 
   return(hash_list)
 }

@@ -7,14 +7,18 @@
 hash_environment(environment)
 }
 \arguments{
-\item{environment}{(\code{environment})\cr
+\item{environment}{(\code{environment} or \code{list})\cr
 The environment to hash.}
 }
 \value{
 (\code{list}(\code{character}))\cr
-A list of hashes for the environment
+A list of hashes for the environment.
 }
 \description{
 Function that hashes the values of the environment,
 handling special cases such as functions and formulae.
+}
+\examples{
+  hash_environment(DiseasyActivity)
+  hash_environment(list(mtcars, iris))
 }
