@@ -234,7 +234,8 @@ hash_environment <- function(environment) {
             deparse() |>
             stringr::str_remove_all(r"{[\s\"]}") |>
             paste(collapse = ""),
-          "function_attributes" = attributes(rlang::zap_srcref(.))
+          "function_attributes" = attributes(rlang::zap_srcref(.)) |>
+            purrr::discard_at("body") # Partialised functions have the source repeated as "body"
         )
       }
     ) |>
@@ -250,7 +251,8 @@ hash_environment <- function(environment) {
                 deparse() |>
                 stringr::str_remove_all(r"{[\s\"]}") |>
                 paste(collapse = ""),
-              "function_attributes" = attributes(rlang::zap_srcref(.))
+              "function_attributes" = attributes(rlang::zap_srcref(.)) |>
+                purrr::discard_at("body") # Partialised functions have the source repeated as "body"
             )
           }
         )
