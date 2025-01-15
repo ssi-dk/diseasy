@@ -36,6 +36,7 @@ reference:
     - DiseasyModelOde
     - diseasyoption
     - hypoexponential
+    - hash_environment
 
 articles:
 - title: Functional modules
