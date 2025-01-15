@@ -301,8 +301,7 @@ ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
   ggplot2::coord_cartesian(xlim = c(1, max(results$M)), expand = FALSE)
 ```
 
-
-```{r cleanup, include = FALSE}
+```{r check_cache, include = FALSE, eval = rlang::is_installed(c("ggplot2", "tibble"))}
 if (!interactive() && cache$size() != (2 + max(M_seq) * length(methods))) {
   stop(
     glue::glue(
@@ -311,7 +310,9 @@ if (!interactive() && cache$size() != (2 + max(M_seq) * length(methods))) {
     )
   )
 }
+```
 
+```{r cleanup, include = FALSE}
 if (exists("im")) rm(im)
 gc()
 ```
