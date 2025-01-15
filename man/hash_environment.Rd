@@ -19,6 +19,6 @@ Function that hashes the values of the environment,
 handling special cases such as functions and formulae.
 }
 \examples{
-  hash_environment(DiseasyActivity)
+  hash_environment(list(DiseasyActivity))
   hash_environment(list(mtcars, iris))
 }
