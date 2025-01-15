@@ -306,7 +306,8 @@ ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
 if (!interactive() && cache$size() != (2 + max(M_seq) * length(methods))) {
   stop(
     glue::glue(
-      "Unexpected number of cache items (cache size: {cache$size()}) -- hashing issue?"
+      "Unexpected number of cache items (cache size: {cache$size()})",
+      " -- hashing issue?"
     )
   )
 }
