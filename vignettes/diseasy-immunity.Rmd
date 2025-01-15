@@ -303,10 +303,10 @@ ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
 
 
 ```{r cleanup, include = FALSE}
-if (!interactive() && cache$size() > 17) {
+if (!interactive() && cache$size() != (2 + max(M_seq) * length(methods))) {
   stop(
     glue::glue(
-      "Extra cache items created (cache size: {cache$size()}) -- hashing issue?"
+      "Unexpected number of cache items (cache size: {cache$size()}) -- hashing issue?"
     )
   )
 }
