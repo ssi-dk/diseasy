@@ -172,7 +172,11 @@ DiseasyBaseModule <- R6::R6Class(                                               
         hash_list <- c(hash_list, class = class(self)[1])
 
         # Reduce to single hash and return
-        return(rlang::hash(hash_list))
+        hash <- withr::with_locale(
+          new = c("LC_COLLATE" = "C"), # Ensure consistent hashing
+          rlang::hash(hash_list[order(names(hash_list))])
+        )
+        return(hash)
       }
     )
   ),
@@ -304,8 +308,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
       )
 
       # Reduce to single hash and return
-      hash <- rlang::hash(hash_list)
-
+      hash <- withr::with_locale(
+        new = c("LC_COLLATE" = "C"), # Ensure consistent hashing
+        rlang::hash(hash_list[order(names(hash_list))])
+      )
       return(substring(hash, 1, 10))
     },
 
