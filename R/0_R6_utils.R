@@ -210,7 +210,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #' Holistic hashing of an environment
 #' @description
 #'   Function that hashes the values of the environment,
-#'   handling special cases such as functions and formulae.
+#'   handling special cases such as functions.
 #' @param environment (`environment` or `list`)\cr
 #'   The environment to hash.
 #' @return (`list`(`character`))\cr
@@ -225,7 +225,6 @@ hash_environment <- function(environment) {
 
   hash_list <- environment |>
     purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-    purrr::map_if(checkmate::test_formula, as.character) |> # formulas are converted to character before hashing
     purrr::map_if(
       checkmate::test_function, # For functions, we hash their attributes
       ~ {
