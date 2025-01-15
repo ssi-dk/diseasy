@@ -40,7 +40,7 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
       "n_infected"        = "seir_example_infected",
       "n_positive_simple" = "seir_example_infected",
       "n_positive"        = "seir_example_infected",
-      "n_admission"      = "seir_example_infected",
+      "n_admission"       = "seir_example_infected",
       "age_group"         = "seir_example_infected"
     ),
     .label = "SEIR example season",
