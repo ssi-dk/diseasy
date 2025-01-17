@@ -66,7 +66,7 @@ We can query the model to give the data for a given observable in a given time f
 obs$get_observation(
   observable = "n_positive",
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
+  end_date = as.Date("2020-03-03")
 )
 ```
 
@@ -78,8 +78,9 @@ obs$get_observation(
   observable = "n_admission",
   stratification = rlang::quos(age_group),
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
-)
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, age_group)
 ```
 
 Since the stratification is flexible, we can programmatically stratify:
@@ -90,8 +91,9 @@ obs$get_observation(
     young_age_groups = age_group == "00-29",
   ),
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
-)
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, young_age_groups)
 ```
 
 # Creating "synthetic" observables
@@ -118,7 +120,7 @@ obs$define_synthetic_observable(
 obs$get_observation(
   observable = "n_new_to_hospital",
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
+  end_date = as.Date("2020-03-03")
 )
 ```
 
@@ -130,8 +132,9 @@ obs$get_observation(
     young_age_groups = age_group == "00-29"
   ),
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
-)
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, young_age_groups)
 ```
 
 ## Adjusting existing observables
@@ -149,7 +152,7 @@ obs$define_synthetic_observable(
 obs$get_observation(
   observable = "n_true_infected",
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
+  end_date = as.Date("2020-03-03")
 )
 ```
 
