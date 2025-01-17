@@ -77,6 +77,9 @@ DiseasyObservables <- R6::R6Class(                                              
       if (!is.null(last_queryable_date))              self$set_last_queryable_date(last_queryable_date)
       if (!is.null(start_date) || !is.null(end_date)) self$set_study_period(start_date, end_date)
 
+      # Allocate the list of synthetic features
+      private$.synthetic_features <- list()
+
     },
 
 
@@ -171,7 +174,10 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @param mapping (`function`)\cr
     #'   The mapping to compute the new feature from existing features.
     #'   Existing features should be included as formal arguments to the function.
-    define_synthetic_feature = function(name, mapping) {
+    #' @param key_join (`function`)\cr
+    #'   A function to summarise the feature. See `?diseasystore::aggregators` and
+    #'  `vignette("extending-diseasystore", package = "diseasystore")` for details.
+    define_synthetic_feature = function(name, mapping, key_join = NULL) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(name, pattern = self$ds$observables_regex, add = coll)
@@ -181,7 +187,10 @@ DiseasyObservables <- R6::R6Class(                                              
       checkmate::reportAssertions(coll)
 
       # Add the synthetic feature
-      private$.synthetic_features[[name]] <- mapping
+      private$.synthetic_features[[name]] <- list(
+        "mapping" = mapping,
+        "key_join" = key_join
+      )
     },
 
 
@@ -234,8 +243,11 @@ DiseasyObservables <- R6::R6Class(                                              
         if (observable %in% self$synthetic_features) {
 
           # First extract the features needed for to compute the synthetic feature
-          mapping <- purrr::pluck(private$.synthetic_features, observable)
-          mapping_arguments <- rlang::fn_fmls_names(mapping) # The names of function arguments
+          mapping <- purrr::pluck(private$.synthetic_features, observable, "mapping")
+          key_join <- purrr::pluck(private$.synthetic_features, observable, "key_join")
+
+          # The names of function arguments
+          mapping_arguments <- rlang::fn_fmls_names(mapping)
 
           # Determine the name of the columns created by the stratifications
           stratification_names <- stratification |>
@@ -441,7 +453,7 @@ DiseasyObservables <- R6::R6Class(                                              
     .last_queryable_date = NULL,
     .ds                  = NULL,
 
-    .synthetic_features = list(),
+    .synthetic_features = NULL,
 
     .slice_ts = NULL,
     .conn = NULL

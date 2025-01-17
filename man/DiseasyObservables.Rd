@@ -227,7 +227,7 @@ Set the slice_ts to get data for
 \subsection{Method \code{define_synthetic_feature()}}{
 Adds a synthetic feature computed from existing features.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$define_synthetic_feature(name, mapping)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$define_synthetic_feature(name, mapping, key_join = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -239,6 +239,10 @@ The name of the new feature.}
 \item{\code{mapping}}{(\code{function})\cr
 The mapping to compute the new feature from existing features.
 Existing features should be included as formal arguments to the function.}
+
+\item{\code{key_join}}{(\code{function})\cr
+A function to summarise the feature. See \code{?diseasystore::aggregators} and
+\code{vignette("extending-diseasystore", package = "diseasystore")} for details.}
 }
 \if{html}{\out{</div>}}
 }
