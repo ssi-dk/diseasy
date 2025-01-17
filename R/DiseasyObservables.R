@@ -180,10 +180,10 @@ DiseasyObservables <- R6::R6Class(                                              
     define_synthetic_observable = function(name, mapping, key_join = NULL) {
 
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_character(name, pattern = self$ds$observables_regex, add = coll)
+      checkmate::assert_character(name, pattern = self  %.% ds %.% observables_regex, add = coll)
       checkmate::assert_disjunct(name, self %.% available_observables, add = coll)
       checkmate::assert_function(mapping, add = coll)
-      checkmate::assert_subset(names(formals(mapping)), self$ds$available_features, add = coll)
+      checkmate::assert_subset(names(formals(mapping)), self %.% available_observables, add = coll)
       checkmate::reportAssertions(coll)
 
       # Add the synthetic feature
@@ -255,11 +255,9 @@ DiseasyObservables <- R6::R6Class(                                              
             purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
             unname()
 
-          # Determine the required observables
-          required_observables <- intersect(mapping_arguments, self %.% available_observables)
 
           # Extract the required observables at the stratification level and combine
-          data <- required_observables |>
+          data <- mapping_arguments |>
             purrr::map(\(observable) self$get_observation(observable, stratification, start_date, end_date)) |>
             purrr::reduce(dplyr::full_join, by = c("date", stratification_names))
 
