@@ -94,6 +94,62 @@ obs$get_observation(
 )
 ```
 
+# Creating "synthetic" observables
+Sometimes you may want to customise the data provided by the observables module to you specific use case.
+
+Within `?DiseasyObservables` we call such customised features for "synthetic" features in the sense that you create (synthesize) the feature from existing features.
+
+These features can be created by using the `?DiseasyObservables$define_synthetic_feature()` method.
+
+Let's consider some examples of when you may want to create a synthetic feature
+
+## Renaming features
+You are working with a `diseasystore` where a feature of interest is named differently than a model expects.
+Rather than modifying the `diseasystore` you can create a synthetic feature renames a existing feature:
+
+```{r synthetic_observable_renaming_1, eval = suggests_available}
+# The diseasystore uses "n_admission" but you prefer "n_new_to_hospital"
+obs$define_synthetic_feature(
+  name = "n_new_to_hospital",
+  mapping = \(n_admission) n_admission
+)
+
+obs$get_observation(
+  observable = "n_new_to_hospital",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-04-30")
+)
+```
+
+Note that the stratifications are still available for the synthetic feature:
+```{r synthetic_observable_renaming_2, eval = suggests_available}
+obs$get_observation(
+  observable = "n_new_to_hospital",
+  stratification = rlang::quos(
+    young_age_groups = age < 20
+  ),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-04-30")
+)
+```
+
+## Adjusting existing features
+You have some observable, say the number of test-positive cases, but the model you are working with needs the number of true infected. You also have a estimate of the amount of under-reporting and want construct a adjusted
+feature for the model to use.
+
+```{r synthetic_observable_adjusting_1, eval = suggests_available}
+obs$define_synthetic_feature(
+  name = "n_true_infected",
+  mapping = \(n_positive) round(n_positive / 0.65) # 65% of cases are detected
+)
+
+obs$get_observation(
+  observable = "n_true_infected",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-04-30")
+)
+```
+
 ```{r cleanup, include = FALSE}
 if (exists("obs")) rm(obs)
 gc()
