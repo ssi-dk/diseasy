@@ -43,7 +43,7 @@ obs <- DiseasyObservables$new(
 )
 # NOTE: Alternatively we could set options("diseasy.conn" = ...)
 
-obs$set_diseasystore(diseasystore = "Simulist")
+obs$set_diseasystore(diseasystore = DiseasystoreSeirExample)
 ```
 
 To see the data that comes with the underlying `diseasystore` we can query the module.
@@ -75,8 +75,8 @@ This argument is designed to be flexible, but it means they need to be wrapped i
 We will see below, why that is.
 ```{r example_2, eval = suggests_available}
 obs$get_observation(
-  observable = "n_hospital",
-  stratification = rlang::quos(age),
+  observable = "n_admission",
+  stratification = rlang::quos(age_group),
   start_date = as.Date("2020-03-01"),
   end_date = as.Date("2020-04-30")
 )
@@ -85,9 +85,9 @@ obs$get_observation(
 Since the stratification is flexible, we can programmatically stratify:
 ```{r example_3, eval = suggests_available}
 obs$get_observation(
-  observable = "n_hospital",
+  observable = "n_admission",
   stratification = rlang::quos(
-    young_age_groups = age < 20
+    young_age_groups = age_group == "00-29",
   ),
   start_date = as.Date("2020-03-01"),
   end_date = as.Date("2020-04-30")
@@ -127,7 +127,7 @@ Note that the stratifications are still available for the synthetic observable:
 obs$get_observation(
   observable = "n_new_to_hospital",
   stratification = rlang::quos(
-    young_age_groups = age < 20
+    young_age_groups = age_group == "00-29"
   ),
   start_date = as.Date("2020-03-01"),
   end_date = as.Date("2020-04-30")
