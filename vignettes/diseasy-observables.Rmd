@@ -88,7 +88,7 @@ Since the stratification is flexible, we can programmatically stratify:
 obs$get_observation(
   observable = "n_admission",
   stratification = rlang::quos(
-    young_age_groups = age_group == "00-29",
+    young_age_groups = age_group == "00-29"
   ),
   start_date = as.Date("2020-03-01"),
   end_date = as.Date("2020-03-03")
@@ -164,7 +164,7 @@ This requires some signal for the number of infected in the population, for whic
 ```{r advanced_synthetic_observable_1, eval = suggests_available}
 obs$define_synthetic_observable(
   name = "incidence",
-  mapping = \(n_positive, n_population) n_positive / n_population,
+  mapping = \(n_positive, n_population) n_positive / n_population
 )
 
 # First we see that it works with the stratification

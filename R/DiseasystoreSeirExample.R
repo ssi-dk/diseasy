@@ -60,7 +60,8 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
               .data$age,
               breaks = c(!!age_cuts, Inf),
               labels = diseasystore::age_labels(age_cuts),
-              right = FALSE)
+              right = FALSE
+            )
           ) |>
           dplyr::summarise("n_population" = sum(.data$population)) |>
           dplyr::transmute(
