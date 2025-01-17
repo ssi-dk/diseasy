@@ -231,7 +231,7 @@ DiseasyObservables <- R6::R6Class(                                              
       if (!private$is_cached(hash)) {
 
         # Is the requested observable synthetic?
-        if (observable %in% names(self$synthetic_features)) {
+        if (observable %in% self$synthetic_features) {
 
           # First extract the features needed for to compute the synthetic feature
           mapping <- purrr::pluck(private$.synthetic_features, observable)
@@ -380,7 +380,7 @@ DiseasyObservables <- R6::R6Class(                                              
       name = "available_observables",
       expr = {
         if (is.null(self %.% ds)) return(NULL)
-        return(c(self %.% ds %.% available_observables, names(self %.% synthetic_features)))
+        return(c(self %.% ds %.% available_observables, self %.% synthetic_features))
       }
     ),
 
@@ -402,7 +402,13 @@ DiseasyObservables <- R6::R6Class(                                              
     synthetic_features = purrr::partial(
       .f = active_binding,
       name = "synthetic_features",
-      expr = return(private %.% .synthetic_features)
+      expr = {
+        synthetic_features <- names(private %.% .synthetic_features)
+        if (!is.null(synthetic_features)) {
+          attr(synthetic_features, "secret_hash") <- hash_environment(private %.% .synthetic_features)
+        }
+        return(synthetic_features)
+      }
     ),
 
 
