@@ -165,6 +165,27 @@ DiseasyObservables <- R6::R6Class(                                              
 
 
     #' @description
+    #'   Adds a synthetic feature computed from existing features.
+    #' @param name (`character`)\cr
+    #'   The name of the new feature.
+    #' @param mapping (`function`)\cr
+    #'   The mapping to compute the new feature from existing features.
+    #'   Existing features should be included as formal arguments to the function.
+    define_synthetic_feature = function(name, mapping) {
+
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_character(name, pattern = self$ds$observables_regex, add = coll)
+      checkmate::assert_disjunct(name, self %.% available_observables, add = coll)
+      checkmate::assert_function(mapping, add = coll)
+      checkmate::assert_subset(names(formals(mapping)), self$ds$available_features, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Add the synthetic feature
+      private$.synthetic_features[[name]] <- mapping
+    },
+
+
+    #' @description
     #'   Retrieve an "observable" in the data set corresponding to the set diseasystore.\cr
     #'   By default, the internal values for start_date and end_date are used to return data,
     #'   but these can be overwritten.\cr
@@ -201,11 +222,45 @@ DiseasyObservables <- R6::R6Class(                                              
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
-        # Join observable features with the stratification features
-        data <- self$ds$key_join_features(observable = observable,
-                                          stratification = stratification,
-                                          start_date = start_date,
-                                          end_date = end_date)
+        # Is the requested observable synthetic?
+        if (observable %in% names(self$synthetic_features)) {
+
+          # First extract the features needed for to compute the synthetic feature
+          mapping <- purrr::pluck(private$.synthetic_features, observable)
+          mapping_arguments <- rlang::fn_fmls_names(mapping) # The names of function arguments
+
+          # Determine the name of the columns created by the stratifications
+          stratification_names <- stratification |>
+            purrr::map(rlang::as_label) |>
+            purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
+            unname()
+
+          # Determine the required observables
+          required_observables <- intersect(mapping_arguments, self %.% available_observables)
+
+          # Extract the required observables at the stratification level and combine
+          data <- required_observables |>
+            purrr::map(\(observable) self$get_observation(observable, stratification, start_date, end_date)) |>
+            purrr::reduce(dplyr::full_join, by = c("date", stratification_names))
+
+          # Compute the synthetic feature
+          data <- data |>
+            dplyr::mutate(!!observable := mapping(!!!rlang::quos(!!!rlang::fn_fmls_syms(mapping))))
+
+          # Remove the intermediary observables
+          data <- data |>
+            dplyr::select(!dplyr::all_of(required_observables))
+
+        } else {
+
+          # Join observable features with the stratification features
+          data <- self$ds$key_join_features(
+            observable = observable,
+            stratification = stratification,
+            start_date = start_date,
+            end_date = end_date
+          )
+        }
 
         # Store in cache
         private$cache(hash, data)
@@ -315,8 +370,8 @@ DiseasyObservables <- R6::R6Class(                                              
       .f = active_binding,
       name = "available_observables",
       expr = {
-        if (is.null(private %.% .ds)) return(NULL)
-        return(purrr::keep(private %.% .ds %.% available_features, ~ startsWith(., "n_") | endsWith(., "_temp")))
+        if (is.null(self %.% ds)) return(NULL)
+        return(c(self %.% ds %.% available_observables, names(self %.% synthetic_features)))
       }
     ),
 
@@ -330,6 +385,15 @@ DiseasyObservables <- R6::R6Class(                                              
         if (is.null(private %.% .ds)) return(NULL)
         return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
       }
+    ),
+
+
+    #' @field synthetic_features (`character`)\cr
+    #'  The synthetic features defined in the module. Read-only.
+    synthetic_features = purrr::partial(
+      .f = active_binding,
+      name = "synthetic_features",
+      expr = return(private %.% .synthetic_features)
     ),
 
 
@@ -361,6 +425,8 @@ DiseasyObservables <- R6::R6Class(                                              
     .end_date            = NULL,
     .last_queryable_date = NULL,
     .ds                  = NULL,
+
+    .synthetic_features = list(),
 
     .slice_ts = NULL,
     .conn = NULL
