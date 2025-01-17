@@ -212,10 +212,18 @@ DiseasyObservables <- R6::R6Class(                                              
         coll$push("start_date/end_date not set. call `$set_study_period()` before getting observations")
         coll$push("Alternatively, specify dates manually in the call")
       }
-      checkmate::assert_date(start_date, any.missing = FALSE,
-                             upper = max(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
-      checkmate::assert_date(end_date, any.missing = FALSE,
-                             upper = min(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
+      checkmate::assert_date(
+        start_date,
+        any.missing = FALSE,
+        upper = max(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
+      checkmate::assert_date(
+        end_date,
+        any.missing = FALSE,
+        upper = min(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
@@ -267,10 +275,11 @@ DiseasyObservables <- R6::R6Class(                                              
       }
 
       # Write to the log
-      private$lg$info("Gettting {observable} from {start_date} to {end_date}",
-                      ifelse(is.null(stratification), "",
-                             " at stratification: {private$stratification_to_string(stratification)}"),
-                      " (hash: {hash})")
+      private$lg$info(
+        "Getting {observable} from {start_date} to {end_date}",
+        switch(!is.null(stratification), " at stratification: {private$stratification_to_string(stratification)}"),
+        " (hash: {hash})"
+      )
 
       # Return
       return(private$cache(hash))
