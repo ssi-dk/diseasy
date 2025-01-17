@@ -156,6 +156,36 @@ obs$get_observation(
 )
 ```
 
+## Constructing new observables from multiple observables
+For this example, we want to add the incidence rate of a disease in the population.
+This requires some signal for the number of infected in the population, for which we will use the
+"n_true_infected" observable we created above. In addition, we need the population to calculate the rate.
+
+```{r advanced_synthetic_observable_1, eval = suggests_available}
+obs$define_synthetic_observable(
+  name = "incidence",
+  mapping = \(n_positive, n_population) n_positive / n_population,
+)
+
+# First we see that it works with the stratification
+obs$get_observation(
+  observable = "incidence",
+  stratification = rlang::quos(age_group),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, age_group)
+```
+
+```{r advanced_synthetic_observable_2, eval = suggests_available}
+# And it works without stratification
+obs$get_observation(
+  observable = "incidence",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
+)
+```
+
 ```{r cleanup, include = FALSE}
 if (exists("obs")) rm(obs)
 gc()
