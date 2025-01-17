@@ -97,19 +97,20 @@ obs$get_observation(
 # Creating "synthetic" observables
 Sometimes you may want to customise the data provided by the observables module to you specific use case.
 
-Within `?DiseasyObservables` we call such customised features for "synthetic" features in the sense that you create (synthesize) the feature from existing features.
+Within `?DiseasyObservables` we call such customised observables for "synthetic" observables in the sense that
+you create (synthesize) the observables from existing features.
 
-These features can be created by using the `?DiseasyObservables$define_synthetic_feature()` method.
+These observables can be created by using the `?DiseasyObservables$define_synthetic_observable()` method.
 
-Let's consider some examples of when you may want to create a synthetic feature
+Let's consider some examples of when you may want to create a synthetic observable
 
-## Renaming features
-You are working with a `diseasystore` where a feature of interest is named differently than a model expects.
-Rather than modifying the `diseasystore` you can create a synthetic feature renames a existing feature:
+## Renaming observables
+You are working with a `diseasystore` where a observable of interest is named differently than a model expects.
+Rather than modifying the `diseasystore` you can create a synthetic observable renames a existing observable:
 
 ```{r synthetic_observable_renaming_1, eval = suggests_available}
 # The diseasystore uses "n_admission" but you prefer "n_new_to_hospital"
-obs$define_synthetic_feature(
+obs$define_synthetic_observable(
   name = "n_new_to_hospital",
   mapping = \(n_admission) n_admission
 )
@@ -121,7 +122,7 @@ obs$get_observation(
 )
 ```
 
-Note that the stratifications are still available for the synthetic feature:
+Note that the stratifications are still available for the synthetic observable:
 ```{r synthetic_observable_renaming_2, eval = suggests_available}
 obs$get_observation(
   observable = "n_new_to_hospital",
@@ -133,12 +134,14 @@ obs$get_observation(
 )
 ```
 
-## Adjusting existing features
-You have some observable, say the number of test-positive cases, but the model you are working with needs the number of true infected. You also have a estimate of the amount of under-reporting and want construct a adjusted
-feature for the model to use.
+## Adjusting existing observables
+You have some observable, say the number of test-positive cases, but the model you are working with needs
+the number of true infected.
+You also have a estimate of the amount of under-reporting and want construct a adjusted
+observable for the model to use.
 
 ```{r synthetic_observable_adjusting_1, eval = suggests_available}
-obs$define_synthetic_feature(
+obs$define_synthetic_observable(
   name = "n_true_infected",
   mapping = \(n_positive) round(n_positive / 0.65) # 65% of cases are detected
 )

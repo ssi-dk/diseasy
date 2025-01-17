@@ -78,7 +78,7 @@ DiseasyObservables <- R6::R6Class(                                              
       if (!is.null(start_date) || !is.null(end_date)) self$set_study_period(start_date, end_date)
 
       # Allocate the list of synthetic features
-      private$.synthetic_features <- list()
+      private$.synthetic_observables <- list()
 
     },
 
@@ -177,7 +177,7 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @param key_join (`function`)\cr
     #'   A function to summarise the feature. See `?diseasystore::aggregators` and
     #'  `vignette("extending-diseasystore", package = "diseasystore")` for details.
-    define_synthetic_feature = function(name, mapping, key_join = NULL) {
+    define_synthetic_observable = function(name, mapping, key_join = NULL) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(name, pattern = self$ds$observables_regex, add = coll)
@@ -187,7 +187,7 @@ DiseasyObservables <- R6::R6Class(                                              
       checkmate::reportAssertions(coll)
 
       # Add the synthetic feature
-      private$.synthetic_features[[name]] <- list(
+      private$.synthetic_observables[[name]] <- list(
         "mapping" = mapping,
         "key_join" = key_join
       )
@@ -240,11 +240,11 @@ DiseasyObservables <- R6::R6Class(                                              
       if (!private$is_cached(hash)) {
 
         # Is the requested observable synthetic?
-        if (observable %in% self$synthetic_features) {
+        if (observable %in% self$synthetic_observables) {
 
           # First extract the features needed for to compute the synthetic feature
-          mapping <- purrr::pluck(private$.synthetic_features, observable, "mapping")
-          key_join <- purrr::pluck(private$.synthetic_features, observable, "key_join")
+          mapping <- purrr::pluck(private$.synthetic_observables, observable, "mapping")
+          key_join <- purrr::pluck(private$.synthetic_observables, observable, "key_join")
 
           # The names of function arguments
           mapping_arguments <- rlang::fn_fmls_names(mapping)
@@ -392,7 +392,7 @@ DiseasyObservables <- R6::R6Class(                                              
       name = "available_observables",
       expr = {
         if (is.null(self %.% ds)) return(NULL)
-        return(c(self %.% ds %.% available_observables, self %.% synthetic_features))
+        return(c(self %.% ds %.% available_observables, self %.% synthetic_observables))
       }
     ),
 
@@ -409,17 +409,17 @@ DiseasyObservables <- R6::R6Class(                                              
     ),
 
 
-    #' @field synthetic_features (`character`)\cr
+    #' @field synthetic_observables (`character`)\cr
     #'  The synthetic features defined in the module. Read-only.
-    synthetic_features = purrr::partial(
+    synthetic_observables = purrr::partial(
       .f = active_binding,
-      name = "synthetic_features",
+      name = "synthetic_observables",
       expr = {
-        synthetic_features <- names(private %.% .synthetic_features)
-        if (!is.null(synthetic_features)) {
-          attr(synthetic_features, "secret_hash") <- hash_environment(private %.% .synthetic_features)
+        synthetic_observables <- names(private %.% .synthetic_observables)
+        if (!is.null(synthetic_observables)) {
+          attr(synthetic_observables, "secret_hash") <- hash_environment(private %.% .synthetic_observables)
         }
-        return(synthetic_features)
+        return(synthetic_observables)
       }
     ),
 
@@ -453,7 +453,7 @@ DiseasyObservables <- R6::R6Class(                                              
     .last_queryable_date = NULL,
     .ds                  = NULL,
 
-    .synthetic_features = NULL,
+    .synthetic_observables = NULL,
 
     .slice_ts = NULL,
     .conn = NULL
