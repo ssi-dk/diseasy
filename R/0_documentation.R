@@ -77,9 +77,9 @@ rd_scale <- function(type = "param") {
 
 rd_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`DBIConnection`)\\cr",
-        "A database connection.",
-        ifelse(type == "field", "Read only.", ""))
+  paste("(`DBIConnection` or `function`)\\cr",
+        "A database connection or function that opens a database connection",
+        ifelse(type == "field", " Read only.", ""))
 }
 
 
@@ -189,6 +189,7 @@ rd_activity_weights <- paste(
   "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
 
+## Templates for DiseasyModel ODE templates
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",
   "If a boolean is given, it dictates whether to load a new instance module of this class.\\cr",
@@ -221,5 +222,37 @@ rd_disease_progression_rates <- function(type = "param") {
     "The reciprocal of each rate is the average time spent in the all of the corresponding compartments.",
     switch(type == "param", "The exposed compartments can optionally be omitted."),
     switch(type == "field", "Read only.")
+  )
+}
+
+## Templates for DiseasyModel Regression templates
+rd_diseasymodel_glm_brm_description <- function(regression_class) {
+  glue::glue(
+    .sep = "\n",
+    "The `DiseasyModel{regression_class}` module implements common structure and functionality to",
+    "{regression_class} regression class of models beyond the model structure provided by `DiseasyModelRegression`.",
+    "",
+    "Most notably, the model module implements the `$fit_regression()` and `$get_prediction()` methods using",
+    "{regression_class}.",
+    "",
+    "`diseasy` includes two simple models that uses the `DiseasyModel{regression_class}` module:",
+    "`DiseasyModel{substr(regression_class, 1, 1)}0` and `DiseasyModel{substr(regression_class, 1, 1)}1`",
+    "These models implements a constant predictor and a exponential model based on the previous 7 and 21 days",
+    "of observations, respectively.",
+    "",
+    "When making a custom {regression_class} model, the subclass should implement the `$update_formula()` method.",
+    "The `$update_formula()` method should update the formula based on the stratifications.",
+    "If the model should flexibly adapt to different stratifications, this method should be implemented.",
+    "See `DiseasyModel{substr(regression_class, 1, 1)}0` and `DiseasyModel{substr(regression_class, 1, 1)}1` for",
+    "examples of how this can be done."
+  )
+}
+
+
+rd_diseasymodel_glm_brm_return <- function(regression_class) {
+  glue::glue(
+    .sep = "\n",
+    "A new instance of the `DiseasyModel{regression_class}`, `DiseasyModel{substr(regression_class, 1, 1)}0` or ",
+    "`DiseasyModel{substr(regression_class, 1, 1)}1` [R6][R6::R6Class] class."
   )
 }

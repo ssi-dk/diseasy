@@ -51,24 +51,22 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
-    #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
-    initialize = function(diseasystore = NULL,
-                          start_date = NULL,
-                          end_date = NULL,
-                          last_queryable_date = NULL,
-                          conn = NULL,
-                          slice_ts = NULL,
-                          ...) {
+    #'   A new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
+    initialize = function(
+      diseasystore = NULL,
+      start_date = NULL,
+      end_date = NULL,
+      last_queryable_date = NULL,
+      conn = diseasyoption("conn", class = "DiseasyObservables"),
+      slice_ts = NULL,
+      ...
+    ) {
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
 
       # Set the db connection
-      if (is.null(conn)) {
-        private$.conn <- parse_diseasyconn(options() %.% diseasy.conn) # Open a new connection to the DB
-      } else {
-        private$.conn <- conn # User provided
-      }
+      private$.conn <- parse_diseasyconn(conn) # Open a new connection to the DB
       checkmate::assert_class(self %.% conn, "DBIConnection")
 
       # Initialize based on input
