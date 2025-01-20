@@ -174,10 +174,7 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @param mapping (`function`)\cr
     #'   The mapping to compute the new feature from existing features.
     #'   Existing features should be included as formal arguments to the function.
-    #' @param key_join (`function`)\cr
-    #'   A function to summarise the feature. See `?diseasystore::aggregators` and
-    #'  `vignette("extending-diseasystore", package = "diseasystore")` for details.
-    define_synthetic_observable = function(name, mapping, key_join = NULL) {
+    define_synthetic_observable = function(name, mapping) {
 
       if (is.null(self %.% ds)) {
         stop("Diseasystore not initialized. call `$set_diseasystore()` before defining synthetic observables")
@@ -190,10 +187,7 @@ DiseasyObservables <- R6::R6Class(                                              
       checkmate::reportAssertions(coll)
 
       # Add the synthetic feature
-      private$.synthetic_observables[[name]] <- list(
-        "mapping" = mapping,
-        "key_join" = key_join
-      )
+      private$.synthetic_observables[[name]] <- mapping
     },
 
 
@@ -246,8 +240,7 @@ DiseasyObservables <- R6::R6Class(                                              
         if (observable %in% self$synthetic_observables) {
 
           # First extract the features needed for to compute the synthetic feature
-          mapping <- purrr::pluck(private$.synthetic_observables, observable, "mapping")
-          key_join <- purrr::pluck(private$.synthetic_observables, observable, "key_join")
+          mapping <- purrr::pluck(private$.synthetic_observables, observable)
 
           # The names of function arguments
           mapping_arguments <- rlang::fn_fmls_names(mapping)
