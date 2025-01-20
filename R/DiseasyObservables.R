@@ -270,7 +270,7 @@ DiseasyObservables <- R6::R6Class(                                              
 
           # Remove the intermediary observables
           data <- data |>
-            dplyr::select(!dplyr::all_of(required_observables))
+            dplyr::select(dplyr::all_of(c("date", stratification_names, observable)))
 
         } else {
 
