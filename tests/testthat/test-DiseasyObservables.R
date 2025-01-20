@@ -349,7 +349,7 @@ test_that("$define_synthetic_observable() works", {
       )
     }) |>
     purrr::reduce(purrr::partial(dplyr::full_join, by = "date")) |>
-    tidyr::pivot_longer(observables_to_sum) |>
+    tidyr::pivot_longer(dplyr::all_of(observables_to_sum)) |>
     dplyr::summarise("synthetic_observable_2" = sum(.data$value), .by = "date")
 
   expect_identical(
@@ -373,7 +373,7 @@ test_that("$define_synthetic_observable() works", {
       )
     }) |>
     purrr::reduce(purrr::partial(dplyr::full_join, by = c("date", obs %.% available_stratifications[[1]]))) |>
-    tidyr::pivot_longer(observables_to_sum) |>
+    tidyr::pivot_longer(dplyr::all_of(observables_to_sum)) |>
     dplyr::summarise(
       "synthetic_observable_2" = sum(.data$value),
       .by = c("date", obs %.% available_stratifications[[1]])
