@@ -181,7 +181,11 @@ DiseasyObservables <- R6::R6Class(                                              
       }
 
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_disjunct(name, c(self %.% available_observables, self %.% available_stratifications), add = coll)
+      checkmate::assert_disjunct(
+        name,
+        c(self %.% available_observables, self %.% available_stratifications),
+        add = coll
+      )
       checkmate::assert_function(mapping, add = coll)
       checkmate::assert_subset(names(formals(mapping)), self %.% available_observables, empty.ok = FALSE, add = coll)
       checkmate::reportAssertions(coll)

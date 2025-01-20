@@ -348,7 +348,7 @@ test_that("$define_synthetic_observable() works", {
         end_date = obs %.% ds %.% min_start_date + 3
       )
     }) |>
-    purrr::reduce(purrr::partial(dplyr::full_join, by = c("date"))) |>
+    purrr::reduce(purrr::partial(dplyr::full_join, by = "date")) |>
     tidyr::pivot_longer(observables_to_sum) |>
     dplyr::summarise("synthetic_observable_2" = sum(.data$value), .by = "date")
 
