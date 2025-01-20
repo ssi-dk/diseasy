@@ -243,7 +243,7 @@ compartments at time \code{t}.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
