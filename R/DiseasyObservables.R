@@ -179,6 +179,10 @@ DiseasyObservables <- R6::R6Class(                                              
     #'  `vignette("extending-diseasystore", package = "diseasystore")` for details.
     define_synthetic_observable = function(name, mapping, key_join = NULL) {
 
+      if (is.null(self %.% ds)) {
+        stop("Diseasystore not initialized. call `$set_diseasystore()` before defining synthetic observables")
+      }
+
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(name, pattern = self  %.% ds %.% observables_regex, add = coll)
       checkmate::assert_disjunct(name, self %.% available_observables, add = coll)
