@@ -47,6 +47,7 @@ These functions define the "API" of the models and ensure the models can take pa
 
 \link{DiseasyVariant}
 }
+\keyword{model-template-builder}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyModel}
 }
@@ -168,9 +169,9 @@ The primary method used to request model results of a given observable at a give
 
 \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
 
-\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr Default NULL. If given, results are returned at the quantiles given.}
+\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 }
 \if{html}{\out{</div>}}
 }
@@ -197,7 +198,7 @@ the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \describe{
 \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 
 \item{\code{period}}{(\code{character})\cr
 The period to return data for. That is, the training, testing or validation period.}

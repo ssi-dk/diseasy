@@ -15,7 +15,7 @@ The module to generate visualisation for.}
 See the \verb{$plot()} method for each module}
 }
 \value{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 \description{
 Visualise \code{diseasy} modules.

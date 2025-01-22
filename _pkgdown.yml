@@ -15,7 +15,7 @@ reference:
     - has_keyword("functional-module")
 
   - title: Model templates
-    desc: Configurable disease models.
+    desc: Templates that construct individual models.
     contents:
     - has_keyword("model-template")
 
@@ -29,11 +29,10 @@ reference:
     - plot
 
   - title: Developer functions
-    desc: Functions to create model templates.
+    desc: Functions to create model templates and functional modules.
     contents:
     - DiseasyBaseModule
-    - DiseasyModel
-    - DiseasyModelOde
+    - has_keyword("model-template-builder")
     - diseasyoption
     - hypoexponential
     - hash_environment
@@ -42,7 +41,12 @@ articles:
 - title: Functional modules
   navbar: Functional modules
   contents:
-  - starts_with("diseasy-")
+  - matches(r"{^diseasy-\w*$}") # I would do a negative lookahead for "-model", but perl is not allowed here
+
+- title: Model templates
+  navbar: Model templates
+  contents:
+  - starts_with("diseasy-model")
 
 - title: Developer guides
   navbar: Developer guides

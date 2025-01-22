@@ -203,6 +203,197 @@ test_that("$set_slice_ts() works", {
 })
 
 
+test_that("$define_synthetic_observable() works", {
+  skip_if_not_installed("RSQLite")
+
+  obs <- DiseasyObservables$new()
+
+  # A diseaystore needs to be loaded before defining synthetic observables
+  expect_error(
+    obs$define_synthetic_observable(
+      name = "malformed_synthetic_observable",
+      mapping = \() 1
+    ),
+    pattern = "Diseasystore not initialized"
+  )
+
+  obs$set_diseasystore(diseasystore = "Google COVID-19")
+
+  # Synthetic observables need at least one formal argument
+  expect_error(
+    checkmate_err_msg(
+      obs$define_synthetic_observable(
+        name = "malformed_synthetic_observable",
+        mapping = \() 1
+      )
+    ),
+    pattern = "Variable 'names(formals(mapping))': Must be a subset of"
+  )
+
+  # And that argument must be an observable, not a stratification
+  expect_error(
+    checkmate_err_msg(
+      obs$define_synthetic_observable(
+        name = "malformed_synthetic_observable",
+        mapping = eval(parse(text = glue::glue("\\({obs %.% available_stratifications[[1]]}) 1")))
+      )
+    ),
+    pattern = "Variable 'names(formals(mapping))': Must be a subset of"
+  )
+
+  # In fact, no stratifications may be included in the function definition
+  expect_error(
+    checkmate_err_msg(
+      obs$define_synthetic_observable(
+        name = "malformed_synthetic_observable",
+        mapping = eval(
+          parse(text = glue::glue(
+            "\\({obs %.% available_observables[[1]]}, {obs %.% available_stratifications[[1]]}) 1"
+          ))
+        )
+      )
+    ),
+    pattern = "Variable 'names(formals(mapping))': Must be a subset of"
+  )
+
+
+  ### Check the mapping works for simple cases
+
+
+  ## Rescaling of an observable
+  obs$define_synthetic_observable(
+    name = "synthetic_observable_1",
+    mapping = eval(
+      parse(text = glue::glue(
+        "\\({obs %.% available_observables[[1]]}) 2 * {obs %.% available_observables[[1]]} + 1"
+      ))
+    )
+  )
+
+  # -- without stratification
+  reference <- obs$get_observation(
+    observable = obs %.% available_observables[[1]],
+    start_date = obs %.% ds %.% min_start_date,
+    end_date = obs %.% ds %.% min_start_date + 3
+  ) |>
+    dplyr::mutate(
+      dplyr::across(
+        .cols = obs %.% available_observables[[1]],
+        .fns = ~ 2 * . + 1,
+        .names = "synthetic_observable_1"
+      )
+    ) |>
+    dplyr::select(!dplyr::all_of(obs %.% available_observables[[1]]))
+
+
+  expect_identical(
+    obs$get_observation(
+      observable = "synthetic_observable_1",
+      start_date = obs %.% ds %.% min_start_date,
+      end_date = obs %.% ds %.% min_start_date + 3
+    ),
+    reference
+  )
+
+
+  # -- with stratification
+  reference <- obs$get_observation(
+    observable = obs %.% available_observables[[1]],
+    stratification = eval(parse(text = glue::glue("rlang::quos({obs %.% available_stratifications[[1]]})"))),
+    start_date = obs %.% ds %.% min_start_date,
+    end_date = obs %.% ds %.% min_start_date + 3
+  ) |>
+    dplyr::mutate(
+      dplyr::across(
+        .cols = obs %.% available_observables[[1]],
+        .fns = ~ 2 * . + 1,
+        .names = "synthetic_observable_1"
+      )
+    ) |>
+    dplyr::select(!dplyr::all_of(obs %.% available_observables[[1]]))
+
+
+
+  expect_identical(
+    obs$get_observation(
+      observable = "synthetic_observable_1",
+      stratification = eval(parse(text = glue::glue("rlang::quos({obs %.% available_stratifications[[1]]})"))),
+      start_date = obs %.% ds %.% min_start_date,
+      end_date = obs %.% ds %.% min_start_date + 3
+    ),
+    reference
+  )
+
+
+
+
+
+  ## Summation of existing observables
+  observables_to_sum <- obs %.% available_observables[1:2]
+
+  obs$define_synthetic_observable(
+    name = "synthetic_observable_2",
+    mapping = eval(
+      parse(text = glue::glue("\\({toString(observables_to_sum)}) {paste(observables_to_sum, collapse = ' + ')}"))
+    )
+  )
+
+
+  # -- without stratification
+  reference <- observables_to_sum |>
+    purrr::map(\(observable) {
+      obs$get_observation(
+        observable = observable,
+        start_date = obs %.% ds %.% min_start_date,
+        end_date = obs %.% ds %.% min_start_date + 3
+      )
+    }) |>
+    purrr::reduce(purrr::partial(dplyr::full_join, by = "date")) |>
+    tidyr::pivot_longer(dplyr::all_of(observables_to_sum)) |>
+    dplyr::summarise("synthetic_observable_2" = sum(.data$value), .by = "date")
+
+  expect_identical(
+    obs$get_observation(
+      observable = "synthetic_observable_2",
+      start_date = obs %.% ds %.% min_start_date,
+      end_date = obs %.% ds %.% min_start_date + 3
+    ),
+    reference
+  )
+
+
+  # -- without stratification
+  reference <- observables_to_sum |>
+    purrr::map(\(observable) {
+      obs$get_observation(
+        observable = observable,
+        stratification = eval(parse(text = glue::glue("rlang::quos({obs %.% available_stratifications[[1]]})"))),
+        start_date = obs %.% ds %.% min_start_date,
+        end_date = obs %.% ds %.% min_start_date + 3
+      )
+    }) |>
+    purrr::reduce(purrr::partial(dplyr::full_join, by = c("date", obs %.% available_stratifications[[1]]))) |>
+    tidyr::pivot_longer(dplyr::all_of(observables_to_sum)) |>
+    dplyr::summarise(
+      "synthetic_observable_2" = sum(.data$value),
+      .by = c("date", obs %.% available_stratifications[[1]])
+    )
+
+  expect_identical(
+    obs$get_observation(
+      observable = "synthetic_observable_2",
+      stratification = eval(parse(text = glue::glue("rlang::quos({obs %.% available_stratifications[[1]]})"))),
+      start_date = obs %.% ds %.% min_start_date,
+      end_date = obs %.% ds %.% min_start_date + 3
+    ),
+    reference
+  )
+
+
+  rm(obs)
+})
+
+
 test_that("$get_observation() works", {
   skip_if_not_installed("RSQLite")
 

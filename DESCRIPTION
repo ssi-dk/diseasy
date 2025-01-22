@@ -23,6 +23,7 @@ Depends:
     diseasystore (>= 0.3),
     R (>= 4.3.0)
 Imports:
+    brms,
     cachem,
     checkmate,
     dfoptim,

@@ -20,6 +20,7 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 \seealso{
 \link{DiseasyObservables}
 }
+\keyword{model-template-builder}
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{DiseasyModelOde}
 }
@@ -62,9 +63,9 @@ The primary method used to request model results of a given observable at a give
 
 \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
 
-\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr Default NULL. If given, results are returned at the quantiles given.}
+\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 }
 \if{html}{\out{</div>}}
 }

@@ -8,8 +8,7 @@ rd_activity_units <- function(type = "param") {
 
 rd_stratification <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`list`(`quosures`))\\cr",
-        "Default NULL.",
+  paste("(`list`(`quosures`) or `NULL`)\\cr",
         "Use `rlang::quos(...)` to specify stratification.",
         "If given, expressions in stratification evaluated to give the stratification level.",
         ifelse(type == "field", "Read only.", ""))
@@ -62,7 +61,6 @@ rd_prediction_length <- function(type = "param") {
 rd_quantiles <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`list`(`numeric`))\\cr",
-        "Default NULL.",
         "If given, results are returned at the quantiles given.",
         ifelse(type == "field", "Read only.", ""))
 }
@@ -94,9 +92,9 @@ rd_time_scale <- function(type = "param") {
 
 rd_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`DBIConnection`)\\cr",
-        "A database connection.",
-        ifelse(type == "field", "Read only.", ""))
+  paste("(`DBIConnection` or `function`)\\cr",
+        "A database connection or function that opens a database connection",
+        ifelse(type == "field", " Read only.", ""))
 }
 
 
@@ -121,7 +119,7 @@ rd_target_conn <- function(type = "param") {
 rd_schema <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
-        "A database schema",
+        "A database schema.",
         ifelse(type == "field", "Read only.", ""),
         "If the database backend does not support schema, the tables will be prefixed with <schema>.")
 }
@@ -193,19 +191,20 @@ rd_get_results_return <- paste(
 rd_get_results_seealso <- "[diseasy::DiseasyObservables]"
 
 
-rd_side_effects <- "NULL (called for side effects)"
+rd_side_effects <- "`NULL` (called for side effects)"
 
 
 rd_age_cuts_lower <- paste(
   "(`numeric`)\\cr",
-  "vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used."
+  "vector of ages defining the lower bound for each age group. If `NULL`, age groups of contact_basis is used."
 )
 
 rd_activity_weights <- paste(
   "(`numeric(4)`)\\cr",
-  "vector of weights for the four types of contacts. If NULL (default), no weighting is done."
+  "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
 
+## Templates for DiseasyModel ODE templates
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",
   "If a boolean is given, it dictates whether to load a new instance module of this class.\\cr",
@@ -238,5 +237,37 @@ rd_disease_progression_rates <- function(type = "param") {
     "The reciprocal of each rate is the average time spent in the all of the corresponding compartments.",
     switch(type == "param", "The exposed compartments can optionally be omitted."),
     switch(type == "field", "Read only.")
+  )
+}
+
+## Templates for DiseasyModel Regression templates
+rd_diseasymodel_glm_brm_description <- function(regression_class) {
+  glue::glue(
+    .sep = "\n",
+    "The `DiseasyModel{regression_class}` module implements common structure and functionality to",
+    "{regression_class} regression class of models beyond the model structure provided by `DiseasyModelRegression`.",
+    "",
+    "Most notably, the model module implements the `$fit_regression()` and `$get_prediction()` methods using",
+    "{regression_class}.",
+    "",
+    "`diseasy` includes two simple models that uses the `DiseasyModel{regression_class}` module:",
+    "`DiseasyModel{substr(regression_class, 1, 1)}0` and `DiseasyModel{substr(regression_class, 1, 1)}1`",
+    "These models implements a constant predictor and a exponential model based on the previous 7 and 21 days",
+    "of observations, respectively.",
+    "",
+    "When making a custom {regression_class} model, the subclass should implement the `$update_formula()` method.",
+    "The `$update_formula()` method should update the formula based on the stratifications.",
+    "If the model should flexibly adapt to different stratifications, this method should be implemented.",
+    "See `DiseasyModel{substr(regression_class, 1, 1)}0` and `DiseasyModel{substr(regression_class, 1, 1)}1` for",
+    "examples of how this can be done."
+  )
+}
+
+
+rd_diseasymodel_glm_brm_return <- function(regression_class) {
+  glue::glue(
+    .sep = "\n",
+    "A new instance of the `DiseasyModel{regression_class}`, `DiseasyModel{substr(regression_class, 1, 1)}0` or ",
+    "`DiseasyModel{substr(regression_class, 1, 1)}1` [R6][R6::R6Class] class."
   )
 }

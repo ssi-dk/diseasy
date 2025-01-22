@@ -69,9 +69,12 @@ The currently available observables in the loaded diseasystore. Read-only.}
 \item{\code{available_stratifications}}{(\code{character})\cr
 The currently available stratifications in the loaded diseasystore. Read-only.}
 
+\item{\code{synthetic_observables}}{(\code{character})\cr
+The synthetic features defined in the module. Read-only.}
+
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
 
-\item{\code{conn}}{(\code{DBIConnection})\cr A database connection. Read only.}
+\item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -83,6 +86,7 @@ The currently available stratifications in the loaded diseasystore. Read-only.}
 \item \href{#method-DiseasyObservables-set_last_queryable_date}{\code{DiseasyObservables$set_last_queryable_date()}}
 \item \href{#method-DiseasyObservables-set_study_period}{\code{DiseasyObservables$set_study_period()}}
 \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
+\item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
 \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
 \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
 \item \href{#method-DiseasyObservables-finalize}{\code{DiseasyObservables$finalize()}}
@@ -108,7 +112,7 @@ Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} cl
   start_date = NULL,
   end_date = NULL,
   last_queryable_date = NULL,
-  conn = NULL,
+  conn = diseasyoption("conn", class = "DiseasyObservables"),
   slice_ts = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -129,7 +133,7 @@ Used as default values for \verb{$get_observation()}.}
 \item{\code{last_queryable_date}}{(\code{Date})\cr
 Enforce a limit on data that can be pulled (not after this date).}
 
-\item{\code{conn}}{(\code{DBIConnection})\cr A database connection.}
+\item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection}
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
 
@@ -138,7 +142,7 @@ Enforce a limit on data that can be pulled (not after this date).}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A new instance of the \code{DiseasyBaseModule} \link[R6:R6Class]{R6} class.
+A new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
 }
 }
 \if{html}{\out{<hr>}}
@@ -218,6 +222,28 @@ Set the slice_ts to get data for
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyObservables-define_synthetic_observable"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-define_synthetic_observable}{}}}
+\subsection{Method \code{define_synthetic_observable()}}{
+Adds a synthetic feature computed from existing features.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$define_synthetic_observable(name, mapping)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(\code{character})\cr
+The name of the new feature.}
+
+\item{\code{mapping}}{(\code{function})\cr
+The mapping to compute the new feature from existing features.
+Existing features should be included as formal arguments to the function.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-get_observation"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-get_observation}{}}}
 \subsection{Method \code{get_observation()}}{
@@ -239,7 +265,7 @@ The results are cached for faster retrieval at subsequent calls.
 \describe{
 \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Default NULL. Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
