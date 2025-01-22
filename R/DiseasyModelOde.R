@@ -55,6 +55,85 @@ DiseasyModelOde <- R6::R6Class(                                                 
   ),
 
   private = list(
+
+    # Run the model to generate the model incidence which all observables are derived from
+    # @param prediction_length (`integer`)\cr
+    #   The number of days to predict for.
+    solve_ode = function(prediction_length) {
+
+      # Look in the cache for data
+      hash <- private$get_hash()
+      if (!private$is_cached(hash)) {
+
+        # Set the stratification to the highest level supported by the data / model
+        maximal_stratification <- c(
+          "age_group",
+          switch(!is.null(self %.% variant %.% variants), "variant") # Variants included in the model
+        )
+
+        # Detect missing data
+        missing_in_data <- maximal_stratification |>
+          purrr::discard_at(self %.% observables %.% available_stratifications)
+
+        if (length(missing_in_data) > 0) {
+          stop("Model stratification not available in data: ", toString(missing_in_data))
+        }
+
+        # Get the incidence data at the stratification level
+        # and rename the incidence column to "incidence" since this is expected by
+        # `$initialise_state_vector()` (implemented by the subclasses)
+        incidence_data <- self$get_training_data(
+          observable = self %.% parameters %.% incidence_feature_name,
+          stratification = rlang::quos(!!!purrr::map(maximal_stratification, as.symbol))
+        ) |>
+          dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name)
+
+
+        ## Ensure incidence_data conforms to the requirements of `$initialise_state_vector()`
+
+        # - If variants are in the incidence data, keep only the variants in the model
+        incidence_data <- incidence_data |>
+          dplyr::filter(dplyr::if_all(dplyr::any_of("variant"), ~ . %in% names(self %.% variant %.% variants)))
+
+
+        # Infer the initial state vector
+        psi <- m$initialise_state_vector(incidence_data)
+
+        # The model has a configured right-hand-side function that
+        # can be used to simulate the model in conjunction with `deSolve`.
+        sol <- deSolve::ode(
+          y = psi$initial_condition,
+          times = seq(from = 1, to = prediction_length, by = 1),
+          func = m$rhs
+        )
+
+        # Convert to long format
+        sol_long <- sol |>
+          as.data.frame() |>
+          tidyr::pivot_longer(
+            !"time",
+            names_sep = "/",
+            names_to = c(maximal_stratification, "state")
+          )
+
+        # Get the raw rates from the model solution
+        model_rates <- sol_long |>
+          dplyr::filter(.data$state == "I1") |>
+          dplyr::mutate(
+            "date" = .data$time + self %.% observables %.% last_queryable_date,
+            "I*" = self %.% disease_progression_rates[["I"]] * self %.% compartment_structure[["I"]] * .data$value
+          ) |>
+          dplyr::select(!"state")
+
+        # Store in cache
+        private$cache(hash, model_rates)
+      }
+
+      # Return
+      return(private$cache(hash))
+    },
+
+
     default_parameters = function() {
       modifyList(
         super$default_parameters(), # Obtain parameters from the super-classes
