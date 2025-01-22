@@ -503,6 +503,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Check incidence column
       checkmate::assert_numeric(incidence_data$incidence, lower = 0, upper = 1, any.missing = FALSE, add = coll)
 
+      # Check the remaining arguments
+      checkmate::assert_numeric(overall_infection_risk, lower = 0, len = 1, add = coll)
+      checkmate::assert_numeric(ei_rs_balance, lower = 0, upper = 1, len = 1, add = coll)
+
       checkmate::reportAssertions(coll)
 
 
