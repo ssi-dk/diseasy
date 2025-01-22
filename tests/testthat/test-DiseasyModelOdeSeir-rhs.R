@@ -5,7 +5,7 @@ fv <- 0.01 # Whenever two variants are in use, the second has a relative infecti
 
 
 test_that("RHS does not leak and solution is non-negative (SEIR single variant / single age group)", {
-  skip_if_not_installed("RSQLite")
+  skip_if_not_installed(c("RSQLite", "deSolve"))
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
@@ -53,7 +53,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
 })
 
 test_that("RHS does not leak and solution is non-negative (SEEIIRR single variant / single age group)", {
-  skip_if_not_installed("RSQLite")
+  skip_if_not_installed(c("RSQLite", "deSolve"))
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
@@ -101,7 +101,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
 })
 
 test_that("RHS does not leak and solution is non-negative (SEEIIRR double variant / single age group)", {
-  skip_if_not_installed("RSQLite")
+  skip_if_not_installed(c("RSQLite", "deSolve"))
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -136,7 +136,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 })
 
 test_that("RHS does not leak and solution is non-negative (SEEIIRR double variant / double age group)", {
-  skip_if_not_installed("RSQLite")
+  skip_if_not_installed(c("RSQLite", "deSolve"))
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)

@@ -45,10 +45,14 @@ if (!identical(source_code_hash, cache$get("source-code-hash"))) {
   cache$set("source-code-hash", source_code_hash)
 }
 
-
 withr::local_options(
   "diseasy.logging" = FALSE,
   "diseasy.cache" = cache
+)
+
+missing_suggests <- !purrr::every(
+  c("dfoptim", "nloptr", "optimx", "subplex", "ucminf"),
+  rlang::is_installed
 )
 ```
 
@@ -237,14 +241,14 @@ The input for the `?DiseasyImmunity$approximate_compartmental()` function includ
 
 In this example, the module contains the infection and hospitalisation targets defined earlier, which will be
 approximated.
-```{r approximate compartmental}
+```{r approximate compartmental, eval = !missing_suggests}
 im$approximate_compartmental(method = "free_gamma", M = 4)
 ```
 
 To visualize how the approximations compare to the target functions, the plot function can be used.
 Simply specify the approach and the number of compartments (`M`).
 The plot will display both the approximations and the target functions for comparison.
-```{r plot approximation, fig.alt = "Visualisation of the approximations of the waning models."}
+```{r plot approximation, eval = !missing_suggests, fig.alt = "Visualisation of the approximations of the waning models."}
 im$plot(method = "free_gamma", M = 4)
 ```
 
@@ -307,7 +311,7 @@ this is not generally true. We find that the "all_free" method can be the best i
 multiple time scales, but often performs no better than "free_gamma".
 For more examples, see the optimisation vignette (`vignette("diseasy-immunity-optimisation")`).
 
-```{r elbow curve method, fig.alt = "Increasing number of compartments has diminishing returns on the error.", eval = rlang::is_installed(c("ggplot2", "tibble"))}
+```{r elbow curve method, fig.alt = "Increasing number of compartments has diminishing returns on the error.", eval = rlang::is_installed(c("ggplot2", "tibble")) && !missing_suggests}
 # Prepare the data
 M_seq <- seq(from = 1, to = 5, by = 1)
 methods <- c("free_gamma", "free_delta", "all_free")

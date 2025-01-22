@@ -28,8 +28,7 @@ See the \code{vignette("diseasy-immunity")} for examples of use.
   rm(im)
 }
 \seealso{
-\code{vignette("diseasy-immunity")}, \link[stats:optim]{stats::optim}, \link[stats:nlm]{stats::nlm}, \link[stats:nlminb]{stats::nlminb}, \link[nloptr:nloptr]{nloptr::nloptr},
-\link[optimx:optimr]{optimx::optimr}, \link[ucminf:ucminf]{ucminf::ucminf}, \link[dfoptim:hookejeeves]{dfoptim::hjkb}, \link[subplex:subplex]{subplex::subplex}, \link[nloptr:bobyqa]{nloptr::bobyqa}
+\code{vignette("diseasy-immunity")}
 }
 \keyword{functional-module}
 \section{Super class}{
