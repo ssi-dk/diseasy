@@ -4873,7 +4873,7 @@
     {
       "ref": "systemfonts",
       "package": "systemfonts",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4885,10 +4885,10 @@
         "RemoteRef": "systemfonts",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.2.0"
+        "RemoteSha": "1.2.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/systemfonts_1.2.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/systemfonts_1.2.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/systemfonts_1.2.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/systemfonts_1.2.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4979,11 +4979,11 @@
     {
       "ref": "textshaping",
       "package": "textshaping",
-      "version": "0.4.1",
+      "version": "1.0.0",
       "type": "standard",
       "direct": false,
       "binary": true,
-      "dependencies": ["lifecycle", "systemfonts"],
+      "dependencies": ["lifecycle", "stringi", "systemfonts"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "textshaping",
@@ -4991,10 +4991,10 @@
         "RemoteRef": "textshaping",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.4.1"
+        "RemoteSha": "1.0.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/textshaping_0.4.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/textshaping_0.4.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/textshaping_1.0.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/textshaping_1.0.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
