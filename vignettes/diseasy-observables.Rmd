@@ -43,7 +43,7 @@ obs <- DiseasyObservables$new(
 )
 # NOTE: Alternatively we could set options("diseasy.conn" = ...)
 
-obs$set_diseasystore(diseasystore = "Simulist")
+obs$set_diseasystore(diseasystore = DiseasystoreSeirExample)
 ```
 
 To see the data that comes with the underlying `diseasystore` we can query the module.
@@ -66,7 +66,7 @@ We can query the model to give the data for a given observable in a given time f
 obs$get_observation(
   observable = "n_positive",
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
+  end_date = as.Date("2020-03-03")
 )
 ```
 
@@ -75,22 +75,114 @@ This argument is designed to be flexible, but it means they need to be wrapped i
 We will see below, why that is.
 ```{r example_2, eval = suggests_available}
 obs$get_observation(
-  observable = "n_hospital",
-  stratification = rlang::quos(age),
+  observable = "n_admission",
+  stratification = rlang::quos(age_group),
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
-)
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, age_group)
 ```
 
 Since the stratification is flexible, we can programmatically stratify:
 ```{r example_3, eval = suggests_available}
 obs$get_observation(
-  observable = "n_hospital",
+  observable = "n_admission",
   stratification = rlang::quos(
-    young_age_groups = age < 20
+    young_age_groups = age_group == "00-29"
   ),
   start_date = as.Date("2020-03-01"),
-  end_date = as.Date("2020-04-30")
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, young_age_groups)
+```
+
+# Creating "synthetic" observables
+Sometimes you may want to customise the data provided by the observables module to you specific use case.
+
+Within `?DiseasyObservables` we call such customised observables for "synthetic" observables in the sense that
+you create (synthesize) the observables from existing features.
+
+These observables can be created by using the `?DiseasyObservables$define_synthetic_observable()` method.
+
+Let's consider some examples of when you may want to create a synthetic observable
+
+## Renaming observables
+You are working with a `diseasystore` where a observable of interest is named differently than a model expects.
+Rather than modifying the `diseasystore` you can create a synthetic observable renames a existing observable:
+
+```{r synthetic_observable_renaming_1, eval = suggests_available}
+# The diseasystore uses "n_admission" but you prefer "n_new_to_hospital"
+obs$define_synthetic_observable(
+  name = "n_new_to_hospital",
+  mapping = \(n_admission) n_admission
+)
+
+obs$get_observation(
+  observable = "n_new_to_hospital",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
+)
+```
+
+Note that the stratifications are still available for the synthetic observable:
+```{r synthetic_observable_renaming_2, eval = suggests_available}
+obs$get_observation(
+  observable = "n_new_to_hospital",
+  stratification = rlang::quos(
+    young_age_groups = age_group == "00-29"
+  ),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, young_age_groups)
+```
+
+## Adjusting existing observables
+You have some observable, say the number of test-positive cases, but the model you are working with needs
+the number of true infected.
+You also have a estimate of the amount of under-reporting and want construct a adjusted
+observable for the model to use.
+
+```{r synthetic_observable_adjusting_1, eval = suggests_available}
+obs$define_synthetic_observable(
+  name = "n_true_infected",
+  mapping = \(n_positive) round(n_positive / 0.65) # 65% of cases are detected
+)
+
+obs$get_observation(
+  observable = "n_true_infected",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
+)
+```
+
+## Constructing new observables from multiple observables
+For this example, we want to add the incidence rate of a disease in the population.
+This requires some signal for the number of infected in the population, for which we will use the
+"n_true_infected" observable we created above. In addition, we need the population to calculate the rate.
+
+```{r advanced_synthetic_observable_1, eval = suggests_available}
+obs$define_synthetic_observable(
+  name = "incidence",
+  mapping = \(n_positive, n_population) n_positive / n_population
+)
+
+# First we see that it works with the stratification
+obs$get_observation(
+  observable = "incidence",
+  stratification = rlang::quos(age_group),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
+) |>
+  dplyr::arrange(date, age_group)
+```
+
+```{r advanced_synthetic_observable_2, eval = suggests_available}
+# And it works without stratification
+obs$get_observation(
+  observable = "incidence",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
 )
 ```
 

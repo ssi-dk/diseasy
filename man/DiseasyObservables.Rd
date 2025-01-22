@@ -69,6 +69,9 @@ The currently available observables in the loaded diseasystore. Read-only.}
 \item{\code{available_stratifications}}{(\code{character})\cr
 The currently available stratifications in the loaded diseasystore. Read-only.}
 
+\item{\code{synthetic_observables}}{(\code{character})\cr
+The synthetic features defined in the module. Read-only.}
+
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
 
 \item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection  Read only.}
@@ -83,6 +86,7 @@ The currently available stratifications in the loaded diseasystore. Read-only.}
 \item \href{#method-DiseasyObservables-set_last_queryable_date}{\code{DiseasyObservables$set_last_queryable_date()}}
 \item \href{#method-DiseasyObservables-set_study_period}{\code{DiseasyObservables$set_study_period()}}
 \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
+\item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
 \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
 \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
 \item \href{#method-DiseasyObservables-finalize}{\code{DiseasyObservables$finalize()}}
@@ -213,6 +217,28 @@ Set the slice_ts to get data for
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyObservables-define_synthetic_observable"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-define_synthetic_observable}{}}}
+\subsection{Method \code{define_synthetic_observable()}}{
+Adds a synthetic feature computed from existing features.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$define_synthetic_observable(name, mapping)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(\code{character})\cr
+The name of the new feature.}
+
+\item{\code{mapping}}{(\code{function})\cr
+The mapping to compute the new feature from existing features.
+Existing features should be included as formal arguments to the function.}
 }
 \if{html}{\out{</div>}}
 }

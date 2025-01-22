@@ -75,6 +75,9 @@ DiseasyObservables <- R6::R6Class(                                              
       if (!is.null(last_queryable_date))              self$set_last_queryable_date(last_queryable_date)
       if (!is.null(start_date) || !is.null(end_date)) self$set_study_period(start_date, end_date)
 
+      # Allocate the list of synthetic features
+      private$.synthetic_observables <- list()
+
     },
 
 
@@ -163,6 +166,34 @@ DiseasyObservables <- R6::R6Class(                                              
 
 
     #' @description
+    #'   Adds a synthetic feature computed from existing features.
+    #' @param name (`character`)\cr
+    #'   The name of the new feature.
+    #' @param mapping (`function`)\cr
+    #'   The mapping to compute the new feature from existing features.
+    #'   Existing features should be included as formal arguments to the function.
+    define_synthetic_observable = function(name, mapping) {
+
+      if (is.null(self %.% ds)) {
+        stop("Diseasystore not initialized. call `$set_diseasystore()` before defining synthetic observables")
+      }
+
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_disjunct(
+        name,
+        c(self %.% available_observables, self %.% available_stratifications),
+        add = coll
+      )
+      checkmate::assert_function(mapping, add = coll)
+      checkmate::assert_subset(names(formals(mapping)), self %.% available_observables, empty.ok = FALSE, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Add the synthetic feature
+      private$.synthetic_observables[[name]] <- mapping
+    },
+
+
+    #' @description
     #'   Retrieve an "observable" in the data set corresponding to the set diseasystore.\cr
     #'   By default, the internal values for start_date and end_date are used to return data,
     #'   but these can be overwritten.\cr
@@ -189,31 +220,74 @@ DiseasyObservables <- R6::R6Class(                                              
         coll$push("start_date/end_date not set. call `$set_study_period()` before getting observations")
         coll$push("Alternatively, specify dates manually in the call")
       }
-      checkmate::assert_date(start_date, any.missing = FALSE,
-                             upper = max(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
-      checkmate::assert_date(end_date, any.missing = FALSE,
-                             upper = min(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
+      checkmate::assert_date(
+        start_date,
+        any.missing = FALSE,
+        upper = max(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
+      checkmate::assert_date(
+        end_date,
+        any.missing = FALSE,
+        upper = min(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
-        # Join observable features with the stratification features
-        data <- self$ds$key_join_features(observable = observable,
-                                          stratification = stratification,
-                                          start_date = start_date,
-                                          end_date = end_date)
+        # Is the requested observable synthetic?
+        if (observable %in% self$synthetic_observables) {
+
+          # First extract the features needed for to compute the synthetic feature
+          mapping <- purrr::pluck(private$.synthetic_observables, observable)
+
+          # The names of function arguments
+          mapping_arguments <- rlang::fn_fmls_names(mapping)
+
+          # Determine the name of the columns created by the stratifications
+          stratification_names <- stratification |>
+            purrr::map(rlang::as_label) |>
+            purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
+            unname()
+
+
+          # Extract the required observables at the stratification level and combine
+          data <- mapping_arguments |>
+            purrr::map(\(observable) self$get_observation(observable, stratification, start_date, end_date)) |>
+            purrr::reduce(dplyr::full_join, by = c("date", stratification_names))
+
+          # Compute the synthetic feature
+          data <- data |>
+            dplyr::mutate(!!observable := mapping(!!!rlang::quos(!!!rlang::fn_fmls_syms(mapping))))
+
+          # Remove the intermediary observables
+          data <- data |>
+            dplyr::select(dplyr::all_of(c("date", stratification_names, observable)))
+
+        } else {
+
+          # Join observable features with the stratification features
+          data <- self$ds$key_join_features(
+            observable = observable,
+            stratification = stratification,
+            start_date = start_date,
+            end_date = end_date
+          )
+        }
 
         # Store in cache
         private$cache(hash, data)
       }
 
       # Write to the log
-      private$lg$info("Gettting {observable} from {start_date} to {end_date}",
-                      ifelse(is.null(stratification), "",
-                             " at stratification: {private$stratification_to_string(stratification)}"),
-                      " (hash: {hash})")
+      private$lg$info(
+        "Getting {observable} from {start_date} to {end_date}",
+        switch(!is.null(stratification), " at stratification: {private$stratification_to_string(stratification)}"),
+        " (hash: {hash})"
+      )
 
       # Return
       return(private$cache(hash))
@@ -313,8 +387,8 @@ DiseasyObservables <- R6::R6Class(                                              
       .f = active_binding,
       name = "available_observables",
       expr = {
-        if (is.null(private %.% .ds)) return(NULL)
-        return(purrr::keep(private %.% .ds %.% available_features, ~ startsWith(., "n_") | endsWith(., "_temp")))
+        if (is.null(self %.% ds)) return(NULL)
+        return(c(self %.% ds %.% available_observables, self %.% synthetic_observables))
       }
     ),
 
@@ -327,6 +401,21 @@ DiseasyObservables <- R6::R6Class(                                              
       expr = {
         if (is.null(private %.% .ds)) return(NULL)
         return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
+      }
+    ),
+
+
+    #' @field synthetic_observables (`character`)\cr
+    #'  The synthetic features defined in the module. Read-only.
+    synthetic_observables = purrr::partial(
+      .f = active_binding,
+      name = "synthetic_observables",
+      expr = {
+        synthetic_observables <- names(private %.% .synthetic_observables)
+        if (!is.null(synthetic_observables)) {
+          attr(synthetic_observables, "secret_hash") <- hash_environment(private %.% .synthetic_observables)
+        }
+        return(synthetic_observables)
       }
     ),
 
@@ -359,6 +448,8 @@ DiseasyObservables <- R6::R6Class(                                              
     .end_date            = NULL,
     .last_queryable_date = NULL,
     .ds                  = NULL,
+
+    .synthetic_observables = NULL,
 
     .slice_ts = NULL,
     .conn = NULL

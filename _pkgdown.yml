@@ -31,6 +31,7 @@ reference:
     - has_keyword("model-template-builder")
     - diseasyoption
     - hypoexponential
+    - hash_environment
 
 articles:
 - title: Functional modules
