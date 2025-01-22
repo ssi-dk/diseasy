@@ -474,7 +474,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         incidence_data <- dplyr::mutate(incidence_data, "age_group" = "0+")
       }
       if (!"variant" %in% colnames(incidence_data)) {
-        incidence_data <- dplyr::mutate(incidence_data, "variant" = "WT")
+        incidence_data <- incidence_data |>
+          dplyr::mutate(
+            "variant" = !!purrr::pluck(self %.% variant %.% variants, names, 1, .default = "All")
+          )
       }
 
 
@@ -626,7 +629,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Impute zeros for missing states
       estimated_exposed_infected_states <- tidyr::expand_grid(
-        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT"),
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
@@ -678,7 +681,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           by = "1 day"
         ),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
-        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT")
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
       ) |>
         dplyr::left_join(incidence_data, by = c("date", "age_group", "variant")) |>
         dplyr::group_by(.data$variant, .data$age_group) |>
@@ -765,7 +768,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
-        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT"),
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = paste0("R", seq.int(self %.% compartment_structure %.% R))
       ) |>
