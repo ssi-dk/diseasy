@@ -512,6 +512,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       checkmate::reportAssertions(coll)
 
+      # Rescale to the number of infections relative to the full population
+      proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+        dplyr::mutate(
+          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out],
+        ) |>
+        dplyr::summarise(
+          "proportion" = sum(.data$proportion),
+          .by = "age_group",
+        )
+
+      incidence_data <- incidence_data |>
+        dplyr::left_join(proportion, by = "age_group") |>
+        dplyr::mutate("incidence" = .data$incidence * .data$proportion) |>
+        dplyr::select(!"proportion")
 
       # We first compute the time relative to the training period end date
       incidence_data <- incidence_data |>

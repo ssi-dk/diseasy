@@ -17,7 +17,7 @@ library(diseasy)
 Let us begin by considering a general SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively,
 which are governed by the rates $r_e$ and $r_i$ respectively.
 
-Let us further assume that we have a incidence signal, $I^*(t)$, which we would like our model to match.
+Let us further assume that we have a incidence signal[^1], $I^*(t)$, which we would like our model to match.
 
 The general approach is to consider the derivatives of the incidence and link these to the states of the model.
 
@@ -447,6 +447,21 @@ get_prediction <- function(
             .data$value
       )
 
+    # Convert to incidence
+    proportion <- model %.% activity %.% map_population(model %.% parameters %.% age_cuts_lower) |>
+      dplyr::mutate(
+        "age_group" = diseasystore::age_labels(model %.% parameters %.% age_cuts_lower)[.data$age_group_out],
+      ) |>
+      dplyr::summarise(
+        "proportion" = sum(.data$proportion),
+        .by = "age_group",
+      )
+
+    out <- out |>
+      dplyr::left_join(proportion, by = "age_group") |>
+      dplyr::mutate("incidence_model" = .data$incidence_model / .data$proportion) |>
+      dplyr::select(!"proportion")
+
   } else if (signal == "prevalence") {
     out <- sol_long |>
       dplyr::filter(startsWith(.data$state, "I1")) |>
@@ -600,3 +615,7 @@ ggplot2::ggplot() +
   ggplot2::facet_grid(source ~ age_group, scales = "free") +
   ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```
+
+[^1]: The signal we eventually inside `?DiseasyModelOdeSeir$initialise_state_vector()` is computed from the incidence
+rate. There is a small but important difference between the incidence rate and the signal need for initialisation,
+$I^*(t)$. Specifically, $I^*(t)$ should be the number of true infections in the group divided by the total population not the group population.
