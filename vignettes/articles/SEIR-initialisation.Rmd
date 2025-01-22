@@ -370,8 +370,8 @@ incidence_data |>
     ggplot2::geom_point(
       color = switch(
         source,
-        "n_infected"        = "orange",
-        "n_positive_simple" = "deepskyblue3",
+        "n_infected"        = "deepskyblue3",
+        "n_positive_simple" = "orange",
         "n_positive"        = "seagreen"
       )
     ) +
@@ -483,8 +483,8 @@ ggplot2::ggplot() +
     ggplot2::aes(x = date, y = incidence),
     color = switch(
       source,
-      "n_infected"        = "orange",
-      "n_positive_simple" = "deepskyblue3",
+      "n_infected"        = "deepskyblue3",
+      "n_positive_simple" = "orange",
       "n_positive"        = "seagreen"
     )
   ) +
@@ -533,8 +533,8 @@ ggplot2::ggplot() +
     ggplot2::aes(x = date, y = incidence),
     color = switch(
       source,
-      "n_infected"        = "orange",
-      "n_positive_simple" = "deepskyblue3",
+      "n_infected"        = "deepskyblue3",
+      "n_positive_simple" = "orange",
       "n_positive"        = "seagreen"
     )
   ) +
@@ -582,8 +582,8 @@ ggplot2::ggplot() +
     ggplot2::aes(x = date, y = incidence),
     color = switch(
       source,
-      "n_infected"        = "orange",
-      "n_positive_simple" = "deepskyblue3",
+      "n_infected"        = "deepskyblue3",
+      "n_positive_simple" = "orange",
       "n_positive"        = "seagreen"
     )
   ) +
