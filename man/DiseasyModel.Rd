@@ -128,7 +128,7 @@ Each model has their own parameters.
 
 Common parameters are:
 \itemize{
-\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 }}
 
 \item{\code{label}}{(\code{character})\cr

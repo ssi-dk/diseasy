@@ -115,21 +115,27 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   List of parameters to set for the model during initialization.
     #'
     #'   Parameters controlling the structure of the model:
-    #'   * `age_cuts_lower` - Determines the age groups in the model.
+    #'   * `age_cuts_lower` (`numeric()`)\cr
+    #'     Determines the age groups in the model.
     #'
     #'   Parameters controlling the dynamics of the model:
-    #'   (Can be inferred from observational data via initialisation routines)
-    #'   * `overall_infection_risk` - A scalar that scales contact rates to infection rates.
+    #'   * `overall_infection_risk` (`numeric(1)`)\cr
+    #'     A scalar that scales contact rates to infection rates.
     #'
     #'   Parameters controlling initialisation routines
-    #'   * `incidence_polynomial_order` - The degree of the polynomial to fit to the incidence curves.
-    #*   * `incidence_polynomial_training_length` - The number of days to include in the incidence polynomial fit.
+    #'   * `incidence_polynomial_order` (`integer(1)`)\cr
+    #'     The degree of the polynomial to fit to the incidence curves.
+    #'   * `incidence_polynomial_training_length` (`integer(1)`)\cr
+    #'     The number of days to include in the incidence polynomial fit.
+    #'   * `incidence_max_order_derivatives` (`integer(1)`)\cr
+    #'     The highest (informed) derivative from incidence data.
+    #'     Higher order derivatives are set to zero.
     #'
     #'   Parameters controlling the functional modules:
-    #'   * `activity.weights` - passed to `DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)`
-    #'   * `immunity.method` - passed to `DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)`
-    #'
-    #'   Additional parameters are:
+    #'   * `activity.weights` (`numeric(4)`)\cr
+    #'     Passed to `?DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)`
+    #'   * `immunity.method` (`character(1)`)\cr
+    #'     Passed to `?DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)`
     #'
     #'   Additional parameters are:
     #'   `r rd_diseasymodel_parameters`

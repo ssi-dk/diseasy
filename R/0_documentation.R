@@ -120,7 +120,7 @@ rd_target_schema <- function(type = "param") {
 
 
 rd_diseasymodel_parameters <- paste(
-  "* `training_length` (`named numeric`)\\cr",
+  "* `training_length` (`named numeric(3)`)\\cr",
   "  The number of days that should be included in the training splits of the data for the model.",
   "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
 )

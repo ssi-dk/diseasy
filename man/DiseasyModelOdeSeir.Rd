@@ -188,28 +188,38 @@ List of parameters to set for the model during initialization.
 
 Parameters controlling the structure of the model:
 \itemize{
-\item \code{age_cuts_lower} - Determines the age groups in the model.
+\item \code{age_cuts_lower} (\code{numeric()})\cr
+Determines the age groups in the model.
 }
 
 Parameters controlling the dynamics of the model:
-(Can be inferred from observational data via initialisation routines)
 \itemize{
-\item \code{overall_infection_risk} - A scalar that scales contact rates to infection rates.
+\item \code{overall_infection_risk} (\code{numeric(1)})\cr
+A scalar that scales contact rates to infection rates.
 }
 
 Parameters controlling initialisation routines
 \itemize{
-\item \code{incidence_polynomial_order} - The degree of the polynomial to fit to the incidence curves.
+\item \code{incidence_polynomial_order} (\code{integer(1)})\cr
+The degree of the polynomial to fit to the incidence curves.
+\item \code{incidence_polynomial_training_length} (\code{integer(1)})\cr
+The number of days to include in the incidence polynomial fit.
+\item \code{incidence_max_order_derivatives} (\code{integer(1)})\cr
+The highest (informed) derivative from incidence data.
+Higher order derivatives are set to zero.
 }
 
 Parameters controlling the functional modules:
 \itemize{
-\item \code{activity.weights} - passed to \code{DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)}
-\item \code{immunity.method} - passed to \code{DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)}
+\item \code{activity.weights} (\code{numeric(4)})\cr
+Passed to \code{?DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)}
+\item \code{immunity.method} (\code{character(1)})\cr
+Passed to \code{?DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)}
 }
 
 Additional parameters are:
 \itemize{
+\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 \item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.
 }}
 
