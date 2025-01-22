@@ -403,13 +403,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Additional arguments to be passed to the optimiser.
     #' @return
     #'   Returns the results from the optimisation with the approximated rates and execution time.
-    #' @seealso `vignette("diseasy-immunity")`, [stats::optim], [stats::nlm], [stats::nlminb], [nloptr::nloptr],
-    #'  [optimx::optimr], [ucminf::ucminf], [dfoptim::hjkb], [subplex::subplex], [nloptr::bobyqa]
-    #' @import nloptr
-    #' @importFrom optimx optimr
-    #' @importFrom dfoptim hjkb
-    #' @importFrom subplex subplex
-    #' @importFrom ucminf ucminf
+    #' @seealso `vignette("diseasy-immunity")`
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
       method = c("free_gamma", "free_delta", "all_free"),
@@ -419,6 +413,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
       optim_control = NULL,
       ...
     ) {
+
+      missing_packages <- c("dfoptim", "nloptr", "optimx", "subplex", "ucminf") |>
+        purrr::discard(rlang::is_installed) |>
+        toString()
+
+      if (missing_packages != "") {
+        stop(glue::glue("The following packages are required but not installed: {missing_packages}"))
+      }
 
 
       # Determine the method to use
