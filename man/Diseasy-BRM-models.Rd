@@ -33,6 +33,9 @@ examples of how this can be done.
 
  rm(model)
 }
+\seealso{
+\link[stats:family]{stats::family}, \link[stats:formula]{stats::as.formula}
+}
 \keyword{model-template}
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelRegression]{diseasy::DiseasyModelRegression}} -> \code{DiseasyModelBRM}
@@ -40,21 +43,47 @@ examples of how this can be done.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-DiseasyModelBRM-new}{\code{DiseasyModelBRM$new()}}
 \item \href{#method-DiseasyModelBRM-clone}{\code{DiseasyModelBRM$clone()}}
 }
 }
 \if{html}{\out{
-<details><summary>Inherited methods</summary>
+<details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>diseasy::DiseasyModelRegression$get_results()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="initialize"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-initialize'><code>diseasy::DiseasyModelRegression$initialize()</code></a></span></li>
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelBRM-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelBRM-new}{}}}
+\subsection{Method \code{new()}}{
+Creates a new instance of the \code{DiseasyModelBRM} \link[R6:R6Class]{R6} class.
+This module is typically not constructed directly but rather through \verb{DiseasyModelB*} classes,
+such as \link{DiseasyModelB0} and \link{DiseasyModelB1}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelBRM$new(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{parameters sent to \code{DiseasyModelRegression} \link[R6:R6Class]{R6} constructor.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Helper class for the the \verb{DiseasyModelB*} \link[R6:R6Class]{R6} classes.
+}
+
+\subsection{Returns}{
+A new instance of the \code{DiseasyModelBRM} \link[R6:R6Class]{R6} class.
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelBRM-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelBRM-clone}{}}}

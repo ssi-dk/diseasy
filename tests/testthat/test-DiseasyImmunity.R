@@ -505,6 +505,7 @@ test_that("`$set_time_scales()` works for each waning model", {
 
 
 test_that("`$approximate_compartmental()` works for exponential_waning", {
+  skip_if_not_installed(c("dfoptim", "nloptr", "optimx", "subplex", "ucminf"))
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
@@ -560,6 +561,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
 
 
 test_that("`$approximate_compartmental()` uses cache optimally", {
+  skip_if_not_installed(c("dfoptim", "nloptr", "optimx", "subplex", "ucminf"))
 
   # In this test, we check that the "recursive" and "combination" strategies
   # uses the cache optimally by checking that we have the cache hits we expect.
@@ -606,6 +608,7 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
 
 
 test_that("Waning models must not be divergent in `$approximate_compartmental()`", {
+  skip_if_not_installed(c("dfoptim", "nloptr", "optimx", "subplex", "ucminf"))
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
