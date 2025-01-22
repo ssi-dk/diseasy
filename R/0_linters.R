@@ -26,7 +26,8 @@ diseasy_code_linters <- function() {
       nonportable_path_linter = NULL,     # Any \\ is flagged. Therefore fails when escaping backslashes
       undesirable_function_linter = NULL, # Library calls in vignettes are flagged and any call to options
       unnecessary_lambda_linter = NULL,   # Fails for purrr::map with additional function arguments
-      strings_as_factors_linter = NULL    # Seems to be some backwards compatibility stuff.
+      strings_as_factors_linter = NULL,   # Seems to be some backwards compatibility stuff.
+      literal_coercion_linter = NULL      # Fails for mlr3 style roxygen2 docs with (`integer(1)`)
     )
   )
 
