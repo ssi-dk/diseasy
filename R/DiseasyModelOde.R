@@ -72,8 +72,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         )
 
         # Detect missing data
-        missing_in_data <- maximal_stratification |>
-          purrr::discard_at(self %.% observables %.% available_stratifications)
+        missing_in_data <- setdiff(maximal_stratification, self %.% observables %.% available_stratifications)
 
         if (length(missing_in_data) > 0) {
           stop("Model stratification not available in data: ", toString(missing_in_data))
