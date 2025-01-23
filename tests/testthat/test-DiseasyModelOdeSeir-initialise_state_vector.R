@@ -4,7 +4,7 @@
 # We can therefore test that the initialisation works "well" and thereby guard ourselves against future,
 # unintended drops in performance.
 
-if (!rlang::is_installed("RSQLite")) {
+if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
   return() # Skip these tests if RSQLite is not installed
 }
 
