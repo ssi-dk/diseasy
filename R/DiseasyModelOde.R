@@ -94,16 +94,23 @@ DiseasyModelOde <- R6::R6Class(                                                 
         incidence_data <- incidence_data |>
           dplyr::filter(dplyr::if_all(dplyr::any_of("variant"), ~ . %in% names(self %.% variant %.% variants)))
 
-
         # Infer the initial state vector
-        psi <- m$initialise_state_vector(incidence_data)
+        psi <- self$initialise_state_vector(incidence_data)
 
         # The model has a configured right-hand-side function that
         # can be used to simulate the model in conjunction with `deSolve`.
         sol <- deSolve::ode(
           y = psi$initial_condition,
           times = seq(from = 1, to = prediction_length, by = 1),
-          func = m$rhs
+          func = self$rhs
+        )
+
+        # Improve the names of the output
+        colnames(sol) <- c(
+          "time",
+          psi |>
+            tidyr::unite("label", "variant", "age_group", "state", sep = "/", na.rm = FALSE) |>
+            dplyr::pull("label")
         )
 
         # Convert to long format
@@ -112,7 +119,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           tidyr::pivot_longer(
             !"time",
             names_sep = "/",
-            names_to = c(maximal_stratification, "state")
+            names_to = unique(c("variant", maximal_stratification, "state")) # Variant is always in the output
           )
 
         # Get the raw rates from the model solution
