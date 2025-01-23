@@ -227,7 +227,13 @@ rd_disease_progression_rates <- function(type = "param") {
 
 rd_diseasymodelode_parameters <- paste(
   "* `incidence_feature_name` (`character(1)`)\\cr",
-  "  The name of the observable that contains the incidence data to initialise from."
+  "  The name of the observable that contains the incidence data to initialise from.",
+  "",
+  "* `model_rate_to_observable` (named list(`function(1)`))\\cr",
+  "  A named list of functions that maps the model rates to the observable in question (name).",
+  "  These functions are applied in a `dplyr::group_map()` call and should take two arguments:",
+  "  - The first argument contains the model `rate` and information about group size: `proportion` and `population`.",
+  "  - The second argument contains the groups (stratification)."
 )
 
 ## Templates for DiseasyModel Regression templates

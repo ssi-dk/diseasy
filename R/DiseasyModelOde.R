@@ -127,7 +127,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           dplyr::filter(.data$state == "I1") |>
           dplyr::mutate(
             "date" = .data$time + self %.% observables %.% last_queryable_date,
-            "I*" = self %.% disease_progression_rates[["I"]] * self %.% compartment_structure[["I"]] * .data$value
+            "rate" = self %.% disease_progression_rates[["I"]] * self %.% compartment_structure[["I"]] * .data$value
           ) |>
           dplyr::select(!"state")
 
@@ -147,6 +147,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
         list(
           # Parameters selecting the data to use for initialisation
           "incidence_feature_name" = "incidence",
+
+          # Maps between the internal model rates (exiting I1) and observables
+          "model_rate_to_observable" = list(
+            "incidence" = \(.data, .groups) dplyr::mutate(.groups, "incidence" = .data$rate / .data$proportion)
+          )
         ),
         keep.null = TRUE
       )

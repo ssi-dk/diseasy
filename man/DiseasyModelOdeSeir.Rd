@@ -220,7 +220,7 @@ Passed to \code{?DiseasyImmunity$approximate_compartmental(method = immunity.met
 Additional parameters are:
 \itemize{
 \item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
-\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.
+\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.  * \code{model_rate_to_observable} (named list(\verb{function(1)}))\cr   A named list of functions that maps the model rates to the observable in question (name).   These functions are applied in a \code{dplyr::group_map()} call and should take two arguments:   - The first argument contains the model \code{rate} and information about group size: \code{proportion} and \code{population}.   - The second argument contains the groups (stratification).
 }}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
