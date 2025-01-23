@@ -82,7 +82,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Get the incidence data at the stratification level
         # and rename the incidence column to "incidence" since this is expected by
         # `$initialise_state_vector()` (implemented by the subclasses)
-        incidence_data <- self$get_training_data(
+        incidence_data <- self$get_data(
           observable = self %.% parameters %.% incidence_feature_name,
           stratification = rlang::quos(!!!purrr::map(maximal_stratification, as.symbol))
         ) |>

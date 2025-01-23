@@ -24,7 +24,7 @@ The module contains the functional modules via its active bindings:
 Configured instances of these modules can be provided during initialisation.
 Alternatively, default instances of these modules can optionally be created.
 \item Model interface:
-The module defines the functions \verb{$get_results()}, \verb{$get_training_data()} and the \verb{$parameters} binding.
+The module defines the functions \verb{$get_results()}, \verb{$get_data()} and the \verb{$parameters} binding.
 These functions define the "API" of the models and ensure the models can take part in the ensemble.
 }
 }

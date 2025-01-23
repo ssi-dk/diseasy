@@ -16,7 +16,7 @@
 #'     Alternatively, default instances of these modules can optionally be created.
 #'
 #'   * Model interface:
-#'     The module defines the functions `$get_results()`, `$get_training_data()` and the `$parameters` binding.
+#'     The module defines the functions `$get_results()`, `$get_data()` and the `$parameters` binding.
 #'     These functions define the "API" of the models and ensure the models can take part in the ensemble.
 #' @examples
 #'   # Normally, one would not want to create this module directly, but it is possible.
