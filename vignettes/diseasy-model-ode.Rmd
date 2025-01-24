@@ -1,0 +1,334 @@
+---
+title: "DiseasyModelOde"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyModelOde}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+# Introduction
+One of the model families in `diseasy` is the family of Ordinary Differential Equation (ODE) models.
+This family of models is presently represented only by the `?DiseasyModelOdeSeir`, a model template that implements
+SEIR (Susceptible, Exposed, Infected, Recovered) ODE models according to user specification.
+This template allows for any number of $E$, $I$ or $R$ states in the model and interfaces with the `?DiseasySeason`,
+`?DiseasyActivity`, `?DiseasVariant` and `?DiseasyImmunity` modules for scenario definitions.
+
+The workflow for creating a specific `DiseasyModelOdeSeir` model would roughly follow these steps:
+
+1) **Defining the scenario.**
+   The first step to using most models in `diseasy` is to define the scenario. That is, to configure the functional
+   modules that the model templates takes as argument (e.g. `?DiseasyActivity`).
+   These steps provide the model template with information about the population, the activity, variants to include etc.
+2) **Choosing the model configuration.**
+   The model template may have some configurability that you control. In the case of `?DiseasyModelOdeSeir` for example,
+   you must choose the number of consecutive $E$, $I$ and $R$ states in the model.
+3) **Mapping to observables.**
+   The ODE family of models is in some ways bespoke in the sense that the user needs provide a mapping from the
+   observables to the "true" incidence of infections. The model is then initialised from this estimated incidence.
+   If the model should provide predictions for observables other than the "true" incidence, the user needs to provide
+   mapping between the model incidence and the observables in question.
+
+These steps are outlined in individual sections below where we work through defining a model in a specific example.
+Note that this example is contrived in the sense that the data we use in this example have been generated with this
+exact model template and we therefore can match the observations near-perfectly.
+
+# Example data
+The data we will use this example is provided by `DiseasystoreSeirExample` which represents data in a Danish context.
+
+We first create an observables module to interface with this data:
+
+```{r observables}
+# Connect to a database
+dir.create("articles/cache/DiseasystoreSeirExample", showWarnings = FALSE)
+conn <- RSQLite::SQLite() |>
+  DBI::dbConnect(dbname = "articles/cache/DiseasystoreSeirExample/ds.sqlite")
+
+# Configure a observables module with the example data and database
+observables <- DiseasyObservables$new(
+  diseasystore = DiseasystoreSeirExample,
+  conn = conn
+)
+```
+
+The data is stratified by age and covers a single infection wave.
+It contains two observables of interest for our example: "n_positive" and "n_admissions".
+
+When running the models, we should also define at what point in time they should provide predictions for.
+This is done by setting the `last_queryable_date` in the observables module:
+```{r last_queryable_date}
+last_queryable_date <- observables$ds$min_start_date + 40
+```
+
+
+```{r example data positive, eval = rlang::is_installed("ggplot2")}
+observables$get_observation(
+  observable = "n_positive",
+  stratification = rlang::quos(age_group),
+  start_date = observables$ds$min_start_date,
+  end_date = observables$ds$max_end_date
+) |>
+  ggplot2::ggplot(ggplot2::aes(x = date, y = n_positive)) +
+  ggplot2::geom_vline(xintercept = last_queryable_date, color = "black", linetype = "dashed") +
+  ggplot2::geom_point(color = "seagreen") +
+  ggplot2::facet_grid(~ age_group)
+```
+
+```{r example data positive, eval = rlang::is_installed("ggplot2")}
+observables$get_observation(
+  observable = "n_admission",
+  stratification = rlang::quos(age_group),
+  start_date = observables$ds$min_start_date,
+  end_date = observables$ds$max_end_date
+) |>
+  ggplot2::ggplot(ggplot2::aes(x = date, y = n_admission)) +
+  ggplot2::geom_vline(xintercept = last_queryable_date, color = "black", linetype = "dashed") +
+  ggplot2::geom_point(color = "violetred3") +
+  ggplot2::facet_grid(~ age_group)
+```
+
+# Defining the scenario
+```{r diseasy_activity}
+# Configure an activity module using Danish population and contact information
+activity <- DiseasyActivity$new()
+activity$set_contact_basis(contact_basis = contact_basis %.% DK)
+activity$set_activity_units(dk_activity_units)
+activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+```
+
+
+# Choosing the model configuration
+```{r model configuration}
+# Hyper parameters
+compartment_structure <- c("E" = 2, "I" = 1, "R" = 1)
+age_cuts_lower <- c(0, 30, 60)
+
+# Parameters
+disease_progression_rates <- c("E" = 1 / 2.1, "I" = 1 / 4.5)
+overall_infection_risk <- 0.025
+
+# When to predict?
+observables$set_last_queryable_date(last_queryable_date)
+```
+
+
+
+# Mapping to observables
+```{r model configuration}
+
+# Map observables to incidence
+observables$define_synthetic_observable(
+  name = "incidence",
+  #mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
+  mapping = \(n_infected, n_population) n_infected / n_population
+)
+
+
+# Maps between the internal model rates (exiting I1) and observables
+map_to_incidence <- list(
+  "map" = \(.x, .y) {
+    dplyr::mutate(
+      .y,
+      "incidence" = .x$rate / .x$proportion,
+      "population" = .x$population # Need for the reduce function
+    )
+  },
+  "reduce" = ~ sum(. * population / sum(population))
+)
+
+map_to_n_infected <- list(
+  "map" = \(.x, .y) {
+    dplyr::mutate(.y, "n_infected" = .x$rate * .x$population / .x$proportion)
+  }
+)
+
+map_to_n_positive <- list(
+  "map" = \(.x, .y) {
+    dplyr::mutate(.y, "n_positive" = 0.65 * .x$rate * .x$population / .x$proportion)
+  }
+)
+
+map_to_n_admission <- list(
+  "map" = \(.x, .y) {
+    risk_of_admission <- stats::setNames(c(0.001, 0.01, 0.1), c("00-29", "30-59", "60+"))  # Risk per age group
+    delay_distribution <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # Must sum = 1
+
+    n_total_admissions <- .x$rate * .x$population / .x$proportion * risk_of_admission[.y$age_group]
+
+    cbind(
+      .y,
+        data.frame(
+        "delay" = seq_along(delay_distribution) - 1,
+        "n_admission" = n_total_admissions * delay_distribution
+      )
+    ) |>
+      dplyr::mutate("date" = .data$date + .data$delay) |>
+      dplyr::select(!"delay")
+  }
+)
+
+model_rate_to_observable = list(
+  "incidence" = map_to_incidence,
+  "n_infected" = map_to_n_infected,
+  "n_positive" = map_to_n_positive,
+  "n_admission" = map_to_n_admission
+)
+```
+
+
+# Puttiing it all togeter
+```{r model creation}
+model <- DiseasyModelOdeSeir$new(
+  activity = activity,
+  observables = observables,
+  compartment_structure = compartment_structure,
+  disease_progression_rates = disease_progression_rates,
+  parameters = list(
+    "age_cuts_lower" = age_cuts_lower,
+    "overall_infection_risk" = overall_infection_risk,
+    "model_rate_to_observable" = model_rate_to_observable
+  )
+)
+```
+
+# Predicting the incidence
+
+```{r}
+model$get_results(
+  observable = "incidence",
+  prediction_length = 5
+)
+```
+
+```{r}
+plot(
+  model,
+  observable = "incidence",
+  prediction_length = 60
+)
+```
+
+```{r}
+model$get_results(
+  observable = "incidence",
+  prediction_length = 5,
+  stratification = rlang::quos(age_group)
+)
+```
+
+```{r}
+plot(
+  model,
+  observable = "incidence",
+  prediction_length = 60,
+  stratification = rlang::quos(age_group)
+)
+```
+```{r}
+model$get_results(
+  observable = "n_infected",
+  prediction_length = 5
+)
+```
+
+```{r}
+plot(
+  model,
+  observable = "n_infected",
+  prediction_length = 60
+)
+```
+
+```{r}
+model$get_results(
+  observable = "n_infected",
+  prediction_length = 5,
+  stratification = rlang::quos(age_group)
+)
+```
+
+
+```{r}
+plot(
+  model,
+  observable = "n_infected",
+  prediction_length = 60,
+  stratification = rlang::quos(age_group)
+)
+```
+
+
+```{r}
+model$get_results(
+  observable = "n_positive",
+  prediction_length = 60
+)
+```
+
+```{r}
+plot(
+  model,
+  observable = "n_positive",
+  prediction_length = 60
+)
+```
+
+```{r}
+model$get_results(
+  observable = "n_positive",
+  prediction_length = 60,
+  stratification = rlang::quos(age_group)
+)
+```
+
+```{r}
+plot(
+  model,
+  observable = "n_positive",
+  prediction_length = 60,
+  stratification = rlang::quos(age_group)
+)
+```
+
+```{r}
+model$get_results(
+  observable = "n_admission",
+  prediction_length = 60
+)
+```
+
+```{r}
+plot(
+  model,
+  observable = "n_admission",
+  prediction_length = 60
+)
+```
+
+```{r}
+model$get_results(
+  observable = "n_admission",
+  prediction_length = 60,
+  stratification = rlang::quos(age_group)
+)
+```
+
+```{r}
+plot(
+  model,
+  observable = "n_admission",
+  prediction_length = 60,
+  stratification = rlang::quos(age_group)
+)
+```
