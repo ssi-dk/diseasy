@@ -127,9 +127,12 @@ DiseasyModelOde <- R6::R6Class(                                                 
           dplyr::filter(.data$state == "I1") |>
           dplyr::mutate(
             "date" = .data$time + self %.% observables %.% last_queryable_date,
+            .before = dplyr::everything()
+          ) |>
+          dplyr::mutate(
             "rate" = self %.% disease_progression_rates[["I"]] * self %.% compartment_structure[["I"]] * .data$value
           ) |>
-          dplyr::select(!"state")
+          dplyr::select(!c("time", "state", "value"))
 
         # Store in cache
         private$cache(hash, model_rates)
