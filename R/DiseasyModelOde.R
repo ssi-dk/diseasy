@@ -53,13 +53,29 @@ DiseasyModelOde <- R6::R6Class(                                                 
         data <- dplyr::left_join(model_rates, proportion, by = "age_group") |>
           dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
 
+        # Retrieve the map / reduce functions for the observable
+        map_fn <- purrr::pluck(self %.% parameters %.% model_rate_to_observable, observable, "map")
+        reduce_fn <- purrr::pluck(
+          self %.% parameters %.% model_rate_to_observable, observable, "reduce",
+          .default = ~ sum(.)
+        )
+
         # Map model incidence to the requested observable
         prediction <- data |>
           dplyr::group_by(dplyr::across(dplyr::all_of(setdiff(colnames(model_rates), "rate")))) |>
-          dplyr::group_map(purrr::pluck(self %.% parameters %.% model_rate_to_observable, observable)) |>
+          dplyr::group_map(map_fn) |>
           purrr::list_rbind()
-        # Get the observable at the stratification level
-        data <- self$get_training_data(observable, stratification)
+
+        # Reduce (summarise) to the requested stratification level.
+        prediction <- prediction |>
+          dplyr::group_by(!!!stratification) |>
+          dplyr::group_by(.data$date, .add = TRUE) |>
+          dplyr::summarise(
+            dplyr::across(
+              .cols = observable,
+              .fns = eval(parse(text = deparse(reduce_fn))) # R is a nice language with absolutely no design issues.
+            )
+          )
 
         # Store in cache
         private$cache(hash, prediction)
@@ -172,7 +188,12 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
           # Maps between the internal model rates (exiting I1) and observables
           "model_rate_to_observable" = list(
-            "incidence" = \(.data, .groups) dplyr::mutate(.groups, "incidence" = .data$rate / .data$proportion)
+            "incidence" = list(
+              "map" = \(.x, .y) {
+                dplyr::mutate(.y, "incidence" = .x$rate * .x$population / .x$proportion)
+              },
+              "reduce" = ~ sum(. * population / sum(population))
+            )
           )
         ),
         keep.null = TRUE

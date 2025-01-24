@@ -229,11 +229,14 @@ rd_diseasymodelode_parameters <- paste(
   "* `incidence_feature_name` (`character(1)`)\\cr",
   "  The name of the observable that contains the incidence data to initialise from.",
   "",
-  "* `model_rate_to_observable` (named list(`function(1)`))\\cr",
+  "* `model_rate_to_observable` (`named list`(`named list`(`function`(2))))\\cr",
   "  A named list of functions that maps the model rates to the observable in question (name).",
-  "  These functions are applied in a `dplyr::group_map()` call and should take two arguments:",
+  "  Each observable needs a `map` and `reduce` function contained in a list (the first nested list).",
+  "  The `map` function is applied in a `dplyr::group_map()` call and should take two arguments:",
   "  - The first argument contains the model `rate` and information about group size: `proportion` and `population`.",
-  "  - The second argument contains the groups (stratification)."
+  "  - The second argument contains the groups (stratification).",
+  "  The `reduce` function is applied in a `dplyr::summarise()` call to summarise across stratification levels.",
+  "  By default, the `sum` function is used and will work for all counting observables."
 )
 
 ## Templates for DiseasyModel Regression templates
