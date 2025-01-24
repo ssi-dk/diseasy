@@ -149,7 +149,7 @@ in the model. Read only.}
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_results"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_results'><code>diseasy::DiseasyModel$get_results()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>diseasy::DiseasyModelOde$plot()</code></a></span></li>
 </ul>
 </details>
 }}

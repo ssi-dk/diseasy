@@ -86,6 +86,96 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
       # Return
       return(private$cache(hash))
+    },
+
+
+    #' @description
+    #'   Plot the predictions from the current model
+    #' @param observable `r rd_observable()`
+    #' @param prediction_length `r rd_prediction_length()`
+    #' @param stratification `r rd_stratification()`
+    plot = function(observable, prediction_length, stratification = NULL) {
+
+      # Retrieve the observations for the observable
+      observations <- self %.% observables %.% get_observation(
+        observable = observable,
+        stratification = stratification,
+        start_date = self %.% training_period %.% start,
+        end_date = self %.% observables %.% last_queryable_date + lubridate::days(prediction_length),
+        respect_last_queryable_date = FALSE
+      )
+
+      # Retrieve the prediction for the observable
+      prediction <- self %.% get_results(
+        observable = observable,
+        prediction_length = prediction_length,
+        stratification = stratification
+      )
+
+      # Determine the groups
+      groups <- observations |>
+        dplyr::group_by(!!!stratification) |>
+        dplyr::summarise()
+      groups <- split(groups, seq_len(nrow(groups)))
+
+      # Create palette with colours to use in plot
+      colours <- palette("dark")
+
+      # Create a plot for each group:
+      groups |>
+        purrr::walk(\(group) {
+          # Modify the margins
+          if (interactive()) par(mar = c(3, 3.25, 2, 1))
+
+          # Filter the data to plot
+          obs   <- dplyr::inner_join(observations, group, by = colnames(group))
+          preds <- dplyr::inner_join(prediction,   group, by = colnames(group))
+
+          # Plot the observations
+          plot(
+            obs[["date"]],
+            obs[[observable]],
+            col = "grey20",
+            pch = 16,
+            xlab = "Date",
+            ylab = stringr::str_to_sentence(stringr::str_remove(observable, r"{^n_}")),
+            main = paste(colnames(group), group, collapse = "; "),
+            yaxs = "i",
+            xaxs = "i",
+            ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
+            mgp = c(2, 0.75, 0),
+            cex.lab = 1.25
+          )
+
+          # Plot the data cut-off
+          abline(
+            v = self %.% observables %.% last_queryable_date,
+            col = "grey20",
+            lty = "dashed",
+            lwd = 2
+          )
+
+          # Plot the predictions
+          lines(
+            preds[["date"]],
+            preds[[observable]],
+            col = colours[1],
+            lwd = 4
+          )
+
+          # Add legend
+          legend(
+            "topleft",
+            legend = c("Observations", "Training cut-off", "Model"),
+            col = c("grey20", "grey20", colours[1]),
+            lty = c(NA,       "dashed", "solid"),
+            pch = c(16,       NA,       NA),
+            lwd = c(NA,       2,        4),
+            inset = c(0, 0),
+            bty = "n",
+            xpd = TRUE
+          )
+        })
     }
   ),
 
