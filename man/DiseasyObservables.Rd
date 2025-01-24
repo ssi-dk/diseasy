@@ -256,7 +256,8 @@ The results are cached for faster retrieval at subsequent calls.
   observable,
   stratification = NULL,
   start_date = self \%.\% start_date,
-  end_date = self \%.\% end_date
+  end_date = self \%.\% end_date,
+  respect_last_queryable_date = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -270,6 +271,9 @@ The results are cached for faster retrieval at subsequent calls.
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+
+\item{\code{respect_last_queryable_date}}{(\code{logical})\cr
+Should the module be able to return data past \verb{$last_queryable_date}?}
 }
 \if{html}{\out{</div>}}
 }
