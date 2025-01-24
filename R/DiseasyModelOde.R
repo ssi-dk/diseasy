@@ -19,8 +19,6 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
   public = list(
 
-    # Roxygen has only limited support for R6 docs currently, so we need to do some tricks for the documentation
-    # of get_results
     #' @description `r rd_get_results_description`
     #' @param observable `r rd_observable()`
     #' @param prediction_length `r rd_prediction_length()`
@@ -31,7 +29,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
     get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_true(!is.null(self %.% observables), add = coll)
-      checkmate::assert_choice(observable, self %.% observables %.% available_observables, add = coll)
+      checkmate::assert_choice(observable, names(self %.% parameters %.% model_rate_to_observable), add = coll)
       checkmate::assert_number(prediction_length, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -39,6 +37,27 @@ DiseasyModelOde <- R6::R6Class(                                                 
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
+        # Run the model to determine the raw rates (I*) at the maximal stratification in the model
+        model_rates <- private %.% solve_ode(prediction_length)
+
+        # Compute intermediate variables for the observables mappings
+        proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+          dplyr::mutate(
+            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out],
+          ) |>
+          dplyr::summarise(
+            "proportion" = sum(.data$proportion),
+            .by = "age_group",
+          )
+
+        data <- dplyr::left_join(model_rates, proportion, by = "age_group") |>
+          dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+
+        # Map model incidence to the requested observable
+        prediction <- data |>
+          dplyr::group_by(dplyr::across(dplyr::all_of(setdiff(colnames(model_rates), "rate")))) |>
+          dplyr::group_map(purrr::pluck(self %.% parameters %.% model_rate_to_observable, observable)) |>
+          purrr::list_rbind()
         # Get the observable at the stratification level
         data <- self$get_training_data(observable, stratification)
 
