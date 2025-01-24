@@ -108,7 +108,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 }
 \keyword{model-template}
 \section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{DiseasyModelOdeSeir}
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelOde]{diseasy::DiseasyModelOde}} -> \code{DiseasyModelOdeSeir}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -143,12 +143,13 @@ in the model. Read only.}
 }
 }
 \if{html}{\out{
-<details open><summary>Inherited methods</summary>
+<details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="get_results"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-get_results'><code>diseasy::DiseasyModelOde$get_results()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>diseasy::DiseasyModelOde$plot()</code></a></span></li>
 </ul>
 </details>

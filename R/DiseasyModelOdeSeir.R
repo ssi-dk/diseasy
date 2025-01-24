@@ -100,7 +100,7 @@
 #' @export
 DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter
   classname = "DiseasyModelOdeSeir",
-  inherit = DiseasyModel,
+  inherit = DiseasyModelOde,
 
   public = list(
 
