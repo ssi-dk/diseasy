@@ -29,11 +29,16 @@ obs$set_study_period(
   end_date = obs %.% ds %.% max_end_date
 )
 
+
 # Get incidence data to infer initial state vector from
+obs$define_synthetic_observable(
+  name = "incidence",
+  mapping = \(n_infected, n_population) n_infected / n_population
+)
+
 incidence_data <- obs$get_observation(
-  observable = "n_infected"
-) |>
-  dplyr::mutate("incidence" = .data$n_infected / !!sum(contact_basis %.% DK %.% population))
+  observable = "incidence"
+)
 
 
 # Lock the observation data to a simulation start date (30 day period)
