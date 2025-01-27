@@ -524,11 +524,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Rescale to the number of infections relative to the full population
       proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
         dplyr::mutate(
-          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out],
+          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
         ) |>
         dplyr::summarise(
           "proportion" = sum(.data$proportion),
-          .by = "age_group",
+          .by = "age_group"
         )
 
       incidence_data <- incidence_data |>

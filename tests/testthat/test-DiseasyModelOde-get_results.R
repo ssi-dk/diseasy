@@ -59,7 +59,7 @@ map_to_n_admission <- list(
 
     cbind(
       .y,
-        data.frame(
+      data.frame(
         "delay" = seq_along(delay_distribution) - 1,
         "n_admission" = n_total_admissions * delay_distribution
       )

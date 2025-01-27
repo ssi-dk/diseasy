@@ -258,14 +258,14 @@ map_to_n_positive <- list(
 
 map_to_n_admission <- list(
   "map" = \(.x, .y) {
-    risk_of_admission <- c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1) # Risk per age group
+    risk_of_admission <- c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1)
     delay_distribution <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # Must sum = 1
 
     n_total_admissions <- .x$n_infected * risk_of_admission[.y$age_group]
 
     cbind(
       .y,
-        data.frame(
+      data.frame(
         "delay" = seq_along(delay_distribution) - 1,
         "n_admission" = n_total_admissions * delay_distribution
       )

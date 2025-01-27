@@ -273,7 +273,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Compute intermediate variables for the observables mappings
         population_data <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
           dplyr::mutate(
-            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out],
+            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
           ) |>
           dplyr::summarise(
             "proportion" = sum(.data$proportion),

@@ -286,7 +286,9 @@ source <- "n_positive"
 if (source == "n_infected") {
   mapping <- \(n_infected, n_population) n_infected / (n_population)
 } else if (source == "n_positive_simple") {
-  mapping <- \(n_positive_simple, n_population) n_positive_simple / (n_population * 0.65)
+  mapping <- \(n_positive_simple, n_population) {
+    n_positive_simple / (n_population * 0.65)
+  }
 } else if (source == "n_positive") {
   mapping <- \(n_positive, n_population) n_positive / (n_population * 0.65)
 }
@@ -448,13 +450,17 @@ get_prediction <- function(
       )
 
     # Convert to incidence
-    proportion <- model %.% activity %.% map_population(model %.% parameters %.% age_cuts_lower) |>
+    proportion <- model$activity$map_population(
+      model$parameters$age_cuts_lower
+    ) |>
       dplyr::mutate(
-        "age_group" = diseasystore::age_labels(model %.% parameters %.% age_cuts_lower)[.data$age_group_out],
+        "age_group" = diseasystore::age_labels(
+          model$parameters$age_cuts_lower
+        )[.data$age_group_out]
       ) |>
       dplyr::summarise(
         "proportion" = sum(.data$proportion),
-        .by = "age_group",
+        .by = "age_group"
       )
 
     out <- out |>
