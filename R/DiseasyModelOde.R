@@ -29,7 +29,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
     get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_true(!is.null(self %.% observables), add = coll)
-      checkmate::assert_choice(observable, names(self %.% parameters %.% model_rate_to_observable), add = coll)
+      checkmate::assert_choice(observable, names(self %.% parameters %.% model_output_to_observable), add = coll)
       checkmate::assert_number(prediction_length, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -41,9 +41,9 @@ DiseasyModelOde <- R6::R6Class(                                                 
         model_output <- private %.% solve_ode(prediction_length)
 
         # Retrieve the map / reduce functions for the observable
-        map_fn <- purrr::pluck(self %.% parameters %.% model_rate_to_observable, observable, "map")
+        map_fn <- purrr::pluck(self %.% parameters %.% model_output_to_observable, observable, "map")
         reduce_fn <- purrr::pluck(
-          self %.% parameters %.% model_rate_to_observable, observable, "reduce",
+          self %.% parameters %.% model_output_to_observable, observable, "reduce",
           .default = ~ sum(.)
         )
 
@@ -286,7 +286,12 @@ DiseasyModelOde <- R6::R6Class(                                                 
           "incidence_feature_name" = "incidence",
 
           # Maps between the internal model rates (exiting I1) and observables
-          "model_rate_to_observable" = list(
+          "model_output_to_observable" = list(
+            "n_infected" = list(
+              "map" = \(.x, .y) {
+                dplyr::mutate(.y, "n_infected" = .x$n_infected)
+              }
+            ),
             "incidence" = list(
               "map" = \(.x, .y) {
                 dplyr::mutate(.y, "incidence" = .x$n_infected / .x$population)

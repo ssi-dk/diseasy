@@ -178,7 +178,7 @@ map_to_n_admission <- list(
   }
 )
 
-model_rate_to_observable = list(
+model_output_to_observable = list(
   "incidence" = map_to_incidence,
   "n_infected" = map_to_n_infected,
   "n_positive" = map_to_n_positive,
@@ -197,7 +197,7 @@ model <- DiseasyModelOdeSeir$new(
   parameters = list(
     "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
-    "model_rate_to_observable" = model_rate_to_observable
+    "model_output_to_observable" = model_output_to_observable
   )
 )
 ```
