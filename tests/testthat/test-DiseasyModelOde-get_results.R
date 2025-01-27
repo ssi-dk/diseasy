@@ -76,86 +76,82 @@ model_output_to_observable <- list(
 
 
 
-# Test the get_results method of the state vector for different model configuration
-tidyr::expand_grid(
-  K = seq.int(from = 0, to = 3),
-  L = seq.int(from = 1, to = 3),
-  M = seq.int(from = 1, to = 3)
-) |>
-  purrr::pwalk(\(K, L, M) {                                                                                             # nolint: object_name_linter
+# Test the get_results method of the configuration used in the example data
+K <- 2                                                                                                                  # nolint start: object_name_linter
+L <- 1
+M <- 1                                                                                                                  # nolint end: object_name_linter
 
-    # Create the model instance
-    m <- DiseasyModelOdeSeir$new(
-      activity = activity,
-      observables = observables,
-      compartment_structure = c("E" = K, "I" = L, "R" = M),
-      disease_progression_rates = c("E" = rE, "I" = rI),
-      parameters = list(
-        "age_cuts_lower" = age_cuts_lower,
-        "overall_infection_risk" = overall_infection_risk,
-        "model_output_to_observable" = model_output_to_observable
-      )
+# Create the model instance
+m <- DiseasyModelOdeSeir$new(
+  activity = activity,
+  observables = observables,
+  compartment_structure = c("E" = K, "I" = L, "R" = M),
+  disease_progression_rates = c("E" = rE, "I" = rI),
+  parameters = list(
+    "age_cuts_lower" = age_cuts_lower,
+    "overall_infection_risk" = overall_infection_risk,
+    "model_output_to_observable" = model_output_to_observable
+  )
+)
+
+# Generate label for the model being tested
+model_string <- c(
+  "S",
+  rep("E", K),
+  rep("I", L),
+  rep("R", M),
+  " (age_cuts = ", toString(age_cuts_lower), ")"
+) |>
+  paste(collapse = "")
+
+# Check the method for different stratifications and observables
+tidyr::expand_grid(
+  observable = c("n_infected", "incidence", "n_positive", "n_admission"),
+  stratification = list(NULL, rlang::quos(age_group))
+) |>
+  purrr::pwalk(\(observable, stratification) {
+    test_label <- glue::glue(
+      "$get_results() ({model_string} - {observable} - stratification: {rlang::as_label(stratification[[1]])})"
     )
 
-    # Generate label for the model being tested
-    model_string <- c(
-      "S",
-      rep("E", K),
-      rep("I", L),
-      rep("R", M),
-      " (age_cuts = ", toString(age_cuts_lower), ")"
-    ) |>
-      paste(collapse = "")
+    test_that(test_label, {
+      skip_if_not_installed("RSQLite")
 
-    # Check the method for different stratifications and observables
-    tidyr::expand_grid(
-      observable = c("n_infected", "incidence", "n_positive", "n_admission"),
-      stratification = list(NULL, rlang::quos(age_group))
-    ) |>
-      purrr::pwalk(\(observable, stratification) {
-        test_label <- glue::glue(
-          "$get_results() ({model_string} - {observable} - stratification: {rlang::as_label(stratification[[1]])})"
-        )
+      # Estimate the initial state vector but suppress messages about negative states being set to zero
+      prediction_length <- 30
 
-        test_that(test_label, {
-          skip_if_not_installed("RSQLite")
-
-          # Estimate the initial state vector but suppress messages about negative states being set to zero
-          prediction_length <- 30
-
-          pkgcond::suppress_conditions(
-            pattern = "Negative values in estimate",
-            expr = {
-              results <- m$get_results(                                                                                 # nolint: implicit_assignment_linter
-                observable = observable,
-                prediction_length = prediction_length,
-                stratification = stratification
-              )
-            }
-          )
-
-          # Retrieve the observations for the observable
-          observations <- observables %.% get_observation(
+      pkgcond::suppress_conditions(
+        pattern = "Negative values in estimate",
+        expr = {
+          results <- m$get_results(                                                                                     # nolint: implicit_assignment_linter
             observable = observable,
-            stratification = stratification,
-            start_date = observables %.% last_queryable_date + lubridate::days(1),
-            end_date = observables %.% last_queryable_date + lubridate::days(prediction_length),
-            respect_last_queryable_date = FALSE
+            prediction_length = prediction_length,
+            stratification = stratification
           )
+        }
+      )
 
-          # Check accuracy within 25%
-          comparison <- rbind(
-            dplyr::mutate(results,      "source" = "model"),
-            dplyr::mutate(observations, "source" = "observations")
-          ) |>
-            tidyr::pivot_wider(names_from = "source", values_from = observable) |>
-            dplyr::mutate("relative_error" = model / observations) |>
-            dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
+      # Retrieve the observations for the observable
+      observations <- observables %.% get_observation(
+        observable = observable,
+        stratification = stratification,
+        start_date = observables %.% last_queryable_date + lubridate::days(1),
+        end_date = observables %.% last_queryable_date + lubridate::days(prediction_length),
+        respect_last_queryable_date = FALSE
+      )
 
-          expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.2)                     # nolint: expect_identical_linter
-        })
-      })
+      # Check accuracy within 15%
+      comparison <- rbind(
+        dplyr::mutate(results,      "source" = "model"),
+        dplyr::mutate(observations, "source" = "observations")
+      ) |>
+        tidyr::pivot_wider(names_from = "source", values_from = observable) |>
+        dplyr::mutate("relative_error" = model / observations) |>
+        dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
 
-    # Clean up
-    rm(m)
+      expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.15)                          # nolint: expect_identical_linter
+    })
   })
+
+# Clean up
+rm(m)
