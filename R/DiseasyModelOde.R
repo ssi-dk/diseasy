@@ -70,7 +70,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # Map model incidence to the requested observable
         prediction <- model_output |>
-          dplyr::group_by(dplyr::across(!c("n_infected", "population", "proportion"))) |>
+          dplyr::group_by(dplyr::across(!c("n_infected", "population"))) |>
           dplyr::group_map(map_fn) |>
           purrr::list_rbind()
 
@@ -288,7 +288,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           dplyr::mutate(
             "n_infected" = .data$rate / .data$proportion * .data$population
           ) |>
-          dplyr::select(!"rate")
+          dplyr::select(!c("rate", "proportion"))
 
 
         # Store in cache
