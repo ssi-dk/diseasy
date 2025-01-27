@@ -30,70 +30,37 @@
 #'   # used to train the models, and predictions start on this date.
 #'   obs$set_last_queryable_date(as.Date("2020-02-29"))
 #'
+#'   # Define the incidence data to initialise the model
+#'   obs$define_synthetic_observable(
+#'     name = "incidence",
+#'     mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
+#'   )
+#'
 #'   # The example data uses a simple activity scenario for Denmark,
 #'   # which we replicate here
 #'   act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
 #'   act$set_activity_units(dk_activity_units)
 #'   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 #'
-#'   # We create a default instance which has:
-#'   # * 1 age group (0+)
-#'   # * 1 variant
-#'   # * No season scaling
-#'   # * No activity scenarios
+#'   # We create a simple model instance
 #'   m <- DiseasyModelOdeSeir$new(
 #'     observables = obs,
 #'     activity = act,
 #'     disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
-#'     parameters = list("overall_infection_risk" = 0.025)
-#'   )
-#'
-#'   # We need the initial state for the system, which we infer from
-#'   # the incidence data (see `vignette("SEIR-initialisation")`).
-#'   # We compute this here from the example data which uses a 65 %
-#'   # change of testing when infected
-#'   incidence_data <- m$observables$get_observation(
-#'     observable = "n_positive",
-#'     start_date = obs$ds$min_start_date,
-#'     end_date = m$training_period$end
-#'   ) |>
-#'     dplyr::mutate(
-#'       "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
+#'     parameters = list(
+#'       "overall_infection_risk" = 0.025,
+#'       "age_cuts_lower" = c(0, 30, 60)
 #'     )
-#'
-#'   psi <- m$initialise_state_vector(incidence_data)
-#'
-#'   # The model now has a configured right-hand-side function that
-#'   # can be used to simulate the model in conjunction with deSolve.
-#'   sol <- deSolve::ode(
-#'     y = psi$initial_condition,
-#'     times = seq(from = 0, to = 100, by = 1),
-#'     func = m$rhs
 #'   )
 #'
-#'   # Extract the incidence outcome from the solution
-#'   time <- sol[, 1]
-#'   model_incidence <- sol[, 3] * m$disease_progression_rates[["I"]]
+#'   # Run the model to predict incidence
+#'   prediction <- m$get_results("incidence", prediction_length = 30)
+#'   print(head(prediction, 5))
 #'
-#'   plot(
-#'     x = time + m$training_period$end,
-#'     y = model_incidence,
-#'     col = "red",
-#'     lty = 2,
-#'     xlim = c(as.Date("2020-01-01"), m$training_period$end + max(time)),
-#'     xlab = "Date",
-#'     ylab = "Incidence"
-#'   )
-#'   points(incidence_data$date, incidence_data$incidence, col = "black")
+#'   # Plot the results
+#'   plot(m, observable = "incidence", prediction_length = 30)
 #'
-#'   legend(
-#'     x = "topright",
-#'     legend = c("Model", "Data"),
-#'     col = c("red", "black"),
-#'     lty = c(2, 1)
-#'   )
-#'
-#'   rm(m, obs)
+#'   rm(m, act, obs)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
