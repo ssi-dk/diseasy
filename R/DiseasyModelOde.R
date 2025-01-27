@@ -83,7 +83,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
               .cols = observable,
               .fns = eval(parse(text = deparse(reduce_fn))) # R is a nice language with absolutely no design issues.
             )
-          )
+          ) |>
+          dplyr::relocate("date", .before = dplyr::first_col())
 
         # Store in cache
         private$cache(hash, prediction)
