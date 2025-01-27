@@ -80,7 +80,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           dplyr::group_by(.data$date, .add = TRUE) |>
           dplyr::summarise(
             dplyr::across(
-              .cols = observable,
+              .cols = dplyr::all_of(observable),
               .fns = eval(parse(text = deparse(reduce_fn))) # R is a nice language with absolutely no design issues.
             )
           ) |>
