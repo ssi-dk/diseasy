@@ -128,6 +128,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
       # Create palette with colours to use in plot
       colours <- palette("dark")
+      colour <- colours[which(names(self %.% parameters %.% model_output_to_observable) == observable)]
 
       # Create a plot for each group:
       groups |>
@@ -167,7 +168,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           lines(
             preds[["date"]],
             preds[[observable]],
-            col = colours[1],
+            col = colour,
             lwd = 4
           )
 
@@ -175,7 +176,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           legend(
             "topleft",
             legend = c("Observations", "Training cut-off", "Model"),
-            col = c("grey20", "grey20", colours[1]),
+            col = c("grey20", "grey20", colour),
             lty = c(NA,       "dashed", "solid"),
             pch = c(16,       NA,       NA),
             lwd = c(NA,       2,        4),
