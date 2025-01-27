@@ -38,20 +38,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
       if (!private$is_cached(hash)) {
 
         # Run the model to determine the raw rates (I*) at the maximal stratification in the model
-        model_rates <- private %.% solve_ode(prediction_length)
-
-        # Compute intermediate variables for the observables mappings
-        proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
-          dplyr::mutate(
-            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out],
-          ) |>
-          dplyr::summarise(
-            "proportion" = sum(.data$proportion),
-            .by = "age_group",
-          )
-
-        data <- dplyr::left_join(model_rates, proportion, by = "age_group") |>
-          dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+        model_output <- private %.% solve_ode(prediction_length)
 
         # Retrieve the map / reduce functions for the observable
         map_fn <- purrr::pluck(self %.% parameters %.% model_rate_to_observable, observable, "map")
@@ -61,8 +48,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
         )
 
         # Map model incidence to the requested observable
-        prediction <- data |>
-          dplyr::group_by(dplyr::across(dplyr::all_of(setdiff(colnames(model_rates), "rate")))) |>
+        prediction <- model_output |>
+          dplyr::group_by(dplyr::across(!c("n_infected", "population", "proportion"))) |>
           dplyr::group_map(map_fn) |>
           purrr::list_rbind()
 
@@ -259,8 +246,30 @@ DiseasyModelOde <- R6::R6Class(                                                 
           ) |>
           dplyr::select(!c("time", "state", "value"))
 
+
+        # Compute intermediate variables for the observables mappings
+        population_data <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+          dplyr::mutate(
+            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out],
+          ) |>
+          dplyr::summarise(
+            "proportion" = sum(.data$proportion),
+            .by = "age_group"
+          ) |>
+          dplyr::mutate(
+            "population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population)
+          )
+
+        # Enrich with proportion and population, then compute number of infected as output
+        model_output <- dplyr::left_join(model_rates, population_data, by = "age_group") |>
+          dplyr::mutate(
+            "n_infected" = .data$rate / .data$proportion * .data$population
+          ) |>
+          dplyr::select(!"rate")
+
+
         # Store in cache
-        private$cache(hash, model_rates)
+        private$cache(hash, model_output)
       }
 
       # Return
@@ -280,7 +289,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           "model_rate_to_observable" = list(
             "incidence" = list(
               "map" = \(.x, .y) {
-                dplyr::mutate(.y, "incidence" = .x$rate * .x$population / .x$proportion)
+                dplyr::mutate(.y, "incidence" = .x$n_infected / .x$population)
               },
               "reduce" = ~ sum(. * population / sum(population))
             )

@@ -140,7 +140,7 @@ map_to_incidence <- list(
   "map" = \(.x, .y) {
     dplyr::mutate(
       .y,
-      "incidence" = .x$rate / .x$proportion,
+      "incidence" = .x$n_infected / .x$population,
       "population" = .x$population # Need for the reduce function
     )
   },
@@ -149,22 +149,22 @@ map_to_incidence <- list(
 
 map_to_n_infected <- list(
   "map" = \(.x, .y) {
-    dplyr::mutate(.y, "n_infected" = .x$rate * .x$population / .x$proportion)
+    dplyr::mutate(.y, "n_infected" = .x$n_infected)
   }
 )
 
 map_to_n_positive <- list(
   "map" = \(.x, .y) {
-    dplyr::mutate(.y, "n_positive" = 0.65 * .x$rate * .x$population / .x$proportion)
+    dplyr::mutate(.y, "n_positive" = 0.65 * .x$n_infected)
   }
 )
 
 map_to_n_admission <- list(
   "map" = \(.x, .y) {
-    risk_of_admission <- stats::setNames(c(0.001, 0.01, 0.1), c("00-29", "30-59", "60+"))  # Risk per age group
+    risk_of_admission <- c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1) # Risk per age group
     delay_distribution <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # Must sum = 1
 
-    n_total_admissions <- .x$rate * .x$population / .x$proportion * risk_of_admission[.y$age_group]
+    n_total_admissions <- .x$n_infected * risk_of_admission[.y$age_group]
 
     cbind(
       .y,
