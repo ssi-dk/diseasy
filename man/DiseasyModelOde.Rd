@@ -27,6 +27,7 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-DiseasyModelOde-new}{\code{DiseasyModelOde$new()}}
 \item \href{#method-DiseasyModelOde-get_results}{\code{DiseasyModelOde$get_results()}}
 \item \href{#method-DiseasyModelOde-plot}{\code{DiseasyModelOde$plot()}}
 \item \href{#method-DiseasyModelOde-clone}{\code{DiseasyModelOde$clone()}}
@@ -39,10 +40,29 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="initialize"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-initialize'><code>diseasy::DiseasyModel$initialize()</code></a></span></li>
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOde-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOde-new}{}}}
+\subsection{Method \code{new()}}{
+Merge the user provided mappings with the default mappings during initialisation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$new(parameters, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{parameters}}{(\code{list})\cr
+Parameters given to sub-class.}
+
+\item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOde-get_results"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOde-get_results}{}}}

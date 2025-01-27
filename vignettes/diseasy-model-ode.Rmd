@@ -136,23 +136,6 @@ observables$define_synthetic_observable(
 
 
 # Maps between the internal model rates (exiting I1) and observables
-map_to_incidence <- list(
-  "map" = \(.x, .y) {
-    dplyr::mutate(
-      .y,
-      "incidence" = .x$n_infected / .x$population,
-      "population" = .x$population # Need for the reduce function
-    )
-  },
-  "reduce" = ~ sum(. * population / sum(population))
-)
-
-map_to_n_infected <- list(
-  "map" = \(.x, .y) {
-    dplyr::mutate(.y, "n_infected" = .x$n_infected)
-  }
-)
-
 map_to_n_positive <- list(
   "map" = \(.x, .y) {
     dplyr::mutate(.y, "n_positive" = 0.65 * .x$n_infected)
@@ -178,9 +161,7 @@ map_to_n_admission <- list(
   }
 )
 
-model_output_to_observable = list(
-  "incidence" = map_to_incidence,
-  "n_infected" = map_to_n_infected,
+model_output_to_observable <- list(
   "n_positive" = map_to_n_positive,
   "n_admission" = map_to_n_admission
 )
