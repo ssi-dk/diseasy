@@ -225,6 +225,11 @@ rd_disease_progression_rates <- function(type = "param") {
   )
 }
 
+rd_diseasymodelode_parameters <- paste(
+  "* `incidence_feature_name` (`character(1)`)\\cr",
+  "  The name of the observable that contains the incidence data to initialise from."
+)
+
 ## Templates for DiseasyModel Regression templates
 rd_diseasymodel_glm_brm_description <- function(regression_class) {
   glue::glue(

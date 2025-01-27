@@ -210,7 +210,7 @@ Parameters controlling the functional modules:
 
 Additional parameters are:
 \itemize{
-\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.
 }}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}

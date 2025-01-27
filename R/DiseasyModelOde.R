@@ -52,5 +52,36 @@ DiseasyModelOde <- R6::R6Class(                                                 
       # Return
       return(private$cache(hash))
     }
+  ),
+
+  private = list(
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the super-classes
+        # Overwrite with model-specific parameters
+        list(
+          # Parameters selecting the data to use for initialisation
+          "incidence_feature_name" = "incidence",
+        ),
+        keep.null = TRUE
+      )
+    },
+
+
+    validate_parameters = function() {
+      coll <- checkmate::makeAssertCollection()
+      # Validate the data source for incidence data
+      checkmate::assert_class(self %.% observables, "DiseasyObservables", add = coll)
+
+      checkmate::assert_subset(
+        self %.% parameters %.% incidence_feature_name,
+        self %.% observables %.% available_observables,
+        add = coll
+      )
+
+      checkmate::reportAssertions(coll)
+
+      super$validate_parameters() # Validate inherited parameters
+    }
   )
 )
