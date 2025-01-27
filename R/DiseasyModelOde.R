@@ -337,11 +337,13 @@ DiseasyModelOde <- R6::R6Class(                                                 
       # Validate the data source for incidence data
       checkmate::assert_class(self %.% observables, "DiseasyObservables", add = coll)
 
-      checkmate::assert_subset(
-        self %.% parameters %.% incidence_feature_name,
-        self %.% observables %.% available_observables,
-        add = coll
-      )
+      if (!is.null(self %.% observables %.% ds)) {
+        checkmate::assert_subset(
+          self %.% parameters %.% incidence_feature_name,
+          self %.% observables %.% available_observables,
+          add = coll
+        )
+      }
 
       checkmate::reportAssertions(coll)
 
