@@ -147,6 +147,25 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
                  "Test positive (realistic)" = "red", "Admissions * 10" = "darkgreen")
     )
 
+  # Remove existing caches
+  c(
+    list.files(
+      devtools::package_file("tests/cache/diseasystores"),
+      pattern = "DiseasystoreSeirExample",
+      full.names = TRUE
+    ),
+    list.files(
+      devtools::package_file("vignettes/articles/cache/diseasystores"),
+      pattern = "DiseasystoreSeirExample",
+      full.names = TRUE
+    )
+  ) |>
+    purrr::walk(~ {
+      print(glue::glue("Removing {.}"))
+      file.remove(.)
+    })
+
+
   # Store data set
   usethis::use_data(seir_example_data, overwrite = TRUE)
 

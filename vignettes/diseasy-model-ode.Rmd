@@ -50,15 +50,15 @@ The data we will use this example is provided by `DiseasystoreSeirExample` which
 We first create an observables module to interface with this data:
 
 ```{r observables}
-# Connect to a database
-dir.create("articles/cache/DiseasystoreSeirExample", showWarnings = FALSE)
-conn <- RSQLite::SQLite() |>
-  DBI::dbConnect(dbname = "articles/cache/DiseasystoreSeirExample/ds.sqlite")
-
 # Configure a observables module with the example data and database
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = conn
+  conn = DBI::dbConnect(
+    RSQLite::SQLite(),
+    dbname = devtools::package_file(
+      "vignettes/articles/cache/diseasystores/DiseasystoreSeirExample.sqlite"
+    )
+  )
 )
 ```
 
@@ -130,8 +130,7 @@ observables$set_last_queryable_date(last_queryable_date)
 # Map observables to incidence
 observables$define_synthetic_observable(
   name = "incidence",
-  #mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
-  mapping = \(n_infected, n_population) n_infected / n_population
+  mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
 )
 
 
