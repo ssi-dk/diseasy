@@ -294,7 +294,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
             ),
             "incidence" = list(
               "map" = \(.x, .y) {
-                dplyr::mutate(.y, "incidence" = .x$n_infected / .x$population)
+                dplyr::mutate(
+                  .y,
+                  "incidence" = .x$n_infected / .x$population,
+                  "population" = .x$population # Need for the reduce function
+                )
               },
               "reduce" = ~ sum(. * population / sum(population))
             )
