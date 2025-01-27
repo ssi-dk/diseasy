@@ -23,9 +23,9 @@ One of the model families in `diseasy` is the family of Ordinary Differential Eq
 This family of models is presently represented only by the `?DiseasyModelOdeSeir`, a model template that implements
 SEIR (Susceptible, Exposed, Infected, Recovered) ODE models according to user specification.
 This template allows for any number of $E$, $I$ or $R$ states in the model and interfaces with the `?DiseasySeason`,
-`?DiseasyActivity`, `?DiseasVariant` and `?DiseasyImmunity` modules for scenario definitions.
+`?DiseasyActivity`, `?DiseasyVariant` and `?DiseasyImmunity` modules for scenario definitions.
 
-The workflow for creating a specific `DiseasyModelOdeSeir` model would roughly follow these steps:
+The workflow for creating a specific `?DiseasyModelOdeSeir` model would roughly follow these steps:
 
 1) **Defining the scenario.**
    The first step to using most models in `diseasy` is to define the scenario. That is, to configure the functional
@@ -45,7 +45,7 @@ Note that this example is contrived in the sense that the data we use in this ex
 exact model template and we therefore can match the observations near-perfectly.
 
 # Example data
-The data we will use this example is provided by `DiseasystoreSeirExample` which represents data in a Danish context.
+The data we will use this example is provided by `?DiseasystoreSeirExample` which represents data in a Danish context.
 
 We first create an observables module to interface with this data:
 
@@ -63,7 +63,13 @@ observables <- DiseasyObservables$new(
 ```
 
 The data is stratified by age and covers a single infection wave.
-It contains two observables of interest for our example: "n_positive" and "n_admissions".
+It contains three observables of interest for our example:
+
+- *n_infected*: The true number of infected in the data.
+- *n_positive*: The observed subset of infected
+  (65% of true infected with weekday variation in detection).
+- *n_admissions*: The number of new hospital admissions due to infections
+  (risk of hospitalisation dependent on age group).
 
 When running the models, we should also define at what point in time they should provide predictions for.
 This is done by setting the `last_queryable_date` in the observables module:
@@ -71,6 +77,24 @@ This is done by setting the `last_queryable_date` in the observables module:
 last_queryable_date <- observables$ds$min_start_date + 40
 ```
 
+Lets first look at the data we have available:
+```{r example data infected, eval = rlang::is_installed("ggplot2")}
+observables$get_observation(
+  observable = "n_infected",
+  stratification = rlang::quos(age_group),
+  start_date = observables$ds$min_start_date,
+  end_date = observables$ds$max_end_date
+) |>
+  ggplot2::ggplot(ggplot2::aes(x = date, y = n_infected)) +
+  ggplot2::geom_vline(
+    xintercept = last_queryable_date,
+    color = "black",
+    linetype = "dashed"
+  ) +
+  ggplot2::geom_point(color = "seagreen") +
+  ggplot2::labs(title = "True number of infected") +
+  ggplot2::facet_grid(~ age_group)
+```
 
 ```{r example data positive, eval = rlang::is_installed("ggplot2")}
 observables$get_observation(
@@ -80,12 +104,17 @@ observables$get_observation(
   end_date = observables$ds$max_end_date
 ) |>
   ggplot2::ggplot(ggplot2::aes(x = date, y = n_positive)) +
-  ggplot2::geom_vline(xintercept = last_queryable_date, color = "black", linetype = "dashed") +
+  ggplot2::geom_vline(
+    xintercept = last_queryable_date,
+    color = "black",
+    linetype = "dashed"
+  ) +
   ggplot2::geom_point(color = "seagreen") +
+  ggplot2::labs(title = "Observed number of positive cases") +
   ggplot2::facet_grid(~ age_group)
 ```
 
-```{r example data positive, eval = rlang::is_installed("ggplot2")}
+```{r example data admission, eval = rlang::is_installed("ggplot2")}
 observables$get_observation(
   observable = "n_admission",
   stratification = rlang::quos(age_group),
@@ -93,22 +122,57 @@ observables$get_observation(
   end_date = observables$ds$max_end_date
 ) |>
   ggplot2::ggplot(ggplot2::aes(x = date, y = n_admission)) +
-  ggplot2::geom_vline(xintercept = last_queryable_date, color = "black", linetype = "dashed") +
+  ggplot2::geom_vline(
+    xintercept = last_queryable_date,
+    color = "black",
+    linetype = "dashed"
+  ) +
   ggplot2::geom_point(color = "violetred3") +
+  ggplot2::labs(title = "Number of admissions") +
   ggplot2::facet_grid(~ age_group)
 ```
 
 # Defining the scenario
+The first step to creating a `?DiseasyModelOdeSeir` model is to define the scenario.
+In this case, as we stated above, we can exactly match the scenario to the data since
+the data was created using this class of models.
+
+First we define the activity scenario via the `?DiseasyActivity` module.
+This scenario describes the changes in activity in the society (e.g. restrictions).
+To see more on how to configure this module, see `vignette("diseasy-activity")`.
+
 ```{r diseasy_activity}
-# Configure an activity module using Danish population and contact information
+# Configure an activity module using Danish population and contact information.
 activity <- DiseasyActivity$new()
 activity$set_contact_basis(contact_basis = contact_basis %.% DK)
 activity$set_activity_units(dk_activity_units)
+
+# The level of activity is fixed to the "baseline" level throughout the simulation.
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 ```
 
+This particular scenario does not include any more dynamics, but this would be the
+stage where the level of seasonality and the variant composition should be defined
+(see `vignette("diseasy-season")` and `vignette("diseasy-variant")` for more details).
+
 
 # Choosing the model configuration
+The `?DiseasyModelOdeSeir` model template has a number of hyperparameters and
+parameters that should be configured for the model to run.
+
+The hyperparameters are:
+
+- *compartment_structure*: A named vector specifying the number of consecutive
+  $E$, $I$ and $R$ states in the model.
+- *age_cuts_lower*: A vector of age cuts for the age groups in the model.
+
+The parameters are:
+
+- *disease_progression_rates*: A named vector specifying the progression rates
+  from $E$ to $I$ and from $I$ to $R$ (i.e. waiting times).
+- *overall_infection_risk*: The overall risk of infection in the population
+  (the overall scaling of infectivity).
+
 ```{r model configuration}
 # Hyper parameters
 compartment_structure <- c("E" = 2, "I" = 1, "R" = 1)
@@ -123,18 +187,69 @@ observables$set_last_queryable_date(last_queryable_date)
 ```
 
 
+# Mapping observables to model and back
+Being a SEIR model, the `?DiseasyModelOdeSeir` model template runs the dynamics of the
+infections in the population. These dynamics are inferred from the incidence of the
+disease in the population. The model then predicts the evolution of the incidence
+under the given configuration. To get predictions for other observables, we must
+map from the incidence to the observable of interest.
 
-# Mapping to observables
-```{r model configuration}
+Mathematically, we map from the set of observables $\vec{O}(t)$ to the incidence $I(t)$ via the map $f$:
+$$\vec{O}(t) \overset{f}{\rightarrow} I(t)$$
 
+From the model incidence $\tilde{I}(t)$, we then map to the observable estimates $\tilde{O}_i(t)$ via the maps $g_i$:
+$$\tilde{I}(t) \overset{g_1}{\rightarrow} \tilde{O}_1(t)$$
+$$\tilde{I}(t) \overset{g_2}{\rightarrow} \tilde{O}_2(t)$$
+$$\vdots$$
+$$\tilde{I}(t) \overset{g_n}{\rightarrow} \tilde{O}_n(t)$$
+
+## Mapping from observables to incidence
+For the model to be initialised, it needs an estimate of the incidence in the population.
+If such an estimate is not defined in the `diseasystore`, or if you wish to provide
+your own estimate from the observable, we can define a "synthetic observable" in the
+`DiseasyObservables` module for the model to use.
+
+In this example, the incidence is not defined in the `diseasystore` and we therefore
+define a synthetic observable for the incidence which maps from the number of positive
+cases to the incidence.
+In many cases, testing data may not be reliable, and you may want to infer the
+incidence from other sources such as waste water data or admissions data.
+
+```{r incidence map}
 # Map observables to incidence
 observables$define_synthetic_observable(
   name = "incidence",
   mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
 )
+```
 
 
-# Maps between the internal model rates (exiting I1) and observables
+## Mapping from model incidence to observables
+By default, the model can only return predictions for the true number of infected
+(`n_infected`) and the incidence (`incidence`) since these are the only observables
+"known" to the model. Any additional observables must be mapped from the incidence
+provided by the model.
+
+To this purpose, we define a "map" and a "reduce" function:
+The *map* function is passed to a `dplyr::group_map()` call on a `data.frame` grouped
+by the stratification.
+The function should be a two-argument function where the first argument contains a
+`data.frame` with columns `n_infected` and `population` (i.e. the size of the group),
+and where the second argument contains the group (as a `data.frame`).
+Note that the output of this function should contain the groups provided in the second
+argument.
+
+The *reduce* function is passed to a `dplyr::summarise()` call on the output of the
+map. By default, a simple sum is used which works for all counting data.
+If the observable is not a count, the user must provide a custom reduce function.
+For example, the incidence is a rate and to summarise a weighted sum must be made.
+
+In this example, we define maps from the incidence to the number of positive cases and
+the number of hospital admissions. These are both counting observables and the default
+*reduce* function can be used.
+
+```{r observable maps}
+# Maps between the internal model incidence and observables
 map_to_n_positive <- list(
   "map" = \(.x, .y) {
     dplyr::mutate(.y, "n_positive" = 0.65 * .x$n_infected)
@@ -160,6 +275,8 @@ map_to_n_admission <- list(
   }
 )
 
+# These maps are provided via a list to the model with the names of
+# the elements denoting the observable being mapped to.
 model_output_to_observable <- list(
   "n_positive" = map_to_n_positive,
   "n_admission" = map_to_n_admission
@@ -167,23 +284,30 @@ model_output_to_observable <- list(
 ```
 
 
-# Puttiing it all togeter
+# Putting it all together
+With all the configuration done above, we can now create our model instance.
+
 ```{r model creation}
 model <- DiseasyModelOdeSeir$new(
+  # Scenario configuration
   activity = activity,
   observables = observables,
+
+  # Parameter and hyper-parameter configuration
   compartment_structure = compartment_structure,
   disease_progression_rates = disease_progression_rates,
   parameters = list(
     "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
+
+    # Mapping to observables
     "model_output_to_observable" = model_output_to_observable
   )
 )
 ```
 
 # Predicting the incidence
-
+From this point, we can easily get predictions for the individual observables.
 ```{r}
 model$get_results(
   observable = "incidence",
@@ -191,6 +315,7 @@ model$get_results(
 )
 ```
 
+... and we can plot the predictions along with observations for the data
 ```{r}
 plot(
   model,
@@ -199,6 +324,8 @@ plot(
 )
 ```
 
+
+The results are easily stratified by the stratifications in the data
 ```{r}
 model$get_results(
   observable = "incidence",
@@ -207,6 +334,7 @@ model$get_results(
 )
 ```
 
+... and we can see the plots for each strata.
 ```{r}
 plot(
   model,
@@ -215,6 +343,9 @@ plot(
   stratification = rlang::quos(age_group)
 )
 ```
+
+
+This can be done for all the observables we have mapped in the model.
 ```{r}
 model$get_results(
   observable = "n_infected",
