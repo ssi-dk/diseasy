@@ -235,7 +235,7 @@ hash_environment <- function(environment) {
             purrr::discard_at("body") # Partialised functions have the source repeated as "body"
       )
     } else if (checkmate::test_formula(obj)) {
-      out <- as.character(obj)
+      out <- rlang::quo_text(obj, width = 500L)
     } else {
       out <- obj
     }
