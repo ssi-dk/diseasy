@@ -121,7 +121,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     ) {
 
       # Pass arguments to the DiseasyModel initialiser
-      super$initialize(activity, season, variant, parameters, ...)
+      super$initialize(
+        activity = activity,
+        season = season,
+        variant = variant,
+        parameters = parameters,
+        ...
+      )
 
 
       # Check the input arguments
