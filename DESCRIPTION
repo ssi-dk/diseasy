@@ -25,7 +25,6 @@ Imports:
     brms,
     cachem,
     checkmate,
-    digest,
     dplyr,
     expm,
     glue,
