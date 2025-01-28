@@ -100,10 +100,12 @@ test_that("$hash works", {
   )
 
   observables$set_last_queryable_date(
-    observables %.% ds %.% min_start_date + lubridate::days(10)
+    observables %.% ds %.% min_start_date + lubridate::days(30)
   )
 
-  model <- DiseasyModelOde$new(
+  # Create a DiseasyModelOdeSeir instance (we need a child class with `$initialise_state_vector()` implemented)
+  model <- DiseasyModelOdeSeir$new(
+    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = observables
   )
 
