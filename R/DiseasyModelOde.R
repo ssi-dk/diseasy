@@ -222,7 +222,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Set the stratification to the highest level supported by the data / model
         maximal_stratification <- c(
           "age_group",
-          switch(!is.null(self %.% variant %.% variants), "variant") # Variants included in the model
+          switch(!is.null(purrr::pluck(self, "variant", "variants")), "variant") # Variants included in the model
         )
 
         # Detect missing data
