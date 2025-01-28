@@ -65,6 +65,69 @@ test_that("initialize works with custom mappings", {
 })
 
 
+test_that("$hash works", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a model instance using example data
+  observables <- DiseasyObservables$new(
+    diseasystore = DiseasystoreSeirExample,
+    conn = DBI::dbConnect(RSQLite::SQLite())
+  )
+
+  observables$define_synthetic_observable(
+    name = "incidence",
+    mapping = \(n_infected, n_population) n_infected / n_population
+  )
+
+  observables$set_last_queryable_date(
+    observables %.% ds %.% min_start_date + lubridate::days(10)
+  )
+
+  model <- DiseasyModelOde$new(
+    observables = observables
+  )
+
+  # Get the hash for the model
+  hash <- model$hash
+
+  ## Request data from the observables module
+  observables$get_observation(
+    "incidence",
+    start_date = observables %.% ds %.% min_start_date,
+    end_date = observables %.% last_queryable_date,
+  )
+
+  # Check that the hash has not changed
+  expect_identical(model$hash, hash)
+
+
+
+  ## Request results from the model
+  model$get_results(
+    observable = "incidence",
+    prediction_length = 10
+  )
+
+  # Check that the hash has not changed
+  expect_identical(model$hash, hash)
+
+
+
+  ## Request stratified results from the model
+  model$get_results(
+    observable = "incidence",
+    stratification = rlang::quos(age_group),
+    prediction_length = 10
+  )
+
+  # Check that the hash has not changed
+  expect_identical(model$hash, hash)
+
+
+  rm(observables, model)
+})
+
+
 test_that("parameter validation works", {
   skip_if_not_installed("RSQLite")
 
