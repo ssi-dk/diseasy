@@ -68,6 +68,21 @@ test_that("initialize works with custom mappings", {
 test_that("$hash works", {
   skip_if_not_installed("RSQLite")
 
+  # Identical model instances should have the same hash
+  m1 <- DiseasyModelOde$new()
+  m2 <- DiseasyModelOde$new()
+  hash <- m1$hash
+  expect_identical(m1$hash, m2$hash)
+
+  # Cloning should produce the same hash and not change to existing hash
+  m3 <- m1$clone()
+  expect_identical(m3$hash, m1$hash)
+  expect_identical(m1$hash, hash)
+
+  rm(m1, m2, m3)
+
+
+  ### Using the module should not produce new hash
   # Create a model instance using example data
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
