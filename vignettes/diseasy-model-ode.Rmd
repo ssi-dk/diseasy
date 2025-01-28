@@ -367,7 +367,7 @@ The results are easily stratified by the stratifications in the data
 ```{r}
 model$get_results(
   observable = "incidence",
-  prediction_length = 5,
+  prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
 ```
@@ -402,7 +402,7 @@ plot(
 ```{r}
 model$get_results(
   observable = "n_infected",
-  prediction_length = 5,
+  prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
 ```
@@ -421,7 +421,7 @@ plot(
 ```{r}
 model$get_results(
   observable = "n_positive",
-  prediction_length = 60
+  prediction_length = 5
 )
 ```
 
@@ -436,7 +436,7 @@ plot(
 ```{r}
 model$get_results(
   observable = "n_positive",
-  prediction_length = 60,
+  prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
 ```
@@ -453,7 +453,7 @@ plot(
 ```{r}
 model$get_results(
   observable = "n_admission",
-  prediction_length = 60
+  prediction_length = 5
 )
 ```
 
@@ -468,7 +468,7 @@ plot(
 ```{r}
 model$get_results(
   observable = "n_admission",
-  prediction_length = 60,
+  prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
 ```
@@ -483,7 +483,7 @@ plot(
 ```
 
 ```{r check_cache, include = FALSE}
-if (!interactive() && cache$size() != 31) {
+if (!interactive() && cache$size() != 36) {
   stop(
     glue::glue(
       "Unexpected number of cache items (cache size: {cache$size()})",
