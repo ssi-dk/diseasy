@@ -492,6 +492,55 @@ test_that("$get_observation() works -- test 2", {
 })
 
 
+test_that("$hash works", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a observables instance using example data
+  observables <- DiseasyObservables$new(
+    diseasystore = DiseasystoreSeirExample,
+    conn = DBI::dbConnect(RSQLite::SQLite())
+  )
+
+  # Get the hash for the observables module
+  hash <- observables$hash
+
+  ## Request data from the observables module
+  observables$get_observation(
+    observables$available_observables[[1]],
+    start_date = observables %.% ds %.% min_start_date,
+    end_date = observables %.% ds %.% min_start_date + lubridate::days(5),
+  )
+
+  # Check that the hash has not changed
+  expect_identical(observables$hash, hash)
+
+
+  ## Request (extended) data from the observables module
+  observables$get_observation(
+    observables$available_observables[[1]],
+    start_date = observables %.% ds %.% min_start_date,
+    end_date = observables %.% ds %.% min_start_date + lubridate::days(10),
+  )
+
+  # Check that the hash has not changed
+  expect_identical(observables$hash, hash)
+
+
+  ## Request more data from the observables module
+  observables$get_observation(
+    observables$available_observables[[2]],
+    start_date = observables %.% ds %.% min_start_date,
+    end_date = observables %.% ds %.% min_start_date + lubridate::days(5),
+  )
+
+  # Check that the hash has not changed
+  expect_identical(observables$hash, hash)
+
+
+  rm(observables)
+})
+
+
 test_that("active binding: diseasystore works", {
   skip_if_not_installed("RSQLite")
 
