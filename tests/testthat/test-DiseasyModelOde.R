@@ -70,9 +70,11 @@ test_that("$hash works", {
 
   # Identical model instances should have the same hash
   m1 <- DiseasyModelOde$new()
-  m2 <- DiseasyModelOde$new()
   hash <- m1$hash
-  expect_identical(m1$hash, m2$hash)
+
+  m2 <- DiseasyModelOde$new()
+  expect_identical(m2$hash, m1$hash)
+  expect_identical(m1$hash, hash)
 
   # Cloning should produce the same hash and not change to existing hash
   m3 <- m1$clone()
