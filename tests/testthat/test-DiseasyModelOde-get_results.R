@@ -145,7 +145,7 @@ tidyr::expand_grid(
         dplyr::mutate(results,      "source" = "model"),
         dplyr::mutate(observations, "source" = "observations")
       ) |>
-        tidyr::pivot_wider(names_from = "source", values_from = observable) |>
+        tidyr::pivot_wider(names_from = "source", values_from = dplyr::all_of(observable)) |>
         dplyr::mutate("relative_error" = model / observations) |>
         dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
 
