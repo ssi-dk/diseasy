@@ -225,18 +225,22 @@ hash_environment <- function(environment) {
 
   # Create helper function to recursively dive into a list and hash function elements
   hash_nested_list <- function(obj) {
-    if (checkmate::test_function(obj)) {
-      list(
+    if (checkmate::test_list(obj)) {
+      out <- purrr::map(obj, hash_nested_list) # If it's a list, recursively hash
+    } else if (checkmate::test_function(obj)) {
+      out <- list(
         "function_formals" = rlang::fn_fmls(obj),
         "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(obj)), r"{[\s\"]}"), collapse = ""),
         "function_attributes" = attributes(rlang::zap_srcref(obj)) |>
             purrr::discard_at("body") # Partialised functions have the source repeated as "body"
       )
-    } else if (checkmate::test_list(obj)) {
-      purrr::map(obj, hash_nested_list)
+    } else if (checkmate::test_formula(obj)) {
+      out <- as.character(obj)
     } else {
-      obj
+      out <- obj
     }
+
+    return(out)
   }
 
   hash_list <- environment |>
