@@ -1,3 +1,70 @@
+test_that("initialize works with custom mappings", {
+
+  # Create instance without custom mapping
+  m <- DiseasyModelOde$new()
+
+  # We expect two mappings, one for n_infected and one for incidence
+  checkmate::assert_subset(
+    names(m %.% parameters %.% model_output_to_observable),
+    c("n_infected", "incidence")
+  )
+
+  # Mapping for n_infected should only have the map
+  checkmate::assert_subset(
+    names(m %.% parameters %.% model_output_to_observable %.% n_infected),
+    "map"
+  )
+
+  # Mapping for incidence should have both map and reduce
+  checkmate::assert_subset(
+    names(m %.% parameters %.% model_output_to_observable %.% incidence),
+    c("map", "reduce")
+  )
+
+  rm(m)
+
+
+  # Create instance with custom mapping
+  m <- DiseasyModelOde$new(
+    parameters = list(
+      "model_output_to_observable" = list(
+        "n_positive" = list(
+          "map" = \(.x, .y) {
+            dplyr::mutate(.y, "n_positive" = 0.65 * .x$n_infected)
+          }
+        )
+      )
+    )
+  )
+
+  # We expect three mappings: n_infected, incidence, and n_positive
+  checkmate::assert_subset(
+    names(m %.% parameters %.% model_output_to_observable),
+    c("n_infected", "incidence", "n_positive")
+  )
+
+  # Mapping for n_infected should only have the map
+  checkmate::assert_subset(
+    names(m %.% parameters %.% model_output_to_observable %.% n_infected),
+    "map"
+  )
+
+  # Mapping for incidence should have both map and reduce
+  checkmate::assert_subset(
+    names(m %.% parameters %.% model_output_to_observable %.% incidence),
+    c("map", "reduce")
+  )
+
+  # Mapping for n_positive should only have the map
+  checkmate::assert_subset(
+    names(m %.% parameters %.% model_output_to_observable %.% n_positive),
+    "map"
+  )
+
+  rm(m)
+})
+
+
 test_that("parameter validation works", {
   skip_if_not_installed("RSQLite")
 
