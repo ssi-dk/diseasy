@@ -21,19 +21,19 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
     #' @description
     #'   Merge the user provided mappings with the default mappings during initialisation.
-    #' @param parameters (`list`)\cr
-    #'   Parameters given to sub-class.
+    #' @param parameters (`list()`)\cr
+    #'   List of parameters given to the model.
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
-    initialize = function(parameters, ...) {
+    initialize = function(parameters = NULL, ...) {
 
       # Merge with the default observables mappings (if any custom mappings are provided)
       if ("model_output_to_observable" %in% names(parameters)) {
         user_mappings <- purrr::pluck(parameters, "model_output_to_observable")
-        default_mappings <- self %.% default_parameters() %.% model_output_to_observable
+        default_mappings <- private %.% default_parameters() %.% model_output_to_observable
 
         # Update the parameters and pass on
-        parameters["model_output_to_observable"] <- modifyList(default_mappings, user_mappings)
+        purrr::pluck(parameters, "model_output_to_observable") <- modifyList(default_mappings, user_mappings)
       }
 
       # Call the super-class constructor with the updated parameters

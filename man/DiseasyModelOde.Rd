@@ -49,14 +49,14 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 \subsection{Method \code{new()}}{
 Merge the user provided mappings with the default mappings during initialisation.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$new(parameters, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$new(parameters = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{parameters}}{(\code{list})\cr
-Parameters given to sub-class.}
+\item{\code{parameters}}{(\code{list()})\cr
+List of parameters given to the model.}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
 }
