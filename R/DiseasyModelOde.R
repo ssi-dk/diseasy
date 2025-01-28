@@ -54,6 +54,9 @@ DiseasyModelOde <- R6::R6Class(                                                 
       checkmate::assert_number(prediction_length, add = coll)
       checkmate::reportAssertions(coll)
 
+      # Cast prediction_length to integer
+      prediction_length <- as.integer(prediction_length)
+
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
