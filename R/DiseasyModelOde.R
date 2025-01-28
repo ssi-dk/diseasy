@@ -37,7 +37,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
       }
 
       # Call the super-class constructor with the updated parameters
-      super$initialize(parameters, ...)
+      super$initialize(parameters = parameters, ...)
     },
 
     #' @description `r rd_get_results_description`
