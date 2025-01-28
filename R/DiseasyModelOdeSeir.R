@@ -402,9 +402,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
 
-    #' @description
-    #'   Infer the state_vector from incidence data
-    #'
+    #' @description `r rd_initialise_state_vector_description`
     #' @details
     #'   The inference of the state_vector from incidence data is two-fold: EI states are inferred with one method and
     #'   the RS states are inferred with another. The methods are described in detail in the initialisation article
@@ -415,12 +413,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   If `ei_rs_balance = 1`, the estimate for EI states are prioritised, and only the RS states are modified.
     #'   If `ei_rs_balance = 0`, the estimate for RS states are prioritised.
     #'
-    #' @param incidence_data (`data.frame`)\cr
-    #'   Incidence observations as a `data.frame` with columns
-    #'   - `date`: The date of the observations
-    #'   - `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)
-    #'   - `variant`: The variant of the incidence observation.
-    #'   - `incidence`: The incidence in the age group at the given date
+    #' @param incidence_data `r rd_incidence_data`
     #' @param overall_infection_risk `r rd_overall_infection_risk`
     #' @param ei_rs_balance (`numeric(1)`)\cr
     #'   Which estimate should be priorities when normalising? See details.

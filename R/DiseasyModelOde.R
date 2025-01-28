@@ -106,6 +106,17 @@ DiseasyModelOde <- R6::R6Class(                                                 
     },
 
 
+    #' @description `r rd_initialise_state_vector_description`
+    #' @param incidence_data `r rd_incidence_data`
+    initialise_state_vector = function(incidence_data) {
+      private$not_implemented_error(
+        "`DiseasyModelOde` should not be used directly. Did you do so by mistake?",
+        "Instead, use a model that inherits`DiseasyModelOde` as it should implement the `$initialise_state_vector()`",
+        "method."
+      )
+    },
+
+
     #' @description
     #'   Plot the predictions from the current model
     #' @param observable `r rd_observable()`

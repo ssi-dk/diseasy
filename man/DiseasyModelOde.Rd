@@ -29,6 +29,7 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 \itemize{
 \item \href{#method-DiseasyModelOde-new}{\code{DiseasyModelOde$new()}}
 \item \href{#method-DiseasyModelOde-get_results}{\code{DiseasyModelOde$get_results()}}
+\item \href{#method-DiseasyModelOde-initialise_state_vector}{\code{DiseasyModelOde$initialise_state_vector()}}
 \item \href{#method-DiseasyModelOde-plot}{\code{DiseasyModelOde$plot()}}
 \item \href{#method-DiseasyModelOde-clone}{\code{DiseasyModelOde$clone()}}
 }
@@ -92,6 +93,23 @@ The primary method used to request model results of a given observable at a give
 }
 \subsection{Returns}{
 A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr   date (\code{Date}) specifying the date of the prediction\cr   realization_id (\code{character}) giving a unique id for each realization in the ensemble\cr   model (\code{character}) the name (classname) of the model used to provide the prediction.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOde-initialise_state_vector"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOde-initialise_state_vector}{}}}
+\subsection{Method \code{initialise_state_vector()}}{
+Infer the state_vector from incidence data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$initialise_state_vector(incidence_data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{incidence_data}}{incidence_data (\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format) - \code{variant}: The variant of the incidence observation. - \code{incidence}: The incidence in the age group at the given date}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

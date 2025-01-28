@@ -270,14 +270,7 @@ Infer the state_vector from incidence data
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{incidence_data}}{(\code{data.frame})\cr
-Incidence observations as a \code{data.frame} with columns
-\itemize{
-\item \code{date}: The date of the observations
-\item \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format)
-\item \code{variant}: The variant of the incidence observation.
-\item \code{incidence}: The incidence in the age group at the given date
-}}
+\item{\code{incidence_data}}{incidence_data (\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format) - \code{variant}: The variant of the incidence observation. - \code{incidence}: The incidence in the age group at the given date}
 
 \item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
 

@@ -189,7 +189,7 @@ rd_activity_weights <- paste(
   "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
 
-## Templates for DiseasyModel ODE templates
+## Templates for DiseasyModel
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",
   "If a boolean is given, it dictates whether to load a new instance module of this class.\\cr",
@@ -197,6 +197,21 @@ rd_diseasy_module <- paste(
   "instance. This copy is a \"clone\" of the instance at the time it is added and any subsequent changes to the",
   "instance will not reflect in the copy that is added to `DiseasyModel`."
 )
+
+## Templates for DiseasyModelOde
+rd_initialise_state_vector_description <- paste(
+  "Infer the state_vector from incidence data"
+)
+
+rd_incidence_data <- paste(
+  "incidence_data (`data.frame`)\\cr",
+  "Incidence observations as a `data.frame` with columns",
+  "- `date`: The date of the observations",
+  "- `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)",
+  "- `variant`: The variant of the incidence observation.",
+  "- `incidence`: The incidence in the age group at the given date"
+)
+
 
 rd_overall_infection_risk <- paste(
   "(`numeric`)\\cr",
