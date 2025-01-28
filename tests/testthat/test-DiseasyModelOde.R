@@ -125,7 +125,7 @@ test_that("$hash works", {
   ## Request results from the model
   model$get_results(
     observable = "incidence",
-    prediction_length = 10
+    prediction_length = 5
   )
 
   # Check that the hash has not changed
@@ -137,7 +137,7 @@ test_that("$hash works", {
   model$get_results(
     observable = "incidence",
     stratification = rlang::quos(age_group),
-    prediction_length = 10
+    prediction_length = 5
   )
 
   # Check that the hash has not changed
