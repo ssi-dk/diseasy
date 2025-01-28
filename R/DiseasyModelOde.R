@@ -67,7 +67,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
       if (!private$is_cached(hash)) {
 
         # Run the model to determine the raw rates (I*) at the maximal stratification in the model
-        model_output <- private %.% solve_ode(prediction_length)
+        model_output <- private %.% solve_ode(prediction_length = prediction_length)
 
         # Retrieve the map / reduce functions for the observable
         map_fn <- purrr::pluck(self %.% parameters %.% model_output_to_observable, observable, "map")
