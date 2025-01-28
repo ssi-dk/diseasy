@@ -49,7 +49,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
     #' @seealso `r rd_get_results_seealso`
     get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_true(!is.null(self %.% observables), add = coll)
+      checkmate::assert_class(self %.% observables, "DiseasyObservables", add = coll)
       checkmate::assert_choice(observable, names(self %.% parameters %.% model_output_to_observable), add = coll)
       checkmate::assert_choice(
         self %.% parameters %.% incidence_feature_name,
