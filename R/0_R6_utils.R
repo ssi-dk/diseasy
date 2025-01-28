@@ -223,34 +223,27 @@ hash_environment <- function(environment) {
 
   if (checkmate::test_environment(environment)) environment <- as.list(environment)
 
+  # Create helper function to recursively dive into a list and hash function elements
+  hash_nested_list <- function(obj) {
+    if (checkmate::test_function(obj)) {
+      list(
+        "function_formals" = rlang::fn_fmls(obj),
+        "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(obj)), r"{[\s\"]}"), collapse = ""),
+        "function_attributes" = attributes(rlang::zap_srcref(obj)) |>
+            purrr::discard_at("body") # Partialised functions have the source repeated as "body"
+      )
+    } else if (checkmate::test_list(obj)) {
+      purrr::map(obj, hash_nested_list)
+    } else {
+      obj
+    }
+  }
+
   hash_list <- environment |>
     purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
     purrr::map_if(checkmate::test_formula, as.character) |> # formulas are converted to character before hashing
-    purrr::map_if(
-      checkmate::test_function, # For functions, we hash their attributes
-      ~ {
-        list(
-          "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(.)), r"{[\s\"]}"), collapse = ""),
-          "function_attributes" = purrr::discard_at(attributes(.), "srcref")
-        )
-      }
-    ) |>
-    purrr::map_if(
-      checkmate::test_list, # In some cases, we have lists of functions
-      ~ {
-        purrr::map_if(
-          .,
-          checkmate::test_function,
-          ~ {
-            list(
-              "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(.)), r"{[\s\"]}"), collapse = ""),
-              "function_attributes" = purrr::discard_at(attributes(.), "srcref")
-            )
-          }
-        )
-      }
-    ) |>
-  purrr::map_chr(rlang::hash)
+    hash_nested_list() |>
+    purrr::map_chr(rlang::hash)
 
   return(hash_list)
 }
