@@ -51,6 +51,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_true(!is.null(self %.% observables), add = coll)
       checkmate::assert_choice(observable, names(self %.% parameters %.% model_output_to_observable), add = coll)
+      checkmate::assert_choice(
+        self %.% parameters %.% incidence_feature_name,
+        self %.% observables %.% available_observables,
+        add = coll
+      )
       checkmate::assert_number(prediction_length, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -332,23 +337,6 @@ DiseasyModelOde <- R6::R6Class(                                                 
         ),
         keep.null = TRUE
       )
-    },
-
-
-    validate_parameters = function() {
-      coll <- checkmate::makeAssertCollection()
-
-      if (checkmate::test_class(self %.% observables, "DiseasyObservables")) {
-        checkmate::assert_subset(
-          self %.% parameters %.% incidence_feature_name,
-          self %.% observables %.% available_observables,
-          add = coll
-        )
-      }
-
-      checkmate::reportAssertions(coll)
-
-      super$validate_parameters() # Validate inherited parameters
     }
   )
 )
