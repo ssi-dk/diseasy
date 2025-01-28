@@ -4,19 +4,19 @@ test_that("initialize works with custom mappings", {
   m <- DiseasyModelOde$new()
 
   # We expect two mappings, one for n_infected and one for incidence
-  checkmate::assert_subset(
+  checkmate::expect_subset(
     names(m %.% parameters %.% model_output_to_observable),
     c("n_infected", "incidence")
   )
 
   # Mapping for n_infected should only have the map
-  checkmate::assert_subset(
+  checkmate::expect_subset(
     names(m %.% parameters %.% model_output_to_observable %.% n_infected),
     "map"
   )
 
   # Mapping for incidence should have both map and reduce
-  checkmate::assert_subset(
+  checkmate::expect_subset(
     names(m %.% parameters %.% model_output_to_observable %.% incidence),
     c("map", "reduce")
   )
@@ -38,25 +38,25 @@ test_that("initialize works with custom mappings", {
   )
 
   # We expect three mappings: n_infected, incidence, and n_positive
-  checkmate::assert_subset(
+  checkmate::expect_subset(
     names(m %.% parameters %.% model_output_to_observable),
     c("n_infected", "incidence", "n_positive")
   )
 
   # Mapping for n_infected should only have the map
-  checkmate::assert_subset(
+  checkmate::expect_subset(
     names(m %.% parameters %.% model_output_to_observable %.% n_infected),
     "map"
   )
 
   # Mapping for incidence should have both map and reduce
-  checkmate::assert_subset(
+  checkmate::expect_subset(
     names(m %.% parameters %.% model_output_to_observable %.% incidence),
     c("map", "reduce")
   )
 
   # Mapping for n_positive should only have the map
-  checkmate::assert_subset(
+  checkmate::expect_subset(
     names(m %.% parameters %.% model_output_to_observable %.% n_positive),
     "map"
   )
