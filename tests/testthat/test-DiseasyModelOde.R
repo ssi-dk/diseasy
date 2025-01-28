@@ -88,7 +88,10 @@ test_that("$hash works", {
   # Create a model instance using example data
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
-    conn = DBI::dbConnect(RSQLite::SQLite())
+    conn = DBI::dbConnect(
+      RSQLite::SQLite(),
+      dbname = devtools::package_file("tests/cache/diseasystores/DiseasystoreSeirExample.sqlite")
+    )
   )
 
   observables$define_synthetic_observable(
