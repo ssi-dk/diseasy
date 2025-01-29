@@ -66,7 +66,7 @@ DiseasyObservables <- R6::R6Class(                                              
       super$initialize(...)
 
       # Set the db connection
-      private$.conn <- parse_diseasyconn(conn) # Open a new connection to the DB
+      private$.conn <- parse_diseasyconn(conn, type = "target_conn") # Open a new connection to the DB
       checkmate::assert_class(self %.% conn, "DBIConnection")
 
       # Initialize based on input
@@ -332,15 +332,6 @@ DiseasyObservables <- R6::R6Class(                                              
       )
 
       printr(glue::glue("slice_date set to: {self$slice_date}"))
-    },
-
-
-    #' @description
-    #'   Handles the clean-up of the class
-    finalize = function() {
-      # Close the connection, then do rest of clean-up
-      if (!isTRUE(attr(self, "clone")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
-      super$finalize()
     }
   ),
 
@@ -446,7 +437,15 @@ DiseasyObservables <- R6::R6Class(                                              
     conn = purrr::partial(
       .f = active_binding,
       name = "conn",
-      expr = return(private %.% .conn)
+      expr = {
+        conn <- private %.% .conn
+
+        # Remove the "needs_cleanup" attribute as it is only used during clean up
+        # and not meaningful in other contexts
+        attr(conn, "needs_cleanup") <- NULL
+
+        return(conn)
+      }
     )
   ),
 
@@ -460,7 +459,15 @@ DiseasyObservables <- R6::R6Class(                                              
     .synthetic_observables = NULL,
 
     .slice_ts = NULL,
-    .conn = NULL
+    .conn = NULL,
+
+    # @description
+    #   Handles the clean-up of the class
+    finalize = function() {
+      # Close the connection if needed
+      if (isTRUE(attr(private$.conn, "needs_cleanup")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
+      super$finalize()
+    }
   )
 )
 

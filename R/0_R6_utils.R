@@ -191,12 +191,14 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
       conn(),
       error = \(e) stop(glue::glue("`{type}` could not be parsed! ({e$message})"))
     )
+    attr(conn, "needs_cleanup") <- TRUE # Internally instanced, we clean it up
     return(conn)
   }
 
   # From here, we need to consider the type of connection
   # "target_conn" must be a valid DBI conn while source_conn can be whatever
   if (type == "target_conn" && inherits(conn, "DBIConnection")) {
+    attr(conn, "needs_cleanup") <- FALSE # Externally provided, we do not clean it up
     return(conn)
   } else if (type == "source_conn") {
     return(conn)

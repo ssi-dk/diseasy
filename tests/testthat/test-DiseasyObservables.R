@@ -62,29 +62,46 @@ test_that("initialize works", {
 })
 
 
-test_that("$finalize works", {
-  for (conn in get_test_conns()) {
+test_that("$finalize works - internal connections", {
+  skip_if_not_installed("RSQLite")
 
-    # Create observables module and load into new model module
-    obs <- DiseasyObservables$new(conn = conn)
-    m <- DiseasyModel$new(obs = obs)
+  # Test that internally created connections are closed when the model is finalized
+  observables <- DiseasyObservables$new(conn = \() DBI::dbConnect(RSQLite::SQLite()))
+  conn <- observables$conn
+
+    # Connection should be open
+  expect_true(DBI::dbIsValid(conn))
+
+  # Finalize the observables module
+  rm(observables)
+  gc()
+
+  # Connection should be closed
+  expect_false(DBI::dbIsValid(conn))
+
+  # Clean up
+  if (DBI::dbIsValid(conn)) {
+    DBI::dbDisconnect(conn)
+  }
+})
+
+
+test_that("$finalize works - external connections", {
+
+  # Test that externally passed connections are not closed when the model is finalized
+  for (conn in get_test_conns()) {
+    # Create observables module
+    observables <- DiseasyObservables$new(conn = conn)
 
     # Connection should be open
     expect_true(DBI::dbIsValid(conn))
 
-    # Finalize the model module
-    rm(m)
-    gc()
-
-    # Connection should still be open
-    expect_true(DBI::dbIsValid(conn))
-
     # Finalize the observables module
-    rm(obs)
+    rm(observables)
     gc()
 
     # Connection should be closed
-    expect_false(DBI::dbIsValid(conn))
+    expect_true(DBI::dbIsValid(conn))
 
     # Clean up
     if (DBI::dbIsValid(conn)) {

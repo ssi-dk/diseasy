@@ -110,6 +110,11 @@ DiseasyBaseModule <- R6::R6Class(                                               
         module$set_moduleowner(class(self)[1])
       }
 
+      # If we are loading an observables module, make sure the connection is marked as not needing clean up
+      if (inherits(module, "DiseasyObservables")) {
+        attr(module$.__enclos_env__$private$.conn, "needs_cleanup") <- FALSE
+      }
+
 
       # Determine all current diseasy modules loaded into the current instance
       nested_diseasy_modules <- as.list(private, all.names = TRUE) |>
