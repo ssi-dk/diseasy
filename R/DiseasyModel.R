@@ -37,7 +37,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param activity,observables,season,variant `r rd_diseasy_module`
+    #' @param observables,activity,season,variant `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -55,23 +55,25 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   the other modules of the framework.
     #' @return
     #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
-    initialize = function(activity    = FALSE,
-                          observables = FALSE,
-                          season      = FALSE,
-                          variant     = FALSE,
-                          parameters  = NULL,
-                          label       = NULL,
-                          ...) {
+    initialize = function(
+      observables = FALSE,
+      activity    = FALSE,
+      season      = FALSE,
+      variant     = FALSE,
+      parameters  = NULL,
+      label       = NULL,
+      ...
+    ) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
-        checkmate::check_logical(activity, null.ok = TRUE),
-        checkmate::check_class(activity, "DiseasyActivity", null.ok = TRUE),
+        checkmate::check_logical(observables, null.ok = TRUE),
+        checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE),
         add = coll
       )
       checkmate::assert(
-        checkmate::check_logical(observables, null.ok = TRUE),
-        checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE),
+        checkmate::check_logical(activity, null.ok = TRUE),
+        checkmate::check_class(activity, "DiseasyActivity", null.ok = TRUE),
         add = coll
       )
       checkmate::assert(
