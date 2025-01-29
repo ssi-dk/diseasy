@@ -165,6 +165,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       checkmate::reportAssertions(coll)
 
+      # Cast the compartment structure to a integer to make hash consistent
+      compartment_structure <- stats::setNames(as.integer(compartment_structure), names(compartment_structure))
+
 
       ### During the initialization of the model, we setup a number of intermediate vectors to speed up the computation
       # of the right-hand-side function in the ODE.
