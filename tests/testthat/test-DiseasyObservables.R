@@ -62,6 +62,38 @@ test_that("initialize works", {
 })
 
 
+test_that("$finalize works", {
+  for (conn in get_test_conns()) {
+
+    # Create observables module and load into new model module
+    obs <- DiseasyObservables$new(conn = conn)
+    m <- DiseasyModel$new(obs = obs)
+
+    # Connection should be open
+    expect_true(DBI::dbIsValid(conn))
+
+    # Finalize the model module
+    rm(m)
+    gc()
+
+    # Connection should still be open
+    expect_true(DBI::dbIsValid(conn))
+
+    # Finalize the observables module
+    rm(obs)
+    gc()
+
+    # Connection should be closed
+    expect_false(DBI::dbIsValid(conn))
+
+    # Clean up
+    if (DBI::dbIsValid(conn)) {
+      DBI::dbDisconnect(conn)
+    }
+  }
+})
+
+
 test_that("$set_diseasystore() works", {
   skip_if_not_installed("RSQLite")
 
