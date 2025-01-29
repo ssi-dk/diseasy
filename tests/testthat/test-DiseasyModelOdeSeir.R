@@ -113,3 +113,75 @@ test_that("$hash works", {
   hashes <- c(hashes, model$hash)
   rm(model, variant)
 })
+
+
+test_that("active binding: compartment_structure works", {
+  skip_if_not_installed("RSQLite")
+
+  # Creating an empty module
+  m <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    )
+  )
+
+  # Retrieve the compartment_structure
+  expect_identical(m %.% compartment_structure, c("E" = 1L, "I" = 1L, "R" = 1L))
+
+  # Try to set compartment_structure through the binding
+  # test_that cannot capture this error, so we have to hack it
+  expect_identical(tryCatch(m$compartment_structure <- c("E" = 2L, "I" = 2L, "R" = 2L), error = \(e) e),                # nolint: implicit_assignment_linter
+                   simpleError("`$compartment_structure` is read only"))
+  expect_identical(m %.% compartment_structure, c("E" = 1L, "I" = 1L, "R" = 1L))
+
+  rm(m)
+})
+
+
+test_that("active binding: disease_progression_rates works", {
+  skip_if_not_installed("RSQLite")
+
+  # Creating an empty module
+  m <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    )
+  )
+
+  # Retrieve the disease_progression_rates
+  expect_identical(m %.% disease_progression_rates, c("E" = 1, "I" = 1))
+
+  # Try to set disease_progression_rates through the binding
+  # test_that cannot capture this error, so we have to hack it
+  expect_identical(tryCatch(m$disease_progression_rates <- c("E" = 2, "I" = 2), error = \(e) e),                        # nolint: implicit_assignment_linter
+                   simpleError("`$disease_progression_rates` is read only"))
+  expect_identical(m %.% disease_progression_rates, c("E" = 1, "I" = 1))
+
+  rm(m)
+})
+
+
+test_that("active binding: malthusian_scaling_factor works", {
+  skip_if_not_installed("RSQLite")
+
+  # Creating an empty module
+  m <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    )
+  )
+
+  # Retrieve the malthusian_scaling_factor
+  expect_identical(m %.% malthusian_scaling_factor, 1)
+
+  # Try to set malthusian_scaling_factor through the binding
+  # test_that cannot capture this error, so we have to hack it
+  expect_identical(tryCatch(m$malthusian_scaling_factor <- 2, error = \(e) e),                                          # nolint: implicit_assignment_linter
+                   simpleError("`$malthusian_scaling_factor` is read only"))
+  expect_identical(m %.% malthusian_scaling_factor, 1)
+
+  rm(m)
+})
