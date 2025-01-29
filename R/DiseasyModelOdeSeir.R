@@ -153,14 +153,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_logical(malthusian_matching, add = coll)
 
       # Check we have the needed modules loaded and configured as needed
-      checkmate::assert_class(self$observables, "DiseasyObservables", add = coll)
-      checkmate::assert_date(self$observables$last_queryable_date, add = coll)
+      checkmate::assert_class(self %.% observables, "DiseasyObservables")
+      checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
 
-      checkmate::assert_class(self$activity, "DiseasyActivity", add = coll)
 
-      checkmate::assert_class(self$season, "DiseasySeason", add = coll)
+      checkmate::assert_class(self %.% activity, "DiseasyActivity", add = coll)
 
-      checkmate::assert_class(self$variant, "DiseasyVariant", add = coll)
+      checkmate::assert_class(self %.% season, "DiseasySeason", add = coll)
+
+      checkmate::assert_class(self %.% variant, "DiseasyVariant", add = coll)
 
       checkmate::reportAssertions(coll)
 
