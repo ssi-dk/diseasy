@@ -67,7 +67,37 @@ DiseasyModelOde <- R6::R6Class(                                                 
       if (!private$is_cached(hash)) {
 
         # Run the model to determine the raw rates (I*) at the maximal stratification in the model
-        model_output <- private %.% solve_ode(prediction_length = prediction_length)
+        model_rates <- private %.% solve_ode(prediction_length = prediction_length)
+
+        # .. get population data
+        population_data <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+          dplyr::mutate(
+            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
+          ) |>
+          dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
+          dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+
+        # Combine and convert raw rates to number of infected
+        model_output <- model_rates |>
+          dplyr::left_join(population_data, by = "age_group") |>
+          dplyr::mutate(
+            "n_infected" = .data$rate / .data$proportion * .data$population
+          ) |>
+          dplyr::select(!c("rate", "proportion"))
+
+        # "Zero-pad" with observational data (necessary for maps with delays)
+        observations <- self %.% observables %.% get_observation(
+          observable = self %.% parameters %.% incidence_feature_name,
+          stratification = private %.% maximal_stratification(),
+          start_date = self %.% training_period %.% start,
+          end_date = self %.% observables %.% last_queryable_date
+        ) |>
+          dplyr::left_join(population_data, by = "age_group") |>
+          dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name) |>
+          dplyr::mutate("n_infected" = .data$incidence * .data$population) |>
+          dplyr::select(colnames(model_output))
+
+        data <- rbind(observations, model_output)
 
         # Retrieve the map / reduce functions for the observable
         map_fn <- purrr::pluck(self %.% parameters %.% model_output_to_observable, observable, "map")
@@ -77,7 +107,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         )
 
         # Map model incidence to the requested observable
-        prediction <- model_output |>
+        prediction <- data |>
           dplyr::group_by(dplyr::across(!c("n_infected", "population"))) |>
           dplyr::group_map(map_fn) |>
           purrr::list_rbind()
@@ -93,6 +123,13 @@ DiseasyModelOde <- R6::R6Class(                                                 
             )
           ) |>
           dplyr::relocate("date", .before = dplyr::everything())
+
+        # Truncate the prediction to the requested period (necessary for maps with delays)
+        prediction <- prediction |>
+          dplyr::filter(
+            .data$date > self %.% observables %.% last_queryable_date,
+            .data$date <= self %.% observables %.% last_queryable_date + lubridate::days(prediction_length)
+          )
 
         # Store in cache
         private$cache(hash, prediction)
@@ -210,7 +247,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
   private = list(
 
-    # Run the model to generate the model incidence which all observables are derived from
+    # @description
+    #   Run the model to generate the model incidence which all observables are derived from.
     # @param prediction_length (`integer`)\cr
     #   The number of days to predict for.
     solve_ode = function(prediction_length) {
@@ -219,25 +257,12 @@ DiseasyModelOde <- R6::R6Class(                                                 
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
-        # Set the stratification to the highest level supported by the data / model
-        maximal_stratification <- c(
-          "age_group",
-          switch(!is.null(purrr::pluck(self, "variant", "variants")), "variant") # Variants included in the model
-        )
-
-        # Detect missing data
-        missing_in_data <- setdiff(maximal_stratification, self %.% observables %.% available_stratifications)
-
-        if (length(missing_in_data) > 0) {
-          stop("Model stratification not available in data: ", toString(missing_in_data))
-        }
-
-        # Get the incidence data at the stratification level
+        # Get the incidence data at the maximal stratification level supported by the data
         # and rename the incidence column to "incidence" since this is expected by
         # `$initialise_state_vector()` (implemented by the subclasses)
         incidence_data <- self$get_data(
           observable = self %.% parameters %.% incidence_feature_name,
-          stratification = rlang::quos(!!!purrr::map(maximal_stratification, as.symbol))
+          stratification = private %.% maximal_stratification(),
         ) |>
           dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name)
 
@@ -246,7 +271,12 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # - If variants are in the incidence data, keep only the variants in the model
         incidence_data <- incidence_data |>
-          dplyr::filter(dplyr::if_all(dplyr::any_of("variant"), ~ . %in% names(self %.% variant %.% variants)))
+          dplyr::filter(
+            dplyr::if_all(
+              dplyr::any_of("variant"),
+              ~ . %in% purrr::pluck(self %.% variant %.% variants, names, .default = "All")
+            )
+          )
 
         # Infer the initial state vector
         psi <- self$initialise_state_vector(incidence_data)
@@ -273,7 +303,16 @@ DiseasyModelOde <- R6::R6Class(                                                 
           tidyr::pivot_longer(
             !"time",
             names_sep = "/",
-            names_to = unique(c("variant", maximal_stratification, "state")) # Variant is always in the output
+            names_to = unique(
+              c(
+                purrr::map2_chr(
+                  names(private %.% maximal_stratification()),
+                  purrr::map_chr(private %.% maximal_stratification(), rlang::as_label),
+                  ~ ifelse(.x != "", .x, .y)
+                ),
+                "state"
+              )
+            )
           )
 
         # Get the raw rates from the model solution
@@ -288,34 +327,29 @@ DiseasyModelOde <- R6::R6Class(                                                 
           ) |>
           dplyr::select(!c("time", "state", "value"))
 
-
-        # Compute intermediate variables for the observables mappings
-        population_data <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
-          dplyr::mutate(
-            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
-          ) |>
-          dplyr::summarise(
-            "proportion" = sum(.data$proportion),
-            .by = "age_group"
-          ) |>
-          dplyr::mutate(
-            "population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population)
-          )
-
-        # Enrich with proportion and population, then compute number of infected as output
-        model_output <- dplyr::left_join(model_rates, population_data, by = "age_group") |>
-          dplyr::mutate(
-            "n_infected" = .data$rate / .data$proportion * .data$population
-          ) |>
-          dplyr::select(!c("rate", "proportion"))
-
-
         # Store in cache
-        private$cache(hash, model_output)
+        private$cache(hash, model_rates)
       }
 
       # Return
       return(private$cache(hash))
+    },
+
+
+    # @description
+    #   Determine the maximal model stratification supported by the data
+    maximal_stratification = function() {
+      # Set the stratification to the highest level supported by the data / model
+      maximal_stratification <- c(
+        dplyr::if_else( # Variants included in the model
+          is.null(purrr::pluck(self, "variant", "variants")),
+          rlang::quos(variant = "All"), # If not user specified, bundle all variants
+          rlang::quos(variant)
+        ),
+        rlang::quos(age_group)
+      )
+
+      return(maximal_stratification)
     },
 
 
