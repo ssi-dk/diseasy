@@ -161,21 +161,53 @@ DiseasyModelOde <- R6::R6Class(                                                 
     #' @param stratification `r rd_stratification()`
     plot = function(observable, prediction_length, stratification = NULL) {
 
-      # Retrieve the observations for the observable
-      observations <- self %.% observables %.% get_observation(
-        observable = observable,
-        stratification = stratification,
-        start_date = self %.% training_period %.% start,
-        end_date = self %.% observables %.% last_queryable_date + lubridate::days(prediction_length),
-        respect_last_queryable_date = FALSE
-      )
-
       # Retrieve the prediction for the observable
       prediction <- self %.% get_results(
         observable = observable,
         prediction_length = prediction_length,
         stratification = stratification
       )
+
+      # Retrieve the observations for the observable at the model stratificaiton level
+      observations <- self %.% observables %.% get_observation(
+        observable = observable,
+        stratification = private %.% model_stratification(),
+        start_date = self %.% training_period %.% start,
+        end_date = self %.% observables %.% last_queryable_date + lubridate::days(prediction_length),
+        respect_last_queryable_date = FALSE
+      )
+
+      # .. get population data
+      population_data <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+        dplyr::mutate(
+          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
+        ) |>
+        dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
+        dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+
+      # .. add to the observations
+      observations <- observations |>
+        dplyr::left_join(population_data, by = "age_group")
+
+      # Then reduce to the requested stratification level
+      reduce_fn <- purrr::pluck(
+        self %.% parameters %.% model_output_to_observable, observable, "reduce",
+        .default = ~ sum(.)
+      )
+
+      # Reduce (summarise) to the requested stratification level.
+      observations <- observations |>
+        dplyr::group_by(!!!stratification) |>
+        dplyr::group_by(.data$date, .add = TRUE) |>
+        dplyr::summarise(
+          dplyr::across(
+            .cols = dplyr::all_of(observable),
+            .fns = eval(parse(text = deparse(reduce_fn))) # R is a nice language with absolutely no design issues.
+          ),
+          .groups = "drop"
+        ) |>
+        dplyr::relocate("date", .before = dplyr::everything())
+
 
       # Determine the groups
       groups <- observations |>
