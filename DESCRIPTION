@@ -19,7 +19,7 @@ RoxygenNote: 7.3.2
 Language: en-GB
 LazyData: TRUE
 Depends:
-    diseasystore (>= 0.3),
+    diseasystore (> 0.3),
     R (>= 4.3.0)
 Imports:
     brms,

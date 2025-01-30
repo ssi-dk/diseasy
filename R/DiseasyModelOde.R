@@ -88,7 +88,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # "Zero-pad" with observational data (necessary for maps with delays)
         observations <- self %.% observables %.% get_observation(
           observable = self %.% parameters %.% incidence_feature_name,
-          stratification = private %.% maximal_stratification(),
+          stratification = private %.% model_stratification(),
           start_date = self %.% training_period %.% start,
           end_date = self %.% observables %.% last_queryable_date
         ) |>
@@ -262,7 +262,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # `$initialise_state_vector()` (implemented by the subclasses)
         incidence_data <- self$get_data(
           observable = self %.% parameters %.% incidence_feature_name,
-          stratification = private %.% maximal_stratification(),
+          stratification = private %.% model_stratification(),
         ) |>
           dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name)
 
@@ -306,8 +306,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
             names_to = unique(
               c(
                 purrr::map2_chr(
-                  names(private %.% maximal_stratification()),
-                  purrr::map_chr(private %.% maximal_stratification(), rlang::as_label),
+                  names(private %.% model_stratification()),
+                  purrr::map_chr(private %.% model_stratification(), rlang::as_label),
                   ~ ifelse(.x != "", .x, .y)
                 ),
                 "state"
@@ -338,18 +338,93 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
     # @description
     #   Determine the maximal model stratification supported by the data
-    maximal_stratification = function() {
+    model_stratification = function() {
+
+      ## Variant stratification
+      if (is.null(purrr::pluck(self, "variant", "variants"))) {
+        # No variants in scenario. Collapse all variant information to single level
+        variant_stratification <- rlang::quos(variant = "All")
+      } else {
+        # Variant in scenario, get data with stratified variant information
+        variant_stratification <- rlang::quos(variant)
+      }
+
+      ## Age group
+      # If age groups are defined in the model, check it is supported by the data
+      if (length(self %.% parameters %.% age_cuts_lower) > 1) {
+
+        # Can we map from the age groups in the data to the age groups in the model?
+        # We use `checkmate::test_choice` because `%in%` randomly does not work in this case.
+        if (checkmate::test_choice("age", self %.% observables %.% available_stratifications)) {
+
+          # For continuous age variables, we can map directly
+          age_group_stratification <- rlang::quos(
+            "age_group" = cut(
+              .data$age,
+              breaks = !!c(self %.% parameters %.% age_cuts_lower, Inf),
+              right = FALSE,
+              labels = !!diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)
+            )
+          )
+
+        } else if (checkmate::test_choice("age_group", self %.% observables %.% available_stratifications)) {
+          # If a age group is defined in the data, check we can map between the two stratifications
+
+          # Get the groups from the data
+          age_groups_in_data <- self %.% observables %.% ds %.% get_feature(
+            feature = "age_group",
+            start_date = self %.% training_period %.% start,
+            end_date = self %.% training_period %.% end
+          ) |>
+            dplyr::pull("age_group") |>
+            unique()
+
+          age_cuts_lower_data <- age_groups_in_data |>
+            stringr::str_extract_all(r"{^\d+}") |>
+            as.numeric()
+
+          # Assert that the model uses a subset of these stratifications
+          if (!checkmate::test_subset(self %.% parameters %.% age_cuts_lower, age_cuts_lower_data)) {
+            stop(
+              glue::glue(
+                "The age groups in the data ({toString(age_groups_in_data)}) cannot be mapped to the ",
+                "models age groups ({toString(diseasystore::age_labels(self %.% parameters %.% age_cuts_lower))})."
+              )
+            )
+          }
+
+          # Map the age groups in the data to the model age groups
+          splits <- outer(age_cuts_lower_data, self %.% parameters %.% age_cuts_lower, FUN = ">=") |>
+            apply(FUN = which, MARGIN = 1) |>
+            purrr::map_dbl(~ tail(., 1))
+
+          # We have to do janky evaluation to get the programatically generated expression
+          age_groups_maps <- purrr::map2(
+            age_groups_in_data,
+            diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[splits],
+            \(from, to) glue::glue('"{from}" ~ "{to}"')
+          ) |>
+            purrr::reduce(~ paste(.x, .y, sep = ", "), .init = "age_group")
+
+          age_group_stratification <- eval(
+            parse(text = paste0(" rlang::quos(age_group = dplyr::case_match(", age_groups_maps, "))"))
+          )
+        }
+
+      } else {
+        # No age groups in the model
+        age_group_stratification <- rlang::quos(age_group = "0+")
+      }
+
+
+
       # Set the stratification to the highest level supported by the data / model
-      maximal_stratification <- c(
-        dplyr::if_else( # Variants included in the model
-          is.null(purrr::pluck(self, "variant", "variants")),
-          rlang::quos(variant = "All"), # If not user specified, bundle all variants
-          rlang::quos(variant)
-        ),
-        rlang::quos(age_group)
+      model_stratification <- c(
+        variant_stratification,
+        age_group_stratification
       )
 
-      return(maximal_stratification)
+      return(model_stratification)
     },
 
 
