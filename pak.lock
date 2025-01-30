@@ -865,7 +865,7 @@
     {
       "ref": "curl",
       "package": "curl",
-      "version": "6.1.0",
+      "version": "6.2.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -877,10 +877,10 @@
         "RemoteRef": "curl",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "6.1.0"
+        "RemoteSha": "6.2.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/curl_6.1.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/curl_6.1.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/curl_6.2.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/curl_6.2.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1155,37 +1155,6 @@
       "repotype": "cranlike"
     },
     {
-      "ref": "diseasystore",
-      "package": "diseasystore",
-      "version": "0.3.0",
-      "type": "standard",
-      "direct": false,
-      "binary": true,
-      "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
-      "vignettes": false,
-      "metadata": {
-        "RemotePkgRef": "diseasystore",
-        "RemoteType": "standard",
-        "RemoteRef": "diseasystore",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
-        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.3.0"
-      },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/diseasystore_0.3.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/diseasystore_0.3.0.tar.gz",
-      "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "rversion": "4.4",
-      "directpkg": false,
-      "license": "GPL (>= 3)",
-      "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "params": [],
-      "install_args": "",
-      "sysreqs": "",
-      "sysreqs_packages": {},
-      "needscompilation": false,
-      "repotype": "cranlike"
-    },
-    {
       "ref": "distributional",
       "package": "distributional",
       "version": "0.5.0",
@@ -1281,7 +1250,7 @@
     {
       "ref": "duckdb",
       "package": "duckdb",
-      "version": "1.1.3-1",
+      "version": "1.1.3-2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1293,10 +1262,10 @@
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.1.3-1"
+        "RemoteSha": "1.1.3-2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/duckdb_1.1.3-1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/duckdb_1.1.3-1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/duckdb_1.1.3-2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/duckdb_1.1.3-2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2809,7 +2778,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["diseasystore", "brms", "cachem", "checkmate", "digest", "dplyr", "expm", "glue", "lgr", "lubridate", "Matrix", "pkgcond", "pracma", "purrr", "R6", "rlang", "stringr", "tidyr"],
+      "dependencies": ["brms", "cachem", "checkmate", "dplyr", "diseasystore", "expm", "glue", "lgr", "lubridate", "Matrix", "pkgcond", "pracma", "purrr", "R6", "rlang", "stringr", "tidyr"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",
@@ -4030,7 +3999,7 @@
     {
       "ref": "RcppParallel",
       "package": "RcppParallel",
-      "version": "5.1.9",
+      "version": "5.1.10",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4042,10 +4011,10 @@
         "RemoteRef": "RcppParallel",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "5.1.9"
+        "RemoteSha": "5.1.10"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/RcppParallel_5.1.9.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/RcppParallel_5.1.9.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/RcppParallel_5.1.10.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/RcppParallel_5.1.10.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4725,6 +4694,41 @@
       "sysreqs_packages": {},
       "needscompilation": false,
       "repotype": "cranlike"
+    },
+    {
+      "ref": "ssi-dk/diseasystore@rc-v0.3.1",
+      "package": "diseasystore",
+      "version": "0.3.0.9000",
+      "type": "github",
+      "direct": false,
+      "binary": false,
+      "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect"],
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "ssi-dk/diseasystore@rc-v0.3.1",
+        "RemoteType": "github",
+        "RemoteRef": "rc-v0.3.1",
+        "RemoteSha": "95edaae5990537ed42009e103d505b98bb756f2c",
+        "RemoteHost": "api.github.com",
+        "RemoteRepo": "diseasystore",
+        "RemoteUsername": "ssi-dk",
+        "GithubRepo": "diseasystore",
+        "GithubUsername": "ssi-dk",
+        "GithubRef": "rc-v0.3.1",
+        "GithubSHA1": "95edaae5990537ed42009e103d505b98bb756f2c"
+      },
+      "sources": "https://api.github.com/repos/ssi-dk/diseasystore/zipball/95edaae5990537ed42009e103d505b98bb756f2c",
+      "target": "src/contrib/diseasystore_0.3.0.9000_95edaae.tar.gz",
+      "platform": "source",
+      "rversion": "*",
+      "directpkg": false,
+      "license": "GPL (>= 3)",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "",
+      "sysreqs": "",
+      "sysreqs_packages": {},
+      "needscompilation": true
     },
     {
       "ref": "StanHeaders",
