@@ -154,3 +154,116 @@ tidyr::expand_grid(
 # Clean up
 rm(model)
 
+
+
+# We should also be able to run the model with a no age groups
+test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: NULL)", {
+  skip_if_not_installed("RSQLite")
+
+  # Create the model instance
+  model <- DiseasyModelOdeSeir$new(
+    activity = activity,
+    observables = observables,
+    compartment_structure = c("E" = K, "I" = L, "R" = M),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list(
+      "age_cuts_lower" = 0,
+      "overall_infection_risk" = overall_infection_risk
+    )
+  )
+
+  # Estimate the initial state vector but suppress messages about negative states being set to zero
+  prediction_length <- 30
+
+  pkgcond::suppress_conditions(
+    pattern = "Negative values in estimate",
+    expr = {
+      results <- model$get_results(                                                                                     # nolint: implicit_assignment_linter
+        observable = "n_infected",
+        prediction_length = prediction_length
+      )
+    }
+  )
+
+  # Retrieve the observations for the observable
+  observations <- observables %.% get_observation(
+    observable = "n_infected",
+    start_date = observables %.% last_queryable_date + lubridate::days(1),
+    end_date = observables %.% last_queryable_date + lubridate::days(prediction_length),
+    respect_last_queryable_date = FALSE
+  )
+
+  # Check accuracy within 15%
+  comparison <- rbind(
+    dplyr::mutate(results,      "source" = "model"),
+    dplyr::mutate(observations, "source" = "observations")
+  ) |>
+    tidyr::pivot_wider(names_from = "source", values_from = "n_infected") |>
+    dplyr::mutate("relative_error" = model / observations) |>
+    dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
+
+  expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.15)                              # nolint: expect_identical_linter
+
+
+  # Clean up
+  rm(model)
+})
+
+
+
+# We should also be able to run the model with sub sets of the data age groups groups
+test_that("$get_results() (SEEIR, subset age groups - n_infected - stratification: NULL)", {
+  skip_if_not_installed("RSQLite")
+
+  # Create the model instance
+  model <- DiseasyModelOdeSeir$new(
+    activity = activity,
+    observables = observables,
+    compartment_structure = c("E" = K, "I" = L, "R" = M),
+    disease_progression_rates = c("E" = rE, "I" = rI),
+    parameters = list(
+      "age_cuts_lower" = c(0, 30),
+      "overall_infection_risk" = overall_infection_risk
+    )
+  )
+
+  # Estimate the initial state vector but suppress messages about negative states being set to zero
+  prediction_length <- 30
+
+  pkgcond::suppress_conditions(
+    pattern = "Negative values in estimate",
+    expr = {
+      results <- model$get_results(                                                                                     # nolint: implicit_assignment_linter
+        observable = "n_infected",
+        prediction_length = prediction_length
+      )
+    }
+  )
+
+  # Retrieve the observations for the observable
+  observations <- observables %.% get_observation(
+    observable = "n_infected",
+    start_date = observables %.% last_queryable_date + lubridate::days(1),
+    end_date = observables %.% last_queryable_date + lubridate::days(prediction_length),
+    respect_last_queryable_date = FALSE
+  )
+
+  # Check accuracy within 15%
+  comparison <- rbind(
+    dplyr::mutate(results,      "source" = "model"),
+    dplyr::mutate(observations, "source" = "observations")
+  ) |>
+    tidyr::pivot_wider(names_from = "source", values_from = "n_infected") |>
+    dplyr::mutate("relative_error" = model / observations) |>
+    dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
+
+  expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.15)                              # nolint: expect_identical_linter
+
+
+  # Clean up
+  rm(model)
+})
+
+
+# Clean up
+rm(observables, activity)
