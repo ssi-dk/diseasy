@@ -32,11 +32,6 @@ observables <- DiseasyObservables$new(
   )
 )
 
-observables$set_study_period(
-  start_date = observables %.% ds %.% min_start_date,
-  end_date = observables %.% ds %.% max_end_date
-)
-
 # Lock the observation data to a simulation start date (30 day period)
 observables$set_last_queryable_date(observables %.% ds %.% min_start_date + 40)
 
@@ -85,7 +80,7 @@ L <- 1
 M <- 1                                                                                                                  # nolint end: object_name_linter
 
 # Create the model instance
-m <- DiseasyModelOdeSeir$new(
+model <- DiseasyModelOdeSeir$new(
   activity = activity,
   observables = observables,
   compartment_structure = c("E" = K, "I" = L, "R" = M),
@@ -126,7 +121,7 @@ tidyr::expand_grid(
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
         expr = {
-          results <- m$get_results(                                                                                     # nolint: implicit_assignment_linter
+          results <- model$get_results(                                                                                     # nolint: implicit_assignment_linter
             observable = observable,
             prediction_length = prediction_length,
             stratification = stratification
@@ -157,4 +152,5 @@ tidyr::expand_grid(
   })
 
 # Clean up
-rm(m)
+rm(model)
+
