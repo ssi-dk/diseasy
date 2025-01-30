@@ -398,8 +398,8 @@ DiseasyObservables <- R6::R6Class(                                              
       .f = active_binding,
       name = "available_stratifications",
       expr = {
-        if (is.null(private %.% .ds)) return(NULL)
-        return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
+        if (is.null(self %.% ds)) return(NULL)
+        return(purrr::keep(self %.% ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
       }
     ),
 
