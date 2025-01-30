@@ -120,7 +120,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
             dplyr::across(
               .cols = dplyr::all_of(observable),
               .fns = eval(parse(text = deparse(reduce_fn))) # R is a nice language with absolutely no design issues.
-            )
+            ),
+            .groups = "drop"
           ) |>
           dplyr::relocate("date", .before = dplyr::everything())
 
