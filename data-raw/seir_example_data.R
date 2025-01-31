@@ -1,7 +1,7 @@
-if (rlang::is_installed(c("deSolve", "usethis"))) {
+if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # Generate synthetic disease data for testing from a simple SEIR model with some noise added
-  set.seed(4260)
+  withr::local_seed(4260)
 
   # Set the time scales of the problem
   rE <- 1 / 2.1                                                                                                         # nolint: object_name_linter
@@ -146,6 +146,25 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
       values = c("Infected" = "black", "Test positive (simple)" = "blue",
                  "Test positive (realistic)" = "red", "Admissions * 10" = "darkgreen")
     )
+
+  # Remove existing caches
+  c(
+    list.files(
+      devtools::package_file("tests/cache/diseasystores"),
+      pattern = "DiseasystoreSeirExample",
+      full.names = TRUE
+    ),
+    list.files(
+      devtools::package_file("vignettes/articles/cache/diseasystores"),
+      pattern = "DiseasystoreSeirExample",
+      full.names = TRUE
+    )
+  ) |>
+    purrr::walk(~ {
+      print(glue::glue("Removing {.}"))
+      file.remove(.)
+    })
+
 
   # Store data set
   usethis::use_data(seir_example_data, overwrite = TRUE)

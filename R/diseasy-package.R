@@ -1,7 +1,6 @@
 #' @keywords internal
 "_PACKAGE"
 
-#' @importFrom digest digest
 #' @importFrom dplyr as_label
 #' @import diseasystore
 #' @import lgr

@@ -14,10 +14,14 @@ rE <- 1 / 2.1 # Overall disease progression rate from E to I                    
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
 overall_infection_risk <- 0.025
 
+
 # Configure a observables module for use in the tests
 obs <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = DBI::dbConnect(
+    RSQLite::SQLite(),
+    dbname = devtools::package_file("tests/cache/diseasystores/DiseasystoreSeirExample.sqlite")
+  )
 )
 
 obs$set_study_period(
@@ -25,11 +29,16 @@ obs$set_study_period(
   end_date = obs %.% ds %.% max_end_date
 )
 
+
 # Get incidence data to infer initial state vector from
+obs$define_synthetic_observable(
+  name = "incidence",
+  mapping = \(n_infected, n_population) n_infected / n_population
+)
+
 incidence_data <- obs$get_observation(
-  observable = "n_infected"
-) |>
-  dplyr::mutate("incidence" = .data$n_infected / !!sum(contact_basis %.% DK %.% population))
+  observable = "incidence"
+)
 
 
 # Lock the observation data to a simulation start date (30 day period)
