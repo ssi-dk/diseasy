@@ -238,6 +238,12 @@ hash_environment <- function(environment) {
       )
     } else if (checkmate::test_formula(obj)) {
       out <- rlang::quo_text(obj, width = 500L)
+    } else if (checkmate::test_class(obj, "DBIConnection")) {
+      out <- list(
+        "conn_class" = class(obj),
+        "conn_info" = purrr::discard_at(DBI::dbGetInfo(obj), "username") |>
+          (\(.) .[order(names(.))])() # Why don't they just make better way to sort lists...
+      )
     } else {
       out <- obj
     }
