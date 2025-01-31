@@ -41,7 +41,9 @@ source_code_hash <- c(
   DiseasyBaseModule,
   DiseasyModel,
   DiseasyModelOde,
-  DiseasyModelOdeSeir
+  DiseasyModelOdeSeir,
+  DiseasyObservables,
+  DiseasyActivity
 ) |>
   purrr::map(r6_hash) |>
   rlang::hash()
@@ -492,7 +494,7 @@ plot(
 ```
 
 ```{r check_cache, include = FALSE}
-if (!interactive() && cache$size() != 36) {
+if (!interactive() && cache$size() != 31) {
   stop(
     glue::glue(
       "Unexpected number of cache items (cache size: {cache$size()})",
