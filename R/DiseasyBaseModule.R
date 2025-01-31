@@ -302,7 +302,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #   The environment of the function to hash.
     # @return (`character`)\cr
     #   The values in the function environment is hashed and combined with the classname and hash of the parent
-    #   environment
+    #   environment.
     get_hash = function(function_environment = rlang::caller_env()) {
 
       # Find all relevant hashes
