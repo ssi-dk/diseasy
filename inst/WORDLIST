@@ -45,6 +45,7 @@ DiseasyActivity
 DiseasyBaseModule
 DiseasyModelB
 DiseasyModelG
+DiseasyModelOde
 DiseasyObservables
 DiseasySeason
 DiseasyVariant
@@ -63,6 +64,7 @@ endblock
 Engbo
 epiverse
 erviss
+etc
 
 fn
 fns
@@ -167,6 +169,7 @@ u
 underbrace
 
 vdots
+vec
 
 walkthrough
 www
