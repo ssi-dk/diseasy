@@ -116,7 +116,7 @@ test_that("$hash works", {
   observables$get_observation(
     "incidence",
     start_date = observables %.% ds %.% min_start_date,
-    end_date = observables %.% last_queryable_date,
+    end_date = observables %.% last_queryable_date
   )
 
   # Check that the hash has not changed

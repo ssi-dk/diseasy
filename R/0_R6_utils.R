@@ -234,7 +234,7 @@ hash_environment <- function(environment) {
         "function_formals" = rlang::fn_fmls(obj),
         "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(obj)), r"{[\s\"]}"), collapse = ""),
         "function_attributes" = attributes(rlang::zap_srcref(obj)) |>
-            purrr::discard_at("body") # Partialised functions have the source repeated as "body"
+          purrr::discard_at("body") # Partialised functions have the source repeated as "body"
       )
     } else if (checkmate::test_formula(obj)) {
       out <- rlang::quo_text(obj, width = 500L)

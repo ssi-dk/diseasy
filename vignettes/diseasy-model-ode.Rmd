@@ -20,8 +20,10 @@ library(diseasy)
 
 ```{r options, include = FALSE}
 # Create a cache for this vignette since the examples take a long time to generate
-# We will destroy the cache if the source code for `DiseasyModelOde`, or `DiseasyModelOdeSeir` changes
+# We will destroy the cache if the source code for `DiseasyModelOde`, or
+# `DiseasyModelOdeSeir` changes
 cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-model-ode")
+
 r6_hash <- \(r6_generator) {
   c(
     "public_methods",
@@ -34,9 +36,16 @@ r6_hash <- \(r6_generator) {
     purrr::reduce(c) |>
     hash_environment()
 }
-source_code_hash <- c(DiseasyBaseModule, DiseasyModel, DiseasyModelOde, DiseasyModelOdeSeir) |>
+
+source_code_hash <- c(
+  DiseasyBaseModule,
+  DiseasyModel,
+  DiseasyModelOde,
+  DiseasyModelOdeSeir
+) |>
   purrr::map(r6_hash) |>
   rlang::hash()
+
 if (!identical(source_code_hash, cache$get("source-code-hash"))) {
   if (interactive()) {
     cache$reset()
