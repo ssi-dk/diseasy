@@ -7,8 +7,10 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
 
   # Get contact matrices for every country in the contactdata package
   countries <- contactdata::list_countries()
-  country_codes <- purrr::map_chr(countries,
-                                  ~ countrycode::countrycode(.,  origin = "country.name", destination = "iso2c"))
+  country_codes <- purrr::map_chr(
+    countries,
+    ~ countrycode::countrycode(.,  origin = "country.name", destination = "iso2c")
+  )
 
   # Get all individual matrices for each country
   locations <- c("home", "work", "school", "other")
@@ -41,8 +43,11 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
   # https://population.un.org/wpp/Download/Standard/Population/
   idbzip <- "https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip"
   curl::curl_fetch_disk(idbzip, file.path(tempdir(), "idbzip.zip"))
-  idb1yr <- readr::read_delim(unz(file.path(tempdir(), "idbzip.zip"), "idbsingleyear.txt"),
-                              delim = "|", show_col_types = FALSE)
+  idb1yr <- readr::read_delim(
+    unz(file.path(tempdir(), "idbzip.zip"), "idbsingleyear.txt"),
+    delim = "|",
+    show_col_types = FALSE
+  )
 
   # Get 1-year age-group data for all countries in the data set
   # We use population data from 2020 to match the study year of `contactdata`s contact matrices
@@ -192,7 +197,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
 
       # Test mp that we lives up to the reciprocity principle:
       N_i <- outer(N, rep(1, length(N)))     # Columns are N: [N; N; N]                                                 # nolint: object_name_linter
-      if (max(abs(N_i * mp -  t(N_i * mp))) > 1e-6) {
+      if (max(abs(N_i * mp - t(N_i * mp))) > 1e-6) {
         rlang::abort("mp is not reciprocal")
       }
 

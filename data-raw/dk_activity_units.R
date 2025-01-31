@@ -362,9 +362,8 @@ dk_activity_units <- dk_activity_units |>
     label = "Folk high schools, etc.",
     home = 0,
     work = (rep(c(0, (1500) / work_force, 0), c(3, 10, 3))) + # Employees
-      (rep(c(0, (5000) / 765000, 0), c(4, 2, 10))) +          # Youth on long courses
-      (rep(c(0, (1000) / 640000, 0), c(13, 2, 1))),           # Elderly (65-75 years old) on short courses
-
+      (rep(c(0, (5000) / 765000, 0), c(4, 2, 10))) + # Youth on long courses
+      (rep(c(0, (1000) / 640000, 0), c(13, 2, 1))),  # Elderly (65-75 years old) on short courses
     school = 0,
     other = 0.005,
     risk = 1
@@ -663,7 +662,7 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("schools_5_8_grade_20pp_R", risk_test_school),
       label = "5-8 grade without club offers - one day per week",
-      home = (rep(c(0.015, 0.005), c(12, 4))),
+      home = rep(c(0.015, 0.005), c(12, 4)),
       work = (rep(c(0, (2300 * 0.062 + 33600 * (0.2 + 0.062)) / work_force, 0), c(5, 8, 3))), # OBS
       school = (0.2 * c(0, 0, 0.8, 0.2, rep(0.212, 9), 0, 0, 0)),
       other = (0.2 * rep(c(0, 0.1, 0.03, 0), c(2, 1, 1, 12))),
@@ -803,10 +802,12 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
       activity = "high_school_non_senior_year_critical",
       label = "Upper secondary education - non-graduating",
       home = 0.025 * 0.1,
-      work = (rep(0.025 * c(0, 19000 / work_force, 0), c(3, 10, 3)) +
-                rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
-      school = (rep(0.025 * c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
-                    c(3, 1, 9, 3))),
+      work = rep(0.025 * c(0, 19000 / work_force, 0), c(3, 10, 3)) +
+        rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9)), # Work + 20+ year old students
+      school = rep(
+        0.025 * c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
+        c(3, 1, 9, 3)
+      ),
       other = 0.025 * 0.07,
       risk = 1
     ) # FAST
@@ -815,11 +816,13 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("high_school_non_senior_year_open_R", risk_test_school),
       label = "Upper secondary education - non-graduating",
-      home = (rep(c(0.1, 0.25 * 0.1), c(12, 4))),
-      work = (rep(c(0, 19000 / work_force, 0), c(3, 10, 3)) +
-                rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
-      school = (rep(c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
-                    c(3, 1, 9, 3))),
+      home = rep(c(0.1, 0.25 * 0.1), c(12, 4)),
+      work = rep(c(0, 19000 / work_force, 0), c(3, 10, 3)) +
+        rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9)), # Work + 20+ year old students
+      school = rep(
+        c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
+        c(3, 1, 9, 3)
+      ),
       other = 0.07,
       risk = risk_test_school
     )
@@ -828,11 +831,13 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("high_school_non_senior_year_summer_R", risk_test_school),
       label = "Upper secondary education - non-graduating - summer",
-      home = (rep(c(0.1, 0.25 * 0.1), c(12, 4))),
-      work = (rep(c(0, 0 / work_force, 0), c(3, 10, 3)) +
-                rep(0.25 * c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
-      school = (0.25 * rep(c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
-                           c(3, 1, 9, 3))),
+      home = rep(c(0.1, 0.25 * 0.1), c(12, 4)),
+      work = rep(c(0, 0 / work_force, 0), c(3, 10, 3) +
+        rep(0.25 * c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
+      school = 0.25 * rep(
+        c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
+        c(3, 1, 9, 3)
+      ),
       other = 0.07,
       risk = risk_test_school
     )
@@ -842,11 +847,13 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("high_school_non_senior_year_20pp_R", risk_test_school),
       label = "Upper secondary education - non-graduating",
-      home = (rep(0.2 * c(0.1, 0.25 * 0.1), c(12, 4))),
+      home = rep(0.2 * c(0.1, 0.25 * 0.1), c(12, 4)),
       work = 0.2 * (rep(c(0, 19000 / work_force, 0), c(3, 10, 3)) +
-                      rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
-      school = 0.2 * (rep(c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
-                          c(3, 1, 9, 3))),
+        rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
+      school = 0.2 * rep(
+        c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
+        c(3, 1, 9, 3)
+      ),
       other = 0.2 * 0.07,
       risk = risk_test_school
     )
@@ -855,11 +862,13 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("high_school_non_senior_year_50pp_R", risk_test_school),
       label = "Upper secondary education - non-graduating",
-      home = (rep(0.5 * c(0.1, 0.25 * 0.1), c(12, 4))),
+      home = rep(0.5 * c(0.1, 0.25 * 0.1), c(12, 4)),
       work = 0.5 * (rep(c(0, 19000 / work_force, 0), c(3, 10, 3)) +
-                      rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
-      school = 0.5 * (rep(c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
-                          c(3, 1, 9, 3))),
+        rep(c(0, 22, 11, 14, 0) * 1000 / work_force, c(4, 1, 1, 1, 9))), # Work + 20+ year old students
+      school = 0.5 * rep(
+        c(0, 0.34, 0.08, 0), # Estimated two grades 15-19 years old - adjusted to 1,7 grades
+        c(3, 1, 9, 3)
+      ),
       other = 0.5 * 0.07,
       risk = risk_test_school
     )
@@ -870,10 +879,12 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
       label = "Upper secondary education + AMU + VEU - graduating",
       home = 0.025 * 0.1,
       work = (0.025 * (rep(c(0, 11600 / work_force, 0), c(3, 10, 3)) +
-                         1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8))) +
-                rep(c(0, (3700 + 320) / work_force, 0), c(6, 7, 3))), # Work + 20+ year old students
-      school = (0.025 * rep(c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+ years old,
-                            c(3, 1, 9, 3))),    # also reduced among children to adults
+        1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8))) +
+        rep(c(0, (3700 + 320) / work_force, 0), c(6, 7, 3))), # Work + 20+ year old students
+      school = 0.025 * rep(
+        c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+ years old,
+        c(3, 1, 9, 3)
+      ),    # also reduced among children to adults
       other = 0.025 * 0.03,
       risk = 1
     ) # FAST
@@ -882,12 +893,14 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("high_school_senior_year_50pp_R", risk_test_school),
       label = "Upper secondary education + AMU + VEU + FGU - graduating - half",
-      home = (rep(c(0.5 * 0.1, 0.25 * 0.1), c(12, 4))), # LAEC c(0.5 * 0.1, 0.025 * 0.1)
-      work = (rep(0.75 * c(0, 11600 / work_force, 0), c(3, 10, 3)) +    # Work + 20+-year old students
-                0.5 * 1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8)) +
-                rep(c(0, 0.5 * (3000 + 13100 + 43400 + 750) / work_force, 0), c(6, 7, 3))),
-      school = (0.5 * rep(c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+-year old,
-                          c(3, 1, 9, 3))),    # also reduced among children to adults
+      home = rep(c(0.5 * 0.1, 0.25 * 0.1), c(12, 4)), # LAEC c(0.5 * 0.1, 0.025 * 0.1)
+      work = (rep(0.75 * c(0, 11600 / work_force, 0), c(3, 10, 3)) + # Work + 20+-year old students
+        0.5 * 1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8)) +
+        rep(c(0, 0.5 * (3000 + 13100 + 43400 + 750) / work_force, 0), c(6, 7, 3))),
+      school = 0.5 * rep(
+        c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+-year old,
+        c(3, 1, 9, 3)
+      ),    # also reduced among children to adults
       other = 0.5 * 0.03,
       risk = risk_test_school
     )
@@ -896,12 +909,14 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("high_school_senior_year_open_R", risk_test_school),
       label = "Upper secondary education + AMU + VEU + FGU - graduating",
-      home = (rep(c(0.1, 0.25 * 0.1), c(12, 4))),
+      home = rep(c(0.1, 0.25 * 0.1), c(12, 4)),
       work = (rep(c(0, 11600 / work_force, 0), c(3, 10, 3)) +
-                1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8)) +
-                rep(c(0, (3000 + 13100 + 43400 + 750) / work_force, 0), c(6, 7, 3))), # Work + 20+-year old students
-      school = (rep(c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+-year old,
-                    c(3, 1, 9, 3))),    # also reduced among children to adults
+        1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8)) +
+        rep(c(0, (3000 + 13100 + 43400 + 750) / work_force, 0), c(6, 7, 3))), # Work + 20+-year old students
+      school = rep(
+        c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+-year old,
+        c(3, 1, 9, 3)
+      ),    # also reduced among children to adults
       other = 0.03,
       risk = risk_test_school
     )
@@ -910,12 +925,14 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     add_activity(
       activity = paste0("high_school_senior_year_summer_R", risk_test_school),
       label = "Upper secondary education + AMU + VEU + FGU - graduating - summer",
-      home = (rep(c(0.1, 0.25 * 0.1), c(12, 4))),
-      work = (rep(c(0, 0 / work_force, 0), c(3, 10, 3)) +   # Work + 20+-year old students
-                0.25 * 1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8)) +
-                0.25 * rep(c(0, (3000 + 13100 + 43400 + 750) / work_force, 0), c(6, 7, 3))),
-      school = (rep(0.25 * c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+-year old,
-                    c(3, 1, 9, 3))),           # also reduced among children to adults
+      home = rep(c(0.1, 0.25 * 0.1), c(12, 4)),
+      work = (rep(c(0, 0 / work_force, 0), c(3, 10, 3)) + # Work + 20+-year old students
+        0.25 * 1 / 3 * rep(c(0, 35, 17, 14, 8, 0) * 1000 / work_force, c(4, 1, 1, 1, 1, 8)) +
+        0.25 * rep(c(0, (3000 + 13100 + 43400 + 750) / work_force, 0), c(6, 7, 3))),
+      school = rep(
+        0.25 * c(0, 0.1, 0.03, 0), # 1/2 grade, as some are 20+-year old,
+        c(3, 1, 9, 3)
+      ),           # also reduced among children to adults
       other = 0.03,
       risk = risk_test_school
     )
@@ -1067,8 +1084,8 @@ dk_activity_units <- dk_activity_units |>
     label = "High Schools and Similar Institutions",
     home = 0,
     work = (rep(c(0, (1000) / work_force, 0), c(3, 10, 3))) + # Employees
-      (rep(c(0, (6100) / work_force, 0), c(4, 2, 10))) +      # students on long stays
-      (rep(c(0, (1000) / work_force, 0), c(13, 2, 1))),       # older adults (65-75 years old) on short stays
+      (rep(c(0, (6100) / work_force, 0), c(4, 2, 10))) + # students on long stays
+      (rep(c(0, (1000) / work_force, 0), c(13, 2, 1))),  # older adults (65-75 years old) on short stays
     school = 0,
     other = 0.005,
     risk = risk_test_school
@@ -1475,8 +1492,10 @@ dk_activity_units <- dk_activity_units |>
 dk_activity_units <- dk_activity_units |>
   add_activity(
     activity = "remaining_private_companies_phase_1",
-    label = paste0("Private employees not directly mentioned and working",
-                   "during lockdown after the opening of 0-4th grade (phase 1)"),
+    label = paste0(
+      "Private employees not directly mentioned and working",
+      "during lockdown after the opening of 0-4th grade (phase 1)"
+    ),
     home = 0.0,
     # LAEC work = (rep(c(0, (1069000) / work_force, 0), c(3, 10, 3))),  #
     work = (rep(c((1069000) / work_force, 0), c(13, 3))), #

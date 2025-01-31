@@ -20,10 +20,10 @@
 #'     functionality to handle this loading (including cloning of the module and passing of the new module to
 #'     already-loaded modules)
 #' @examples
-#'   # Normally, you would not want to create this module directly, but it is possible.
-#'   base_module <- DiseasyBaseModule$new()
+#' # Normally, you would not want to create this module directly, but it is possible.
+#' base_module <- DiseasyBaseModule$new()
 #'
-#'   rm(base_module)
+#' rm(base_module)
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
@@ -168,8 +168,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
         # Iteratively map the public environment to hashes
         hash_list <-  public_env |>
           purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-          purrr::map_if(checkmate::test_function,        # For functions, we hash their attributes
-                        ~ digest::digest(attributes(.)))
+          purrr::map_if(
+            checkmate::test_function, # For functions, we hash their attributes
+            ~ digest::digest(attributes(.))
+          )
 
         # Add the class name to "salt" the hashes
         hash_list <- c(purrr::discard(hash_list, is.null), class = class(self)[1]) |>
@@ -307,9 +309,11 @@ DiseasyBaseModule <- R6::R6Class(                                               
         purrr::map_if(checkmate::test_formula, as.character)    # formulas are converted to character before hashing
 
       # Find all relevant hashes
-      hash_list <- c(module_hash = self$hash, # Hash of the module (state of public fields)
-                     purrr::map_chr(function_environment, digest::digest), # hash everything in the function environment
-                     class = class(self)[1]) # And add the module name to the hash
+      hash_list <- c(
+        module_hash = self$hash, # Hash of the module (state of public fields)
+        purrr::map_chr(function_environment, digest::digest), # hash everything in the function environment
+        class = class(self)[1] # And add the module name to the hash
+      )
 
       # Reduce to single hash and return
       hash <- digest::digest(hash_list[order(names(hash_list))])
@@ -347,8 +351,9 @@ DiseasyBaseModule <- R6::R6Class(                                               
       if (is.null(stratification)) {
         stratification_chr <- NA_character_
       } else {
-        stratification_chr <- purrr::imap(purrr::map(stratification, dplyr::as_label),
-                                          ~ ifelse(.y == "", .x, glue::glue_collapse(c(.y, .x), sep = " = "))) |>
+        stratification_chr <- stratification |>
+          purrr::map(dplyr::as_label) |>
+          purrr::imap(~ ifelse(.y == "", .x, glue::glue_collapse(c(.y, .x), sep = " = "))) |>
           toString()
       }
       return(stratification_chr)

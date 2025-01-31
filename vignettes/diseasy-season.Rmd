@@ -40,20 +40,30 @@ s$describe()
 Once a season model is set, interfacing with the model happens through the `$model_t()` and `$model_date()` methods.
 ```{r plot_constant_season_t, fig.alt = "Example plot of $model_t() with the constant_season model."}
 t <- 0:365
-plot(t, purrr::map_dbl(t, s$model_t),
-     type = "l", lwd = 2,
-     xlab = "Days past reference date",
-     ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
+plot(
+  x = t,
+  y = purrr::map_dbl(t, s$model_t),
+  type = "l", lwd = 2,
+  xlab = "Days past reference date",
+  ylab = "Relative effect of season",
+  ylim = c(0, 1.25),
+  xaxs = "i",
+  yaxs = "i"
+)
 ```
 
 ```{r plot_constant_season_date, fig.alt = "Example plot of $model_date() with the constant_season model."}
 d <- s$reference_date + 0:365
-plot(d, purrr::map_dbl(d, s$model_date),
-     type = "l", lwd = 2,
-     xlab = "",
-     ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
+plot(
+  x = d,
+  y = purrr::map_dbl(d, s$model_date),
+  type = "l", lwd = 2,
+  xlab = "",
+  ylab = "Relative effect of season",
+  ylim = c(0, 1.25),
+  xaxs = "i",
+  yaxs = "i"
+)
 ```
 
 To use the other models for season, the module provides functions of the form `$use_*_season()`.
@@ -65,11 +75,16 @@ s$use_cosine_season()
 Once re-configured the models stored in `$model_t` and `$model_date` change to the new model:
 ```{r plot_cosine_season_date, fig.alt = "Example plot of $model_t() with the cosine_season model."}
 d <- s$reference_date + 0:365
-plot(d, purrr::map_dbl(d, s$model_date),
-     type = "l", lwd = 2,
-     xlab = "",
-     ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
+plot(
+  x = d,
+  y = purrr::map_dbl(d, s$model_date),
+  type = "l", lwd = 2,
+  xlab = "",
+  ylab = "Relative effect of season",
+  ylim = c(0, 1.25),
+  xaxs = "i",
+  yaxs = "i"
+)
 ```
 
 Note that all models, other than `constant_season` has a `scale` parameter.
@@ -80,11 +95,16 @@ For example, if `scale = 0.25`, the effect of season should never drop below 25%
 s$set_scale(0.25)
 
 d <- s$reference_date + 0:365
-plot(d, purrr::map_dbl(d, s$model_date),
-     type = "l", lwd = 2,
-     xlab = "",
-     ylab = "Relative effect of season",
-     ylim = c(0, 1.25), xaxs = "i", yaxs = "i")
+plot(
+  x = d,
+  y = purrr::map_dbl(d, s$model_date),
+  type = "l", lwd = 2,
+  xlab = "",
+  ylab = "Relative effect of season",
+  ylim = c(0, 1.25),
+  xaxs = "i",
+  yaxs = "i"
+)
 ```
 
 The models may have additional parameters that control their shape. See the documentation of the module to learn more about the specific models.

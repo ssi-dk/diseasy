@@ -258,7 +258,7 @@ ggplot2::ggplot(model_data) +
     ),
     linewidth = 1
   ) +
-  ggplot2::facet_wrap(~ age_group) +
+  ggplot2::facet_wrap(~age_group) +
   ggplot2::ylab("Test positive / Infected") +
   ggplot2::scale_color_manual(
     values = c(
@@ -350,7 +350,7 @@ poly_fit_projection <- poly_fit_data |>
         data = dplyr::filter(
           .x,
           .data$t <= 0,
-          .data$t >= - m$parameters$incidence_polynomial_training_length
+          .data$t >= -m$parameters$incidence_polynomial_training_length
         )
       )
 
@@ -366,33 +366,33 @@ poly_fit_projection <- poly_fit_data |>
 incidence_data |>
   dplyr::filter(source == !!source) |>
   ggplot2::ggplot(ggplot2::aes(x = date, y = incidence)) +
-    ggplot2::geom_point(
-      color = switch(
-        source,
-        "n_infected"        = "orange",
-        "n_positive_simple" = "deepskyblue3",
-        "n_positive"        = "seagreen"
-      )
-    ) +
-    ggplot2::geom_line(data = poly_fit_projection, color = "red", linewidth = 1) +
-    ggplot2::geom_vline(
-      xintercept = obs$last_queryable_date,
-      linetype = 2, linewidth = 1, color = "red"
-    ) +
-    ggplot2::geom_vline(
-      xintercept = obs$last_queryable_date -
-        m$parameters$incidence_polynomial_training_length,
-      linetype = 2, linewidth = 1, color = "red"
-    ) +
-    ggplot2::ylim(
-      0,
-      incidence_data |>
-        dplyr::filter(source == !!source) |>
-        dplyr::pull("incidence") |>
-        max() * 1.1
-    ) +
-    ggplot2::facet_wrap(~ age_group) +
-    ggplot2::theme_bw()
+  ggplot2::geom_point(
+    color = switch(
+      source,
+      "n_infected"        = "orange",
+      "n_positive_simple" = "deepskyblue3",
+      "n_positive"        = "seagreen"
+    )
+  ) +
+  ggplot2::geom_line(data = poly_fit_projection, color = "red", linewidth = 1) +
+  ggplot2::geom_vline(
+    xintercept = obs$last_queryable_date,
+    linetype = 2, linewidth = 1, color = "red"
+  ) +
+  ggplot2::geom_vline(
+    xintercept = obs$last_queryable_date -
+      m$parameters$incidence_polynomial_training_length,
+    linetype = 2, linewidth = 1, color = "red"
+  ) +
+  ggplot2::ylim(
+    0,
+    incidence_data |>
+      dplyr::filter(source == !!source) |>
+      dplyr::pull("incidence") |>
+      max() * 1.1
+  ) +
+  ggplot2::facet_wrap(~age_group) +
+  ggplot2::theme_bw()
 ```
 
 We can now use the `?DiseasyModelOdeSeir$initialise_state_vector()` method to infer the initial state vector.
@@ -408,11 +408,11 @@ psi
 And we now test the initial conditions by solving the model using these starting conditions.
 ```{r}
 get_prediction <- function(
-    model,
-    psi,
-    reporting_percentage = 1,
-    signal = "incidence"
-  ) {
+  model,
+  psi,
+  reporting_percentage = 1,
+  signal = "incidence"
+) {
 
   # Integrate the ODE system with deSolve
   sol <- deSolve::ode(
@@ -446,9 +446,9 @@ get_prediction <- function(
       dplyr::mutate(
         "date" = .data$time + model$observables$last_queryable_date,
         "n_model" = model$disease_progression_rates[["I"]] *
-            model$compartment_structure[["I"]] *
-            .data$value * reporting_percentage *
-            sum(model$activity$contact_basis$population)
+          model$compartment_structure[["I"]] *
+          .data$value * reporting_percentage *
+          sum(model$activity$contact_basis$population)
       )
   } else if (signal == "prevalence") {
     out <- sol_long |>
@@ -570,7 +570,6 @@ ggplot2::ggplot() +
 
 #### Misspecified model in periods of decreasing infections
 ```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing."}
-
 models <- list(
   generate_model(2, 1, 1),
   generate_model(1, 1, 1),

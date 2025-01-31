@@ -31,12 +31,18 @@ test_that("$set_reference_date() works", {
   expect_identical(s$reference_date, as.Date("2022-01-01"))
 
   # Testing malformed inputs
-  expect_error(s$set_reference_date("2022-01-02"),
-               class = "simpleError", regexp = "Must be of class 'Date'")
+  expect_error(
+    s$set_reference_date("2022-01-02"),
+    class = "simpleError",
+    regexp = "Must be of class 'Date'"
+  )
   expect_identical(s$reference_date, as.Date("2022-01-01"))
 
-  expect_error(s$set_reference_date(as.Date(NA)),
-               class = "simpleError", regexp = "Contains missing values")
+  expect_error(
+    s$set_reference_date(as.Date(NA)),
+    class = "simpleError",
+    regexp = "Contains missing values"
+  )
   expect_identical(s$reference_date, as.Date("2022-01-01"))
   rm(s)
 
@@ -187,13 +193,17 @@ test_that("$use_covid_season_v2() works", {
   for (case_def in case_defs) {
 
     # We create an DiseasyObservables module for the season module
-    observables <- DiseasyObservables$new(diseasystore = case_def,
-                                          start_date = as.Date("2022-01-01"),
-                                          end_date = as.Date("2022-01-15"))
+    observables <- DiseasyObservables$new(
+      diseasystore = case_def,
+      start_date = as.Date("2022-01-01"),
+      end_date = as.Date("2022-01-15")
+    )
 
     # Creating an empty module
-    s <- DiseasySeason$new(reference_date = as.Date("2022-01-01"),
-                           observables = observables)
+    s <- DiseasySeason$new(
+      reference_date = as.Date("2022-01-01"),
+      observables = observables
+    )
 
     # Default scale
     models <- s$get_covid_season_v2()
@@ -329,8 +339,10 @@ test_that("active binding: reference_date works", {
 
   # Try to set the reference_date
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$reference_date <- Sys.Date(), error = \(e) e),                                            # nolint: implicit_assignment_linter
-                   simpleError("`$reference_date` is read only"))
+  expect_identical(
+    tryCatch(s$reference_date <- Sys.Date(), error = \(e) e),                                            # nolint: implicit_assignment_linter
+    simpleError("`$reference_date` is read only")
+  )
   expect_null(s %.% reference_date)
 
   rm(s)
@@ -345,8 +357,10 @@ test_that("active binding: model_t works", {
 
   # Try to set the model_t
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$model_t <- \(t) t, error = \(e) e),                                                       # nolint: implicit_assignment_linter
-                   simpleError("`$model_t` is read only"))
+  expect_identical(
+    tryCatch(s$model_t <- \(t) t, error = \(e) e),                                                       # nolint: implicit_assignment_linter
+    simpleError("`$model_t` is read only")
+  )
   expect_equal(s$model_t, s$get_season_model("constant_season")$model_t)                                                # nolint: expect_identical_linter. Functions have different environments
 
   rm(s)
@@ -361,8 +375,10 @@ test_that("active binding: model_date works", {
 
   # Try to set the model_date
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$model_date <- \(date) date, error = \(e) e),                                              # nolint: implicit_assignment_linter
-                   simpleError("`$model_date` is read only"))
+  expect_identical(
+    tryCatch(s$model_date <- \(date) date, error = \(e) e),                                              # nolint: implicit_assignment_linter
+    simpleError("`$model_date` is read only")
+  )
   expect_equal(s$model_date, s$get_season_model("constant_season")$model_date)                                          # nolint: expect_identical_linter. Functions have different environments
 
   rm(s)
@@ -379,8 +395,10 @@ test_that("active binding: available_season_models works", {
 
   # Try to set the available_season_models
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(s$available_season_models <- "unknown_season_model", error = \(e) e),                       # nolint: implicit_assignment_linter
-                   simpleError("`$available_season_models` is read only"))
+  expect_identical(
+    tryCatch(s$available_season_models <- "unknown_season_model", error = \(e) e),                       # nolint: implicit_assignment_linter
+    simpleError("`$available_season_models` is read only")
+  )
   expect_identical(s$available_season_models, expected_season_models)
 
   rm(s)

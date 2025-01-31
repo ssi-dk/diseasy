@@ -22,31 +22,33 @@
 #'
 #'   See vignette("diseasy-activity") for examples of use.
 #' @examples
-#'   # Activity module with Danish reference scenario
-#'   act <- DiseasyActivity$new(base_scenario = "dk_reference",
-#'                              activity_units = dk_activity_units,
-#'                              contact_basis = contact_basis %.% DK)
+#' # Activity module with Danish reference scenario
+#' act <- DiseasyActivity$new(base_scenario = "dk_reference",
+#'   activity_units = dk_activity_units,
+#'   contact_basis = contact_basis %.% DK
+#' )
 #'
-#'   # Get contact matrices
-#'   contact_matrices <- act$get_scenario_activities()
+#' # Get contact matrices
+#' contact_matrices <- act$get_scenario_activities()
 #'
 #'
-#'   # Configuring a custom scenario in another country (using Danish activity units)
-#'   scenario <- data.frame(date = as.Date(character(0)),
-#'                          opening = character(0),
-#'                          closing = character(0)) |>
-#'     dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",      closing = NA) |>
-#'     dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,              closing = "baseline") |>
-#'     dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020", closing = NA)
+#' # Configuring a custom scenario in another country (using Danish activity units)
+#' scenario <- data.frame(date = as.Date(character(0)),
+#'   opening = character(0),
+#'   closing = character(0)
+#' ) |>
+#'   dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",      closing = NA) |>
+#'   dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,              closing = "baseline") |>
+#'   dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020", closing = NA)
 #'
-#'   act$set_contact_basis(contact_basis %.% GB) # Use the "Great Britain" contact_basis
-#'   act$set_activity_units(dk_activity_units)
-#'   act$change_activity(scenario)
+#' act$set_contact_basis(contact_basis %.% GB) # Use the "Great Britain" contact_basis
+#' act$set_activity_units(dk_activity_units)
+#' act$change_activity(scenario)
 #'
-#'   # Get societal "openness"
-#'   openness <- act$get_scenario_openness()
+#' # Get societal "openness"
+#' openness <- act$get_scenario_openness()
 #'
-#'   rm(act)
+#' rm(act)
 #' @return
 #'   A new instance of the `DiseasyActivity` [R6][R6::R6Class] class.
 #' @importFrom Matrix sparseMatrix
@@ -83,7 +85,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       private$upper_activity_level <- as.numeric(private$direction == "opening")
 
       if (!is.null(activity_units)) self$set_activity_units(activity_units = activity_units)
-      if (!is.null(contact_basis))  self$set_contact_basis(contact_basis = contact_basis)
+      if (!is.null(contact_basis)) self$set_contact_basis(contact_basis = contact_basis)
 
       lgr::without_logging(self$reset_scenario()) # Configure internal matrices to activity_unit dimensions
 
@@ -130,12 +132,14 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Checking if all activity units contains "home", "work", "school" and "other":
       purrr::walk2(activity_units, names(activity_units),
-                   ~ {
-                     if (!all(private$activity_types %in% names(.x))) {
-                       coll$push(glue::glue("Activity unit {.y} does not contain matrices for:",
-                                            "{setdiff(private$activity_types, names(.x))}"))
-                     }
-                   })
+        ~ {
+          if (!all(private$activity_types %in% names(.x))) {
+            coll$push(glue::glue("Activity unit {.y} does not contain matrices for:",
+              "{setdiff(private$activity_types, names(.x))}"
+            ))
+          }
+        }
+      )
 
       # - Check for consistency of the number of age groups in the activity_units
       # Find all implied n_age_groups larger than 1
@@ -180,9 +184,11 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Check structure of contact_basis
       checkmate::assert_list(contact_basis, add = coll)
-      checkmate::assert_set_equal(names(contact_basis),
-                                  c("contacts", "population", "proportion", "demography", "description"),
-                                  add = coll)
+      checkmate::assert_set_equal(
+        names(contact_basis),
+        c("contacts", "population", "proportion", "demography", "description"),
+        add = coll
+      )
 
       # Checks on contact_basis contacts
       checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
@@ -210,18 +216,29 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_numeric(purrr::pluck(contact_basis, "population"), len = n_age_groups, lower = 0, add = coll)
 
       # Checks on contact_basis proportion
-      checkmate::assert_numeric(purrr::pluck(contact_basis, "proportion"), len = n_age_groups, lower = 0, upper = 1,
-                                add = coll)
+      checkmate::assert_numeric(
+        purrr::pluck(contact_basis, "proportion"), len = n_age_groups, lower = 0, upper = 1,
+        add = coll
+      )
 
       # Checks on contact_basis demography
       checkmate::assert_data_frame(purrr::pluck(contact_basis, "demography"), add = coll)
-      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "demography")),
-                                  c("age", "population", "proportion"), add = coll)
+      checkmate::assert_set_equal(
+        names(purrr::pluck(contact_basis, "demography")),
+        c("age", "population", "proportion"), add = coll
+      )
 
       # Check for dimension mismatch
-      checkmate::assert_number(unique(c(nrow(purrr::pluck(contact_basis, "contacts", 1)),
-                                        ncol(purrr::pluck(contact_basis, "contacts", 1)),
-                                        length(purrr::pluck(contact_basis, "proportion")))), add = coll)
+      checkmate::assert_number(
+        unique(
+          c(
+            nrow(purrr::pluck(contact_basis, "contacts", 1)),
+            ncol(purrr::pluck(contact_basis, "contacts", 1)),
+            length(purrr::pluck(contact_basis, "proportion"))
+          )
+        ),
+        add = coll
+      )
 
       # End checks
       checkmate::reportAssertions(coll)
@@ -272,10 +289,16 @@ DiseasyActivity <- R6::R6Class(                                                 
       input_dates <- as.character(input_dates)
 
       # Create new scenario matrix (including additional columns if needed)
-      new_scenario_matrix <- private$update_with_dates(input_matrix = private$.scenario_matrix,
-                                                       input_dates = input_dates, first_col_value = 0)
-      new_risk_matrix <- private$update_with_dates(input_matrix = private$.risk_matrix,
-                                                   input_dates = input_dates, first_col_value = 1)
+      new_scenario_matrix <- private$update_with_dates(
+        input_matrix = private$.scenario_matrix,
+        input_dates = input_dates,
+        first_col_value = 0
+      )
+      new_risk_matrix <- private$update_with_dates(
+        input_matrix = private$.risk_matrix,
+        input_dates = input_dates,
+        first_col_value = 1
+      )
 
       # Now the 'scenario_matrix' has the right size
 
@@ -376,10 +399,16 @@ DiseasyActivity <- R6::R6Class(                                                 
       input_dates <- as.character(input_dates)
 
       # Create new scenario matrix (including additional columns if needed)
-      new_scenario_matrix <- private$update_with_dates(input_matrix = private$.scenario_matrix,
-                                                       input_dates = input_dates, first_col_value = 0)
-      new_risk_matrix     <- private$update_with_dates(input_matrix = private$.risk_matrix,
-                                                       input_dates = input_dates, first_col_value = 1)
+      new_scenario_matrix <- private$update_with_dates(
+        input_matrix = private$.scenario_matrix,
+        input_dates = input_dates,
+        first_col_value = 0
+      )
+      new_risk_matrix <- private$update_with_dates(
+        input_matrix = private$.risk_matrix,
+        input_dates = input_dates,
+        first_col_value = 1
+      )
 
       # Updating with input changes of activities
       # One date at a time - in chronological order
@@ -415,12 +444,12 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (!is.null(first_date) && any(as.Date(colnames(private$.scenario_matrix)) < first_date)) {
         col_id <- max(which(as.Date(colnames(private$.scenario_matrix)) <= first_date)) # First column to keep
         colnames(private$.scenario_matrix)[col_id] <- as.character(first_date)
-        private$.scenario_matrix <- private$.scenario_matrix[, col_id : ncol(private$.scenario_matrix)]
+        private$.scenario_matrix <- private$.scenario_matrix[, col_id:ncol(private$.scenario_matrix)]
       }
 
       if (!is.null(last_date) && any(as.Date(colnames(private$.scenario_matrix)) > last_date)) {
         col_id <- min(which(as.Date(colnames(private$.scenario_matrix)) > last_date)) # First column to delete
-        private$.scenario_matrix <- private$.scenario_matrix[, 1 : (col_id - 1)]
+        private$.scenario_matrix <- private$.scenario_matrix[, 1:(col_id - 1)]
       }
     },
 
@@ -536,8 +565,14 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, unique = TRUE, add = coll)
+      checkmate::assert_numeric(
+        age_cuts_lower,
+        any.missing = FALSE,
+        null.ok = TRUE,
+        lower = 0,
+        unique = TRUE,
+        add = coll
+      )
       checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -644,8 +679,14 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, unique = TRUE, add = coll)
+      checkmate::assert_numeric(
+        age_cuts_lower,
+        any.missing = FALSE,
+        null.ok = TRUE,
+        lower = 0,
+        unique = TRUE,
+        add = coll
+      )
       checkmate::assert_character(names(self$contact_basis$proportion), add = coll)
       checkmate::reportAssertions(coll)
 
@@ -702,12 +743,22 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   NOTE: Called automatically when setting/changing activity units.
     #' @return `r rd_side_effects`
     reset_scenario = function() {
-      private$.scenario_matrix <- matrix(0, nrow = length(private$activity_units_labels), ncol = 0,
-                                         dimnames = list(private$activity_units_labels, NULL))
-      private$.risk_matrix <-     matrix(0, nrow = length(private$activity_types), ncol = 0,
-                                         dimnames = list(private$activity_types, NULL))
-      private$lg$info("`$scenario_matrix` and `$risk_matrix` reset to zero columns. ",
-                      "This means that you have to recreate scenarios.")
+      private$.scenario_matrix <- matrix(
+        0,
+        nrow = length(private$activity_units_labels),
+        ncol = 0,
+        dimnames = list(private$activity_units_labels, NULL)
+      )
+      private$.risk_matrix <- matrix(
+        0,
+        nrow = length(private$activity_types),
+        ncol = 0,
+        dimnames = list(private$activity_types, NULL)
+      )
+      private$lg$info(
+        "`$scenario_matrix` and `$risk_matrix` reset to zero columns. ",
+        "This means that you have to recreate scenarios."
+      )
     },
 
     #' @description `r rd_describe`
@@ -727,7 +778,6 @@ DiseasyActivity <- R6::R6Class(                                                 
         printr("Contact basis: ", self$contact_basis$description, max_width = 100)
       }
     }
-
   ),
 
   active = list(
@@ -885,10 +935,12 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Inserting columns with NA elements for the new dates to add
         out <- cbind(out,
-                     matrix(NA,
-                            nrow = nrow(input_matrix),
-                            ncol = length(new_dates),
-                            dimnames = list(rownames(input_matrix), new_dates)))
+          matrix(NA,
+            nrow = nrow(input_matrix),
+            ncol = length(new_dates),
+            dimnames = list(rownames(input_matrix), new_dates)
+          )
+        )
 
         # Reordering columns to chronological order
         out <- out[, order(colnames(out)), drop = FALSE] # Force R to maintain the data type when reordering...
@@ -898,8 +950,11 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Loop over indices and update the matrix
         for (dd in to_update) {
-          if (dd == 1) out[, dd] <- first_col_value # Insert first_col_value left
-          else         out[, dd] <- out[, dd - 1] # Use state from previous date
+          if (dd == 1) {
+            out[, dd] <- first_col_value # Insert first_col_value left
+          } else {
+            out[, dd] <- out[, dd - 1] # Use state from previous date
+          }
         }
       }
       return(out)
@@ -917,7 +972,9 @@ DiseasyActivity <- R6::R6Class(                                                 
     #   Vector to transform.
     vector_to_matrix = function(vector) {
       n <- length(vector)
-      if (n == 1) return(vector)
+      if (n == 1) {
+        return(vector)
+      }
       h <- diag(vector)
       for (i in 1:n) {
         h[i, (1:i)] <- h[(1:i), i] <- vector[i]
@@ -941,9 +998,11 @@ DiseasyActivity <- R6::R6Class(                                                 
       population <- self$map_population(age_cuts_lower)
 
       # Calculating transformation matrix
-      tt <- merge(aggregate(proportion ~ age_group_ref + age_group_out, data = population, FUN = sum),
-                  aggregate(proportion ~ age_group_ref,                 data = population, FUN = sum),
-                  by = "age_group_ref")
+      tt <- merge(
+        aggregate(proportion ~ age_group_ref + age_group_out, data = population, FUN = sum),
+        aggregate(proportion ~ age_group_ref,                 data = population, FUN = sum),
+        by = "age_group_ref"
+      )
       tt$proportion <- tt$proportion.x / tt$proportion.y
       p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = proportion)))
 

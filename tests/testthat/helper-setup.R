@@ -65,8 +65,11 @@ get_test_conns <- function(skip_backends = NULL) {
 
 
   get_driver <- function(x = character(), ...) {                                                                        # nolint: object_usage_linter
-    if (!grepl(".*::.*", x)) stop("Package must be specified with namespace (e.g. RSQLite::SQLite)!\n",
-                                  "Received: ", x)
+    if (!grepl(".*::.*", x)) {
+      stop("Package must be specified with namespace (e.g. RSQLite::SQLite)!\n",
+        "Received: ", x
+      )
+    }
     parts <- strsplit(x, "::", fixed = TRUE)[[1]]
 
     # Skip unavailable packages

@@ -8,24 +8,24 @@
 #'
 #'   See vignette("diseasy-observables")
 #' @examplesIf rlang::is_installed("duckdb")
-#'   # Create observables module using the Simulist data
-#'   obs <- DiseasyObservables$new(
-#'     diseasystore = "Simulist",
-#'     conn = DBI::dbConnect(duckdb::duckdb())
-#'   )
+#' # Create observables module using the Simulist data
+#' obs <- DiseasyObservables$new(
+#'   diseasystore = "Simulist",
+#'   conn = DBI::dbConnect(duckdb::duckdb())
+#' )
 #'
-#'   # See available observables
-#'   print(obs$available_observables)
-#'   print(obs$available_stratifications)
+#' # See available observables
+#' print(obs$available_observables)
+#' print(obs$available_stratifications)
 #'
-#'   # Get data for one observable
-#'   obs$get_observation(
-#'     "n_hospital",
-#'     start_date = as.Date("2020-03-01"),
-#'     end_date = as.Date("2020-03-05")
-#'   )
+#' # Get data for one observable
+#' obs$get_observation(
+#'   "n_hospital",
+#'   start_date = as.Date("2020-03-01"),
+#'   end_date = as.Date("2020-03-05")
+#' )
 #'
-#'   rm(obs)
+#' rm(obs)
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @keywords functional-module
@@ -70,11 +70,18 @@ DiseasyObservables <- R6::R6Class(                                              
       checkmate::assert_class(self %.% conn, "DBIConnection")
 
       # Initialize based on input
-      if (!is.null(slice_ts))                         self$set_slice_ts(slice_ts)
-      if (!is.null(diseasystore))                     self$set_diseasystore(diseasystore)
-      if (!is.null(last_queryable_date))              self$set_last_queryable_date(last_queryable_date)
-      if (!is.null(start_date) || !is.null(end_date)) self$set_study_period(start_date, end_date)
-
+      if (!is.null(slice_ts)) {
+        self$set_slice_ts(slice_ts)
+      }
+      if (!is.null(diseasystore)) {
+        self$set_diseasystore(diseasystore)
+      }
+      if (!is.null(last_queryable_date)) {
+        self$set_last_queryable_date(last_queryable_date)
+      }
+      if (!is.null(start_date) || !is.null(end_date)) {
+        self$set_study_period(start_date, end_date)
+      }
     },
 
 
@@ -135,10 +142,18 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @param end_date `r rd_end_date()`
     set_study_period = function(start_date, end_date) {
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_date(start_date, any.missing = FALSE,
-                             upper = max(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
-      checkmate::assert_date(end_date,   any.missing = FALSE,
-                             upper = max(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
+      checkmate::assert_date(
+        start_date,
+        any.missing = FALSE,
+        upper = max(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
+      checkmate::assert_date(
+        end_date,
+        any.missing = FALSE,
+        upper = max(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
       checkmate::reportAssertions(coll)
       private$.start_date      <- start_date
       private$.end_date        <- end_date
@@ -175,9 +190,12 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   If the observable is found, the function returns the corresponding data at the stratification level.\cr
     #'   Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
     #' @seealso [SCDB::get_table]
-    get_observation = function(observable, stratification = NULL,
-                               start_date = self %.% start_date,
-                               end_date   = self %.% end_date) {
+    get_observation = function(
+      observable,
+      stratification = NULL,
+      start_date = self %.% start_date,
+      end_date   = self %.% end_date
+    ) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -189,10 +207,18 @@ DiseasyObservables <- R6::R6Class(                                              
         coll$push("start_date/end_date not set. call `$set_study_period()` before getting observations")
         coll$push("Alternatively, specify dates manually in the call")
       }
-      checkmate::assert_date(start_date, any.missing = FALSE,
-                             upper = max(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
-      checkmate::assert_date(end_date, any.missing = FALSE,
-                             upper = min(self$last_queryable_date, as.Date(self$slice_ts)), add = coll)
+      checkmate::assert_date(
+        start_date,
+        any.missing = FALSE,
+        upper = max(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
+      checkmate::assert_date(
+        end_date,
+        any.missing = FALSE,
+        upper = min(self$last_queryable_date, as.Date(self$slice_ts)),
+        add = coll
+      )
       checkmate::reportAssertions(coll)
 
       # Look in the cache for data
@@ -200,20 +226,23 @@ DiseasyObservables <- R6::R6Class(                                              
       if (!private$is_cached(hash)) {
 
         # Join observable features with the stratification features
-        data <- self$ds$key_join_features(observable = observable,
-                                          stratification = stratification,
-                                          start_date = start_date,
-                                          end_date = end_date)
+        data <- self$ds$key_join_features(
+          observable = observable,
+          stratification = stratification,
+          start_date = start_date,
+          end_date = end_date
+        )
 
         # Store in cache
         private$cache(hash, data)
       }
 
       # Write to the log
-      private$lg$info("Gettting {observable} from {start_date} to {end_date}",
-                      ifelse(is.null(stratification), "",
-                             " at stratification: {private$stratification_to_string(stratification)}"),
-                      " (hash: {hash})")
+      private$lg$info(
+        "Gettting {observable} from {start_date} to {end_date}",
+        switch(!is.null(stratification), " at stratification: {private$stratification_to_string(stratification)}"),
+        " (hash: {hash})"
+      )
 
       # Return
       return(private$cache(hash))
@@ -313,7 +342,9 @@ DiseasyObservables <- R6::R6Class(                                              
       .f = active_binding,
       name = "available_observables",
       expr = {
-        if (is.null(private %.% .ds)) return(NULL)
+        if (is.null(private %.% .ds)) {
+          return(NULL)
+        }
         return(purrr::keep(private %.% .ds %.% available_features, ~ startsWith(., "n_") | endsWith(., "_temp")))
       }
     ),
@@ -325,7 +356,9 @@ DiseasyObservables <- R6::R6Class(                                              
       .f = active_binding,
       name = "available_stratifications",
       expr = {
-        if (is.null(private %.% .ds)) return(NULL)
+        if (is.null(private %.% .ds)) {
+          return(NULL)
+        }
         return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
       }
     ),

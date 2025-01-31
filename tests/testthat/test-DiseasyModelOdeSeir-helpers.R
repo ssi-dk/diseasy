@@ -171,7 +171,7 @@ test_that("helpers works (SIR double variant / double age group)", {
   expect_identical(
     private %.% immunity_matrix,
     matrix(
-      c(#v1 v2
+      c(# v1 v2
         fr, fr, # R, Age group 1, Variant 1
         fr, fr, # R, Age group 2, Variant 1
         fr, fr, # R, Age group 1, Variant 2
@@ -357,7 +357,7 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
   expect_identical(
     private %.% immunity_matrix,
     matrix(
-      c(#v1 v2
+      c(# v1 v2
         fr[1], fr[1], # R1, Variant 1
         fr[2], fr[2], # R2, Variant 1
         fr[1], fr[1], # R1, Variant 2
@@ -435,7 +435,7 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   expect_identical(
     private %.% immunity_matrix,
     matrix(
-      c(#v1 v2
+      c(# v1 v2
         fr[1], fr[1], # R1, Age group 1, Variant 1
         fr[2], fr[2], # R2, Age group 1, Variant 1
         fr[1], fr[1], # R1, Age group 2, Variant 1

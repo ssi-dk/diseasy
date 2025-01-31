@@ -139,7 +139,7 @@ test_that("$load_module() works", {
   rm(m)
 
 
-  #.. and the other way around
+  # .. and the other way around
   m <- DiseasyModel$new(observables = TRUE)
   checkmate::expect_class(m %.% observables, "DiseasyObservables")
   expect_null(m %.% season)
@@ -273,9 +273,11 @@ test_that("cloning works", {
 
 
   # Create instance of the DiseasyModel with the modules
-  m <- DiseasyModel$new(activity = act,
-                        season = s,
-                        observables = obs)
+  m <- DiseasyModel$new(
+    activity = act,
+    season = s,
+    observables = obs
+  )
   hash_loaded <- m$hash
 
 
@@ -346,9 +348,11 @@ test_that("$get_results() gives error", {
   m <- DiseasyModel$new()
 
   # Test the get_results
-  expect_error(m$get_results(),
-               class = "simpleError",
-               regex = "`DiseasyModel` should not be used directly")
+  expect_error(
+    m$get_results(),
+    class = "simpleError",
+    regex = "`DiseasyModel` should not be used directly"
+  )
 
   rm(m)
 })
@@ -471,8 +475,10 @@ test_that("active binding: activity works", {
 
   # Try to set activity through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$activity <- DiseasyActivity$new(), error = \(e) e),                                       # nolint: implicit_assignment_linter
-                   simpleError("`$activity` is read only"))
+  expect_identical(
+    tryCatch(m$activity <- DiseasyActivity$new(), error = \(e) e),                                       # nolint: implicit_assignment_linter
+    simpleError("`$activity` is read only")
+  )
   expect_null(m %.% activity)
 
   rm(m)
@@ -490,8 +496,10 @@ test_that("active binding: observables works", {
 
   # Try to set observables through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$observables <- DiseasyObservables$new(), error = \(e) e),                                 # nolint: implicit_assignment_linter
-                   simpleError("`$observables` is read only"))
+  expect_identical(
+    tryCatch(m$observables <- DiseasyObservables$new(), error = \(e) e),                                 # nolint: implicit_assignment_linter
+    simpleError("`$observables` is read only")
+  )
   expect_null(m %.% observables)
 
   rm(m)
@@ -508,8 +516,10 @@ test_that("active binding: season works", {
 
   # Try to set season through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$season <- DiseasySeason$new(), error = \(e) e),                                           # nolint: implicit_assignment_linter
-                   simpleError("`$season` is read only"))
+  expect_identical(
+    tryCatch(m$season <- DiseasySeason$new(), error = \(e) e),                                           # nolint: implicit_assignment_linter
+    simpleError("`$season` is read only")
+  )
   expect_null(m %.% season)
 
   rm(m)
@@ -526,8 +536,10 @@ test_that("active binding: variant works", {
 
   # Try to set variant through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$variant <- DiseasyVariant$new(), error = \(e) e),                                         # nolint: implicit_assignment_linter
-                   simpleError("`$variant` is read only"))
+  expect_identical(
+    tryCatch(m$variant <- DiseasyVariant$new(), error = \(e) e),                                         # nolint: implicit_assignment_linter
+    simpleError("`$variant` is read only")
+  )
   expect_null(m %.% variant)
 
   rm(m)
@@ -544,8 +556,10 @@ test_that("active binding: parameters works", {
 
   # Try to set parameters through the binding
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$parameters <- c("test" = 2), error = \(e) e),                                             # nolint: implicit_assignment_linter
-                   simpleError("`$parameters` is read only"))
+  expect_identical(
+    tryCatch(m$parameters <- c("test" = 2), error = \(e) e),                                             # nolint: implicit_assignment_linter
+    simpleError("`$parameters` is read only")
+  )
   checkmate::expect_list(m %.% parameters)
 
   rm(m)
@@ -645,14 +659,20 @@ test_that("active binding: training_period, testing_period and validation_period
   # test_that cannot capture this error, so we have to hack it
   m <- DiseasyModel$new()
 
-  expect_identical(tryCatch(m$training_period <- c("start" = Sys.Date()), error = \(e) e),                              # nolint: implicit_assignment_linter
-                   simpleError("`$training_period` is read only"))
+  expect_identical(
+    tryCatch(m$training_period <- c("start" = Sys.Date()), error = \(e) e),                              # nolint: implicit_assignment_linter
+    simpleError("`$training_period` is read only")
+  )
 
-  expect_identical(tryCatch(m$testing_period <- c("start" = Sys.Date()), error = \(e) e),                               # nolint: implicit_assignment_linter
-                   simpleError("`$testing_period` is read only"))
+  expect_identical(
+    tryCatch(m$testing_period <- c("start" = Sys.Date()), error = \(e) e),                               # nolint: implicit_assignment_linter
+    simpleError("`$testing_period` is read only")
+  )
 
-  expect_identical(tryCatch(m$validation_period <- c("start" = Sys.Date()), error = \(e) e),                            # nolint: implicit_assignment_linter
-                   simpleError("`$validation_period` is read only"))
+  expect_identical(
+    tryCatch(m$validation_period <- c("start" = Sys.Date()), error = \(e) e),                            # nolint: implicit_assignment_linter
+    simpleError("`$validation_period` is read only")
+  )
 
   rm(m)
 })

@@ -11,18 +11,18 @@
 #'
 #'   See the vignette("diseasy-season") for examples of use.
 #' @examples
-#'   # Season module with an constant season
-#'   s1 <- DiseasySeason$new()
+#' # Season module with an constant season
+#' s1 <- DiseasySeason$new()
 #'
-#'   t <- 0:365
-#'   plot(t, purrr::map_dbl(t, s1$model_t), ylab = "Effect")
+#' t <- 0:365
+#' plot(t, purrr::map_dbl(t, s1$model_t), ylab = "Effect")
 #'
-#'   # Season module with an cosine season
-#'   s2 <- DiseasySeason$new(reference_date = Sys.Date())
-#'   s2$use_cosine_season()
-#'   plot(t, purrr::map_dbl(t, s2$model_t), ylab = "Effect")
+#' # Season module with an cosine season
+#' s2 <- DiseasySeason$new(reference_date = Sys.Date())
+#' s2$use_cosine_season()
+#' plot(t, purrr::map_dbl(t, s2$model_t), ylab = "Effect")
 #'
-#'   rm(s1, s2)
+#' rm(s1, s2)
 #' @return
 #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
 #' @keywords functional-module
@@ -41,9 +41,11 @@ DiseasySeason <- R6::R6Class(                                                   
     #'   A instance of `DiseasyObservables` are needed for some season models.
     #' @param ...
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    initialize = function(reference_date = NULL,
-                          observables = NULL,
-                          ...) {
+    initialize = function(
+      reference_date = NULL,
+      observables = NULL,
+      ...
+    ) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(reference_date, null.ok = TRUE, add = coll)
@@ -55,7 +57,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # Initialize based on input
       if (!is.null(reference_date)) self$set_reference_date(reference_date)
-      if (!is.null(observables))    self$load_module(observables)
+      if (!is.null(observables)) self$load_module(observables)
 
       # Set constant season as the default
       self$use_constant_season()
@@ -75,8 +77,10 @@ DiseasySeason <- R6::R6Class(                                                   
       # Reset the season model if already set
       if (!is.null(private$.model_t)) {
         lgr::without_logging(
-          self$use_season_model(attr(private$.model_t, "name"),
-                                attr(private$.model_t, "dots"))
+          self$use_season_model(
+            attr(private$.model_t, "name"),
+            attr(private$.model_t, "dots")
+          )
         )
       }
     },
@@ -263,10 +267,10 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # and the climate normal
       climate_normal <- private$climate_normal("max_temperature")
-
+                                                                                                                        # styler: off
       max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1)) /                          # nolint: infix_spaces_linter
                        (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1))                            # nolint: infix_spaces_linter, indentation_linter
-      max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale
+      max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale                                 # styler: on
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -342,10 +346,10 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # and the climate normal
       climate_normal <- private$climate_normal("max_temperature")
-
+                                                                                                                        # styler: off
       max_scale <- 1 - (1 - (1 + exp(-b * (max(climate_normal$max_temperature) - t0)))^(-1 / nu)) /                     # nolint: infix_spaces_linter
                        (1 - (1 + exp(-b * (min(climate_normal$max_temperature) - t0)))^(-1 / nu))                       # nolint: infix_spaces_linter, indentation_linter
-      max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale
+      max_scale <- floor(max_scale * 100) / 100 # Remove the very high end of the scale                                 # styler: on
 
 
       coll <- checkmate::makeAssertCollection()
@@ -369,11 +373,16 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # Select relevant metrics
       temperature_dk <- temperature |>
-        dplyr::group_by(date) |>
-        dplyr::summarise(max_temperature = max(max_temperature, na.rm = TRUE), .groups = "drop") |>
+        dplyr::group_by(.data$date) |>
+        dplyr::summarise(
+          "max_temperature" = max(.data$max_temperature, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
         dplyr::collect() |>
-        dplyr::mutate(date = zoo::as.Date(date),
-                      t = date - !!self$reference_date)
+        dplyr::mutate(
+          "date" = zoo::as.Date(.data$date),
+          "t" = .data$date - !!self$reference_date
+        )
 
 
       min_date <- min(temperature_dk$date)
@@ -387,39 +396,51 @@ DiseasySeason <- R6::R6Class(                                                   
       # Determine the references
       reference_t <- date_map(self$reference_date)
       if (dplyr::between(self$reference_date, min_date, max_date)) {
-        reference_value <- stats::approx(x = temperature_dk$date,
-                                         y = beta_sweden_v2(temperature_dk$max_temperature),
-                                         xout = self$reference_date)$y
+        reference_value <- stats::approx(
+          x = temperature_dk$date,
+          y = beta_sweden_v2(temperature_dk$max_temperature),
+          xout = self$reference_date
+        )$y
       } else {
-        reference_value <- stats::approx(x = climate_normal$t,
-                                         y = beta_sweden_v2(climate_normal$max_temperature),
-                                         xout = date_map(self$reference_date))$y
+        reference_value <- stats::approx(
+          x = climate_normal$t,
+          y = beta_sweden_v2(climate_normal$max_temperature),
+          xout = date_map(self$reference_date)
+        )$y
       }
 
 
       # Set the models
       model_date <- function(date) {
         if (date <= max_date) {
-          approximation <- stats::approx(x = temperature_dk$date,
-                                         y = beta_sweden_v2(temperature_dk$max_temperature),
-                                         xout = date)$y
+          approximation <- stats::approx(
+            x = temperature_dk$date,
+            y = beta_sweden_v2(temperature_dk$max_temperature),
+            xout = date
+          )$y
         } else {
-          approximation <- stats::approx(x = climate_normal$t,
-                                         y = beta_sweden_v2(climate_normal$max_temperature),
-                                         xout = date_map(date))$y
+          approximation <- stats::approx(
+            x = climate_normal$t,
+            y = beta_sweden_v2(climate_normal$max_temperature),
+            xout = date_map(date)
+          )$y
         }
         return(approximation / reference_value)
       }
 
       model_t <- function(t) {
         if (t <= max_t) {
-          approximation <- stats::approx(x = temperature_dk$t,
-                                         y = beta_sweden_v2(temperature_dk$max_temperature),
-                                         xout = t)$y
+          approximation <- stats::approx(
+            x = temperature_dk$t,
+            y = beta_sweden_v2(temperature_dk$max_temperature),
+            xout = t
+          )$y
         } else {
-          approximation <- stats::approx(x = climate_normal$t,
-                                         y = beta_sweden_v2(climate_normal$max_temperature),
-                                         xout = (reference_t + t / 365) %% 1)$y
+          approximation <- stats::approx(
+            x = climate_normal$t,
+            y = beta_sweden_v2(climate_normal$max_temperature),
+            xout = (reference_t + t / 365) %% 1
+          )$y
         }
         return(approximation / reference_value)
       }
@@ -562,7 +583,7 @@ DiseasySeason <- R6::R6Class(                                                   
       checkmate::assert_number(c)
       checkmate::assert_number(x0)
 
-      return(a + (k - a) / (c + q * exp(- b * (x - x0)))^(1 / nu))
+      return(a + (k - a) / (c + q * exp(-b * (x - x0)))^(1 / nu))
     },
 
 
@@ -582,9 +603,11 @@ DiseasySeason <- R6::R6Class(                                                   
         dk_climate_max_temperature <- c(3.6, 3.7, 6.4, 11.2, 15.6, 18.5, 21.2, 21.2, 17.2, 12.3, 7.6, 4.7)
 
         # Place the temperatures on a normalized scale across the year
-        dk_climate_max_temperature <- c(purrr::pluck(dk_climate_max_temperature, - 1),
-                                        dk_climate_max_temperature,
-                                        dk_climate_max_temperature[1])
+        dk_climate_max_temperature <- c(
+          purrr::pluck(dk_climate_max_temperature, -1),
+          dk_climate_max_temperature,
+          dk_climate_max_temperature[1]
+        )
 
         # Observations are for each month, assume centered in month
         t <- seq.Date(from = as.Date("0000-12-01"), to = as.Date("0002-01-01"), by = "1 month")

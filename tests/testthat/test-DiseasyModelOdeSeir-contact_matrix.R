@@ -24,12 +24,12 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
 
   # The default contact matrix starts on 1970-01-01
   expect_identical(
-    private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
+    private %.% contact_matrix(-as.numeric(Sys.Date() - 1)),
     matrix(1, dimnames = list("0+", "0+"))
   )
 
   # (.. So it should not be there before)
-  expect_null(private %.% contact_matrix(- as.numeric(Sys.Date())))
+  expect_null(private %.% contact_matrix(-as.numeric(Sys.Date())))
 
   # The contact matrix should be valid forever
   expect_identical(
@@ -60,11 +60,11 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
 
   # The default contact matrix starts on 1970-01-01
   # (.. So it should not be there before)
-  expect_null(private %.% contact_matrix(- as.numeric(Sys.Date())))
+  expect_null(private %.% contact_matrix(-as.numeric(Sys.Date())))
 
   # Then from 1970-01-01, it should always be the same
   expect_identical(
-    private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
+    private %.% contact_matrix(-as.numeric(Sys.Date() - 1)),
     matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
   )
 
@@ -102,11 +102,11 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
 
   # The default contact matrix starts on 1970-01-01
   # (.. So it should not be there before)
-  expect_null(private %.% contact_matrix(- as.numeric(Sys.Date())))
+  expect_null(private %.% contact_matrix(-as.numeric(Sys.Date())))
 
   # Then from 1970-01-01, it should always be the same
   expect_identical(
-    private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
+    private %.% contact_matrix(-as.numeric(Sys.Date() - 1)),
     matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
   )
 

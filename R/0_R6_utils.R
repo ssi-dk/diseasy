@@ -63,17 +63,17 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 #'   * If `option` is missing, all options related to `diseasy` packages.
 #'
 #' @examples
-#'   # Retrieve default option for source conn
-#'   diseasyoption("source_conn")
+#' # Retrieve default option for source conn
+#' diseasyoption("source_conn")
 #'
-#'   # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
-#'   diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
+#' # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
+#' diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 #'
-#'   # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
-#'   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
+#' # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
+#' diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 #'
-#'   # Try to retrieve specific non-existent option
-#'   diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this")
+#' # Try to retrieve specific non-existent option
+#' diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this")
 #' @export
 diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NULL) {
 

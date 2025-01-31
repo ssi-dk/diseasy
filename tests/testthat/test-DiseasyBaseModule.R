@@ -43,8 +43,10 @@ test_that("$hash works", {
 
   # Try to set the hash
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$hash <- "test", error = \(e) e),                                                          # nolint: implicit_assignment_linter
-                   simpleError("`$hash` is read only"))
+  expect_identical(
+    tryCatch(m$hash <- "test", error = \(e) e),                                                          # nolint: implicit_assignment_linter
+    simpleError("`$hash` is read only")
+  )
   expect_identical(m$hash, hash_new_instance)
 
   rm(m)
@@ -112,17 +114,23 @@ test_that("errors work", {
 
   # Test the read_only_error
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(private$read_only_error("test_field"), error = \(e) e),
-                   simpleError("`$test_field` is read only"))
+  expect_identical(
+    tryCatch(private$read_only_error("test_field"), error = \(e) e),
+    simpleError("`$test_field` is read only")
+  )
 
   # Test the not_implemented_error
-  expect_error(private$not_implemented_error("test1"),
-               class = "simpleError",
-               regex = "Not implemented: test1")
+  expect_error(
+    private$not_implemented_error("test1"),
+    class = "simpleError",
+    regex = "Not implemented: test1"
+  )
 
-  expect_error(private$not_implemented_error("test1", "test2"),
-               class = "simpleError",
-               regex = "Not implemented: test1 test2")
+  expect_error(
+    private$not_implemented_error("test1", "test2"),
+    class = "simpleError",
+    regex = "Not implemented: test1 test2"
+  )
 
   rm(m)
 })

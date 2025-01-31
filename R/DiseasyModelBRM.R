@@ -3,9 +3,9 @@
 #'
 #' @description `r rd_diseasymodel_glm_brm_description("GLM")`
 #' @examples
-#'  model <- DiseasyModelG0$new()
+#' model <- DiseasyModelG0$new()
 #'
-#'  rm(model)
+#' rm(model)
 #' @return `r rd_diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export

@@ -7,8 +7,8 @@
 #'   Most notably, the model module implements the `$get_results()` method.
 #'   This implementation requires the subclass to implement the `$rhs()` and `$initialise_state_vector()` methods.
 #' @examples
-#'   # This module should not be constructed directly but should instead be used to
-#'   # inherit from when creating a new model class.
+#' # This module should not be constructed directly but should instead be used to
+#' # inherit from when creating a new model class.
 #' @return
 #'   A new instance of the `DiseasyModelOde` [R6][R6::R6Class] class.
 #' @keywords model-template-builder

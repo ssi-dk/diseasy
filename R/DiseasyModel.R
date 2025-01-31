@@ -19,10 +19,10 @@
 #'     The module defines the functions `$get_results()`, `$get_training_data()` and the `$parameters` binding.
 #'     These functions define the "API" of the models and ensure the models can take part in the ensemble.
 #' @examples
-#'   # Normally, one would not want to create this module directly, but it is possible.
-#'   m <- DiseasyModel$new()
+#' # Normally, one would not want to create this module directly, but it is possible.
+#' m <- DiseasyModel$new()
 #'
-#'   rm(m)
+#' rm(m)
 #' @return
 #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
 #' @keywords model-template-builder
@@ -55,13 +55,15 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   the other modules of the framework.
     #' @return
     #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
-    initialize = function(activity    = FALSE,
-                          observables = FALSE,
-                          season      = FALSE,
-                          variant     = FALSE,
-                          parameters  = NULL,
-                          label       = NULL,
-                          ...) {
+    initialize = function(
+      activity    = FALSE,
+      observables = FALSE,
+      season      = FALSE,
+      variant     = FALSE,
+      parameters  = NULL,
+      label       = NULL,
+      ...
+    ) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
@@ -424,7 +426,8 @@ DiseasyModel <- R6::R6Class(                                                    
       }
       if (!is.null(stratification)) {
         coll$push(glue::glue("Model not configured to predict at stratification: ",
-                             "{private$stratification_to_string(stratification)}"))
+          "{private$stratification_to_string(stratification)}"
+        ))
       }
       checkmate::reportAssertions(coll)
     }

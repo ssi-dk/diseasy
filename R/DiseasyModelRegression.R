@@ -19,8 +19,8 @@
 #'   See `?DiseasyModelGLM` and `?DiseasyModelBRM` for examples of how this can be done.
 #'
 #' @examples
-#'   # This module cannot be constructed directly but should instead be used to
-#'   # inherit from when creating a new model class.
+#' # This module cannot be constructed directly but should instead be used to
+#' # inherit from when creating a new model class.
 #' @return
 #'   A new instance of the `DiseasyModelRegression` [R6][R6::R6Class] class.
 #' @keywords model-template-builder
@@ -175,18 +175,20 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #'   The base formula of the module. Stratification features extend this base formula. Read-only.
     #' @importFrom diseasystore `%.%`
     formula = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "formula",
-      expr = return(private %.% .formula)),
+      expr = return(private %.% .formula)
+    ),
 
 
     #' @field family (`family`)\cr
     #'   The family used in the regression fit (see `glm` or `brms`). Read-only.
     #' @importFrom diseasystore `%.%`
     family = purrr::partial(
-      .f = active_binding,                                                                                              # nolint: indentation_linter
+      .f = active_binding,
       name = "family",
-      expr = return(private %.% .family))
+      expr = return(private %.% .family)
+    )
   ),
 
   private = list(

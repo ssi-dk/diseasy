@@ -98,12 +98,12 @@ The `DiseasyModel` class contains slots for instances of functional modules:
 # We dynamically update this list as new functional modules are added to DiseasyModel
 purrr::keep(names(DiseasyModel$private_fields), ~ startsWith(., ".Diseasy")) |>
   purrr::map_chr(~ stringr::str_remove(., stringr::fixed(".Diseasy"))) |>
-  purrr::map_chr(~
+  purrr::map_chr(~ {
     paste0(
       "- `$", stringr::str_to_lower(.), "`",
       ": `{Diseasy", ., "}`"
     )
-  ) |>
+  }) |>
   cat(sep = "\n")
 ```
 

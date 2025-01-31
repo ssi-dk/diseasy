@@ -19,26 +19,37 @@ test_that("printr: printing to file works", {
 
   # 1)
   test_file <- withr::local_tempfile()
-  checkmate::expect_character(capture.output(printr("test string",    file = test_file)),
-                              pattern = r"{test string}")
+  checkmate::expect_character(
+    capture.output(printr("test string", file = test_file)),
+    pattern = r"{test string}"
+  )
   checkmate::expect_character(readLines(test_file),
-                              pattern = r"{test string}")
+    pattern = r"{test string}"
+  )
 
 
   # 2)
   test_file <- withr::local_tempfile()
-  checkmate::expect_character(capture.output(printr("test1", "test2", file = test_file)),
-                              pattern = r"{test1test2}")
-  checkmate::expect_character(readLines(test_file),
-                              pattern = r"{test1test2}")
+  checkmate::expect_character(
+    capture.output(printr("test1", "test2", file = test_file)),
+    pattern = r"{test1test2}"
+  )
+  checkmate::expect_character(
+    readLines(test_file),
+    pattern = r"{test1test2}"
+  )
 
 
   # 3)
   test_file <- withr::local_tempfile()
-  checkmate::expect_character(capture.output(printr("test1", "test2", file = test_file, sep = " ")),
-                              pattern = r"{test1 test2}")
-  checkmate::expect_character(readLines(test_file),
-                              pattern = r"{test1 test2}")
+  checkmate::expect_character(
+    capture.output(printr("test1", "test2", file = test_file, sep = " ")),
+    pattern = r"{test1 test2}"
+  )
+  checkmate::expect_character(
+    readLines(test_file),
+    pattern = r"{test1 test2}"
+  )
 
 })
 

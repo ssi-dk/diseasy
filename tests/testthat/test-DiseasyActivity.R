@@ -12,10 +12,12 @@ scenario_1 <- data.frame(date = as.Date(character(0)), opening = character(0), c
 
 
 # How the $scenario_matrix should look with the above scenario loaded
-ref_scenario_1 <- matrix(0,
-                         ncol = 3,
-                         nrow = length(dk_activity_units_subset),
-                         dimnames = list(names(dk_activity_units_subset), as.character(unique(scenario_1$date))))
+ref_scenario_1 <- matrix(
+  0,
+  ncol = 3,
+  nrow = length(dk_activity_units_subset),
+  dimnames = list(names(dk_activity_units_subset), as.character(unique(scenario_1$date)))
+)
 ref_scenario_1["baseline", "2020-01-01"] <- 1
 ref_scenario_1["baseline", "2020-03-12"] <- 0
 ref_scenario_1["lockdown_2020", "2020-03-12"] <- 1
@@ -57,9 +59,11 @@ test_that("$set_activity_units() fails when loading malformed activity units", {
 
   dk_activity_units_error <- dk_activity_units_subset
   dk_activity_units_error$baseline$work <- NULL
-  expect_error(act$set_activity_units(dk_activity_units_error),
-               class = "simpleError",
-               regexp = "baseline.*work")
+  expect_error(
+    act$set_activity_units(dk_activity_units_error),
+    class = "simpleError",
+    regexp = "baseline.*work"
+  )
 
   rm(act)
 })
@@ -104,9 +108,11 @@ test_that("$change_activity() works with different ways of initializing", {
 
   # And without a data.frame as input
   act$reset_scenario() # resets the scenario matrix
-  act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
-                      opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
-                      closing      = c(NA,           "baseline",       NA))
+  act$change_activity(
+    date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
+    opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
+    closing      = c(NA,           "baseline",       NA)
+  )
   expect_identical(act$scenario_matrix, ref_scenario_1)
   expect_identical(act$hash, hash_scenario_1_loaded) # hash should be the same as before
 
@@ -138,9 +144,11 @@ test_that("$change_activity() fails with malformed inputs", {
     dplyr::add_row(date = as.Date("2020-03-12"), opening = "non_existing_activity_unit",       closing = NA) |>
     dplyr::add_row(date = as.Date("2020-04-15"), opening = "secondary_education_phase_1_2020", closing = NA)
 
-  expect_error(act$change_activity(malformed_scenario),
-               class = "simpleError",
-               regexp = "non_existing_activity_unit")
+  expect_error(
+    act$change_activity(malformed_scenario),
+    class = "simpleError",
+    regexp = "non_existing_activity_unit"
+  )
   expect_null(act %.% scenario_matrix) # Check the state is unchanged
 
 
@@ -176,9 +184,11 @@ test_that("$change_risk() works", {
 
 
   # `$change_risk` fails when wrong type is given
-  expect_error(act$change_risk(date = as.Date("2020-03-15"), type = "workers", risk = 0.5),
-               class = "simpleError",
-               regexp = "workers")
+  expect_error(
+    act$change_risk(date = as.Date("2020-03-15"), type = "workers", risk = 0.5),
+    class = "simpleError",
+    regexp = "workers"
+  )
   expect_identical(act$hash, hash_new_risks)
 
 
@@ -205,10 +215,12 @@ test_that("$change_risk()'s secret_hash works", {
 
   # if we change one of the activity units, the secret_hash should ensure that the hash is not the same
   tmp_activity_units <- dk_activity_units_subset
-  names(tmp_activity_units) <- c(names(tmp_activity_units[1:3]),
-                                 names(tmp_activity_units[10]),
-                                 names(tmp_activity_units[5:9]),
-                                 names(tmp_activity_units[4]))
+  names(tmp_activity_units) <- c(
+    names(tmp_activity_units[1:3]),
+    names(tmp_activity_units[10]),
+    names(tmp_activity_units[5:9]),
+    names(tmp_activity_units[4])
+  )
 
   act$set_activity_units(tmp_activity_units)
   act$change_activity(scenario_1) # setting of activity units resets the scenario, so we set it again
@@ -296,9 +308,11 @@ test_that("$get_scenario_openness() works with given scenario", {
   act$set_activity_units(dk_activity_units_subset)
 
   # Now we load a scenario
-  act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
-                      opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
-                      closing      = c(NA,           "baseline",      NA))
+  act$change_activity(
+    date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
+    opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
+    closing      = c(NA,           "baseline",      NA)
+  )
 
   expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
   expect_length(act$get_scenario_openness()[[1]], 4L) # 4 arenas
@@ -402,9 +416,11 @@ test_that("$get_scenario_contacts() works with given scenario", {
   act$set_activity_units(dk_activity_units_subset)
 
   # Now we load a scenario
-  act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
-                      opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
-                      closing      = c(NA,           "baseline",      NA))
+  act$change_activity(
+    date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
+    opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
+    closing      = c(NA,           "baseline",      NA)
+  )
 
   expect_length(act$get_scenario_contacts(), 3L) # 3 dates in scenario
   expect_length(act$get_scenario_contacts()[[1]], 4L) # 4 arenas
@@ -452,9 +468,11 @@ test_that("contactdata: contact_basis works", {
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
-  act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
-                      opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
-                      closing      = c(NA,           "baseline",         NA))
+  act$change_activity(
+    date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
+    opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
+    closing      = c(NA,           "baseline",         NA)
+  )
 
   # Repeating a previous to see that methods are available
   expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario

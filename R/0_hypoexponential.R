@@ -24,19 +24,19 @@ ones <- \(shape) matrix(rep(1, shape))
 #'   - `qhypo` gives the quantile function.
 #'   - `rhypo` gives the random generation.
 #' @examples
-#'   dhypo(1:10, shape = 2)
-#'   dhypo(1:10, shape = 2, rate = c(1, 2))
+#' dhypo(1:10, shape = 2)
+#' dhypo(1:10, shape = 2, rate = c(1, 2))
 #'
-#'   phypo(0.75, shape = 2)
-#'   phypo(0.75, shape = 2, rate = c(1, 2))
-#'   phypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
+#' phypo(0.75, shape = 2)
+#' phypo(0.75, shape = 2, rate = c(1, 2))
+#' phypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
 #'
-#'   qhypo(0.75, shape = 2)
-#'   qhypo(0.75, shape = 2, rate = c(1, 2))
-#'   qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
+#' qhypo(0.75, shape = 2)
+#' qhypo(0.75, shape = 2, rate = c(1, 2))
+#' qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
 #'
-#'   rhypo(10, shape = 2)
-#'   rhypo(10, shape = 2, rate = c(1, 2))
+#' rhypo(10, shape = 2)
+#' rhypo(10, shape = 2, rate = c(1, 2))
 #' @name hypoexponential
 #' @export
 #' @importFrom expm expm
@@ -51,7 +51,7 @@ dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
   tt <- theta(shape, rate)
   d <- vapply(
     x,
-    \(x) - alpha(shape) %*% expm::expm(x * tt) %*% tt %*% ones(shape),
+    \(x) -alpha(shape) %*% expm::expm(x * tt) %*% tt %*% ones(shape),
     FUN.VALUE = numeric(1),
     USE.NAMES = FALSE
   )

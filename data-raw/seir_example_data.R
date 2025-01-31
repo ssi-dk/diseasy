@@ -118,7 +118,7 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
   for (i in seq_len(length(frac_to_hosp_after_days))) {
     admitted <- admitted + rbind(
       array(0, dim = c(i, 3)),
-      frac_to_hosp_after_days[i] * future_admitted[1: (NROW(future_admitted) - i), ]
+      frac_to_hosp_after_days[i] * future_admitted[1:(NROW(future_admitted) - i), ]
     )
   }
 
@@ -140,11 +140,15 @@ if (rlang::is_installed(c("deSolve", "usethis"))) {
     ggplot2::geom_line(ggplot2::aes(x = date, y = n_positive_simple, color = "Test positive (simple)"), linewidth = 1) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = 10 * n_admission, color = "Admissions * 10")) +
-    ggplot2::facet_wrap(~ age_group) +
+    ggplot2::facet_wrap(~age_group) +
     ggplot2::ylab("Test positive / Infected / Admissions") +
     ggplot2::scale_color_manual(
-      values = c("Infected" = "black", "Test positive (simple)" = "blue",
-                 "Test positive (realistic)" = "red", "Admissions * 10" = "darkgreen")
+      values = c(
+        "Infected" = "black",
+        "Test positive (simple)" = "blue",
+        "Test positive (realistic)" = "red",
+        "Admissions * 10" = "darkgreen"
+      )
     )
 
   # Store data set

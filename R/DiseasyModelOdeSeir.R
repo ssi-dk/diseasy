@@ -15,85 +15,85 @@
 #'
 #'   See `vignette(diseasy-model-ode-seir)` for a detailed examples of how to use this model.
 #' @examplesIf rlang::is_installed(c("duckdb", "deSolve")) && (Sys.info()["sysname"] != "Darwin")
-#'   # The model can be instantiated almost without arguments, but
-#'   # to illustrate its use, we configure a simple model:
+#' # The model can be instantiated almost without arguments, but
+#' # to illustrate its use, we configure a simple model:
 #'
-#'   # First, we add a observables modules with example data bundled
-#'   # with the package.
-#'   obs <- DiseasyObservables$new(
-#'     diseasystore = DiseasystoreSeirExample,
-#'     conn = DBI::dbConnect(duckdb::duckdb())
+#' # First, we add a observables modules with example data bundled
+#' # with the package.
+#' obs <- DiseasyObservables$new(
+#'   diseasystore = DiseasystoreSeirExample,
+#'   conn = DBI::dbConnect(duckdb::duckdb())
+#' )
+#'
+#' # The observables module also defines the time if interest via
+#' # the `last_queryable_date` field. Data before this date are
+#' # used to train the models, and predictions start on this date.
+#' obs$set_last_queryable_date(as.Date("2020-02-29"))
+#'
+#' # The example data uses a simple activity scenario for Denmark,
+#' # which we replicate here
+#' act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
+#' act$set_activity_units(dk_activity_units)
+#' act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+#'
+#' # We create a default instance which has:
+#' # * 1 age group (0+)
+#' # * 1 variant
+#' # * No season scaling
+#' # * No activity scenarios
+#' m <- DiseasyModelOdeSeir$new(
+#'   observables = obs,
+#'   activity = act,
+#'   disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
+#'   parameters = list("overall_infection_risk" = 0.025)
+#' )
+#'
+#' # We need the initial state for the system, which we infer from
+#' # the incidence data (see `vignette("SEIR-initialisation")`).
+#' # We compute this here from the example data which uses a 65 %
+#' # change of testing when infected
+#' incidence_data <- m$observables$get_observation(
+#'   observable = "n_positive",
+#'   start_date = obs$ds$min_start_date,
+#'   end_date = m$training_period$end
+#' ) |>
+#'   dplyr::mutate(
+#'     "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
 #'   )
 #'
-#'   # The observables module also defines the time if interest via
-#'   # the `last_queryable_date` field. Data before this date are
-#'   # used to train the models, and predictions start on this date.
-#'   obs$set_last_queryable_date(as.Date("2020-02-29"))
+#' psi <- m$initialise_state_vector(incidence_data)
 #'
-#'   # The example data uses a simple activity scenario for Denmark,
-#'   # which we replicate here
-#'   act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
-#'   act$set_activity_units(dk_activity_units)
-#'   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+#' # The model now has a configured right-hand-side function that
+#' # can be used to simulate the model in conjunction with deSolve.
+#' sol <- deSolve::ode(
+#'   y = psi$initial_condition,
+#'   times = seq(from = 0, to = 100, by = 1),
+#'   func = m$rhs
+#' )
 #'
-#'   # We create a default instance which has:
-#'   # * 1 age group (0+)
-#'   # * 1 variant
-#'   # * No season scaling
-#'   # * No activity scenarios
-#'   m <- DiseasyModelOdeSeir$new(
-#'     observables = obs,
-#'     activity = act,
-#'     disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
-#'     parameters = list("overall_infection_risk" = 0.025)
-#'   )
+#' # Extract the incidence outcome from the solution
+#' time <- sol[, 1]
+#' model_incidence <- sol[, 3] * m$disease_progression_rates[["I"]]
 #'
-#'   # We need the initial state for the system, which we infer from
-#'   # the incidence data (see `vignette("SEIR-initialisation")`).
-#'   # We compute this here from the example data which uses a 65 %
-#'   # change of testing when infected
-#'   incidence_data <- m$observables$get_observation(
-#'     observable = "n_positive",
-#'     start_date = obs$ds$min_start_date,
-#'     end_date = m$training_period$end
-#'   ) |>
-#'     dplyr::mutate(
-#'       "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
-#'     )
+#' plot(
+#'   x = time + m$training_period$end,
+#'   y = model_incidence,
+#'   col = "red",
+#'   lty = 2,
+#'   xlim = c(as.Date("2020-01-01"), m$training_period$end + max(time)),
+#'   xlab = "Date",
+#'   ylab = "Incidence"
+#' )
+#' points(incidence_data$date, incidence_data$incidence, col = "black")
 #'
-#'   psi <- m$initialise_state_vector(incidence_data)
+#' legend(
+#'   x = "topright",
+#'   legend = c("Model", "Data"),
+#'   col = c("red", "black"),
+#'   lty = c(2, 1)
+#' )
 #'
-#'   # The model now has a configured right-hand-side function that
-#'   # can be used to simulate the model in conjunction with deSolve.
-#'   sol <- deSolve::ode(
-#'     y = psi$initial_condition,
-#'     times = seq(from = 0, to = 100, by = 1),
-#'     func = m$rhs
-#'   )
-#'
-#'   # Extract the incidence outcome from the solution
-#'   time <- sol[, 1]
-#'   model_incidence <- sol[, 3] * m$disease_progression_rates[["I"]]
-#'
-#'   plot(
-#'     x = time + m$training_period$end,
-#'     y = model_incidence,
-#'     col = "red",
-#'     lty = 2,
-#'     xlim = c(as.Date("2020-01-01"), m$training_period$end + max(time)),
-#'     xlab = "Date",
-#'     ylab = "Incidence"
-#'   )
-#'   points(incidence_data$date, incidence_data$incidence, col = "black")
-#'
-#'   legend(
-#'     x = "topright",
-#'     legend = c("Model", "Data"),
-#'     col = c("red", "black"),
-#'     lty = c(2, 1)
-#'   )
-#'
-#'   rm(m, obs)
+#' rm(m, obs)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
@@ -528,7 +528,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           ~ {
             stats::lm(
               incidence ~ poly(t, polynomial_order, raw = TRUE),
-              data = dplyr::filter(., - polynomial_training_length < .data$t, .data$t <= 0)
+              data = dplyr::filter(., -polynomial_training_length < .data$t, .data$t <= 0)
             )
           }
         )
@@ -644,7 +644,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # (we take the max with 1 to ensure non-inf values which triggers an error. If the reduced model
       # has no I states, the disease_progression_rates$I value is not)
       disease_progression_rates <- self %.% disease_progression_rates |>
-        purrr::keep_at("I") * self %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
+        purrr::keep_at("I") * self %.% compartment_structure %.% I / max(compartment_structure %.% I, 1)
 
       # Generate the reduced model
       m_forcing <- DiseasyModelOdeSeir$new(
@@ -1092,7 +1092,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         rep(L * purrr::pluck(self %.% disease_progression_rates, "I", .default = 0), L)
       )
       transition_matrix <- diag(
-        - rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
+        -rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
         nrow = private %.% n_age_groups * private %.% n_variants * (K + L)
       )
 
@@ -1157,9 +1157,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         for (i in seq_len(private %.% n_age_groups)) {
           for (j in seq_len(private %.% n_age_groups)) {
             transmission_matrix[
-              #                                   Block offset
+              #                                   Block offset                                                          # styler: off
               1 + (i - 1) * (K + L)               + (a - 1) * (K + L) * private %.% n_age_groups,
-              (K + 1):(K + L) + (j - 1) * (K + L) + (a - 1) * (K + L) * private %.% n_age_groups
+              (K + 1):(K + L) + (j - 1) * (K + L) + (a - 1) * (K + L) * private %.% n_age_groups                        # styler: on
             ] <- transmission_matrix_components[[a]][i, j]
           }
         }

@@ -396,7 +396,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       (si + si) * ss,      -si * rI,  si * rI, # Variant 1, age group 2
       (si + si) * ss * fv, -si * rI,  si * rI, # Variant 2, age group 1
       (si + si) * ss * fv, -si * rI,  si * rI, # Variant 2, age group 2
-      -(2 * si +  2 * si * fv) * ss, -(2 * si + 2 * si * fv) * ss # Susceptible
+      -(2 * si + 2 * si * fv) * ss, -(2 * si + 2 * si * fv) * ss # Susceptible
     )
   )
 
@@ -644,7 +644,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
   expect_identical(
     private %.% immunity_matrix,
     matrix(
-      c(#v1 v2
+      c(# v1 v2
         # Variant 1
         fr, 1 - 0.75 * (1 - fr), # R
 
@@ -701,7 +701,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
   expect_identical(
     private %.% immunity_matrix,
     matrix(
-      c(#v1 v2
+      c(# v1 v2
         # Age group 1, Variant 1
         fr, 1 - 0.75 * (1 - fr), # R
 
