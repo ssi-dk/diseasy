@@ -29,9 +29,9 @@ See \code{DiseasyModelG0} and \code{DiseasyModelG1} for
 examples of how this can be done.
 }
 \examples{
- model <- DiseasyModelG0$new()
+model <- DiseasyModelG0$new()
 
- rm(model)
+rm(model)
 }
 \keyword{model-template}
 \section{Super classes}{

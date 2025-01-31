@@ -12,19 +12,20 @@ The \code{DiseasyVariant} module is responsible for defining scenarios for disea
 See vignette("diseasy-variant")
 }
 \examples{
-  # Create variant module
-  var <- DiseasyVariant$new()
+# Create variant module
+var <- DiseasyVariant$new()
 
-  # By default, a no variants are included
-  var$variants
+# By default, a no variants are included
+var$variants
 
-  # Add variants via the `$add_variant()` method
+# Add variants via the `$add_variant()` method
 
-  var$add_variant(name = "WT")
-  var$add_variant(name = "Mutant", characteristics = list("relative_infection_risk" = 1.2))
-  var$variants
+var$add_variant(name = "WT")
+var$add_variant(name = "Mutant", characteristics = list("relative_infection_risk" = 1.2))
+#
+var$variants
 
-  rm(var)
+rm(var)
 }
 \keyword{functional-module}
 \section{Super class}{

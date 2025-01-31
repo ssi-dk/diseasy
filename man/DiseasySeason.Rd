@@ -18,18 +18,18 @@ Each season model has varying number of parameters. See documentation for each f
 See the vignette("diseasy-season") for examples of use.
 }
 \examples{
-  # Season module with an constant season
-  s1 <- DiseasySeason$new()
+# Season module with an constant season
+s1 <- DiseasySeason$new()
 
-  t <- 0:365
-  plot(t, purrr::map_dbl(t, s1$model_t), ylab = "Effect")
+t <- 0:365
+plot(t, purrr::map_dbl(t, s1$model_t), ylab = "Effect")
 
-  # Season module with an cosine season
-  s2 <- DiseasySeason$new(reference_date = Sys.Date())
-  s2$use_cosine_season()
-  plot(t, purrr::map_dbl(t, s2$model_t), ylab = "Effect")
+# Season module with an cosine season
+s2 <- DiseasySeason$new(reference_date = Sys.Date())
+s2$use_cosine_season()
+plot(t, purrr::map_dbl(t, s2$model_t), ylab = "Effect")
 
-  rm(s1, s2)
+rm(s1, s2)
 }
 \seealso{
 \link{DiseasyObservables}

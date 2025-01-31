@@ -29,31 +29,35 @@ If no scenario is provided, the module will provide non-informative activity inf
 See vignette("diseasy-activity") for examples of use.
 }
 \examples{
-  # Activity module with Danish reference scenario
-  act <- DiseasyActivity$new(base_scenario = "dk_reference",
-                             activity_units = dk_activity_units,
-                             contact_basis = contact_basis \%.\% DK)
+# Activity module with Danish reference scenario
+act <- DiseasyActivity$new(
+  base_scenario = "dk_reference",
+  activity_units = dk_activity_units,
+  contact_basis = contact_basis \%.\% DK
+)
 
-  # Get contact matrices
-  contact_matrices <- act$get_scenario_activities()
+# Get contact matrices
+contact_matrices <- act$get_scenario_activities()
 
 
-  # Configuring a custom scenario in another country (using Danish activity units)
-  scenario <- data.frame(date = as.Date(character(0)),
-                         opening = character(0),
-                         closing = character(0)) |>
-    dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",      closing = NA) |>
-    dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,              closing = "baseline") |>
-    dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020", closing = NA)
+# Configuring a custom scenario in another country (using Danish activity units)
+scenario <- data.frame(
+  date = as.Date(character(0)),
+  opening = character(0),
+  closing = character(0)
+) |>
+  dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",      closing = NA) |>
+  dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,              closing = "baseline") |>
+  dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020", closing = NA)
 
-  act$set_contact_basis(contact_basis \%.\% GB) # Use the "Great Britain" contact_basis
-  act$set_activity_units(dk_activity_units)
-  act$change_activity(scenario)
+act$set_contact_basis(contact_basis \%.\% GB) # Use the "Great Britain" contact_basis
+act$set_activity_units(dk_activity_units)
+act$change_activity(scenario)
 
-  # Get societal "openness"
-  openness <- act$get_scenario_openness()
+# Get societal "openness"
+openness <- act$get_scenario_openness()
 
-  rm(act)
+rm(act)
 }
 \seealso{
 \link{dk_activity_units}

@@ -16,24 +16,24 @@ See vignette("diseasy-observables")
 }
 \examples{
 \dontshow{if (rlang::is_installed("duckdb")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-  # Create observables module using the Simulist data
-  obs <- DiseasyObservables$new(
-    diseasystore = "Simulist",
-    conn = DBI::dbConnect(duckdb::duckdb())
-  )
+# Create observables module using the Simulist data
+obs <- DiseasyObservables$new(
+  diseasystore = "Simulist",
+  conn = DBI::dbConnect(duckdb::duckdb())
+)
 
-  # See available observables
-  print(obs$available_observables)
-  print(obs$available_stratifications)
+# See available observables
+print(obs$available_observables)
+print(obs$available_stratifications)
 
-  # Get data for one observable
-  obs$get_observation(
-    "n_hospital",
-    start_date = as.Date("2020-03-01"),
-    end_date = as.Date("2020-03-05")
-  )
+# Get data for one observable
+obs$get_observation(
+  "n_hospital",
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-05")
+)
 
-  rm(obs)
+rm(obs)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

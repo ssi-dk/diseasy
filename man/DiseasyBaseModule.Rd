@@ -29,10 +29,10 @@ already-loaded modules)
 }
 }
 \examples{
-  # Normally, you would not want to create this module directly, but it is possible.
-  base_module <- DiseasyBaseModule$new()
+# Normally, you would not want to create this module directly, but it is possible.
+base_module <- DiseasyBaseModule$new()
 
-  rm(base_module)
+rm(base_module)
 }
 \seealso{
 \link[lgr:lgr-package]{lgr}

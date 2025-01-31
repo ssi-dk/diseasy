@@ -25,8 +25,8 @@ If the model should flexibly adapt to different stratifications, this method sho
 See \code{?DiseasyModelGLM} and \code{?DiseasyModelBRM} for examples of how this can be done.
 }
 \examples{
-  # This module cannot be constructed directly but should instead be used to
-  # inherit from when creating a new model class.
+# This module cannot be constructed directly but should instead be used to
+# inherit from when creating a new model class.
 }
 \seealso{
 \link[stats:family]{stats::family}, \link[stats:formula]{stats::as.formula}, \link{DiseasyModelG0}, \link{DiseasyModelG1}, \link{DiseasyModelB0}, \link{DiseasyModelG1}

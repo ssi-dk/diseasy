@@ -42,17 +42,17 @@ Density, distribution, quantile and random generation functions for the hypoexpo
 parameters shape and rate.
 }
 \examples{
-  dhypo(1:10, shape = 2)
-  dhypo(1:10, shape = 2, rate = c(1, 2))
+dhypo(1:10, shape = 2)
+dhypo(1:10, shape = 2, rate = c(1, 2))
 
-  phypo(0.75, shape = 2)
-  phypo(0.75, shape = 2, rate = c(1, 2))
-  phypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
+phypo(0.75, shape = 2)
+phypo(0.75, shape = 2, rate = c(1, 2))
+phypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
 
-  qhypo(0.75, shape = 2)
-  qhypo(0.75, shape = 2, rate = c(1, 2))
-  qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
+qhypo(0.75, shape = 2)
+qhypo(0.75, shape = 2, rate = c(1, 2))
+qhypo(0.75, shape = 2, rate = c(1, 2), lower.tail = FALSE)
 
-  rhypo(10, shape = 2)
-  rhypo(10, shape = 2, rate = c(1, 2))
+rhypo(10, shape = 2)
+rhypo(10, shape = 2, rate = c(1, 2))
 }

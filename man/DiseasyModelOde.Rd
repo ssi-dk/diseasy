@@ -14,8 +14,8 @@ Most notably, the model module implements the \verb{$get_results()} method.
 This implementation requires the subclass to implement the \verb{$rhs()} and \verb{$initialise_state_vector()} methods.
 }
 \examples{
-  # This module should not be constructed directly but should instead be used to
-  # inherit from when creating a new model class.
+# This module should not be constructed directly but should instead be used to
+# inherit from when creating a new model class.
 }
 \seealso{
 \link{DiseasyObservables}
