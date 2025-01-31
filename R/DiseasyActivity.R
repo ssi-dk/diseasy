@@ -23,7 +23,8 @@
 #'   See vignette("diseasy-activity") for examples of use.
 #' @examples
 #' # Activity module with Danish reference scenario
-#' act <- DiseasyActivity$new(base_scenario = "dk_reference",
+#' act <- DiseasyActivity$new(
+#'   base_scenario = "dk_reference",
 #'   activity_units = dk_activity_units,
 #'   contact_basis = contact_basis %.% DK
 #' )
@@ -33,7 +34,8 @@
 #'
 #'
 #' # Configuring a custom scenario in another country (using Danish activity units)
-#' scenario <- data.frame(date = as.Date(character(0)),
+#' scenario <- data.frame(
+#'   date = as.Date(character(0)),
 #'   opening = character(0),
 #'   closing = character(0)
 #' ) |>
@@ -131,10 +133,12 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_list(activity_units, add = coll)
 
       # Checking if all activity units contains "home", "work", "school" and "other":
-      purrr::walk2(activity_units, names(activity_units),
+      purrr::walk2(
+        activity_units, names(activity_units),
         ~ {
           if (!all(private$activity_types %in% names(.x))) {
-            coll$push(glue::glue("Activity unit {.y} does not contain matrices for:",
+            coll$push(glue::glue(
+              "Activity unit {.y} does not contain matrices for:",
               "{setdiff(private$activity_types, names(.x))}"
             ))
           }
@@ -217,7 +221,8 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Checks on contact_basis proportion
       checkmate::assert_numeric(
-        purrr::pluck(contact_basis, "proportion"), len = n_age_groups, lower = 0, upper = 1,
+        purrr::pluck(contact_basis, "proportion"),
+        len = n_age_groups, lower = 0, upper = 1,
         add = coll
       )
 
@@ -225,7 +230,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_data_frame(purrr::pluck(contact_basis, "demography"), add = coll)
       checkmate::assert_set_equal(
         names(purrr::pluck(contact_basis, "demography")),
-        c("age", "population", "proportion"), add = coll
+        c("age", "population", "proportion"),
+        add = coll
       )
 
       # Check for dimension mismatch
@@ -305,7 +311,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Updating with input changes of activities
       # One date at a time - in chronological order
       for (dd in input_dates) {
-        sub <- input[input$date == dd, ]
+        sub <- input[input$date == dd,]
         to_open  <- stats::na.omit(sub$opening)
         to_close <- stats::na.omit(sub$closing)
         col_id <- match(dd, colnames(new_scenario_matrix))
@@ -413,7 +419,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       # Updating with input changes of activities
       # One date at a time - in chronological order
       for (dd in input_dates) {
-        sub <- input[input$date == dd, ]
+        sub <- input[input$date == dd,]
         col_id <- match(dd, colnames(new_risk_matrix))
         new_risk_matrix[sub$type, col_id:ncol(new_risk_matrix)] <- sub$risk
       }
@@ -790,11 +796,11 @@ DiseasyActivity <- R6::R6Class(                                                 
         if (any(private %.% .scenario_matrix != 0)) {
 
           # We filter out rows without any 1's (these activity units are not active)
-          out <- private$.scenario_matrix[rowSums(private$.scenario_matrix != 0) > 0, , drop = FALSE] # Keep data type
+          out <- private$.scenario_matrix[rowSums(private$.scenario_matrix != 0) > 0,, drop = FALSE] # Keep data type
 
           # We then order the activity_units by first occurrence, tie-broken by the name of the activity_unit
           index <- apply(out, 1, \(x) which(x != 0)[1])
-          out <- out[order(index, rownames(out)), , drop = FALSE] # Keep data type
+          out <- out[order(index, rownames(out)),, drop = FALSE] # Keep data type
 
           # Prevent attributes from printing by converting to data.frame
           out <- data.frame(out, check.names = FALSE)
@@ -934,7 +940,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (length(new_dates) > 0) {
 
         # Inserting columns with NA elements for the new dates to add
-        out <- cbind(out,
+        out <- cbind(
+          out,
           matrix(NA,
             nrow = nrow(input_matrix),
             ncol = length(new_dates),

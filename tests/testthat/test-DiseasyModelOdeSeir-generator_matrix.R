@@ -149,7 +149,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   fr_21 <- 1 - chi_21 * (1 - fr)
   rho_1 <- s + fr * r + fr_21 * r + fr * r # "cross section" of variant 1 infecting a given age group
   rho_2 <- s + fr * r + fr_12 * r + fr * r # "cross section" of variant 2 infecting a given age group
-  rho_3 <- s + fr * r + fr * r    + fr * r # "cross section" of variant 3 infecting a given age group                   # styler: on
+  rho_3 <- s + fr * r + fr * r + fr * r # "cross section" of variant 3 infecting a given age group                   # styler: on
 
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
@@ -193,7 +193,7 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(                                                                                                                  # styler: off
       -rE,   1,
-       rE, -rI
+      rE, -rI
     ),                                                                                                                  # styler: on
     nrow = 2,
     byrow = TRUE                                                                                                        # nolint end
@@ -230,8 +230,8 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(                                                                                                                  # styler: off
       -rE,       1,       1,
-       rE, -2 * rI,       0,
-        0,  2 * rI, -2 * rI
+      rE, -2 * rI,       0,
+      0,  2 * rI, -2 * rI
     ),                                                                                                                  # styler: on
     nrow = 3,
     byrow = TRUE                                                                                                        # nolint end
@@ -301,15 +301,15 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(                                                                                                                  # styler: off
       -rE,   rho_1,   rho_1,   0,          0,          0, 0, 0, 0,
-       rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
-        0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
-        0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
-        0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
-        0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
-        0,       0,       0,   0,          0,          0, 0, 0, 0,
-        0,       0,       0,   0,          0,          0, 0, 0, 0,
-        0,       0,       0,   0,          0,          0, 0, 0, 0
-      ),                                                                                                                # styler: on
+      rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
+      0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
+      0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
+      0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
+      0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
+      0,       0,       0,   0,          0,          0, 0, 0, 0,
+      0,       0,       0,   0,          0,          0, 0, 0, 0,
+      0,       0,       0,   0,          0,          0, 0, 0, 0
+    ),                                                                                                                # styler: on
     nrow = 9,
     byrow = TRUE                                                                                                        # nolint end
   )
@@ -336,14 +336,14 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(                                                                                                                  # styler: off
       -rE,   rho_1,   rho_1,   0,          0,          0, 0, 0, 0,
-       rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
-        0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
-        0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
-        0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
-        0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
-        0,       0,       0,   0,          0,          0, 0, 0, 0,
-        0,       0,       0,   0,          0,          0, 0, 0, 0,
-        0,       0,       0,   0,          0,          0, 0, 0, 0
+      rE, -2 * rI,       0,   0,          0,          0, 0, 0, 0,
+      0,  2 * rI, -2 * rI,   0,          0,          0, 0, 0, 0,
+      0,       0,       0, -rE, e2 * rho_2, e2 * rho_2, 0, 0, 0,
+      0,       0,       0,  rE,    -2 * rI,          0, 0, 0, 0,
+      0,       0,       0,   0,     2 * rI,    -2 * rI, 0, 0, 0,
+      0,       0,       0,   0,          0,          0, 0, 0, 0,
+      0,       0,       0,   0,          0,          0, 0, 0, 0,
+      0,       0,       0,   0,          0,          0, 0, 0, 0
     ),                                                                                                                  # styler: on
     nrow = 9,
     byrow = TRUE                                                                                                        # nolint end
@@ -367,14 +367,14 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(
       -rE,   rho_1,   rho_1,   0,          0,          0,   0,       0,         0,
-       rE, -2 * rI,       0,   0,          0,          0,   0,       0,         0,
-        0,  2 * rI, -2 * rI,   0,          0,          0,   0,       0,         0,
-        0,       0,       0, -rE, e2 * rho_2, e2 * rho_2,   0,       0,         0,
-        0,       0,       0,  rE,    -2 * rI,          0,   0,       0,         0,
-        0,       0,       0,   0,     2 * rI,    -2 * rI,   0,       0,         0,
-        0,       0,       0,   0,          0,          0, -rE,   rho_3,     rho_3,
-        0,       0,       0,   0,          0,          0,  rE, -2 * rI,         0,
-        0,       0,       0,   0,          0,          0,   0,  2 * rI,   -2 * rI
+      rE, -2 * rI,       0,   0,          0,          0,   0,       0,         0,
+      0,  2 * rI, -2 * rI,   0,          0,          0,   0,       0,         0,
+      0,       0,       0, -rE, e2 * rho_2, e2 * rho_2,   0,       0,         0,
+      0,       0,       0,  rE,    -2 * rI,          0,   0,       0,         0,
+      0,       0,       0,   0,     2 * rI,    -2 * rI,   0,       0,         0,
+      0,       0,       0,   0,          0,          0, -rE,   rho_3,     rho_3,
+      0,       0,       0,   0,          0,          0,  rE, -2 * rI,         0,
+      0,       0,       0,   0,          0,          0,   0,  2 * rI,   -2 * rI
     ),                                                                                                                  # styler: on
     nrow = 9,
     byrow = TRUE                                                                                                        # nolint end
@@ -439,13 +439,13 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(                                                                                                                  # styler: off
       -rE, rho_1,   0, rho_1,   0,          0,   0,          0,
-       rE,   -rI,   0,     0,   0,          0,   0,          0,
-        0, rho_1, -rE, rho_1,   0,          0,   0,          0,
-        0,     0,  rE,   -rI,   0,          0,   0,          0,
-        0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
-        0,     0,   0,     0,  rE,        -rI,   0,          0,
-        0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
-        0,     0,   0,     0,   0,          0,  rE,        -rI
+      rE,   -rI,   0,     0,   0,          0,   0,          0,
+      0, rho_1, -rE, rho_1,   0,          0,   0,          0,
+      0,     0,  rE,   -rI,   0,          0,   0,          0,
+      0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
+      0,     0,   0,     0,  rE,        -rI,   0,          0,
+      0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
+      0,     0,   0,     0,   0,          0,  rE,        -rI
     ),                                                                                                                  # styler: on
     nrow = 8,
     byrow = TRUE                                                                                                        # nolint end
@@ -473,13 +473,13 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   generator_matrix <- matrix(                                                                                           # nolint start: indentation_linter
     c(                                                                                                                  # styler: off
       -rE, rho_1,   0, rho_1,   0,          0,   0,          0,
-       rE,   -rI,   0,     0,   0,          0,   0,          0,
-        0, rho_1, -rE, rho_1,   0,          0,   0,          0,
-        0,     0,  rE,   -rI,   0,          0,   0,          0,
-        0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
-        0,     0,   0,     0,  rE,        -rI,   0,          0,
-        0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
-        0,     0,   0,     0,   0,          0,  rE,        -rI
+      rE,   -rI,   0,     0,   0,          0,   0,          0,
+      0, rho_1, -rE, rho_1,   0,          0,   0,          0,
+      0,     0,  rE,   -rI,   0,          0,   0,          0,
+      0,     0,   0,     0, -rE, e2 * rho_2,   0, e2 * rho_2,
+      0,     0,   0,     0,  rE,        -rI,   0,          0,
+      0,     0,   0,     0,   0, e2 * rho_2, -rE, e2 * rho_2,
+      0,     0,   0,     0,   0,          0,  rE,        -rI
     ),                                                                                                                  # styler: on
     nrow = 8,
     byrow = TRUE                                                                                                        # nolint end

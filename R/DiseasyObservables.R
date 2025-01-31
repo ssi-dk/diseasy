@@ -52,15 +52,13 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
     #'   A new instance of the `DiseasyObservables` [R6][R6::R6Class] class.
-    initialize = function(
-      diseasystore = NULL,
-      start_date = NULL,
-      end_date = NULL,
-      last_queryable_date = NULL,
-      conn = diseasyoption("conn", class = "DiseasyObservables"),
-      slice_ts = NULL,
-      ...
-    ) {
+    initialize = function(      diseasystore = NULL,
+                          start_date = NULL,
+                          end_date = NULL,
+                          last_queryable_date = NULL,
+                          conn = diseasyoption("conn", class = "DiseasyObservables"),
+                          slice_ts = NULL,
+                          ...) {
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
@@ -168,7 +166,8 @@ DiseasyObservables <- R6::R6Class(                                              
     set_slice_ts = function(slice_ts) {
       checkmate::assert(
         checkmate::check_character(
-          slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE
+          slice_ts,
+          pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", any.missing = FALSE
         ),
         checkmate::check_date(slice_ts, any.missing = FALSE)
       )
@@ -190,12 +189,10 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   If the observable is found, the function returns the corresponding data at the stratification level.\cr
     #'   Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
     #' @seealso [SCDB::get_table]
-    get_observation = function(
-      observable,
-      stratification = NULL,
-      start_date = self %.% start_date,
-      end_date   = self %.% end_date
-    ) {
+    get_observation = function(      observable,
+                               stratification = NULL,
+                               start_date = self %.% start_date,
+                               end_date   = self %.% end_date) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -240,7 +237,9 @@ DiseasyObservables <- R6::R6Class(                                              
       # Write to the log
       private$lg$info(
         "Gettting {observable} from {start_date} to {end_date}",
-        switch(!is.null(stratification), " at stratification: {private$stratification_to_string(stratification)}"),
+        switch(!is.null(stratification),
+          " at stratification: {private$stratification_to_string(stratification)}"
+        ),
         " (hash: {hash})"
       )
 

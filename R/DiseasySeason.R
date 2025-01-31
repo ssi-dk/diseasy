@@ -41,11 +41,9 @@ DiseasySeason <- R6::R6Class(                                                   
     #'   A instance of `DiseasyObservables` are needed for some season models.
     #' @param ...
     #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    initialize = function(
-      reference_date = NULL,
-      observables = NULL,
-      ...
-    ) {
+    initialize = function(      reference_date = NULL,
+                          observables = NULL,
+                          ...) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(reference_date, null.ok = TRUE, add = coll)
@@ -161,7 +159,8 @@ DiseasySeason <- R6::R6Class(                                                   
       model_t    <- \(t)    1
 
       attr(model_date, "name")        <- "constant_season"
-      attr(model_date, "description") <- paste(sep = "\n",
+      attr(model_date, "description") <- paste(
+        sep = "\n",
         "Constant (no) seasonality model.",
         "Risk of infection constant through year"
       )
@@ -221,7 +220,8 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # Set the attributes
       attr(model_date, "name")        <- "cosine_season"
-      attr(model_date, "description") <- paste(sep = "\n",
+      attr(model_date, "description") <- paste(
+        sep = "\n",
         "Simple seasonality model.",
         "Risk of infection highest at the `peak` days after new year"
       )
@@ -302,7 +302,8 @@ DiseasySeason <- R6::R6Class(                                                   
       model_t    <- \(t)    beta_sweden_dk((reference_t + t / 365) %% 1) / reference_value
 
       attr(model_date, "name")        <- "covid_season_v1"
-      attr(model_date, "description") <- paste(sep = "\n",
+      attr(model_date, "description") <- paste(
+        sep = "\n",
         "Seasonality model for covid based on the development in Sweden 2021.",
         "Uses the DMI climate normal of the maximum daily tempearture."
       )
@@ -447,7 +448,8 @@ DiseasySeason <- R6::R6Class(                                                   
 
 
       attr(model_date, "name")        <- "covid_season_v2"
-      attr(model_date, "description") <- paste(sep = "\n",
+      attr(model_date, "description") <- paste(
+        sep = "\n",
         "Seasonality model for covid based on the development in Sweden 2021",
         "Uses the DMI data for observed the maximum daily tempearture",
         "and extends first with prognoses and then with the climate normal."
@@ -553,7 +555,6 @@ DiseasySeason <- R6::R6Class(                                                   
   ),
 
   private = list(
-
     .reference_date = NULL,
     .DiseasyObservables = NULL,
 

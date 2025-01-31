@@ -55,15 +55,13 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   the other modules of the framework.
     #' @return
     #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
-    initialize = function(
-      activity    = FALSE,
-      observables = FALSE,
-      season      = FALSE,
-      variant     = FALSE,
-      parameters  = NULL,
-      label       = NULL,
-      ...
-    ) {
+    initialize = function(      activity    = FALSE,
+                          observables = FALSE,
+                          season      = FALSE,
+                          variant     = FALSE,
+                          parameters  = NULL,
+                          label       = NULL,
+                          ...) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
@@ -369,7 +367,6 @@ DiseasyModel <- R6::R6Class(                                                    
   ),
 
   private = list(
-
     .DiseasyActivity    = NULL,
     .DiseasyObservables = NULL,
     .DiseasySeason      = NULL,
@@ -425,7 +422,8 @@ DiseasyModel <- R6::R6Class(                                                    
         coll$push(glue::glue("Model not configured to predict for observable: {observable}"))
       }
       if (!is.null(stratification)) {
-        coll$push(glue::glue("Model not configured to predict at stratification: ",
+        coll$push(glue::glue(
+          "Model not configured to predict at stratification: ",
           "{private$stratification_to_string(stratification)}"
         ))
       }

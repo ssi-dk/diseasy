@@ -133,16 +133,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   `r rd_diseasymodel_parameters`
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
-    initialize = function(
-      compartment_structure = c("E" = 1L, "I" = 1L, "R" = 1L),
-      disease_progression_rates = c("E" = 1, "I" = 1),
-      malthusian_matching = TRUE,
-      activity = TRUE,
-      season = TRUE,
-      variant = TRUE,
-      parameters = NULL,
-      ...
-    ) {
+    initialize = function(      compartment_structure = c("E" = 1L, "I" = 1L, "R" = 1L),
+                          disease_progression_rates = c("E" = 1, "I" = 1),
+                          malthusian_matching = TRUE,
+                          activity = TRUE,
+                          season = TRUE,
+                          variant = TRUE,
+                          parameters = NULL,
+                          ...) {
 
       # Pass arguments to the DiseasyModel initialiser
       super$initialize(activity, season, variant, parameters, ...)
@@ -451,12 +449,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @return (`numeric()`)\cr
     #'   The initial state vector for the model (invisibly).
     #' @importFrom tidyr expand_grid
-    initialise_state_vector = function(
-      incidence_data,
-      overall_infection_risk = self %.% parameters %.% overall_infection_risk,
-      ei_rs_balance = 1,
-      method = c("derivative", "eigen-value")
-    ) {
+    initialise_state_vector = function(      incidence_data,
+                                       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
+                                       ei_rs_balance = 1,
+                                       method = c("derivative", "eigen-value")) {
       method <- match.arg(method)
 
       coll <- checkmate::makeAssertCollection()
@@ -820,12 +816,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param overall_infection_risk `r rd_overall_infection_risk`
     #' @return (`numeric()`)\cr
     #'   The rate of change for the differential equations.
-    rhs = function(
-      t,
-      state_vector,
-      parms = NULL,
-      overall_infection_risk = self %.% parameters %.% overall_infection_risk
-    ) {
+    rhs = function(      t,
+                   state_vector,
+                   parms = NULL,
+                   overall_infection_risk = self %.% parameters %.% overall_infection_risk) {
       # Compute the flow from infections
       # Each variant attempts to infect the population
 
@@ -861,7 +855,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 4, determine the infective interactions
       # We use the pre computed immunity_matrix to account for waning and cross-immunity
       infection_matrix <- private$immunity_matrix * state_vector[private$rs_state_indices] *
-        infection_rate[private$rs_age_group, , drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
+        infection_rate[private$rs_age_group,, drop = FALSE]  # R challenge: "respect data-types". Level: Impossible
 
       # Then we can compute the loss from each compartment
       loss_due_to_infections <- rowSums(infection_matrix)
@@ -934,7 +928,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
   private = list(
-
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
 
@@ -1060,14 +1053,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #   Must sum to 1 and follow the order of R and S in the model structure.
     #   That is:  [ [R_1, ..., R_M]_age_group_1_variant_1, [R_1, ..., R_M]_age_group_2_variant_1, ..., S ].
     #   Default is that everyone is susceptible.
-    generator_matrix = function(
-      t = 0,
-      overall_infection_risk = self %.% parameters %.% overall_infection_risk,
-      RS_states = c(                                                                                                    # nolint: object_name_linter
-        rep(0, private %.% n_age_groups * private %.% n_variants * self %.% compartment_structure %.% R),
-        private$population_proportion
-      )
-    ) {
+    generator_matrix = function(      t = 0,
+                                overall_infection_risk = self %.% parameters %.% overall_infection_risk,
+                                RS_states = c(                                                                                                    # nolint: object_name_linter
+                                  rep(0, private %.% n_age_groups * private %.% n_variants * self %.% compartment_structure %.% R),
+                                  private$population_proportion
+                                )) {
 
       K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)                                              # nolint: object_name_linter
       L <- purrr::pluck(self %.% compartment_structure, "I", .default = 0)                                              # nolint: object_name_linter
@@ -1177,7 +1168,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       inactive_idx <- seq_len((K + L) * private %.% n_age_groups) +
         (K + L) * private %.% n_age_groups * (which(!active_variants) - 1)
 
-      generator_matrix[inactive_idx, ] <- 0
+      generator_matrix[inactive_idx,] <- 0
       generator_matrix[, inactive_idx] <- 0
 
       return(generator_matrix)

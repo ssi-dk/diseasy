@@ -21,7 +21,6 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   act$change_risk(date = as.Date("2020-01-05"), type = "other", risk = 0.5)
 
   m <- DiseasyModelOdeSeir$new(
-
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),

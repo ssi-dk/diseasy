@@ -66,7 +66,8 @@ get_test_conns <- function(skip_backends = NULL) {
 
   get_driver <- function(x = character(), ...) {                                                                        # nolint: object_usage_linter
     if (!grepl(".*::.*", x)) {
-      stop("Package must be specified with namespace (e.g. RSQLite::SQLite)!\n",
+      stop(
+        "Package must be specified with namespace (e.g. RSQLite::SQLite)!\n",
         "Received: ", x
       )
     }
@@ -124,7 +125,8 @@ get_test_conns <- function(skip_backends = NULL) {
   )
 
   # Inform the user about the tested back ends:
-  msg <- paste(sep = "\n",
+  msg <- paste(
+    sep = "\n",
     "#####",
     "Following backends will be tested:",
     paste("  ", names(test_conns), collapse = "\n"),

@@ -14,7 +14,6 @@ DiseasyModelGLM <- R6::R6Class(                                                 
   inherit = DiseasyModelRegression,
 
   private = list(
-
     default_parameters = function() {
       modifyList(
         super$default_parameters(), # Obtain parameters from the superclasses
@@ -107,7 +106,8 @@ DiseasyModelG_ <- R6::R6Class(                                                  
     #' @return
     #'   A new instance of the `DiseasyModelG_` [R6][R6::R6Class] class.
     initialize = function(...) {
-      super$initialize(formula = self$formula,
+      super$initialize(
+        formula = self$formula,
         family = stats::quasipoisson(),
         ...
       )
