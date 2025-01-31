@@ -295,7 +295,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # `$initialise_state_vector()` (implemented by the subclasses)
         incidence_data <- self$get_data(
           observable = self %.% parameters %.% incidence_feature_name,
-          stratification = private %.% model_stratification(),
+          stratification = private %.% model_stratification()
         ) |>
           dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name)
 

@@ -69,7 +69,7 @@ test_that("$finalize works - internal connections", {
   observables <- DiseasyObservables$new(conn = \() DBI::dbConnect(RSQLite::SQLite()))
   conn <- observables$conn
 
-    # Connection should be open
+  # Connection should be open
   expect_true(DBI::dbIsValid(conn))
 
   # Finalize the observables module
@@ -557,7 +557,7 @@ test_that("$hash works", {
   observables$get_observation(
     observables$available_observables[[1]],
     start_date = observables %.% ds %.% min_start_date,
-    end_date = observables %.% ds %.% min_start_date + lubridate::days(5),
+    end_date = observables %.% ds %.% min_start_date + lubridate::days(5)
   )
 
   # Check that the hash has not changed
@@ -568,7 +568,7 @@ test_that("$hash works", {
   observables$get_observation(
     observables$available_observables[[1]],
     start_date = observables %.% ds %.% min_start_date,
-    end_date = observables %.% ds %.% min_start_date + lubridate::days(10),
+    end_date = observables %.% ds %.% min_start_date + lubridate::days(10)
   )
 
   # Check that the hash has not changed
@@ -579,7 +579,7 @@ test_that("$hash works", {
   observables$get_observation(
     observables$available_observables[[2]],
     start_date = observables %.% ds %.% min_start_date,
-    end_date = observables %.% ds %.% min_start_date + lubridate::days(5),
+    end_date = observables %.% ds %.% min_start_date + lubridate::days(5)
   )
 
   # Check that the hash has not changed
