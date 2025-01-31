@@ -321,50 +321,6 @@ DiseasyBaseModule <- R6::R6Class(                                               
     },
 
 
-    # @description
-    #   Function that hashes the values of the environment,
-    #   handling special cases such as functions and formulae.
-    # @param environment (`environment`)\cr
-    #   The environment to hash.
-    # @return (`list`(`character`))\cr
-    #   A list of hashes for the environment
-    hash_environment = function(environment) {
-
-      if (checkmate::test_environment(environment)) environment <- as.list(environment)
-
-      hash_list <- environment |>
-        purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-        purrr::map_if(checkmate::test_formula, as.character) |> # formulas are converted to character before hashing
-        purrr::map_if(
-          checkmate::test_function,        # For functions, we hash their attributes
-          ~ {
-            list(
-              "function_source" = deparse(rlang::fn_body(.)),
-              "function_attributes" = purrr::discard_at(attributes(.), "srcref")
-            )
-          }
-        ) |>
-        purrr::map_if(
-          checkmate::test_list,            # In some cases, we have lists of functions
-          ~ {
-            purrr::map_if(
-              .,
-              checkmate::test_function,
-              ~ {
-                list(
-                  "function_source" = deparse(rlang::fn_body(.)),
-                  "function_attributes" = purrr::discard_at(attributes(.), "srcref")
-                )
-              }
-            )
-          }
-        ) |>
-        purrr::map_chr(digest::digest)
-
-      return(hash_list)
-    },
-
-
     # Errors
     read_only_error = function(field) {
       stop(glue::glue("`${field}` is read only"), call. = FALSE)
