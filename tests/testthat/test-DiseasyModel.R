@@ -279,6 +279,10 @@ test_that("$hash works", {
   expect_identical(m$hash, default_hash)
   rm(m)
 
+  m <- DiseasyModelParameterTest$new(parameters = list("list" = list("b" = 2, "a" = 2), "num" = 2))
+  checkmate::expect_disjunct(m$hash, default_hash)
+  rm(m)
+
 })
 
 
