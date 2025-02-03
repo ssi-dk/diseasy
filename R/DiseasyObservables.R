@@ -399,7 +399,7 @@ DiseasyObservables <- R6::R6Class(                                              
       name = "available_stratifications",
       expr = {
         if (is.null(self %.% ds)) return(NULL)
-        return(purrr::keep(self %.% ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
+        return(self %.% ds %.% available_stratifications)
       }
     ),
 
