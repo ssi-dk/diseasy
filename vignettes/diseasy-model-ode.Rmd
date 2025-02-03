@@ -127,7 +127,7 @@ last_queryable_date <- observables$ds$min_start_date + 40
 ```
 
 Lets first look at the data we have available:
-```{r example data infected, eval = rlang::is_installed("ggplot2")}
+```{r example data infected, eval = rlang::is_installed("ggplot2"), fig.alt = "Data to model: True number of infected."}
 observables$get_observation(
   observable = "n_infected",
   stratification = rlang::quos(age_group),
@@ -145,7 +145,7 @@ observables$get_observation(
   ggplot2::facet_grid(~ age_group)
 ```
 
-```{r example data positive, eval = rlang::is_installed("ggplot2")}
+```{r example data positive, eval = rlang::is_installed("ggplot2"), fig.alt = "Data to model: Number of positive cases."}
 observables$get_observation(
   observable = "n_positive",
   stratification = rlang::quos(age_group),
@@ -163,7 +163,7 @@ observables$get_observation(
   ggplot2::facet_grid(~ age_group)
 ```
 
-```{r example data admission, eval = rlang::is_installed("ggplot2")}
+```{r example data admission, eval = rlang::is_installed("ggplot2"), fig.alt = "Data to model: Number of hospital admissions."}
 observables$get_observation(
   observable = "n_admission",
   stratification = rlang::quos(age_group),
@@ -365,7 +365,7 @@ model$get_results(
 ```
 
 ... and we can plot the predictions along with observations for the data
-```{r}
+```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group."}
 plot(
   model,
   observable = "incidence",
@@ -384,7 +384,7 @@ model$get_results(
 ```
 
 ... and we can see the plots for each strata.
-```{r}
+```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group."}
 plot(
   model,
   observable = "incidence",
@@ -402,7 +402,7 @@ model$get_results(
 )
 ```
 
-```{r}
+```{r, fig.alt = "Model prediction for the number of infected - stratified by age group."}
 plot(
   model,
   observable = "n_infected",
@@ -419,7 +419,7 @@ model$get_results(
 ```
 
 
-```{r}
+```{r, fig.alt = "Model prediction for the number of infected - stratified by age group."}
 plot(
   model,
   observable = "n_infected",
@@ -436,7 +436,7 @@ model$get_results(
 )
 ```
 
-```{r}
+```{r, fig.alt = "Model prediction for the number of positive."}
 plot(
   model,
   observable = "n_positive",
@@ -452,7 +452,7 @@ model$get_results(
 )
 ```
 
-```{r}
+```{r, fig.alt = "Model prediction for the number of positive - stratified by age group."}
 plot(
   model,
   observable = "n_positive",
@@ -468,7 +468,7 @@ model$get_results(
 )
 ```
 
-```{r}
+```{r, fig.alt = "Model prediction for the number of hospital admissions."}
 plot(
   model,
   observable = "n_admission",
@@ -484,7 +484,7 @@ model$get_results(
 )
 ```
 
-```{r}
+```{r, fig.alt = "Model prediction for the number of hospital admissions - stratified by age group."}
 plot(
   model,
   observable = "n_admission",
