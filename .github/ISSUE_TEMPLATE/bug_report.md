@@ -32,5 +32,7 @@ A clear and concise description of what you expected to happen.
 
 * [ ] I have checked that the bug is not already described in [open issues](https://github.com/ssi-dk/diseasy/issues?q=is%3Aopen)
 
-**Additional context
-Add any other context about the problem here.
+## Additional context
+<!--
+	Add any other context about the problem here.
+-->
