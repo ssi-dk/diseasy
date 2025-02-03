@@ -98,7 +98,7 @@ The data we will use this example is provided by `?DiseasystoreSeirExample` whic
 
 We first create an observables module to interface with this data:
 
-```{r observables}
+```{r observables, eval = rlang::is_installed("RSQLite")}
 # Configure a observables module with the example data and database
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
@@ -122,12 +122,12 @@ It contains three observables of interest for our example:
 
 When running the models, we should also define at what point in time they should provide predictions for.
 This is done by setting the `last_queryable_date` in the observables module:
-```{r last_queryable_date}
+```{r last_queryable_date, eval = rlang::is_installed("RSQLite")}
 last_queryable_date <- observables$ds$min_start_date + 40
 ```
 
 Lets first look at the data we have available:
-```{r example data infected, eval = rlang::is_installed("ggplot2"), fig.alt = "Data to model: True number of infected."}
+```{r example data infected, eval = rlang::is_installed(c("ggplot2", "RSQLite")), fig.alt = "Data to model: True number of infected."}
 observables$get_observation(
   observable = "n_infected",
   stratification = rlang::quos(age_group),
@@ -145,7 +145,7 @@ observables$get_observation(
   ggplot2::facet_grid(~ age_group)
 ```
 
-```{r example data positive, eval = rlang::is_installed("ggplot2"), fig.alt = "Data to model: Number of positive cases."}
+```{r example data positive, eval = rlang::is_installed(c("ggplot2", "RSQLite")), fig.alt = "Data to model: Number of positive cases."}
 observables$get_observation(
   observable = "n_positive",
   stratification = rlang::quos(age_group),
@@ -163,7 +163,7 @@ observables$get_observation(
   ggplot2::facet_grid(~ age_group)
 ```
 
-```{r example data admission, eval = rlang::is_installed("ggplot2"), fig.alt = "Data to model: Number of hospital admissions."}
+```{r example data admission, eval = rlang::is_installed(c("ggplot2", "RSQLite")), fig.alt = "Data to model: Number of hospital admissions."}
 observables$get_observation(
   observable = "n_admission",
   stratification = rlang::quos(age_group),
@@ -222,7 +222,7 @@ The parameters are:
 - *overall_infection_risk*: The overall risk of infection in the population
   (the overall scaling of infectivity).
 
-```{r model configuration}
+```{r model configuration, eval = rlang::is_installed("RSQLite")}
 # Hyper parameters
 compartment_structure <- c("E" = 2, "I" = 1, "R" = 1)
 age_cuts_lower <- c(0, 30, 60)
@@ -264,7 +264,7 @@ cases to the incidence.
 In many cases, testing data may not be reliable, and you may want to infer the
 incidence from other sources such as waste water data or admissions data.
 
-```{r incidence map}
+```{r incidence map, eval = rlang::is_installed("RSQLite")}
 # Map observables to incidence
 observables$define_synthetic_observable(
   name = "incidence",
@@ -336,7 +336,7 @@ model_output_to_observable <- list(
 # Putting it all together
 With all the configuration done above, we can now create our model instance.
 
-```{r model creation}
+```{r model creation, eval = rlang::is_installed("RSQLite")}
 model <- DiseasyModelOdeSeir$new(
   # Scenario configuration
   activity = activity,
@@ -357,7 +357,7 @@ model <- DiseasyModelOdeSeir$new(
 
 # Predicting the incidence
 From this point, we can easily get predictions for the individual observables.
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "incidence",
   prediction_length = 5
@@ -365,7 +365,7 @@ model$get_results(
 ```
 
 ... and we can plot the predictions along with observations for the data
-```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group."}
+```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "incidence",
@@ -375,7 +375,7 @@ plot(
 
 
 The results are easily stratified by the stratifications in the data
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "incidence",
   prediction_length = 3,
@@ -384,7 +384,7 @@ model$get_results(
 ```
 
 ... and we can see the plots for each strata.
-```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group."}
+```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "incidence",
@@ -395,14 +395,14 @@ plot(
 
 
 This can be done for all the observables we have mapped in the model.
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_infected",
   prediction_length = 5
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of infected - stratified by age group."}
+```{r, fig.alt = "Model prediction for the number of infected - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "n_infected",
@@ -410,7 +410,7 @@ plot(
 )
 ```
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_infected",
   prediction_length = 3,
@@ -419,7 +419,7 @@ model$get_results(
 ```
 
 
-```{r, fig.alt = "Model prediction for the number of infected - stratified by age group."}
+```{r, fig.alt = "Model prediction for the number of infected - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "n_infected",
@@ -429,14 +429,14 @@ plot(
 ```
 
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_positive",
   prediction_length = 5
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of positive."}
+```{r, fig.alt = "Model prediction for the number of positive.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "n_positive",
@@ -444,7 +444,7 @@ plot(
 )
 ```
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_positive",
   prediction_length = 3,
@@ -452,7 +452,7 @@ model$get_results(
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of positive - stratified by age group."}
+```{r, fig.alt = "Model prediction for the number of positive - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "n_positive",
@@ -461,14 +461,14 @@ plot(
 )
 ```
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_admission",
   prediction_length = 5
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of hospital admissions."}
+```{r, fig.alt = "Model prediction for the number of hospital admissions.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "n_admission",
@@ -476,7 +476,7 @@ plot(
 )
 ```
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_admission",
   prediction_length = 3,
@@ -484,7 +484,7 @@ model$get_results(
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of hospital admissions - stratified by age group."}
+```{r, fig.alt = "Model prediction for the number of hospital admissions - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "n_admission",
