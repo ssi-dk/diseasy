@@ -14,14 +14,10 @@ rE <- 1 / 2.1 # Overall disease progression rate from E to I                    
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
 overall_infection_risk <- 0.025
 
-
 # Configure a observables module for use in the tests
 obs <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(
-    RSQLite::SQLite(),
-    dbname = devtools::package_file("tests/cache/diseasystores/DiseasystoreSeirExample.sqlite")
-  )
+  conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
 obs$set_study_period(

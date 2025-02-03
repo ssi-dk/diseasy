@@ -26,10 +26,7 @@ activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(
-    RSQLite::SQLite(),
-    dbname = devtools::package_file("tests/cache/diseasystores/DiseasystoreSeirExample.sqlite")
-  )
+  conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
 # Lock the observation data to a simulation start date (30 day period)

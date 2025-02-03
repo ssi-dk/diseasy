@@ -102,12 +102,7 @@ We first create an observables module to interface with this data:
 # Configure a observables module with the example data and database
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(
-    RSQLite::SQLite(),
-    dbname = devtools::package_file(
-      "vignettes/articles/cache/diseasystores/DiseasystoreSeirExample.sqlite"
-    )
-  )
+  conn = DBI::dbConnect(RSQLite::SQLite())
 )
 ```
 

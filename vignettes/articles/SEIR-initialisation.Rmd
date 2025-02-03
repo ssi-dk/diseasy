@@ -197,14 +197,10 @@ For the first example, we use the SEIR model output where we know the parameters
 
 To begin, we configure the observables module to use this data set and to use all available data.
 ```{r}
+# Connect to a database
 obs <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(
-    RSQLite::SQLite(),
-    dbname = devtools::package_file(
-      "vignettes/articles/cache/diseasystores/DiseasystoreSeirExample.sqlite"
-    )
-  )
+  conn = DBI::dbConnect(duckdb::duckdb())
 )
 
 obs$set_study_period( # Use all available data
