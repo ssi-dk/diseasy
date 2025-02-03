@@ -218,7 +218,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #' @return (`list`(`character`))\cr
 #'   A list of hashes for the environment
 #' @examples
-#'   hash_environment(DiseasyActivity)
+#'   hash_environment(list(DiseasyActivity))
 #'   hash_environment(list(mtcars, iris))
 #' @export
 hash_environment <- function(environment) {
