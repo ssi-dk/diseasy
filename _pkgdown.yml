@@ -24,6 +24,10 @@ reference:
     contents:
     - has_keyword("data")
 
+  - title: Helper functions
+    contents:
+    - plot
+
   - title: Developer functions
     desc: Functions to create model templates and functional modules.
     contents:
@@ -53,3 +57,8 @@ articles:
   navbar: Model notes
   contents:
   - starts_with("articles/SEIR")
+
+- title: Additional information
+  navbar: Additional information
+  contents:
+  - starts_with("articles/")

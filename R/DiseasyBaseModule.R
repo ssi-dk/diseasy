@@ -166,17 +166,17 @@ DiseasyBaseModule <- R6::R6Class(                                               
         names(public_env) <- public_names
 
         # Iteratively map the public environment to hashes
-        hash_list <-  public_env |>
-          purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-          purrr::map_if(checkmate::test_function,        # For functions, we hash their attributes
-                        ~ digest::digest(attributes(.)))
+        hash_list <- hash_environment(public_env)
 
         # Add the class name to "salt" the hashes
-        hash_list <- c(purrr::discard(hash_list, is.null), class = class(self)[1]) |>
-          purrr::map_chr(digest::digest)
+        hash_list <- c(hash_list, class = class(self)[1])
 
         # Reduce to single hash and return
-        return(digest::digest(hash_list[order(names(hash_list))]))
+        hash <- withr::with_locale(
+          new = c("LC_COLLATE" = "C"), # Ensure consistent hashing
+          rlang::hash(hash_list[order(names(hash_list))])
+        )
+        return(hash)
       }
     )
   ),
@@ -294,27 +294,27 @@ DiseasyBaseModule <- R6::R6Class(                                               
     # @description
     #   Function that parses the given environment to a unique hash.
     # @param function_environment (`environment`)\cr
-    #   The environment of the function to hash
+    #   The environment of the function to hash.
     # @return (`character`)\cr
     #   The values in the function environment is hashed and combined with the classname and hash of the parent
     #   environment
     get_hash = function(function_environment = rlang::caller_env()) {
-      checkmate::assert_environment(function_environment)
-
-      # Process the function environment
-      function_environment <- as.list(function_environment)
-      function_environment <- function_environment |>
-        purrr::map_if(checkmate::test_formula, as.character)    # formulas are converted to character before hashing
 
       # Find all relevant hashes
-      hash_list <- c(module_hash = self$hash, # Hash of the module (state of public fields)
-                     purrr::map_chr(function_environment, digest::digest), # hash everything in the function environment
-                     class = class(self)[1]) # And add the module name to the hash
+      hash_list <- c(
+        module_hash = self$hash, # Hash of the module (state of public fields)
+        hash_environment(function_environment), # hash everything in the function environment
+        class = class(self)[1] # And add the module name to the hash
+      )
 
       # Reduce to single hash and return
-      hash <- digest::digest(hash_list[order(names(hash_list))])
+      hash <- withr::with_locale(
+        new = c("LC_COLLATE" = "C"), # Ensure consistent hashing
+        rlang::hash(hash_list[order(names(hash_list))])
+      )
       return(substring(hash, 1, 10))
     },
+
 
     # Errors
     read_only_error = function(field) {
@@ -355,6 +355,32 @@ DiseasyBaseModule <- R6::R6Class(                                               
     }
   )
 )
+
+
+#' @name plot
+#' @title
+#'   Plotting method for `diseasy` modules
+#' @description
+#'   Visualise `diseasy` modules.
+#' @param x (`Diseasy*`)\cr
+#'   The module to generate visualisation for.
+#' @param ...
+#'   Parameters sent to the specific plotting methods.
+#'   See the `$plot()` method for each module
+#' @return `r rd_side_effects`
+#' @examples
+#'   immunity <- DiseasyImmunity$new()
+#'   plot(immunity)
+#'
+#'   immunity$set_exponential_waning(target = "hospitalisation")
+#'   plot(immunity)
+#'
+#'   rm(immunity)
+#' @export
+plot.DiseasyBaseModule <- function(x, ...) {
+  x$plot(...)
+}
+
 
 # Set default options for the package related to DiseasyObservables
 rlang::on_load({
