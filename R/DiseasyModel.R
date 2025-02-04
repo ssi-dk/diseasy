@@ -206,6 +206,10 @@ DiseasyModel <- R6::R6Class(                                                    
         stop(glue::glue("Requested period is not configured! Check the corresponding `${period}_period`."))
       }
 
+      # Set local seed to break SCDB::unique_table_name() collisions
+      # https://github.com/ssi-dk/SCDB/issues/170 -- can be removed if solved
+      withr::local_seed(as.integer(Sys.time()))
+
       data <- self %.% observables %.% get_observation(
         observable,
         stratification,
