@@ -126,16 +126,20 @@ DiseasyModelRegression <- R6::R6Class(                                          
           dplyr::select(!tidyselect::any_of(c(observable, "date", "t", "season"))) |>
           dplyr::distinct_all()
 
-        new_data <- purrr::map(
-          c(-(seq(self$parameters$training_length) - 1), seq(prediction_length)),                                       # nolint: infix_spaces_linter
-          ~ {
-            prototype_data |>
-              dplyr::mutate(
-                "t" = .x,
-                "date" = max(training_data$date) + lubridate::days(.data$t)
-              )
-          }
+        new_data <- seq.Date(
+          from = self %.% training_period %.% end + lubridate::days(1),
+          to = self %.% observables %.% last_queryable_date + lubridate::days(prediction_length),
+          by = "1 day"
         ) |>
+          purrr::map(
+            ~ {
+              prototype_data |>
+                dplyr::mutate(
+                  "t" = as.numeric(.x - self %.% observables %.% last_queryable_date),
+                  "date" = .x
+                )
+            }
+          ) |>
           purrr::reduce(dplyr::union_all) |>
           dplyr::relocate("date") # Move "date" column to first column
 
