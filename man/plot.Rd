@@ -21,11 +21,5 @@ See the \verb{$plot()} method for each module}
 Visualise \code{diseasy} modules.
 }
 \examples{
-  immunity <- DiseasyImmunity$new()
-  plot(immunity)
-
-  immunity$set_exponential_waning(target = "hospitalisation")
-  plot(immunity)
-
-  rm(immunity)
+# Examples to come
 }
