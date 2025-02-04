@@ -236,6 +236,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
           # Modify the margins
           if (interactive()) par(mar = c(3, 3.25, 2, 1))
 
+          # Generate labels for the group
+          group_label <- colnames(group) |>
+            stringr::str_replace_all(stringr::fixed("_"), " ") |>
+            stringr::str_to_sentence()
+
           # Plot the observations
           plot(
             obs[["date"]],
@@ -244,7 +249,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
             pch = 16,
             xlab = "Date",
             ylab = stringr::str_to_sentence(stringr::str_remove(observable, r"{^n_}")),
-            main = paste(colnames(group), group, collapse = "; "),
+            main = paste(group_label, group, collapse = "; "),
             yaxs = "i",
             xaxs = "i",
             ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
@@ -277,8 +282,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
             pch = c(16,       NA,       NA),
             lwd = c(NA,       2,        4),
             inset = c(0, 0),
-            bty = "n",
-            xpd = TRUE
+            xpd = TRUE,
+            bg = "white"
           )
         })
     }
