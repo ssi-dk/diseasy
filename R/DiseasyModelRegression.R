@@ -224,6 +224,11 @@ DiseasyModelRegression <- R6::R6Class(                                          
           # Modify the margins
           if (interactive()) par(mar = c(3, 3.25, 2, 1))
 
+          # Generate labels for the group
+          group_label <- colnames(group) |>
+            stringr::str_replace_all(stringr::fixed("_"), " ") |>
+            stringr::str_to_sentence()
+
           # Plot the predictions
           d <- MASS::kde2d(
             x = as.numeric(preds[["date"]]),
@@ -238,7 +243,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
             ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
             xlab = "Date",
             ylab = stringr::str_to_sentence(stringr::str_remove(observable, r"{^n_}")),
-            main = paste(colnames(group), group, collapse = "; "),
+            main = paste(group_label, group, collapse = "; "),
             yaxs = "i",
             xaxs = "i",
             mgp = c(2, 0.75, 0),
@@ -273,8 +278,8 @@ DiseasyModelRegression <- R6::R6Class(                                          
             pch = c(16,       NA,       NA),
             lwd = c(NA,       2,        4),
             inset = c(0, 0),
-            bty = "n",
-            xpd = TRUE
+            xpd = TRUE,
+            bg = "white"
           )
         })
     }
