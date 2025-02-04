@@ -1,8 +1,8 @@
 ---
-title: "Regressions models in `diseasy`"
+title: "DiseasyModelRegression"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{diseasy-model-regression}
+  %\VignetteIndexEntry{DiseasyModelRegression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,8 +27,8 @@ These are structured as R6 classes that uses inheritance to simplify the creatin
 
 Structurally, R6 classes we provide are as follows:
 
-| Module               | Description        |
-|--------------------- | ------------------ |
+| Module               | Description                                                           |
+|--------------------- | --------------------------------------------------------------------- |
 |`?DiseasyModel`       | All model templates initially inherit from this module (see `vignette("creating-a-model")`). |
 |`?DiseasyRegression`  | Defines the structure of regression model templates (i.e. must implement `$fit_regression()`, `$get_prediction()`, and `$update_formula()`). |
 |`?DiseasyModelGLM`    | Implements `$fit_regression()` and `$get_prediction()` using `stats::glm` |
@@ -45,10 +45,12 @@ The regression models are "duplicated" in the sense that there exist two similar
 models implemented in different statistical engines. The predictions from the
 models are very similar.
 
-| Engine \ model | constant         | exponential      |
-|----------------|------------------|------------------|
-| *glm*          | `DiseasyModelG0` | `DiseasyModelG1` |
-| *brms*         | `DiseasyModelB0` | `DiseasyModelB1` |
+| Engine \\ model | constant         | exponential      |
+|-----------------|------------------|------------------|
+| *glm*           | `DiseasyModelG0` | `DiseasyModelG1` |
+| *brms*          | `DiseasyModelB0` | `DiseasyModelB1` |
+
+For the examples below, we therefore show the results from the GLM class of models only.
 
 
 ## The data to model
@@ -74,7 +76,7 @@ When running the models, we should also define at what point in time they should
 This is done by setting the `last_queryable_date` in the observables module:
 
 ```{r last_queryable_date, eval = rlang::is_installed("RSQLite")}
-last_queryable_date <- observables$ds$min_start_date + 40
+last_queryable_date <- observables$ds$min_start_date + 60
 ```
 
 Lets first look at the data we have available:
@@ -121,14 +123,25 @@ and requires essentially no configuration.
 Since the models are "duplicated" as described above, we here show only the results
 for the GLM family of models
 
-```{r}
+```{r, fig.alt = "Model prediction for the number of hospital admissions - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 observables$set_last_queryable_date(last_queryable_date)
 model_1 <- DiseasyModelG0$new(observables = observables)
 model_2 <- DiseasyModelG1$new(observables = observables)
 ```
 
+The models are configured out-of-the-box and we can now retrieve model predictions for any observable:
+```{r, eval = rlang::is_installed("RSQLite")}
+model_1$get_results(
+  observable = "n_positive",
+  prediction_length = 30
+)
+```
+
+To visualise these predictions, we can use the standard `plot()` method where we supply the observable to 
+predict and the number of days to predict into the future, as well as any stratification supported by the `diseasystore`.
+
 ### Example plots for the constant predictor model
-```{r}
+```{r, fig.alt = "Constant model prediction for the number of positive.", eval = rlang::is_installed("RSQLite")}
 plot(
   model_1,
   observable = "n_positive",
@@ -136,7 +149,7 @@ plot(
 )
 ```
 
-```{r}
+```{r, fig.alt = "Constant model prediction for the number of positive - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model_1,
   observable = "n_positive",
@@ -146,7 +159,7 @@ plot(
 ```
 
 ### Example plots for the exponential growth predictor model
-```{r}
+```{r, fig.alt = "Exponential model  prediction for the number of hospital admissions.", eval = rlang::is_installed("RSQLite")}
 plot(
   model_2,
   observable = "n_admission",
@@ -154,7 +167,7 @@ plot(
 )
 ```
 
-```{r}
+```{r, fig.alt = "Exponential model prediction for the number of hospital admissions - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model_2,
   observable = "n_admission",
