@@ -213,22 +213,28 @@ DiseasyModelOde <- R6::R6Class(                                                 
       # Determine the groups
       groups <- observations |>
         dplyr::group_by(!!!stratification) |>
-        dplyr::summarise()
+        dplyr::summarise(.groups = "drop")
       groups <- split(groups, seq_len(nrow(groups)))
 
       # Create palette with colours to use in plot
       colours <- palette("dark")
-      colour <- colours[which(names(self %.% parameters %.% model_output_to_observable) == observable)]
+      colour <- colours[which(self %.% observables %.% available_observables == observable)]
 
       # Create a plot for each group:
       groups |>
         purrr::walk(\(group) {
-          # Modify the margins
-          if (interactive()) par(mar = c(3, 3.25, 2, 1))
 
           # Filter the data to plot
-          obs   <- dplyr::inner_join(observations, group, by = colnames(group))
-          preds <- dplyr::inner_join(prediction,   group, by = colnames(group))
+          if (length(colnames(group)) > 0) {
+            obs   <- dplyr::inner_join(observations, group, by = colnames(group))
+            preds <- dplyr::inner_join(prediction,   group, by = colnames(group))
+          } else {
+            obs <- observations
+            preds <- prediction
+          }
+
+          # Modify the margins
+          if (interactive()) par(mar = c(3, 3.25, 2, 1))
 
           # Plot the observations
           plot(
