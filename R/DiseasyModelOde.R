@@ -170,12 +170,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
       )
 
       # Retrieve the observations for the observable at the model stratificaiton level
-      observations <- self %.% observables %.% get_observation(
+      observations <- self %.% get_data(
         observable = observable,
         stratification = private %.% model_stratification(),
-        start_date = self %.% training_period %.% start,
-        end_date = self %.% observables %.% last_queryable_date + lubridate::days(prediction_length),
-        respect_last_queryable_date = FALSE
+        period = "plotting",
+        prediction_length = prediction_length
       )
 
       # .. get population data

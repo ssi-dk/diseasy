@@ -437,7 +437,7 @@ test_that("$get_data() works", {
   rm(m)
 
 
-  # -- Using a  non-default training and testing period
+  # -- Using a non-default training and testing period
   m <- DiseasyModel$new(
     observables = obs,
     parameters = list("training_length" = c("training" = 10, "testing" = 5))
@@ -456,7 +456,7 @@ test_that("$get_data() works", {
   rm(m)
 
 
-  # -- Using a  non-default training, testing and validation period
+  # -- Using a non-default training, testing and validation period
   m <- DiseasyModel$new(
     observables = obs,
     parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
@@ -478,6 +478,16 @@ test_that("$get_data() works", {
   expect_identical(max(validation_data$date), m %.% validation_period %.% end)
   expect_identical(min(validation_data$t), -2 + 1)
   expect_identical(max(validation_data$t), 0)
+  rm(m)
+
+
+  # -- Getting data for the plotting period
+  m <- DiseasyModel$new(observables = obs)
+  plotting_data <- m$get_data("n_positive", period = "plotting", prediction_length = 10)
+  expect_identical(min(plotting_data$date), m %.% training_period %.% start)
+  expect_identical(max(plotting_data$date), obs %.% last_queryable_date + lubridate::days(10))
+  expect_identical(min(plotting_data$t), -last_queryable_offset)
+  expect_identical(max(plotting_data$t), 10)
   rm(m)
 
 })
