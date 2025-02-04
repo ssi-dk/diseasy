@@ -166,22 +166,41 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @param observable `r rd_observable()`
     #' @param stratification `r rd_stratification()`
     #' @param period (`character`)\cr
-    #'   The period to return data for. That is, the training, testing or validation period.
+    #'   The period to return data for. That is, the training, testing, validation or plotting period.
+    #' @param prediction_length `r rd_prediction_length()`
     #' @return The output of `DiseasyObservables$get_observation` constrained to the training period.
-    get_data = function(observable, stratification = NULL, period = c("training", "testing", "validation")) {
+    get_data = function(
+      observable,
+      stratification = NULL,
+      period = c("training", "testing", "validation", "plotting"),
+      prediction_length = NULL
+    ) {
       period <- match.arg(period)
 
       # Input validation
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(observable, add = coll)
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
-      checkmate::assert_choice(period, c("training", "testing", "validation"), add = coll)
+      checkmate::assert_choice(period, c("training", "testing", "validation", "plotting"), add = coll)
+      if (period == "plotting") {
+        if (is.null(prediction_length)) {
+          coll$push("Prediction length must be provided when requesting plotting data.")
+        } else {
+          checkmate::assert_number(prediction_length, lower = 1, add = coll)
+        }
+      }
+
       checkmate::reportAssertions(coll)
 
       # Get the observable at the stratification level
-      period_duration <- purrr::pluck(self, glue::glue("{period}_period"))
-      start_date <- period_duration %.% start
-      end_date   <- period_duration %.% end
+      if (period == "plotting") {
+        start_date <- self %.% training_period %.% start
+        end_date   <- self %.% observables %.% last_queryable_date + lubridate::days(prediction_length)
+      } else {
+        period_duration <- purrr::pluck(self, glue::glue("{period}_period"))
+        start_date <- period_duration %.% start
+        end_date   <- period_duration %.% end
+      }
 
       if (is.null(start_date) || is.null(end_date)) {
         stop(
