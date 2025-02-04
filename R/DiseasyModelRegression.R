@@ -236,14 +236,6 @@ DiseasyModelRegression <- R6::R6Class(                                          
             col = colorRampPalette(c("white", colour))(50),
             xlim = range(obs$date),
             ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
-          )
-
-          # Plot the observations
-          points(
-            obs[["date"]],
-            obs[[observable]],
-            col = "grey20",
-            pch = 16,
             xlab = "Date",
             ylab = stringr::str_to_sentence(stringr::str_remove(observable, r"{^n_}")),
             main = paste(colnames(group), group, collapse = "; "),
@@ -251,6 +243,14 @@ DiseasyModelRegression <- R6::R6Class(                                          
             xaxs = "i",
             mgp = c(2, 0.75, 0),
             cex.lab = 1.25
+          )
+
+          # Plot the observations
+          points(
+            obs[["date"]],
+            obs[[observable]],
+            col = "grey20",
+            pch = 16
           )
 
           # Plot the data cut-off
