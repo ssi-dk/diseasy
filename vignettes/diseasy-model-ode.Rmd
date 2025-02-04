@@ -489,7 +489,7 @@ plot(
 ```
 
 ```{r check_cache, include = FALSE}
-if (!interactive() && cache$size() != 31) {
+if (cache$size() != 31) {
   stop(
     glue::glue(
       "Unexpected number of cache items (cache size: {cache$size()})",
