@@ -209,7 +209,17 @@ DiseasyModel <- R6::R6Class(                                                    
         )
       }
 
-      data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>             # nolint: object_overwrite_linter
+      # Set local seed to break SCDB::unique_table_name() collisions
+      # https://github.com/ssi-dk/SCDB/issues/170 -- can be removed if solved
+      withr::local_seed(as.integer(Sys.time()))
+
+      data <- self %.% observables %.% get_observation(
+        observable,
+        stratification,
+        start_date,
+        end_date,
+        respect_last_queryable_date = (period != "plotting")
+      ) |>
         dplyr::mutate(
           t = lubridate::interval(
             !!self %.% observables %.% last_queryable_date,
