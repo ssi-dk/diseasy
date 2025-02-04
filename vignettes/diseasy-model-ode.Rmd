@@ -135,7 +135,7 @@ observables$get_observation(
     color = "black",
     linetype = "dashed"
   ) +
-  ggplot2::geom_point(color = "seagreen") +
+  ggplot2::geom_point(color = "deepskyblue3") +
   ggplot2::labs(title = "True number of infected") +
   ggplot2::facet_grid(~ age_group)
 ```
