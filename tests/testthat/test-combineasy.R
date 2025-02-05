@@ -117,3 +117,34 @@ test_that("`combineasy()` can create a model ensembles using parameters", {
   expect_true(purrr::every(unique(loaded_modules), is.null))
 
 })
+
+
+test_that("`combineasy()` can create a model ensembles from multiple templates", {
+
+  # Create ensemble from single model template
+  ensemble <- combineasy(
+    model_templates = list(DiseasyModelDummy1, DiseasyModelDummy2)
+  )
+
+  # Check classes are as expected
+  checkmate::expect_class(ensemble, "DiseasyEnsemble")
+  checkmate::expect_list(ensemble, types = c("DiseasyModelDummy1", "DiseasyModelDummy2"), len = 2)
+
+  # Check modules are unset (i.e. NULL)
+  module_names <- c("activity", "season", "observables", "variant")
+  loaded_modules <- purrr::map(modules, \(module) purrr::map(ensemble, \(model) purrr::pluck(model, module))) |>
+    purrr::list_flatten()
+  expect_true(purrr::every(unique(loaded_modules), is.null))
+
+
+  # Check parameters are default
+  expect_identical(
+    ensemble[[1]]$parameters,
+    DiseasyModelDummy1$new()$parameters
+  )
+
+  expect_identical(
+    ensemble[[2]]$parameters,
+    DiseasyModelDummy2$new()$parameters
+  )
+})
