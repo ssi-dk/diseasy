@@ -73,13 +73,12 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
     }) |>
     purrr::flatten()
 
-  # Then, we initialize the models with each combination of parameters
-  parameters <- tidyr::expand_grid(...)
 
   # Return early, if no parameters are to be set
-  if (ncol(parameters) == 0)  {
+  if (is.null(parameters))  {
     return(models_modules_loaded)
   }
+
   # Apparently, the tibble output of expand_grid with no input thinks it has one record, even though it does not.
   # So we have to use ncol over nrow...
 
