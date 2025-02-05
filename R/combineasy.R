@@ -51,27 +51,31 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
   checkmate::reportAssertions(coll)
 
   # First, we initialize the models with the modules
-  models_modules_loaded <- models_empty |>
-    purrr::map(\(model) { # We iterate over all models
+  if (is.null(modules)) {
+    models_modules_loaded <- models_empty
+  } else {
+    models_modules_loaded <- models_empty |>
+      purrr::map(\(model) { # We iterate over all models
 
-      # And make an inner loop over the module combination to load
-      purrr::map(
-        seq_len(nrow(modules)),
-        \(module_combination) {
+        # And make an inner loop over the module combination to load
+        purrr::map(
+          seq_len(nrow(modules)),
+          \(module_combination) {
 
-          # We must clone the model before loading new modules
-          model <- model$clone()
+            # We must clone the model before loading new modules
+            model <- model$clone()
 
-          # Then load each module in turn
-          unlist(modules[module_combination, ]) |>
-            purrr::walk(~ model$load_module(.))
+            # Then load each module in turn
+            unlist(modules[module_combination, ]) |>
+              purrr::walk(~ model$load_module(.))
 
-          # Then return the model
-          model
-        }
-      )
-    }) |>
-    purrr::flatten()
+            # Then return the model
+            model
+          }
+        )
+      }) |>
+      purrr::flatten()
+  }
 
 
   # Return early, if no parameters are to be set
