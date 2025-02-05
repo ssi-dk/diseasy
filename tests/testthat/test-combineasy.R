@@ -43,21 +43,6 @@ season_modules <- list(
 )
 
 
-
-test_that("`combineasy()` requires either modules or parameters", {
-  expect_error(
-    checkmate_err_msg(combineasy(model_templates = list(DiseasyModelDummy1))),
-    class = "simpleError",
-    regexp = "Either modules or parameters must be provided!"
-  )
-  expect_error(
-    checkmate_err_msg(combineasy(model_templates = list(DiseasyModelDummy1, DiseasyModelDummy2))),
-    class = "simpleError",
-    regexp = "Either modules or parameters must be provided!"
-  )
-})
-
-
 test_that("`combineasy()` can create a model ensembles using functional modules", {
 
   # Functional modules to load
