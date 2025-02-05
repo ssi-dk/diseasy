@@ -148,3 +148,40 @@ test_that("`combineasy()` can create a model ensembles from multiple templates",
     DiseasyModelDummy2$new()$parameters
   )
 })
+
+
+test_that("`combineasy()` can create a model ensembles from templates with partially matching parameters", {
+
+  ## Parameter loading should work with if parameters are present in all templates
+
+  # Parameters to load
+  parameters <- tidyr::expand_grid(
+    number = c(1, 2),
+    string = c("hello", "world")
+  )
+
+  # Create ensemble from a parameter set
+  ensemble <- expect_no_error(combineasy(
+    model_templates = list(DiseasyModelDummy1, DiseasyModelDummy2),
+    parameters = parameters
+  ))
+
+  # Check classes are as expected
+  checkmate::expect_class(ensemble, "DiseasyEnsemble")
+  checkmate::expect_list(ensemble, types = c("DiseasyModelDummy1", "DiseasyModelDummy2"), len = nrow(parameters) * 2)
+
+
+  ## Parameter loading should fail with if parameters are only present in some templates
+
+  # Create ensemble from a parameter set
+  ensemble <- expect_error(
+    combineasy(
+      model_templates = list(DiseasyModelDummy1, DiseasyModelDummy2),
+      parameters = tidyr::expand_grid(
+        logical = c(TRUE, FALSE)
+      )
+    ),
+    class = "simpleError",
+    regexp = "Parameter `logical` only found in some, not all, of the given model generators"
+  )
+})
