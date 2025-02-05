@@ -149,7 +149,7 @@ default_parameters = function() {
 }
 ```                                                                                                                     # nolint end
 During initialisation, these are then evaluated to a single list of parameters, updated with the user-specified values
-for the parmaters and stored in the `private$.parameters` slot. The parameters are then acccessable via `$parameters`.
+for the parameters and stored in the `private$.parameters` slot. The parameters are then accessible via `$parameters`.
 
 #### Validating the parameters
 The model template can test the user provided `parameters` by implementing the `private$validate_parameters()` method.
