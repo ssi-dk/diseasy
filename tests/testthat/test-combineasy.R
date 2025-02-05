@@ -106,15 +106,14 @@ test_that("`combineasy()` can create a model ensembles using parameters", {
 
   # Check the modules are loaded and in the order as expected
   expect_identical(
-    purrr::map(ensemble, ~ .x$parameters)
-
-    purrr::map_chr(ensemble,~ toString(c(.x$season$hash, .x$activity$hash))),
-    module_hashes
+    tibble::as_tibble(purrr::list_transpose(purrr::map(ensemble, ~ .x$parameters))),
+    parameters
   )
 
-  # Check parameters are default
-  expect_identical(
-    unique(purrr::map(ensemble, ~ .x$parameters))[[1]],
-    DiseasyModelDummy1$new()$parameters
-  )
+  # Check modules are unset (i.e. NULL)
+  module_names <- c("activity", "season", "observables", "variant")
+  loaded_modules <- purrr::map(modules, \(module) purrr::map(ensemble, \(model) purrr::pluck(model, module))) |>
+    purrr::list_flatten()
+  expect_true(purrr::every(unique(loaded_modules), is.null))
+
 })
