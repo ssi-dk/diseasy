@@ -105,5 +105,8 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
       purrr::flatten()
   }
 
+  # Set the class
+  class(models_fully_loaded) <- c("DiseasyEnsemble", "list")
+
   return(models_fully_loaded)
 }
