@@ -5,13 +5,9 @@ DiseasyModelDummy1 <- R6::R6Class(                                              
 
   private = list(
     default_parameters = function() {
-      modifyList(
-        super$default_parameters(), # Obtain parameters from the super-classes
-        # Overwrite with model-specific parameters
-        list("number" = 1, "string" = "hello", "logical" = TRUE),
-        keep.null = TRUE
-      )
-    }
+      list("number" = 1, "string" = "hello", "logical" = TRUE)
+    },
+    validate_parameters = function() {} # Disable parameter validation
   )
 )
 
@@ -21,13 +17,9 @@ DiseasyModelDummy2 <- R6::R6Class(                                              
 
   private = list(
     default_parameters = function() {
-      modifyList(
-        super$default_parameters(), # Obtain parameters from the super-classes
-        # Overwrite with model-specific parameters
-        list("number" = 1, "string" = "hello"), # Compared to above, this does not have the logical parameter
-        keep.null = TRUE
-      )
-    }
+      list("number" = 1, "string" = "hello") # Compared to above, this does not have the logical parameter
+    },
+    validate_parameters = function() {} # Disable parameter validation
   )
 )
 
@@ -129,6 +121,8 @@ test_that("`combineasy()` can create a model ensembles using parameters", {
 
   # Check the modules are loaded and in the order as expected
   expect_identical(
+    purrr::map(ensemble, ~ .x$parameters)
+
     purrr::map_chr(ensemble,~ toString(c(.x$season$hash, .x$activity$hash))),
     module_hashes
   )
