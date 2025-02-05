@@ -19,29 +19,6 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
     coll$push(glue::glue("Index {which(!is_model_generator)} of model_templates is not of class `DiseasyModel`"))
   }
 
-  # Check all modules have the correct class
-  if (!is.null(modules)) {
-    module_classes <- modules |>
-      utils::head(1) |>
-      dplyr::mutate(dplyr::across(tidyselect::everything(), \(col) purrr::map_chr(col, ~ purrr::pluck(class(.), 1)))) |>
-      unlist()
-
-    disallowed_module <- module_classes |>
-      purrr::discard( ~ . %in% c("DiseasyObservables", "DiseasyActivity", "DiseasySeason"))
-
-    purrr::iwalk(
-      disallowed_module,
-      ~ {
-        coll$push(
-          glue::glue(
-            "modules element {.y} has unaccepted class '{.x}'. ",
-            "Must be one of `DiseasyObservables`, `DiseasyActivity`, `DiseasySeason`"
-          )
-        )
-      }
-    )
-  }
-
   # Create empty instances of the models
   models_empty <- purrr::map(model_templates, ~ .x$new())
 
