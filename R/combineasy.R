@@ -11,10 +11,6 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
 
   coll <- checkmate::makeAssertCollection()
 
-  if (is.null(modules) && is.null(parameters)) {
-    coll$push("Either modules or parameters must be provided!")
-  }
-
   checkmate::assert_list(model_templates, add = coll)
 
   # Check that all model_templates have the model class
