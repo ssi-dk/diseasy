@@ -78,35 +78,32 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
   }
 
 
-  # Return early, if no parameters are to be set
+  # Set the parameters if given
   if (is.null(parameters))  {
-    return(models_modules_loaded)
+    models_fully_loaded <- models_modules_loaded
+  } else {
+    models_fully_loaded <- models_modules_loaded |>
+      purrr::map(\(model) { # We iterate over all models
+
+        # And make an inner loop over the parameter combination to load
+        purrr::map(
+          seq_len(nrow(parameters)),
+          \(parameter_combination) {
+
+            # We must clone the model before setting new parameters
+            model <- model$clone()
+
+            # Then load each module in turn
+            params <- parameters[parameter_combination, ]
+            purrr::walk2(params, names(params), \(p, np) model$.__enclos_env__$private$.parameters[np] <- p)
+
+            # Then return the model
+            model
+          }
+        )
+      }) |>
+      purrr::flatten()
   }
-
-  # Apparently, the tibble output of expand_grid with no input thinks it has one record, even though it does not.
-  # So we have to use ncol over nrow...
-
-  models_fully_loaded <- models_modules_loaded |>
-    purrr::map(\(model) { # We iterate over all models
-
-      # And make an inner loop over the parameter combination to load
-      purrr::map(
-        seq_len(nrow(parameters)),
-        \(parameter_combination) {
-
-          # We must clone the model before setting new parameters
-          model <- model$clone()
-
-          # Then load each module in turn
-          params <- parameters[parameter_combination, ]
-          purrr::walk2(params, names(params), \(p, np) model$.__enclos_env__$private$.parameters[np] <- p)
-
-          # Then return the model
-          model
-        }
-      )
-    }) |>
-    purrr::flatten()
 
   return(models_fully_loaded)
 }
