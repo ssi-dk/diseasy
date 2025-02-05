@@ -7,7 +7,7 @@
 combineasy(model_templates, modules = NULL, parameters = NULL)
 }
 \arguments{
-\item{model_templates}{(\verb{list(}DiseasyModel`))\cr
+\item{model_templates}{(\code{list}(\code{DiseasyModel}))\cr
 Provide a list of model templates that will be initialized with (functional) modules and parameters.}
 
 \item{modules}{(\code{tibble})\cr
