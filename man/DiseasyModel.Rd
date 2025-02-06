@@ -24,7 +24,7 @@ The module contains the functional modules via its active bindings:
 Configured instances of these modules can be provided during initialisation.
 Alternatively, default instances of these modules can optionally be created.
 \item Model interface:
-The module defines the functions \verb{$get_results()}, \verb{$get_training_data()} and the \verb{$parameters} binding.
+The module defines the functions \verb{$get_results()}, \verb{$get_data()} and the \verb{$parameters} binding.
 These functions define the "API" of the models and ensure the models can take part in the ensemble.
 }
 }
@@ -106,8 +106,8 @@ Creates a new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
 This module is typically not constructed directly but rather through \verb{DiseasyModel*} classes.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$new(
-  activity = FALSE,
   observables = FALSE,
+  activity = FALSE,
   season = FALSE,
   variant = FALSE,
   parameters = NULL,
@@ -119,7 +119,7 @@ This module is typically not constructed directly but rather through \verb{Disea
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{activity, observables, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+\item{\code{observables, activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
@@ -128,7 +128,7 @@ Each model has their own parameters.
 
 Common parameters are:
 \itemize{
-\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 }}
 
 \item{\code{label}}{(\code{character})\cr

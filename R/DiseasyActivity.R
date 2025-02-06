@@ -160,7 +160,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (is.null(private$n_age_groups) && n_age_groups > 1) private$n_age_groups <- n_age_groups
       private$activity_units        <- activity_units
       private$activity_units_labels <- names(activity_units)
-      private$lg$info("activity_units loaded (hash: {digest::digest(activity_units)})")
+      private$lg$info("activity_units loaded (hash: {rlang::hash(activity_units)})")
 
       if (!is.null(private$.scenario_matrix)) {
         self$reset_scenario()
@@ -315,8 +315,8 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Add a "secret hash" to the scenario matrix to ensure uniqueness if activity units change
       active_activity_units <- rownames(self$scenario_matrix)
-      active_activity_units_hash <- purrr::map_chr(private$activity_units[active_activity_units], digest::digest) |>
-        digest::digest()
+      active_activity_units_hash <- purrr::map_chr(private$activity_units[active_activity_units], rlang::hash) |>
+        rlang::hash()
       attr(private$.scenario_matrix, "secret_hash") <- active_activity_units_hash
 
     },

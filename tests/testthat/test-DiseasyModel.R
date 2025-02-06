@@ -249,6 +249,40 @@ test_that("$hash works", {
 
   rm(m, s, act, obs, var, s_alt, act_alt, obs_alt, var_alt)
 
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("list" = list("a" = 1, "b" = 2), "num" = 2),
+          keep.null = TRUE
+        )
+      }
+    )
+  )
+
+  # Hash default instance
+  m <- DiseasyModelParameterTest$new()
+  default_hash <- m$hash
+  rm(m)
+
+  # Hash instance with permutated parameters
+  m <- DiseasyModelParameterTest$new(parameters = list("num" = 2, "list" = list("a" = 1, "b" = 2)))
+  expect_identical(m$hash, default_hash)
+  rm(m)
+
+  m <- DiseasyModelParameterTest$new(parameters = list("list" = list("b" = 2, "a" = 1), "num" = 2))
+  expect_identical(m$hash, default_hash)
+  rm(m)
+
+  m <- DiseasyModelParameterTest$new(parameters = list("list" = list("b" = 2, "a" = 2), "num" = 2))
+  checkmate::expect_disjunct(m$hash, default_hash)
+  rm(m)
+
 })
 
 

@@ -19,6 +19,12 @@ reference:
     contents:
     - has_keyword("model-template")
 
+  - title: Helper functions
+    desc: Functions that help with the construction of models.
+    contents:
+    - plot
+    - diseasyoption
+
   - title: Data sets
     desc: Data for the functional modules and model templates.
     contents:
@@ -29,7 +35,6 @@ reference:
     contents:
     - DiseasyBaseModule
     - has_keyword("model-template-builder")
-    - diseasyoption
     - hypoexponential
     - hash_environment
 
