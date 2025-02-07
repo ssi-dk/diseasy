@@ -17,7 +17,8 @@
   prediction_length,
   stratification = NULL,
   context_length = 30,
-  by_model = FALSE
+  by_model = FALSE,
+  ...
 )
 }
 \arguments{
@@ -27,7 +28,8 @@ Ensemble object to print, summarise or plot.}
 \item{width}{(\code{integer(1)})\cr
 The maximum number of characters to print.}
 
-\item{...}{additional arguments affecting the summary produced.}
+\item{...}{(\code{Any}) \cr
+Unused. Required to match the generic signature.}
 
 \item{observable}{(\code{character})\cr The observable to provide data or prediction for.}
 
