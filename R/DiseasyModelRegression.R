@@ -190,7 +190,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
         stratification = stratification
       )
 
-      # Retrieve the observations for the observable at the model stratificaiton level
+      # Retrieve the observations for the observable at the model stratification level
       observations <- self %.% get_data(
         observable = observable,
         stratification = stratification,
