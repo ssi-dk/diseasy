@@ -112,7 +112,7 @@ test_that("`combineasy()` can create a model ensembles using parameters", {
 
   # Check modules are unset (i.e. NULL)
   module_names <- c("activity", "season", "observables", "variant")
-  loaded_modules <- purrr::map(modules, \(module) purrr::map(ensemble, \(model) purrr::pluck(model, module))) |>
+  loaded_modules <- purrr::map(module_names, \(module) purrr::map(ensemble, \(model) purrr::pluck(model, module))) |>
     purrr::list_flatten()
   expect_true(purrr::every(unique(loaded_modules), is.null))
 
