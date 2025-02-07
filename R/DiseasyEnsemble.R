@@ -77,6 +77,8 @@ summary.DiseasyEnsemble <- function(object, ...) {
 #'   Number of days prior to prediction to plot observable for.
 #' @param by_model (`logical(1)`)\cr
 #'   Should the plot be stratified by model?
+#' @param ... (`Any`) \cr
+#'   Unused. Required to match the generic signature.
 #' @export
 plot.DiseasyEnsemble <- function(
   x,
@@ -84,7 +86,8 @@ plot.DiseasyEnsemble <- function(
   prediction_length,
   stratification = NULL,
   context_length = 30,
-  by_model = FALSE
+  by_model = FALSE,
+  ...
 ) {
 
   if (length(x) == 0) {
