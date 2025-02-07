@@ -11,17 +11,34 @@
 
 \method{summary}{DiseasyEnsemble}(object, ...)
 
-\method{plot}{DiseasyEnsemble}(x, ...)
+\method{plot}{DiseasyEnsemble}(
+  x,
+  observable,
+  stratification = NULL,
+  prediction_length,
+  context_length = 30,
+  by_model = FALSE
+)
 }
 \arguments{
-\item{x}{an object used to select a method.}
+\item{x, object}{\code{DiseasyEnsemble} object.}
 
 \item{width}{(\code{integer(1)})\cr
 The maximum number of characters to print.}
 
-\item{...}{further arguments passed to or from other methods.}
+\item{...}{additional arguments affecting the summary produced.}
 
-\item{object}{an object for which a summary is desired.}
+\item{observable}{(\code{character})\cr The observable to provide data or prediction for.}
+
+\item{stratification}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+
+\item{prediction_length}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+
+\item{context_length}{(\code{integer(1)})\cr
+Number of days prior to prediction to plot observable for.}
+
+\item{by_model}{(\code{logical(1)})\cr
+Should the plot be stratified by model?}
 }
 \value{
 \code{NULL} (called for side effects)
