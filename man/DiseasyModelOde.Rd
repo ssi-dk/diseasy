@@ -115,7 +115,7 @@ Infer the state_vector from incidence data
 \if{html}{\out{<a id="method-DiseasyModelOde-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOde-plot}{}}}
 \subsection{Method \code{plot()}}{
-Plot the predictions from the current model
+Plot the predictions from the current model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$plot(observable, prediction_length, stratification = NULL)}\if{html}{\out{</div>}}
 }
