@@ -49,6 +49,11 @@ articles:
   contents:
   - starts_with("diseasy-model")
 
+- title: Creating ensembles
+  navbar: Creating ensembles
+  contents:
+  - creating-ensembles
+
 - title: Developer guides
   navbar: Developer guides
   contents:
