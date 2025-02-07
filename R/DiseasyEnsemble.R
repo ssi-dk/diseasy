@@ -149,7 +149,7 @@ plot.DiseasyEnsemble <- function(
 
 
   # Create palette with colours to use in plot
-  colours <- palette("dark")
+  colours <- grDevices::palette("dark")
   colour <- colours[which(observables$available_observables == observable)]
 
 
@@ -187,9 +187,9 @@ plot.DiseasyEnsemble <- function(
       linetype = "dashed",
       colour = "black"
     ) +
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = q05, ymax = q95, fill = model), alpha = 0.25) +                            # nolint: object_usage_linter
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = q25, ymax = q75, fill = model), alpha = 0.35) +                            # nolint: object_usage_linter
-    ggplot2::geom_line(ggplot2::aes(y = q50, color = model), alpha = 1) +                                               # nolint: object_usage_linter
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$q05, ymax = .data$q95, fill = .data$model), alpha = 0.25) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$q25, ymax = .data$q75, fill = .data$model), alpha = 0.35) +
+    ggplot2::geom_line(ggplot2::aes(y = .data$q50, color = .data$model), alpha = 1) +
     ggplot2::labs(
       title = glue::glue('{purrr::pluck(attr(x, "weight"), .default = "Unweighted")} ensemble prediction'),
       x = "Date",
