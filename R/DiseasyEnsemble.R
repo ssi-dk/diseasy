@@ -43,7 +43,7 @@ print.DiseasyEnsemble <- function(x, width = 200, ...) {
   }
 
   cat(prefix, model_str, "\n")
-  invisible(x)
+  return(invisible(x))
 }
 
 
@@ -63,7 +63,7 @@ summary.DiseasyEnsemble <- function(object, ...) {
     dplyr::pull("counts") |>
     purrr::walk(~ cat(., "\n"))
 
-  invisible(object)
+  return(invisible(object))
 }
 
 
