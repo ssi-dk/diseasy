@@ -74,7 +74,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
                   "observable" = self$family$linkinv(
                     stats::rnorm(nrow(new_data), glm_predict$fit, glm_predict$se.fit)
                   ),
-                  "realization_id" = as.character(.x)
+                  "realisation_id" = as.character(.x)
                 )
             }
           ) |>
