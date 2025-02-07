@@ -49,10 +49,12 @@ To configure this module we must:
 ```{r}
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite()),
+  conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
-observables$set_last_queryable_date(observables$ds$max_end_date - lubridate::days(50))
+observables$set_last_queryable_date(
+  observables$ds$max_end_date - lubridate::days(50)
+)
 ```
 
 
@@ -78,7 +80,7 @@ the training size of the model.
 ensemble <- combineasy(
   model_templates = list(DiseasyModelG1),
   modules = tidyr::expand_grid(
-    observables = list(observables),
+    observables = list(observables)
   ),
   parameters = tidyr::expand_grid(
     training_length = list(

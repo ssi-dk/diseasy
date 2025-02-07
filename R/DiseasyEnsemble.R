@@ -4,7 +4,8 @@
 
 #' Standard generics for `DiseasyEnsemble` objects
 #' @name DiseasyEnsemble-generics
-#' @param x,object `DiseasyEnsemble` object.
+#' @param x,object (`DiseasyEnsemble`)\cr
+#'   Ensemble object to print, summarise or plot.
 #' @param width (`integer(1)`)\cr
 #'   The maximum number of characters to print.
 #' @examplesIf rlang::is_installed("duckdb")
@@ -70,8 +71,8 @@ summary.DiseasyEnsemble <- function(object, ...) {
 #' @rdname DiseasyEnsemble-generics
 #' @inheritParams base::plot
 #' @param observable `r rd_observable()`
-#' @param stratification `r rd_stratification()`
 #' @param prediction_length `r rd_prediction_length()`
+#' @param stratification `r rd_stratification()`
 #' @param context_length (`integer(1)`)\cr
 #'   Number of days prior to prediction to plot observable for.
 #' @param by_model (`logical(1)`)\cr
@@ -80,8 +81,8 @@ summary.DiseasyEnsemble <- function(object, ...) {
 plot.DiseasyEnsemble <- function(
   x,
   observable,
-  stratification = NULL,
   prediction_length,
+  stratification = NULL,
   context_length = 30,
   by_model = FALSE
 ) {
@@ -108,7 +109,7 @@ plot.DiseasyEnsemble <- function(
   # Confirm that all outputs conform to the requirements
   stratification_names <- observables %.% stratification_names(stratification)
 
-  expected_get_results_columns <- c(
+  expected_get_results_columns <- c(                                                                                    # nolint: ojbect_usage_linter
     "date",
     observable,
     stratification_names,
@@ -129,24 +130,24 @@ plot.DiseasyEnsemble <- function(
   # Add model information and collapse to single data set
   results <- purrr::map2(
     results, x,
-    \(results, model) dplyr::mutate(results, "model" = !! model %.% hash)
+    \(results, model) dplyr::mutate(results, "model" = !!model$hash)
   ) |>
     purrr::list_rbind()
 
 
   # Retrieve the observations for the observable at the stratification level
-  observations <- observables %.% get_observation(
+  observations <- observables$get_observation(
     observable = observable,
     stratification = stratification,
-    start_date = observables %.% last_queryable_date - lubridate::days(context_length - 1),
-    end_date = observables %.% last_queryable_date + lubridate::days(prediction_length),
+    start_date = observables$last_queryable_date - lubridate::days(context_length - 1),
+    end_date = observables$last_queryable_date + lubridate::days(prediction_length),
     respect_last_queryable_date = FALSE
   )
 
 
   # Create palette with colours to use in plot
   colours <- palette("dark")
-  colour <- colours[which(observables %.% available_observables == observable)]
+  colour <- colours[which(observables$available_observables == observable)]
 
 
   # Determine the level to plot at
@@ -179,20 +180,20 @@ plot.DiseasyEnsemble <- function(
       colour = "black"
     ) +
     ggplot2::geom_vline(
-      xintercept = observables %.% last_queryable_date,
+      xintercept = observables$last_queryable_date,
       linetype = "dashed",
       colour = "black"
     ) +
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = q05, ymax = q95, fill = model), alpha = 0.25) +
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = q25, ymax = q75, fill = model), alpha = 0.35) +
-    ggplot2::geom_line(ggplot2::aes(y = q50, color = model), alpha = 1) +
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = q05, ymax = q95, fill = model), alpha = 0.25) +                            # nolint: object_usage_linter
+    ggplot2::geom_ribbon(ggplot2::aes(ymin = q25, ymax = q75, fill = model), alpha = 0.35) +                            # nolint: object_usage_linter
+    ggplot2::geom_line(ggplot2::aes(y = q50, color = model), alpha = 1) +                                               # nolint: object_usage_linter
     ggplot2::labs(
       title = glue::glue('{purrr::pluck(attr(x, "weight"), .default = "Unweighted")} ensemble prediction'),
       x = "Date",
       y = stringr::str_to_sentence(stringr::str_remove(observable, "^n_"))
     ) +
     ggplot2::theme_bw() +
-    ggplot2::scale_y_continuous(limits = c(0, NA), expand = ggplot2::expansion(mult = c(0, .1)))
+    ggplot2::scale_y_continuous(limits = c(0, NA), expand = ggplot2::expansion(mult = c(0, 0.1)))
 
   if (!by_model) {
     g <- g +

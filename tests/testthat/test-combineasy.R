@@ -46,41 +46,41 @@ season_modules <- list(
 test_that("`combineasy()` can create a model ensembles using functional modules", {
 
   # Functional modules to load
-	modules <- tidyr::expand_grid(
-		season = season_modules,
-		activity = activity_modules
-	)
+  modules <- tidyr::expand_grid(
+    season = season_modules,
+    activity = activity_modules
+  )
 
-	module_hashes <- tidyr::expand_grid(
-	  season = purrr::map_chr(season_modules, ~ .x$hash),
-	  activity = purrr::map_chr(activity_modules, ~ .x$hash)
-	) |>
-	  tidyr::unite("hash", dplyr::everything(), sep = ", ") |>
-	  dplyr::pull("hash")
+  module_hashes <- tidyr::expand_grid(
+    season = purrr::map_chr(season_modules, ~ .x$hash),
+    activity = purrr::map_chr(activity_modules, ~ .x$hash)
+  ) |>
+    tidyr::unite("hash", dplyr::everything(), sep = ", ") |>
+    dplyr::pull("hash")
 
 
   # Create ensemble from single model template
   ensemble <- combineasy(
     model_templates = list(DiseasyModelDummy1),
-		modules = modules
+    modules = modules
   )
 
 
   # Check classes are as expected
-	checkmate::expect_class(ensemble, "DiseasyEnsemble")
-	checkmate::expect_list(ensemble, types = "DiseasyModelDummy1", len = nrow(modules))
+  checkmate::expect_class(ensemble, "DiseasyEnsemble")
+  checkmate::expect_list(ensemble, types = "DiseasyModelDummy1", len = nrow(modules))
 
-	# Check the modules are loaded and in the order as expected
-	expect_identical(
-	  purrr::map_chr(ensemble,~ toString(c(.x$season$hash, .x$activity$hash))),
-	  module_hashes
-	)
-
-	# Check parameters are default
+  # Check the modules are loaded and in the order as expected
   expect_identical(
-	  unique(purrr::map(ensemble, ~ .x$parameters))[[1]],
-	  DiseasyModelDummy1$new()$parameters
-	)
+    purrr::map_chr(ensemble, ~ toString(c(.x$season$hash, .x$activity$hash))),
+    module_hashes
+  )
+
+  # Check parameters are default
+  expect_identical(
+    unique(purrr::map(ensemble, ~ .x$parameters))[[1]],
+    DiseasyModelDummy1$new()$parameters
+  )
 })
 
 

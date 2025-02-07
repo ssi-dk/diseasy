@@ -15,7 +15,7 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
 
   # Check that all model_templates have the model class
   is_model_generator <- purrr::map_lgl(model_templates, ~ inherits(.x$new(), "DiseasyModel"))
-  if (any(!is_model_generator)) {
+  if (!all(is_model_generator)) {
     coll$push(glue::glue("Index {which(!is_model_generator)} of model_templates is not of class `DiseasyModel`"))
   }
 
