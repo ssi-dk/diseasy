@@ -17,7 +17,9 @@
 #'   # Create a DiseasyEnsemble object
 #'   ensemble <- combineasy(
 #'     model_templates = list(DiseasyModelG0, DiseasyModelG1),
-#'     modules = observables
+#'     modules = tidyr::expand_grid(
+#'       observables = list(observables)
+#'     )
 #'   )
 #'
 #'   print(ensemble)
