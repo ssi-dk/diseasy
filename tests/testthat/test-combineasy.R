@@ -175,12 +175,12 @@ test_that("`combineasy()` can create a model ensembles from templates with parti
 
   # Create ensemble from a parameter set
   ensemble <- expect_error(
-    combineasy(
+    checkmate_err_msg(combineasy(
       model_templates = list(DiseasyModelDummy1, DiseasyModelDummy2),
       parameters = tidyr::expand_grid(
         logical = c(TRUE, FALSE)
       )
-    ),
+    )),
     class = "simpleError",
     regexp = "Parameter `logical` only found in some, not all, of the given model generators"
   )
