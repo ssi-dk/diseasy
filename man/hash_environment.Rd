@@ -12,11 +12,11 @@ The environment to hash.}
 }
 \value{
 (\code{list}(\code{character}))\cr
-A list of hashes for the environment.
+A list of hashes for the environment
 }
 \description{
 Function that hashes the values of the environment,
-handling special cases such as functions.
+handling special cases such as functions and formulae.
 }
 \examples{
   hash_environment(list(DiseasyActivity))
