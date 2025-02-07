@@ -1,5 +1,4 @@
 test_that("g0 / b0 works", {
-  skip_if_not_installed("brms")
 
   purrr::walk(list(DiseasyModelG0, DiseasyModelB0), \(model) {
 
@@ -69,7 +68,6 @@ test_that("g0 / b0 works", {
 
 
 test_that("g1 / b1 works", {
-  skip_if_not_installed("brms")
 
   purrr::walk(list(DiseasyModelG1, DiseasyModelB1), \(model) {
 
