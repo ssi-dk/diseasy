@@ -257,11 +257,7 @@ DiseasyObservables <- R6::R6Class(                                              
           mapping_arguments <- rlang::fn_fmls_names(mapping)
 
           # Determine the name of the columns created by the stratifications
-          stratification_names <- stratification |>
-            purrr::map(rlang::as_label) |>
-            purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
-            unname()
-
+          stratification_names <- self %.% stratification_names(stratification)
 
           # Extract the required observables at the stratification level and combine
           data <- mapping_arguments |>
@@ -303,6 +299,20 @@ DiseasyObservables <- R6::R6Class(                                              
       # Return
       return(private$cache(hash))
 
+    },
+
+
+    #' @description
+    #'  Get the names of the stratifications.
+    #' @param stratification `r rd_stratification()`
+    #' @return
+    #'  The names of the stratifications.
+    stratification_names = function(stratification) {
+      stratification_names <- stratification |>
+        purrr::map(rlang::as_label) |>
+        purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
+        unname()
+      return(stratification_names)
     },
 
 
