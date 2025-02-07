@@ -19,6 +19,18 @@ reference:
     contents:
     - has_keyword("model-template")
 
+  - title: Creating ensembles
+    desc: Functions related to creating ensembles of models.
+    contents:
+    - combineasy
+    - DiseasyEnsemble-generics
+
+  - title: Helper functions
+    desc: Functions that help with the construction of models.
+    contents:
+    - plot
+    - diseasyoption
+
   - title: Data sets
     desc: Data for the functional modules and model templates.
     contents:
@@ -29,7 +41,6 @@ reference:
     contents:
     - DiseasyBaseModule
     - has_keyword("model-template-builder")
-    - diseasyoption
     - hypoexponential
     - hash_environment
 
@@ -43,6 +54,11 @@ articles:
   navbar: Model templates
   contents:
   - starts_with("diseasy-model")
+
+- title: Creating ensembles
+  navbar: Creating ensembles
+  contents:
+  - creating-ensembles
 
 - title: Developer guides
   navbar: Developer guides

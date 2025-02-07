@@ -65,7 +65,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
 
       # Draw samples if quantiles is not given
       if (is.null(quantiles)) {
-        set.seed(seed = self$parameters$seed)
+        withr::local_seed(seed = self$parameters$seed)
         glm_samples <- seq(self$parameters$n_realizations) |>
           purrr::map(
             ~ {
@@ -74,7 +74,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
                   "observable" = self$family$linkinv(
                     stats::rnorm(nrow(new_data), glm_predict$fit, glm_predict$se.fit)
                   ),
-                  "realization_id" = as.character(.x)
+                  "realisation_id" = as.character(.x)
                 )
             }
           ) |>

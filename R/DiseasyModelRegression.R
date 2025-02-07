@@ -84,6 +84,9 @@ DiseasyModelRegression <- R6::R6Class(                                          
       checkmate::assert_number(prediction_length, add = coll)
       checkmate::reportAssertions(coll)
 
+      # Cast prediction_length to integer
+      prediction_length <- as.integer(prediction_length)
+
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
@@ -123,16 +126,20 @@ DiseasyModelRegression <- R6::R6Class(                                          
           dplyr::select(!tidyselect::any_of(c(observable, "date", "t", "season"))) |>
           dplyr::distinct_all()
 
-        new_data <- purrr::map(
-          c(-(seq(self$parameters$training_length) - 1), seq(prediction_length)),                                       # nolint: infix_spaces_linter
-          ~ {
-            prototype_data |>
-              dplyr::mutate(
-                "t" = .x,
-                "date" = max(training_data$date) + lubridate::days(.data$t)
-              )
-          }
+        new_data <- seq.Date(
+          from = self %.% training_period %.% end + lubridate::days(1),
+          to = self %.% observables %.% last_queryable_date + lubridate::days(prediction_length),
+          by = "1 day"
         ) |>
+          purrr::map(
+            ~ {
+              prototype_data |>
+                dplyr::mutate(
+                  "t" = as.numeric(.x - self %.% observables %.% last_queryable_date),
+                  "date" = .x
+                )
+            }
+          ) |>
           purrr::reduce(dplyr::union_all) |>
           dplyr::relocate("date") # Move "date" column to first column
 
@@ -152,10 +159,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
         prediction <- prediction |>
           dplyr::select(!tidyselect::any_of(c("t", "season"))) |> # Delete the surplus columns
           dplyr::rename(!!observable := observable) |>
-          dplyr::mutate(
-            "weight" = 1,  # All realizations have the same weight
-            "model" = self$hash
-          ) # Add meta information to the data
+          dplyr::mutate("weight" = 1) # All realisations have the same weight
 
         # Store in cache
         private$cache(hash, prediction)
@@ -166,6 +170,116 @@ DiseasyModelRegression <- R6::R6Class(                                          
 
       # Return
       return(private$cache(hash))
+    },
+
+
+    #' @description
+    #'   Plot the predictions from the current model
+    #' @param observable `r rd_observable()`
+    #' @param prediction_length `r rd_prediction_length()`
+    #' @param stratification `r rd_stratification()`
+    #' @importFrom MASS kde2d
+    plot = function(observable, prediction_length, stratification = NULL) {
+
+      # Retrieve the prediction for the observable
+      prediction <- self %.% get_results(
+        observable = observable,
+        prediction_length = prediction_length,
+        stratification = stratification
+      )
+
+      # Retrieve the observations for the observable at the model stratification level
+      observations <- self %.% get_data(
+        observable = observable,
+        stratification = stratification,
+        period = "plotting",
+        prediction_length = prediction_length
+      )
+
+      # Determine the groups
+      groups <- observations |>
+        dplyr::group_by(!!!stratification) |>
+        dplyr::summarise(.groups = "drop")
+      groups <- split(groups, seq_len(nrow(groups)))
+
+      # Create palette with colours to use in plot
+      colours <- palette("dark")
+      colour <- colours[which(self %.% observables %.% available_observables == observable)]
+
+      # Create a plot for each group:
+      groups |>
+        purrr::walk(\(group) {
+
+          # Filter the data to plot
+          if (length(colnames(group)) > 0) {
+            obs   <- dplyr::inner_join(observations, group, by = colnames(group))
+            preds <- dplyr::inner_join(prediction,   group, by = colnames(group))
+          } else {
+            obs <- observations
+            preds <- prediction
+          }
+
+          # Modify the margins
+          if (interactive()) par(mar = c(3, 3.25, 2, 1))
+
+          # Generate labels for the group
+          group_label <- colnames(group) |>
+            stringr::str_replace_all(stringr::fixed("_"), " ") |>
+            stringr::str_to_sentence()
+
+          # Plot the predictions
+          d <- MASS::kde2d(
+            x = as.numeric(preds[["date"]]),
+            y = preds[[observable]],
+            lims = c(range(as.numeric(preds[["date"]])), c(0, max(preds[[observable]]))),
+            n = 100
+          )
+          image(
+            as.Date(d$x), d$y, d$z,
+            col = colorRampPalette(c("white", colour))(50),
+            xlim = range(obs$date),
+            ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
+            xlab = "Date",
+            ylab = stringr::str_to_sentence(stringr::str_remove(observable, r"{^n_}")),
+            main = paste(group_label, group, collapse = "; "),
+            yaxs = "i",
+            xaxs = "i",
+            mgp = c(2, 0.75, 0),
+            cex.lab = 1.25
+          )
+
+          # Plot the observations
+          points(
+            obs[["date"]],
+            obs[[observable]],
+            col = "grey20",
+            pch = 16
+          )
+
+          # Plot the data cut-off
+          abline(
+            v = self %.% observables %.% last_queryable_date,
+            col = "grey20",
+            lty = "dashed",
+            lwd = 2
+          )
+
+          # Ensure axis is visible
+          box()
+
+          # Add legend
+          legend(
+            "topleft",
+            legend = c("Observations", "Training cut-off", "Model"),
+            col = c("grey20", "grey20", colour),
+            lty = c(NA,       "dashed", "solid"),
+            pch = c(16,       NA,       NA),
+            lwd = c(NA,       2,        4),
+            inset = c(0, 0),
+            xpd = TRUE,
+            bg = "white"
+          )
+        })
     }
   ),
 

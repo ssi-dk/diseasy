@@ -23,8 +23,8 @@ ref_scenario_1["lockdown_2020", "2020-04-15"] <- 1
 ref_scenario_1["secondary_education_phase_1_2020", "2020-04-15"] <- 1
 ref_scenario_1 <- data.frame(ref_scenario_1[rowSums(ref_scenario_1) > 0, ], check.names = FALSE)
 secret_hash <- dk_activity_units_subset[c("baseline", "lockdown_2020", "secondary_education_phase_1_2020")] |>
-  purrr::map_chr(digest::digest) |>
-  digest::digest()
+  purrr::map_chr(rlang::hash) |>
+  rlang::hash()
 attr(ref_scenario_1, "secret_hash") <- secret_hash
 
 

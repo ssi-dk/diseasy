@@ -19,18 +19,18 @@ RoxygenNote: 7.3.2
 Language: en-GB
 LazyData: TRUE
 Depends:
-    diseasystore (>= 0.3),
+    diseasystore (> 0.3),
     R (>= 4.3.0)
 Imports:
     brms,
     cachem,
     checkmate,
-    digest,
     dplyr,
     expm,
     glue,
     lgr,
     lubridate,
+    MASS,
     Matrix,
     pkgcond,
     pracma,
@@ -38,7 +38,8 @@ Imports:
     R6,
     rlang,
     stringr,
-    tidyr
+    tidyr,
+    withr
 Suggests:
     contactdata,
     countrycode,
@@ -60,8 +61,9 @@ Suggests:
     testthat (>= 3.0.0),
     tibble,
     usethis,
-    withr,
     zoo
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy, https://ssi-dk.github.io/diseasy/
 BugReports: https://github.com/ssi-dk/diseasy/issues
+Remotes:
+    ssi-dk/diseasystore@rc-v0.3.1

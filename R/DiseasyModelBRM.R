@@ -91,7 +91,7 @@ DiseasyModelBRM <- R6::R6Class(                                                 
             new_data |>
               dplyr::mutate(
                 "observable" = !!brms_predict[..3, ],
-                "realization_id" = paste(..1, ..2, sep = "_")
+                "realisation_id" = paste(..1, ..2, sep = "_")
               )
           }
         ) |>

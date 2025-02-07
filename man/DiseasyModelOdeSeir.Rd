@@ -40,75 +40,42 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   # used to train the models, and predictions start on this date.
   obs$set_last_queryable_date(as.Date("2020-02-29"))
 
+  # Define the incidence data to initialise the model
+  obs$define_synthetic_observable(
+    name = "incidence",
+    mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
+  )
+
   # The example data uses a simple activity scenario for Denmark,
   # which we replicate here
   act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
   act$set_activity_units(dk_activity_units)
   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
-  # We create a default instance which has:
-  # * 1 age group (0+)
-  # * 1 variant
-  # * No season scaling
-  # * No activity scenarios
+  # We create a simple model instance
   m <- DiseasyModelOdeSeir$new(
     observables = obs,
     activity = act,
     disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
-    parameters = list("overall_infection_risk" = 0.025)
-  )
-
-  # We need the initial state for the system, which we infer from
-  # the incidence data (see `vignette("SEIR-initialisation")`).
-  # We compute this here from the example data which uses a 65 \%
-  # change of testing when infected
-  incidence_data <- m$observables$get_observation(
-    observable = "n_positive",
-    start_date = obs$ds$min_start_date,
-    end_date = m$training_period$end
-  ) |>
-    dplyr::mutate(
-      "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
+    parameters = list(
+      "overall_infection_risk" = 0.025,
+      "age_cuts_lower" = c(0, 30, 60)
     )
-
-  psi <- m$initialise_state_vector(incidence_data)
-
-  # The model now has a configured right-hand-side function that
-  # can be used to simulate the model in conjunction with deSolve.
-  sol <- deSolve::ode(
-    y = psi$initial_condition,
-    times = seq(from = 0, to = 100, by = 1),
-    func = m$rhs
   )
 
-  # Extract the incidence outcome from the solution
-  time <- sol[, 1]
-  model_incidence <- sol[, 3] * m$disease_progression_rates[["I"]]
+  # Run the model to predict incidence
+  prediction <- m$get_results("incidence", prediction_length = 30)
+  print(head(prediction, 5))
 
-  plot(
-    x = time + m$training_period$end,
-    y = model_incidence,
-    col = "red",
-    lty = 2,
-    xlim = c(as.Date("2020-01-01"), m$training_period$end + max(time)),
-    xlab = "Date",
-    ylab = "Incidence"
-  )
-  points(incidence_data$date, incidence_data$incidence, col = "black")
+  # Plot the results
+  plot(m, observable = "incidence", prediction_length = 30)
 
-  legend(
-    x = "topright",
-    legend = c("Model", "Data"),
-    col = c("red", "black"),
-    lty = c(2, 1)
-  )
-
-  rm(m, obs)
+  rm(m, act, obs)
 \dontshow{\}) # examplesIf}
 }
 \keyword{model-template}
 \section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{DiseasyModelOdeSeir}
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelOde]{diseasy::DiseasyModelOde}} -> \code{DiseasyModelOdeSeir}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -143,13 +110,14 @@ in the model. Read only.}
 }
 }
 \if{html}{\out{
-<details open><summary>Inherited methods</summary>
+<details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_results"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_results'><code>diseasy::DiseasyModel$get_results()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="get_results"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-get_results'><code>diseasy::DiseasyModelOde$get_results()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>diseasy::DiseasyModelOde$plot()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -160,12 +128,13 @@ in the model. Read only.}
 Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$new(
-  compartment_structure = c(E = 1L, I = 1L, R = 1L),
-  disease_progression_rates = c(E = 1, I = 1),
-  malthusian_matching = TRUE,
+  observables,
   activity = TRUE,
   season = TRUE,
   variant = TRUE,
+  compartment_structure = c(E = 1L, I = 1L, R = 1L),
+  disease_progression_rates = c(E = 1, I = 1),
+  malthusian_matching = TRUE,
   parameters = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -174,6 +143,8 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{observables, activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+
 \item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.}
 
 \item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.}
@@ -181,36 +152,44 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \item{\code{malthusian_matching}}{(\code{logical(1)})\cr
 Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?}
 
-\item{\code{activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
-
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
 Parameters controlling the structure of the model:
 \itemize{
-\item \code{age_cuts_lower} - Determines the age groups in the model.
+\item \code{age_cuts_lower} (\code{numeric()})\cr
+Determines the age groups in the model.
 }
 
 Parameters controlling the dynamics of the model:
-(Can be inferred from observational data via initialisation routines)
 \itemize{
-\item \code{overall_infection_risk} - A scalar that scales contact rates to infection rates.
+\item \code{overall_infection_risk} (\code{numeric(1)})\cr
+A scalar that scales contact rates to infection rates.
 }
 
 Parameters controlling initialisation routines
 \itemize{
-\item \code{incidence_polynomial_order} - The degree of the polynomial to fit to the incidence curves.
+\item \code{incidence_polynomial_order} (\code{integer(1)})\cr
+The degree of the polynomial to fit to the incidence curves.
+\item \code{incidence_polynomial_training_length} (\code{integer(1)})\cr
+The number of days to include in the incidence polynomial fit.
+\item \code{incidence_max_order_derivatives} (\code{integer(1)})\cr
+The highest (informed) derivative from incidence data.
+Higher order derivatives are set to zero.
 }
 
 Parameters controlling the functional modules:
 \itemize{
-\item \code{activity.weights} - passed to \code{DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)}
-\item \code{immunity.method} - passed to \code{DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)}
+\item \code{activity.weights} (\code{numeric(4)})\cr
+Passed to \code{?DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)}
+\item \code{immunity.method} (\code{character(1)})\cr
+Passed to \code{?DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)}
 }
 
 Additional parameters are:
 \itemize{
-\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.  * \code{model_rate_to_observable} (\verb{named list}(\verb{named list}(\code{function}(2))))\cr   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a \code{map} and \code{reduce} function contained in a list (the first nested list).   The \code{map} function is applied in a \code{dplyr::group_map()} call and should take two arguments:   - The first argument contains the model \code{rate} and information about group size: \code{proportion} and \code{population}.   - The second argument contains the groups (stratification).   The \code{reduce} function is applied in a \code{dplyr::summarise()} call to summarise across stratification levels.   By default, the \code{sum} function is used and will work for all counting observables.
 }}
 
 \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
@@ -292,14 +271,7 @@ Infer the state_vector from incidence data
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{incidence_data}}{(\code{data.frame})\cr
-Incidence observations as a \code{data.frame} with columns
-\itemize{
-\item \code{date}: The date of the observations
-\item \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format)
-\item \code{variant}: The variant of the incidence observation.
-\item \code{incidence}: The incidence in the age group at the given date
-}}
+\item{\code{incidence_data}}{incidence_data (\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format) - \code{variant}: The variant of the incidence observation. - \code{incidence}: The incidence in the age group at the given date}
 
 \item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
 
