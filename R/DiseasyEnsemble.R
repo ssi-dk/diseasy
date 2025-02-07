@@ -16,7 +16,7 @@
 #'
 #'   # Create a DiseasyEnsemble object
 #'   ensemble <- combineasy(
-#'     model_templates = list(DiseasyModelG0, DiseasyModelG1)
+#'     model_templates = list(DiseasyModelG0, DiseasyModelG1),
 #'     modules = observables
 #'   )
 #'
