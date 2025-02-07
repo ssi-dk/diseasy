@@ -181,6 +181,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #' @param observable `r rd_observable()`
     #' @param prediction_length `r rd_prediction_length()`
     #' @param stratification `r rd_stratification()`
+    #' @importFrom MASS kde2d
     plot = function(observable, prediction_length, stratification = NULL) {
 
       # Retrieve the prediction for the observable
