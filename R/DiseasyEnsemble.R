@@ -71,6 +71,80 @@ summary.DiseasyEnsemble <- function(object, ...) {
 
 
 #' @rdname DiseasyEnsemble-generics
+#' @inheritParams base::predict
+#' @param observable `r rd_observable()`
+#' @param prediction_length `r rd_prediction_length()`
+#' @param stratification `r rd_stratification()`
+#' @param by_model (`logical(1)`)\cr
+#'   Should the prediction be stratified by model?
+#' @param ... (`Any`) \cr
+#'   Unused. Required to match the generic signature.
+#' @return
+#'   `data.frame`-like object with columns with the predictions for the observable from the ensemble by
+#'  date, stratification and model (optional).
+#' @export
+predict.DiseasyEnsemble <- function(
+  object,
+  observable,
+  prediction_length,
+  stratification = NULL,
+  context_length = 30,
+  by_model = FALSE,
+  ...
+) {
+
+  if (length(object) == 0) {
+    stop("No models in ensemble")
+  }
+
+  # Get an model to draw data from
+  observables <- purrr::pluck(object, 1, "observables")
+
+  # Get results from ensemble
+  results <- object |>
+    purrr::map(
+      \(model) {
+        model$get_results(
+          observable = observable,
+          prediction_length = prediction_length,
+          stratification = stratification
+        )
+      }
+    )
+
+  # Confirm that all outputs conform to the requirements
+  stratification_names <- observables %.% stratification_names(stratification)
+
+  expected_get_results_columns <- c(                                                                                    # nolint: object_usage_linter
+    "date",
+    observable,
+    stratification_names,
+    "realisation_id",
+    "weight"
+  )
+  coll <- checkmate::makeAssertCollection()
+  purrr::iwalk(
+    results,
+    ~ {
+      if (!checkmate::test_set_equal(colnames(.), expected_get_results_columns)) {
+        coll$push(glue::glue("Malformed output from model at index {.y}"))
+      }
+    }
+  )
+  checkmate::reportAssertions(coll)
+
+  # Add model information and collapse to single data set
+  results <- purrr::map2(
+    results, object,
+    \(results, model) dplyr::mutate(results, "model" = !!model$hash)
+  ) |>
+    purrr::list_rbind()
+
+  return(results)
+}
+
+
+#' @rdname DiseasyEnsemble-generics
 #' @inheritParams base::plot
 #' @param observable `r rd_observable()`
 #' @param prediction_length `r rd_prediction_length()`
@@ -100,45 +174,14 @@ plot.DiseasyEnsemble <- function(
   observables <- purrr::pluck(x, 1, "observables")
 
   # Get results from ensemble
-  results <- x |>
-    purrr::map(
-      \(model) {
-        model$get_results(
-          observable = observable,
-          prediction_length = prediction_length,
-          stratification = stratification
-        )
-      }
-    )
-
-  # Confirm that all outputs conform to the requirements
-  stratification_names <- observables %.% stratification_names(stratification)
-
-  expected_get_results_columns <- c(                                                                                    # nolint: ojbect_usage_linter
-    "date",
-    observable,
-    stratification_names,
-    "realisation_id",
-    "weight"
+  results <- predict(
+    object = x,
+    observable = observable,
+    prediction_length = prediction_length,
+    stratification = stratification,
+    context_length = context_length,
+    by_model = by_model
   )
-  coll <- checkmate::makeAssertCollection()
-  purrr::iwalk(
-    results,
-    ~ {
-      if (!checkmate::test_set_equal(colnames(.), expected_get_results_columns)) {
-        coll$push(glue::glue("Malformed output from model at index {.y}"))
-      }
-    }
-  )
-  checkmate::reportAssertions(coll)
-
-  # Add model information and collapse to single data set
-  results <- purrr::map2(
-    results, x,
-    \(results, model) dplyr::mutate(results, "model" = !!model$hash)
-  ) |>
-    purrr::list_rbind()
-
 
   # Retrieve the observations for the observable at the stratification level
   observations <- observables$get_observation(
@@ -149,11 +192,12 @@ plot.DiseasyEnsemble <- function(
     respect_last_queryable_date = FALSE
   )
 
+  # Get the names of the stratifications
+  stratification_names <- observables %.% stratification_names(stratification)
 
   # Create palette with colours to use in plot
   colours <- grDevices::palette("dark")
   colour <- colours[which(observables$available_observables == observable)]
-
 
   # Determine the level to plot at
   plot_stratification <- c(

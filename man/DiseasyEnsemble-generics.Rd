@@ -4,12 +4,23 @@
 \alias{DiseasyEnsemble-generics}
 \alias{print.DiseasyEnsemble}
 \alias{summary.DiseasyEnsemble}
+\alias{predict.DiseasyEnsemble}
 \alias{plot.DiseasyEnsemble}
 \title{Standard generics for \code{DiseasyEnsemble} objects}
 \usage{
 \method{print}{DiseasyEnsemble}(x, width = 200, ...)
 
 \method{summary}{DiseasyEnsemble}(object, ...)
+
+\method{predict}{DiseasyEnsemble}(
+  object,
+  observable,
+  prediction_length,
+  stratification = NULL,
+  context_length = 30,
+  by_model = FALSE,
+  ...
+)
 
 \method{plot}{DiseasyEnsemble}(
   x,
@@ -45,6 +56,9 @@ Should the plot be stratified by model?}
 }
 \value{
 \code{NULL} (called for side effects)
+
+\code{data.frame}-like object with columns with the predictions for the observable from the ensemble by
+date, stratification and model (optional).
 }
 \description{
 Standard generics for \code{DiseasyEnsemble} objects
