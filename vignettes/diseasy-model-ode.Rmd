@@ -204,7 +204,10 @@ $$\tilde{I}(t) \overset{g_n}{\rightarrow} \tilde{O}_n(t)$$
 
 ## Mapping from observables to incidence
 For the model to be initialised, it needs an estimate of the incidence in the population.
-If such an estimate is not defined in the `diseasystore`, or if you wish to provide
+This incidence is then used to infer the dynamics of the disease in the population
+(See the article `SEIR-initialisation` in the online documentation for more information).
+
+If an estimate of the incidence is not defined in the `diseasystore`, or if you wish to provide
 your own estimate from the observable, we can define a "synthetic observable" in the
 `DiseasyObservables` module for the model to use.
 
