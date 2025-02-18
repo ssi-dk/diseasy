@@ -104,6 +104,7 @@ summary(ensemble)
 ```
 
 To produce plots from the ensemble, we need to at least specify the following:
+
 - *observable*: The observable to predict
 - *prediction_length*: The number of days to predict
 
@@ -145,6 +146,7 @@ plot(
 
 
 The `plot()` method has additional optional arguments which can be used to customize the plot further:
+
 - *by_model*: Should the results from the individual models be plotted instead?
 - *context_length*: The number of observations leading up the prediction to include in the plot.
 
