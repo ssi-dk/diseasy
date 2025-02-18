@@ -19,6 +19,7 @@ diseasy_code_linters <- function() {
     lintr::all_linters(
       object_length_linter = lintr::object_length_linter(length = 40L), # We allow for longer variable names
       line_length_linter = NULL,          # We use 120, nolint-aware line length linter instead
+      cyclocomp_linter = NULL,            # Not required in diseasy style guide
       keyword_quote_linter = NULL,        # Quoting variables names improves readability over R defaults
       implicit_integer_linter = NULL,     # Flags too many cases where integer status is not relevant
       nonportable_path_linter = NULL,     # Any \\ is flagged. Therefore fails when escaping backslashes
