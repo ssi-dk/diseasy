@@ -166,7 +166,7 @@ checkmate_err_msg <- function(expr) {
       msg <- stringr::str_remove_all(msg, stringr::fixed("\n *"))
       msg <- stringr::str_remove_all(msg, stringr::fixed("* "))
 
-      stop(simpleError(message = msg))                                                # nolint: condition_call_linter
+      stop(simpleError(message = msg))                                                                                  # nolint: condition_call_linter
     }
   )
 }
