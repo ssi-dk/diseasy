@@ -66,7 +66,7 @@ It contains three observables of interest for our example:
 
 - *n_infected*: The true number of infected in the data.
 - *n_positive*: The observed subset of infected
-  (65% of true infected with weekday variation in detection).
+  (65% of true infected are observed but fewer are observed during the weekend).
 - *n_admissions*: The number of new hospital admissions due to infections
   (risk of hospitalisation dependent on age group).
 
