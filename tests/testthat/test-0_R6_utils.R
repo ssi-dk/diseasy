@@ -160,6 +160,7 @@ test_that("parse_diseasyconn works", {
 
 
   conn <- expect_no_condition(parse_diseasyconn(valid_dbi_conn, type = "target_conn"))
+  attr(conn, "needs_cleanup") <- NULL # Remove our internal flag
   expect_identical(conn, valid_dbi_conn)
   checkmate::expect_class(conn, "DBIConnection")
 

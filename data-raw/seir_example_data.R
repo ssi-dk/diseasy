@@ -1,7 +1,7 @@
-if (rlang::is_installed(c("deSolve", "usethis"))) {
+if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # Generate synthetic disease data for testing from a simple SEIR model with some noise added
-  set.seed(4260)
+  withr::local_seed(4260)
 
   # Set the time scales of the problem
   rE <- 1 / 2.1                                                                                                         # nolint: object_name_linter

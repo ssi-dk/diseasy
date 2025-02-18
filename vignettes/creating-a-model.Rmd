@@ -174,7 +174,7 @@ be provided (target observable, time-window and stratification level). In return
 `data.frame`-like output that can be used for further analysis in conjunction with the results from other models.
 
 The outputs of the model are standardised, and should follow the structure of the `training_data` provided by
-`$get_training_data()` enriched by model prediction, model id and realization id.
+`$get_data()` enriched by model prediction, model id and realization id.
 
 [^1]: The seasonal model exposed by a configured `DiseasySeason` instance is a "closure" instead of a pure function.
 [^2]: In R6, functions from superclasses are available via the `super` keyword but non-function objects are not.

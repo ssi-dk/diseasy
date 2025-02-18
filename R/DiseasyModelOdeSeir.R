@@ -30,77 +30,44 @@
 #'   # used to train the models, and predictions start on this date.
 #'   obs$set_last_queryable_date(as.Date("2020-02-29"))
 #'
+#'   # Define the incidence data to initialise the model
+#'   obs$define_synthetic_observable(
+#'     name = "incidence",
+#'     mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
+#'   )
+#'
 #'   # The example data uses a simple activity scenario for Denmark,
 #'   # which we replicate here
 #'   act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
 #'   act$set_activity_units(dk_activity_units)
 #'   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 #'
-#'   # We create a default instance which has:
-#'   # * 1 age group (0+)
-#'   # * 1 variant
-#'   # * No season scaling
-#'   # * No activity scenarios
+#'   # We create a simple model instance
 #'   m <- DiseasyModelOdeSeir$new(
 #'     observables = obs,
 #'     activity = act,
 #'     disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
-#'     parameters = list("overall_infection_risk" = 0.025)
-#'   )
-#'
-#'   # We need the initial state for the system, which we infer from
-#'   # the incidence data (see `vignette("SEIR-initialisation")`).
-#'   # We compute this here from the example data which uses a 65 %
-#'   # change of testing when infected
-#'   incidence_data <- m$observables$get_observation(
-#'     observable = "n_positive",
-#'     start_date = obs$ds$min_start_date,
-#'     end_date = m$training_period$end
-#'   ) |>
-#'     dplyr::mutate(
-#'       "incidence" = .data$n_positive / (sum(act$contact_basis$population) * 0.65)
+#'     parameters = list(
+#'       "overall_infection_risk" = 0.025,
+#'       "age_cuts_lower" = c(0, 30, 60)
 #'     )
-#'
-#'   psi <- m$initialise_state_vector(incidence_data)
-#'
-#'   # The model now has a configured right-hand-side function that
-#'   # can be used to simulate the model in conjunction with deSolve.
-#'   sol <- deSolve::ode(
-#'     y = psi$initial_condition,
-#'     times = seq(from = 0, to = 100, by = 1),
-#'     func = m$rhs
 #'   )
 #'
-#'   # Extract the incidence outcome from the solution
-#'   time <- sol[, 1]
-#'   model_incidence <- sol[, 3] * m$disease_progression_rates[["I"]]
+#'   # Run the model to predict incidence
+#'   prediction <- m$get_results("incidence", prediction_length = 30)
+#'   print(head(prediction, 5))
 #'
-#'   plot(
-#'     x = time + m$training_period$end,
-#'     y = model_incidence,
-#'     col = "red",
-#'     lty = 2,
-#'     xlim = c(as.Date("2020-01-01"), m$training_period$end + max(time)),
-#'     xlab = "Date",
-#'     ylab = "Incidence"
-#'   )
-#'   points(incidence_data$date, incidence_data$incidence, col = "black")
+#'   # Plot the results
+#'   plot(m, observable = "incidence", prediction_length = 30)
 #'
-#'   legend(
-#'     x = "topright",
-#'     legend = c("Model", "Data"),
-#'     col = c("red", "black"),
-#'     lty = c(2, 1)
-#'   )
-#'
-#'   rm(m, obs)
+#'   rm(m, act, obs)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
 #' @export
 DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter
   classname = "DiseasyModelOdeSeir",
-  inherit = DiseasyModel,
+  inherit = DiseasyModelOde,
 
   public = list(
 
@@ -110,42 +77,59 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param disease_progression_rates `r rd_disease_progression_rates()`
     #' @param malthusian_matching (`logical(1)`)\cr
     #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
-    #' @param activity,season,variant `r rd_diseasy_module`
+    #' @param observables,activity,season,variant `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
     #'   Parameters controlling the structure of the model:
-    #'   * `age_cuts_lower` - Determines the age groups in the model.
+    #'   * `age_cuts_lower` (`numeric()`)\cr
+    #'     Determines the age groups in the model.
     #'
     #'   Parameters controlling the dynamics of the model:
-    #'   (Can be inferred from observational data via initialisation routines)
-    #'   * `overall_infection_risk` - A scalar that scales contact rates to infection rates.
+    #'   * `overall_infection_risk` (`numeric(1)`)\cr
+    #'     A scalar that scales contact rates to infection rates.
     #'
     #'   Parameters controlling initialisation routines
-    #'   * `incidence_polynomial_order` - The degree of the polynomial to fit to the incidence curves.
-    #*   * `incidence_polynomial_training_length` - The number of days to include in the incidence polynomial fit.
+    #'   * `incidence_polynomial_order` (`integer(1)`)\cr
+    #'     The degree of the polynomial to fit to the incidence curves.
+    #'   * `incidence_polynomial_training_length` (`integer(1)`)\cr
+    #'     The number of days to include in the incidence polynomial fit.
+    #'   * `incidence_max_order_derivatives` (`integer(1)`)\cr
+    #'     The highest (informed) derivative from incidence data.
+    #'     Higher order derivatives are set to zero.
     #'
     #'   Parameters controlling the functional modules:
-    #'   * `activity.weights` - passed to `DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)`
-    #'   * `immunity.method` - passed to `DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)`
+    #'   * `activity.weights` (`numeric(4)`)\cr
+    #'     Passed to `?DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)`
+    #'   * `immunity.method` (`character(1)`)\cr
+    #'     Passed to `?DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)`
     #'
     #'   Additional parameters are:
     #'   `r rd_diseasymodel_parameters`
+    #'   `r rd_diseasymodelode_parameters`
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     initialize = function(
-      compartment_structure = c("E" = 1L, "I" = 1L, "R" = 1L),
-      disease_progression_rates = c("E" = 1, "I" = 1),
-      malthusian_matching = TRUE,
+      observables,
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
+      compartment_structure = c("E" = 1L, "I" = 1L, "R" = 1L),
+      disease_progression_rates = c("E" = 1, "I" = 1),
+      malthusian_matching = TRUE,
       parameters = NULL,
       ...
     ) {
 
       # Pass arguments to the DiseasyModel initialiser
-      super$initialize(activity, season, variant, parameters, ...)
+      super$initialize(
+        observables = observables,
+        activity = activity,
+        season = season,
+        variant = variant,
+        parameters = parameters,
+        ...
+      )
 
 
       # Check the input arguments
@@ -169,16 +153,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_logical(malthusian_matching, add = coll)
 
       # Check we have the needed modules loaded and configured as needed
-      checkmate::assert_class(self$observables, "DiseasyObservables", add = coll)
-      checkmate::assert_date(self$observables$last_queryable_date, add = coll)
+      checkmate::assert_class(self %.% observables, "DiseasyObservables")
+      checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
 
-      checkmate::assert_class(self$activity, "DiseasyActivity", add = coll)
 
-      checkmate::assert_class(self$season, "DiseasySeason", add = coll)
+      checkmate::assert_class(self %.% activity, "DiseasyActivity", add = coll)
 
-      checkmate::assert_class(self$variant, "DiseasyVariant", add = coll)
+      checkmate::assert_class(self %.% season, "DiseasySeason", add = coll)
+
+      checkmate::assert_class(self %.% variant, "DiseasyVariant", add = coll)
 
       checkmate::reportAssertions(coll)
+
+      # Cast the compartment structure to a integer to make hash consistent
+      compartment_structure <- stats::setNames(as.integer(compartment_structure), names(compartment_structure))
 
 
       ### During the initialization of the model, we setup a number of intermediate vectors to speed up the computation
@@ -420,9 +408,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
 
-    #' @description
-    #'   Infer the state_vector from incidence data
-    #'
+    #' @description `r rd_initialise_state_vector_description`
     #' @details
     #'   The inference of the state_vector from incidence data is two-fold: EI states are inferred with one method and
     #'   the RS states are inferred with another. The methods are described in detail in the initialisation article
@@ -433,12 +419,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   If `ei_rs_balance = 1`, the estimate for EI states are prioritised, and only the RS states are modified.
     #'   If `ei_rs_balance = 0`, the estimate for RS states are prioritised.
     #'
-    #' @param incidence_data (`data.frame`)\cr
-    #'   Incidence observations as a `data.frame` with columns
-    #'   - `date`: The date of the observations
-    #'   - `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)
-    #'   - `variant`: The variant of the incidence observation.
-    #'   - `incidence`: The incidence in the age group at the given date
+    #' @param incidence_data `r rd_incidence_data`
     #' @param overall_infection_risk `r rd_overall_infection_risk`
     #' @param ei_rs_balance (`numeric(1)`)\cr
     #'   Which estimate should be priorities when normalising? See details.
@@ -474,7 +455,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         incidence_data <- dplyr::mutate(incidence_data, "age_group" = "0+")
       }
       if (!"variant" %in% colnames(incidence_data)) {
-        incidence_data <- dplyr::mutate(incidence_data, "variant" = "WT")
+        incidence_data <- incidence_data |>
+          dplyr::mutate(
+            "variant" = !!purrr::pluck(self %.% variant %.% variants, names, 1, .default = "All")
+          )
       }
 
 
@@ -503,8 +487,26 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Check incidence column
       checkmate::assert_numeric(incidence_data$incidence, lower = 0, upper = 1, any.missing = FALSE, add = coll)
 
+      # Check the remaining arguments
+      checkmate::assert_numeric(overall_infection_risk, lower = 0, len = 1, add = coll)
+      checkmate::assert_numeric(ei_rs_balance, lower = 0, upper = 1, len = 1, add = coll)
+
       checkmate::reportAssertions(coll)
 
+      # Rescale to the number of infections relative to the full population
+      proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+        dplyr::mutate(
+          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
+        ) |>
+        dplyr::summarise(
+          "proportion" = sum(.data$proportion),
+          .by = "age_group"
+        )
+
+      incidence_data <- incidence_data |>
+        dplyr::left_join(proportion, by = "age_group") |>
+        dplyr::mutate("incidence" = .data$incidence * .data$proportion) |>
+        dplyr::select(!"proportion")
 
       # We first compute the time relative to the training period end date
       incidence_data <- incidence_data |>
@@ -622,7 +624,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Impute zeros for missing states
       estimated_exposed_infected_states <- tidyr::expand_grid(
-        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT"),
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
@@ -674,7 +676,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           by = "1 day"
         ),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
-        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT")
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
       ) |>
         dplyr::left_join(incidence_data, by = c("date", "age_group", "variant")) |>
         dplyr::group_by(.data$variant, .data$age_group) |>
@@ -761,7 +763,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
-        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "WT"),
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = paste0("R", seq.int(self %.% compartment_structure %.% R))
       ) |>
@@ -978,6 +980,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Validate the incidence polynomial parameters
       checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_order, lower = 0, add = coll)
       checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_training_length, lower = 0, add = coll)
+      checkmate::assert_integerish(self %.% parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
 
       # Validate the functional modules parameters
       checkmate::assert_numeric(self %.% parameters %.% activity.weights, lower = 0, len = 4, add = coll)

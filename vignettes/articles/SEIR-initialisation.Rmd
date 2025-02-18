@@ -17,7 +17,7 @@ library(diseasy)
 Let us begin by considering a general SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively,
 which are governed by the rates $r_e$ and $r_i$ respectively.
 
-Let us further assume that we have a incidence signal, $I^*(t)$, which we would like our model to match.
+Let us further assume that we have a incidence signal[^1], $I^*(t)$, which we would like our model to match.
 
 The general approach is to consider the derivatives of the incidence and link these to the states of the model.
 
@@ -198,13 +198,9 @@ For the first example, we use the SEIR model output where we know the parameters
 To begin, we configure the observables module to use this data set and to use all available data.
 ```{r}
 # Connect to a database
-dir.create("cache/SEIR-initialisation", showWarnings = FALSE)
-conn <- duckdb::duckdb(dbdir = "cache/SEIR-initialisation/ds.duckdb") |>
-  DBI::dbConnect()
-
 obs <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = conn
+  conn = DBI::dbConnect(duckdb::duckdb())
 )
 
 obs$set_study_period( # Use all available data
@@ -274,26 +270,32 @@ These different levels of detail allows us to test the initialisation from incid
 
 
 The method relies on having incidence data, so we scale the model outputs by the population size.
-```{r}
-# Scale test / infected information to incidence data
-incidence_data <- model_data |>
-  tidyr::pivot_longer(
-    cols = dplyr::starts_with("n_"),
-    names_to = "source",
-    values_to = "model_output"
-  ) |>
-  dplyr::mutate(
-    "reporting_percentage" = dplyr::if_else(.data$source == "n_infected", 1, 0.65),
-    "incidence" = .data$model_output /
-      (sum(contact_basis$DK$population) * .data$reporting_percentage)
-  )
-```
-
+We do this by creating a "synthetic" observable in the observables module.
 
 The simplest cases is using the "n_infected" signal which directly tracks the `I1` state in the model.
 While the most realistic case is the "n_positive" signal which has some real life inspired noise patterns.
+
 ```{r}
 source <- "n_positive"
+
+
+if (source == "n_infected") {
+  mapping <- \(n_infected, n_population) n_infected / (n_population)
+} else if (source == "n_positive_simple") {
+  mapping <- \(n_positive_simple, n_population) {
+    n_positive_simple / (n_population * 0.65)
+  }
+} else if (source == "n_positive") {
+  mapping <- \(n_positive, n_population) n_positive / (n_population * 0.65)
+}
+
+obs$define_synthetic_observable("incidence", mapping)
+
+incidence_data <- obs$get_observation(
+  observable = "incidence",
+  stratification = rlang::quos(age_group)
+) |>
+  dplyr::mutate("source" = !!source)
 ```
 
 
@@ -336,13 +338,12 @@ This method relies on fitting a polynomial to the latest period, so we here visu
 ```{r, incidence fitting, fig.alt = "Fitting a polynomial to the incidence data to estimate derivatives."}
 # Extract the most recent signal
 poly_fit_data <- incidence_data |>
-  dplyr::filter(source == !!source) |>
   dplyr::mutate(
     "t" = as.numeric(.data$date - !!obs$last_queryable_date, units = "days")
   )
 
 poly_fit_projection <- poly_fit_data |>
-  dplyr::group_by(.data$age_group, .data$variant) |>
+  dplyr::group_by(.data$age_group) |>
   dplyr::group_modify(
     ~ {
       poly_fit <- lm(
@@ -356,21 +357,19 @@ poly_fit_projection <- poly_fit_data |>
 
       tibble::tibble(
         "t" = .x$t,
-        incidence = predict(poly_fit, data.frame("t" = t))
+        "incidence" = predict(poly_fit, data.frame("t" = t))
       ) |>
         dplyr::mutate("date" = .x$date)
     }
   )
 
-
 incidence_data |>
-  dplyr::filter(source == !!source) |>
   ggplot2::ggplot(ggplot2::aes(x = date, y = incidence)) +
     ggplot2::geom_point(
       color = switch(
         source,
-        "n_infected"        = "orange",
-        "n_positive_simple" = "deepskyblue3",
+        "n_infected"        = "deepskyblue3",
+        "n_positive_simple" = "orange",
         "n_positive"        = "seagreen"
       )
     ) +
@@ -387,7 +386,6 @@ incidence_data |>
     ggplot2::ylim(
       0,
       incidence_data |>
-        dplyr::filter(source == !!source) |>
         dplyr::pull("incidence") |>
         max() * 1.1
     ) +
@@ -398,9 +396,7 @@ incidence_data |>
 We can now use the `?DiseasyModelOdeSeir$initialise_state_vector()` method to infer the initial state vector.
 
 ```{r}
-psi <- incidence_data |>
-  dplyr::filter(.data$source == !!source) |>
-  m$initialise_state_vector()
+psi <- m$initialise_state_vector(incidence_data)
 
 psi
 ```
@@ -410,7 +406,6 @@ And we now test the initial conditions by solving the model using these starting
 get_prediction <- function(
     model,
     psi,
-    reporting_percentage = 1,
     signal = "incidence"
   ) {
 
@@ -445,18 +440,37 @@ get_prediction <- function(
       dplyr::select(!"state") |>
       dplyr::mutate(
         "date" = .data$time + model$observables$last_queryable_date,
-        "n_model" = model$disease_progression_rates[["I"]] *
+        "incidence_model" = model$disease_progression_rates[["I"]] *
             model$compartment_structure[["I"]] *
-            .data$value * reporting_percentage *
-            sum(model$activity$contact_basis$population)
+            .data$value
       )
+
+    # Convert to incidence
+    proportion <- model$activity$map_population(
+      model$parameters$age_cuts_lower
+    ) |>
+      dplyr::mutate(
+        "age_group" = diseasystore::age_labels(
+          model$parameters$age_cuts_lower
+        )[.data$age_group_out]
+      ) |>
+      dplyr::summarise(
+        "proportion" = sum(.data$proportion),
+        .by = "age_group"
+      )
+
+    out <- out |>
+      dplyr::left_join(proportion, by = "age_group") |>
+      dplyr::mutate("incidence_model" = .data$incidence_model / .data$proportion) |>
+      dplyr::select(!"proportion")
+
   } else if (signal == "prevalence") {
     out <- sol_long |>
       dplyr::filter(startsWith(.data$state, "I1")) |>
       dplyr::select(!"state") |>
       dplyr::summarise(
         "date" = dplyr::first(.data$time) + model$observables$last_queryable_date,
-        "n_model" = sum(.data$value),
+        "incidence_model" = sum(.data$value),
         .by = "time"
       )
   }
@@ -474,11 +488,7 @@ get_prediction <- function(
   return(out)
 }
 
-prediction <- get_prediction(
-  model = m,
-  psi = psi,
-  reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
-)
+prediction <- get_prediction(model = m, psi = psi)
 
 prediction
 ```
@@ -486,18 +496,18 @@ prediction
 ```{r correctly specified model, fig.alt = "Using a correctly specified model to initialise the SEIR model matches the true data near-perfectly."}
 ggplot2::ggplot() +
   ggplot2::geom_point(
-    data = dplyr::filter(incidence_data, .data$source == !!source),
-    ggplot2::aes(x = date, y = model_output),
+    data = incidence_data,
+    ggplot2::aes(x = date, y = incidence),
     color = switch(
       source,
-      "n_infected"        = "orange",
-      "n_positive_simple" = "deepskyblue3",
+      "n_infected"        = "deepskyblue3",
+      "n_positive_simple" = "orange",
       "n_positive"        = "seagreen"
     )
   ) +
   ggplot2::geom_line(
     data = prediction,
-    ggplot2::aes(x = date, y = n_model, color = model_configuration),
+    ggplot2::aes(x = date, y = incidence_model, color = model_configuration),
     linewidth = 1.5
   ) +
   ggplot2::geom_vline(
@@ -529,34 +539,25 @@ models <- list(
 
 predictions <- models |>
   purrr::map(\(m) {
-    psi <- m$initialise_state_vector(
-      incidence_data |>
-        dplyr::filter(.data$source == !!source)
-    )
-
-    get_prediction(
-      model = m,
-      psi = psi,
-      reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
-    )
+    get_prediction(model = m, psi = m$initialise_state_vector(incidence_data))
   }) |>
   purrr::reduce(rbind)
 
 
 ggplot2::ggplot() +
   ggplot2::geom_point(
-    data = dplyr::filter(incidence_data, .data$source == !!source),
-    ggplot2::aes(x = date, y = model_output),
+    data = incidence_data,
+    ggplot2::aes(x = date, y = incidence),
     color = switch(
       source,
-      "n_infected"        = "orange",
-      "n_positive_simple" = "deepskyblue3",
+      "n_infected"        = "deepskyblue3",
+      "n_positive_simple" = "orange",
       "n_positive"        = "seagreen"
     )
   ) +
   ggplot2::geom_line(
     data = predictions,
-    ggplot2::aes(x = date, y = n_model, color = model_configuration),
+    ggplot2::aes(x = date, y = incidence_model, color = model_configuration),
     linewidth = 1.5
   ) +
   ggplot2::geom_vline(
@@ -587,34 +588,25 @@ purrr::walk(models, \(m) {
 
 predictions <- models |>
   purrr::map(\(m) {
-    psi <- m$initialise_state_vector(
-      incidence_data |>
-        dplyr::filter(.data$source == !!source)
-    )
-
-    get_prediction(
-      model = m,
-      psi = psi,
-      reporting_percentage = ifelse(source == "n_infected", 1, 0.65)
-    )
+    get_prediction(model = m, psi = m$initialise_state_vector(incidence_data))
   }) |>
   purrr::reduce(rbind)
 
 
 ggplot2::ggplot() +
   ggplot2::geom_point(
-    data = dplyr::filter(incidence_data, .data$source == !!source),
-    ggplot2::aes(x = date, y = model_output),
+    data = incidence_data,
+    ggplot2::aes(x = date, y = incidence),
     color = switch(
       source,
-      "n_infected"        = "orange",
-      "n_positive_simple" = "deepskyblue3",
+      "n_infected"        = "deepskyblue3",
+      "n_positive_simple" = "orange",
       "n_positive"        = "seagreen"
     )
   ) +
   ggplot2::geom_line(
     data = predictions,
-    ggplot2::aes(x = date, y = n_model, color = model_configuration),
+    ggplot2::aes(x = date, y = incidence_model, color = model_configuration),
     linewidth = 1.5
   ) +
   ggplot2::geom_vline(
@@ -625,3 +617,7 @@ ggplot2::ggplot() +
   ggplot2::facet_grid(source ~ age_group, scales = "free") +
   ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```
+
+[^1]: The signal we eventually inside `?DiseasyModelOdeSeir$initialise_state_vector()` is computed from the incidence
+rate. There is a small but important difference between the incidence rate and the signal need for initialisation,
+$I^*(t)$. Specifically, $I^*(t)$ should be the number of true infections in the group divided by the total population not the group population.

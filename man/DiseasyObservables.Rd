@@ -89,13 +89,13 @@ The synthetic features defined in the module. Read-only.}
 \item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
 \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
 \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
-\item \href{#method-DiseasyObservables-finalize}{\code{DiseasyObservables$finalize()}}
 \item \href{#method-DiseasyObservables-clone}{\code{DiseasyObservables$clone()}}
 }
 }
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
@@ -256,7 +256,8 @@ The results are cached for faster retrieval at subsequent calls.
   observable,
   stratification = NULL,
   start_date = self \%.\% start_date,
-  end_date = self \%.\% end_date
+  end_date = self \%.\% end_date,
+  respect_last_queryable_date = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -270,6 +271,9 @@ The results are cached for faster retrieval at subsequent calls.
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+
+\item{\code{respect_last_queryable_date}}{(\code{logical})\cr
+Should the module be able to return data past \verb{$last_queryable_date}?}
 }
 \if{html}{\out{</div>}}
 }
@@ -285,16 +289,6 @@ Otherwise, the function fails and lists the available DiseasyObservables from th
 Prints a human readable report of the internal state of the module.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$describe()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyObservables-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyObservables-finalize}{}}}
-\subsection{Method \code{finalize()}}{
-Handles the clean-up of the class
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$finalize()}\if{html}{\out{</div>}}
 }
 
 }

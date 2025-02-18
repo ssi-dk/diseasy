@@ -90,7 +90,7 @@ A \code{character} string that is passed to \code{stats::as.formula} via \code{g
 
 \item{\code{parameters}}{(\verb{named list()})\cr
 \itemize{
-\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 }}
 }
 \if{html}{\out{</div>}}
