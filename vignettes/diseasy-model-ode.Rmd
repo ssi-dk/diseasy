@@ -315,7 +315,7 @@ model$get_results(
 ```
 
 ... and we can plot the predictions along with observations for the data
-```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of incidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "incidence",
@@ -334,7 +334,7 @@ model$get_results(
 ```
 
 ... and we can see the plots for each strata.
-```{r, fig.alt = "Model prediction for the number of ncidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of incidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
 plot(
   model,
   observable = "incidence",
