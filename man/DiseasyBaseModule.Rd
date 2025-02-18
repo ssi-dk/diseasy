@@ -51,7 +51,6 @@ Computes a hash value for the module. Useful for logging and caching. Read only.
 \item \href{#method-DiseasyBaseModule-new}{\code{DiseasyBaseModule$new()}}
 \item \href{#method-DiseasyBaseModule-set_moduleowner}{\code{DiseasyBaseModule$set_moduleowner()}}
 \item \href{#method-DiseasyBaseModule-load_module}{\code{DiseasyBaseModule$load_module()}}
-\item \href{#method-DiseasyBaseModule-finalize}{\code{DiseasyBaseModule$finalize()}}
 \item \href{#method-DiseasyBaseModule-clone}{\code{DiseasyBaseModule$clone()}}
 }
 }
@@ -132,16 +131,6 @@ The methods allows the setting of the internal module instances after the instan
 \subsection{Returns}{
 \code{NULL}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyBaseModule-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyBaseModule-finalize}{}}}
-\subsection{Method \code{finalize()}}{
-Handles the clean-up of the class
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyBaseModule$finalize()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyBaseModule-clone"></a>}}

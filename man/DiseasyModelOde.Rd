@@ -37,7 +37,6 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
