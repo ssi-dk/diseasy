@@ -358,7 +358,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
         purrr::discard(~ isTRUE(attr(., "clone"))) |>
         purrr::walk(~ .$finalize())
     }
-  ),
+  )
 )
 
 
