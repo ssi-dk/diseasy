@@ -175,7 +175,10 @@ DiseasyObservables <- R6::R6Class(                                              
     define_synthetic_observable = function(name, mapping) {
 
       if (is.null(self %.% ds)) {
-        stop("Diseasystore not initialized. call `$set_diseasystore()` before defining synthetic observables")
+        stop(
+          "Diseasystore not initialized. call `$set_diseasystore()` before defining synthetic observables",
+          call. = FALSE
+        )
       }
 
       coll <- checkmate::makeAssertCollection()

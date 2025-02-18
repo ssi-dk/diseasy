@@ -234,7 +234,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           }
 
           # Modify the margins
-          if (interactive()) par(mar = c(3, 3.25, 2, 1))
+          if (interactive()) withr::local_par(mar = c(3, 3.25, 2, 1))
 
           # Generate labels for the group
           group_label <- colnames(group) |>
@@ -366,7 +366,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
             "date" = .data$time + self %.% observables %.% last_queryable_date,
             .before = dplyr::everything()
           ) |>
-          dplyr::mutate(
+          dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter
             "rate" = self %.% disease_progression_rates[["I"]] * self %.% compartment_structure[["I"]] * .data$value
           ) |>
           dplyr::select(!c("time", "state", "value"))
@@ -433,7 +433,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
               glue::glue(
                 "The age groups in the data ({toString(age_groups_in_data)}) cannot be mapped to the ",
                 "models age groups ({toString(diseasystore::age_labels(self %.% parameters %.% age_cuts_lower))})."
-              )
+              ),
+              call. = FALSE
             )
           }
 

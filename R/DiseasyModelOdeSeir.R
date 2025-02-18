@@ -473,7 +473,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Check variant column
       if (length(unique(incidence_data$variant)) > 1) {
         if (is.null(self %.% variant %.% variants)) {
-          stop("DiseasyVariant must be configured in the model when using incidence data for multiple variants!")
+          stop(
+            "DiseasyVariant must be configured in the model when using incidence data for multiple variants!",
+            call. = FALSE
+          )
         }
         checkmate::assert_subset(
           unique(incidence_data$variant),
@@ -778,7 +781,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Report negative values
       if (purrr::some(estimated_recovered_susceptible_states$initial_condition, ~ . < 0)) {
-        warning("Negative values in estimated recovered and susceptible states. Setting to zero.")
+        warning("Negative values in estimated recovered and susceptible states. Setting to zero.", call. = FALSE)
         estimated_recovered_susceptible_states <- estimated_recovered_susceptible_states |>
           dplyr::mutate("initial_condition" = pmax(0, .data$initial_condition))
       }
@@ -1193,7 +1196,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     compute_malthusian_scaling_factor = function(...) {
 
       if (self %.% parameters %.% overall_infection_risk == 0) {
-        stop("The overall_infection_risk parameter must be strictly positive matching malthusian growth rates.")
+        stop(
+          "The overall_infection_risk parameter must be strictly positive matching malthusian growth rates.",
+          call. = FALSE
+        )
       }
 
       # The reference model is an SIR model with the same parameters as the current model

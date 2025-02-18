@@ -94,7 +94,7 @@ qhypo <- function(p, shape = 1, rate = rep(1, shape), lower.tail = TRUE) {      
   }
 
   # Compute the upper tail of the cumulative distribution function
-  q <- purrr::map_dbl(
+  q <- purrr::map_dbl(                                                                                                  # nolint: object_overwrite_linter
     p,
     \(p) {
       stats::uniroot(

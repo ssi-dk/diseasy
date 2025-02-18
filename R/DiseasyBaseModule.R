@@ -98,7 +98,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
       # Check the instance has a slot for the module to be loaded
       if (!paste0(".", class(module)[1]) %in% names(private)) {
-        stop(glue::glue("Module {class(module)[1]} not found in {class(self)[1]}"))
+        stop(glue::glue("Module {class(module)[1]} not found in {class(self)[1]}"), call. = FALSE)
       }
 
       # Check if the module should be cloned (i.e. a new instance is created, or if the module is used by reference)
@@ -271,14 +271,14 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
         obj <- private$.cache$get(hash)
         if (cachem::is.key_missing(obj)) {
-          stop("Hash not found in cache!")
+          stop("Hash not found in cache!", call. = FALSE)
         }
         return(obj)
 
       } else {
 
         if (private$.cache$exists(hash)) {
-          stop("Hash already found in cache!")
+          stop("Hash already found in cache!", call. = FALSE)
         } else {
           private$.cache$set(hash, obj)
         }
