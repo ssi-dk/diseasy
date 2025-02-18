@@ -433,7 +433,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
               glue::glue(
                 "The age groups in the data ({toString(age_groups_in_data)}) cannot be mapped to the ",
                 "models age groups ({toString(diseasystore::age_labels(self %.% parameters %.% age_cuts_lower))})."
-              )
+              ),
+              call. = FALSE
             )
           }
 

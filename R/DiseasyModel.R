@@ -184,10 +184,13 @@ DiseasyModel <- R6::R6Class(                                                    
       end_date   <- period_duration %.% end
 
       if (is.null(start_date) || is.null(end_date)) {
-        stop(glue::glue("Requested period is not configured! Check the corresponding `${period}_period`."))
+        stop(
+          glue::glue("Requested period is not configured! Check the corresponding `${period}_period`."),
+          call. = FALSE
+        )
       }
 
-      data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
+      data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>             # nolint: object_overwrite_linter
         dplyr::mutate(
           t = lubridate::interval(
             !!self %.% observables %.% last_queryable_date,
@@ -264,10 +267,10 @@ DiseasyModel <- R6::R6Class(                                                    
       name = "training_period",
       expr = {
         if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
+          stop("Observables module is not loaded!", call. = FALSE)
         }
         if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
+          stop("`$last_queryable_date` not configured in observables module!", call. = FALSE)
         }
 
         # We work backwards from the `last_queryable_date` and remove the testing and validation periods
@@ -312,10 +315,10 @@ DiseasyModel <- R6::R6Class(                                                    
       name = "testing_period",
       expr = {
         if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
+          stop("Observables module is not loaded!", call. = FALSE)
         }
         if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
+          stop("`$last_queryable_date` not configured in observables module!", call. = FALSE)
         }
 
         testing_length <- purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0)
@@ -344,10 +347,10 @@ DiseasyModel <- R6::R6Class(                                                    
       name = "validation_period",
       expr = {
         if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
+          stop("Observables module is not loaded!", call. = FALSE)
         }
         if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
+          stop("`$last_queryable_date` not configured in observables module!", call. = FALSE)
         }
 
         validation_length <- purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0)

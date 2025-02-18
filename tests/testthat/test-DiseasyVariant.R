@@ -39,19 +39,6 @@ test_that("$add_variant() works", {
 
 
   # Check malformed input
-  checkmate_err_msg <- \(expr) {
-    tryCatch(
-      expr,
-      error = \(e) {
-        e$message |>
-          stringr::str_remove_all(stringr::fixed("\n *")) |>
-          stringr::str_remove_all(stringr::fixed("* ")) |>
-          simpleError(message = _) |>
-          stop()
-      }
-    )
-  }
-
   expect_error(
     checkmate_err_msg(var$add_variant(name = "WT")),
     pattern = "Must be disjunct from"
