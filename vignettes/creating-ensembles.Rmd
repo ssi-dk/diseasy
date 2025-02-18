@@ -93,7 +93,8 @@ ensemble <- combineasy(
 ```
 The output of `combineasy()` is simply a list of model instances which we give the class `DiseasyEnsemble`.
 
-In doing so, we can use the `print()`, `summary()` and `plot()` functions to get a quick overview of the ensemble.
+In doing so, we can use the `print()`, `summary()`, `predict()` and `plot()` functions to get a quick overview
+of the ensemble.
 
 ```{r}
 print(ensemble)
@@ -103,10 +104,15 @@ print(ensemble)
 summary(ensemble)
 ```
 
-To produce plots from the ensemble, we need to at least specify the following:
+To produce predictions and plots from the ensemble, we need to at least specify the following:
 
 - *observable*: The observable to predict
 - *prediction_length*: The number of days to predict
+
+```{r}
+predict(ensemble, observable = "n_positive", prediction_length = 30) |>
+  head()
+```
 
 ```{r}
 plot(ensemble, observable = "n_positive", prediction_length = 30)
@@ -180,7 +186,7 @@ ensemble <- combineasy(
 )
 ```
 
-The ensemble now consists of $2 \times 3 \times 3 = 18$ models:
+The ensemble now consists of $2 \times 3 = 6$ models:
 ```{r}
 print(ensemble)
 ```
