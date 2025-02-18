@@ -234,7 +234,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           }
 
           # Modify the margins
-          if (interactive()) par(mar = c(3, 3.25, 2, 1))
+          if (interactive()) withr::local_par(mar = c(3, 3.25, 2, 1))
 
           # Generate labels for the group
           group_label <- colnames(group) |>

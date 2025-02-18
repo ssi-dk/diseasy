@@ -19,10 +19,7 @@ library(diseasy)
 ```
 
 ```{r vignette configuration, include = FALSE}
-opts <- options(
-  "tibble.print_min" = 5,
-  "diseasy.logging" = FALSE
-)
+withr::local_options("tibble.print_min" = 5)
 
 # We have a "hard" dependency for duckdb to render this vignette
 suggests_available <- rlang::is_installed("duckdb")
@@ -189,5 +186,4 @@ obs$get_observation(
 ```{r cleanup, include = FALSE}
 if (exists("obs")) rm(obs)
 gc()
-options(opts)
 ```
