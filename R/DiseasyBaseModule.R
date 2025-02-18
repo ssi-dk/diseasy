@@ -345,18 +345,6 @@ DiseasyBaseModule <- R6::R6Class(                                               
           toString()
       }
       return(stratification_chr)
-    },
-
-
-    # @description
-    #   Handles the clean-up of the class
-    finalize = function() {
-      # Look for contained Diseasy* classes and call finalize on these
-      private |>
-        as.list(all.names = TRUE) |>
-        purrr::keep(~ inherits(., "DiseasyBaseModule")) |>
-        purrr::discard(~ isTRUE(attr(., "clone"))) |>
-        purrr::walk(~ .$finalize())
     }
   )
 )

@@ -466,7 +466,6 @@ DiseasyObservables <- R6::R6Class(                                              
     finalize = function() {
       # Close the connection if needed
       if (isTRUE(attr(private$.conn, "needs_cleanup")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
-      super$finalize()
     }
   )
 )
