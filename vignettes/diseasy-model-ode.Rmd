@@ -143,7 +143,7 @@ To see more on how to configure this module, see `vignette("diseasy-activity")`.
 ```{r diseasy_activity}
 # Configure an activity module using Danish population and contact information.
 activity <- DiseasyActivity$new()
-activity$set_contact_basis(contact_basis = contact_basis %.% DK)
+activity$set_contact_basis(contact_basis = contact_basis$DK)
 activity$set_activity_units(dk_activity_units)
 
 # The level of activity is fixed to the "baseline" level throughout the simulation.
