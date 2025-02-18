@@ -189,7 +189,7 @@ observables$set_last_queryable_date(last_queryable_date)
 # Mapping observables to model and back
 Being a SEIR model, the `?DiseasyModelOdeSeir` model template runs the dynamics of the
 infections in the population. These dynamics are inferred from the incidence of the
-disease in the population. The model then predicts the evolution of the incidence
+disease in the population. The model then predicts the evolution of the incidence[^1]
 under the given configuration. To get predictions for other observables, we must
 map from the incidence to the observable of interest.
 
@@ -448,3 +448,5 @@ plot(
 if (exists("model")) rm(model)
 gc()
 ```
+
+[^1]: Measured as the rate of individuals exiting the first `I` state.
