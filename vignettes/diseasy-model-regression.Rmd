@@ -27,16 +27,16 @@ These are structured as R6 classes that uses inheritance to simplify the creatin
 
 Structurally, R6 classes we provide are as follows:
 
-| Module               | Description                                                           |
-|--------------------- | --------------------------------------------------------------------- |
-|`?DiseasyModel`       | All model templates initially inherit from this module (see `vignette("creating-a-model")`). |
-|`?DiseasyRegression`  | Defines the structure of regression model templates (i.e. must implement `$fit_regression()`, `$get_prediction()`, and `$update_formula()`). |
-|`?DiseasyModelGLM`    | Implements `$fit_regression()` and `$get_prediction()` using `stats::glm` |
-|`?DiseasyModelBRM`    | Implements `$fit_regression()` and `$get_prediction()` using `brms::brm`  |
-|`?DiseasyModelG0`     | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelGLM`) |
-|`?DiseasyModelG1`     | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelGLM`) |
-|`?DiseasyModelB0`     | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelBRM`) |
-|`?DiseasyModelB1`     | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelBRM`) |
+| Module                   | Description                                                           |
+|------------------------- | --------------------------------------------------------------------- |
+|`?DiseasyModel`           | All model templates initially inherit from this module (see `vignette("creating-a-model")`). |
+|`?DiseasyModelRegression` | Defines the structure of regression model templates (i.e. must implement `$fit_regression()`, `$get_prediction()`, and `$update_formula()`). |
+|`?DiseasyModelGLM`        | Implements `$fit_regression()` and `$get_prediction()` using `stats::glm` |
+|`?DiseasyModelBRM`        | Implements `$fit_regression()` and `$get_prediction()` using `brms::brm`  |
+|`?DiseasyModelG0`         | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelGLM`) |
+|`?DiseasyModelG1`         | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelGLM`) |
+|`?DiseasyModelB0`         | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelBRM`) |
+|`?DiseasyModelB1`         | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelBRM`) |
 
 # Examples
 Here we show how to use the simple regression model templates in `diseasy`.
@@ -45,10 +45,10 @@ The regression models are "duplicated" in the sense that there exist two similar
 models implemented in different statistical engines. The predictions from the
 models are very similar.
 
-| Engine \\ model | constant         | exponential      |
-|-----------------|------------------|------------------|
-| *glm*           | `DiseasyModelG0` | `DiseasyModelG1` |
-| *brms*          | `DiseasyModelB0` | `DiseasyModelB1` |
+| Engine \\ model | constant          | exponential       |
+|-----------------|-------------------|-------------------|
+| *glm*           | `?DiseasyModelG0` | `?DiseasyModelG1` |
+| *brms*          | `?DiseasyModelB0` | `?DiseasyModelB1` |
 
 For the examples below, we therefore show the results from the GLM class of models only.
 
@@ -137,7 +137,7 @@ model_1$get_results(
 )
 ```
 
-To visualise these predictions, we can use the standard `plot()` method where we supply the observable to 
+To visualise these predictions, we can use the standard `plot()` method where we supply the observable to
 predict and the number of days to predict into the future, as well as any stratification supported by the `diseasystore`.
 
 ### Example plots for the constant predictor model
