@@ -45,6 +45,11 @@ reference:
     - hash_environment
 
 articles:
+- title: Creating ensembles
+  navbar: Creating ensembles
+  contents:
+  - creating-ensembles
+
 - title: Functional modules
   navbar: Functional modules
   contents:
