@@ -542,16 +542,16 @@ test_that("$set_contact_basis() works", {
 })
 
 
-test_that("$describe() works", {
+test_that("$print() works", {
   act <- DiseasyActivity$new()
-  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+  expect_no_error(withr::with_output_sink(nullfile(), act$print()))
 
   act$set_contact_basis(contact_basis %.% DK)
-  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+  expect_no_error(withr::with_output_sink(nullfile(), act$print()))
 
   act$set_activity_units(dk_activity_units)
   act$change_activity(scenario_1)
-  expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
+  expect_no_error(withr::with_output_sink(nullfile(), act$print()))
 
   rm(act)
 })
