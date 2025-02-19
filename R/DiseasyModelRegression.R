@@ -181,7 +181,6 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #' @param observable `r rd_observable()`
     #' @param prediction_length `r rd_prediction_length()`
     #' @param stratification `r rd_stratification()`
-    #' @importFrom MASS kde2d
     plot = function(observable, prediction_length, stratification = NULL) {
 
       # Retrieve the prediction for the observable
@@ -230,16 +229,22 @@ DiseasyModelRegression <- R6::R6Class(                                          
             stringr::str_replace_all(stringr::fixed("_"), " ") |>
             stringr::str_to_sentence()
 
-          # Plot the predictions
-          d <- MASS::kde2d(
-            x = as.numeric(preds[["date"]]),
-            y = preds[[observable]],
-            lims = c(range(as.numeric(preds[["date"]])), c(0, max(preds[[observable]]))),
-            n = 100
-          )
-          image(
-            as.Date(d$x), d$y, d$z,
-            col = colorRampPalette(c("white", colour))(50),
+          # Compute quantiles
+          data <- preds |>
+            dplyr::summarise(
+              q05 = stats::quantile(.data[[observable]], 0.05),
+              q25 = stats::quantile(.data[[observable]], 0.25),
+              q50 = stats::quantile(.data[[observable]], 0.50),
+              q75 = stats::quantile(.data[[observable]], 0.75),
+              q95 = stats::quantile(.data[[observable]], 0.95),
+              .by = "date"
+            )
+
+          # plot the main line
+          plot(
+            data$date, data$q50,
+            type = "l",
+            col = colour,
             xlim = range(obs$date),
             ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
             xlab = "Date",
@@ -249,6 +254,21 @@ DiseasyModelRegression <- R6::R6Class(                                          
             xaxs = "i",
             mgp = c(2, 0.75, 0),
             cex.lab = 1.25
+          )
+
+          # Add shaded areas for the quantiles
+          polygon(
+            c(data$date, rev(data$date)),
+            c(data$q05, rev(data$q95)),
+            col = adjustcolor(colour, alpha.f = 0.25),
+            border = NA
+          )
+
+          polygon(
+            c(data$date, rev(data$date)),
+            c(data$q25, rev(data$q75)),
+            col = adjustcolor(colour, alpha.f = 0.35),
+            border = NA
           )
 
           # Plot the observations
