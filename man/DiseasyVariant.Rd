@@ -48,7 +48,7 @@ Read-only.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiseasyVariant-add_variant}{\code{DiseasyVariant$add_variant()}}
-\item \href{#method-DiseasyVariant-describe}{\code{DiseasyVariant$describe()}}
+\item \href{#method-DiseasyVariant-print}{\code{DiseasyVariant$print()}}
 \item \href{#method-DiseasyVariant-clone}{\code{DiseasyVariant$clone()}}
 }
 }
@@ -91,12 +91,12 @@ Characteristics can be:
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyVariant-describe"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyVariant-describe}{}}}
-\subsection{Method \code{describe()}}{
+\if{html}{\out{<a id="method-DiseasyVariant-print"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyVariant-print}{}}}
+\subsection{Method \code{print()}}{
 Prints a human readable report of the internal state of the module.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$describe()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$print()}\if{html}{\out{</div>}}
 }
 
 }

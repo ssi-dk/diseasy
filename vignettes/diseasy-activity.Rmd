@@ -176,9 +176,9 @@ act$get_scenario_openness(
 
 
 # Inspecting the module
-As we saw above, we can use the `$describe()` method to get a human readable summary of the module
+As we saw above, we can use the `print()` generic to get a human readable summary of the module
 ```{r inspect_describe}
-act$describe()
+print(act)
 ```
 
 We can also inspect the individual elements of the module more carefully such as the `$scenario_matrix` and
