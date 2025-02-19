@@ -78,8 +78,8 @@ rd_scale <- function(type = "param") {
 rd_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`DBIConnection` or `function`)\\cr",
-        "A database connection or function that opens a database connection",
-        ifelse(type == "field", " Read only.", ""))
+        "A database connection or function that opens a database connection.",
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
