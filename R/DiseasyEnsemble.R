@@ -56,7 +56,6 @@ print.DiseasyEnsemble <- function(x, width = 200, ...) {
 
 
 #' @rdname DiseasyEnsemble-generics
-#' @inheritParams base::summary
 #' @export
 summary.DiseasyEnsemble <- function(object, ...) {
   cat("DiseasyEnsemble consisting of:\n")
@@ -76,7 +75,6 @@ summary.DiseasyEnsemble <- function(object, ...) {
 
 
 #' @rdname DiseasyEnsemble-generics
-#' @inheritParams base::predict
 #' @param observable `r rd_observable()`
 #' @param prediction_length `r rd_prediction_length()`
 #' @param stratification `r rd_stratification()`
@@ -150,7 +148,6 @@ predict.DiseasyEnsemble <- function(
 
 
 #' @rdname DiseasyEnsemble-generics
-#' @inheritParams base::plot
 #' @param observable `r rd_observable()`
 #' @param prediction_length `r rd_prediction_length()`
 #' @param stratification `r rd_stratification()`
