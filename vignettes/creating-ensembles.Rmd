@@ -114,7 +114,7 @@ predict(ensemble, observable = "n_positive", prediction_length = 30) |>
   head()
 ```
 
-```{r}
+```{r, fig.alt = "Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points."}
 plot(ensemble, observable = "n_positive", prediction_length = 30)
 ```
 
@@ -122,7 +122,7 @@ One of the advantages of `diseasy` is its ability to easily stratify the models 
 In this example, the data in `DiseasystoreSeirExample` is stratified by age, and we can run our
 ensemble on each age group separately:
 
-```{r}
+```{r, fig.alt = "Plot of the ensemble predictions stratified by age group. Shaded area is ensemble quantiles with observations as points."}
 plot(
   ensemble,
   observable = "n_positive",
@@ -134,7 +134,7 @@ plot(
 These stratifications are *flexible* and we can stratify to our hearts desire, limited only by the
 stratification level in the `diseasystore`:
 
-```{r}
+```{r, fig.alt = "Plot of the ensemble predictions stratified by custom age group. Shaded area is ensemble quantiles with observations as points."}
 plot(
   ensemble,
   observable = "n_positive",
@@ -156,7 +156,7 @@ The `plot()` method has additional optional arguments which can be used to custo
 - *by_model*: Should the results from the individual models be plotted instead?
 - *context_length*: The number of observations leading up the prediction to include in the plot.
 
-```{r}
+```{r, fig.alt = "Plot of the ensemble predictions my model. Shaded area is ensemble quantiles with observations as points."}
 plot(
   ensemble,
   observable = "n_positive",
@@ -197,6 +197,6 @@ summary(ensemble)
 
 And again we can use the `plot()` method to visualize the predictions from the ensemble:
 
-```{r}
+```{r, fig.alt = "Plot of predictions from alternative ensemble. Shaded area is ensemble quantiles with observations as points."}
 plot(ensemble, observable = "n_positive", prediction_length = 30)
 ```
