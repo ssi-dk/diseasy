@@ -188,7 +188,8 @@ the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_data(
   observable,
   stratification = NULL,
-  period = c("training", "testing", "validation")
+  period = c("training", "testing", "validation", "plotting"),
+  prediction_length = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -200,7 +201,9 @@ the \code{last_queryable_date} of the \code{DiseasyObservables} module.
 \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 
 \item{\code{period}}{(\code{character})\cr
-The period to return data for. That is, the training, testing or validation period.}
+The period to return data for. That is, the training, testing, validation or plotting period.}
+
+\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
 }
 \if{html}{\out{</div>}}
 }

@@ -39,7 +39,7 @@ if (curl::has_internet()) {
 target_schema_1 <- "test_ds"
 target_schema_2 <- "not_test_ds"
 
-withr::local_options(
+options(
   "diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir,
   "diseasystore.target_schema" = target_schema_1
 )

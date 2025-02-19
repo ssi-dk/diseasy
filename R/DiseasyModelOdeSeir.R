@@ -513,7 +513,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We first compute the time relative to the training period end date
       incidence_data <- incidence_data |>
-        dplyr::mutate("t" = as.numeric(.data$date - self %.% training_period %.% end, units = "days"))
+        dplyr::mutate("t" = as.numeric(.data$date - self %.% training_period %.% end, units = "days")) |>
+        dplyr::filter(.data$t <= 0)
 
       # Now we need to fit the polynomials to each age-group / variant in the model, so we group by these
       # and extract the subsets.
