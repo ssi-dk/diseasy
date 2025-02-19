@@ -94,7 +94,7 @@ predict.DiseasyEnsemble <- function(
 ) {
 
   if (length(object) == 0) {
-    stop("No models in ensemble")
+    stop("No models in ensemble", call. = FALSE)
   }
 
   # Get an model to draw data from
@@ -167,7 +167,7 @@ plot.DiseasyEnsemble <- function(
 ) {
 
   if (length(x) == 0) {
-    stop("No models in ensemble")
+    stop("No models in ensemble", call. = FALSE)
   }
 
   # Get an model to draw data from
