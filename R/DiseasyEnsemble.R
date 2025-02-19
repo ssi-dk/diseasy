@@ -14,6 +14,11 @@
 #'     conn = DBI::dbConnect(duckdb::duckdb())
 #'   )
 #'
+#'   # Set the reference date in the observables module
+#'   observables$set_last_queryable_date(
+#'     observables$ds$min_start_date + 30
+#'   )
+#'
 #'   # Create a DiseasyEnsemble object
 #'   ensemble <- combineasy(
 #'     model_templates = list(DiseasyModelG0, DiseasyModelG1),
@@ -26,7 +31,7 @@
 #'
 #'   summary(ensemble)
 #'
-#'   plot(ensemble)
+#'   plot(ensemble, "n_positive", prediction_length = 30)
 #'
 #'   rm(ensemble, observables)
 #' @return `r rd_side_effects`
