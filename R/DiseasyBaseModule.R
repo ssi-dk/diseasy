@@ -375,6 +375,25 @@ plot.DiseasyBaseModule <- function(x, ...) {
 }
 
 
+#' @name print
+#' @title
+#'   Printing method for `diseasy` modules
+#' @description
+#'   Summarise `diseasy` modules.
+#' @param x (`Diseasy*`)\cr
+#'   The module to get information for.
+#' @param ...
+#'   Parameters sent to the specific printing methods.
+#'   See the `$print()` method for each module
+#' @return `r rd_side_effects`
+#' @examples
+#' # Examples to come
+#' @export
+print.DiseasyBaseModule <- function(x, ...) {
+  x$print(...)
+}
+
+
 # Set default options for the package related to DiseasyObservables
 rlang::on_load({
   options("diseasy.logging" = FALSE)
