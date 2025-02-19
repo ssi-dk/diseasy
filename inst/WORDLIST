@@ -7,6 +7,8 @@ CCW
 backends
 bitemporal
 bmatrix
+brm
+brms
 
 cccc
 ccccc
@@ -47,6 +49,7 @@ DiseasyBaseModule
 DiseasyModelB
 DiseasyModelG
 DiseasyModelOde
+DiseasyModelRegression
 DiseasyObservables
 DiseasySeason
 DiseasyVariant
@@ -78,6 +81,7 @@ FeatureHandlers
 frac
 
 github
+glm
 gov
 Gruson
 
