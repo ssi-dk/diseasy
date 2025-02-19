@@ -37,6 +37,7 @@ DBIConnection
 DBIDriver
 dbplyr
 ddots
+dI
 Diekmann
 diseasy
 diseasystore
@@ -56,6 +57,10 @@ dk
 DMI
 doi
 dplyr
+dR
+ds
+dS
+dt
 dtplyr
 DuckDB
 
