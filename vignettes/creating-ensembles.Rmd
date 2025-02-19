@@ -46,7 +46,7 @@ To configure this module we must:
   This date determine which data the models can "see", i.e. inform the ensemble, while everything
   after this date is kept from the ensemble.
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
   conn = DBI::dbConnect(RSQLite::SQLite())
@@ -76,7 +76,7 @@ To begin, we create a small ensemble using only one model template `DiseasyModel
 optional season module. For the ensemble, we will supply three different parameter sets which changes
 the training size of the model.
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 ensemble <- combineasy(
   model_templates = list(DiseasyModelG1),
   modules = tidyr::expand_grid(
@@ -96,11 +96,11 @@ The output of `combineasy()` is simply a list of model instances which we give t
 In doing so, we can use the `print()`, `summary()`, `predict()` and `plot()` functions to get a quick overview
 of the ensemble.
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 print(ensemble)
 ```
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 summary(ensemble)
 ```
 
@@ -109,12 +109,12 @@ To produce predictions and plots from the ensemble, we need to at least specify 
 - *observable*: The observable to predict
 - *prediction_length*: The number of days to predict
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 predict(ensemble, observable = "n_positive", prediction_length = 30) |>
   head()
 ```
 
-```{r, fig.alt = "Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points."}
+```{r, fig.alt = "Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points.", eval = rlang::is_installed("RSQLite")}
 plot(ensemble, observable = "n_positive", prediction_length = 30)
 ```
 
@@ -122,7 +122,7 @@ One of the advantages of `diseasy` is its ability to easily stratify the models 
 In this example, the data in `DiseasystoreSeirExample` is stratified by age, and we can run our
 ensemble on each age group separately:
 
-```{r, fig.alt = "Plot of the ensemble predictions stratified by age group. Shaded area is ensemble quantiles with observations as points."}
+```{r, fig.alt = "Plot of the ensemble predictions stratified by age group. Shaded area is ensemble quantiles with observations as points.", eval = rlang::is_installed("RSQLite")}
 plot(
   ensemble,
   observable = "n_positive",
@@ -134,7 +134,7 @@ plot(
 These stratifications are *flexible* and we can stratify to our hearts desire, limited only by the
 stratification level in the `diseasystore`:
 
-```{r, fig.alt = "Plot of the ensemble predictions stratified by custom age group. Shaded area is ensemble quantiles with observations as points."}
+```{r, fig.alt = "Plot of the ensemble predictions stratified by custom age group. Shaded area is ensemble quantiles with observations as points.", eval = rlang::is_installed("RSQLite")}
 plot(
   ensemble,
   observable = "n_positive",
@@ -156,7 +156,7 @@ The `plot()` method has additional optional arguments which can be used to custo
 - *by_model*: Should the results from the individual models be plotted instead?
 - *context_length*: The number of observations leading up the prediction to include in the plot.
 
-```{r, fig.alt = "Plot of the ensemble predictions my model. Shaded area is ensemble quantiles with observations as points."}
+```{r, fig.alt = "Plot of the ensemble predictions my model. Shaded area is ensemble quantiles with observations as points.", eval = rlang::is_installed("RSQLite")}
 plot(
   ensemble,
   observable = "n_positive",
@@ -170,7 +170,7 @@ plot(
 ## Example 2
 Now we create a larger ensemble using both model template (`DiseasyModelG0` and `DiseasyModelG1`) and the parameter settings from before.
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 ensemble <- combineasy(
   model_templates = list(DiseasyModelG0, DiseasyModelG1),
   modules = tidyr::expand_grid(
@@ -187,16 +187,16 @@ ensemble <- combineasy(
 ```
 
 The ensemble now consists of $2 \times 3 = 6$ models:
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 print(ensemble)
 ```
 
-```{r}
+```{r, eval = rlang::is_installed("RSQLite")}
 summary(ensemble)
 ```
 
 And again we can use the `plot()` method to visualize the predictions from the ensemble:
 
-```{r, fig.alt = "Plot of predictions from alternative ensemble. Shaded area is ensemble quantiles with observations as points."}
+```{r, fig.alt = "Plot of predictions from alternative ensemble. Shaded area is ensemble quantiles with observations as points.", eval = rlang::is_installed("RSQLite")}
 plot(ensemble, observable = "n_positive", prediction_length = 30)
 ```
