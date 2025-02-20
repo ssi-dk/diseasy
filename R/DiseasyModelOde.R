@@ -156,7 +156,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
 
     #' @description
-    #'   Plot the predictions from the current model
+    #'   Plot the predictions from the current model.
     #' @param observable `r rd_observable()`
     #' @param prediction_length `r rd_prediction_length()`
     #' @param stratification `r rd_stratification()`

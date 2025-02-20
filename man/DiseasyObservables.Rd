@@ -88,6 +88,7 @@ The synthetic features defined in the module. Read-only.}
 \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
 \item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
 \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
+\item \href{#method-DiseasyObservables-stratification_names}{\code{DiseasyObservables$stratification_names()}}
 \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
 \item \href{#method-DiseasyObservables-clone}{\code{DiseasyObservables$clone()}}
 }
@@ -279,6 +280,26 @@ Should the module be able to return data past \verb{$last_queryable_date}?}
 \subsection{Returns}{
 If the observable is found, the function returns the corresponding data at the stratification level.\cr
 Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyObservables-stratification_names"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-stratification_names}{}}}
+\subsection{Method \code{stratification_names()}}{
+Get the names of the stratifications.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$stratification_names(stratification)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The names of the stratifications.
 }
 }
 \if{html}{\out{<hr>}}

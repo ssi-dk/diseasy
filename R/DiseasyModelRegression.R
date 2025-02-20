@@ -159,10 +159,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
         prediction <- prediction |>
           dplyr::select(!tidyselect::any_of(c("t", "season"))) |> # Delete the surplus columns
           dplyr::rename(!!observable := observable) |>
-          dplyr::mutate(
-            "weight" = 1,  # All realizations have the same weight
-            "model" = self$hash
-          ) # Add meta information to the data
+          dplyr::mutate("weight" = 1) # All realisations have the same weight
 
         # Store in cache
         private$cache(hash, prediction)

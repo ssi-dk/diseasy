@@ -91,7 +91,7 @@ The primary method used to request model results of a given observable at a give
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr   date (\code{Date}) specifying the date of the prediction\cr   realization_id (\code{character}) giving a unique id for each realization in the ensemble\cr   model (\code{character}) the name (classname) of the model used to provide the prediction.
+A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
 }
 }
 \if{html}{\out{<hr>}}
@@ -115,7 +115,7 @@ Infer the state_vector from incidence data
 \if{html}{\out{<a id="method-DiseasyModelOde-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOde-plot}{}}}
 \subsection{Method \code{plot()}}{
-Plot the predictions from the current model
+Plot the predictions from the current model.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$plot(observable, prediction_length, stratification = NULL)}\if{html}{\out{</div>}}
 }
