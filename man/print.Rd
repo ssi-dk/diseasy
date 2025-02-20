@@ -5,11 +5,14 @@
 \alias{print.DiseasyBaseModule}
 \title{Printing method for \code{diseasy} modules}
 \usage{
-\method{print}{DiseasyBaseModule}(x, ...)
+\method{print}{DiseasyBaseModule}(x, verbose = FALSE, ...)
 }
 \arguments{
 \item{x}{(\verb{Diseasy*})\cr
 The module to get information for.}
+
+\item{verbose}{(\code{logical(1)})\cr
+Should the full information for the module be printed?}
 
 \item{...}{Parameters sent to the specific printing methods.
 See the \verb{$print()} method for each module}
