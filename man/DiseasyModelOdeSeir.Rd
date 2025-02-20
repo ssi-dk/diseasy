@@ -77,14 +77,6 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelOde]{diseasy::DiseasyModelOde}} -> \code{DiseasyModelOdeSeir}
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
-Place holder for the immunity module}
-}
-\if{html}{\out{</div>}}
-}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
