@@ -865,7 +865,7 @@
     {
       "ref": "curl",
       "package": "curl",
-      "version": "6.2.0",
+      "version": "6.2.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -877,10 +877,10 @@
         "RemoteRef": "curl",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "6.2.0"
+        "RemoteSha": "6.2.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/curl_6.2.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/curl_6.2.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/curl_6.2.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/curl_6.2.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2457,7 +2457,7 @@
     {
       "ref": "jsonlite",
       "package": "jsonlite",
-      "version": "1.8.9",
+      "version": "1.9.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2469,10 +2469,10 @@
         "RemoteRef": "jsonlite",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.8.9"
+        "RemoteSha": "1.9.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/jsonlite_1.8.9.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/jsonlite_1.8.9.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/jsonlite_1.9.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/jsonlite_1.9.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -5130,7 +5130,7 @@
     {
       "ref": "tinytex",
       "package": "tinytex",
-      "version": "0.54",
+      "version": "0.55",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -5142,10 +5142,10 @@
         "RemoteRef": "tinytex",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.54"
+        "RemoteSha": "0.55"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/tinytex_0.54.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/tinytex_0.54.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/tinytex_0.55.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/tinytex_0.55.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -5471,7 +5471,7 @@
     {
       "ref": "xfun",
       "package": "xfun",
-      "version": "0.50",
+      "version": "0.51",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -5483,10 +5483,10 @@
         "RemoteRef": "xfun",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.50"
+        "RemoteSha": "0.51"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/xfun_0.50.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/xfun_0.50.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/xfun_0.51.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/xfun_0.51.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
