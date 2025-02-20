@@ -284,8 +284,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         method = self %.% parameters %.% immunity.method,
         M = compartment_structure[["R"]]
       )
-      immunity_risks <- 1 - immunity_approx[1:compartment_structure[["R"]]]
-      immunity_rates <- immunity_approx[-(1:compartment_structure[["R"]])]
+      immunity_risks <- 1 - immunity_approx %.% gamma %.% infection
+      immunity_rates <- immunity_approx %.% delta
 
 
 

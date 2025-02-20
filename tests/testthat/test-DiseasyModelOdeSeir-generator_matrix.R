@@ -1,7 +1,6 @@
 # For these tests to be more readable, we define some short hand here and explain their value
 rE <- 1 / 2 # Overall disease progression rate from E to I                                                              # nolint: object_name_linter
 rI <- 1 / 4 # Overall disease progression rate from I to R                                                              # nolint: object_name_linter
-fv <- 0.01 # Whenever two variants are in use, the second has a relative infection risk of this factor
 
 
 test_that("$generator_matrix() (SIR single variant / single age group)", {
@@ -28,10 +27,8 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   )
 
   # Then check where everyone is in R
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+
   expect_identical(
     private$generator_matrix(RS_states = c(1, 0)),
     matrix(fr - rI)
@@ -115,10 +112,8 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   # Then check where population is uniform and two variants are active
   s <- r <- 1 / (2 * (1 + 2))
 
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
   fr_21 <- 1 - chi_21 * (1 - fr)
   rho_1 <- s + fr * r + fr_21 * r # "cross section" of variant 1 infecting a given age group
@@ -324,10 +319,8 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   # Then check where population is uniform and two variants are active
   s <- r <- 1 / (1 + 2 * 2)
 
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
   fr_21 <- 1 - chi_21 * (1 - fr)
   rho_1 <- mean(s + fr * 2 * r + fr_21 * 2 * r) # "cross section" of variant 1 infecting a given age group
@@ -461,10 +454,8 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   # Then check where population is uniform and two variants are active
   s <- r <- 1 / (2 + 2 * 2)
 
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
   fr_21 <- 1 - chi_21 * (1 - fr)
   rho_1 <- s + fr * r + fr_21 * r # "cross section" of variant 1 infecting a given age group
