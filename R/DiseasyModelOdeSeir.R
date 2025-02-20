@@ -900,16 +900,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
 
       return(list(dy_dt))
-    },
-
-
-    #' @field immunity (`diseasy::DiseasyImmunity`)\cr
-    #'   Place holder for the immunity module
-    immunity = list(
-      "approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), M = NULL) {            # nolint: object_name_linter
-        c(rev(seq(from = 0.9, to = 0.05, length.out = M)), rep(1, M - 1))
-      }
-    )
+    }
   ),
 
 
