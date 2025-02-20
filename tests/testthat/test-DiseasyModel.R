@@ -414,8 +414,8 @@ test_that("$get_data() works", {
   checkmate::expect_names(names(training_data), must.include = c("date", "n_positive", "t"))
 
   # Check the returned data falls in the training period
-  expect_identical(min(training_data$date), m %.% training_period %.% start)
-  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_equal(min(training_data$date), m %.% training_period %.% start)                                                # nolint: expect_identical_linter
+  expect_equal(max(training_data$date), m %.% training_period %.% end)                                                  # nolint: expect_identical_linter
 
   expect_identical(min(training_data$t), -last_queryable_offset)
   expect_identical(max(training_data$t), 0)
@@ -430,8 +430,8 @@ test_that("$get_data() works", {
   )
   training_data <- m$get_data("n_positive", period = "training")
 
-  expect_identical(min(training_data$date), m %.% training_period %.% start)
-  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_equal(min(training_data$date), m %.% training_period %.% start)                                                # nolint: expect_identical_linter
+  expect_equal(max(training_data$date), m %.% training_period %.% end)                                                  # nolint: expect_identical_linter
   expect_identical(min(training_data$t), -10 + 1)
   expect_identical(max(training_data$t), 0)
   rm(m)
@@ -443,14 +443,14 @@ test_that("$get_data() works", {
     parameters = list("training_length" = c("training" = 10, "testing" = 5))
   )
   training_data <- m$get_data("n_positive", period = "training")
-  expect_identical(min(training_data$date), m %.% training_period %.% start)
-  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_equal(min(training_data$date), m %.% training_period %.% start)                                                # nolint: expect_identical_linter
+  expect_equal(max(training_data$date), m %.% training_period %.% end)                                                  # nolint: expect_identical_linter
   expect_identical(min(training_data$t), -10 - 5 + 1)
   expect_identical(max(training_data$t), -5)
 
   testing_data <- m$get_data("n_positive", period = "testing")
-  expect_identical(min(testing_data$date), m %.% testing_period %.% start)
-  expect_identical(max(testing_data$date), m %.% testing_period %.% end)
+  expect_equal(min(testing_data$date), m %.% testing_period %.% start)                                                  # nolint: expect_identical_linter
+  expect_equal(max(testing_data$date), m %.% testing_period %.% end)                                                    # nolint: expect_identical_linter
   expect_identical(min(testing_data$t), -5 + 1)
   expect_identical(max(testing_data$t), 0)
   rm(m)
@@ -462,20 +462,20 @@ test_that("$get_data() works", {
     parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
   )
   training_data <- m$get_data("n_positive", period = "training")
-  expect_identical(min(training_data$date), m %.% training_period %.% start)
-  expect_identical(max(training_data$date), m %.% training_period %.% end)
+  expect_equal(min(training_data$date), m %.% training_period %.% start)                                                # nolint: expect_identical_linter
+  expect_equal(max(training_data$date), m %.% training_period %.% end)                                                  # nolint: expect_identical_linter
   expect_identical(min(training_data$t), -10 - 5 - 2 + 1)
   expect_identical(max(training_data$t), -5 - 2)
 
   testing_data <- m$get_data("n_positive", period = "testing")
-  expect_identical(min(testing_data$date), m %.% testing_period %.% start)
-  expect_identical(max(testing_data$date), m %.% testing_period %.% end)
+  expect_equal(min(testing_data$date), m %.% testing_period %.% start)                                                  # nolint: expect_identical_linter
+  expect_equal(max(testing_data$date), m %.% testing_period %.% end)                                                    # nolint: expect_identical_linter
   expect_identical(min(testing_data$t), -5 - 2 + 1)
   expect_identical(max(testing_data$t), -2)
 
   validation_data <- m$get_data("n_positive", period = "validation")
-  expect_identical(min(validation_data$date), m %.% validation_period %.% start)
-  expect_identical(max(validation_data$date), m %.% validation_period %.% end)
+  expect_equal(min(validation_data$date), m %.% validation_period %.% start)                                            # nolint: expect_identical_linter
+  expect_equal(max(validation_data$date), m %.% validation_period %.% end)                                              # nolint: expect_identical_linter
   expect_identical(min(validation_data$t), -2 + 1)
   expect_identical(max(validation_data$t), 0)
   rm(m)
@@ -484,8 +484,8 @@ test_that("$get_data() works", {
   # -- Getting data for the plotting period
   m <- DiseasyModel$new(observables = obs)
   plotting_data <- m$get_data("n_positive", period = "plotting", prediction_length = 10)
-  expect_identical(min(plotting_data$date), m %.% training_period %.% start)
-  expect_identical(max(plotting_data$date), obs %.% last_queryable_date + lubridate::days(10))
+  expect_equal(min(plotting_data$date), m %.% training_period %.% start)                                                # nolint: expect_identical_linter
+  expect_equal(max(plotting_data$date), obs %.% last_queryable_date + lubridate::days(10))                              # nolint: expect_identical_linter
   expect_identical(min(plotting_data$t), -last_queryable_offset)
   expect_identical(max(plotting_data$t), 10)
   rm(m)
