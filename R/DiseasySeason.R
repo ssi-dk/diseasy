@@ -458,7 +458,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
 
     #' @description `r rd_describe`
-    print = function() {
+    describe = function() {
       printr("# DiseasySeason ##############################################")
       printr(glue::glue("Season model: {attr(self$model_t, 'name')}"))
       printr(glue::glue("{attr(self$model_t, 'description')}"))

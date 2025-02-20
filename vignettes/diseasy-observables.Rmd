@@ -52,9 +52,9 @@ obs$available_observables
 obs$available_stratifications
 ```
 
-To check the current status of the module, the `print()` generic can be used:
-```{r print, eval = suggests_available}
-print(obs)
+To check the current status of the module, the `$describe()` method can be used:
+```{r describe, eval = suggests_available}
+obs$describe()
 ```
 
 # Getting observations

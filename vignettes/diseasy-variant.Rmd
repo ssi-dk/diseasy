@@ -84,7 +84,7 @@ variant$cross_immunity
 
 
 # Summarising the scenario
-As with other `diseasy` modules, the `print()` generic can be used to get a human readable summary of the scenario.
+As with other `diseasy` modules, the `$describe()` method can be used to get a human readable summary of the scenario.
 ```{r inspect_describe}
-print(variant)
+variant$describe()
 ```

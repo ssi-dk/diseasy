@@ -32,9 +32,9 @@ s$available_season_models
 ```
 
 By default, the module initializes with the `constant_season()` model.
-To check the current status of the module, including which model is set, the `print()` generic can be used:
-```{r print}
-print(s)
+To check the current status of the module, including which model is set, the `$describe()` method can be used:
+```{r describe}
+s$describe()
 ```
 
 Once a season model is set, interfacing with the model happens through the `$model_t()` and `$model_date()` methods.

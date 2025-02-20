@@ -698,23 +698,23 @@ test_that("active binding: available_observables works", {
 })
 
 
-test_that("$print() works", {
+test_that("$describe() works", {
   skip_if_not_installed("RSQLite")
 
   obs <- DiseasyObservables$new()
-  expect_no_error(withr::with_output_sink(nullfile(), obs$print()))
+  expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
 
   obs$set_diseasystore(diseasystore = "Google COVID-19")
-  expect_no_error(withr::with_output_sink(nullfile(), obs$print()))
+  expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
 
   obs$set_study_period(start_date = as.Date("2021-03-01"), end_date = as.Date("2021-03-03"))
-  expect_no_error(withr::with_output_sink(nullfile(), obs$print()))
+  expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
 
   obs$set_last_queryable_date(last_queryable_date = as.Date("2021-03-03"))
-  expect_no_error(withr::with_output_sink(nullfile(), obs$print()))
+  expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
 
   obs$set_slice_ts(slice_ts = "2021-03-04 09:00:00")
-  expect_no_error(withr::with_output_sink(nullfile(), obs$print()))
+  expect_no_error(withr::with_output_sink(nullfile(), obs$describe()))
 
   rm(obs)
 })

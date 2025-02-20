@@ -711,7 +711,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     },
 
     #' @description `r rd_describe`
-    print = function() {
+    describe = function() {
       printr("# DiseasyActivity ############################################")
       if (is.null(self$scenario_matrix)) {
         printr("Scenario: Activity scenario not yet set")

@@ -88,7 +88,7 @@ The synthetic features defined in the module. Read-only.}
 \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
 \item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
 \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
-\item \href{#method-DiseasyObservables-print}{\code{DiseasyObservables$print()}}
+\item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
 \item \href{#method-DiseasyObservables-clone}{\code{DiseasyObservables$clone()}}
 }
 }
@@ -282,12 +282,12 @@ Otherwise, the function fails and lists the available DiseasyObservables from th
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyObservables-print"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyObservables-print}{}}}
-\subsection{Method \code{print()}}{
+\if{html}{\out{<a id="method-DiseasyObservables-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-describe}{}}}
+\subsection{Method \code{describe()}}{
 Prints a human readable report of the internal state of the module.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$print()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$describe()}\if{html}{\out{</div>}}
 }
 
 }
