@@ -9,6 +9,8 @@ CCW
 backends
 bitemporal
 bmatrix
+brm
+brms
 
 cccc
 ccccc
@@ -50,6 +52,8 @@ DiseasyBaseModule
 DiseasyImmunity
 DiseasyModelB
 DiseasyModelG
+DiseasyModelOde
+DiseasyModelRegression
 DiseasyObservables
 DiseasySeason
 DiseasyVariant
@@ -57,6 +61,10 @@ dk
 DMI
 doi
 dplyr
+dR
+ds
+dS
+dt
 dtplyr
 DuckDB
 
@@ -68,6 +76,7 @@ endblock
 Engbo
 epiverse
 erviss
+etc
 
 FeatureHandler
 FeatureHandlers
@@ -76,6 +85,7 @@ fns
 frac
 
 github
+glm
 gov
 Gruson
 
@@ -190,6 +200,7 @@ underbrace
 
 vec
 vdots
+vec
 
 walkthrough
 www

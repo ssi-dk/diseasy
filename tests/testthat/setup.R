@@ -28,13 +28,18 @@ options(diseasy.conn = test_conn)
 # Then we download the first n rows of the google data set of interest
 remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-purrr::walk(google_files, ~ {
-  readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-    readr::write_csv(file.path(tmp_dir, .))
-})
+if (curl::has_internet()) {
+  purrr::walk(google_files, ~ {
+    readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+      readr::write_csv(file.path(tmp_dir, .))
+  })
+}
 
 # Set the diseasystores to use the testing schemas
 target_schema_1 <- "test_ds"
 target_schema_2 <- "not_test_ds"
-options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir)
-options("diseasystore.target_schema" = target_schema_1)
+
+options(
+  "diseasystore.DiseasystoreGoogleCovid19.source_conn" = tmp_dir,
+  "diseasystore.target_schema" = target_schema_1
+)

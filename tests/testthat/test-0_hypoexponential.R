@@ -66,7 +66,7 @@ for (shape in c(1, 5)) { # Number of compartments
       if (length(r) == 1) r <- rep(r, shape)
 
       # Generate samples from the corresponding hypoexponential distribution
-      set.seed(42)
+      withr::local_seed(42)
       rhypo_samples <- r |>
         purrr::map(~ stats::rexp(n_samples, rate = .)) |>
         purrr::reduce(`+`)

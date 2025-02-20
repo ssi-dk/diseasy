@@ -96,7 +96,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
         # Give error if scale not used in model
         if (!("scale" %in% names(dots))) {
-          stop(attr(private$.model_t, "dots"), "does not use scale argument")
+          stop(attr(private$.model_t, "dots"), "does not use scale argument", call. = FALSE)
         }
 
         # Set new scale

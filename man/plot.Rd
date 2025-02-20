@@ -12,7 +12,7 @@
 The module to generate visualisation for.}
 
 \item{...}{Parameters sent to the specific plotting methods.
-See the \verb{$plot()} method for each module}
+See the \verb{$plot()} method for each module.}
 }
 \value{
 \code{NULL} (called for side effects)

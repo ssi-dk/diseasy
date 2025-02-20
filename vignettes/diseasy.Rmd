@@ -19,11 +19,7 @@ library(diseasy)
 ```
 
 ```{r hidden_options, include = FALSE}
-if (rlang::is_installed("withr")) {
-  withr::local_options("diseasystore.verbose" = FALSE)
-} else {
-  opts <- options("diseasystore.verbose" = FALSE)
-}
+withr::local_options("diseasystore.verbose" = FALSE)
 ```
 
 # Overview
@@ -128,7 +124,4 @@ See `?DiseasyBaseModule` for more information.
 ```{r cleanup, include = FALSE}
 rm(s)
 gc()
-if (!rlang::is_installed("withr")) {
-  options(opts)
-}
 ```

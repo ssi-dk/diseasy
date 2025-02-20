@@ -66,7 +66,7 @@ DiseasyObservables <- R6::R6Class(                                              
       super$initialize(...)
 
       # Set the db connection
-      private$.conn <- parse_diseasyconn(conn) # Open a new connection to the DB
+      private$.conn <- parse_diseasyconn(conn, type = "target_conn") # Open a new connection to the DB
       checkmate::assert_class(self %.% conn, "DBIConnection")
 
       # Initialize based on input
@@ -175,7 +175,10 @@ DiseasyObservables <- R6::R6Class(                                              
     define_synthetic_observable = function(name, mapping) {
 
       if (is.null(self %.% ds)) {
-        stop("Diseasystore not initialized. call `$set_diseasystore()` before defining synthetic observables")
+        stop(
+          "Diseasystore not initialized. call `$set_diseasystore()` before defining synthetic observables",
+          call. = FALSE
+        )
       }
 
       coll <- checkmate::makeAssertCollection()
@@ -202,13 +205,19 @@ DiseasyObservables <- R6::R6Class(                                              
     #' @param stratification `r rd_stratification()`
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
+    #' @param respect_last_queryable_date (`logical`)\cr
+    #'   Should the module be able to return data past `$last_queryable_date`?
     #' @return
     #'   If the observable is found, the function returns the corresponding data at the stratification level.\cr
     #'   Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
     #' @seealso [SCDB::get_table]
-    get_observation = function(observable, stratification = NULL,
-                               start_date = self %.% start_date,
-                               end_date   = self %.% end_date) {
+    get_observation = function(
+      observable,
+      stratification = NULL,
+      start_date = self %.% start_date,
+      end_date   = self %.% end_date,
+      respect_last_queryable_date = TRUE
+    ) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -223,13 +232,13 @@ DiseasyObservables <- R6::R6Class(                                              
       checkmate::assert_date(
         start_date,
         any.missing = FALSE,
-        upper = max(self$last_queryable_date, as.Date(self$slice_ts)),
+        upper = switch(respect_last_queryable_date, min(self$last_queryable_date, as.Date(self$slice_ts))),
         add = coll
       )
       checkmate::assert_date(
         end_date,
         any.missing = FALSE,
-        upper = min(self$last_queryable_date, as.Date(self$slice_ts)),
+        upper = switch(respect_last_queryable_date, min(self$last_queryable_date, as.Date(self$slice_ts))),
         add = coll
       )
       checkmate::reportAssertions(coll)
@@ -256,7 +265,9 @@ DiseasyObservables <- R6::R6Class(                                              
 
           # Extract the required observables at the stratification level and combine
           data <- mapping_arguments |>
-            purrr::map(\(observable) self$get_observation(observable, stratification, start_date, end_date)) |>
+            purrr::map(\(observable) {
+              self$get_observation(observable, stratification, start_date, end_date, respect_last_queryable_date)
+            }) |>
             purrr::reduce(dplyr::full_join, by = c("date", stratification_names))
 
           # Compute the synthetic feature
@@ -324,15 +335,6 @@ DiseasyObservables <- R6::R6Class(                                              
       )
 
       printr(glue::glue("slice_date set to: {self$slice_date}"))
-    },
-
-
-    #' @description
-    #'   Handles the clean-up of the class
-    finalize = function() {
-      # Close the connection, then do rest of clean-up
-      if (!isTRUE(attr(self, "clone")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
-      super$finalize()
     }
   ),
 
@@ -399,8 +401,8 @@ DiseasyObservables <- R6::R6Class(                                              
       .f = active_binding,
       name = "available_stratifications",
       expr = {
-        if (is.null(private %.% .ds)) return(NULL)
-        return(purrr::keep(private %.% .ds %.% available_features, ~ !startsWith(., "n_") | endsWith(., "_temp")))
+        if (is.null(self %.% ds)) return(NULL)
+        return(self %.% ds %.% available_stratifications)
       }
     ),
 
@@ -438,7 +440,15 @@ DiseasyObservables <- R6::R6Class(                                              
     conn = purrr::partial(
       .f = active_binding,
       name = "conn",
-      expr = return(private %.% .conn)
+      expr = {
+        conn <- private %.% .conn
+
+        # Remove the "needs_cleanup" attribute as it is only used during clean up
+        # and not meaningful in other contexts
+        attr(conn, "needs_cleanup") <- NULL
+
+        return(conn)
+      }
     )
   ),
 
@@ -452,7 +462,14 @@ DiseasyObservables <- R6::R6Class(                                              
     .synthetic_observables = NULL,
 
     .slice_ts = NULL,
-    .conn = NULL
+    .conn = NULL,
+
+    # @description
+    #   Handles the clean-up of the class
+    finalize = function() {
+      # Close the connection if needed
+      if (isTRUE(attr(private$.conn, "needs_cleanup")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
+    }
   )
 )
 

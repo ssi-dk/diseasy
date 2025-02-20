@@ -16,7 +16,7 @@
 #'     Alternatively, default instances of these modules can optionally be created.
 #'
 #'   * Model interface:
-#'     The module defines the functions `$get_results()`, `$get_training_data()` and the `$parameters` binding.
+#'     The module defines the functions `$get_results()`, `$get_data()` and the `$parameters` binding.
 #'     These functions define the "API" of the models and ensure the models can take part in the ensemble.
 #' @examples
 #'   # Normally, one would not want to create this module directly, but it is possible.
@@ -37,7 +37,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param activity,observables,season,variant `r rd_diseasy_module`
+    #' @param observables,activity,season,variant `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -55,23 +55,25 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   the other modules of the framework.
     #' @return
     #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
-    initialize = function(activity    = FALSE,
-                          observables = FALSE,
-                          season      = FALSE,
-                          variant     = FALSE,
-                          parameters  = NULL,
-                          label       = NULL,
-                          ...) {
+    initialize = function(
+      observables = FALSE,
+      activity    = FALSE,
+      season      = FALSE,
+      variant     = FALSE,
+      parameters  = NULL,
+      label       = NULL,
+      ...
+    ) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
-        checkmate::check_logical(activity, null.ok = TRUE),
-        checkmate::check_class(activity, "DiseasyActivity", null.ok = TRUE),
+        checkmate::check_logical(observables, null.ok = TRUE),
+        checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE),
         add = coll
       )
       checkmate::assert(
-        checkmate::check_logical(observables, null.ok = TRUE),
-        checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE),
+        checkmate::check_logical(activity, null.ok = TRUE),
+        checkmate::check_class(activity, "DiseasyActivity", null.ok = TRUE),
         add = coll
       )
       checkmate::assert(
@@ -164,28 +166,56 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @param observable `r rd_observable()`
     #' @param stratification `r rd_stratification()`
     #' @param period (`character`)\cr
-    #'   The period to return data for. That is, the training, testing or validation period.
+    #'   The period to return data for. That is, the training, testing, validation or plotting period.
+    #' @param prediction_length `r rd_prediction_length()`
     #' @return The output of `DiseasyObservables$get_observation` constrained to the training period.
-    get_data = function(observable, stratification = NULL, period = c("training", "testing", "validation")) {
+    get_data = function(
+      observable,
+      stratification = NULL,
+      period = c("training", "testing", "validation", "plotting"),
+      prediction_length = NULL
+    ) {
       period <- match.arg(period)
 
       # Input validation
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(observable, add = coll)
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
-      checkmate::assert_choice(period, c("training", "testing", "validation"), add = coll)
+      checkmate::assert_choice(period, c("training", "testing", "validation", "plotting"), add = coll)
+      if (period == "plotting") {
+        if (is.null(prediction_length)) {
+          coll$push("Prediction length must be provided when requesting plotting data.")
+        } else {
+          checkmate::assert_number(prediction_length, lower = 1, add = coll)
+        }
+      }
+
       checkmate::reportAssertions(coll)
 
       # Get the observable at the stratification level
-      period_duration <- purrr::pluck(self, glue::glue("{period}_period"))
-      start_date <- period_duration %.% start
-      end_date   <- period_duration %.% end
-
-      if (is.null(start_date) || is.null(end_date)) {
-        stop(glue::glue("Requested period is not configured! Check the corresponding `${period}_period`."))
+      if (period == "plotting") {
+        start_date <- self %.% training_period %.% start
+        end_date   <- self %.% observables %.% last_queryable_date + lubridate::days(prediction_length)
+      } else {
+        period_duration <- purrr::pluck(self, glue::glue("{period}_period"))
+        start_date <- period_duration %.% start
+        end_date   <- period_duration %.% end
       }
 
-      data <- self %.% observables %.% get_observation(observable, stratification, start_date, end_date) |>
+      if (is.null(start_date) || is.null(end_date)) {
+        stop(
+          glue::glue("Requested period is not configured! Check the corresponding `${period}_period`."),
+          call. = FALSE
+        )
+      }
+
+      data <- self %.% observables %.% get_observation(
+        observable,
+        stratification,
+        start_date,
+        end_date,
+        respect_last_queryable_date = (period != "plotting")
+      ) |>
         dplyr::mutate(
           t = lubridate::interval(
             !!self %.% observables %.% last_queryable_date,
@@ -262,10 +292,10 @@ DiseasyModel <- R6::R6Class(                                                    
       name = "training_period",
       expr = {
         if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
+          stop("Observables module is not loaded!", call. = FALSE)
         }
         if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
+          stop("`$last_queryable_date` not configured in observables module!", call. = FALSE)
         }
 
         # We work backwards from the `last_queryable_date` and remove the testing and validation periods
@@ -310,10 +340,10 @@ DiseasyModel <- R6::R6Class(                                                    
       name = "testing_period",
       expr = {
         if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
+          stop("Observables module is not loaded!", call. = FALSE)
         }
         if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
+          stop("`$last_queryable_date` not configured in observables module!", call. = FALSE)
         }
 
         testing_length <- purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0)
@@ -342,10 +372,10 @@ DiseasyModel <- R6::R6Class(                                                    
       name = "validation_period",
       expr = {
         if (is.null(self %.% observables)) {
-          stop("Observables module is not loaded!")
+          stop("Observables module is not loaded!", call. = FALSE)
         }
         if (is.null(self %.% observables %.% last_queryable_date)) {
-          stop("`$last_queryable_date` not configured in observables module!")
+          stop("`$last_queryable_date` not configured in observables module!", call. = FALSE)
         }
 
         validation_length <- purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0)

@@ -53,13 +53,13 @@ The family used in the regression fit (see \code{glm} or \code{brms}). Read-only
 \itemize{
 \item \href{#method-DiseasyModelRegression-new}{\code{DiseasyModelRegression$new()}}
 \item \href{#method-DiseasyModelRegression-get_results}{\code{DiseasyModelRegression$get_results()}}
+\item \href{#method-DiseasyModelRegression-plot}{\code{DiseasyModelRegression$plot()}}
 \item \href{#method-DiseasyModelRegression-clone}{\code{DiseasyModelRegression$clone()}}
 }
 }
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="finalize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-finalize'><code>diseasy::DiseasyBaseModule$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
@@ -90,7 +90,7 @@ A \code{character} string that is passed to \code{stats::as.formula} via \code{g
 
 \item{\code{parameters}}{(\verb{named list()})\cr
 \itemize{
-\item \code{training_length} (\verb{named numeric})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
+\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 }}
 }
 \if{html}{\out{</div>}}
@@ -135,6 +135,31 @@ The primary method used to request model results of a given observable at a give
 }
 \subsection{Returns}{
 A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr   date (\code{Date}) specifying the date of the prediction\cr   realization_id (\code{character}) giving a unique id for each realization in the ensemble\cr   model (\code{character}) the name (classname) of the model used to provide the prediction.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelRegression-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelRegression-plot}{}}}
+\subsection{Method \code{plot()}}{
+Plot the predictions from the current model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelRegression$plot(
+  observable,
+  prediction_length,
+  stratification = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+
+\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

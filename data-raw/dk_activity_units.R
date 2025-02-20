@@ -655,7 +655,7 @@ dk_activity_units <- dk_activity_units |>
 
 
 # Temporarily make R use "_" as decimal separator
-options(OutDec = "_")
+withr::local_options(OutDec = "_")
 for (risk_test_school in c(0.5, 0.75, 1)) {
 
   # 90% of teachers and 75% for children
@@ -921,7 +921,7 @@ for (risk_test_school in c(0.5, 0.75, 1)) {
     )
 
 } # EndOf: risk_test_school
-options(OutDec = ".") # Reset the decimal separator
+withr::deferred_run() # Reset the decimal separator
 
 # The above loop introduces duplicated rows. Remove those here (when risk is always 1)
 dk_activity_units <- dk_activity_units |> dplyr::distinct()

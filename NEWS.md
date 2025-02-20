@@ -1,6 +1,6 @@
 # diseasy 0.0.0.9000
 
-## Features:
+## Features
 
 * `DiseasyBaseModule`: The baseline for all `diseasy` modules.
 
@@ -13,7 +13,7 @@
   For examples of usage, see `vignette("diseasy-immunity")`.
 
 * `DiseasyModel`: A base class for the model templates (#36).
-  * R6 class that defines the interface for the models and empower the flexible configuration of models from the
+  * Defines the interface for the models and empower the flexible configuration of models from the
     functional modules.
 
   * The model class has a system for model parameters (#116):
@@ -22,13 +22,23 @@
     * Parameters can easily be adjusted during model initialisation.
     * Parameters are inherited from super classes as needed.
 
+* `DiseasyModelOde`: A base class for Ordinary Differential Equation (ODE) model templates (#142, #162).
+  * Defines the interface for the ODE models.
+
+* `DiseasyModelOdeSeir`: A model template for SEIR-like models (#142, #162).
+  * Dynamically allocated  with configuration
+    * Any number of E, I and R states.
+    * Any number of age groups.
+    * Any number of disease variants.
+  * Methods for initialising from incidence data.
+
 * A range of utility functions:
   * The hypoexponential distribution: `dhypo()`, `phypo()`, `qhypo()`, and `rhypo()` (#146)
 
-## Documentation:
+## Documentation
 
 * The functions are fully documented.
 
 * Vignettes for the use of the package is included.
-  - `vignette("diseasy")`
-  - `vignette("creating-a-model")`
+  * `vignette("diseasy")`
+  * `vignette("creating-a-model")`
