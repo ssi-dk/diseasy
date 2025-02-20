@@ -382,6 +382,8 @@ plot.DiseasyBaseModule <- function(x, ...) {
 #'   Summarise `diseasy` modules.
 #' @param x (`Diseasy*`)\cr
 #'   The module to get information for.
+#' @param verbose (`logical(1)`)\cr
+#'   Should the full information for the module be printed?
 #' @param ...
 #'   Parameters sent to the specific printing methods.
 #'   See the `$print()` method for each module
@@ -389,8 +391,12 @@ plot.DiseasyBaseModule <- function(x, ...) {
 #' @examples
 #' # Examples to come
 #' @export
-print.DiseasyBaseModule <- function(x, ...) {
-  x$print(...)
+print.DiseasyBaseModule <- function(x, verbose = FALSE, ...) {
+  if (verbose) {
+    NextMethod(generic = "print", object = x, ...)
+  } else {
+    x$describe(...)
+  }
 }
 
 
