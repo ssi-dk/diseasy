@@ -82,7 +82,7 @@ DiseasyVariant <- R6::R6Class(                                                  
 
 
     #' @description `r rd_describe`
-    print = function() {
+    describe = function() {
       printr("# DiseasyVariant #############################################")
       if (is.null(self %.% variants)) {
         printr("No variants have been configured")

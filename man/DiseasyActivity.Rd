@@ -90,7 +90,7 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
 \item \href{#method-DiseasyActivity-rescale_contacts_to_rates}{\code{DiseasyActivity$rescale_contacts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
-\item \href{#method-DiseasyActivity-print}{\code{DiseasyActivity$print()}}
+\item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
 \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
 }
 }
@@ -397,12 +397,12 @@ NOTE: Called automatically when setting/changing activity units.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-print"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-print}{}}}
-\subsection{Method \code{print()}}{
+\if{html}{\out{<a id="method-DiseasyActivity-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-describe}{}}}
+\subsection{Method \code{describe()}}{
 Prints a human readable report of the internal state of the module.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$print()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$describe()}\if{html}{\out{</div>}}
 }
 
 }

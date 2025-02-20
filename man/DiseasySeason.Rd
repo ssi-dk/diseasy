@@ -74,7 +74,7 @@ The local copy of an DiseasyObservables module. Read-only.}
 \item \href{#method-DiseasySeason-use_covid_season_v1}{\code{DiseasySeason$use_covid_season_v1()}}
 \item \href{#method-DiseasySeason-get_covid_season_v2}{\code{DiseasySeason$get_covid_season_v2()}}
 \item \href{#method-DiseasySeason-use_covid_season_v2}{\code{DiseasySeason$use_covid_season_v2()}}
-\item \href{#method-DiseasySeason-print}{\code{DiseasySeason$print()}}
+\item \href{#method-DiseasySeason-describe}{\code{DiseasySeason$describe()}}
 \item \href{#method-DiseasySeason-clone}{\code{DiseasySeason$clone()}}
 }
 }
@@ -317,12 +317,12 @@ Sets the \code{DiseasySeason} module to use the second version of the COVID-19 s
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasySeason-print"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasySeason-print}{}}}
-\subsection{Method \code{print()}}{
+\if{html}{\out{<a id="method-DiseasySeason-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasySeason-describe}{}}}
+\subsection{Method \code{describe()}}{
 Prints a human readable report of the internal state of the module.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$print()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasySeason$describe()}\if{html}{\out{</div>}}
 }
 
 }
