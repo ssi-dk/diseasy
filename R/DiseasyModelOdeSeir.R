@@ -981,11 +981,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Validate the functional modules parameters
       checkmate::assert_numeric(self %.% parameters %.% activity.weights, lower = 0, len = 4, add = coll)
-      checkmate::assert_choice(
-        self %.% parameters %.% immunity.method,
-        choices = eval(formals(self %.% immunity %.% approximate_compartmental)$method),
-        add = coll
-      )
+
+      if (!is.null(self %.% immunity)) {
+        checkmate::assert_choice(
+          self %.% parameters %.% immunity.method,
+          choices = eval(formals(self %.% immunity %.% approximate_compartmental)$method),
+          add = coll
+        )
+      }
 
       checkmate::reportAssertions(coll)
 
