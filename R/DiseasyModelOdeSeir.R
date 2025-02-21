@@ -77,7 +77,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param disease_progression_rates `r rd_disease_progression_rates()`
     #' @param malthusian_matching (`logical(1)`)\cr
     #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
-    #' @param observables,activity,season,variant `r rd_diseasy_module`
+    #' @param observables,activity,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -114,6 +114,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
+      immunity = TRUE,
       compartment_structure = c("E" = 1L, "I" = 1L, "R" = 1L),
       disease_progression_rates = c("E" = 1, "I" = 1),
       malthusian_matching = TRUE,
@@ -127,6 +128,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         activity = activity,
         season = season,
         variant = variant,
+        immunity = immunity,
         parameters = parameters,
         ...
       )
@@ -284,8 +286,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         method = self %.% parameters %.% immunity.method,
         M = compartment_structure[["R"]]
       )
-      immunity_risks <- 1 - immunity_approx[1:compartment_structure[["R"]]]
-      immunity_rates <- immunity_approx[-(1:compartment_structure[["R"]])]
+      immunity_risks <- 1 - immunity_approx %.% gamma %.% infection
+      immunity_rates <- immunity_approx %.% delta
 
 
 
@@ -331,7 +333,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # (thereby also accounting for cross-immunity)
 
       # Account for cross-immunity
-      private$immunity_matrix <- self %.% variant %.% cross_immunity |>
+      immunity_matrix <- self %.% variant %.% cross_immunity |>
         purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_age_groups)) |>
         purrr::reduce(c) |>
         matrix(ncol = private$n_variants) |>
@@ -341,6 +343,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             ncol = private %.% n_variants
           )
         )
+
+      # R cannot handle 1x1 matrices, so we need to convert to a vector
+      if (length(immunity_matrix) == 1) immunity_matrix <- immunity_matrix[[1]]
+
+      private$immunity_matrix <- immunity_matrix
 
 
       # Set the default forcing functions (no forcing)
@@ -658,6 +665,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         activity = self %.% activity,
         variant = self %.% variant,
         season = self %.% season,
+        immunity = self %.% immunity,
         compartment_structure = compartment_structure,
         disease_progression_rates = disease_progression_rates,
         malthusian_matching = FALSE, # Since we have different disease_progression_rates, we cannot directly match
@@ -900,16 +908,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
 
       return(list(dy_dt))
-    },
-
-
-    #' @field immunity (`diseasy::DiseasyImmunity`)\cr
-    #'   Place holder for the immunity module
-    immunity = list(
-      "approximate_compartmental" = function(method = c("free_gamma", "free_delta", "all_free"), M = NULL) {            # nolint: object_name_linter
-        c(rev(seq(from = 0.9, to = 0.05, length.out = M)), rep(1, M - 1))
-      }
-    )
+    }
   ),
 
 
@@ -988,11 +987,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Validate the functional modules parameters
       checkmate::assert_numeric(self %.% parameters %.% activity.weights, lower = 0, len = 4, add = coll)
-      checkmate::assert_choice(
-        self %.% parameters %.% immunity.method,
-        choices = eval(formals(self %.% immunity %.% approximate_compartmental)$method),
-        add = coll
-      )
+
+      if (!is.null(self %.% immunity)) {
+        checkmate::assert_choice(
+          self %.% parameters %.% immunity.method,
+          choices = eval(formals(self %.% immunity %.% approximate_compartmental)$method),
+          add = coll
+        )
+      }
 
       checkmate::reportAssertions(coll)
 

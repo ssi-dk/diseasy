@@ -359,10 +359,16 @@ DiseasyBaseModule <- R6::R6Class(                                               
 #'   The module to generate visualisation for.
 #' @param ...
 #'   Parameters sent to the specific plotting methods.
-#'   See the `$plot()` method for each module
+#'   See the `$plot()` method for each module.
 #' @return `r rd_side_effects`
 #' @examples
-#' # Examples to come
+#'   immunity <- DiseasyImmunity$new()
+#'   plot(immunity)
+#'
+#'   immunity$set_exponential_waning(target = "hospitalisation")
+#'   plot(immunity)
+#'
+#'   rm(immunity)
 #' @export
 plot.DiseasyBaseModule <- function(x, ...) {
   x$plot(...)

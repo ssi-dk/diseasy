@@ -40,10 +40,7 @@ test_that("helpers works (SR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(0, 0))
 
   # Check risk matrix is correctly set
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -93,10 +90,7 @@ test_that("helpers works (SIR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
 
   # Check risk matrix is correctly set
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -163,10 +157,7 @@ test_that("helpers works (SIR double variant / double age group)", {
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -220,10 +211,7 @@ test_that("helpers works (SEIR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
 
   # Check risk matrix is correctly set
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -271,16 +259,14 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
   expect_identical(private %.% infection_matrix_to_rs_indices, list(seq.int(3)))
 
   # Check progression flow rates are correctly set
+  delta <- m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% delta
   expect_identical(
     private %.% progression_flow_rates,
-    c(2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, 0)
+    c(2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, 0)
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -339,20 +325,18 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
   )
 
   # Check progression flow rates are correctly set
+  delta <- m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% delta
   expect_identical(
     private %.% progression_flow_rates,
     c(
-      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 1
-      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 2
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, # Variant 1
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, # Variant 2
       0 # Susceptible
     )
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -415,22 +399,20 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   )
 
   # Check progression flow rates are correctly set
+  delta <- m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% delta
   expect_identical(
     private %.% progression_flow_rates,
     c(
-      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 1, age group 1
-      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 1, age group 2
-      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 2, age group 1
-      2 * rE, 2 * rE, 2 * rI, 2 * rI, 1, 0, # Variant 2, age group 2
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, # Variant 1, age group 1
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, # Variant 1, age group 2
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, # Variant 2, age group 1
+      2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, # Variant 2, age group 2
       0, 0 # Susceptible
     )
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,

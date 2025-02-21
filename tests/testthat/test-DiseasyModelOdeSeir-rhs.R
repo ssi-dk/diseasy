@@ -428,10 +428,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
@@ -472,10 +469,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
@@ -635,10 +629,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   # Check risk matrix is correctly set
   expect_identical(
@@ -692,10 +683,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - purrr::keep_at(
-    m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R),
-    seq_len(m %.% compartment_structure %.% R)
-  )
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
 
   # Check risk matrix is correctly set
   expect_identical(
