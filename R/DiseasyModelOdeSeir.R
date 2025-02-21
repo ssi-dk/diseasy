@@ -77,7 +77,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param disease_progression_rates `r rd_disease_progression_rates()`
     #' @param malthusian_matching (`logical(1)`)\cr
     #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
-    #' @param observables,activity,season,variant `r rd_diseasy_module`
+    #' @param observables,activity,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -114,6 +114,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
+      immunity = TRUE,
       compartment_structure = c("E" = 1L, "I" = 1L, "R" = 1L),
       disease_progression_rates = c("E" = 1, "I" = 1),
       malthusian_matching = TRUE,
@@ -127,6 +128,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         activity = activity,
         season = season,
         variant = variant,
+        immunity = immunity,
         parameters = parameters,
         ...
       )
