@@ -538,7 +538,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # The last parameter is the delta rate which is identical for all compartments
           n_free_parameters <- (M - 1) * n_models + as.numeric(M > 1)
 
-          par_to_delta <- \(par) p_0inf(par[-seq_len(max(0, n_free_parameters - 1))]) # Last parameter is delta
+          # Last parameter is delta - repeat to match the number of transitions
+          par_to_delta <- \(par) rep(p_0inf(par[-seq_len(max(0, n_free_parameters - 1))]), max(1, M - 1))
+
           par_to_gamma <- \(par, model_id) {
             c(
               p_01(par[seq_len(M - 1) + (model_id - 1) * (M - 1)]), # The gamma parameters of the n'th model
