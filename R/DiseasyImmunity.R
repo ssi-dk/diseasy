@@ -629,8 +629,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # If we have no free parameters we return the default rates
         if (n_free_parameters == 0) {
-          gamma <- purrr::map(self$model, \(model) numeric(0)) |>
-            stats::setNames(names(self$model))
+          gamma <- stats::setNames(f_inf, names(self$model))
           delta <- numeric(0)
 
           # Get the metrics for the solution
