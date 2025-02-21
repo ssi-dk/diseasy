@@ -333,7 +333,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # (thereby also accounting for cross-immunity)
 
       # Account for cross-immunity
-      private$immunity_matrix <- self %.% variant %.% cross_immunity |>
+      immunity_matrix <- self %.% variant %.% cross_immunity |>
         purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_age_groups)) |>
         purrr::reduce(c) |>
         matrix(ncol = private$n_variants) |>
@@ -343,6 +343,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             ncol = private %.% n_variants
           )
         )
+
+      # R cannot handle 1x1 matrices, so we need to convert to a vector
+      if (length(immunity_matrix) == 1) immunity_matrix <- immunity_matrix[[1]]
+
+      private$immunity_matrix <- immunity_matrix
 
 
       # Set the default forcing functions (no forcing)
