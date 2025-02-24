@@ -1312,7 +1312,7 @@
     {
       "ref": "duckdb",
       "package": "duckdb",
-      "version": "1.1.3-2",
+      "version": "1.2.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1324,10 +1324,10 @@
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.1.3-2"
+        "RemoteSha": "1.2.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/duckdb_1.1.3-2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/duckdb_1.1.3-2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/duckdb_1.2.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/duckdb_1.2.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2902,7 +2902,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["diseasystore", "brms", "cachem", "checkmate", "digest", "dplyr", "expm", "glue", "lgr", "lubridate", "Matrix", "pkgcond", "pracma", "purrr", "R6", "rlang", "stringr", "tidyr"],
+      "dependencies": ["diseasystore", "brms", "cachem", "checkmate", "dfoptim", "dplyr", "expm", "glue", "lgr", "lubridate", "Matrix", "nloptr", "optimx", "pkgcond", "pracma", "purrr", "R6", "rlang", "stringr", "subplex", "tidyr", "ucminf", "withr"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",
@@ -3819,7 +3819,7 @@
     {
       "ref": "processx",
       "package": "processx",
-      "version": "3.8.5",
+      "version": "3.8.6",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3831,10 +3831,10 @@
         "RemoteRef": "processx",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "3.8.5"
+        "RemoteSha": "3.8.6"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/processx_3.8.5.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/processx_3.8.5.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/processx_3.8.6.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/processx_3.8.6.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4005,7 +4005,7 @@
     {
       "ref": "QuickJSR",
       "package": "QuickJSR",
-      "version": "1.5.1",
+      "version": "1.5.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4017,10 +4017,10 @@
         "RemoteRef": "QuickJSR",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.5.1"
+        "RemoteSha": "1.5.2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/QuickJSR_1.5.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/QuickJSR_1.5.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/QuickJSR_1.5.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/QuickJSR_1.5.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -5695,7 +5695,7 @@
     {
       "ref": "V8",
       "package": "V8",
-      "version": "6.0.0",
+      "version": "6.0.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -5707,10 +5707,10 @@
         "RemoteRef": "V8",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "6.0.0"
+        "RemoteSha": "6.0.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/V8_6.0.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/V8_6.0.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/V8_6.0.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/V8_6.0.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -6143,7 +6143,7 @@
     {
       "ref": "zoo",
       "package": "zoo",
-      "version": "1.8-12",
+      "version": "1.8-13",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -6155,10 +6155,10 @@
         "RemoteRef": "zoo",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.8-12"
+        "RemoteSha": "1.8-13"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/zoo_1.8-12.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/zoo_1.8-12.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/zoo_1.8-13.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/zoo_1.8-13.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
