@@ -258,6 +258,39 @@ im$plot(method = "free_gamma", M = 4)
 ```
 
 
+## The effect of penalties
+By default, a small penalty is added to encourage monotonous $\gamma_m$ values and smooth transitions between
+compartments. This worsens the absolute fit to the target functions, but means that the waning of immunity can be 
+interpreted at the individual level rather than population level.
+
+```{r effect of penalty, fig.alt = "Adding penalty to approximations smoothens the transitions between compartments."}  
+im$set_custom_waning(
+  custom_function = \(t) sum(exp(- (1:3) * t / time_scale)) / 3,
+  time_scale = 20,
+  target = "infection"
+)
+
+approximation <- im$approximate_compartmental(method = "all_free", M = 5)
+plot(
+  x = cumsum(c(0, 1 / approximation$delta)), 
+  y = approximation$gamma$infection, 
+  col = "red", 
+  xlab = "Time", ylab = "gamma",
+  ylim = c(0, 1), pch = "16"
+)
+
+approximation <- im$approximate_compartmental(
+  method = "all_free", 
+  M = 5, 
+  monotonous = FALSE, 
+  individual_level = FALSE
+)
+
+points(cumsum(c(0, 1 / approximation$delta)), approximation$gamma$infection, pch = "16")
+```
+
+
+
 # Compartment selection (elbow curve method)
 The accuracy of the approximation can be influenced by the number of compartments (`M`) used in the model.
 Therefore it is crucial to select the right `M`, as too few compartments can lead to poor approximation,
