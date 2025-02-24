@@ -93,8 +93,8 @@ rd_time_scale <- function(type = "param") {
 rd_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`DBIConnection` or `function`)\\cr",
-        "A database connection or function that opens a database connection",
-        ifelse(type == "field", " Read only.", ""))
+        "A database connection or function that opens a database connection.",
+        ifelse(type == "field", "Read only.", ""))
 }
 
 
@@ -135,7 +135,7 @@ rd_target_schema <- function(type = "param") {
 
 
 rd_diseasymodel_parameters <- paste(
-  "* `training_length` (`named numeric`)\\cr",
+  "* `training_length` (`named numeric(3)`)\\cr",
   "  The number of days that should be included in the training splits of the data for the model.",
   "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
 )
@@ -204,7 +204,7 @@ rd_activity_weights <- paste(
   "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
 
-## Templates for DiseasyModel ODE templates
+## Templates for DiseasyModel
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",
   "If a boolean is given, it dictates whether to load a new instance module of this class.\\cr",
@@ -212,6 +212,21 @@ rd_diseasy_module <- paste(
   "instance. This copy is a \"clone\" of the instance at the time it is added and any subsequent changes to the",
   "instance will not reflect in the copy that is added to `DiseasyModel`."
 )
+
+## Templates for DiseasyModelOde
+rd_initialise_state_vector_description <- paste(
+  "Infer the state_vector from incidence data"
+)
+
+rd_incidence_data <- paste(
+  "incidence_data (`data.frame`)\\cr",
+  "Incidence observations as a `data.frame` with columns",
+  "- `date`: The date of the observations",
+  "- `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)",
+  "- `variant`: The variant of the incidence observation.",
+  "- `incidence`: The incidence in the age group at the given date"
+)
+
 
 rd_overall_infection_risk <- paste(
   "(`numeric`)\\cr",
@@ -239,6 +254,20 @@ rd_disease_progression_rates <- function(type = "param") {
     switch(type == "field", "Read only.")
   )
 }
+
+rd_diseasymodelode_parameters <- paste(
+  "* `incidence_feature_name` (`character(1)`)\\cr",
+  "  The name of the observable that contains the incidence data to initialise from.",
+  "",
+  "* `model_rate_to_observable` (`named list`(`named list`(`function`(2))))\\cr",
+  "  A named list of functions that maps the model rates to the observable in question (name).",
+  "  Each observable needs a `map` and `reduce` function contained in a list (the first nested list).",
+  "  The `map` function is applied in a `dplyr::group_map()` call and should take two arguments:",
+  "  - The first argument contains the model `rate` and information about group size: `proportion` and `population`.",
+  "  - The second argument contains the groups (stratification).",
+  "  The `reduce` function is applied in a `dplyr::summarise()` call to summarise across stratification levels.",
+  "  By default, the `sum` function is used and will work for all counting observables."
+)
 
 ## Templates for DiseasyModel Regression templates
 rd_diseasymodel_glm_brm_description <- function(regression_class) {

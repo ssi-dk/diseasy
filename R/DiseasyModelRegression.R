@@ -84,6 +84,9 @@ DiseasyModelRegression <- R6::R6Class(                                          
       checkmate::assert_number(prediction_length, add = coll)
       checkmate::reportAssertions(coll)
 
+      # Cast prediction_length to integer
+      prediction_length <- as.integer(prediction_length)
+
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
@@ -123,16 +126,20 @@ DiseasyModelRegression <- R6::R6Class(                                          
           dplyr::select(!tidyselect::any_of(c(observable, "date", "t", "season"))) |>
           dplyr::distinct_all()
 
-        new_data <- purrr::map(
-          c(-(seq(self$parameters$training_length) - 1), seq(prediction_length)),                                       # nolint: infix_spaces_linter
-          ~ {
-            prototype_data |>
-              dplyr::mutate(
-                "t" = .x,
-                "date" = max(training_data$date) + lubridate::days(.data$t)
-              )
-          }
+        new_data <- seq.Date(
+          from = self %.% training_period %.% end + lubridate::days(1),
+          to = self %.% observables %.% last_queryable_date + lubridate::days(prediction_length),
+          by = "1 day"
         ) |>
+          purrr::map(
+            ~ {
+              prototype_data |>
+                dplyr::mutate(
+                  "t" = as.numeric(.x - self %.% observables %.% last_queryable_date),
+                  "date" = .x
+                )
+            }
+          ) |>
           purrr::reduce(dplyr::union_all) |>
           dplyr::relocate("date") # Move "date" column to first column
 
@@ -166,6 +173,136 @@ DiseasyModelRegression <- R6::R6Class(                                          
 
       # Return
       return(private$cache(hash))
+    },
+
+
+    #' @description
+    #'   Plot the predictions from the current model
+    #' @param observable `r rd_observable()`
+    #' @param prediction_length `r rd_prediction_length()`
+    #' @param stratification `r rd_stratification()`
+    plot = function(observable, prediction_length, stratification = NULL) {
+
+      # Retrieve the prediction for the observable
+      prediction <- self %.% get_results(
+        observable = observable,
+        prediction_length = prediction_length,
+        stratification = stratification
+      )
+
+      # Retrieve the observations for the observable at the model stratification level
+      observations <- self %.% get_data(
+        observable = observable,
+        stratification = stratification,
+        period = "plotting",
+        prediction_length = prediction_length
+      )
+
+      # Determine the groups
+      groups <- observations |>
+        dplyr::group_by(!!!stratification) |>
+        dplyr::summarise(.groups = "drop")
+      groups <- split(groups, seq_len(nrow(groups)))
+
+      # Create palette with colours to use in plot
+      colours <- palette("dark")
+      colour <- colours[which(self %.% observables %.% available_observables == observable)]
+
+      # Create a plot for each group:
+      groups |>
+        purrr::walk(\(group) {
+
+          # Filter the data to plot
+          if (length(colnames(group)) > 0) {
+            obs   <- dplyr::inner_join(observations, group, by = colnames(group))
+            preds <- dplyr::inner_join(prediction,   group, by = colnames(group))
+          } else {
+            obs <- observations
+            preds <- prediction
+          }
+
+          # Modify the margins
+          if (interactive()) par(mar = c(3, 3.25, 2, 1))
+
+          # Generate labels for the group
+          group_label <- colnames(group) |>
+            stringr::str_replace_all(stringr::fixed("_"), " ") |>
+            stringr::str_to_sentence()
+
+          # Compute quantiles
+          data <- preds |>
+            dplyr::summarise(
+              q05 = stats::quantile(.data[[observable]], 0.05),
+              q25 = stats::quantile(.data[[observable]], 0.25),
+              q50 = stats::quantile(.data[[observable]], 0.50),
+              q75 = stats::quantile(.data[[observable]], 0.75),
+              q95 = stats::quantile(.data[[observable]], 0.95),
+              .by = "date"
+            )
+
+          # plot the main line
+          plot(
+            data$date, data$q50,
+            type = "l",
+            col = colour,
+            xlim = range(obs$date),
+            ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
+            xlab = "Date",
+            ylab = stringr::str_to_sentence(stringr::str_remove(observable, r"{^n_}")),
+            main = paste(group_label, group, collapse = "; "),
+            yaxs = "i",
+            xaxs = "i",
+            mgp = c(2, 0.75, 0),
+            cex.lab = 1.25
+          )
+
+          # Add shaded areas for the quantiles
+          polygon(
+            c(data$date, rev(data$date)),
+            c(data$q05, rev(data$q95)),
+            col = adjustcolor(colour, alpha.f = 0.25),
+            border = NA
+          )
+
+          polygon(
+            c(data$date, rev(data$date)),
+            c(data$q25, rev(data$q75)),
+            col = adjustcolor(colour, alpha.f = 0.35),
+            border = NA
+          )
+
+          # Plot the observations
+          points(
+            obs[["date"]],
+            obs[[observable]],
+            col = "grey20",
+            pch = 16
+          )
+
+          # Plot the data cut-off
+          abline(
+            v = self %.% observables %.% last_queryable_date,
+            col = "grey20",
+            lty = "dashed",
+            lwd = 2
+          )
+
+          # Ensure axis is visible
+          box()
+
+          # Add legend
+          legend(
+            "topleft",
+            legend = c("Observations", "Training cut-off", "Model"),
+            col = c("grey20", "grey20", colour),
+            lty = c(NA,       "dashed", "solid"),
+            pch = c(16,       NA,       NA),
+            lwd = c(NA,       2,        4),
+            inset = c(0, 0),
+            xpd = TRUE,
+            bg = "white"
+          )
+        })
     }
   ),
 

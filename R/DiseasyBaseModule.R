@@ -98,7 +98,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
       # Check the instance has a slot for the module to be loaded
       if (!paste0(".", class(module)[1]) %in% names(private)) {
-        stop(glue::glue("Module {class(module)[1]} not found in {class(self)[1]}"))
+        stop(glue::glue("Module {class(module)[1]} not found in {class(self)[1]}"), call. = FALSE)
       }
 
       # Check if the module should be cloned (i.e. a new instance is created, or if the module is used by reference)
@@ -108,6 +108,11 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
         # Set the ownership of the module
         module$set_moduleowner(class(self)[1])
+      }
+
+      # If we are loading an observables module, make sure the connection is marked as not needing clean up
+      if (inherits(module, "DiseasyObservables")) {
+        attr(module$.__enclos_env__$private$.conn, "needs_cleanup") <- FALSE
       }
 
 
@@ -130,18 +135,6 @@ DiseasyBaseModule <- R6::R6Class(                                               
       # ... and track if module was cloned
       attr(private[[glue::glue(".{class(module)[1]}")]], "clone") <- clone
 
-    },
-
-
-    #' @description
-    #'   Handles the clean-up of the class
-    finalize = function() {
-      # Look for contained Diseasy* classes and call finalize on these
-      private |>
-        as.list(all.names = TRUE) |>
-        purrr::keep(~ inherits(., "DiseasyBaseModule")) |>
-        purrr::discard(~ isTRUE(attr(., "clone"))) |>
-        purrr::walk(~ .$finalize())
     }
   ),
 
@@ -266,14 +259,14 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
         obj <- private$.cache$get(hash)
         if (cachem::is.key_missing(obj)) {
-          stop("Hash not found in cache!")
+          stop("Hash not found in cache!", call. = FALSE)
         }
         return(obj)
 
       } else {
 
         if (private$.cache$exists(hash)) {
-          stop("Hash already found in cache!")
+          stop("Hash already found in cache!", call. = FALSE)
         } else {
           private$.cache$set(hash, obj)
         }
@@ -297,7 +290,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #   The environment of the function to hash.
     # @return (`character`)\cr
     #   The values in the function environment is hashed and combined with the classname and hash of the parent
-    #   environment
+    #   environment.
     get_hash = function(function_environment = rlang::caller_env()) {
 
       # Find all relevant hashes

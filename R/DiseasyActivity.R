@@ -291,7 +291,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         if (length(to_open) > 0) {
           # First a check
           if (any(new_scenario_matrix[to_open, col_id] == private$upper_activity_level)) {
-            stop("\nSome of ", toString(to_open), " are already open!")
+            stop("\nSome of ", toString(to_open), " are already open!", call. = FALSE)
           }
           new_state <- new_scenario_matrix[to_open, col_id] + 1
           new_scenario_matrix[to_open, col_id:ncol(new_scenario_matrix)] <- new_state
@@ -301,7 +301,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         if (length(to_close) > 0) {
           # First a check
           if (any(new_scenario_matrix[to_close, col_id] == (private$upper_activity_level - 1))) {
-            stop("\nSome of ", toString(to_close), " are already closed!")
+            stop("\nSome of ", toString(to_close), " are already closed!", call. = FALSE)
           }
           new_state <- new_scenario_matrix[to_close, col_id] - 1
           new_scenario_matrix[to_close, col_id:ncol(new_scenario_matrix)] <- new_state
