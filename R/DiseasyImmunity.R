@@ -4,7 +4,7 @@
 #'   The `DiseasyImmunity` module is responsible for implementing various models (scenarios) for the immunity
 #'   dependencies of the disease.
 #'
-#'   The module implements a number immunity models with different functional forms and allows the user to set
+#'   The module implements a number of immunity models with different functional forms and allows the user to set
 #'   their own, custom waning function.
 #'
 #'   See the `vignette("diseasy-immunity")` for examples of use.
@@ -317,7 +317,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The transition rates between the compartments and the risk associated with each compartment are optimized to
     #'   approximate the configured waning immunity scenario.
     #'
-    #'   The function implements three methods for parametrising the waning immunity curves:
+    #'   The function implements three methods for parametrising the waning immunity curves, differing in the number of free parameters:
     #'
     #'   - "free_gamma": All transition rates are equal and risks are free to vary (M + 1 free parameters).
     #'   - "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
@@ -328,7 +328,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   These strategies modify the initial guess for the transition rates and risks:
     #'
     #'   - "naive":
-    #'      Transitions rates are initially set as the inverse of the median time scale.
+    #'      Transitions rates are initially set as the reciprocal of the median time scale.
     #'      Risks are initially set as linearly distributed values between f(0) and f(infinity).
     #'
     #'   - "recursive":
@@ -590,7 +590,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 ) |>
                   purrr::pluck("value", sqrt),
                 error = function(e) {
-                  1 / (min(delta) + .Machine$double.eps) # If the any delta is too small, the integral looks divergent
+                  1 / (min(delta) + .Machine$double.eps) # If any delta is too small, the integral looks divergent
                   # (since we too approach the asymptote too slowly).
                   # We use the 1 / delta to create a wall in the optimisation
                 }
@@ -636,7 +636,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         } else {
           # We provide a starting guess for the rates
 
-          # Note that need to be "inverted" through the inverse of the mapping functions
+          # Note that the rates need to be "inverted" through the inverse of the mapping functions
           # so they are are in the same parameter space as the optimisation occurs
 
           # Account for the differences in methods

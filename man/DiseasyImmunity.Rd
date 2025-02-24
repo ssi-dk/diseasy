@@ -10,7 +10,7 @@ A new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class.
 The \code{DiseasyImmunity} module is responsible for implementing various models (scenarios) for the immunity
 dependencies of the disease.
 
-The module implements a number immunity models with different functional forms and allows the user to set
+The module implements a number of immunity models with different functional forms and allows the user to set
 their own, custom waning function.
 
 See the \code{vignette("diseasy-immunity")} for examples of use.
@@ -383,7 +383,7 @@ is a phase-type distribution (with Erlang distribution as a special case when al
 The transition rates between the compartments and the risk associated with each compartment are optimized to
 approximate the configured waning immunity scenario.
 
-The function implements three methods for parametrising the waning immunity curves:
+The function implements three methods for parametrising the waning immunity curves, differing in the number of free parameters:
 \itemize{
 \item "free_gamma": All transition rates are equal and risks are free to vary (M + 1 free parameters).
 \item "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
@@ -395,7 +395,7 @@ In addition, this function implements three strategies for optimising the transi
 These strategies modify the initial guess for the transition rates and risks:
 \itemize{
 \item "naive":
-Transitions rates are initially set as the inverse of the median time scale.
+Transitions rates are initially set as the reciprocal of the median time scale.
 Risks are initially set as linearly distributed values between f(0) and f(infinity).
 \item "recursive":
 Initial transition rates and risks are linearly interpolated from the $M - 1$ solution.

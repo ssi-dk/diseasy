@@ -71,7 +71,7 @@ im <- DiseasyImmunity$new()
 ```
 
 # Inspecting the module
-By default, the module initializes with the `no_waning` model (that is, constant, perfect immunity) stored under the
+By default, the module initializes with the `no_waning` model (that is, constant, full immunity) stored under the
 target "infection".
 
 To check the currently set targets and associated models, you can use the following code.
@@ -145,7 +145,7 @@ If instead it is `character`, the corresponding to `$set_<model>()` method will 
 Input for both predefined models and custom waning functions can be passed to the `?DiseasyImmunity$set_waning_model()`
 as additional arguments.
 
-An example of how to set they two model examples from above, using the `?DiseasyImmunity$set_waning_model()` is as
+An example of how to set the two model examples from above, using the `?DiseasyImmunity$set_waning_model()` is as
 follows:
 ```{r set waning models function}
 im$set_waning_model(model = "sigmoidal_waning", time_scale = 9, target = "infection")
@@ -172,7 +172,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 `?DiseasyImmunity` can also provide the approximations of the waning models for compartmental ODE models.
 (e.g. the Susceptible-Infected-Recovered-Susceptible (SEIR) models).
 
-The approximation assumes the model has a number of sequential R compartments and then provides the transition rates
+The approximation assumes the model has a number of sequential R compartments ($R_1 .., R_M$) and then provides the transition rates
 and associated risks for each compartment that best approximates set waning functions (see Figure 1 for a illustration).
 
 ![Figure 1: Illustration of the compartmental model structure.](vignette_data/diseasy-immunity-model-structure.png)
@@ -182,8 +182,8 @@ Some definitions:
 - Flow between compartments: The transition rate between compartments $m$ and $m+1$ is defined as $\delta_m$.
 - Risk associated with compartments: The protective effect associated with compartment $m$ is defined as $\gamma_m$,
   which represents the probability of not becoming infected when exposed to an infected individual.
-- In `?DiseasyImmunity` we operate with multiple targets, so we have a set of `\gamma_m` values for each target, but
-  only a single set of transition rates `\delta_m`.
+- In `?DiseasyImmunity` we operate with multiple targets, so we have a set of $\gamma_m$ values for each target, but
+  only a single set of transition rates $\delta_m$.
 
 Combined, these rates and risks define a population level waning immunity. From the waiting time distributions,
 hypoexponential in general, Erlang distributed if all rates are equal, we can compute the probability to occupy each
@@ -209,13 +209,12 @@ that best approximates the set waning functions:
 
 In addition, there are three strategies for the initial guess of the parameters:
 
-- Strategy 1 (`naive`): The initial guess that `\gamma_m` values are linearly distributed from $f(0)$ to $f(\infty)$,
-  while the `\delta_m` values are assumed to be set by the reciprocal of the median time scale of the targets.
+- Strategy 1 (`naive`): The initial guess that $\gamma_m$ values are linearly distributed from $f(0)$ to $f(\infty)$,
+  while the $\delta_m$ values are assumed to be set by the reciprocal of the median time scale of the targets.
 
 - Strategy 2 (`recursive`): The initial guess is based on the previous optimisation results for `M - 1`.
 
-- Strategy 3 (`combination` - only for the `all_free` method): The initial guess uses the `free_gamma` solution using
-  its corresponding default strategy.
+- Strategy 3 (`combination` - only for the `all_free` method): The initial guess uses the solution from strategy 1.
 
 
 The parameters of the approximation are then determined through the use of an optimiser
@@ -232,7 +231,8 @@ where the penalties are controllable via the `monotonous` and `individual_level`
 
 - `individual_level`: A penalty variation in $\gamma_m$ and $\delta_m$ values are added.
    The population level waning immunity may be smoothly changing for a set of parameters, but the instantaneous change
-   in immunity between two neighbouring compartments may be large. This penalty can be added to avoid such behaviour.
+   in immunity between two neighbouring compartments may be large. This penalty can be added to avoid such behaviour and
+   smoothen transitions between states.
 
 
 The input for the `?DiseasyImmunity$approximate_compartmental()` function includes:
@@ -257,15 +257,16 @@ The plot will display both the approximations and the target functions for compa
 im$plot(method = "free_gamma", M = 4)
 ```
 
+
 # Compartment selection (elbow curve method)
 The accuracy of the approximation can be influenced by the number of compartments (`M`) used in the model.
-Therefore it is crucial to select the right `M` as too few compartments can lead to poor approximation,
+Therefore it is crucial to select the right `M`, as too few compartments can lead to poor approximation,
 while too many compartments can lead to unnecessary computational time without significant improvement in accuracy.
 The elbow curve method is employed to determine the appropriate `M` for the models.
 Each approach is executed across a range of `M` values, and the resulting objective function values are returned as
 `value` from the `?DiseasyImmunity$approximate_compartmental()` function.
 
-In the example below, we have a case where the "all_free" method out performs the other methods, but
+In the example below, we have a case where the "all_free" method outperforms the other methods, but
 this is not generally true. We find that the "all_free" method can be the best if the problem contains
 multiple time scales, but often performs no better than "free_gamma".
 For more examples, see the optimisation vignette (`vignette("diseasy-immunity-optimisation")`).

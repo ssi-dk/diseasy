@@ -29,8 +29,8 @@ From our testing, we have learned that method used to express the waning immunit
 is a hard optimisation problem. Depending on the choice of optimisation algorithm, the quality of the approximation
 will vary wildly as well as the time it takes for the algorithm to converge.
 
-To mitigate this issue, we here investigate the effect of optimisation algorithm to find the optimisation algorithms
-that finish in reasonable time and provide the best approximation of the target waning immunity.
+To mitigate this issue, we investigate the effect of several optimisation algorithms to identify the best
+performing one, evaluating both run time and approximation accuracy of the waning immunity target.
 
 `?DiseasyImmunity` can internally employ the optimisation algorithms of `stats`, `{nloptr}` and
 `optimx::optimr()`, which means that we have around 30 different algorithms to test.
@@ -51,11 +51,11 @@ These targets are:
 
 | Function            | Functional form                                                                                |
 | ------------------- | ---------------------------------------------------------------------------------------------- |
-| Exponential         | $\exp\!\!(-t / \tau)$                                                                          |
-| Sigmoidal           | $\exp\!\!(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6))$                              |
+| Exponential         | $\exp\left(-t / \tau\right)$                                                                   |
+| Sigmoidal           | $\exp\left(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6)\right)$                       |
 | Heaviside           | $\Theta(\tau - t)$                                                                             |
-| Sum of exponentials | $\frac{1}{3}\left(\!\exp\!\!(-t / \tau) + \exp\!\!(-2t / \tau) + \exp\!\!(-3t / \tau)\right)$  |
-| Linear              | $\sup\!\!(\{1 - t/\tau, 0\})$                                                                  |
+| Sum of exponentials | $\frac{1}{3}\left(\exp(-t / \tau) + \exp(-2t / \tau) + \exp(-3t / \tau)\right)$                |
+| Linear              | $\sup\left(\{1 - t/\tau, 0\}\right)$                                                           |
 
 We then construct more target functions from this family of functions:
 
@@ -122,14 +122,14 @@ best_optim_results <- best_optim_results |>
 ```
 
 ## Global results
-To get an overview of the best performing optimisers, we present the an aggregated view of the results in the table
+To get an overview of the best performing optimisers, we present an aggregated view of the results in the table
 below.
 Here we present the top 5 "best" optimiser/strategy combination for each method and penalty setting.
 To define what it means to be the "best" we simply take the total integral difference between the approximation
 and the target function across all target functions and problem sizes ($M$).
 
-Note that we currently filter out the results from the Heaviside and Linear targets seems to be especially difficult
-for the optimisers to handle (see the [Per target results](#per-target-results) section below).
+Note that we currently filter out the results from the Heaviside and linear targets, which seem to be especially
+difficult for the optimisers to handle (see the [Per target results](#per-target-results) section below).
 
 In addition, we only consider problems up to size $M = 5$ for the general results.
 
@@ -435,6 +435,8 @@ visualise_methods(total_results, "free_gamma")
 ```{r overview all_free, echo = FALSE, fig.alt = "Total error vs execution time for the all_free method."}
 visualise_methods(total_results, "all_free")
 ```
+
+
 In total, we find that there is no clear choice for best, general optimiser/strategy combination.
 
 For the defaults, we have chose the optimiser/strategy combination dependent on the method of parametrisation and the
