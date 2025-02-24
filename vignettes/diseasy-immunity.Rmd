@@ -232,7 +232,7 @@ where the penalties are controllable via the `monotonous` and `individual_level`
 - `individual_level`: A penalty variation in $\gamma_m$ and $\delta_m$ values are added.
    The population level waning immunity may be smoothly changing for a set of parameters, but the instantaneous change
    in immunity between two neighbouring compartments may be large. This penalty can be added to avoid such behaviour and
-   smoothen transitions between states.
+   soften transitions between states.
 
 
 The input for the `?DiseasyImmunity$approximate_compartmental()` function includes:
@@ -355,5 +355,5 @@ if (exists("im")) rm(im)
 gc()
 ```
 
-[^1]: "time" here is the expectation value of the time of the transition to the comparment with the given
+[^1]: "time" here is the expectation value of the time of the transition to the compartment with the given
 value of $\gamma$
