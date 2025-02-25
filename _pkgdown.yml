@@ -19,6 +19,12 @@ reference:
     contents:
     - has_keyword("model-template")
 
+  - title: Creating ensembles
+    desc: Functions related to creating ensembles of models.
+    contents:
+    - combineasy
+    - DiseasyEnsemble-generics
+
   - title: Helper functions
     desc: Functions that help with the construction of models.
     contents:
@@ -39,6 +45,11 @@ reference:
     - hash_environment
 
 articles:
+- title: Creating ensembles
+  navbar: Creating ensembles
+  contents:
+  - creating-ensembles
+
 - title: Functional modules
   navbar: Functional modules
   contents:

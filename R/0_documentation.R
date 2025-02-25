@@ -166,10 +166,10 @@ rd_get_results_description <- paste(
 
 rd_get_results_return <- paste(
   "A `tibble` [tibble::tibble] with predictions at the level specified by stratification level.",
-  "In addition to stratification columns, the output has the columns:\\cr",
-  "  date (`Date`) specifying the date of the prediction\\cr",
-  "  realization_id (`character`) giving a unique id for each realization in the ensemble\\cr",
-  "  model (`character`) the name (classname) of the model used to provide the prediction."
+  "In addition to stratification columns, the output has the columns:\\cr\\cr",
+  " - date (`Date`) specifying the date of the prediction.\\cr",
+  " - realisation_id (`character`) giving a unique id for each realization in the ensemble.\\cr",
+  " - weight (`numeric`) giving the weight of the realization in the ensemble."
 )
 
 

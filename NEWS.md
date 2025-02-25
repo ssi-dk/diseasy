@@ -29,8 +29,16 @@
     * Any number of disease variants.
   * Methods for initialising from incidence data.
 
+* `combineasy()`: A utility to combine model templates into an ensemble (`DiseasyEnsemble`) (#166).
+
+* Standard generics for `DiseasyEnsemble` (#166):
+  * `print()` - Simple console printing.
+  * `summary()` - View of the composition of the ensemble.
+  * `predict()` - Retrieve predictions from the ensemble.
+  * `plot()` - Plot predictions from the ensemble.
+
 * A range of utility functions:
-  * The hypoexponential distribution: `dhypo()`, `phypo()`, `qhypo()`, and `rhypo()` (#146)
+  * The hypoexponential distribution: `dhypo()`, `phypo()`, `qhypo()`, and `rhypo()` (#146).
 
 ## Documentation
 
@@ -39,3 +47,4 @@
 * Vignettes for the use of the package is included.
   * `vignette("diseasy")`
   * `vignette("creating-a-model")`
+  * `vignette("creating-ensembles")`
