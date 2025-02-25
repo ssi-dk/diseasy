@@ -392,7 +392,7 @@ plot.DiseasyBaseModule <- function(x, ...) {
 #' # Examples to come
 #' @export
 print.DiseasyBaseModule <- function(x, verbose = FALSE, ...) {
-  if (verbose) {
+  if (verbose || !("describe" %in% names(x))) {
     NextMethod(generic = "print", object = x, ...)
   } else {
     x$describe(...)
