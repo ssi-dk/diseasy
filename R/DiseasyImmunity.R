@@ -56,7 +56,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Check if the model has a time_scale attribute
         dots <- attr(private$.model[[.y]], "dots")
         if (!("time_scale" %in% names(dots))) {
-          stop("Model for ", .y, " (\"", attr(private$.model[[.y]], "name"), "\") does not use time_scale argument!")
+          stop(
+            "Model for ", .y, " (\"", attr(private$.model[[.y]], "name"), "\") does not use time_scale argument!",
+            call. = FALSE
+          )
         }
 
         # Update the time_scale for the model
@@ -317,7 +320,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The transition rates between the compartments and the risk associated with each compartment are optimized to
     #'   approximate the configured waning immunity scenario.
     #'
-    #'   The function implements three methods for parametrising the waning immunity curves, differing in the number of free parameters:
+    #'   The function implements three methods for parametrising the waning immunity curves.
     #'
     #'   - "free_gamma": All transition rates are equal and risks are free to vary (M + 1 free parameters).
     #'   - "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
@@ -515,7 +518,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         stopifnot("The waning function(s) must have finite values at infinity." = purrr::every(f_inf, is.finite))
 
 
-        if (method == "free_delta") {
+        if (method == "free_delta") {                                                                                   # nolint: if_switch_linter
           # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
           n_free_parameters <- M - 1
 
@@ -754,7 +757,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           } else if (method == "all_free") {
 
-            if (strategy == "naive") {
+            if (strategy == "naive") {                                                                                  # nolint: if_switch_linter
 
               # Uniform delta using time scale as M / delta
               delta_0 <- (M - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1) |>
@@ -941,7 +944,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
               glue::glue(
                 "`optim_control` format ({dput(optim_control)}) ",
                 "matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::optimr`!"
-              )
+              ),
+              call. = FALSE
             )
           }
 
