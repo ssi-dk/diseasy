@@ -33,7 +33,7 @@
 
 * Standard generics for `DiseasyEnsemble` (#166):
   * `print()` - Simple console printing.
-  * `summery()` - View of the composition of the ensemble.
+  * `summary()` - View of the composition of the ensemble.
   * `predict()` - Retrieve predictions from the ensemble.
   * `plot()` - Plot predictions from the ensemble.
 
