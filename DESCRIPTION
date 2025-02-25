@@ -37,9 +37,7 @@ Imports:
     R6,
     rlang,
     stringr,
-    subplex,
     tidyr,
-    ucminf,
     withr
 Suggests:
     brms,
