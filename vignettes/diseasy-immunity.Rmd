@@ -261,7 +261,7 @@ interpreted at the individual level rather than population level.
 To see this in effect, we run the approximation with and without the penalties and plot the value of $\gamma$ over
 time[^1].
 
-```{r effect of penalty, fig.alt = "Adding penalty to approximations smoothens the transitions between compartments."}
+```{r effect of penalty, fig.alt = "Adding penalty to approximations smoothens the transitions between compartments.", eval = !missing_suggests}
 # Retrieve gamma and delta values for both cases
 results <- purrr::map(
   c(TRUE, FALSE),
