@@ -49,7 +49,8 @@ if (!identical(source_code_hash, cache$get("source-code-hash"))) {
       glue::glue(
         "Cache should not reset (source_code_hash: {source_code_hash})",
         " - Please run `diseasy-immunity.Rmd` locally and commit the updated cache."
-      )
+      ),
+      call. = FALSE
     )
   }
 }
@@ -289,12 +290,15 @@ results <- purrr::map(
 
 # Plot
 results |>
-  dplyr::mutate("t" = cumsum(1 / dplyr::lag(.data$delta, default = Inf)), .by = "penalty") |>
+  dplyr::mutate(
+    "t" = cumsum(1 / dplyr::lag(.data$delta, default = Inf)),
+    .by = "penalty"
+  ) |>
   ggplot2::ggplot(ggplot2::aes(x = t, y = gamma, color = penalty)) +
   ggplot2::geom_step(linewidth = 1) +
   ggplot2::scale_x_continuous(limits = c(0, NA), expand = c(0, 1)) +
   ggplot2::scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  ggplot2::labs(x = "Time", y = "γ", color = "Penalty?")
+  ggplot2::labs(x = "Time", y = "gamma", color = "Penalty?")
 ```
 
 With the penalties imposed, the steps in the $\gamma$ values are smaller than if the penalties are not imposed.
@@ -345,7 +349,8 @@ if (!interactive() && cache$size() != (2 + max(M_seq) * length(methods))) {
     glue::glue(
       "Unexpected number of cache items (cache size: {cache$size()})",
       " -- hashing issue?"
-    )
+    ),
+    call. = FALSE
   )
 }
 ```
