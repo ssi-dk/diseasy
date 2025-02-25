@@ -2902,7 +2902,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["diseasystore", "cachem", "checkmate", "dplyr", "expm", "glue", "lgr", "lubridate", "Matrix", "pkgcond", "pracma", "purrr", "R6", "rlang", "stringr", "subplex", "tidyr", "ucminf", "withr"],
+      "dependencies": ["diseasystore", "cachem", "checkmate", "dplyr", "expm", "glue", "lgr", "lubridate", "Matrix", "pkgcond", "pracma", "purrr", "R6", "rlang", "stringr", "tidyr", "withr"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",
