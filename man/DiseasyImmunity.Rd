@@ -382,7 +382,7 @@ is a phase-type distribution (with Erlang distribution as a special case when al
 The transition rates between the compartments and the risk associated with each compartment are optimized to
 approximate the configured waning immunity scenario.
 
-The function implements three methods for parametrising the waning immunity curves, differing in the number of free parameters:
+The function implements three methods for parametrising the waning immunity curves.
 \itemize{
 \item "free_gamma": All transition rates are equal and risks are free to vary (M + 1 free parameters).
 \item "free_delta": Transition rates are free to vary and risks are linearly distributed between f(0) and
