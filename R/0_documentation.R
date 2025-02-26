@@ -74,6 +74,21 @@ rd_scale <- function(type = "param") {
         ifelse(type == "field", "Read only.", ""))
 }
 
+rd_target <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`character(1)`)\\cr",
+        "The target of the waning model (e.g. \"infection\", \"hospitalisation\", \"death\").",
+        ifelse(type == "field", " Read only.", ""))
+}
+
+rd_time_scale <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`numeric(1)`)\\cr",
+        "Sets the time_scale of the waning (immunity) model.",
+        "The time_scale is the characteristic time scale, which defines the period until when the immunity",
+        "is significantly waning",
+        ifelse(type == "field", " Read only.", ""))
+}
 
 rd_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
