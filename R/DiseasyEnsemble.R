@@ -6,6 +6,8 @@
 #' @name DiseasyEnsemble-generics
 #' @param x,object (`DiseasyEnsemble`)\cr
 #'   Ensemble object to print, summarise or plot.
+#' @param n (`integer(1)`)\cr
+#'   The number of models to produce output for.
 #' @param width (`integer(1)`)\cr
 #'   The maximum number of characters to print.
 #' @examplesIf rlang::is_installed("duckdb")
@@ -36,11 +38,12 @@
 #'   rm(ensemble, observables)
 #' @return `r rd_side_effects`
 #' @export
-print.DiseasyEnsemble <- function(x, width = 200, ...) {
+print.DiseasyEnsemble <- function(x, n = 5, width = 200, ...) {
 
   prefix <- "DiseasyEnsemble:"
 
-  model_str <- purrr::map(x, \(model) glue::glue("{class(model)[[1]]} (hash: {substr(model %.% hash, 1, 5)})")) |>
+  model_str <- utils::head(x, n) |>
+    purrr::map(\(model) glue::glue("{class(model)[[1]]} (hash: {substr(model %.% hash, 1, 5)})")) |>
     toString()
 
   if (nchar(model_str) > width) {
