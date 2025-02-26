@@ -52,12 +52,12 @@ articles:
 - title: Creating ensembles
   navbar: Creating ensembles
   contents:
-  - creating-ensembles
+  - articles/creating-ensembles
 
 - title: Functional modules
   navbar: Functional modules
   contents:
-  - matches(r"{^diseasy-\w*$}") # I would do a negative lookahead for "-model", but perl is not allowed here
+  - matches(r"{^articles/diseasy-\w*$}") # I would do a negative lookahead for "-model", but perl is not allowed here
 
 - title: Model templates
   navbar: Model templates
@@ -67,7 +67,7 @@ articles:
 - title: Developer guides
   navbar: Developer guides
   contents:
-  - creating-a-model
+  - articles/creating-a-model
 
 - title: Model notes
   navbar: Model notes
