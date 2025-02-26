@@ -115,7 +115,8 @@ predict.DiseasyEnsemble <- function(
           prediction_length = prediction_length,
           stratification = stratification
         )
-      }
+      },
+      .progress = TRUE
     )
 
   # Confirm that all outputs conform to the requirements
@@ -142,7 +143,8 @@ predict.DiseasyEnsemble <- function(
   # Add model information and collapse to single data set
   results <- purrr::map2(
     results, object,
-    \(results, model) dplyr::mutate(results, "model" = !!model$hash)
+    \(results, model) dplyr::mutate(results, "model" = !!model$hash),
+    .progress = TRUE
   ) |>
     purrr::list_rbind()
 
