@@ -200,3 +200,99 @@ And again we can use the `plot()` method to visualize the predictions from the e
 ```{r, fig.alt = "Plot of predictions from alternative ensemble. Shaded area is ensemble quantiles with observations as points.", eval = rlang::is_installed("RSQLite")}
 plot(ensemble, observable = "n_positive", prediction_length = 30)
 ```
+
+## Example 3 - A large SEIR model ensemble`
+
+In this example, we will create a large ensemble of SEIR models using the `DiseasyModelOdeSeir` template.
+
+
+```{r, eval = FALSE}
+# Create three different contact bases for the ensemble
+# All uses the Danish populations but with different contact matrices
+contact_basis_1 <- contact_basis_2 <- contact_basis_3 <- contact_basis$DK
+contact_basis_2$contacts <- contact_basis$SE$contact
+contact_basis_3$contacts <- contact_basis$NO$contact
+
+# Create an activity instance with the Danish changes in restrictions
+activity <- DiseasyActivity$new()
+activity$set_activity_units(dk_activity_units)
+activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+# Load the different contact bases to create distinct activity instances
+activities <- list(
+  contact_basis_1,
+  contact_basis_2,
+  contact_basis_3
+) |>
+  purrr::map(~ {
+    act <- activity$clone()
+    act$set_contact_basis(contact_basis = .)
+    return(act)
+  })
+rm(activity)
+```
+
+```{r, eval = FALSE}
+# Create three different season modules for the ensemble
+season <- DiseasySeason$new(reference_date = as.Date("2020-01-01"))
+
+seasons <- c("constant_season", "cosine_season", "covid_season_v1") |>
+  purrr::map(~ {
+    s <- season$clone()
+    s$use_season_model(.)
+    return(s)
+  })
+rm(season)
+```
+
+```{r, eval = FALSE}
+# Use different waning immunity models for the ensemble
+no_immunity <- DiseasyImmunity$new()
+no_immunity$set_waning_model("no_waning")
+
+# Exponential waning
+immunities <- c(60, 120, 180) |>
+  purrr::map(~ {
+    immunity <- DiseasyImmunity$new()
+    immunity$set_exponential_waning(time_scale = .)
+    return(immunity)
+  }) |>
+  c(no_immunity)
+```
+
+```{r, eval = FALSE}
+# Create an estimator for the incidence
+observables$define_synthetic_observable(
+  name = "incidence",
+  mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
+)
+```
+
+```{r, eval = FALSE}
+# Create the ensemble
+seir_ensemble <- combineasy(
+  model_templates = list(DiseasyModelOdeSeir),
+  modules = tidyr::expand_grid(
+    activity = activities,
+    season = seasons,
+    immunity = immunities,
+    observables = list(observables)
+  ),
+  parameters = tidyr::expand_grid(
+    "compartment_structure" = list(
+      c("E" = 1L, "I" = 1L, "R" = 1L),
+      c("E" = 2L, "I" = 3L, "R" = 1L),
+      c("E" = 1L, "I" = 1L, "R" = 5L),
+      c("E" = 2L, "I" = 3L, "R" = 5L)
+    ),
+    "disease_progression_rates" = list(
+      c("E" = 1 / 2.0, "I" = 1 / 4.4),
+      c("E" = 1 / 2.2, "I" = 1 / 4.6),
+      c("E" = 1 / 2.0, "I" = 1 / 4.6),
+      c("E" = 1 / 2.2, "I" = 1 / 4.4)
+    )
+  )
+)
+
+summary(seir_ensemble)
+```
