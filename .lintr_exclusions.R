@@ -1,5 +1,5 @@
 list(
-  "vignettes/diseasy-immunity.Rmd" = list(
+  "vignettes/articles/diseasy-immunity.Rmd" = list(
     "object_name_linter" = Inf
   ),
   "vignettes/articles/SEIR-initialisation.Rmd" = list(
