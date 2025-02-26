@@ -110,7 +110,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     initialize = function(
-      observables,
+      observables = FALSE,
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
@@ -130,43 +130,51 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ...
       )
 
+      # Attempt to initialise helpers with the current inputs
+      tryCatch(self$prepare_rhs(), error = function(e) {})
+    },
 
-      # Check the input arguments
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_integerish(compartment_structure, lower = 0, add = coll)
-      checkmate::assert_names(
-        names(compartment_structure),
-        subset.of = c("E", "I", "R"),
-        must.include = c("I", "R"),
-        add = coll
-      )
 
-      checkmate::assert_numeric(disease_progression_rates, lower = 0, add = coll)
-      checkmate::assert_names(
-        names(disease_progression_rates),
-        subset.of = c("E", "I"),
-        must.include = "I",
-        add = coll
-      )
+    #' @description
+    #'   Overload the `$load_module()` to re-initialise the helpers after loading
+    #' @param ...
+    #'   Arguments sent to parent method.
+    load_module = function(...) {
+      super$load_module(...)
 
-      checkmate::assert_logical(malthusian_matching, add = coll)
+      # Attempt to initialise helpers with updated state
+      tryCatch(self$prepare_rhs(), error = function(e) {})
+    },
+
+
+    #' @description `r rd_get_results_description`
+    #' @param observable `r rd_observable()`
+    #' @param prediction_length `r rd_prediction_length()`
+    #' @param quantiles `r rd_quantiles()`
+    #' @param stratification `r rd_stratification()`
+    #' @return `r rd_get_results_return`
+    #' @seealso `r rd_get_results_seealso`
+    get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
 
       # Check we have the needed modules loaded and configured as needed
+      coll <- checkmate::makeAssertCollection()
       checkmate::assert_class(self %.% observables, "DiseasyObservables")
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
-
-
       checkmate::assert_class(self %.% activity, "DiseasyActivity", add = coll)
-
       checkmate::assert_class(self %.% season, "DiseasySeason", add = coll)
-
       checkmate::assert_class(self %.% variant, "DiseasyVariant", add = coll)
-
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
-
       checkmate::reportAssertions(coll)
 
-      # Cast the compartment structure to a integer to make hash consistent
+
+      super$get_results(observable, prediction_length, quantiles, stratification)
+    },
+
+
+    #' @description
+    #'  Allocate the helpers for the rhs method
+    prepare_rhs = function() {
+
       compartment_structure <- self %.% parameters %.% compartment_structure
       disease_progression_rates <- self %.% parameters %.% disease_progression_rates
 
@@ -365,6 +373,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         private$set_contact_matrix(self$malthusian_scaling_factor)
       }
 
+      # Mark that model has been initialised
+      private$initialised <- TRUE
     },
 
 
@@ -926,6 +936,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
+    initialised = FALSE,
 
     default_parameters = function() {
       modifyList(
