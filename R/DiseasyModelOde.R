@@ -366,7 +366,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
             .before = dplyr::everything()
           ) |>
           dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter
-            "rate" = self %.% disease_progression_rates[["I"]] * self %.% compartment_structure[["I"]] * .data$value
+            "rate" = self %.% parameters %.% disease_progression_rates[["I"]] *
+              self %.% parameters %.% compartment_structure[["I"]] * .data$value
           ) |>
           dplyr::select(!c("time", "state", "value"))
 

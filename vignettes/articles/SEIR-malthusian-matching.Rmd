@@ -59,10 +59,13 @@ combinations |>
           last_queryable_date = Sys.Date() - 1
         ),
         variant = DiseasyVariant$new(),
-        compartment_structure = c("E" = K, "I" = L, "R" = 1),
-        disease_progression_rates = c("E" = rE, "I" = rI),
-        parameters = list("age_cuts_lower" = 0, "overall_infection_risk" = 0.6),
-        malthusian_matching = match
+        parameters = list(
+          "compartment_structure" = c("E" = K, "I" = L, "R" = 1),
+          "age_cuts_lower" = 0,
+          "overall_infection_risk" = 0.6,
+          "disease_progression_rates" = c("E" = rE, "I" = rI),
+          "malthusian_matching" = match
+        )
       )
 
       # Generate a uniform initial state_vector that sums to 1

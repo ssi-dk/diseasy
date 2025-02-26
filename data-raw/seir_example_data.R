@@ -13,9 +13,9 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   age_cuts_lower <- c(0, 30, 60)
 
   # Setup the number of compartments for the generating model
-  K <- 2                                                                                                                # nolint start: object_name_linter
-  L <- 1
-  M <- 1                                                                                                                # nolint end
+  K <- 2L                                                                                                               # nolint start: object_name_linter
+  L <- 1L
+  M <- 1L                                                                                                               # nolint end
 
   # Build model
   act <- DiseasyActivity$new()
@@ -33,9 +33,12 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   m <- DiseasyModelOdeSeir$new(
     activity = act,
     observables = obs,
-    compartment_structure = c("E" = K, "I" = L, "R" = M),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = age_cuts_lower, "overall_infection_risk" = overall_infection_risk)
+    parameters = list(
+      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
+      "age_cuts_lower" = age_cuts_lower,
+      "overall_infection_risk" = overall_infection_risk,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment

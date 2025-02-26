@@ -56,10 +56,10 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   m <- DiseasyModelOdeSeir$new(
     observables = obs,
     activity = act,
-    disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
     parameters = list(
+      "age_cuts_lower" = c(0, 30, 60),
       "overall_infection_risk" = 0.025,
-      "age_cuts_lower" = c(0, 30, 60)
+      "disease_progression_rates" = c("E" = 1 / 2, "I" = 1 / 4),
     )
   )
 
@@ -80,10 +80,6 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively.  Read only.}
-
-\item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments.  Read only.}
-
 \item{\code{malthusian_scaling_factor}}{(\code{numeric(1)})\cr
 A scaling factor to apply to the contact matrices to account for structural differences
 in the model. Read only.}
@@ -124,9 +120,6 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
   season = TRUE,
   variant = TRUE,
   immunity = TRUE,
-  compartment_structure = c(E = 1L, I = 1L, R = 1L),
-  disease_progression_rates = c(E = 1, I = 1),
-  malthusian_matching = TRUE,
   parameters = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -137,26 +130,23 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \describe{
 \item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
-\item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.}
-
-\item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.}
-
-\item{\code{malthusian_matching}}{(\code{logical(1)})\cr
-Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?}
-
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
 Parameters controlling the structure of the model:
 \itemize{
+\item \code{compartment_structure} (\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.
 \item \code{age_cuts_lower} (\code{numeric()})\cr
 Determines the age groups in the model.
+\item \code{malthusian_matching} (\code{logical(1)})\cr
+Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?
 }
 
 Parameters controlling the dynamics of the model:
 \itemize{
 \item \code{overall_infection_risk} (\code{numeric(1)})\cr
 A scalar that scales contact rates to infection rates.
+\item \code{disease_progression_rates} (\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.
 }
 
 Parameters controlling initialisation routines
