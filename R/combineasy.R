@@ -87,7 +87,8 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
 
             # Then return the model
             model
-          }
+          },
+          .progress = TRUE
         )
       }) |>
       purrr::flatten()
@@ -115,7 +116,8 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
 
             # Then return the model
             model
-          }
+          },
+          .progress = TRUE
         )
       }) |>
       purrr::flatten()
