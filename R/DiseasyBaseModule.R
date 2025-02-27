@@ -389,7 +389,16 @@ plot.DiseasyBaseModule <- function(x, ...) {
 #'   See the `$print()` method for each module
 #' @return `r rd_side_effects`
 #' @examples
-#' # Examples to come
+#' # Create a season module with an constant season
+#' season <- DiseasySeason$new()
+#' print(season)
+#'
+#' # Create an activity module with Danish reference scenario
+#' activity <- DiseasyActivity$new(
+#'   base_scenario = "dk_reference",
+#'   contact_basis = contact_basis$DK
+#' )
+#' print(activity)
 #' @export
 print.DiseasyBaseModule <- function(x, verbose = FALSE, ...) {
   if (verbose || !("describe" %in% names(x))) {
