@@ -29,6 +29,7 @@ reference:
     desc: Functions that help with the construction of models.
     contents:
     - plot
+    - print
     - diseasyoption
 
   - title: Data sets

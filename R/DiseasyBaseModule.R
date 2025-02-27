@@ -375,6 +375,40 @@ plot.DiseasyBaseModule <- function(x, ...) {
 }
 
 
+#' @name print
+#' @title
+#'   Printing method for `diseasy` modules
+#' @description
+#'   Summarise `diseasy` modules.
+#' @param x (`Diseasy*`)\cr
+#'   The module to get information for.
+#' @param verbose (`logical(1)`)\cr
+#'   Should the full information for the module be printed?
+#' @param ...
+#'   Parameters sent to the specific printing methods.
+#'   See the `$print()` method for each module
+#' @return `r rd_side_effects`
+#' @examples
+#' # Create a season module with an constant season
+#' season <- DiseasySeason$new()
+#' print(season)
+#'
+#' # Create an activity module with Danish reference scenario
+#' activity <- DiseasyActivity$new(
+#'   base_scenario = "dk_reference",
+#'   contact_basis = contact_basis$DK
+#' )
+#' print(activity)
+#' @export
+print.DiseasyBaseModule <- function(x, verbose = FALSE, ...) {
+  if (verbose || !("describe" %in% names(x))) {
+    NextMethod(generic = "print", object = x, ...)
+  } else {
+    x$describe(...)
+  }
+}
+
+
 # Set default options for the package related to DiseasyObservables
 rlang::on_load({
   options("diseasy.logging" = FALSE)
