@@ -165,6 +165,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       checkmate::assert_class(self %.% variant, "DiseasyVariant", add = coll)
 
+      checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
+
       checkmate::reportAssertions(coll)
 
       # Cast the compartment structure to a integer to make hash consistent
