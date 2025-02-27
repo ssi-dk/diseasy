@@ -101,8 +101,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   Parameters controlling the functional modules:
     #'   * `activity.weights` (`numeric(4)`)\cr
     #'     Passed to `?DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)`
-    #'   * `immunity.method` (`character(1)`)\cr
-    #'     Passed to `?DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)`
+    #'   * `immunity.approximate_compartmental_args` (`named list()`)\cr
+    #'     Arguments passed to `?DiseasyImmunity$approximate_compartmental()`
     #'
     #'   Additional parameters are:
     #'   `r rd_diseasymodel_parameters`
@@ -284,9 +284,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Get risks and accompanying rates from DiseasyImmunity
-      immunity_approx <- self %.% immunity %.% approximate_compartmental(
-        method = self %.% parameters %.% immunity.method,
-        M = compartment_structure[["R"]]
+      immunity_approx <- do.call(
+        what = self %.% immunity %.% approximate_compartmental,
+        args = modifyList(
+          self %.% parameters %.% immunity.approximate_compartmental_args,
+          list(M = compartment_structure[["R"]])
+        )
       )
       immunity_risks <- 1 - immunity_approx %.% gamma %.% infection
       immunity_rates <- immunity_approx %.% delta
@@ -963,7 +966,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
           # Defaults for functional modules
           "activity.weights" = c(1, 1, 1, 1),
-          "immunity.method" = "free_gamma"
+          "immunity.approximate_compartmental_args" = list()
         ),
         keep.null = TRUE
       )
@@ -990,13 +993,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Validate the functional modules parameters
       checkmate::assert_numeric(self %.% parameters %.% activity.weights, lower = 0, len = 4, add = coll)
 
-      if (!is.null(self %.% immunity)) {
-        checkmate::assert_choice(
-          self %.% parameters %.% immunity.method,
-          choices = eval(formals(self %.% immunity %.% approximate_compartmental)$method),
-          add = coll
-        )
-      }
 
       checkmate::reportAssertions(coll)
 

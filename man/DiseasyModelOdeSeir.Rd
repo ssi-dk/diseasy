@@ -174,8 +174,8 @@ Parameters controlling the functional modules:
 \itemize{
 \item \code{activity.weights} (\code{numeric(4)})\cr
 Passed to \code{?DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)}
-\item \code{immunity.method} (\code{character(1)})\cr
-Passed to \code{?DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)}
+\item \code{immunity.approximate_compartmental_args} (\verb{named list()})\cr
+Arguments passed to \code{?DiseasyImmunity$approximate_compartmental()}
 }
 
 Additional parameters are:
