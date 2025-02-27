@@ -10,28 +10,32 @@ test_that("initialize works with functional modules", {
   # Check module instances can be loaded into new model instance
   act <- DiseasyActivity$new()
   s   <- DiseasySeason$new()
+  immunity <- DiseasyImmunity$new()
   obs <- DiseasyObservables$new()
   var <- DiseasyVariant$new()
 
   m_act_instance <- DiseasyModel$new(activity = act)
   m_s_instance   <- DiseasyModel$new(season = s)
+  m_immunity_instance <- DiseasyModel$new(immunity = immunity)
   m_obs_instance <- DiseasyModel$new(observables = obs)
   m_var_instance <- DiseasyModel$new(variant = var)
 
   # Check the hash is unique for each module when created this way
-  modules <- list(m, m_act_instance, m_s_instance, m_obs_instance, m_var_instance)
+  modules <- list(m, m_act_instance, m_s_instance, m_immunity_instance, m_obs_instance, m_var_instance)
   expect_length(unique(purrr::map(modules, ~ .x$hash)), length(modules))
 
 
   # Check modules can be created during model instantiation
   m_act_boolean <- DiseasyModel$new(activity = TRUE)
   m_s_boolean   <- DiseasyModel$new(season = TRUE)
+  m_immunity_boolean <- DiseasyModel$new(immunity = TRUE)
   m_obs_boolean <- DiseasyModel$new(observables = TRUE)
   m_var_boolean <- DiseasyModel$new(variant = TRUE)
 
   # Check the hash is the same when created this way
   expect_identical(m_act_instance$hash, m_act_boolean$hash)
   expect_identical(m_s_instance$hash,   m_s_boolean$hash)
+  expect_identical(m_immunity_instance$hash, m_immunity_boolean$hash)
   expect_identical(m_obs_instance$hash, m_obs_boolean$hash)
   expect_identical(m_var_instance$hash, m_var_boolean$hash)
 
@@ -39,7 +43,8 @@ test_that("initialize works with functional modules", {
   m_label <- DiseasyModel$new(label = "test")
   expect_identical(m_label$hash, m$hash) # label should not change the hash
 
-  rm(m, m_act_instance, m_s_instance, m_obs_instance, m_act_boolean, m_s_boolean, m_obs_boolean, m_var_boolean, m_label)
+  rm(m, m_act_instance, m_s_instance, m_immunity_instance, m_obs_instance)
+  rm(m_act_boolean, m_s_boolean, m_immunity_boolean, m_obs_boolean, m_var_boolean, m_label)
 })
 
 
@@ -178,6 +183,7 @@ test_that("$hash works", {
   s   <- DiseasySeason$new()
   obs <- DiseasyObservables$new()
   var <- DiseasyVariant$new()
+  immunity <- DiseasyImmunity$new()
 
   # Loading DiseasyActivity
   m$load_module(act)
@@ -205,49 +211,66 @@ test_that("$hash works", {
   expect_false(hash_4 == hash_2)
   expect_false(hash_4 == hash_3)
 
+  # Loading DiseasyImmunity
+  m$load_module(immunity)
+  hash_5 <- m$hash
+  expect_false(hash_5 == hash_new_instance)
+  expect_false(hash_5 == hash_1)
+  expect_false(hash_5 == hash_2)
+  expect_false(hash_5 == hash_3)
+  expect_false(hash_5 == hash_4)
 
   # Check reloading modules works
   m$load_module(act)
-  expect_identical(m$hash, hash_4)
+  expect_identical(m$hash, hash_5)
 
   m$load_module(s)
-  expect_identical(m$hash, hash_4)
+  expect_identical(m$hash, hash_5)
 
   m$load_module(obs)
-  expect_identical(m$hash, hash_4)
+  expect_identical(m$hash, hash_5)
 
   m$load_module(var)
-  expect_identical(m$hash, hash_4)
+  expect_identical(m$hash, hash_5)
 
+  m$load_module(immunity)
+  expect_identical(m$hash, hash_5)
 
   # Check loading of altered module changes the hash
   act_alt <- DiseasyActivity$new()
   act_alt$set_activity_units(dk_activity_units)
   act_alt$change_activity(head(scenario_1, 3))
   m$load_module(act_alt)
-  expect_false(m$hash == hash_4)
+  expect_false(m$hash == hash_5)
   m$load_module(act) # Reset to original
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
-  expect_identical(m$hash, hash_4)
+  expect_identical(m$hash, hash_5)
   m$load_module(s_alt)
-  expect_false(m$hash == hash_4)
+  expect_false(m$hash == hash_5)
   m$load_module(s) # Reset to original
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
-  expect_identical(m$hash, hash_4)
+  expect_identical(m$hash, hash_5)
   m$load_module(obs_alt)
-  expect_false(m$hash == hash_4)
+  expect_false(m$hash == hash_5)
   m$load_module(obs) # Reset to original
 
   var_alt <- DiseasyVariant$new()
   var_alt$add_variant(name = "WT")
-  expect_identical(m$hash, hash_4)
+  expect_identical(m$hash, hash_5)
   m$load_module(var_alt)
-  expect_false(m$hash == hash_4)
+  expect_false(m$hash == hash_5)
   m$load_module(var) # Reset to original
 
-  rm(m, s, act, obs, var, s_alt, act_alt, obs_alt, var_alt)
+  immunity_alt <- DiseasyImmunity$new()
+  immunity_alt$set_linear_waning()
+  expect_identical(m$hash, hash_5)
+  m$load_module(immunity_alt)
+  expect_false(m$hash == hash_5)
+  m$load_module(immunity) # Reset to original
+
+  rm(m, s, act, obs, var, immunity, s_alt, act_alt, obs_alt, var_alt, immunity_alt)
 
 
   # Create a simple model that takes parameters

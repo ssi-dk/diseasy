@@ -41,6 +41,8 @@ These functions define the "API" of the models and ensure the models can take pa
 
 \link{DiseasyActivity}
 
+\link{DiseasyImmunity}
+
 \link{DiseasyObservables}
 
 \link{DiseasySeason}
@@ -54,17 +56,20 @@ These functions define the "API" of the models and ensure the models can take pa
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{activity}}{(\code{diseasy::activity})\cr
-The local copy of an activity module. Read-only.}
+\item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
+The local copy of an DiseasyActivity module. Read-only.}
+
+\item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
+The local copy of a DiseasyImmunity module. Read-only.}
 
 \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
 The local copy of a DiseasyObservables module. Read-only.}
 
 \item{\code{season}}{(\code{diseasy::DiseasySeason})\cr
-The local copy of a season module. Read-only.}
+The local copy of a DiseasySeason module. Read-only.}
 
 \item{\code{variant}}{(\code{diseasy::.DiseasyVariant})\cr
-The local copy of a variant module. Read-only.}
+The local copy of a DiseasyVariant module. Read-only.}
 
 \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
@@ -109,6 +114,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   activity = FALSE,
   season = FALSE,
   variant = FALSE,
+  immunity = FALSE,
   parameters = NULL,
   label = NULL,
   ...
@@ -118,7 +124,7 @@ This module is typically not constructed directly but rather through \verb{Disea
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observables, activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+\item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.

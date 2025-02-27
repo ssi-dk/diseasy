@@ -77,14 +77,6 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelOde]{diseasy::DiseasyModelOde}} -> \code{DiseasyModelOdeSeir}
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
-Place holder for the immunity module}
-}
-\if{html}{\out{</div>}}
-}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
@@ -131,6 +123,7 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
   activity = TRUE,
   season = TRUE,
   variant = TRUE,
+  immunity = TRUE,
   compartment_structure = c(E = 1L, I = 1L, R = 1L),
   disease_progression_rates = c(E = 1, I = 1),
   malthusian_matching = TRUE,
@@ -142,14 +135,14 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observables, activity, season, variant}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+\item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
 \item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.}
 
 \item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.}
 
 \item{\code{malthusian_matching}}{(\code{logical(1)})\cr
-Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?}
+Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?}
 
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
@@ -181,8 +174,8 @@ Parameters controlling the functional modules:
 \itemize{
 \item \code{activity.weights} (\code{numeric(4)})\cr
 Passed to \code{?DiseasyActivity$get_scenario_contacts(..., weights = activity.weights)}
-\item \code{immunity.method} (\code{character(1)})\cr
-Passed to \code{?DiseasyImmunity$approximate_compartmental(method = immunity.method, ...)}
+\item \code{immunity.approximate_compartmental_args} (\verb{named list()})\cr
+Arguments passed to \code{?DiseasyImmunity$approximate_compartmental()}
 }
 
 Additional parameters are:
