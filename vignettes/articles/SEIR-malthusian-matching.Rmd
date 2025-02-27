@@ -60,7 +60,7 @@ combinations |>
         ),
         variant = DiseasyVariant$new(),
         parameters = list(
-          "compartment_structure" = c("E" = K, "I" = L, "R" = 1),
+          "compartment_structure" = c("E" = K, "I" = L, "R" = 1L),
           "age_cuts_lower" = 0,
           "overall_infection_risk" = 0.6,
           "disease_progression_rates" = c("E" = rE, "I" = rI),
