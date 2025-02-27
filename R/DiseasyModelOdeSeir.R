@@ -49,7 +49,7 @@
 #'     parameters = list(
 #'       "age_cuts_lower" = c(0, 30, 60),
 #'       "overall_infection_risk" = 0.025,
-#'       "disease_progression_rates" = c("E" = 1 / 2, "I" = 1 / 4),
+#'       "disease_progression_rates" = c("E" = 1 / 2, "I" = 1 / 4)
 #'     )
 #'   )
 #'
