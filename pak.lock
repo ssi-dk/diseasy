@@ -4005,7 +4005,7 @@
     {
       "ref": "QuickJSR",
       "package": "QuickJSR",
-      "version": "1.5.2",
+      "version": "1.6.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4017,10 +4017,10 @@
         "RemoteRef": "QuickJSR",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.5.2"
+        "RemoteSha": "1.6.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/QuickJSR_1.5.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/QuickJSR_1.5.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/QuickJSR_1.6.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/QuickJSR_1.6.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -5029,17 +5029,17 @@
         "RemotePkgRef": "ssi-dk/SCDB@rc-v0.5.1",
         "RemoteType": "github",
         "RemoteRef": "rc-v0.5.1",
-        "RemoteSha": "370664e8820e8b245d436e8a1122ae4f8e37da71",
+        "RemoteSha": "803b15f0298f0b686197494e0d7816da155a5622",
         "RemoteHost": "api.github.com",
         "RemoteRepo": "SCDB",
         "RemoteUsername": "ssi-dk",
         "GithubRepo": "SCDB",
         "GithubUsername": "ssi-dk",
         "GithubRef": "rc-v0.5.1",
-        "GithubSHA1": "370664e8820e8b245d436e8a1122ae4f8e37da71"
+        "GithubSHA1": "803b15f0298f0b686197494e0d7816da155a5622"
       },
-      "sources": "https://api.github.com/repos/ssi-dk/SCDB/zipball/370664e8820e8b245d436e8a1122ae4f8e37da71",
-      "target": "src/contrib/SCDB_0.5.0.9000_370664e.tar.gz",
+      "sources": "https://api.github.com/repos/ssi-dk/SCDB/zipball/803b15f0298f0b686197494e0d7816da155a5622",
+      "target": "src/contrib/SCDB_0.5.0.9000_803b15f.tar.gz",
       "platform": "source",
       "rversion": "*",
       "directpkg": false,
@@ -5509,7 +5509,7 @@
     {
       "ref": "tinytex",
       "package": "tinytex",
-      "version": "0.55",
+      "version": "0.56",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -5521,10 +5521,10 @@
         "RemoteRef": "tinytex",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.55"
+        "RemoteSha": "0.56"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/tinytex_0.55.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/tinytex_0.55.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/tinytex_0.56.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/tinytex_0.56.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
