@@ -142,7 +142,7 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.}
 
 \item{\code{malthusian_matching}}{(\code{logical(1)})\cr
-Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?}
+Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?}
 
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.

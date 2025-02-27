@@ -76,7 +76,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param compartment_structure `r rd_compartment_structure()`
     #' @param disease_progression_rates `r rd_disease_progression_rates()`
     #' @param malthusian_matching (`logical(1)`)\cr
-    #'   Should the model be scaled such the Malthusian growth rate marches the corresponding SIR model?
+    #'   Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?
     #' @param observables,activity,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
