@@ -121,7 +121,7 @@ rd_schema <- function(type = "param") {
   paste("(`character`)\\cr",
         "A database schema.",
         ifelse(type == "field", "Read only.", ""),
-        "If the database backend does not support schema, the tables will be prefixed with <schema>.")
+        "If the database backend does not support schema, the tables will be prefixed with `<schema>.`")
 }
 
 
@@ -130,7 +130,7 @@ rd_target_schema <- function(type = "param") {
   paste("(`character`)\\cr",
         "The schema to place the feature store in.",
         ifelse(type == "field", "Read only.", ""),
-        "If the database backend does not support schema, the tables will be prefixed with <target_schema>.")
+        "If the database backend does not support schema, the tables will be prefixed with `<target_schema>.`.")
 }
 
 
