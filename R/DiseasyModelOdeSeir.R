@@ -142,8 +142,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     load_module = function(...) {
       super$load_module(...)
 
-      # Attempt to initialise helpers with updated state
-      tryCatch(self$prepare_rhs(), error = function(e) {})
+      # Mark that model is not initialised
+      private$initialised <- FALSE
     },
 
 
@@ -166,6 +166,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
       checkmate::reportAssertions(coll)
 
+      if (!private$initialised) {
+        self$prepare_rhs()
+      }
 
       super$get_results(observable, prediction_length, quantiles, stratification)
     },
