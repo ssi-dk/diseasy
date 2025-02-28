@@ -200,3 +200,124 @@ And again we can use the `plot()` method to visualize the predictions from the e
 ```{r, fig.alt = "Plot of predictions from alternative ensemble. Shaded area is ensemble quantiles with observations as points.", eval = rlang::is_installed("RSQLite")}
 plot(ensemble, observable = "n_positive", prediction_length = 30)
 ```
+
+## Example 3 - A large SEIR model ensemble`
+
+In this example, we will create a large ensemble of SEIR models using the `DiseasyModelOdeSeir` template.
+
+To do so, we will create a few different instances of the functional modules, `DiseasyActivity`, `DiseasySeason` and
+`DiseasyImmunity`. Which each represent different mechanistic scenarios to include in the model.
+
+### Activity module
+```{r, eval = FALSE}
+# Create three different contact bases for the ensemble
+# All uses the Danish populations but with different contact matrices
+contact_basis_1 <- contact_basis_2 <- contact_basis_3 <- contact_basis$DK
+contact_basis_2$contacts <- contact_basis$SE$contact
+contact_basis_3$contacts <- contact_basis$NO$contact
+
+# Create an activity instance with the Danish changes in restrictions
+activity <- DiseasyActivity$new()
+activity$set_activity_units(dk_activity_units)
+activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+# Load the different contact bases to create distinct activity instances
+activities <- list(
+  contact_basis_1,
+  contact_basis_2,
+  contact_basis_3
+) |>
+  purrr::map(~ {
+    act <- activity$clone()
+    act$set_contact_basis(contact_basis = .)
+    return(act)
+  })
+rm(activity)
+```
+
+### Season module
+```{r, eval = FALSE}
+# Create three different season modules for the ensemble
+season <- DiseasySeason$new(reference_date = as.Date("2020-01-01"))
+
+seasons <- c("constant_season", "cosine_season", "covid_season_v1") |>
+  purrr::map(~ {
+    s <- season$clone()
+    s$use_season_model(.)
+    return(s)
+  })
+rm(season)
+```
+
+### Immunity module
+```{r, eval = FALSE}
+# Use different waning immunity models for the ensemble
+no_immunity <- DiseasyImmunity$new()
+no_immunity$set_waning_model("no_waning")
+
+# Exponential waning
+immunities <- c(60, 120, 180) |>
+  purrr::map(~ {
+    immunity <- DiseasyImmunity$new()
+    immunity$set_exponential_waning(time_scale = .)
+    return(immunity)
+  }) |>
+  c(no_immunity)
+```
+
+
+### Observables module
+Beyond setting the different scenarios for the models, we also need to define the "incidence" observable for the
+`DiseasyModelOdeSeir` class.
+We here use the number of observed positive cases adjusted for under-reporting.
+```{r, eval = FALSE}
+# Create an estimator for the incidence
+observables$define_synthetic_observable(
+  name = "incidence",
+  mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
+)
+```
+
+### Create the ensemble
+With the functional modules configured, we can now use the `combineasy()` function to create a large SEIR ensemble.
+We create the models with different compartment structures
+(i.e. different number of exposed, infected and recovered compartments) to provide structurally different models.
+```{r, eval = FALSE}
+# Create the ensemble
+seir_ensemble <- combineasy(
+  model_templates = list(DiseasyModelOdeSeir),
+  modules = tidyr::expand_grid(
+    activity = activities,
+    season = seasons,
+    immunity = immunities,
+    observables = list(observables)
+  ),
+  parameters = tidyr::expand_grid(
+    # Hyper parameters
+    "compartment_structure" = list(
+      c("E" = 1L, "I" = 1L, "R" = 1L),
+      c("E" = 2L, "I" = 1L, "R" = 1L),
+      c("E" = 2L, "I" = 3L, "R" = 1L),
+      c("E" = 1L, "I" = 1L, "R" = 3L),
+      c("E" = 2L, "I" = 1L, "R" = 3L),
+      c("E" = 2L, "I" = 3L, "R" = 3L)
+    ),
+    "age_cuts_lower" = list(
+      c(0, 30, 60)
+    ),
+    # Parameters
+    "disease_progression_rates" = list(
+      c("E" = 1 / 2.1, "I" = 1 / 4.5)
+    ),
+    "overall_infection_risk" = list(
+      0.025
+    )
+  )
+)
+
+summary(seir_ensemble)
+```
+
+```{r, fig.alt = "Plot of predictions from SEIR ensemble. Shaded area is ensemble quantiles with observations as points.", eval = FALSE}
+plot(seir_ensemble, observable = "incidence", prediction_length = 30)
+```

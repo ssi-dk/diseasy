@@ -72,19 +72,19 @@ model_output_to_observable <- list(
 
 
 # Test the get_results method of the configuration used in the example data
-K <- 2                                                                                                                  # nolint start: object_name_linter
-L <- 1
-M <- 1                                                                                                                  # nolint end: object_name_linter
+K <- 2L                                                                                                                 # nolint start: object_name_linter
+L <- 1L
+M <- 1L                                                                                                                 # nolint end: object_name_linter
 
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
   activity = activity,
   observables = observables,
-  compartment_structure = c("E" = K, "I" = L, "R" = M),
-  disease_progression_rates = c("E" = rE, "I" = rI),
   parameters = list(
+    "compartment_structure" = c("E" = K, "I" = L, "R" = M),
     "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
+    "disease_progression_rates" = c("E" = rE, "I" = rI),
     "model_output_to_observable" = model_output_to_observable
   )
 )
@@ -161,11 +161,11 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
     observables = observables,
-    compartment_structure = c("E" = K, "I" = L, "R" = M),
-    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list(
+      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = 0,
-      "overall_infection_risk" = overall_infection_risk
+      "overall_infection_risk" = overall_infection_risk,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
 
@@ -216,11 +216,11 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
     observables = observables,
-    compartment_structure = c("E" = K, "I" = L, "R" = M),
-    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list(
+      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = c(0, 30),
-      "overall_infection_risk" = overall_infection_risk
+      "overall_infection_risk" = overall_infection_risk,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
 

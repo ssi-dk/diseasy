@@ -63,9 +63,11 @@ tidyr::expand_grid(
       m <- DiseasyModelOdeSeir$new(
         activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
         observables = obs,
-        compartment_structure = c("E" = K, "I" = L, "R" = M),
-        disease_progression_rates = c("E" = rE, "I" = rI),
-        parameters = list("age_cuts_lower" = 0)
+        parameters = list(
+          "compartment_structure" = c("E" = K, "I" = L, "R" = M),
+          "age_cuts_lower" = 0,
+          "disease_progression_rates" = c("E" = rE, "I" = rI)
+        )
       )
 
       # Get a reference to the private environment

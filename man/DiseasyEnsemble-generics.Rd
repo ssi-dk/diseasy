@@ -8,7 +8,7 @@
 \alias{plot.DiseasyEnsemble}
 \title{Standard generics for \code{DiseasyEnsemble} objects}
 \usage{
-\method{print}{DiseasyEnsemble}(x, width = 200, ...)
+\method{print}{DiseasyEnsemble}(x, n = 5, width = 200, ...)
 
 \method{summary}{DiseasyEnsemble}(object, ...)
 
@@ -35,6 +35,9 @@
 \arguments{
 \item{x, object}{(\code{DiseasyEnsemble})\cr
 Ensemble object to print, summarise or plot.}
+
+\item{n}{(\code{integer(1)})\cr
+The number of models to produce output for.}
 
 \item{width}{(\code{integer(1)})\cr
 The maximum number of characters to print.}
