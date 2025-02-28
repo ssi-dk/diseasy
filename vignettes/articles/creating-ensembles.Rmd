@@ -205,7 +205,10 @@ plot(ensemble, observable = "n_positive", prediction_length = 30)
 
 In this example, we will create a large ensemble of SEIR models using the `DiseasyModelOdeSeir` template.
 
+To do so, we will create a few different instances of the functional modules, `DiseasyActivity`, `DiseasySeason` and
+`DiseasyImmunity`. Which each represent different mechanistic scenarios to include in the model.
 
+### Activity module
 ```{r, eval = FALSE}
 # Create three different contact bases for the ensemble
 # All uses the Danish populations but with different contact matrices
@@ -232,6 +235,7 @@ activities <- list(
 rm(activity)
 ```
 
+### Season module
 ```{r, eval = FALSE}
 # Create three different season modules for the ensemble
 season <- DiseasySeason$new(reference_date = as.Date("2020-01-01"))
@@ -245,6 +249,7 @@ seasons <- c("constant_season", "cosine_season", "covid_season_v1") |>
 rm(season)
 ```
 
+### Immunity module
 ```{r, eval = FALSE}
 # Use different waning immunity models for the ensemble
 no_immunity <- DiseasyImmunity$new()
@@ -260,6 +265,11 @@ immunities <- c(60, 120, 180) |>
   c(no_immunity)
 ```
 
+
+### Observables module
+Beyond setting the different scenarios for the models, we also need to define the "incidence" observable for the
+`DiseasyModelOdeSeir` class.
+We here use the number of observed positive cases adjusted for under-reporting.
 ```{r, eval = FALSE}
 # Create an estimator for the incidence
 observables$define_synthetic_observable(
@@ -268,6 +278,10 @@ observables$define_synthetic_observable(
 )
 ```
 
+### Create the ensemble
+With the functional modules configured, we can now use the `combineasy()` function to create a large SEIR ensemble.
+We create the models with different compartment structures
+(i.e. different number of exposed, infected and recovered compartments) to provide structurally different models.
 ```{r, eval = FALSE}
 # Create the ensemble
 seir_ensemble <- combineasy(
@@ -279,20 +293,31 @@ seir_ensemble <- combineasy(
     observables = list(observables)
   ),
   parameters = tidyr::expand_grid(
+    # Hyper parameters
     "compartment_structure" = list(
       c("E" = 1L, "I" = 1L, "R" = 1L),
+      c("E" = 2L, "I" = 1L, "R" = 1L),
       c("E" = 2L, "I" = 3L, "R" = 1L),
-      c("E" = 1L, "I" = 1L, "R" = 5L),
-      c("E" = 2L, "I" = 3L, "R" = 5L)
+      c("E" = 1L, "I" = 1L, "R" = 3L),
+      c("E" = 2L, "I" = 1L, "R" = 3L),
+      c("E" = 2L, "I" = 3L, "R" = 3L)
     ),
+    "age_cuts_lower" = list(
+      c(0, 30, 60)
+    ),
+    # Parameters
     "disease_progression_rates" = list(
-      c("E" = 1 / 2.0, "I" = 1 / 4.4),
-      c("E" = 1 / 2.2, "I" = 1 / 4.6),
-      c("E" = 1 / 2.0, "I" = 1 / 4.6),
-      c("E" = 1 / 2.2, "I" = 1 / 4.4)
+      c("E" = 1 / 2.1, "I" = 1 / 4.5)
+    ),
+    "overall_infection_risk" = list(
+      0.025
     )
   )
 )
 
 summary(seir_ensemble)
+```
+
+```{r, fig.alt = "Plot of predictions from SEIR ensemble. Shaded area is ensemble quantiles with observations as points.", eval = FALSE}
+plot(seir_ensemble, observable = "incidence", prediction_length = 30)
 ```
