@@ -132,6 +132,13 @@ DiseasyModelOde <- R6::R6Class(                                                 
             .data$date <= self %.% observables %.% last_queryable_date + lubridate::days(prediction_length)
           )
 
+        # Add realisation_id and weight
+        prediction <- prediction |>
+          dplyr::mutate(
+            "realisation_id" = 1,
+            "weight" = 1
+          )
+
         # Store in cache
         private$cache(hash, prediction)
       }
