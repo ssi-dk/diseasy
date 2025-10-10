@@ -137,8 +137,8 @@ tidyr::expand_grid(
 
       # Check accuracy within 15%
       comparison <- rbind(
-        dplyr::mutate(results,      "source" = "model"),
-        dplyr::mutate(observations, "source" = "observations")
+        dplyr::mutate(results, "source" = "model"),
+        dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
       ) |>
         tidyr::pivot_wider(names_from = "source", values_from = dplyr::all_of(observable)) |>
         dplyr::mutate("relative_error" = model / observations) |>
@@ -192,8 +192,8 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
 
   # Check accuracy within 15%
   comparison <- rbind(
-    dplyr::mutate(results,      "source" = "model"),
-    dplyr::mutate(observations, "source" = "observations")
+    dplyr::mutate(results, "source" = "model"),
+    dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
   ) |>
     tidyr::pivot_wider(names_from = "source", values_from = "n_infected") |>
     dplyr::mutate("relative_error" = model / observations) |>
@@ -247,8 +247,8 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
 
   # Check accuracy within 15%
   comparison <- rbind(
-    dplyr::mutate(results,      "source" = "model"),
-    dplyr::mutate(observations, "source" = "observations")
+    dplyr::mutate(results, "source" = "model"),
+    dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
   ) |>
     tidyr::pivot_wider(names_from = "source", values_from = "n_infected") |>
     dplyr::mutate("relative_error" = model / observations) |>
