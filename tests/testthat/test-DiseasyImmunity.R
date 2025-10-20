@@ -513,7 +513,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   # Set the exponential waning model
   im$set_exponential_waning()
 
-  # Test the approximations for M = 1 to M = 3 using defaults
+  # Test the approximations for M = 1 to M = 4 using defaults
   test_combinations <- tidyr::expand_grid(
     M = seq(1, 3),
     method = c("free_delta", "free_gamma", "all_free"),
@@ -533,7 +533,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
 
   # Test all combinations of method and strategy
   test_combinations <- tidyr::expand_grid(
-    M = seq(1, 3),
+    M = seq(1, 4),
     method_label = c(
       "free_delta-naive", "free_gamma-naive", "all_free-naive",
       "free_delta-recursive", "free_gamma-recursive", "all_free-recursive",
