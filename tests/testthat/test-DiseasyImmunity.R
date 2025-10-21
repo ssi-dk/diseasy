@@ -515,14 +515,14 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
 
   # Test the approximations for M = 1 to M = 4 using defaults
   test_combinations <- tidyr::expand_grid(
-    M = seq(1, 3),
+    M = seq(1, 4),
     method = c("free_delta", "free_gamma", "all_free"),
     penalty = c(TRUE, FALSE)
   )
 
   purrr::pwalk(test_combinations, \(M, method, penalty) {                                                               # nolint: object_name_linter
     expect_no_error(
-      im$approximate_compartmental(
+      im$plot(
         M = !!M,
         method = !!method,
         monotonous = !!penalty,
@@ -545,7 +545,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
 
   purrr::pwalk(test_combinations, \(M, method, strategy, penalty) {                                                     # nolint: object_name_linter
     expect_no_error(
-      im$approximate_compartmental(
+      im$plot(
         M = !!M,
         method = !!method,
         strategy = !!strategy,
