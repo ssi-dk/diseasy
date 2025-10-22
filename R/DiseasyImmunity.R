@@ -29,6 +29,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set no waning as the default
       self$set_no_waning()
+
+      # Store machine information to module
+      private$machine <- .Machine
     },
 
     #' @description
@@ -498,15 +501,15 @@ DiseasyImmunity <- R6::R6Class(                                                 
         inv_p_01 <- \(p) {
           # As we near the machine precision, we need to avoid the Inf and -Inf
           # values from the mapping. The optimiser cannot handle these values.
-          p <- pmax(p, .Machine$double.eps)
-          pm <- pmax(1 - p, .Machine$double.eps)
+          p <- pmax(p, private$machine$double.eps)
+          pm <- pmax(1 - p, private$machine$double.eps)
 
           log(p) - log(pm)  # Inverse mapping of p_01
         }
         inv_p_0inf <- \(p) {
           p <- p |>
-            pmin(log(.Machine$double.xmax)) |> # Prevent exp(p) = Inf
-            pmax(.Machine$double.eps) # Prevent exp(p) = 1
+            pmin(log(private$machine$double.xmax)) |> # Prevent exp(p) = Inf
+            pmax(private$machine$double.eps) # Prevent exp(p) = 1
 
           log(exp(p) - 1)
         }
@@ -577,7 +580,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             if (any(is.infinite(delta)) || anyNA(delta) || anyNA(gamma)) {
 
               # We define the objective function as infinite in this case
-              return(list("value" = 1 / .Machine$double.eps, "penalty" = 1 / .Machine$double.eps))
+              return(list("value" = 1 / private$machine$double.eps, "penalty" = 1 / private$machine$double.eps))
 
             } else {
 
@@ -593,11 +596,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   lower = 0,
                   upper = Inf,
                   subdivisions = 10000L,
-                  rel.tol = .Machine$double.eps^0.6
+                  rel.tol = private$machine$double.eps^0.6
                 ) |>
                   purrr::pluck("value", sqrt),
                 error = function(e) {
-                  1 / (min(delta) + .Machine$double.eps) # If any delta is too small, the integral looks divergent
+                  1 / (min(delta) + private$machine$double.eps) # If any delta is too small, the integral looks divergent
                   # (since we too approach the asymptote too slowly).
                   # We use the 1 / delta to create a wall in the optimisation
                 }
@@ -1138,6 +1141,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
   private = list(
 
     .model = NULL,
+    machine = NULL,
 
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
