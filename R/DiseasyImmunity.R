@@ -635,7 +635,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
           delta <- numeric(0)
 
           # Get the metrics for the solution
-          par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          if (method == "free_delta") {
+            par <- c(inv_p_0inf(delta))
+          } else if (method %in% c("free_gamma", "all_free")) {
+            par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          }
+
           metrics <- obj_function(par)
           res <- list("value" = sum(metrics), "message" = "No free parameters to optimise")
 
