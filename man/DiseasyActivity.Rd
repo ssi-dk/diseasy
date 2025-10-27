@@ -306,7 +306,7 @@ Return openness [0 ; 1] for all age groups and activities on all dates.
 }
 \subsection{Returns}{
 (\code{list()})\cr
-Returns a list with depth of two: value[\link{date}][\link{type}]
+Returns a list with depth of two: value[\link[lubridate:date]{lubridate::date}][\link{type}]
 }
 }
 \if{html}{\out{<hr>}}
@@ -328,7 +328,7 @@ Return contacts across age groups and activities on all dates.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
+If no weights are supplied, a \code{list()} of depth of two: value[\link[lubridate:date]{lubridate::date}][\link{type}] is returned.
 Map population between age groups
 }
 }
