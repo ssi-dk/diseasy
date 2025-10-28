@@ -12,3 +12,4 @@
 ^pak.lock
 ^vignettes/articles$
 ^pkg-build$
+^dockerfile$
