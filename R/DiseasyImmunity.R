@@ -635,7 +635,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
           delta <- numeric(0)
 
           # Get the metrics for the solution
-          par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          if (method == "free_delta") {
+            par <- c(inv_p_0inf(delta))
+          } else if (method %in% c("free_gamma", "all_free")) {
+            par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          }
+
           metrics <- obj_function(par)
           res <- list("value" = sum(metrics), "message" = "No free parameters to optimise")
 
@@ -733,7 +738,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   optim_control = optim_control,
                   ...
                 ) |>
-                  purrr::pluck("delta")
+                  purrr::pluck("delta") |>
+                  utils::head(1) # For free_gamma method, all delta are the same and algo expects only one value
 
                 # Adjust for the increase in the number of compartments
                 delta_0 <- delta_0 * (M - 1) / (M - 2)
@@ -850,6 +856,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 individual_level = individual_level
               ) |>
                 purrr::pluck("delta") |>
+                utils::head(1) |>
                 rep(M - 1)
 
               # Use free_gamma solution as starting point

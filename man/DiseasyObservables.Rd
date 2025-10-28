@@ -15,7 +15,7 @@ will therefore depend on the data made available by the diseasystores.
 See vignette("diseasy-observables")
 }
 \examples{
-\dontshow{if (rlang::is_installed("duckdb")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
   # Create observables module using the Simulist data
   obs <- DiseasyObservables$new(
     diseasystore = "Simulist",

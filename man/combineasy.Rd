@@ -23,7 +23,7 @@ A list of model instances with the class \code{DiseasyEnsemble}.
 Easily combine modules and parameters to form a model ensemble
 }
 \examples{
-\dontshow{if (rlang::is_installed("duckdb")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
   # Create a small ensemble with the `DiseasyModelG1` model template
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
