@@ -64,7 +64,7 @@ date, stratification and model (optional).
 Standard generics for \code{DiseasyEnsemble} objects
 }
 \examples{
-\dontshow{if (rlang::is_installed("duckdb")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
     conn = DBI::dbConnect(duckdb::duckdb())

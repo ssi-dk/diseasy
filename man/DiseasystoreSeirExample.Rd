@@ -10,7 +10,7 @@ A new instance of the \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} class
 This \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} brings support the SEIR example data bundled with \code{diseasy}.
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   ds <- DiseasystoreSeirExample$new(
     source_conn = ".",
     target_conn = DBI::dbConnect(RSQLite::SQLite())
