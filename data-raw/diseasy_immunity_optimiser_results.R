@@ -4,13 +4,22 @@ required_suggested_packages <- c(
   "BB", # Provides spg
   "ucminf",
   "minqa", # Provides uobyqa
+  "nloptr",
   "dfoptim", # Provides nmkb and hjkb
   "subplex",
   "marqLevAlg" # Provides mla
 )
 
+
 coll <- checkmate::makeAssertCollection()
-required_suggested_packages |>
+missing_pkgs <- required_suggested_packages |>
+  purrr::discard(rlang::is_installed)
+
+# Attempt install of missing packages
+if (length(missing_pkgs) > 0) try(pak::pak(missing_pkgs))
+
+# Throw error for missing
+missing_pkgs |>
   purrr::discard(rlang::is_installed) |>
   purrr::walk(~ coll$push(glue::glue("Missing package: {.}")))
 checkmate::reportAssertions(coll)
@@ -183,7 +192,7 @@ for (penalty in c(0, 1)) {
 
   closeAllConnections()
 
-  workers <- unname(floor(future::availableCores() * 0.9))
+  workers <- unname(future::availableCores(omit = 1))
   future::plan("multisession", gc = TRUE, workers = workers)
 
   # Set the optimiser configurations to test
