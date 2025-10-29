@@ -5,6 +5,7 @@
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
+      "ref": "abind",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -24,7 +25,6 @@
       "package": "abind",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "abind",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/abind_1.4-8.tar.gz",
@@ -36,6 +36,7 @@
       "vignettes": false
     },
     {
+      "ref": "askpass",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "sys",
@@ -55,7 +56,6 @@
       "package": "askpass",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "askpass",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/askpass_1.2.1.tar.gz",
@@ -67,6 +67,7 @@
       "vignettes": false
     },
     {
+      "ref": "assertthat",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -86,7 +87,6 @@
       "package": "assertthat",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "assertthat",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/assertthat_0.2.1.tar.gz",
@@ -98,6 +98,7 @@
       "vignettes": false
     },
     {
+      "ref": "backports",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -117,7 +118,6 @@
       "package": "backports",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "backports",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/backports_1.5.0.tar.gz",
@@ -129,6 +129,7 @@
       "vignettes": false
     },
     {
+      "ref": "base64enc",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -148,7 +149,6 @@
       "package": "base64enc",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "base64enc",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/base64enc_0.1-3.tar.gz",
@@ -160,6 +160,7 @@
       "vignettes": false
     },
     {
+      "ref": "bayesplot",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["dplyr", "ggplot2", "ggridges", "glue", "posterior", "reshape2", "rlang", "tibble", "tidyr", "tidyselect"],
@@ -179,7 +180,6 @@
       "package": "bayesplot",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "bayesplot",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bayesplot_1.14.0.tar.gz",
@@ -198,6 +198,7 @@
       "vignettes": false
     },
     {
+      "ref": "bigD",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -217,7 +218,6 @@
       "package": "bigD",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "bigD",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bigD_0.3.1.tar.gz",
@@ -229,6 +229,7 @@
       "vignettes": false
     },
     {
+      "ref": "bit",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -248,7 +249,6 @@
       "package": "bit",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "bit",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bit_4.6.0.tar.gz",
@@ -260,6 +260,7 @@
       "vignettes": false
     },
     {
+      "ref": "bit64",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "bit",
@@ -279,7 +280,6 @@
       "package": "bit64",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "bit64",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bit64_4.6.0-1.tar.gz",
@@ -291,6 +291,7 @@
       "vignettes": false
     },
     {
+      "ref": "bitops",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -310,7 +311,6 @@
       "package": "bitops",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "bitops",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bitops_1.0-9.tar.gz",
@@ -322,6 +322,7 @@
       "vignettes": false
     },
     {
+      "ref": "blob",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["rlang", "vctrs"],
@@ -341,7 +342,6 @@
       "package": "blob",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "blob",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/blob_1.2.4.tar.gz",
@@ -353,6 +353,7 @@
       "vignettes": false
     },
     {
+      "ref": "brew",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -372,7 +373,6 @@
       "package": "brew",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "brew",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/brew_1.0-10.tar.gz",
@@ -384,6 +384,7 @@
       "vignettes": false
     },
     {
+      "ref": "bridgesampling",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["Brobdingnag", "coda", "Matrix", "mvtnorm", "scales", "stringr"],
@@ -403,7 +404,6 @@
       "package": "bridgesampling",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "bridgesampling",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bridgesampling_1.1-2.tar.gz",
@@ -415,6 +415,7 @@
       "vignettes": false
     },
     {
+      "ref": "brio",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -434,7 +435,6 @@
       "package": "brio",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "brio",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/brio_1.1.5.tar.gz",
@@ -446,6 +446,7 @@
       "vignettes": false
     },
     {
+      "ref": "brms",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["abind", "backports", "bayesplot", "bridgesampling", "coda", "future", "future.apply", "ggplot2", "glue", "loo", "Matrix", "matrixStats", "mgcv", "nleqslv", "nlme", "posterior", "Rcpp", "rlang", "rstan", "rstantools"],
@@ -465,7 +466,6 @@
       "package": "brms",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "brms",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/brms_2.23.0.tar.gz",
@@ -477,6 +477,7 @@
       "vignettes": false
     },
     {
+      "ref": "Brobdingnag",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "Matrix",
@@ -496,7 +497,6 @@
       "package": "Brobdingnag",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "Brobdingnag",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/Brobdingnag_1.2-9.tar.gz",
@@ -508,6 +508,7 @@
       "vignettes": false
     },
     {
+      "ref": "bslib",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["base64enc", "cachem", "fastmap", "htmltools", "jquerylib", "jsonlite", "lifecycle", "memoise", "mime", "rlang", "sass"],
@@ -527,7 +528,6 @@
       "package": "bslib",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "bslib",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bslib_0.9.0.tar.gz",
@@ -539,6 +539,7 @@
       "vignettes": false
     },
     {
+      "ref": "cachem",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["fastmap", "rlang"],
@@ -558,7 +559,6 @@
       "package": "cachem",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "cachem",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/cachem_1.1.0.tar.gz",
@@ -570,6 +570,7 @@
       "vignettes": false
     },
     {
+      "ref": "callr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["processx", "R6"],
@@ -589,7 +590,6 @@
       "package": "callr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "callr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/callr_3.7.6.tar.gz",
@@ -601,6 +601,7 @@
       "vignettes": false
     },
     {
+      "ref": "checkmate",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "backports",
@@ -620,7 +621,6 @@
       "package": "checkmate",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "checkmate",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/checkmate_2.3.3.tar.gz",
@@ -632,6 +632,7 @@
       "vignettes": false
     },
     {
+      "ref": "cli",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -651,7 +652,6 @@
       "package": "cli",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "cli",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/cli_3.6.5.tar.gz",
@@ -663,6 +663,7 @@
       "vignettes": false
     },
     {
+      "ref": "clipr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -682,7 +683,6 @@
       "package": "clipr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "clipr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/clipr_0.8.0.tar.gz",
@@ -701,6 +701,7 @@
       "vignettes": false
     },
     {
+      "ref": "coda",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "lattice",
@@ -720,7 +721,6 @@
       "package": "coda",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "coda",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/coda_0.19-4.1.tar.gz",
@@ -732,6 +732,7 @@
       "vignettes": false
     },
     {
+      "ref": "commonmark",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -751,7 +752,6 @@
       "package": "commonmark",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "commonmark",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/commonmark_2.0.0.tar.gz",
@@ -763,6 +763,7 @@
       "vignettes": false
     },
     {
+      "ref": "contactdata",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -782,7 +783,6 @@
       "package": "contactdata",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "contactdata",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/contactdata_1.1.0.tar.gz",
@@ -794,6 +794,7 @@
       "vignettes": false
     },
     {
+      "ref": "countrycode",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -813,7 +814,6 @@
       "package": "countrycode",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "countrycode",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/countrycode_1.6.1.tar.gz",
@@ -825,6 +825,7 @@
       "vignettes": false
     },
     {
+      "ref": "crayon",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -844,7 +845,6 @@
       "package": "crayon",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "crayon",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/crayon_1.5.3.tar.gz",
@@ -856,6 +856,7 @@
       "vignettes": false
     },
     {
+      "ref": "credentials",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["askpass", "curl", "jsonlite", "openssl", "sys"],
@@ -875,7 +876,6 @@
       "package": "credentials",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "credentials",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/credentials_2.0.3.tar.gz",
@@ -894,6 +894,7 @@
       "vignettes": false
     },
     {
+      "ref": "curl",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -913,7 +914,6 @@
       "package": "curl",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "curl",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/curl_7.0.0.tar.gz",
@@ -938,6 +938,7 @@
       "vignettes": false
     },
     {
+      "ref": "DBI",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -957,7 +958,6 @@
       "package": "DBI",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "DBI",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/DBI_1.2.3.tar.gz",
@@ -969,6 +969,7 @@
       "vignettes": false
     },
     {
+      "ref": "dbplyr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["blob", "cli", "DBI", "dplyr", "glue", "lifecycle", "magrittr", "pillar", "purrr", "R6", "rlang", "tibble", "tidyr", "tidyselect", "vctrs", "withr"],
@@ -988,7 +989,6 @@
       "package": "dbplyr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "dbplyr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/dbplyr_2.5.1.tar.gz",
@@ -1000,6 +1000,7 @@
       "vignettes": false
     },
     {
+      "ref": "desc",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "R6"],
@@ -1019,7 +1020,6 @@
       "package": "desc",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "desc",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/desc_1.4.3.tar.gz",
@@ -1031,6 +1031,7 @@
       "vignettes": false
     },
     {
+      "ref": "deSolve",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1050,7 +1051,6 @@
       "package": "deSolve",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "deSolve",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/deSolve_1.40.tar.gz",
@@ -1062,6 +1062,7 @@
       "vignettes": false
     },
     {
+      "ref": "devtools",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "desc", "ellipsis", "fs", "lifecycle", "memoise", "miniUI", "pkgbuild", "pkgdown", "pkgload", "profvis", "rcmdcheck", "remotes", "rlang", "roxygen2", "rversions", "sessioninfo", "testthat", "urlchecker", "usethis", "withr"],
@@ -1081,7 +1082,6 @@
       "package": "devtools",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "devtools",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/devtools_2.4.6.tar.gz",
@@ -1093,6 +1093,7 @@
       "vignettes": false
     },
     {
+      "ref": "dfoptim",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1112,7 +1113,6 @@
       "package": "dfoptim",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "dfoptim",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/dfoptim_2023.1.0.tar.gz",
@@ -1124,6 +1124,7 @@
       "vignettes": false
     },
     {
+      "ref": "diffobj",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "crayon",
@@ -1143,7 +1144,6 @@
       "package": "diffobj",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "diffobj",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/diffobj_0.3.6.tar.gz",
@@ -1155,6 +1155,7 @@
       "vignettes": false
     },
     {
+      "ref": "digest",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1174,7 +1175,6 @@
       "package": "digest",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "digest",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/digest_0.6.37.tar.gz",
@@ -1186,6 +1186,7 @@
       "vignettes": false
     },
     {
+      "ref": "distributional",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["generics", "lifecycle", "numDeriv", "pillar", "rlang", "vctrs"],
@@ -1205,7 +1206,6 @@
       "package": "distributional",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "distributional",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/distributional_0.5.0.tar.gz",
@@ -1217,6 +1217,7 @@
       "vignettes": false
     },
     {
+      "ref": "downlit",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["brio", "desc", "digest", "evaluate", "fansi", "memoise", "rlang", "vctrs", "withr", "yaml"],
@@ -1236,7 +1237,6 @@
       "package": "downlit",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "downlit",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/downlit_0.4.4.tar.gz",
@@ -1248,6 +1248,7 @@
       "vignettes": false
     },
     {
+      "ref": "dplyr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "generics", "glue", "lifecycle", "magrittr", "pillar", "R6", "rlang", "tibble", "tidyselect", "vctrs"],
@@ -1267,7 +1268,6 @@
       "package": "dplyr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "dplyr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/dplyr_1.1.4.tar.gz",
@@ -1279,6 +1279,7 @@
       "vignettes": false
     },
     {
+      "ref": "duckdb",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "DBI",
@@ -1298,7 +1299,6 @@
       "package": "duckdb",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "duckdb",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/duckdb_1.4.1.tar.gz",
@@ -1317,6 +1317,7 @@
       "vignettes": false
     },
     {
+      "ref": "ellipsis",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "rlang",
@@ -1336,7 +1337,6 @@
       "package": "ellipsis",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ellipsis",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ellipsis_0.3.2.tar.gz",
@@ -1348,6 +1348,7 @@
       "vignettes": false
     },
     {
+      "ref": "evaluate",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1367,7 +1368,6 @@
       "package": "evaluate",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "evaluate",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/evaluate_1.0.5.tar.gz",
@@ -1379,6 +1379,7 @@
       "vignettes": false
     },
     {
+      "ref": "expm",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "Matrix",
@@ -1398,7 +1399,6 @@
       "package": "expm",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "expm",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/expm_1.0-0.tar.gz",
@@ -1410,6 +1410,7 @@
       "vignettes": false
     },
     {
+      "ref": "fansi",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1429,7 +1430,6 @@
       "package": "fansi",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "fansi",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/fansi_1.0.6.tar.gz",
@@ -1441,6 +1441,7 @@
       "vignettes": false
     },
     {
+      "ref": "farver",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1460,7 +1461,6 @@
       "package": "farver",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "farver",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/farver_2.1.2.tar.gz",
@@ -1472,6 +1472,7 @@
       "vignettes": false
     },
     {
+      "ref": "fastmap",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1491,7 +1492,6 @@
       "package": "fastmap",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "fastmap",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/fastmap_1.2.0.tar.gz",
@@ -1503,6 +1503,7 @@
       "vignettes": false
     },
     {
+      "ref": "fontawesome",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["htmltools", "rlang"],
@@ -1522,7 +1523,6 @@
       "package": "fontawesome",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "fontawesome",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/fontawesome_0.5.3.tar.gz",
@@ -1534,6 +1534,7 @@
       "vignettes": false
     },
     {
+      "ref": "fs",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1553,7 +1554,6 @@
       "package": "fs",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "fs",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/fs_1.6.6.tar.gz",
@@ -1572,6 +1572,7 @@
       "vignettes": false
     },
     {
+      "ref": "future",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["digest", "globals", "listenv", "parallelly"],
@@ -1591,7 +1592,6 @@
       "package": "future",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "future",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/future_1.67.0.tar.gz",
@@ -1603,6 +1603,7 @@
       "vignettes": false
     },
     {
+      "ref": "future.apply",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["future", "globals"],
@@ -1622,7 +1623,6 @@
       "package": "future.apply",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "future.apply",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/future.apply_1.20.0.tar.gz",
@@ -1634,6 +1634,7 @@
       "vignettes": false
     },
     {
+      "ref": "generics",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1653,7 +1654,6 @@
       "package": "generics",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "generics",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/generics_0.1.4.tar.gz",
@@ -1665,6 +1665,7 @@
       "vignettes": false
     },
     {
+      "ref": "gert",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["askpass", "credentials", "openssl", "rstudioapi", "sys", "zip"],
@@ -1684,7 +1685,6 @@
       "package": "gert",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "gert",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/gert_2.1.5.tar.gz",
@@ -1703,6 +1703,7 @@
       "vignettes": false
     },
     {
+      "ref": "ggplot2",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "gtable", "isoband", "lifecycle", "rlang", "S7", "scales", "vctrs", "withr"],
@@ -1722,7 +1723,6 @@
       "package": "ggplot2",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ggplot2",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ggplot2_4.0.0.tar.gz",
@@ -1734,6 +1734,7 @@
       "vignettes": false
     },
     {
+      "ref": "ggridges",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["ggplot2", "scales", "withr"],
@@ -1753,7 +1754,6 @@
       "package": "ggridges",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ggridges",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ggridges_0.5.7.tar.gz",
@@ -1765,6 +1765,7 @@
       "vignettes": false
     },
     {
+      "ref": "gh",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "gitcreds", "glue", "httr2", "ini", "jsonlite", "lifecycle", "rlang"],
@@ -1784,7 +1785,6 @@
       "package": "gh",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "gh",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/gh_1.5.0.tar.gz",
@@ -1796,6 +1796,7 @@
       "vignettes": false
     },
     {
+      "ref": "gitcreds",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1815,7 +1816,6 @@
       "package": "gitcreds",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "gitcreds",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/gitcreds_0.1.2.tar.gz",
@@ -1834,6 +1834,7 @@
       "vignettes": false
     },
     {
+      "ref": "globals",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "codetools",
@@ -1853,7 +1854,6 @@
       "package": "globals",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "globals",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/globals_0.18.0.tar.gz",
@@ -1865,6 +1865,7 @@
       "vignettes": false
     },
     {
+      "ref": "glue",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -1884,7 +1885,6 @@
       "package": "glue",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "glue",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/glue_1.8.0.tar.gz",
@@ -1896,6 +1896,7 @@
       "vignettes": false
     },
     {
+      "ref": "gridExtra",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "gtable",
@@ -1915,7 +1916,6 @@
       "package": "gridExtra",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "gridExtra",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/gridExtra_2.3.tar.gz",
@@ -1927,6 +1927,7 @@
       "vignettes": false
     },
     {
+      "ref": "gt",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["base64enc", "bigD", "bitops", "cli", "commonmark", "dplyr", "fs", "glue", "htmltools", "htmlwidgets", "juicyjuice", "magrittr", "markdown", "reactable", "rlang", "sass", "scales", "tidyselect", "vctrs", "xml2"],
@@ -1946,7 +1947,6 @@
       "package": "gt",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "gt",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/gt_1.1.0.tar.gz",
@@ -1958,6 +1958,7 @@
       "vignettes": false
     },
     {
+      "ref": "gtable",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "glue", "lifecycle", "rlang"],
@@ -1977,7 +1978,6 @@
       "package": "gtable",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "gtable",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/gtable_0.3.6.tar.gz",
@@ -1989,6 +1989,7 @@
       "vignettes": false
     },
     {
+      "ref": "highr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "xfun",
@@ -2008,7 +2009,6 @@
       "package": "highr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "highr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/highr_0.11.tar.gz",
@@ -2020,6 +2020,7 @@
       "vignettes": false
     },
     {
+      "ref": "hms",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "lifecycle", "pkgconfig", "rlang", "vctrs"],
@@ -2039,7 +2040,6 @@
       "package": "hms",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "hms",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/hms_1.1.4.tar.gz",
@@ -2051,6 +2051,7 @@
       "vignettes": false
     },
     {
+      "ref": "htmltools",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["base64enc", "digest", "fastmap", "rlang"],
@@ -2070,7 +2071,6 @@
       "package": "htmltools",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "htmltools",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/htmltools_0.5.8.1.tar.gz",
@@ -2082,6 +2082,7 @@
       "vignettes": false
     },
     {
+      "ref": "htmlwidgets",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["htmltools", "jsonlite", "knitr", "rmarkdown", "yaml"],
@@ -2101,7 +2102,6 @@
       "package": "htmlwidgets",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "htmlwidgets",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/htmlwidgets_1.6.4.tar.gz",
@@ -2113,6 +2113,7 @@
       "vignettes": false
     },
     {
+      "ref": "httpuv",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["later", "promises", "R6", "Rcpp"],
@@ -2132,7 +2133,6 @@
       "package": "httpuv",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "httpuv",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/httpuv_1.6.16.tar.gz",
@@ -2157,6 +2157,7 @@
       "vignettes": false
     },
     {
+      "ref": "httr2",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "curl", "glue", "lifecycle", "magrittr", "openssl", "R6", "rappdirs", "rlang", "vctrs", "withr"],
@@ -2176,7 +2177,6 @@
       "package": "httr2",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "httr2",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/httr2_1.2.1.tar.gz",
@@ -2188,6 +2188,7 @@
       "vignettes": false
     },
     {
+      "ref": "hunspell",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["digest", "Rcpp"],
@@ -2207,7 +2208,6 @@
       "package": "hunspell",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "hunspell",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/hunspell_3.0.6.tar.gz",
@@ -2219,6 +2219,7 @@
       "vignettes": false
     },
     {
+      "ref": "ini",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2238,7 +2239,6 @@
       "package": "ini",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ini",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ini_0.3.1.tar.gz",
@@ -2250,6 +2250,7 @@
       "vignettes": false
     },
     {
+      "ref": "inline",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2269,7 +2270,6 @@
       "package": "inline",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "inline",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/inline_0.3.21.tar.gz",
@@ -2281,6 +2281,7 @@
       "vignettes": false
     },
     {
+      "ref": "installed::/usr/local/lib/R/library/codetools",
       "binary": true,
       "built": "R 4.5.1; ; 2025-10-02 10:44:28 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -2299,7 +2300,6 @@
       "package": "codetools",
       "params": [],
       "platform": "*",
-      "ref": "installed::/usr/local/lib/R/library/codetools",
       "repotype": "cran",
       "rversion": "R 4.5.1",
       "sources": [],
@@ -2310,6 +2310,7 @@
       "vignettes": false
     },
     {
+      "ref": "installed::/usr/local/lib/R/library/lattice",
       "binary": true,
       "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:40:57 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -2328,7 +2329,6 @@
       "package": "lattice",
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
-      "ref": "installed::/usr/local/lib/R/library/lattice",
       "repotype": "cran",
       "rversion": "R 4.5.1",
       "sources": [],
@@ -2339,6 +2339,7 @@
       "vignettes": false
     },
     {
+      "ref": "installed::/usr/local/lib/R/library/Matrix",
       "binary": true,
       "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:41:10 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -2357,7 +2358,6 @@
       "package": "Matrix",
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
-      "ref": "installed::/usr/local/lib/R/library/Matrix",
       "repotype": "cran",
       "rversion": "R 4.5.1",
       "sources": [],
@@ -2368,6 +2368,7 @@
       "vignettes": false
     },
     {
+      "ref": "installed::/usr/local/lib/R/library/mgcv",
       "binary": true,
       "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:44:43 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -2386,7 +2387,6 @@
       "package": "mgcv",
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
-      "ref": "installed::/usr/local/lib/R/library/mgcv",
       "repotype": "cran",
       "rversion": "R 4.5.1",
       "sources": [],
@@ -2397,6 +2397,7 @@
       "vignettes": false
     },
     {
+      "ref": "installed::/usr/local/lib/R/library/nlme",
       "binary": true,
       "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:43:40 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -2415,7 +2416,6 @@
       "package": "nlme",
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
-      "ref": "installed::/usr/local/lib/R/library/nlme",
       "repotype": "cran",
       "rversion": "R 4.5.1",
       "sources": [],
@@ -2426,6 +2426,7 @@
       "vignettes": false
     },
     {
+      "ref": "isoband",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2445,7 +2446,6 @@
       "package": "isoband",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "isoband",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/isoband_0.2.7.tar.gz",
@@ -2457,6 +2457,7 @@
       "vignettes": false
     },
     {
+      "ref": "ISOweek",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "stringr",
@@ -2476,7 +2477,6 @@
       "package": "ISOweek",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ISOweek",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ISOweek_0.6-2.tar.gz",
@@ -2488,6 +2488,7 @@
       "vignettes": false
     },
     {
+      "ref": "jquerylib",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "htmltools",
@@ -2507,7 +2508,6 @@
       "package": "jquerylib",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "jquerylib",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/jquerylib_0.1.4.tar.gz",
@@ -2519,6 +2519,7 @@
       "vignettes": false
     },
     {
+      "ref": "jsonlite",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2538,7 +2539,6 @@
       "package": "jsonlite",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "jsonlite",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/jsonlite_2.0.0.tar.gz",
@@ -2550,6 +2550,7 @@
       "vignettes": false
     },
     {
+      "ref": "juicyjuice",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "V8",
@@ -2569,7 +2570,6 @@
       "package": "juicyjuice",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "juicyjuice",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/juicyjuice_0.1.0.tar.gz",
@@ -2581,6 +2581,7 @@
       "vignettes": false
     },
     {
+      "ref": "knitr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["evaluate", "highr", "xfun", "yaml"],
@@ -2600,7 +2601,6 @@
       "package": "knitr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "knitr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/knitr_1.50.tar.gz",
@@ -2619,6 +2619,7 @@
       "vignettes": false
     },
     {
+      "ref": "labeling",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2638,7 +2639,6 @@
       "package": "labeling",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "labeling",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/labeling_0.4.3.tar.gz",
@@ -2650,6 +2650,7 @@
       "vignettes": false
     },
     {
+      "ref": "later",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["Rcpp", "rlang"],
@@ -2669,7 +2670,6 @@
       "package": "later",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "later",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/later_1.4.4.tar.gz",
@@ -2681,6 +2681,7 @@
       "vignettes": false
     },
     {
+      "ref": "lazyeval",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2700,7 +2701,6 @@
       "package": "lazyeval",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "lazyeval",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lazyeval_0.2.2.tar.gz",
@@ -2712,6 +2712,7 @@
       "vignettes": false
     },
     {
+      "ref": "lgr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "R6",
@@ -2731,7 +2732,6 @@
       "package": "lgr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "lgr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lgr_0.5.0.tar.gz",
@@ -2743,6 +2743,7 @@
       "vignettes": false
     },
     {
+      "ref": "lifecycle",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "glue", "rlang"],
@@ -2762,7 +2763,6 @@
       "package": "lifecycle",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "lifecycle",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lifecycle_1.0.4.tar.gz",
@@ -2774,6 +2774,7 @@
       "vignettes": false
     },
     {
+      "ref": "lintr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["backports", "cli", "codetools", "digest", "glue", "knitr", "rex", "xml2", "xmlparsedata"],
@@ -2793,7 +2794,6 @@
       "package": "lintr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "lintr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lintr_3.2.0.tar.gz",
@@ -2805,6 +2805,7 @@
       "vignettes": false
     },
     {
+      "ref": "listenv",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2824,7 +2825,6 @@
       "package": "listenv",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "listenv",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/listenv_0.9.1.tar.gz",
@@ -2836,6 +2836,7 @@
       "vignettes": false
     },
     {
+      "ref": "litedown",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["commonmark", "xfun"],
@@ -2855,7 +2856,6 @@
       "package": "litedown",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "litedown",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/litedown_0.7.tar.gz",
@@ -2867,6 +2867,7 @@
       "vignettes": false
     },
     {
+      "ref": "local::.",
       "binary": false,
       "dep_types": ["Depends", "Imports", "LinkingTo", "Suggests"],
       "dependencies": ["diseasystore", "cachem", "checkmate", "dplyr", "expm", "glue", "lgr", "lubridate", "Matrix", "pkgcond", "pracma", "purrr", "R6", "rlang", "stringr", "tidyr", "withr"],
@@ -2881,7 +2882,6 @@
       "package": "diseasy",
       "params": [],
       "platform": "source",
-      "ref": "local::.",
       "rversion": "*",
       "sources": "file:///__w/diseasy/diseasy",
       "sysreqs": "",
@@ -2892,6 +2892,7 @@
       "vignettes": false
     },
     {
+      "ref": "loo",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["checkmate", "matrixStats", "posterior"],
@@ -2911,7 +2912,6 @@
       "package": "loo",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "loo",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/loo_2.8.0.tar.gz",
@@ -2930,6 +2930,7 @@
       "vignettes": false
     },
     {
+      "ref": "lubridate",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["generics", "timechange"],
@@ -2949,7 +2950,6 @@
       "package": "lubridate",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "lubridate",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lubridate_1.9.4.tar.gz",
@@ -2961,6 +2961,7 @@
       "vignettes": false
     },
     {
+      "ref": "magrittr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -2980,7 +2981,6 @@
       "package": "magrittr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "magrittr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/magrittr_2.0.4.tar.gz",
@@ -2992,6 +2992,7 @@
       "vignettes": false
     },
     {
+      "ref": "markdown",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["litedown", "xfun"],
@@ -3011,7 +3012,6 @@
       "package": "markdown",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "markdown",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/markdown_2.0.tar.gz",
@@ -3023,6 +3023,7 @@
       "vignettes": false
     },
     {
+      "ref": "matrixStats",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3042,7 +3043,6 @@
       "package": "matrixStats",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "matrixStats",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/matrixStats_1.5.0.tar.gz",
@@ -3054,6 +3054,7 @@
       "vignettes": false
     },
     {
+      "ref": "memoise",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cachem", "rlang"],
@@ -3073,7 +3074,6 @@
       "package": "memoise",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "memoise",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/memoise_2.0.1.tar.gz",
@@ -3085,6 +3085,7 @@
       "vignettes": false
     },
     {
+      "ref": "microbenchmark",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3104,7 +3105,6 @@
       "package": "microbenchmark",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "microbenchmark",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/microbenchmark_1.5.0.tar.gz",
@@ -3116,6 +3116,7 @@
       "vignettes": false
     },
     {
+      "ref": "mime",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3135,7 +3136,6 @@
       "package": "mime",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "mime",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/mime_0.13.tar.gz",
@@ -3147,6 +3147,7 @@
       "vignettes": false
     },
     {
+      "ref": "miniUI",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["htmltools", "shiny"],
@@ -3166,7 +3167,6 @@
       "package": "miniUI",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "miniUI",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/miniUI_0.1.2.tar.gz",
@@ -3178,6 +3178,7 @@
       "vignettes": false
     },
     {
+      "ref": "mvtnorm",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3197,7 +3198,6 @@
       "package": "mvtnorm",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "mvtnorm",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/mvtnorm_1.3-3.tar.gz",
@@ -3209,6 +3209,7 @@
       "vignettes": false
     },
     {
+      "ref": "nleqslv",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3228,7 +3229,6 @@
       "package": "nleqslv",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "nleqslv",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/nleqslv_3.3.5.tar.gz",
@@ -3240,6 +3240,7 @@
       "vignettes": false
     },
     {
+      "ref": "nloptr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3259,7 +3260,6 @@
       "package": "nloptr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "nloptr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/nloptr_2.2.1.tar.gz",
@@ -3278,6 +3278,7 @@
       "vignettes": false
     },
     {
+      "ref": "numDeriv",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3297,7 +3298,6 @@
       "package": "numDeriv",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "numDeriv",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/numDeriv_2016.8-1.1.tar.gz",
@@ -3309,6 +3309,7 @@
       "vignettes": false
     },
     {
+      "ref": "openssl",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "askpass",
@@ -3328,7 +3329,6 @@
       "package": "openssl",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "openssl",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/openssl_2.3.4.tar.gz",
@@ -3347,6 +3347,7 @@
       "vignettes": false
     },
     {
+      "ref": "optimx",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["nloptr", "numDeriv", "pracma"],
@@ -3366,7 +3367,6 @@
       "package": "optimx",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "optimx",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/optimx_2025-4.9.tar.gz",
@@ -3378,6 +3378,7 @@
       "vignettes": false
     },
     {
+      "ref": "otel",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3397,7 +3398,6 @@
       "package": "otel",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "otel",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/otel_0.2.0.tar.gz",
@@ -3409,6 +3409,7 @@
       "vignettes": false
     },
     {
+      "ref": "parallelly",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3428,7 +3429,6 @@
       "package": "parallelly",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "parallelly",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/parallelly_1.45.1.tar.gz",
@@ -3440,6 +3440,7 @@
       "vignettes": false
     },
     {
+      "ref": "pillar",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "glue", "lifecycle", "rlang", "utf8", "vctrs"],
@@ -3459,7 +3460,6 @@
       "package": "pillar",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "pillar",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/pillar_1.11.1.tar.gz",
@@ -3471,6 +3471,7 @@
       "vignettes": false
     },
     {
+      "ref": "pkgbuild",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["callr", "cli", "desc", "processx", "R6"],
@@ -3490,7 +3491,6 @@
       "package": "pkgbuild",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "pkgbuild",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/pkgbuild_1.4.8.tar.gz",
@@ -3502,6 +3502,7 @@
       "vignettes": false
     },
     {
+      "ref": "pkgcond",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "assertthat",
@@ -3521,7 +3522,6 @@
       "package": "pkgcond",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "pkgcond",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/pkgcond_0.1.1.tar.gz",
@@ -3533,6 +3533,7 @@
       "vignettes": false
     },
     {
+      "ref": "pkgconfig",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3552,7 +3553,6 @@
       "package": "pkgconfig",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "pkgconfig",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/pkgconfig_2.0.3.tar.gz",
@@ -3564,6 +3564,7 @@
       "vignettes": false
     },
     {
+      "ref": "pkgdown",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["bslib", "callr", "cli", "desc", "downlit", "fontawesome", "fs", "httr2", "jsonlite", "openssl", "purrr", "ragg", "rlang", "rmarkdown", "tibble", "whisker", "withr", "xml2", "yaml"],
@@ -3583,7 +3584,6 @@
       "package": "pkgdown",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "pkgdown",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/pkgdown_2.1.3.tar.gz",
@@ -3602,6 +3602,7 @@
       "vignettes": false
     },
     {
+      "ref": "pkgload",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "desc", "fs", "glue", "lifecycle", "pkgbuild", "processx", "rlang", "rprojroot"],
@@ -3621,7 +3622,6 @@
       "package": "pkgload",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "pkgload",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/pkgload_1.4.1.tar.gz",
@@ -3633,6 +3633,7 @@
       "vignettes": false
     },
     {
+      "ref": "plyr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "Rcpp",
@@ -3652,7 +3653,6 @@
       "package": "plyr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "plyr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/plyr_1.8.9.tar.gz",
@@ -3664,6 +3664,7 @@
       "vignettes": false
     },
     {
+      "ref": "posterior",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["abind", "checkmate", "distributional", "matrixStats", "pillar", "rlang", "tensorA", "tibble", "vctrs"],
@@ -3683,7 +3684,6 @@
       "package": "posterior",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "posterior",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/posterior_1.6.1.tar.gz",
@@ -3695,6 +3695,7 @@
       "vignettes": false
     },
     {
+      "ref": "pracma",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3714,7 +3715,6 @@
       "package": "pracma",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "pracma",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/pracma_2.4.6.tar.gz",
@@ -3726,6 +3726,7 @@
       "vignettes": false
     },
     {
+      "ref": "praise",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3745,7 +3746,6 @@
       "package": "praise",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "praise",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/praise_1.0.0.tar.gz",
@@ -3757,6 +3757,7 @@
       "vignettes": false
     },
     {
+      "ref": "prettyunits",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3776,7 +3777,6 @@
       "package": "prettyunits",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "prettyunits",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/prettyunits_1.2.0.tar.gz",
@@ -3788,6 +3788,7 @@
       "vignettes": false
     },
     {
+      "ref": "processx",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["ps", "R6"],
@@ -3807,7 +3808,6 @@
       "package": "processx",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "processx",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/processx_3.8.6.tar.gz",
@@ -3819,6 +3819,7 @@
       "vignettes": false
     },
     {
+      "ref": "profvis",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["htmlwidgets", "rlang", "vctrs"],
@@ -3838,7 +3839,6 @@
       "package": "profvis",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "profvis",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/profvis_0.4.0.tar.gz",
@@ -3850,6 +3850,7 @@
       "vignettes": false
     },
     {
+      "ref": "progressr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "digest",
@@ -3869,7 +3870,6 @@
       "package": "progressr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "progressr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/progressr_0.17.0.tar.gz",
@@ -3881,6 +3881,7 @@
       "vignettes": false
     },
     {
+      "ref": "promises",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["fastmap", "later", "lifecycle", "magrittr", "otel", "R6", "rlang"],
@@ -3900,7 +3901,6 @@
       "package": "promises",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "promises",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/promises_1.4.0.tar.gz",
@@ -3912,6 +3912,7 @@
       "vignettes": false
     },
     {
+      "ref": "ps",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3931,7 +3932,6 @@
       "package": "ps",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ps",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ps_1.9.1.tar.gz",
@@ -3943,6 +3943,7 @@
       "vignettes": false
     },
     {
+      "ref": "purrr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "lifecycle", "magrittr", "rlang", "vctrs"],
@@ -3962,7 +3963,6 @@
       "package": "purrr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "purrr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/purrr_1.1.0.tar.gz",
@@ -3974,6 +3974,7 @@
       "vignettes": false
     },
     {
+      "ref": "QuickJSR",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -3993,7 +3994,6 @@
       "package": "QuickJSR",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "QuickJSR",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/QuickJSR_1.8.1.tar.gz",
@@ -4012,6 +4012,7 @@
       "vignettes": false
     },
     {
+      "ref": "R6",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4031,7 +4032,6 @@
       "package": "R6",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "R6",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/R6_2.6.1.tar.gz",
@@ -4043,6 +4043,7 @@
       "vignettes": false
     },
     {
+      "ref": "ragg",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["systemfonts", "textshaping"],
@@ -4062,7 +4063,6 @@
       "package": "ragg",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ragg",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ragg_1.5.0.tar.gz",
@@ -4105,6 +4105,7 @@
       "vignettes": false
     },
     {
+      "ref": "rappdirs",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4124,7 +4125,6 @@
       "package": "rappdirs",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rappdirs",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rappdirs_0.3.3.tar.gz",
@@ -4136,6 +4136,7 @@
       "vignettes": false
     },
     {
+      "ref": "rcmdcheck",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["callr", "cli", "curl", "desc", "digest", "pkgbuild", "prettyunits", "R6", "rprojroot", "sessioninfo", "withr", "xopen"],
@@ -4155,7 +4156,6 @@
       "package": "rcmdcheck",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rcmdcheck",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rcmdcheck_1.4.0.tar.gz",
@@ -4167,6 +4167,7 @@
       "vignettes": false
     },
     {
+      "ref": "RColorBrewer",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4186,7 +4187,6 @@
       "package": "RColorBrewer",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "RColorBrewer",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/RColorBrewer_1.1-3.tar.gz",
@@ -4198,6 +4198,7 @@
       "vignettes": false
     },
     {
+      "ref": "Rcpp",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4217,7 +4218,6 @@
       "package": "Rcpp",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "Rcpp",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/Rcpp_1.1.0.tar.gz",
@@ -4229,6 +4229,7 @@
       "vignettes": false
     },
     {
+      "ref": "RcppParallel",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4248,7 +4249,6 @@
       "package": "RcppParallel",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "RcppParallel",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/RcppParallel_5.1.11-1.tar.gz",
@@ -4267,6 +4267,7 @@
       "vignettes": false
     },
     {
+      "ref": "reactable",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["digest", "htmltools", "htmlwidgets", "jsonlite", "reactR"],
@@ -4286,7 +4287,6 @@
       "package": "reactable",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "reactable",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/reactable_0.4.4.tar.gz",
@@ -4298,6 +4298,7 @@
       "vignettes": false
     },
     {
+      "ref": "reactR",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "htmltools",
@@ -4317,7 +4318,6 @@
       "package": "reactR",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "reactR",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/reactR_0.6.1.tar.gz",
@@ -4329,6 +4329,7 @@
       "vignettes": false
     },
     {
+      "ref": "readr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "clipr", "crayon", "hms", "lifecycle", "R6", "rlang", "tibble", "vroom"],
@@ -4348,7 +4349,6 @@
       "package": "readr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "readr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/readr_2.1.5.tar.gz",
@@ -4360,6 +4360,7 @@
       "vignettes": false
     },
     {
+      "ref": "remotes",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4379,7 +4380,6 @@
       "package": "remotes",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "remotes",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/remotes_2.5.0.tar.gz",
@@ -4398,6 +4398,7 @@
       "vignettes": false
     },
     {
+      "ref": "reshape2",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["plyr", "Rcpp", "stringr"],
@@ -4417,7 +4418,6 @@
       "package": "reshape2",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "reshape2",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/reshape2_1.4.4.tar.gz",
@@ -4429,6 +4429,7 @@
       "vignettes": false
     },
     {
+      "ref": "rex",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "lazyeval",
@@ -4448,7 +4449,6 @@
       "package": "rex",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rex",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rex_1.2.1.tar.gz",
@@ -4460,6 +4460,7 @@
       "vignettes": false
     },
     {
+      "ref": "rlang",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4479,7 +4480,6 @@
       "package": "rlang",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rlang",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rlang_1.1.6.tar.gz",
@@ -4491,6 +4491,7 @@
       "vignettes": false
     },
     {
+      "ref": "rmarkdown",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["bslib", "evaluate", "fontawesome", "htmltools", "jquerylib", "jsonlite", "knitr", "tinytex", "xfun", "yaml"],
@@ -4510,7 +4511,6 @@
       "package": "rmarkdown",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rmarkdown",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rmarkdown_2.30.tar.gz",
@@ -4529,6 +4529,7 @@
       "vignettes": false
     },
     {
+      "ref": "roxygen2",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["brew", "cli", "commonmark", "desc", "knitr", "pkgload", "purrr", "R6", "rlang", "stringi", "stringr", "withr", "xml2"],
@@ -4548,7 +4549,6 @@
       "package": "roxygen2",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "roxygen2",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/roxygen2_7.3.3.tar.gz",
@@ -4560,6 +4560,7 @@
       "vignettes": false
     },
     {
+      "ref": "rprojroot",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4579,7 +4580,6 @@
       "package": "rprojroot",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rprojroot",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rprojroot_2.1.1.tar.gz",
@@ -4591,6 +4591,7 @@
       "vignettes": false
     },
     {
+      "ref": "RSQLite",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["bit64", "blob", "DBI", "memoise", "pkgconfig", "rlang"],
@@ -4610,7 +4611,6 @@
       "package": "RSQLite",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "RSQLite",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/RSQLite_2.4.3.tar.gz",
@@ -4622,6 +4622,7 @@
       "vignettes": false
     },
     {
+      "ref": "rstan",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["ggplot2", "gridExtra", "inline", "loo", "pkgbuild", "QuickJSR", "Rcpp", "RcppParallel", "StanHeaders"],
@@ -4641,7 +4642,6 @@
       "package": "rstan",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rstan",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rstan_2.32.7.tar.gz",
@@ -4666,6 +4666,7 @@
       "vignettes": false
     },
     {
+      "ref": "rstantools",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["desc", "Rcpp", "RcppParallel"],
@@ -4685,7 +4686,6 @@
       "package": "rstantools",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rstantools",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rstantools_2.5.0.tar.gz",
@@ -4704,6 +4704,7 @@
       "vignettes": false
     },
     {
+      "ref": "rstudioapi",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4723,7 +4724,6 @@
       "package": "rstudioapi",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rstudioapi",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rstudioapi_0.17.1.tar.gz",
@@ -4735,6 +4735,7 @@
       "vignettes": false
     },
     {
+      "ref": "rversions",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "curl",
@@ -4754,7 +4755,6 @@
       "package": "rversions",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "rversions",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/rversions_3.0.0.tar.gz",
@@ -4766,6 +4766,7 @@
       "vignettes": false
     },
     {
+      "ref": "S7",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4785,7 +4786,6 @@
       "package": "S7",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "S7",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/S7_0.2.0.tar.gz",
@@ -4797,6 +4797,7 @@
       "vignettes": false
     },
     {
+      "ref": "sass",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["fs", "htmltools", "R6", "rappdirs", "rlang"],
@@ -4816,7 +4817,6 @@
       "package": "sass",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "sass",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/sass_0.4.10.tar.gz",
@@ -4835,6 +4835,7 @@
       "vignettes": false
     },
     {
+      "ref": "scales",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "farver", "glue", "labeling", "lifecycle", "R6", "RColorBrewer", "rlang", "viridisLite"],
@@ -4854,7 +4855,6 @@
       "package": "scales",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "scales",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/scales_1.4.0.tar.gz",
@@ -4866,6 +4866,7 @@
       "vignettes": false
     },
     {
+      "ref": "SCDB",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["checkmate", "DBI", "dbplyr", "dplyr", "glue", "magrittr", "openssl", "parallelly", "purrr", "R6", "rlang", "stringr", "tidyr", "tidyselect"],
@@ -4885,7 +4886,6 @@
       "package": "SCDB",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "SCDB",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/SCDB_0.5.1.tar.gz",
@@ -4897,6 +4897,7 @@
       "vignettes": false
     },
     {
+      "ref": "sessioninfo",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "cli",
@@ -4916,7 +4917,6 @@
       "package": "sessioninfo",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "sessioninfo",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/sessioninfo_1.2.3.tar.gz",
@@ -4928,6 +4928,7 @@
       "vignettes": false
     },
     {
+      "ref": "shiny",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["bslib", "cachem", "cli", "commonmark", "fastmap", "fontawesome", "glue", "htmltools", "httpuv", "jsonlite", "later", "lifecycle", "mime", "promises", "R6", "rlang", "sourcetools", "withr", "xtable"],
@@ -4947,7 +4948,6 @@
       "package": "shiny",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "shiny",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/shiny_1.11.1.tar.gz",
@@ -4959,6 +4959,7 @@
       "vignettes": false
     },
     {
+      "ref": "sourcetools",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -4978,7 +4979,6 @@
       "package": "sourcetools",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "sourcetools",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/sourcetools_0.1.7-1.tar.gz",
@@ -4990,6 +4990,7 @@
       "vignettes": false
     },
     {
+      "ref": "spelling",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["commonmark", "hunspell", "knitr", "xml2"],
@@ -5009,7 +5010,6 @@
       "package": "spelling",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "spelling",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/spelling_2.3.2.tar.gz",
@@ -5021,6 +5021,7 @@
       "vignettes": false
     },
     {
+      "ref": "ssi-dk/diseasystore@rc-v0.3.1",
       "binary": false,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect"],
@@ -5045,7 +5046,6 @@
       "package": "diseasystore",
       "params": [],
       "platform": "source",
-      "ref": "ssi-dk/diseasystore@rc-v0.3.1",
       "rversion": "*",
       "sources": "https://api.github.com/repos/ssi-dk/diseasystore/zipball/a8d6ba6c60cba9042768c630452a9e671942de22",
       "sysreqs": "",
@@ -5056,6 +5056,7 @@
       "vignettes": false
     },
     {
+      "ref": "StanHeaders",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "RcppParallel",
@@ -5075,7 +5076,6 @@
       "package": "StanHeaders",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "StanHeaders",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/StanHeaders_2.32.10.tar.gz",
@@ -5100,6 +5100,7 @@
       "vignettes": false
     },
     {
+      "ref": "stringi",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5119,7 +5120,6 @@
       "package": "stringi",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "stringi",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/stringi_1.8.7.tar.gz",
@@ -5138,6 +5138,7 @@
       "vignettes": false
     },
     {
+      "ref": "stringr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "glue", "lifecycle", "magrittr", "rlang", "stringi", "vctrs"],
@@ -5157,7 +5158,6 @@
       "package": "stringr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "stringr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/stringr_1.5.2.tar.gz",
@@ -5169,6 +5169,7 @@
       "vignettes": false
     },
     {
+      "ref": "subplex",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5188,7 +5189,6 @@
       "package": "subplex",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "subplex",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/subplex_1.9.tar.gz",
@@ -5200,6 +5200,7 @@
       "vignettes": false
     },
     {
+      "ref": "sys",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5219,7 +5220,6 @@
       "package": "sys",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "sys",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/sys_3.4.3.tar.gz",
@@ -5231,6 +5231,7 @@
       "vignettes": false
     },
     {
+      "ref": "systemfonts",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["base64enc", "jsonlite", "lifecycle"],
@@ -5250,7 +5251,6 @@
       "package": "systemfonts",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "systemfonts",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/systemfonts_1.3.1.tar.gz",
@@ -5275,6 +5275,7 @@
       "vignettes": false
     },
     {
+      "ref": "tensorA",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5294,7 +5295,6 @@
       "package": "tensorA",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "tensorA",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tensorA_0.36.2.1.tar.gz",
@@ -5306,6 +5306,7 @@
       "vignettes": false
     },
     {
+      "ref": "testthat",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["brio", "callr", "cli", "desc", "digest", "evaluate", "jsonlite", "lifecycle", "magrittr", "pkgload", "praise", "processx", "ps", "R6", "rlang", "waldo", "withr"],
@@ -5325,7 +5326,6 @@
       "package": "testthat",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "testthat",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/testthat_3.2.3.tar.gz",
@@ -5337,6 +5337,7 @@
       "vignettes": false
     },
     {
+      "ref": "textshaping",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["lifecycle", "stringi", "systemfonts"],
@@ -5356,7 +5357,6 @@
       "package": "textshaping",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "textshaping",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/textshaping_1.0.4.tar.gz",
@@ -5387,6 +5387,7 @@
       "vignettes": false
     },
     {
+      "ref": "tibble",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "lifecycle", "magrittr", "pillar", "pkgconfig", "rlang", "vctrs"],
@@ -5406,7 +5407,6 @@
       "package": "tibble",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "tibble",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tibble_3.3.0.tar.gz",
@@ -5418,6 +5418,7 @@
       "vignettes": false
     },
     {
+      "ref": "tidyr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "dplyr", "glue", "lifecycle", "magrittr", "purrr", "rlang", "stringr", "tibble", "tidyselect", "vctrs"],
@@ -5437,7 +5438,6 @@
       "package": "tidyr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "tidyr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tidyr_1.3.1.tar.gz",
@@ -5449,6 +5449,7 @@
       "vignettes": false
     },
     {
+      "ref": "tidyselect",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "glue", "lifecycle", "rlang", "vctrs", "withr"],
@@ -5468,7 +5469,6 @@
       "package": "tidyselect",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "tidyselect",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tidyselect_1.2.1.tar.gz",
@@ -5480,6 +5480,7 @@
       "vignettes": false
     },
     {
+      "ref": "timechange",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5499,7 +5500,6 @@
       "package": "timechange",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "timechange",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/timechange_0.3.0.tar.gz",
@@ -5511,6 +5511,7 @@
       "vignettes": false
     },
     {
+      "ref": "tinytex",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "xfun",
@@ -5530,7 +5531,6 @@
       "package": "tinytex",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "tinytex",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tinytex_0.57.tar.gz",
@@ -5542,6 +5542,7 @@
       "vignettes": false
     },
     {
+      "ref": "tzdb",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5561,7 +5562,6 @@
       "package": "tzdb",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "tzdb",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tzdb_0.5.0.tar.gz",
@@ -5573,6 +5573,7 @@
       "vignettes": false
     },
     {
+      "ref": "ucminf",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5592,7 +5593,6 @@
       "package": "ucminf",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "ucminf",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/ucminf_1.2.2.tar.gz",
@@ -5604,6 +5604,7 @@
       "vignettes": false
     },
     {
+      "ref": "urlchecker",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "curl", "xml2"],
@@ -5623,7 +5624,6 @@
       "package": "urlchecker",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "urlchecker",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/urlchecker_1.0.1.tar.gz",
@@ -5635,6 +5635,7 @@
       "vignettes": false
     },
     {
+      "ref": "usethis",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "clipr", "crayon", "curl", "desc", "fs", "gert", "gh", "glue", "jsonlite", "lifecycle", "purrr", "rappdirs", "rlang", "rprojroot", "rstudioapi", "whisker", "withr", "yaml"],
@@ -5654,7 +5655,6 @@
       "package": "usethis",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "usethis",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/usethis_3.2.1.tar.gz",
@@ -5666,6 +5666,7 @@
       "vignettes": false
     },
     {
+      "ref": "utf8",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5685,7 +5686,6 @@
       "package": "utf8",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "utf8",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/utf8_1.2.6.tar.gz",
@@ -5697,6 +5697,7 @@
       "vignettes": false
     },
     {
+      "ref": "V8",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["curl", "jsonlite", "Rcpp"],
@@ -5716,7 +5717,6 @@
       "package": "V8",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "V8",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/V8_8.0.1.tar.gz",
@@ -5735,6 +5735,7 @@
       "vignettes": false
     },
     {
+      "ref": "vctrs",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "glue", "lifecycle", "rlang"],
@@ -5754,7 +5755,6 @@
       "package": "vctrs",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "vctrs",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/vctrs_0.6.5.tar.gz",
@@ -5766,6 +5766,7 @@
       "vignettes": false
     },
     {
+      "ref": "viridisLite",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5785,7 +5786,6 @@
       "package": "viridisLite",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "viridisLite",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/viridisLite_0.4.2.tar.gz",
@@ -5797,6 +5797,7 @@
       "vignettes": false
     },
     {
+      "ref": "vroom",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["bit64", "cli", "crayon", "glue", "hms", "lifecycle", "rlang", "tibble", "tidyselect", "tzdb", "vctrs", "withr"],
@@ -5816,7 +5817,6 @@
       "package": "vroom",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "vroom",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/vroom_1.6.6.tar.gz",
@@ -5828,6 +5828,7 @@
       "vignettes": false
     },
     {
+      "ref": "waldo",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "diffobj", "glue", "rlang"],
@@ -5847,7 +5848,6 @@
       "package": "waldo",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "waldo",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/waldo_0.6.2.tar.gz",
@@ -5859,6 +5859,7 @@
       "vignettes": false
     },
     {
+      "ref": "whisker",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5878,7 +5879,6 @@
       "package": "whisker",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "whisker",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/whisker_0.4.1.tar.gz",
@@ -5890,6 +5890,7 @@
       "vignettes": false
     },
     {
+      "ref": "withr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5909,7 +5910,6 @@
       "package": "withr",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "withr",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/withr_3.0.2.tar.gz",
@@ -5921,6 +5921,7 @@
       "vignettes": false
     },
     {
+      "ref": "xfun",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -5940,7 +5941,6 @@
       "package": "xfun",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "xfun",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xfun_0.53.tar.gz",
@@ -5952,6 +5952,7 @@
       "vignettes": false
     },
     {
+      "ref": "xml2",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["cli", "rlang"],
@@ -5963,7 +5964,7 @@
         "RemotePkgRef": "xml2",
         "RemoteType": "standard",
         "RemoteRef": "xml2",
-        "RemoteSha": "1.4.0",
+        "RemoteSha": "1.4.1",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04"
       },
@@ -5971,10 +5972,9 @@
       "package": "xml2",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "xml2",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xml2_1.4.0.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xml2_1.4.1.tar.gz",
       "sysreqs": "libxml2: libxml2-dev (deb), libxml2-devel (rpm)",
       "sysreqs_packages": [
         {
@@ -5984,12 +5984,13 @@
           "post_install": {}
         }
       ],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.4.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.4.1.tar.gz",
       "type": "standard",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "vignettes": false
     },
     {
+      "ref": "xmlparsedata",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -6009,7 +6010,6 @@
       "package": "xmlparsedata",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "xmlparsedata",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xmlparsedata_1.0.5.tar.gz",
@@ -6021,6 +6021,7 @@
       "vignettes": false
     },
     {
+      "ref": "xopen",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "processx",
@@ -6040,7 +6041,6 @@
       "package": "xopen",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "xopen",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xopen_1.0.1.tar.gz",
@@ -6052,6 +6052,7 @@
       "vignettes": false
     },
     {
+      "ref": "xtable",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -6071,7 +6072,6 @@
       "package": "xtable",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "xtable",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xtable_1.8-4.tar.gz",
@@ -6083,6 +6083,7 @@
       "vignettes": false
     },
     {
+      "ref": "yaml",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -6102,7 +6103,6 @@
       "package": "yaml",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "yaml",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/yaml_2.3.10.tar.gz",
@@ -6114,6 +6114,7 @@
       "vignettes": false
     },
     {
+      "ref": "zip",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
@@ -6133,7 +6134,6 @@
       "package": "zip",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "zip",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/zip_2.3.3.tar.gz",
@@ -6145,6 +6145,7 @@
       "vignettes": false
     },
     {
+      "ref": "zoo",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "lattice",
@@ -6164,7 +6165,6 @@
       "package": "zoo",
       "params": [],
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-      "ref": "zoo",
       "repotype": "cran",
       "rversion": "4.5",
       "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/zoo_1.8-14.tar.gz",
