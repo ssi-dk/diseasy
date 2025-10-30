@@ -192,7 +192,7 @@ for (penalty in c(0, 1)) {
 
   closeAllConnections()
 
-  workers <- unname(future::availableCores(omit = 1))
+  workers <- unname(future::availableCores(omit = 4))
   future::plan("multisession", gc = TRUE, workers = workers)
 
   # Set the optimiser configurations to test
@@ -420,7 +420,7 @@ for (penalty in c(0, 1)) {
 
     # Eliminate too slow candidates
     candidates <- round_results |>
-      dplyr::filter(.data$execution_time < 60 / 1200 * !!M) |>
+      dplyr::filter(.data$execution_time < 60 / 12 * !!M) |>
       dplyr::select("optim_method", "target_label", "method", "strategy")
   }
 }
@@ -472,7 +472,7 @@ results <- results |>
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
-  dplyr::filter(.data$execution_time > 60 / 1200 * .data$M) |>
+  dplyr::filter(.data$execution_time > 60 / 12 * .data$M) |>
   dplyr::slice_min(M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::transmute(
     .data$optim_method,
@@ -506,7 +506,7 @@ results <- dplyr::anti_join(
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
   dplyr::slice_max(.data$M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
-  dplyr::filter(.data$execution_time < 60 / 1200 * .data$M, .data$M < 10)
+  dplyr::filter(.data$execution_time < 60 / 12 * .data$M, .data$M < 10)
 
 print(should_not_have_been_eliminated)
 
