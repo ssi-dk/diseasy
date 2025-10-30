@@ -738,7 +738,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   optim_control = optim_control,
                   ...
                 ) |>
-                  purrr::pluck("delta")
+                  purrr::pluck("delta") |>
+                  utils::head(1) # For free_gamma method, all delta are the same and algo expects only one value
 
                 # Adjust for the increase in the number of compartments
                 delta_0 <- delta_0 * (M - 1) / (M - 2)
@@ -855,6 +856,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 individual_level = individual_level
               ) |>
                 purrr::pluck("delta") |>
+                utils::head(1) |>
                 rep(M - 1)
 
               # Use free_gamma solution as starting point
