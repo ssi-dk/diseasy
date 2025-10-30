@@ -5021,7 +5021,7 @@
       "vignettes": false
     },
     {
-      "ref": "ssi-dk/diseasystore@rc-v0.3.1",
+      "ref": "ssi-dk/diseasystore@fix/duckdb-from_ts-conversion",
       "binary": false,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect"],
@@ -5030,29 +5030,29 @@
       "install_args": "",
       "license": "GPL (>= 3)",
       "metadata": {
-        "RemotePkgRef": "ssi-dk/diseasystore@rc-v0.3.1",
+        "RemotePkgRef": "ssi-dk/diseasystore@fix/duckdb-from_ts-conversion",
         "RemoteType": "github",
         "RemoteHost": "api.github.com",
         "RemoteRepo": "diseasystore",
         "RemoteUsername": "ssi-dk",
-        "RemoteRef": "rc-v0.3.1",
-        "RemoteSha": "a8d6ba6c60cba9042768c630452a9e671942de22",
+        "RemoteRef": "fix/duckdb-from_ts-conversion",
+        "RemoteSha": "0992dc358cd0851f1800c010039f3fdadfff6e4a",
         "GithubRepo": "diseasystore",
         "GithubUsername": "ssi-dk",
-        "GithubRef": "rc-v0.3.1",
-        "GithubSHA1": "a8d6ba6c60cba9042768c630452a9e671942de22"
+        "GithubRef": "fix/duckdb-from_ts-conversion",
+        "GithubSHA1": "0992dc358cd0851f1800c010039f3fdadfff6e4a"
       },
       "needscompilation": true,
       "package": "diseasystore",
       "params": [],
       "platform": "source",
       "rversion": "*",
-      "sources": "https://api.github.com/repos/ssi-dk/diseasystore/zipball/a8d6ba6c60cba9042768c630452a9e671942de22",
+      "sources": "https://api.github.com/repos/ssi-dk/diseasystore/zipball/0992dc358cd0851f1800c010039f3fdadfff6e4a",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/diseasystore_0.3.1.9000_a8d6ba6.tar.gz",
+      "target": "src/contrib/diseasystore_0.3.2.9000_0992dc3.tar.gz",
       "type": "github",
-      "version": "0.3.1.9000",
+      "version": "0.3.2.9000",
       "vignettes": false
     },
     {
