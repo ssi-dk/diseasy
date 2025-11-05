@@ -192,7 +192,7 @@ for (penalty in c(0, 1)) {
 
   closeAllConnections()
 
-  workers <- unname(future::availableCores(omit = 1))
+  workers <- unname(future::availableCores(omit = 4))
   future::plan("multisession", gc = TRUE, workers = workers)
 
   # Set the optimiser configurations to test
@@ -289,11 +289,50 @@ for (penalty in c(0, 1)) {
       names = c("method", "strategy")
     )
 
+
+  # Gather the results for the round and eliminate stragglers
+  if (length(list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds"))) > 0) {
+    round_results <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds")) |>
+      purrr::map(
+        .progress = TRUE,
+        \(file) {
+        tmp <- file.path(path, file) |>
+          readRDS()
+
+        tmp |>
+          purrr::imap(\(approx, target_label) {
+            approx |>
+              purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
+              modifyList(list("target_label" = target_label))
+          }) |>
+          purrr::list_transpose() |>
+          tibble::as_tibble() |>
+          dplyr::mutate(
+            "optim_method" = stringr::str_extract(
+              !!file,
+              r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
+            )
+          )
+      }) |>
+      purrr::list_rbind() |>
+      dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
+      dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
+
+
+    # Eliminate too slow candidates
+    candidates <- dplyr::setdiff(
+          candidates,
+          round_results |>
+            dplyr::select("optim_method", "target_label", "method", "strategy")
+        )
+  }
+
+
   # Define a helper to construct combinations
   zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 
 
-  for (M in seq(from = 2, to = 10)) {
+  for (M in seq(from = 2, to = 5)) {
     message(glue::glue("M = {M}"))
 
     combinations <- tidyr::expand_grid(
@@ -467,7 +506,7 @@ results <- dplyr::anti_join(
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
   dplyr::slice_max(.data$M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
-  dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10)
+  dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 5)
 
 print(should_not_have_been_eliminated)
 
