@@ -16,7 +16,7 @@ missing_pkgs <- required_suggested_packages |>
   purrr::discard(rlang::is_installed)
 
 # Attempt install of missing packages
-if (length(missing_pkgs) > 0) try(pak::pak(missing_pkgs))
+if (length(missing_pkgs) > 0 && curl::has_internet()) try(pak::pak(missing_pkgs))
 
 # Throw error for missing
 missing_pkgs |>
