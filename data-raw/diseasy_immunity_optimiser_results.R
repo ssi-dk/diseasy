@@ -296,24 +296,25 @@ for (penalty in c(0, 1)) {
       purrr::map(
         .progress = TRUE,
         \(file) {
-        tmp <- file.path(path, file) |>
-          readRDS()
+          tmp <- file.path(path, file) |>
+            readRDS()
 
-        tmp |>
-          purrr::imap(\(approx, target_label) {
-            approx |>
-              purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
-              modifyList(list("target_label" = target_label))
-          }) |>
-          purrr::list_transpose() |>
-          tibble::as_tibble() |>
-          dplyr::mutate(
-            "optim_method" = stringr::str_extract(
-              !!file,
-              r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
+          tmp |>
+            purrr::imap(\(approx, target_label) {
+              approx |>
+                purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
+                modifyList(list("target_label" = target_label))
+            }) |>
+            purrr::list_transpose() |>
+            tibble::as_tibble() |>
+            dplyr::mutate(
+              "optim_method" = stringr::str_extract(
+                !!file,
+                r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
+              )
             )
-          )
-      }) |>
+        }
+      ) |>
       purrr::list_rbind() |>
       dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
       dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
@@ -321,10 +322,10 @@ for (penalty in c(0, 1)) {
 
     # Eliminate too slow candidates
     candidates <- dplyr::setdiff(
-          candidates,
-          round_results |>
-            dplyr::select("optim_method", "target_label", "method", "strategy")
-        )
+      candidates,
+      round_results |>
+        dplyr::select("optim_method", "target_label", "method", "strategy")
+    )
   }
 
 
