@@ -170,7 +170,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 The approximation assumes the model has a number of sequential R compartments ($R_1 .., R_M$) and then provides the transition rates
 and associated risks for each compartment that best approximates set waning functions (see Figure 1 for a illustration).
 
-![Figure 1: Illustration of the compartmental model structure.](vignette_data/diseasy-immunity-model-structure.png)
+![Figure 1: Illustration of the compartmental model structure.](article_data/diseasy-immunity-model-structure.png)
 
 Some definitions:
 
