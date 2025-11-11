@@ -1,0 +1,182 @@
+# Creating a model
+
+## Introduction
+
+This vignette provides an overview of the `DiseasyModel` class and its
+use in creating a `diseasy` model.
+
+As described in the package introduction
+([`vignette("diseasy")`](https://ssi-dk.github.io/diseasy/articles/diseasy.md)),
+the power of `diseasy` comes from combining different “functional”
+modules with model “templates” to create a large ensemble of models
+easily.
+
+It is `DiseasyModel` that defines how such model templates should look,
+and provides the mechanism by which the functional modules are loaded in
+the model templates to create the individual model members of the
+ensemble.
+
+Before we dive into the details of `DiseasyModel`, let’s first consider
+what it means to be a “model template”:
+
+## Model Templates
+
+Developing a model in `diseasy` involves constructing a model template
+that incorporates one or more functional modules into a model design.
+
+For instance, let’s consider the creation of a simple SIR (Susceptible,
+Infectious, Recovered) infection model with a seasonal forcing
+$\sigma(t)$ of the overall infection rate, denoted by .
+
+The SEIR model with seasonal forcing can be represented by the following
+set of differential equations:
+
+$$\frac{dS(t)}{dt} = - \beta \cdot \sigma(t) \cdot S(t) \cdot I(t)$$
+
+$$\frac{dI(t)}{dt} = \beta \cdot \sigma(t) \cdot S(t) \cdot I(t) - \gamma \cdot I(t)$$
+
+$$\frac{dR(t)}{dt} = \gamma \cdot I(t)$$
+
+When developing this model traditionally, we would choose some
+functional form for the seasonal forcing $\sigma(t)$, e.g. a sinusoidal
+relationship: $$\sigma(t) = A \cdot \cos(k \cdot t + \phi)$$
+
+The strategy of `diseasy` is to source the seasonal forcing $\sigma(t)$
+directly from the corresponding functional module (`DiseasySeason`).
+
+Every implementation of a seasonal forcing in `DiseasySeason` has the
+same function signature (i.e. they all take only a single argument $t$
+once configured).
+
+This way, we can configure different instances of `DiseasySeason` using
+the whole range of (available) plausible functional forms of seasonal
+forcing:
+
+- No seasonal forcing ($\sigma(t) = 1$)
+- Sinusoidal forcing
+- Temperature dependent forcing
+- Other plausible seasonal forcing forms
+
+Since the modules of `diseasy` are “objects” in an
+object-oriented-programming sense, the functional forms of the seasonal
+forcing can have parameters (as we see in the list above), but these are
+stored in the object when configuring the module, and the actual
+seasonal forcing exposed to the models all have the same function
+signature that takes only time as input ($\sigma(t)$)[¹](#fn1).
+
+This way, we can easily swap out different seasonal forcing models in
+our model templates without having to change the model equations
+themselves. If new seasonal forcing models are developed, they are then
+automatically available to the developed model.
+
+This is the philosophy behind the `diseasy` package, since we can easily
+swap out different functional modules for the templates and generate a
+large ensemble of models with functional forms for the disease dynamics.
+
+## The `DiseasyModel` class
+
+To create a model template in `diseasy` is to create a new class that
+inherits the `DiseasyModel` class.
+
+This gives the model template access to the functional modules that are
+available in the package, it defines how the user sets the parameters of
+the model and queries the model for results.
+
+In addition, it provides useful utilities for the implementation of the
+model such as logging and caching.
+
+### A container for functional modules
+
+The `DiseasyModel` class contains slots for instances of functional
+modules:
+
+- `$activity`: `{DiseasyActivity}`
+- `$immunity`: `{DiseasyImmunity}`
+- `$observables`: `{DiseasyObservables}`
+- `$season`: `{DiseasySeason}`
+- `$variant`: `{DiseasyVariant}`
+
+This means, that once a new `DiseasyModel` instance is created, it will
+have the functional modules internally available. Going back to the
+above example of the SIR model with seasonal forcing, the model template
+would be access the seasonal forcing $\sigma(t)$ via the call
+`self$season$model_t(t)`.
+
+### Training, testing, and validation data
+
+The `DiseasyModel` class also contains the method `$get_data()` that
+provides training data to the models.
+
+This method interfaces with the `DiseasyObservables` module to provide
+data for an observable at some stratification level. The level of
+stratification is generally a flexible parameter that will be set by the
+user when requesting results from the model. For example, the user my
+request results at the country level or at the regional level.
+
+The helper method `$get_data()` will then provide the training, testing,
+and validation data for the observable at the requested level. This data
+will contain one record for each time point in the corresponding period,
+with columns for the date of the observation, the values of the
+different (optional) stratification, and the value of the observable on
+the date, and finally, an integer counter for the day relative to the
+end of the period.
+
+### Model-user interface
+
+Beyond providing access to the functional modules, `DiseasyModel`
+defines how the user will interface with the model.
+
+#### Setting parameters
+
+The default parameters of the model should be contained within the
+`$parameters` slot of the model template.
+
+These are then exposed to the user, and logic can be implemented to
+allow the user to set some parameters of the model while leaving others
+free to be determined by the model during model fitting.
+
+For technical reasons[²](#fn2), you should implement the
+`private$default_parameters()` slot as a function that combines the
+model-specific parameters with the inherited parameters from the
+superclasses.
+`{r .parameters implementation, eval = FALSE} # nolint: assignment_linter, object_usage_linter default_parameters = function() { modifyList( super$default_parameters(), # Obtain parameters from the superclasses # Overwrite with model-specific parameters list("model_specific_param_1" = 1, "model_specific_param_2" = "method_1"), keep.null = TRUE ) }`
+\# nolint end During initialisation, these are then evaluated to a
+single list of parameters, updated with the user-specified values for
+the parameters and stored in the `private$.parameters` slot. The
+parameters are then accessible via `$parameters`.
+
+##### Validating the parameters
+
+The model template can test the user provided `parameters` by
+implementing the `private$validate_parameters()` method. Note that some
+parameters may be set inherited from superclasses, so the implementation
+of the `$validate_parameters()` method should also call the parent
+validation method (`super$validate_parameters()`).
+
+`{r .parameter validation implementation, eval = FALSE} # nolint: assignment_linter, object_usage_linter validate_parameters = function() { checkmate::assert_number(self$parameters$model_specific_param_1) checkmate::assert_choice( self$parameters$model_specific_param_2, c("method_1", "method_2") ) super$validate_parameters() }`
+\# nolint end
+
+#### Getting results
+
+Once the parameters of the model is set (either by the user or by the
+model), the user can query the model for results using the
+`$get_results()` function. Through this function, the user provides the
+parameters of the result that should be provided (target observable,
+time-window and stratification level). In return, the function returns a
+standardised `data.frame`-like output that can be used for further
+analysis in conjunction with the results from other models.
+
+The outputs of the model are standardised, and should follow the
+structure of the `training_data` provided by `$get_data()` enriched by
+model prediction, model id and realization id.
+
+------------------------------------------------------------------------
+
+1.  The seasonal model exposed by a configured `DiseasySeason` instance
+    is a “closure” instead of a pure function.
+
+2.  In R6, functions from superclasses are available via the `super`
+    keyword but non-function objects are not. by implementing the
+    `private$default_parameters` slot as a function, we can ensure that
+    the parameters from the superclasses are available to the model
+    template.

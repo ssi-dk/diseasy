@@ -1,14 +1,22 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
-  creating-a-model: creating-a-model.html
-  diseasy-activity: diseasy-activity.html
-  diseasy-observables: diseasy-observables.html
-  diseasy-season: diseasy-season.html
-  diseasy-variant: diseasy-variant.html
+  articles/creating-a-model: creating-a-model.html
+  articles/creating-ensembles: creating-ensembles.html
+  articles/diseasy-activity: diseasy-activity.html
+  articles/diseasy-immunity-optimisation: diseasy-immunity-optimisation.html
+  articles/diseasy-immunity: diseasy-immunity.html
+  articles/diseasy-model-ode: diseasy-model-ode.html
+  articles/diseasy-model-regression: diseasy-model-regression.html
+  articles/diseasy-observables: diseasy-observables.html
+  articles/diseasy-season: diseasy-season.html
+  articles/diseasy-variant: diseasy-variant.html
   diseasy: diseasy.html
-last_built: 2024-11-21T08:01Z
+  articles/SEIR-implementation: SEIR-implementation.html
+  articles/SEIR-initialisation: SEIR-initialisation.html
+  articles/SEIR-malthusian-matching: SEIR-malthusian-matching.html
+last_built: 2025-11-11T08:53Z
 urls:
   reference: https://ssi-dk.github.io/diseasy/reference
   article: https://ssi-dk.github.io/diseasy/articles
