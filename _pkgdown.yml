@@ -63,7 +63,7 @@ articles:
 - title: Model templates
   navbar: Model templates
   contents:
-  - starts_with("diseasy-model")
+  - matches(r"{^articles/diseasy-model}")
 
 - title: Developer guides
   navbar: Developer guides
@@ -78,4 +78,4 @@ articles:
 - title: Additional information
   navbar: Additional information
   contents:
-  - starts_with("articles/")
+  - articles/diseasy-immunity-optimisation
