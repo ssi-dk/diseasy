@@ -20,7 +20,7 @@ RoxygenNote: 7.3.3
 Language: en-GB
 LazyData: TRUE
 Depends:
-    diseasystore (> 0.3),
+    diseasystore,
     R (>= 4.3.0)
 Imports:
     cachem,
@@ -40,6 +40,7 @@ Imports:
     tidyr,
     withr
 Suggests:
+    BB,
     brms,
     contactdata,
     countrycode,
@@ -55,9 +56,12 @@ Suggests:
     gt,
     jsonlite,
     knitr,
+    lbfgsb3c,
     lintr,
     nloptr,
+    marqLevAlg,
     microbenchmark,
+    minqa,
     optimx,
     progressr,
     readr,

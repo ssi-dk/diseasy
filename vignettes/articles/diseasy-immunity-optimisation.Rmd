@@ -185,10 +185,10 @@ add_footnote <- function(gt_table) {
     caption <- c(caption, "auglag_lbfgs: auglag with LBFGS as local solver.")
   }
   if ("auglag_slsqp" %in% optimisers) {
-    caption <- c(caption, "auglag_lbfgs: auglag with SLSQP as local solver.")
+    caption <- c(caption, "auglag_slsqp: auglag with SLSQP as local solver.")
   }
   if ("auglag_mma" %in% optimisers) {
-    caption <- c(caption, "auglag_lbfgs: auglag with MMA as local solver.")
+    caption <- c(caption, "auglag_mma: auglag with MMA as local solver.")
   }
   if ("sbplx_10000" %in% optimisers) {
     caption <- c(caption, "sbplx_10000: sbplx with `maxeval = 10000`.")
