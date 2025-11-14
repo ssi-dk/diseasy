@@ -406,6 +406,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Additional arguments to be passed to the optimiser.
     #' @return
     #'   Returns the results from the optimisation with the approximated rates and execution time.
+    #'   The output of the objective function is given as the "error" (the square-root of the integral of the squared
+    #'   difference between approximation and target) and the "penalty" (the penalty controllable
+    #'   by `monotonous` and `individual_level`).
     #' @seealso `vignette("diseasy-immunity")`
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
@@ -1021,7 +1024,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
-              "sqrt_integral" = purrr::pluck(metrics, "value"),
+              "error" = purrr::pluck(metrics, "value"),
               "penalty" = purrr::pluck(metrics, "penalty"),
               "execution_time" = Sys.time() - tic + execution_time_offset
             )
