@@ -1021,7 +1021,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
-              "sqrt_integral" = purrr::pluck(metrics, "value"),
+              "error" = purrr::pluck(metrics, "value"),
               "penalty" = purrr::pluck(metrics, "penalty"),
               "execution_time" = Sys.time() - tic + execution_time_offset
             )
