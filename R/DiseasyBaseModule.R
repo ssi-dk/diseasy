@@ -266,7 +266,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
       } else {
 
         if (private$.cache$exists(hash)) {
-          stop("Hash already found in cache!", call. = FALSE)
+          pkgcond::pkg_warning("Hash already found in cache!")
         } else {
           private$.cache$set(hash, obj)
         }
