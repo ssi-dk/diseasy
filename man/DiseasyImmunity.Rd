@@ -431,7 +431,7 @@ which uses the "free_gamma" default optimiser to determine the starting point.
 
 \subsection{Returns}{
 Returns the results from the optimisation with the approximated rates and execution time.
-The output of the objective function is given as the "error" (the integral of the squared
+The output of the objective function is given as the "error" (the square-root of the integral of the squared
 difference between approximation and target) and the "penalty" (the penalty controllable
 by \code{monotonous} and \code{individual_level}).
 }

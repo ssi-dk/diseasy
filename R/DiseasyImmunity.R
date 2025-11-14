@@ -406,7 +406,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Additional arguments to be passed to the optimiser.
     #' @return
     #'   Returns the results from the optimisation with the approximated rates and execution time.
-    #'   The output of the objective function is given as the "error" (the integral of the squared
+    #'   The output of the objective function is given as the "error" (the square-root of the integral of the squared
     #'   difference between approximation and target) and the "penalty" (the penalty controllable
     #'   by `monotonous` and `individual_level`).
     #' @seealso `vignette("diseasy-immunity")`
