@@ -314,6 +314,7 @@ best matches the waning immunity curves set in the module.
   monotonous = TRUE,
   individual_level = TRUE,
   optim_control = NULL,
+  unify_initial_guess = TRUE,
   ...
 )}\if{html}{\out{</div>}}
 }
