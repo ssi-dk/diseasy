@@ -656,6 +656,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           # For the starting guesses, we use some linear extrapolation:
           linear_extrapolate <- function(x, y, xout) {
+
+            checkmate::assert_numeric(x, min.len = 2)
+            checkmate::assert_numeric(y, len = length(x))
+            checkmate::assert_numeric(xout)
+
             # Detect closes two points in x
             anchors <- purrr::map(xout, ~ head(order(abs(x - .)), 2))
 
