@@ -653,6 +653,26 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # Note that the rates need to be "inverted" through the inverse of the mapping functions
           # so they are are in the same parameter space as the optimisation occurs
 
+          # For the starting guesses, we use some linear extrapolation:
+          linear_extrapolate <- function(x, y, xout) {
+            # Detect closes two points in x
+            anchors <- purrr::map(xout, ~ head(order(abs(x - .)), 2))
+
+            purrr::map2_dbl(
+              .x = xout,
+              .y = anchors,
+              \(xout, anchors) {
+                x0 <- x[[anchors[[1]]]]
+                y0 <- y[[anchors[[1]]]]
+
+                x1 <- x[[anchors[[2]]]]
+                y1 <- y[[anchors[[2]]]]
+
+                (y0 * (x1 - xout) + y1 * (xout - x0)) / (x1 - x0)
+              }
+            )
+          }
+
           # Account for the differences in methods
           if (method == "free_delta")  {
 
