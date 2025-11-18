@@ -401,7 +401,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   If `optim_method` matches any of the methods in `optimx::optimr`:
     #'   - Additional `optim_control` arguments passed as `control` to `stats::optimr` using the chosen `method`.
-    #'
+    #' @param unify_initial_guess New method?
     #' @param ...
     #'   Additional arguments to be passed to the optimiser.
     #' @return
@@ -711,6 +711,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   monotonous = monotonous,
                   individual_level = individual_level,
                   optim_control = optim_control,
+                  unify_initial_guess = unify_initial_guess,
                   ...
                 ) |>
                   purrr::pluck("delta")
@@ -816,6 +817,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   monotonous = monotonous,
                   individual_level = individual_level,
                   optim_control = optim_control,
+                  unify_initial_guess = unify_initial_guess,
                   ...
                 ) |>
                   purrr::pluck("delta") |>
@@ -829,6 +831,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   monotonous = monotonous,
                   individual_level = individual_level,
                   optim_control = optim_control,
+                  unify_initial_guess = unify_initial_guess,
                   ...
                 ) |>
                   purrr::pluck("gamma")
@@ -898,6 +901,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   monotonous = monotonous,
                   individual_level = individual_level,
                   optim_control = optim_control,
+                  unify_initial_guess = unify_initial_guess,
                   ...
                 ) |>
                   purrr::pluck("delta")
@@ -910,6 +914,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   monotonous = monotonous,
                   individual_level = individual_level,
                   optim_control = optim_control,
+                  unify_initial_guess = unify_initial_guess,
                   ...
                 ) |>
                   purrr::pluck("gamma")
@@ -988,7 +993,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 method = "free_gamma",
                 M = M,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
-                individual_level = individual_level
+                individual_level = individual_level,
+                unify_initial_guess = unify_initial_guess,
               ) |>
                 purrr::pluck("delta") |>
                 utils::head(1) |>
@@ -999,7 +1005,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 method = "free_gamma",
                 M = M,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
-                individual_level = individual_level
+                individual_level = individual_level,
+                unify_initial_guess = unify_initial_guess,
               ) |>
                 purrr::pluck("gamma") |>
                 purrr::map(~ utils::head(., M - 1)) |> # Drop last value since it is fixed in the method
@@ -1123,6 +1130,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
+                unify_initial_guess = unify_initial_guess,
                 ...
               ) |>
                 purrr::pluck("execution_time") |>
@@ -1136,7 +1144,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
             method = "free_gamma",
             M = M,                                                                                                      # nolint: object_name_linter
             monotonous = monotonous,
-            individual_level = individual_level
+            individual_level = individual_level,
+            unify_initial_guess = unify_initial_guess,
           ) |>
             purrr::pluck("execution_time")
 
