@@ -372,6 +372,8 @@ If \code{optim_method} matches any of the methods in \code{optimx::optimr}:
 \item Additional \code{optim_control} arguments passed as \code{control} to \code{stats::optimr} using the chosen \code{method}.
 }}
 
+\item{\code{unify_initial_guess}}{New method?}
+
 \item{\code{...}}{Additional arguments to be passed to the optimiser.}
 }
 \if{html}{\out{</div>}}
