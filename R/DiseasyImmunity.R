@@ -765,7 +765,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                     }
 
                     # And convert back to transition rates
-                    delta_0 <- 1 / diff(t_out)
+                    delta_0 <- 1 / c(t_out[[1]], diff(t_out))
 
                   } else {  # Interpolate the time spent in each compartment
                     t <- approx(
@@ -951,7 +951,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   }
 
                   # And convert back to transition rates
-                  delta_0 <- 1 / diff(t_out)
+                  delta_0 <- 1 / c(t_out[[1]], diff(t_out))
 
                   # Linear extrapolation of gamma
                   gamma_0 <- gamma_0 |>
