@@ -1324,7 +1324,7 @@
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.4.1"
+        "RemoteSha": "1.4.2"
       },
       "needscompilation": false,
       "package": "duckdb",
@@ -1332,7 +1332,7 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/duckdb_1.4.1.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/duckdb_1.4.2.tar.gz",
       "sysreqs": "xz (for building from source)",
       "sysreqs_packages": [
         {
@@ -1342,9 +1342,9 @@
           "post_install": {}
         }
       ],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/duckdb_1.4.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/duckdb_1.4.2.tar.gz",
       "type": "standard",
-      "version": "1.4.1",
+      "version": "1.4.2",
       "vignettes": false
     },
     {
@@ -1617,7 +1617,7 @@
         "RemoteRef": "future",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.67.0"
+        "RemoteSha": "1.68.0"
       },
       "needscompilation": false,
       "package": "future",
@@ -1625,12 +1625,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/future_1.67.0.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/future_1.68.0.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/future_1.67.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/future_1.68.0.tar.gz",
       "type": "standard",
-      "version": "1.67.0",
+      "version": "1.68.0",
       "vignettes": false
     },
     {
@@ -5962,7 +5962,7 @@
         "RemoteRef": "xml2",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.4.1"
+        "RemoteSha": "1.5.0"
       },
       "needscompilation": false,
       "package": "xml2",
@@ -5970,7 +5970,7 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xml2_1.4.1.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xml2_1.5.0.tar.gz",
       "sysreqs": "libxml2: libxml2-dev (deb), libxml2-devel (rpm)",
       "sysreqs_packages": [
         {
@@ -5980,9 +5980,9 @@
           "post_install": {}
         }
       ],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.4.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.5.0.tar.gz",
       "type": "standard",
-      "version": "1.4.1",
+      "version": "1.5.0",
       "vignettes": false
     },
     {
