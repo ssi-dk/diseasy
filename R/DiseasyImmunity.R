@@ -742,30 +742,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
                     # add to get the middle time for this compartment.
 
                     # Time to enter each compartment (M - 1 solution)
-                    # t0 = (0, 1/delta_1, 1/delta_1 + 1/delta_2, ...)
+                    t <- c(0, cumsum(1 / delta_0))
 
-                    # Middle time (M - 1 solution)
-                    # tm = (1/(2*delta_1), 1/delta_1 + 1/(2*delta_1),
-                    #  1/delta_1 + 1/delta_2 + 1/delta_1 + 1/(2*delta_2), ...)
-                    tm <- c(0, cumsum(1 / delta_0)) + 1 / (2 * c(delta_0, tail(delta_0, 1)))
-
-                    # Linear extrapolation
-                    tm_out <- linear_extrapolate(
+                    # Time to enter each compartment (M solution)
+                    t_prime <- approx(
                       # Progress along compartments (M - 1 solution)
-                      x = seq(1 / (2 * (M - 1)), 1 - 1 / (2 * (M - 1)), length.out = M - 1),
-                      y = tm,
+                      x = seq(0, 1, length.out = M - 1),
+                      y = t,
                       # Progress along compartments (M solution)
-                      xout = seq(1 / (2 * M), 1 - 1 / (2 * M), length.out = M)
-                    )
-
-                    # Convert back to the exit times for each of the compartments (with exit times)
-                    t_out <- 2 * tm_out[[1]]
-                    for (t in tail(tm_out, -1)) {
-                      t_out <- c(t_out, max(t_out) + 2 * (t - max(t_out)))
-                    }
+                      xout = seq(0, 1, length.out = M)
+                    ) |>
+                      purrr::pluck("y")
 
                     # And convert back to transition rates
-                    delta_0 <- 1 / c(t_out[[1]], diff(t_out))
+                    delta_0 <- 1 / diff(t_prime)
 
                   } else {  # Interpolate the time spent in each compartment
                     t <- approx(
@@ -837,18 +827,18 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   # See code comments above for "free_delta" and the "recursive"
                   # strategy for more details on this extrapolation
 
-                  # Middle time (M - 1 solution)
-                  tm <- c(0, cumsum(1 / rep(delta_0, M - 2))) + 1 / (2 * delta_0)
+                  # Time to enter each compartment (M - 1 solution)
+                  t <- c(0, cumsum(1 / rep(delta_0, M - 2)))
 
                   # Adjust for the increase in the number of compartments
                   delta_0 <- delta_0 * (M - 1) / (M - 2)
 
-                  # Middle time (M solution)
-                  tm_out <- c(0, cumsum(1 / rep(delta_0, M - 1))) + 1 / (2 * delta_0)
+                  # Time to enter each compartment (M solution)
+                  t_prime <- c(0, cumsum(1 / rep(delta_0, M - 1)))
 
-                  # Linear extrapolation
+                  # Linear interpolation
                   gamma_0 <- gamma_0 |>
-                    purrr::map(~ linear_extrapolate(x = tm, y = .x, xout = tm_out)) |>
+                    purrr::map(~ approx(x = t, y = .x, xout = t_prime)$y) |>
                     purrr::map(~ utils::head(., -1)) |>
                     purrr::reduce(c)
 
@@ -932,30 +922,25 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   # See code comments above for "free_delta" and "free_gamma" and the "recursive"
                   # strategy for more details on this interpolation
 
-                  # Middle time (M - 1 solution)
-                  tm <- c(0, cumsum(1 / delta_0)) + 1 / (2 * c(delta_0, utils::tail(delta_0, 1)))
+                  # Time to enter each compartment (M - 1 solution)
+                  t <- c(0, cumsum(1 / delta_0))
 
-                  # Linear extrapolation of middle times
-                  tm_out <- linear_extrapolate(
+                  # Time to enter each compartment (M solution)
+                  t_prime <- approx(
                     # Progress along compartments (M - 1 solution)
-                    x = seq(1 / (2 * (M - 1)), 1 - 1 / (2 * (M - 1)), length.out = M - 1),
-                    y = tm,
+                    x = seq(0, 1, length.out = M - 1),
+                    y = t,
                     # Progress along compartments (M solution)
-                    xout = seq(1 / (2 * M), 1 - 1 / (2 * M), length.out = M)
-                  )
-
-                  # Convert back to the exit times for each of the compartments (with exit times)
-                  t_out <- 2 * tm_out[[1]]
-                  for (t in utils::tail(tm_out, -1)) {
-                    t_out <- c(t_out, max(t_out) + 2 * (t - max(t_out)))
-                  }
+                    xout = seq(0, 1, length.out = M)
+                  ) |>
+                    purrr::pluck("y")
 
                   # And convert back to transition rates
-                  delta_0 <- 1 / c(t_out[[1]], diff(t_out))
+                  delta_0 <- 1 / diff(t_prime)
 
-                  # Linear extrapolation of gamma
+                  # Linear interpolation of gamma
                   gamma_0 <- gamma_0 |>
-                    purrr::map(~ linear_extrapolate(x = tm, y = .x, xout = tm_out)) |>
+                    purrr::map(~ approx(x = t, y = .x, xout = t_prime)$y) |>
                     purrr::map(~ utils::head(., -1)) |>
                     purrr::reduce(c)
 
