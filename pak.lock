@@ -398,7 +398,7 @@
         "RemoteRef": "bridgesampling",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.1-2"
+        "RemoteSha": "1.2-1"
       },
       "needscompilation": false,
       "package": "bridgesampling",
@@ -406,12 +406,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bridgesampling_1.1-2.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/bridgesampling_1.2-1.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/bridgesampling_1.1-2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/bridgesampling_1.2-1.tar.gz",
       "type": "standard",
-      "version": "1.1-2",
+      "version": "1.2-1",
       "vignettes": false
     },
     {
@@ -1169,7 +1169,7 @@
         "RemoteRef": "digest",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.6.38"
+        "RemoteSha": "0.6.39"
       },
       "needscompilation": false,
       "package": "digest",
@@ -1177,12 +1177,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/digest_0.6.38.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/digest_0.6.39.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/digest_0.6.38.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/digest_0.6.39.tar.gz",
       "type": "standard",
-      "version": "0.6.38",
+      "version": "0.6.39",
       "vignettes": false
     },
     {
@@ -1455,7 +1455,7 @@
         "RemoteRef": "fansi",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.0.6"
+        "RemoteSha": "1.0.7"
       },
       "needscompilation": false,
       "package": "fansi",
@@ -1463,12 +1463,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/fansi_1.0.6.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/fansi_1.0.7.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/fansi_1.0.6.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/fansi_1.0.7.tar.gz",
       "type": "standard",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "vignettes": false
     },
     {
@@ -5521,7 +5521,7 @@
         "RemoteRef": "tinytex",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.57"
+        "RemoteSha": "0.58"
       },
       "needscompilation": false,
       "package": "tinytex",
@@ -5529,12 +5529,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tinytex_0.57.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/tinytex_0.58.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/tinytex_0.57.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/tinytex_0.58.tar.gz",
       "type": "standard",
-      "version": "0.57",
+      "version": "0.58",
       "vignettes": false
     },
     {
