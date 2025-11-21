@@ -607,6 +607,28 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
 })
 
 
+test_that("`$approximate_compartmental()` works with custom controls", {
+  skip_if_not_installed("BB")
+
+  # Initialize the DiseasyImmunity instance
+  im <- DiseasyImmunity$new()
+
+  # Set the exponential waning model
+  im$set_sigmoidal_waning()
+
+  expect_no_error(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "recursive",
+      optim_control = list("optim_method" = "spg", "ftol" = 1e-2)
+    )
+  )
+
+  rm(im)
+})
+
+
 test_that("Waning models must not be divergent in `$approximate_compartmental()`", {
   skip_if_not_installed(c("dfoptim", "nloptr", "optimx", "subplex", "ucminf"))
 
