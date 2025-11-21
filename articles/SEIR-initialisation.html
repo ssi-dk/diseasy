@@ -51,6 +51,8 @@
     <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Model templates</h6></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-model-ode.html">DiseasyModelOde</a></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-model-regression.html">DiseasyModelRegression</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer guides</h6></li>
     <li><a class="dropdown-item" href="../articles/creating-a-model.html">Creating a model</a></li>
@@ -61,19 +63,7 @@
     <li><a class="dropdown-item" href="../articles/SEIR-malthusian-matching.html">SEIR: Accounting for structural differences in malthusian growth rates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Additional information</h6></li>
-    <li><a class="dropdown-item" href="../articles/creating-a-model.html">Creating a model</a></li>
-    <li><a class="dropdown-item" href="../articles/creating-ensembles.html">Creating ensembles</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-immunity-optimisation.html">DiseasyImmunity optimisation</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-immunity.html">DiseasyImmunity</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-model-ode.html">DiseasyModelOde</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-model-regression.html">DiseasyModelRegression</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-observables.html">DiseasyObservables</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-season.html">DiseasySeason</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-implementation.html">SEIR: Implementation</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-initialisation.html">SEIR: Initialising from incidence data</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-malthusian-matching.html">SEIR: Accounting for structural differences in malthusian growth rates</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -548,7 +538,7 @@ we here visualise this fitting.</p>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">age_group</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 68 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; Warning: Removed 169 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
 <p><img src="SEIR-initialisation_files/figure-html/incidence%20fitting-1.png" class="r-plt" alt="Fitting a polynomial to the incidence data to estimate derivatives." width="700"></p>
 <p>We can now use the

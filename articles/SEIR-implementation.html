@@ -51,6 +51,8 @@
     <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Model templates</h6></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-model-ode.html">DiseasyModelOde</a></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-model-regression.html">DiseasyModelRegression</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer guides</h6></li>
     <li><a class="dropdown-item" href="../articles/creating-a-model.html">Creating a model</a></li>
@@ -61,19 +63,7 @@
     <li><a class="dropdown-item" href="../articles/SEIR-malthusian-matching.html">SEIR: Accounting for structural differences in malthusian growth rates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Additional information</h6></li>
-    <li><a class="dropdown-item" href="../articles/creating-a-model.html">Creating a model</a></li>
-    <li><a class="dropdown-item" href="../articles/creating-ensembles.html">Creating ensembles</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-immunity-optimisation.html">DiseasyImmunity optimisation</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-immunity.html">DiseasyImmunity</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-model-ode.html">DiseasyModelOde</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-model-regression.html">DiseasyModelRegression</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-observables.html">DiseasyObservables</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-season.html">DiseasySeason</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-implementation.html">SEIR: Implementation</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-initialisation.html">SEIR: Initialising from incidence data</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-malthusian-matching.html">SEIR: Accounting for structural differences in malthusian growth rates</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -826,11 +816,11 @@ and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min      lq      mean  median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 21.717 22.4900 23.513116 22.7900 23.3095   97.015  1000</span></span>
-<span><span class="co">#&gt;              sapply 11.115 11.5550 12.128401 11.8855 12.2820   23.444  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 11.189 11.5775 14.212789 11.8765 12.2730 1957.428  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.334  4.6430  4.919972  4.7720  4.9430   17.801  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min     lq      mean  median      uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 24.516 26.314 27.958321 27.5920 28.5435  102.382  1000</span></span>
+<span><span class="co">#&gt;              sapply 12.543 12.974 13.818862 13.2950 14.1560   44.013  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES 12.533 12.964 15.296226 13.2595 14.1265 1560.332  1000</span></span>
+<span><span class="co">#&gt;              vapply  4.809  5.210  5.554369  5.4300  5.6400   21.511  1000</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

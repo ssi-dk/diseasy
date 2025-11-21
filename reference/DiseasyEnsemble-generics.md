@@ -111,7 +111,7 @@ observable from the ensemble by date, stratification and model
   )
 
   print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG0 (hash: 40225), DiseasyModelG1 (hash: 62528) 
+#> DiseasyEnsemble: DiseasyModelG0 (hash: 2df0d), DiseasyModelG1 (hash: 3fdc9) 
 
   summary(ensemble)
 #> DiseasyEnsemble consisting of:

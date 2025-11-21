@@ -51,6 +51,8 @@
     <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Model templates</h6></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-model-ode.html">DiseasyModelOde</a></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-model-regression.html">DiseasyModelRegression</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer guides</h6></li>
     <li><a class="dropdown-item" href="../articles/creating-a-model.html">Creating a model</a></li>
@@ -61,19 +63,7 @@
     <li><a class="dropdown-item" href="../articles/SEIR-malthusian-matching.html">SEIR: Accounting for structural differences in malthusian growth rates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Additional information</h6></li>
-    <li><a class="dropdown-item" href="../articles/creating-a-model.html">Creating a model</a></li>
-    <li><a class="dropdown-item" href="../articles/creating-ensembles.html">Creating ensembles</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-immunity-optimisation.html">DiseasyImmunity optimisation</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-immunity.html">DiseasyImmunity</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-model-ode.html">DiseasyModelOde</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-model-regression.html">DiseasyModelRegression</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-observables.html">DiseasyObservables</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-season.html">DiseasySeason</a></li>
-    <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-implementation.html">SEIR: Implementation</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-initialisation.html">SEIR: Initialising from incidence data</a></li>
-    <li><a class="dropdown-item" href="../articles/SEIR-malthusian-matching.html">SEIR: Accounting for structural differences in malthusian growth rates</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -139,7 +129,7 @@ the following code.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 1</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56290f1db9f0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55bd7fafd140&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "no_waning"</span></span></code></pre></div>
 <p>This returns a <code>named list()</code> where the named target are
@@ -175,7 +165,7 @@ parameter.</li>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5629067b47f8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55bd81211320&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -220,7 +210,7 @@ identification. Default is “custom_waning”.</li>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x562905459568&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55bd81fd6fa8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -258,8 +248,8 @@ additional arguments.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5629086e0b40&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x562901fa6dd0&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55bd833d8e68&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55bd82ee01a8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -277,7 +267,7 @@ additional arguments.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x562908dc8950&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55bd83b76878&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -301,7 +291,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x562901fa6dd0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55bd82ee01a8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -312,7 +302,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x562908dc8950&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55bd83b76878&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -332,7 +322,7 @@ and then provides the transition rates and associated risks for each
 compartment that best approximates set waning functions (see Figure 1
 for a illustration).</p>
 <div class="float">
-<img src="vignette_data/diseasy-immunity-model-structure.png" alt="Figure 1: Illustration of the compartmental model structure."><div class="figcaption">Figure 1: Illustration of the compartmental
+<img src="article_data/diseasy-immunity-model-structure.png" alt="Figure 1: Illustration of the compartmental model structure."><div class="figcaption">Figure 1: Illustration of the compartmental
 model structure.</div>
 </div>
 <p>Some definitions:</p>
@@ -627,7 +617,11 @@ For more examples, see the optimisation vignette
 <span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">M</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">method</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"M"</span>, y <span class="op">=</span> <span class="st">"Error"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">M</span><span class="op">)</span><span class="op">)</span>, expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span></span>
+<span>    xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">M</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>    expand <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="diseasy-immunity_files/figure-html/elbow%20curve%20method-1.png" class="r-plt" alt="Increasing number of compartments has diminishing returns on the error." width="700"></p>
 </div>
 

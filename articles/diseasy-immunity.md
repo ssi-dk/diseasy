@@ -39,7 +39,7 @@ im$model
 #> $infection
 #> function (t) 
 #> 1
-#> <environment: 0x56290f1db9f0>
+#> <environment: 0x55bd7fafd140>
 #> attr(,"name")
 #> [1] "no_waning"
 ```
@@ -78,7 +78,7 @@ im$set_sigmoidal_waning(time_scale = 9, target = "infection")
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <environment: 0x5629067b47f8>
+#> <environment: 0x55bd81211320>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -128,7 +128,7 @@ im$set_custom_waning(
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x562905459568>
+#> <environment: 0x55bd81fd6fa8>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -174,8 +174,8 @@ im$set_waning_model(model = "sigmoidal_waning", time_scale = 9, target = "infect
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <bytecode: 0x5629086e0b40>
-#> <environment: 0x562901fa6dd0>
+#> <bytecode: 0x55bd833d8e68>
+#> <environment: 0x55bd82ee01a8>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -193,7 +193,7 @@ im$set_waning_model(
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x562908dc8950>
+#> <environment: 0x55bd83b76878>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -218,7 +218,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <environment: 0x562901fa6dd0>
+#> <environment: 0x55bd82ee01a8>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -229,7 +229,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x562908dc8950>
+#> <environment: 0x55bd83b76878>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -250,7 +250,7 @@ and associated risks for each compartment that best approximates set
 waning functions (see Figure 1 for a illustration).
 
 ![Figure 1: Illustration of the compartmental model
-structure.](vignette_data/diseasy-immunity-model-structure.png)
+structure.](article_data/diseasy-immunity-model-structure.png)
 
 Figure 1: Illustration of the compartmental model structure.
 
@@ -514,7 +514,11 @@ results <- tidyr::expand_grid(
 ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
   ggplot2::geom_line(linewidth = 1) +
   ggplot2::labs(x = "M", y = "Error") +
-  ggplot2::coord_cartesian(xlim = c(1, max(results$M)), expand = FALSE)
+  ggplot2::coord_cartesian(
+    xlim = c(1, max(results$M)),
+    ylim = c(0, NA),
+    expand = FALSE
+  )
 ```
 
 ![Increasing number of compartments has diminishing returns on the

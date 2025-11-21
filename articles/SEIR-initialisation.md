@@ -400,7 +400,7 @@ incidence_data |>
     ) +
     ggplot2::facet_wrap(~ age_group) +
     ggplot2::theme_bw()
-#> Warning: Removed 68 rows containing missing values or values outside the scale range
+#> Warning: Removed 169 rows containing missing values or values outside the scale range
 #> (`geom_line()`).
 ```
 
