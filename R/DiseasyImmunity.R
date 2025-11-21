@@ -1071,7 +1071,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
             individual_level = individual_level,
             unify_initial_guess = unify_initial_guess,
           ) |>
-            purrr::pluck("execution_time")
+            purrr::pluck("execution_time") |>
+            as.numeric(unit = "secs")
 
         } else {
           execution_time_offset <- 0
@@ -1091,7 +1092,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "M" = M,
               "sqrt_integral" = purrr::pluck(metrics, "value"),
               "penalty" = purrr::pluck(metrics, "penalty"),
-              "execution_time" = Sys.time() - tic + execution_time_offset
+              "execution_time" = lubridate::as.period(Sys.time() - tic) + lubridate::seconds(execution_time_offset)
             )
           )
         )
