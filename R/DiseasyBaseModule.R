@@ -254,7 +254,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #   (`NULL`) if object is given\cr
     #   (`object`) if no object is given
     #' @import cachem
-    cache = function(hash, obj) {
+    cache = function(hash, obj, prefix = class(self)) {
+
+      hash <- glue::glue("{prefix}_{hash}")
+
       if (missing(obj)) {
 
         obj <- private$.cache$get(hash)
