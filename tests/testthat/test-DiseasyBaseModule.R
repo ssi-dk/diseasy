@@ -88,7 +88,7 @@ for (cache_id in seq_along(caches)) {
     )
 
     # Try to write to hash that exists
-    expect_error(
+    expect_warning(
       private$cache("mtcars", utils::head(mtcars, 5)),
       class = "simpleError",
       regex = "Hash already found in cache!"
