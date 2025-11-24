@@ -256,11 +256,13 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #' @import cachem
     cache = function(hash, obj, prefix = class(self)[[1]]) {
 
-      hash <- glue::glue("{prefix}_{hash}")
+      # Add prefix to hash name to form valid key
+      # (no upper-case letters allowed - replacing with dash and lowercase)
+      key <- glue::glue("{tolower(stringr::str_replace_all(prefix, '(?<=[a-z])([A-Z])', r'{-\\1}'))}_{hash}")
 
       if (missing(obj)) {
 
-        obj <- private$.cache$get(hash)
+        obj <- private$.cache$get(key)
         if (cachem::is.key_missing(obj)) {
           stop("Hash not found in cache!", call. = FALSE)
         }
@@ -268,10 +270,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
       } else {
 
-        if (private$.cache$exists(hash)) {
+        if (private$.cache$exists(key)) {
           pkgcond::pkg_warning("Hash already found in cache!")
         } else {
-          private$.cache$set(hash, obj)
+          private$.cache$set(key, obj)
         }
 
       }
