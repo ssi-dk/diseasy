@@ -244,12 +244,14 @@ DiseasyBaseModule <- R6::R6Class(                                               
     .cache = NULL,
 
     # @description
-    #   Retrieve or put results in the the cache
-    # @param hash (`character`)\cr
-    #   The hash corresponding to the result
+    #   Retrieve or put results in the the cache.
+    # @param hash (`character(1)`)\cr
+    #   The hash corresponding to the result.
     # @param obj (`object`)\cr
     #   If given, the data will be stored in the .cache list. \cr
-    #   If no object is given, the function returns the object located at the hash
+    #   If no object is given, the function returns the object located at the hash.
+    # @param prefix (`character(1)`)
+    #   A character string to prefix the created cache object with.
     # @return
     #   (`NULL`) if object is given\cr
     #   (`object`) if no object is given
@@ -280,13 +282,20 @@ DiseasyBaseModule <- R6::R6Class(                                               
     },
 
     # @description
-    #   Looks for the hash in the cache
-    # @param hash (`character`)\cr
-    #   The hash to search the cache for
+    #   Looks for the hash in the cache.
+    # @param hash (`character(1)`)\cr
+    #   The hash to search the cache for.
+    # @param prefix (`character(1)`)
+    #   A character string to prefix the created cache object with.
     # @return (`bool`)\cr
-    #   Boolean that indicates if the hash is found
-    is_cached = function(hash) {
-      return(private$.cache$exists(hash))
+    #   Boolean that indicates if the hash is found.
+    is_cached = function(hash, prefix = class(self)[[1]]) {
+
+      # Add prefix to hash name to form valid key
+      # (no upper-case letters allowed - replacing with dash and lowercase)
+      key <- glue::glue("{tolower(stringr::str_replace_all(prefix, '(?<=[a-z])([A-Z])', r'{-\\1}'))}_{hash}")
+
+      return(private$.cache$exists(key))
     },
 
     # @description
