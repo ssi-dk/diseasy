@@ -89,7 +89,7 @@ results
 
 ```{r, include = FALSE}
 # Aggregate results for optimiser across variations of the problem
-best_optim_results <- results |>
+marginal_results <- results |>
   dplyr::filter(.data$M <= 5) |>
   dplyr::summarise(
     "value" = sum(.data$value),
@@ -104,7 +104,7 @@ best_optim_results <- results |>
 
 
 # Adjust the labels
-best_optim_results <- best_optim_results |>
+marginal_results <- marginal_results |>
   dplyr::mutate(
     "target" = factor(
       .data$target,
@@ -197,8 +197,7 @@ add_footnote <- function(gt_table) {
 
 
 ```{r, echo = FALSE, results = "asis"}
-total_results <- best_optim_results |>
-  dplyr::filter(!(.data$target %in% c("Heaviside", "Linear"))) |>
+total_results <- marginal_results |>
   dplyr::summarise(
     "value" = sum(.data$value),
     "execution_time" = sum(.data$execution_time) / 60,
@@ -337,13 +336,13 @@ chosen_defaults <- tibble::tibble(
 ```
 
 
-```{r, echo = FALSE}
-visualise_methods <- function(total_results, method) {
-  gg_data <- total_results |>
+```{r gg_data, echo = FALSE}
+gg_data <- function(total_results, method, n = 5) {
+  total_results |>
     dplyr::slice_min(
       (.data$value - min(.data$value)) / median(.data$value) +
         (.data$execution_time - min(.data$execution_time)) / median(.data$execution_time),
-      n = 10,
+      n = n,
       with_ties = FALSE,
       by = c("penalty", "method")
     ) |>
@@ -355,42 +354,84 @@ visualise_methods <- function(total_results, method) {
       "default" = dplyr::if_else(!is.na(.data$default), "Yes", "No")
     ) |>
     dplyr::filter(.data$method == !!method) |>
-    tidyr::unite("optim_strategy", "strategy", "optim_method", sep = "-")
+    tidyr::unite("optim_strategy", "strategy", "optim_method", sep = " - ")
+}
+```
 
-  ggplot2::ggplot() +
-    ggplot2::geom_point(
-      data = gg_data,
-      mapping = ggplot2::aes(
-        x = .data$execution_time,
-        y = .data$value,
-        color = .data$optim_strategy,
-        shape = .data$default
-      ),
-      size = 4
-    ) +
+```{r palette, echo = FALSE}
+optimisers <- purrr::map(c("free_delta", "free_gamma", "all_free"), ~ gg_data(total_results, .)) |>
+  purrr::list_rbind() |>
+  dplyr::pull("optim_strategy") |>
+  unique()
+
+palette <- purrr::reduce(
+  purrr::map(
+    c("Dark2", "Set1", "Set2"),
+    ~ RColorBrewer::brewer.pal(8, .)
+  ),
+  c
+) |>
+  purrr::discard(~ . == "#FFFF33") |>
+  stats::setNames(optimisers)
+
+palette <- palette[!is.na(names(palette))]
+palette <- c(palette, "other" = "grey40")
+```
+
+```{r visualise_methods, echo = FALSE}
+visualise_methods <- function(total_results, method) {
+  best <- gg_data(total_results, method)
+  all <- gg_data(total_results, method, n = Inf)
+  focus <- all |>
+    dplyr::filter(
+      .data$execution_time <= max(best$execution_time),
+      .data$value <= max(best$value)
+    ) |>
+    dplyr::mutate(
+      "optim_strategy" = factor(
+        dplyr::if_else(
+          .data$optim_strategy %in% best$optim_strategy,
+          .data$optim_strategy,
+          "other"
+        ),
+        levels = names(palette)
+      )
+    )
+  
+  ggplot2::ggplot(
+    mapping = ggplot2::aes(
+      x = .data$execution_time, 
+      y = .data$value,
+      color = .data$optim_strategy,
+      shape = .data$default
+    )
+  ) +
     ggplot2::geom_hline(
-      data = dplyr::summarise(gg_data, "value" = min(.data$value), .by = "penalty"),
-      mapping = ggplot2::aes(yintercept = .data$value),
-      linetype = 2, color = "grey"
+      data = dplyr::summarise(all, "value" = min(.data$value), .by = "penalty"),
+      mapping = ggplot2::aes(yintercept = .data$value, linetype = "Smallest observed error"),
+      color = "black"
     ) +
+    ggplot2::geom_point(data = focus, size = 4) + 
     ggplot2::facet_wrap(
       ~ penalty,
-      labeller = ggplot2::labeller(.cols = ggplot2::label_both),
-      scales = "free"
+      labeller = ggplot2::labeller(.cols = ggplot2::label_both)
     ) +
     ggplot2::labs( 
       x = "Execution time (minutes)",
-      y = "Total error",
-      title = glue::glue("Best optimisers for {method}"),
-      color = "strategy-optim_method",
-      shape = "Chosen as default?"
+      y = "Total error (excluding penalties)",
+      title = glue::glue("Optimisation trade-off for method `{method}`"),
+      color = "Configuration",
+      shape = "Chosen as default?",
+      linetype = NULL
     ) +
     ggplot2::guides(
-      color = ggplot2::guide_legend(order  = 1, ncol = 2),
+      color = ggplot2::guide_legend(order = 1, ncol = 1),
       shape = ggplot2::guide_legend(order = 2)
     ) +
     ggplot2::theme(legend.text = ggplot2::element_text(size = 8)) +
-    ggplot2::scale_shape_manual(values = c("Yes" = 18, "No" = 20))
+    ggplot2::scale_color_manual(values = palette) +
+    ggplot2::scale_shape_manual(values = c("Yes" = 18, "No" = 20)) +
+    ggplot2::scale_linetype_manual(values = 2)
 }
 ```
 
@@ -442,7 +483,7 @@ We present the top 3 best optimiser/strategy combination for each method and pen
 
 ```{r, echo = FALSE, results = "asis"}
 # Formatting the results
-per_target_results <- best_optim_results |>
+per_target_results <- marginal_results |>
   dplyr::mutate(
     "value" = round(.data$value, 2)
   )
