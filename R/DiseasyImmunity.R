@@ -460,7 +460,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Set default optimisation controls
       default_optim_controls <- list(
         "free_delta" = list("optim_method" = "ucminf"),
-        "free_gamma" = list("optim_method" = ifelse(monotonous || individual_level, "hjkb", "subplex")),
+        "free_gamma" = list("optim_method" = "ucminf"),
         "all_free"   = list("optim_method" = "ucminf")
       )
 
@@ -470,7 +470,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default strategy
       default_optim_strategy <- list(
-        "free_delta" = "recursive",
+        "free_delta" = "naive",
         "free_gamma" = "naive",
         "all_free"   = "naive"
       )
