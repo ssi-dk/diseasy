@@ -53,9 +53,7 @@ These targets are:
 | ------------------- | ---------------------------------------------------------------------------------------------- |
 | Exponential         | $\exp\left(-t / \tau\right)$                                                                   |
 | Sigmoidal           | $\exp\left(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6)\right)$                       |
-| Heaviside           | $\Theta(\tau - t)$                                                                             |
 | Sum of exponentials | $\frac{1}{3}\left(\exp(-t / \tau) + \exp(-2t / \tau) + \exp(-3t / \tau)\right)$                |
-| Linear              | $\sup\left(\{1 - t/\tau, 0\}\right)$                                                           |
 
 We then construct more target functions from this family of functions:
 
@@ -128,9 +126,6 @@ Here we present the top 5 "best" optimiser/strategy combination for each method 
 To define what it means to be the "best" we simply take the total integral difference between the approximation
 and the target function across all target functions and problem sizes ($M$).
 
-Note that we currently filter out the results from the Heaviside and linear targets, which seem to be especially
-difficult for the optimisers to handle (see the [Per target results](#per-target-results) section below).
-
 In addition, we only consider problems up to size $M = 5$ for the general results.
 
 ```{r helper functions for gt, include = FALSE}
@@ -185,10 +180,10 @@ add_footnote <- function(gt_table) {
     caption <- c(caption, "auglag_lbfgs: auglag with LBFGS as local solver.")
   }
   if ("auglag_slsqp" %in% optimisers) {
-    caption <- c(caption, "auglag_lbfgs: auglag with SLSQP as local solver.")
+    caption <- c(caption, "auglag_slsqp: auglag with SLSQP as local solver.")
   }
   if ("auglag_mma" %in% optimisers) {
-    caption <- c(caption, "auglag_lbfgs: auglag with MMA as local solver.")
+    caption <- c(caption, "auglag_mma: auglag with MMA as local solver.")
   }
   if ("sbplx_10000" %in% optimisers) {
     caption <- c(caption, "sbplx_10000: sbplx with `maxeval = 10000`.")
@@ -206,16 +201,16 @@ total_results <- best_optim_results |>
   dplyr::filter(!(.data$target %in% c("Heaviside", "Linear"))) |>
   dplyr::summarise(
     "value" = sum(.data$value),
-    "execution_time" = sum(.data$execution_time) / 3600,
+    "execution_time" = sum(.data$execution_time) / 60,
     "n_targets" = sum(.data$n_targets),
     .by = c("penalty", "method", "strategy", "optim_method")
-  ) |>
-  dplyr::mutate(
-    "value" = round(.data$value, 2)
   ) |>
   dplyr::slice_max(.data$n_targets, by = c("penalty", "method"))
 
 total_results |>
+  dplyr::mutate(
+    "value" = round(.data$value, 2)
+  ) |>
   dplyr::slice_min(
     .data$value,
     n = 5,
@@ -292,7 +287,7 @@ total_results |>
     )
   ) |>
   gt::tab_caption(
-    "Table 1: Global results (excluding heaviside and linear targets)"
+    "Table 1: Global results"
   ) |>
   bold_min_value() |>
   add_footnote()
@@ -322,12 +317,12 @@ chosen_defaults <- tibble::tibble(
   tibble::add_row(
     "method" = "free_gamma", "penalty" = "no",
     "strategy" = "naive",
-    "optim_method" = "subplex"
+    "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
     "method" = "free_gamma", "penalty" = "yes",
     "strategy" = "naive",
-    "optim_method" = "hjkb"
+    "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
     "method" = "all_free", "penalty" = "no",
@@ -343,22 +338,11 @@ chosen_defaults <- tibble::tibble(
 
 
 ```{r, echo = FALSE}
-total_results <- total_results |>
-  dplyr::summarise(
-    "min_value" = min(.data$value, na.rm = TRUE),
-    "min_execution_time" = min(.data$execution_time, na.rm = TRUE),
-    .by = c("penalty", "method")
-  ) |>
-  dplyr::left_join(
-    total_results,
-    by = c("penalty", "method")
-  )
-
 visualise_methods <- function(total_results, method) {
   gg_data <- total_results |>
     dplyr::slice_min(
-      .data$value - .data$min_value +
-        .data$execution_time - .data$min_execution_time,
+      (.data$value - min(.data$value)) / median(.data$value) +
+        (.data$execution_time - min(.data$execution_time)) / median(.data$execution_time),
       n = 10,
       with_ties = FALSE,
       by = c("penalty", "method")
@@ -372,18 +356,6 @@ visualise_methods <- function(total_results, method) {
     ) |>
     dplyr::filter(.data$method == !!method) |>
     tidyr::unite("optim_strategy", "strategy", "optim_method", sep = "-")
-
-  palette <- purrr::reduce(
-    purrr::map(
-      c("Dark2", "Set1", "Set2"),
-      ~ RColorBrewer::brewer.pal(8, .)
-    ),
-    c
-  ) |>
-    stats::setNames(unique(gg_data$optim_strategy))
-
-  # discard_at with is.na directly fails for whatever reason, so we need to do this
-  palette <- purrr::discard_at(palette, is.na(names(palette)))
 
   ggplot2::ggplot() +
     ggplot2::geom_point(
@@ -406,8 +378,8 @@ visualise_methods <- function(total_results, method) {
       labeller = ggplot2::labeller(.cols = ggplot2::label_both),
       scales = "free"
     ) +
-    ggplot2::labs(
-      x = "Execution time (hours)",
+    ggplot2::labs( 
+      x = "Execution time (minutes)",
       y = "Total error",
       title = glue::glue("Best optimisers for {method}"),
       color = "strategy-optim_method",
@@ -418,9 +390,7 @@ visualise_methods <- function(total_results, method) {
       shape = ggplot2::guide_legend(order = 2)
     ) +
     ggplot2::theme(legend.text = ggplot2::element_text(size = 8)) +
-    ggplot2::scale_color_manual(values = palette) +
-    ggplot2::scale_shape_manual(values = c("Yes" = 18, "No" = 20)) +
-    ggplot2::scale_x_log10()
+    ggplot2::scale_shape_manual(values = c("Yes" = 18, "No" = 20))
 }
 ```
 
