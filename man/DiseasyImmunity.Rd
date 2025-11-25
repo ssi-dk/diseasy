@@ -314,7 +314,6 @@ best matches the waning immunity curves set in the module.
   monotonous = TRUE,
   individual_level = TRUE,
   optim_control = NULL,
-  unify_initial_guess = TRUE,
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -371,8 +370,6 @@ If \code{optim_method} matches any of the methods in \code{optimx::optimr}:
 \itemize{
 \item Additional \code{optim_control} arguments passed as \code{control} to \code{stats::optimr} using the chosen \code{method}.
 }}
-
-\item{\code{unify_initial_guess}}{New method?}
 
 \item{\code{...}}{Additional arguments to be passed to the optimiser.}
 }

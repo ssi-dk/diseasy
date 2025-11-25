@@ -400,7 +400,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   If `optim_method` matches any of the methods in `optimx::optimr`:
     #'   - Additional `optim_control` arguments passed as `control` to `stats::optimr` using the chosen `method`.
-    #' @param unify_initial_guess New method?
     #' @param ...
     #'   Additional arguments to be passed to the optimiser.
     #' @return
@@ -416,7 +415,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
       monotonous = TRUE,
       individual_level = TRUE,
       optim_control = NULL,
-      unify_initial_guess = TRUE,
       ...
     ) {
 
@@ -677,7 +675,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
-                unify_initial_guess = unify_initial_guess,
                 ...
               ) |>
                 purrr::pluck("delta")
@@ -692,51 +689,38 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 delta_0 <- c(delta_0, delta_0) * 2
               } else {
 
-                if (unify_initial_guess) {
-                  # To perform the interpolation as fairly as possible, we need
-                  # to consider the temporal evolution from compartment to
-                  # compartment.
-                  # The average process of going through the compartments in
-                  # sequence means that first you spend 1/delta_1 time in
-                  # compartment 1 then 1/delta_2 time in compartment 2 etc.
-                  # This creates a "staircase" like-discrete function for the
-                  # gamma that you experience as you move through the
-                  # compartments.
-                  # To interpolate, we assign the middle time in each
-                  # compartment with the associated gamma value and map to the
-                  # new set of middle times and then compute back to the
-                  # corresponding deltas.
-                  # The last compartment is absorbing, so there is no meaningful
-                  # middle time to assign. Here we use the last difference and
-                  # add to get the middle time for this compartment.
+                # To perform the interpolation as fairly as possible, we need
+                # to consider the temporal evolution from compartment to
+                # compartment.
+                # The average process of going through the compartments in
+                # sequence means that first you spend 1/delta_1 time in
+                # compartment 1 then 1/delta_2 time in compartment 2 etc.
+                # This creates a "staircase" like-discrete function for the
+                # gamma that you experience as you move through the
+                # compartments.
+                # To interpolate, we assign the middle time in each
+                # compartment with the associated gamma value and map to the
+                # new set of middle times and then compute back to the
+                # corresponding deltas.
+                # The last compartment is absorbing, so there is no meaningful
+                # middle time to assign. Here we use the last difference and
+                # add to get the middle time for this compartment.
 
-                  # Time to enter each compartment (M - 1 solution)
-                  t <- c(0, cumsum(1 / delta_0))
+                # Time to enter each compartment (M - 1 solution)
+                t <- c(0, cumsum(1 / delta_0))
 
-                  # Time to enter each compartment (M solution)
-                  t_prime <- approx(
-                    # Progress along compartments (M - 1 solution)
-                    x = seq(0, 1, length.out = M - 1),
-                    y = t,
-                    # Progress along compartments (M solution)
-                    xout = seq(0, 1, length.out = M)
-                  ) |>
-                    purrr::pluck("y")
+                # Time to enter each compartment (M solution)
+                t_prime <- approx(
+                  # Progress along compartments (M - 1 solution)
+                  x = seq(0, 1, length.out = M - 1),
+                  y = t,
+                  # Progress along compartments (M solution)
+                  xout = seq(0, 1, length.out = M)
+                ) |>
+                  purrr::pluck("y")
 
-                  # And convert back to transition rates
-                  delta_0 <- 1 / diff(t_prime)
-
-                } else {  # Interpolate the time spent in each compartment
-                  t <- approx(
-                    x = seq(0, 1, length.out = M - 2), # Progress along compartments (M - 1 solution)
-                    y = cumsum(1 / delta_0), # Time to reach compartments (M - 1 solution)
-                    xout = seq(0, 1, length.out = M - 1) # Progress along compartments (M solution)
-                  ) |>
-                    purrr::pluck("y") # Time to reach compartments (M solution)
-
-                  # Convert to rates
-                  delta_0 <- c(delta_0[[1]], 1 / diff(t))
-                }
+                # And convert back to transition rates
+                delta_0 <- 1 / diff(t_prime)
               }
             }
 
@@ -762,7 +746,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
-                unify_initial_guess = unify_initial_guess,
                 ...
               ) |>
                 purrr::pluck("delta") |>
@@ -776,39 +759,27 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
-                unify_initial_guess = unify_initial_guess,
                 ...
               ) |>
                 purrr::pluck("gamma")
 
-              if (unify_initial_guess) {
-                # See code comments above for "free_delta" and the "recursive"
-                # strategy for more details on this extrapolation
+              # See code comments above for "free_delta" and the "recursive"
+              # strategy for more details on this extrapolation
 
-                # Time to enter each compartment (M - 1 solution)
-                t <- c(0, cumsum(1 / rep(delta_0, M - 2)))
+              # Time to enter each compartment (M - 1 solution)
+              t <- c(0, cumsum(1 / rep(delta_0, M - 2)))
 
-                # Adjust for the increase in the number of compartments
-                delta_0 <- delta_0 * (M - 1) / (M - 2)
+              # Adjust for the increase in the number of compartments
+              delta_0 <- delta_0 * (M - 1) / (M - 2)
 
-                # Time to enter each compartment (M solution)
-                t_prime <- c(0, cumsum(1 / rep(delta_0, M - 1)))
+              # Time to enter each compartment (M solution)
+              t_prime <- c(0, cumsum(1 / rep(delta_0, M - 1)))
 
-                # Linear interpolation
-                gamma_0 <- gamma_0 |>
-                  purrr::map(~ approx(x = t, y = .x, xout = t_prime)$y) |>
-                  purrr::map(~ utils::head(., -1)) |>
-                  purrr::reduce(c)
-
-              } else {
-                # Adjust for the increase in the number of compartments
-                delta_0 <- delta_0 * (M - 1) / (M - 2)
-
-                # Repeat the last gamma level from the M-1 solution to form the M initial guess
-                gamma_0 <- gamma_0 |>
-                  purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
-                  purrr::reduce(c)
-              }
+              # Linear interpolation
+              gamma_0 <- gamma_0 |>
+                purrr::map(~ approx(x = t, y = .x, xout = t_prime)$y) |>
+                purrr::map(~ utils::head(., -1)) |>
+                purrr::reduce(c)
             }
 
           } else if (method == "all_free") {
@@ -834,7 +805,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
-                unify_initial_guess = unify_initial_guess,
                 ...
               ) |>
                 purrr::pluck("delta")
@@ -847,7 +817,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
-                unify_initial_guess = unify_initial_guess,
                 ...
               ) |>
                 purrr::pluck("gamma")
@@ -863,7 +832,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 delta_0 <- c(delta_0, delta_0) * 2
 
-              } else if (unify_initial_guess) {
+              } else {
 
                 # See code comments above for "free_delta" and "free_gamma" and the "recursive"
                 # strategy for more details on this interpolation
@@ -889,27 +858,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   purrr::map(~ approx(x = t, y = .x, xout = t_prime)$y) |>
                   purrr::map(~ utils::head(., -1)) |>
                   purrr::reduce(c)
-
-              } else {
-                # Create a mapping from time (cumsum(1 / delta)) to gamma
-                gammas_from_delta <- purrr::map(gamma_0, ~ approxfun(cumsum(1 / delta_0), head(.x, -1), rule = 2))
-
-                # Interpolate the time spent in each compartment
-                t <- approx(
-                  x = seq(0, 1, length.out = M - 2), # Progress along compartments (M - 1 solution)
-                  y = cumsum(1 / delta_0), # Time to reach compartments (M - 1 solution)
-                  xout = seq(0, 1, length.out = M - 1) # Progress along compartments (M solution)
-                ) |>
-                  purrr::pluck("y") # Time to reach compartments (M solution)
-
-                # Convert to rates
-                delta_0 <- c(delta_0[[1]], 1 / diff(t))
-
-                # Now, with delta computed, we must use the mapping that was created for M > 3 to get the gamma values
-                if (M > 3) {
-                  gamma_0 <- purrr::map(gammas_from_delta, ~ .x(cumsum(1 / delta_0))) |>
-                    purrr::reduce(c)
-                }
               }
 
             } else if (strategy == "combination") {
@@ -919,8 +867,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 method = "free_gamma",
                 M = M,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
-                individual_level = individual_level,
-                unify_initial_guess = unify_initial_guess,
+                individual_level = individual_level
               ) |>
                 purrr::pluck("delta") |>
                 utils::head(1) |>
@@ -931,8 +878,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 method = "free_gamma",
                 M = M,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
-                individual_level = individual_level,
-                unify_initial_guess = unify_initial_guess,
+                individual_level = individual_level
               ) |>
                 purrr::pluck("gamma") |>
                 purrr::map(~ utils::head(., M - 1)) |> # Drop last value since it is fixed in the method
@@ -1056,7 +1002,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 monotonous = monotonous,
                 individual_level = individual_level,
                 optim_control = optim_control,
-                unify_initial_guess = unify_initial_guess,
                 ...
               ) |>
                 purrr::pluck("execution_time") |>
@@ -1070,8 +1015,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             method = "free_gamma",
             M = M,                                                                                                      # nolint: object_name_linter
             monotonous = monotonous,
-            individual_level = individual_level,
-            unify_initial_guess = unify_initial_guess,
+            individual_level = individual_level
           ) |>
             purrr::pluck("execution_time") |>
             as.numeric(unit = "secs")
