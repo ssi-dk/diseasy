@@ -359,8 +359,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   | method      | penalty  | strategy    | optimiser |
     #'   |-------------|----------|-------------|-----------|
     #'   | free_delta  | No/Yes   | naive       | ucminf    |
-    #'   | free_gamma  | No       | naive       | subplex   |
-    #'   | free_gamma  | Yes      | naive       | hjkb      |
+    #'   | free_gamma  | No/Yes   | naive       | ucminf    |
     #'   | all_free    | No/Yes   | naive       | ucminf    |
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
