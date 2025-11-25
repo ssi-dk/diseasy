@@ -698,13 +698,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 # This creates a "staircase" like-discrete function for the
                 # gamma that you experience as you move through the
                 # compartments.
-                # To interpolate, we assign the middle time in each
-                # compartment with the associated gamma value and map to the
-                # new set of middle times and then compute back to the
-                # corresponding deltas.
-                # The last compartment is absorbing, so there is no meaningful
-                # middle time to assign. Here we use the last difference and
-                # add to get the middle time for this compartment.
 
                 # Time to enter each compartment (M - 1 solution)
                 t <- c(0, cumsum(1 / delta_0))
