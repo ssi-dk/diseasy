@@ -997,12 +997,22 @@ DiseasyImmunity <- R6::R6Class(                                                 
         } else if (strategy == "combination") {
 
           execution_time_offset <- self$approximate_compartmental(
+            method = "free_delta",
+            M = M,                                                                                                      # nolint: object_name_linter
+            monotonous = monotonous,
+            individual_level = individual_level
+          ) |>
+            purrr::pluck("execution_time") |>
+            as.numeric(unit = "secs")
+
+          execution_time_offset <- execution_time_offset + self$approximate_compartmental(
             method = "free_gamma",
             M = M,                                                                                                      # nolint: object_name_linter
             monotonous = monotonous,
             individual_level = individual_level
           ) |>
-            purrr::pluck("execution_time")
+            purrr::pluck("execution_time") |>
+            as.numeric(unit = "secs")
 
         } else {
           execution_time_offset <- 0
