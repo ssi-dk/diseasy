@@ -335,10 +335,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'      Risks are initially set as linearly distributed values between f(0) and f(infinity).
     #'
     #'   - "recursive":
-    #'      Initial transition rates and risks are linearly interpolated from the $M - 1$ solution.
+    #'      Initial transition rates and risks are linearly extra- and  interpolated from the $M - 1$ solution.
     #'
     #'   - "combination" (only for "all_free" method):
-    #'      Initial transition rates and risks are set from the "free_gamma" solution for $M$.
+    #'      Initial transition rates and risks are uses the solutions from the "free_delta" and "free_gamma" strategy
+    #'      respectively for $M$.
     #'
     #'   The optimisation minimises the square root of the squared differences between the target waning and the
     #'   approximated waning (analogous to the 2-norm). Additional penalties can be added to the objective function
@@ -848,18 +849,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             } else if (strategy == "combination") {
 
-              # Use free_gamma solution as starting point
+              # Use free_delta solution as starting point for delta
               delta_0 <- self$approximate_compartmental(
-                method = "free_gamma",
+                method = "free_delta",
                 M = M,                                                                                                  # nolint: object_name_linter
                 monotonous = monotonous,
                 individual_level = individual_level
               ) |>
-                purrr::pluck("delta") |>
-                utils::head(1) |>
-                rep(M - 1)
+                purrr::pluck("delta")
 
-              # Use free_gamma solution as starting point
+              # Use free_gamma solution as starting point for gamma
               gamma_0 <- self$approximate_compartmental(
                 method = "free_gamma",
                 M = M,                                                                                                  # nolint: object_name_linter

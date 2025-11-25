@@ -396,9 +396,10 @@ These strategies modify the initial guess for the transition rates and risks:
 Transitions rates are initially set as the reciprocal of the median time scale.
 Risks are initially set as linearly distributed values between f(0) and f(infinity).
 \item "recursive":
-Initial transition rates and risks are linearly interpolated from the $M - 1$ solution.
+Initial transition rates and risks are linearly extra- and  interpolated from the $M - 1$ solution.
 \item "combination" (only for "all_free" method):
-Initial transition rates and risks are set from the "free_gamma" solution for $M$.
+Initial transition rates and risks are uses the solutions from the "free_delta" and "free_gamma" strategy
+respectively for $M$.
 }
 
 The optimisation minimises the square root of the squared differences between the target waning and the
