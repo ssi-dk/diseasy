@@ -815,15 +815,17 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 purrr::pluck("gamma")
 
 
-              # Interpolate gamma from M - 1 to M
+              # Interpolate delta and gamma from M - 1 to M
               if (M == 3) {
+                # As in the "free_delta" method, we need to manually interpolate M = 3
+                # by "splitting the difference"
+                delta_0 <- c(delta_0, delta_0) * 2
 
-                # For M == 3 we cannot use approx so we manually interpolate
+                # For gamma, the M - 1 solution is: gamma_1, gamma_2 = f(infinity)
+                # We use as initial guess: gamma_1, mean(gamma_1, gamma_2), gamma_3 = f(infinity)
                 gamma_0 <- gamma_0 |>
                   purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
                   purrr::reduce(c)
-
-                delta_0 <- c(delta_0, delta_0) * 2
 
               } else {
 
