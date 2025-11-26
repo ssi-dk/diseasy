@@ -129,7 +129,7 @@ the following code.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 1</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55a2c0dae9f0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5556cf426230&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "no_waning"</span></span></code></pre></div>
 <p>This returns a <code>named list()</code> where the named target are
@@ -165,7 +165,7 @@ parameter.</li>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55a2c24c86a0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5556d0b3fa40&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -210,7 +210,7 @@ identification. Default is “custom_waning”.</li>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55a2c32844f8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5556d18ffbb8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -248,8 +248,8 @@ additional arguments.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55a2c4688468&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55a2c418f738&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5556d2d05eb8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5556d2809428&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -267,7 +267,7 @@ additional arguments.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55a2c4e26158&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5556d34a1d58&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -291,7 +291,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55a2c418f738&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5556d2809428&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -302,7 +302,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55a2c4e26158&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5556d34a1d58&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -458,12 +458,13 @@ hospitalisation targets defined earlier, which will be approximated.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">approximate_compartmental</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"free_gamma"</span>, M <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $par</span></span>
-<span><span class="co">#&gt; [1]  0.9825630  0.3443419 -1.5147314 37.8180675 39.4978985 38.8664686 -1.5891168</span></span>
+<span><span class="co">#&gt; [1]   0.8668365   0.8329360 -50.6183234  32.9310321  32.9109082   2.5332243</span></span>
+<span><span class="co">#&gt; [7]  -1.6389635</span></span>
 <span><span class="co">#&gt; attr(,"status")</span></span>
 <span><span class="co">#&gt; [1] " " " " " " " " " " " " " "</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 0.2235232</span></span>
+<span><span class="co">#&gt; [1] 0.2783246</span></span>
 <span><span class="co">#&gt; attr(,"fname")</span></span>
 <span><span class="co">#&gt; function(p) sum(obj_function(p))</span></span>
 <span><span class="co">#&gt; attr(,"method")</span></span>
@@ -478,21 +479,21 @@ hospitalisation targets defined earlier, which will be approximated.</p>
 <span><span class="co">#&gt; [1] 19</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $counts</span></span>
-<span><span class="co">#&gt; [1] 1826   NA</span></span>
+<span><span class="co">#&gt; [1] 3898   NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $scounts</span></span>
-<span><span class="co">#&gt; [1] 1826    0    0</span></span>
+<span><span class="co">#&gt; [1] 3898    0    0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $gamma</span></span>
 <span><span class="co">#&gt; $gamma$infection</span></span>
-<span><span class="co">#&gt; [1] 0.7276165 0.5852448 0.1802387 0.0000000</span></span>
+<span><span class="co">#&gt; [1] 7.040870e-01 6.969754e-01 1.039301e-22 0.000000e+00</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $gamma$hospitalisation</span></span>
-<span><span class="co">#&gt; [1] 1.0 1.0 1.0 0.2</span></span>
+<span><span class="co">#&gt; [1] 1.0000000 1.0000000 0.9264384 0.2000000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $delta</span></span>
-<span><span class="co">#&gt; [1] 0.1857372 0.1857372 0.1857372</span></span>
+<span><span class="co">#&gt; [1] 0.1774608 0.1774608 0.1774608</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $method</span></span>
 <span><span class="co">#&gt; [1] "free_gamma"</span></span>
@@ -504,13 +505,13 @@ hospitalisation targets defined earlier, which will be approximated.</p>
 <span><span class="co">#&gt; [1] 4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $error</span></span>
-<span><span class="co">#&gt; [1] 0.1422456</span></span>
+<span><span class="co">#&gt; [1] 0.1434377</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $penalty</span></span>
-<span><span class="co">#&gt; [1] 0.08127763</span></span>
+<span><span class="co">#&gt; [1] 0.1348869</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $execution_time</span></span>
-<span><span class="co">#&gt; Time difference of 5.237234 mins</span></span>
+<span><span class="co">#&gt; Time difference of 9.679828 mins</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"maximize")</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
