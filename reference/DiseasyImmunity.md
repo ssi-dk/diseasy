@@ -517,7 +517,10 @@ default optimiser to determine the starting point.
 #### Returns
 
 Returns the results from the optimisation with the approximated rates
-and execution time.
+and execution time. The output of the objective function is given as the
+"error" (the square-root of the integral of the squared difference
+between approximation and target) and the "penalty" (the penalty
+controllable by `monotonous` and `individual_level`).
 
 ------------------------------------------------------------------------
 
@@ -588,7 +591,7 @@ The objects of this class are cloneable with this method.
 #> $infection
 #> function (t) 
 #> exp(-t/time_scale)
-#> <environment: 0x5585ed0e45e8>
+#> <environment: 0x5620ebf2b818>
 #> attr(,"name")
 #> [1] "exponential_waning"
 #> attr(,"dots")
@@ -600,7 +603,7 @@ The objects of this class are cloneable with this method.
 #> $infection
 #> function (t) 
 #> exp(-t/time_scale)
-#> <environment: 0x5585ed0e45e8>
+#> <environment: 0x5620ebf2b818>
 #> attr(,"name")
 #> [1] "exponential_waning"
 #> attr(,"dots")
