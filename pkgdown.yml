@@ -16,7 +16,7 @@ articles:
   articles/SEIR-implementation: SEIR-implementation.html
   articles/SEIR-initialisation: SEIR-initialisation.html
   articles/SEIR-malthusian-matching: SEIR-malthusian-matching.html
-last_built: 2025-11-26T09:57Z
+last_built: 2025-11-26T11:23Z
 urls:
   reference: https://ssi-dk.github.io/diseasy/reference
   article: https://ssi-dk.github.io/diseasy/articles
