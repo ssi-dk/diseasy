@@ -398,7 +398,7 @@
         "RemoteRef": "bridgesampling",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.1-2"
+        "RemoteSha": "1.2-1"
       },
       "needscompilation": false,
       "package": "bridgesampling",
@@ -409,9 +409,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/bridgesampling_1.1-2.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/bridgesampling_1.1-2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/bridgesampling_1.2-1.tar.gz",
       "type": "standard",
-      "version": "1.1-2",
+      "version": "1.2-1",
       "vignettes": false
     },
     {
@@ -1262,7 +1262,7 @@
         "RemoteRef": "downlit",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.4.4"
+        "RemoteSha": "0.4.5"
       },
       "needscompilation": false,
       "package": "downlit",
@@ -1273,9 +1273,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/downlit_0.4.4.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/downlit_0.4.4.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/downlit_0.4.5.tar.gz",
       "type": "standard",
-      "version": "0.4.4",
+      "version": "0.4.5",
       "vignettes": false
     },
     {
@@ -1324,7 +1324,7 @@
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.4.1"
+        "RemoteSha": "1.4.2"
       },
       "needscompilation": false,
       "package": "duckdb",
@@ -1342,9 +1342,9 @@
           "post_install": {}
         }
       ],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/duckdb_1.4.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/duckdb_1.4.2.tar.gz",
       "type": "standard",
-      "version": "1.4.1",
+      "version": "1.4.2",
       "vignettes": false
     },
     {
@@ -1455,7 +1455,7 @@
         "RemoteRef": "fansi",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.0.6"
+        "RemoteSha": "1.0.7"
       },
       "needscompilation": false,
       "package": "fansi",
@@ -1466,9 +1466,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/fansi_1.0.6.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/fansi_1.0.6.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/fansi_1.0.7.tar.gz",
       "type": "standard",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "vignettes": false
     },
     {
@@ -1617,7 +1617,7 @@
         "RemoteRef": "future",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.67.0"
+        "RemoteSha": "1.68.0"
       },
       "needscompilation": false,
       "package": "future",
@@ -1628,9 +1628,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/future_1.67.0.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/future_1.67.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/future_1.68.0.tar.gz",
       "type": "standard",
-      "version": "1.67.0",
+      "version": "1.68.0",
       "vignettes": false
     },
     {
@@ -1710,7 +1710,7 @@
         "RemoteRef": "gert",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "2.1.5"
+        "RemoteSha": "2.2.0"
       },
       "needscompilation": false,
       "package": "gert",
@@ -1728,9 +1728,9 @@
           "post_install": {}
         }
       ],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/gert_2.1.5.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/gert_2.2.0.tar.gz",
       "type": "standard",
-      "version": "2.1.5",
+      "version": "2.2.0",
       "vignettes": false
     },
     {
@@ -1748,7 +1748,7 @@
         "RemoteRef": "ggplot2",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "4.0.0"
+        "RemoteSha": "4.0.1"
       },
       "needscompilation": false,
       "package": "ggplot2",
@@ -1759,9 +1759,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/ggplot2_4.0.0.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/ggplot2_4.0.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/ggplot2_4.0.1.tar.gz",
       "type": "standard",
-      "version": "4.0.0",
+      "version": "4.0.1",
       "vignettes": false
     },
     {
@@ -4374,7 +4374,7 @@
         "RemoteRef": "readr",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "2.1.5"
+        "RemoteSha": "2.1.6"
       },
       "needscompilation": false,
       "package": "readr",
@@ -4385,9 +4385,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/readr_2.1.5.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/readr_2.1.5.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/readr_2.1.6.tar.gz",
       "type": "standard",
-      "version": "2.1.5",
+      "version": "2.1.6",
       "vignettes": false
     },
     {
@@ -4811,7 +4811,7 @@
         "RemoteRef": "S7",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.2.0"
+        "RemoteSha": "0.2.1"
       },
       "needscompilation": false,
       "package": "S7",
@@ -4822,9 +4822,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/S7_0.2.0.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/S7_0.2.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/S7_0.2.1.tar.gz",
       "type": "standard",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "vignettes": false
     },
     {
@@ -5305,7 +5305,7 @@
       "ref": "testthat",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "dependencies": ["brio", "callr", "cli", "desc", "digest", "evaluate", "jsonlite", "lifecycle", "magrittr", "pkgload", "praise", "processx", "ps", "R6", "rlang", "waldo", "withr"],
+      "dependencies": ["brio", "callr", "cli", "desc", "evaluate", "jsonlite", "lifecycle", "magrittr", "pkgload", "praise", "processx", "ps", "R6", "rlang", "waldo", "withr"],
       "direct": false,
       "directpkg": false,
       "install_args": "",
@@ -5316,7 +5316,7 @@
         "RemoteRef": "testthat",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "3.2.3"
+        "RemoteSha": "3.3.0"
       },
       "needscompilation": false,
       "package": "testthat",
@@ -5327,9 +5327,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/testthat_3.2.3.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/testthat_3.2.3.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/testthat_3.3.0.tar.gz",
       "type": "standard",
-      "version": "3.2.3",
+      "version": "3.3.0",
       "vignettes": false
     },
     {
@@ -5521,7 +5521,7 @@
         "RemoteRef": "tinytex",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.57"
+        "RemoteSha": "0.58"
       },
       "needscompilation": false,
       "package": "tinytex",
@@ -5532,9 +5532,9 @@
       "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/tinytex_0.57.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/tinytex_0.57.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/tinytex_0.58.tar.gz",
       "type": "standard",
-      "version": "0.57",
+      "version": "0.58",
       "vignettes": false
     },
     {
@@ -5962,7 +5962,7 @@
         "RemoteRef": "xml2",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.4.1"
+        "RemoteSha": "1.5.0"
       },
       "needscompilation": false,
       "package": "xml2",
@@ -5980,9 +5980,9 @@
           "post_install": {}
         }
       ],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.4.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.5.0.tar.gz",
       "type": "standard",
-      "version": "1.4.1",
+      "version": "1.5.0",
       "vignettes": false
     },
     {
