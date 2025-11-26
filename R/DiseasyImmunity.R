@@ -879,6 +879,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 purrr::map(~ utils::head(., M - 1)) |> # Drop last value since it is fixed in the method
                 purrr::reduce(c)
             }
+
+            if (M == 3) {
+              # We have observed an edge-case where the optimiser gets stuck in
+              # a local minima which we can break by introducing slight variation
+              # in the transition rates
+              delta_0 <- delta_0 * c(0.99, 1.01)
+            }
           }
 
           # Inverse mapping of parameters to optimiser space
