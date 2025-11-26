@@ -621,7 +621,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
       M = 3,
       method = "free_gamma",
       strategy = "recursive",
-      optim_control = list("optim_method" = "spg", "ftol" = 1e-2)
+      optim_control = list("optim_method" = "neldermead", "xtol_rel" = 1e-2)
     )
   )
 
