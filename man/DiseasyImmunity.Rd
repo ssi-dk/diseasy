@@ -311,8 +311,8 @@ best matches the waning immunity curves set in the module.
   M,
   method = c("free_gamma", "free_delta", "all_free"),
   strategy = NULL,
-  monotonous = TRUE,
-  individual_level = TRUE,
+  monotonous = FALSE,
+  individual_level = FALSE,
   optim_control = NULL,
   ...
 )}\if{html}{\out{</div>}}

@@ -412,8 +412,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       M,                                                                                                                # nolint: object_name_linter
       method = c("free_gamma", "free_delta", "all_free"),
       strategy = NULL,
-      monotonous = TRUE,
-      individual_level = TRUE,
+      monotonous = FALSE,
+      individual_level = FALSE,
       optim_control = NULL,
       ...
     ) {
