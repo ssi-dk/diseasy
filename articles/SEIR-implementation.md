@@ -514,9 +514,9 @@ microbenchmark::microbenchmark( # Microseconds
   check = "equal", times = 1000L
 )
 #> Unit: microseconds
-#>                expr    min      lq      mean median      uq      max neval
-#>      purrr::map_dbl 24.877 27.1610 28.946705 28.153 29.2895  104.465  1000
-#>              sapply 12.603 13.1840 14.150009 13.545 14.4070   30.266  1000
-#>  sapply - USE.NAMES 12.704 13.2240 15.890892 13.605 14.4470 1711.326  1000
-#>              vapply  4.859  5.3345  5.661156  5.570  5.7710   18.685  1000
+#>                expr    min      lq      mean  median      uq      max neval
+#>      purrr::map_dbl 24.936 27.2005 29.008598 28.2225 29.2450  110.356  1000
+#>              sapply 12.503 13.0640 13.983537 13.4900 14.3470   46.737  1000
+#>  sapply - USE.NAMES 12.453 13.0650 16.240392 13.4560 14.3365 2308.523  1000
+#>              vapply  4.789  5.2300  5.612371  5.4900  5.7310   26.240  1000
 ```

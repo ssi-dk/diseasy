@@ -98,7 +98,7 @@ to get a quick overview of the ensemble.
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG1 (hash: 64862), DiseasyModelG1 (hash: 4ba21), DiseasyModelG1 (hash: 1b01c)
+#> DiseasyEnsemble: DiseasyModelG1 (hash: 8674b), DiseasyModelG1 (hash: 8bd3b), DiseasyModelG1 (hash: 01eb1)
 ```
 
 ``` r
@@ -119,12 +119,12 @@ predict(ensemble, observable = "n_positive", prediction_length = 30) |>
 #> # A tibble: 6 × 5
 #>   date       n_positive realisation_id weight model                           
 #>   <date>          <dbl> <chr>           <dbl> <chr>                           
-#> 1 2020-04-12     30717. 1                   1 6486213cac6b5f5a232d05af16fba9d3
-#> 2 2020-04-13     23174. 1                   1 6486213cac6b5f5a232d05af16fba9d3
-#> 3 2020-04-14     31103. 1                   1 6486213cac6b5f5a232d05af16fba9d3
-#> 4 2020-04-15     30758. 1                   1 6486213cac6b5f5a232d05af16fba9d3
-#> 5 2020-04-16     24464. 1                   1 6486213cac6b5f5a232d05af16fba9d3
-#> 6 2020-04-17     13287. 1                   1 6486213cac6b5f5a232d05af16fba9d3
+#> 1 2020-04-12     30717. 1                   1 8674bc89254a97d212e3c56a92bd0d75
+#> 2 2020-04-13     23174. 1                   1 8674bc89254a97d212e3c56a92bd0d75
+#> 3 2020-04-14     31103. 1                   1 8674bc89254a97d212e3c56a92bd0d75
+#> 4 2020-04-15     30758. 1                   1 8674bc89254a97d212e3c56a92bd0d75
+#> 5 2020-04-16     24464. 1                   1 8674bc89254a97d212e3c56a92bd0d75
+#> 6 2020-04-17     13287. 1                   1 8674bc89254a97d212e3c56a92bd0d75
 ```
 
 ``` r
@@ -225,7 +225,7 @@ The ensemble now consists of $2 \times 3 = 6$ models:
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG0 (hash: ef125), DiseasyModelG0 (hash: 614a7), DiseasyModelG0 (hash: 5c2ea), DiseasyModelG1 (hash: 64862), DiseasyModelG1 (hash: 4ba21), DiseasyModelG1 (hash: 1b01c)
+#> DiseasyEnsemble: DiseasyModelG0 (hash: beaf0), DiseasyModelG0 (hash: c0b55), DiseasyModelG0 (hash: d9dc5), DiseasyModelG1 (hash: 8674b), DiseasyModelG1 (hash: 8bd3b), DiseasyModelG1 (hash: 01eb1)
 ```
 
 ``` r
