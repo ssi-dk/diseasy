@@ -206,7 +206,7 @@ The parameters are:
 
 ``` r
 # Hyper parameters
-compartment_structure <- c("E" = 2, "I" = 1, "R" = 1)
+compartment_structure <- c("E" = 2L, "I" = 1L, "R" = 1L)
 age_cuts_lower <- c(0, 30, 60)
 
 # Parameters
@@ -337,12 +337,12 @@ model <- DiseasyModelOdeSeir$new(
   activity = activity,
   observables = observables,
 
-  # Parameter and hyper-parameter configuration
-  compartment_structure = compartment_structure,
-  disease_progression_rates = disease_progression_rates,
   parameters = list(
+    # Parameter and hyper-parameter configuration
+    "compartment_structure" = compartment_structure,
     "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
+    "disease_progression_rates" = disease_progression_rates,
 
     # Mapping to observables
     "model_output_to_observable" = model_output_to_observable
@@ -360,14 +360,14 @@ model$get_results(
   observable = "incidence",
   prediction_length = 5
 )
-#> # A tibble: 5 × 2
-#>   date       incidence
-#>   <date>         <dbl>
-#> 1 2020-02-13   0.00180
-#> 2 2020-02-14   0.00198
-#> 3 2020-02-15   0.00216
-#> 4 2020-02-16   0.00234
-#> 5 2020-02-17   0.00252
+#> # A tibble: 5 × 4
+#>   date       incidence realisation_id weight
+#>   <date>         <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13   0.00180              1      1
+#> 2 2020-02-14   0.00198              1      1
+#> 3 2020-02-15   0.00216              1      1
+#> 4 2020-02-16   0.00234              1      1
+#> 5 2020-02-17   0.00252              1      1
 ```
 
 … and we can plot the predictions along with observations for the data
@@ -391,18 +391,18 @@ model$get_results(
   prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
-#> # A tibble: 9 × 3
-#>   date       age_group incidence
-#>   <date>     <chr>         <dbl>
-#> 1 2020-02-13 00-29      0.00235 
-#> 2 2020-02-14 00-29      0.00259 
-#> 3 2020-02-15 00-29      0.00282 
-#> 4 2020-02-13 30-59      0.00185 
-#> 5 2020-02-14 30-59      0.00204 
-#> 6 2020-02-15 30-59      0.00222 
-#> 7 2020-02-13 60+        0.000964
-#> 8 2020-02-14 60+        0.00107 
-#> 9 2020-02-15 60+        0.00116
+#> # A tibble: 9 × 5
+#>   date       age_group incidence realisation_id weight
+#>   <date>     <chr>         <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13 00-29      0.00235               1      1
+#> 2 2020-02-14 00-29      0.00259               1      1
+#> 3 2020-02-15 00-29      0.00282               1      1
+#> 4 2020-02-13 30-59      0.00185               1      1
+#> 5 2020-02-14 30-59      0.00204               1      1
+#> 6 2020-02-15 30-59      0.00222               1      1
+#> 7 2020-02-13 60+        0.000964              1      1
+#> 8 2020-02-14 60+        0.00107               1      1
+#> 9 2020-02-15 60+        0.00116               1      1
 ```
 
 … and we can see the plots for each strata.
@@ -430,14 +430,14 @@ model$get_results(
   observable = "n_infected",
   prediction_length = 5
 )
-#> # A tibble: 5 × 2
-#>   date       n_infected
-#>   <date>          <dbl>
-#> 1 2020-02-13     10575.
-#> 2 2020-02-14     11643.
-#> 3 2020-02-15     12685.
-#> 4 2020-02-16     13731.
-#> 5 2020-02-17     14818.
+#> # A tibble: 5 × 4
+#>   date       n_infected realisation_id weight
+#>   <date>          <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13     10575.              1      1
+#> 2 2020-02-14     11643.              1      1
+#> 3 2020-02-15     12685.              1      1
+#> 4 2020-02-16     13731.              1      1
+#> 5 2020-02-17     14818.              1      1
 ```
 
 ``` r
@@ -457,18 +457,18 @@ model$get_results(
   prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
-#> # A tibble: 9 × 3
-#>   date       age_group n_infected
-#>   <date>     <chr>          <dbl>
-#> 1 2020-02-13 00-29          4917.
-#> 2 2020-02-14 00-29          5415.
-#> 3 2020-02-15 00-29          5902.
-#> 4 2020-02-13 30-59          4198.
-#> 5 2020-02-14 30-59          4614.
-#> 6 2020-02-15 30-59          5024.
-#> 7 2020-02-13 60+            1460.
-#> 8 2020-02-14 60+            1614.
-#> 9 2020-02-15 60+            1759.
+#> # A tibble: 9 × 5
+#>   date       age_group n_infected realisation_id weight
+#>   <date>     <chr>          <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13 00-29          4917.              1      1
+#> 2 2020-02-14 00-29          5415.              1      1
+#> 3 2020-02-15 00-29          5902.              1      1
+#> 4 2020-02-13 30-59          4198.              1      1
+#> 5 2020-02-14 30-59          4614.              1      1
+#> 6 2020-02-15 30-59          5024.              1      1
+#> 7 2020-02-13 60+            1460.              1      1
+#> 8 2020-02-14 60+            1614.              1      1
+#> 9 2020-02-15 60+            1759.              1      1
 ```
 
 ``` r
@@ -492,14 +492,14 @@ model$get_results(
   observable = "n_positive",
   prediction_length = 5
 )
-#> # A tibble: 5 × 2
-#>   date       n_positive
-#>   <date>          <dbl>
-#> 1 2020-02-13      6874.
-#> 2 2020-02-14      7568.
-#> 3 2020-02-15      8246.
-#> 4 2020-02-16      8925.
-#> 5 2020-02-17      9632.
+#> # A tibble: 5 × 4
+#>   date       n_positive realisation_id weight
+#>   <date>          <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13      6874.              1      1
+#> 2 2020-02-14      7568.              1      1
+#> 3 2020-02-15      8246.              1      1
+#> 4 2020-02-16      8925.              1      1
+#> 5 2020-02-17      9632.              1      1
 ```
 
 ``` r
@@ -519,18 +519,18 @@ model$get_results(
   prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
-#> # A tibble: 9 × 3
-#>   date       age_group n_positive
-#>   <date>     <chr>          <dbl>
-#> 1 2020-02-13 00-29          3196.
-#> 2 2020-02-14 00-29          3520.
-#> 3 2020-02-15 00-29          3836.
-#> 4 2020-02-13 30-59          2729.
-#> 5 2020-02-14 30-59          2999.
-#> 6 2020-02-15 30-59          3266.
-#> 7 2020-02-13 60+             949.
-#> 8 2020-02-14 60+            1049.
-#> 9 2020-02-15 60+            1144.
+#> # A tibble: 9 × 5
+#>   date       age_group n_positive realisation_id weight
+#>   <date>     <chr>          <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13 00-29          3196.              1      1
+#> 2 2020-02-14 00-29          3520.              1      1
+#> 3 2020-02-15 00-29          3836.              1      1
+#> 4 2020-02-13 30-59          2729.              1      1
+#> 5 2020-02-14 30-59          2999.              1      1
+#> 6 2020-02-15 30-59          3266.              1      1
+#> 7 2020-02-13 60+             949.              1      1
+#> 8 2020-02-14 60+            1049.              1      1
+#> 9 2020-02-15 60+            1144.              1      1
 ```
 
 ``` r
@@ -554,14 +554,14 @@ model$get_results(
   observable = "n_admission",
   prediction_length = 5
 )
-#> # A tibble: 5 × 2
-#>   date       n_admission
-#>   <date>           <dbl>
-#> 1 2020-02-13        144.
-#> 2 2020-02-14        166.
-#> 3 2020-02-15        180.
-#> 4 2020-02-16        194.
-#> 5 2020-02-17        206.
+#> # A tibble: 5 × 4
+#>   date       n_admission realisation_id weight
+#>   <date>           <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13        144.              1      1
+#> 2 2020-02-14        166.              1      1
+#> 3 2020-02-15        180.              1      1
+#> 4 2020-02-16        194.              1      1
+#> 5 2020-02-17        206.              1      1
 ```
 
 ``` r
@@ -581,18 +581,18 @@ model$get_results(
   prediction_length = 3,
   stratification = rlang::quos(age_group)
 )
-#> # A tibble: 9 × 3
-#>   date       age_group n_admission
-#>   <date>     <chr>           <dbl>
-#> 1 2020-02-13 00-29            3.69
-#> 2 2020-02-14 00-29            4.26
-#> 3 2020-02-15 00-29            4.61
-#> 4 2020-02-13 30-59           31.5 
-#> 5 2020-02-14 30-59           36.3 
-#> 6 2020-02-15 30-59           39.4 
-#> 7 2020-02-13 60+            108.  
-#> 8 2020-02-14 60+            125.  
-#> 9 2020-02-15 60+            136.
+#> # A tibble: 9 × 5
+#>   date       age_group n_admission realisation_id weight
+#>   <date>     <chr>           <dbl>          <dbl>  <dbl>
+#> 1 2020-02-13 00-29            3.69              1      1
+#> 2 2020-02-14 00-29            4.26              1      1
+#> 3 2020-02-15 00-29            4.61              1      1
+#> 4 2020-02-13 30-59           31.5               1      1
+#> 5 2020-02-14 30-59           36.3               1      1
+#> 6 2020-02-15 30-59           39.4               1      1
+#> 7 2020-02-13 60+            108.                1      1
+#> 8 2020-02-14 60+            125.                1      1
+#> 9 2020-02-15 60+            136.                1      1
 ```
 
 ``` r

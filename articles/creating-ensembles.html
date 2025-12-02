@@ -188,7 +188,7 @@ instances which we give the class <code>DiseasyEnsemble</code>.</p>
 functions to get a quick overview of the ensemble.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 8674b), DiseasyModelG1 (hash: 8bd3b), DiseasyModelG1 (hash: 01eb1)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 45ae4), DiseasyModelG1 (hash: 64501), DiseasyModelG1 (hash: 80f39)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
@@ -204,15 +204,17 @@ least specify the following:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  4s</span></span>
+<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span>  67% |  ETA:  2s</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
 <span><span class="co">#&gt;   date       n_positive realisation_id weight model                           </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-04-12     <span style="text-decoration: underline;">30</span>717. 1                   1 8674bc89254a97d212e3c56a92bd0d75</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-04-13     <span style="text-decoration: underline;">23</span>174. 1                   1 8674bc89254a97d212e3c56a92bd0d75</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-04-14     <span style="text-decoration: underline;">31</span>103. 1                   1 8674bc89254a97d212e3c56a92bd0d75</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-04-15     <span style="text-decoration: underline;">30</span>758. 1                   1 8674bc89254a97d212e3c56a92bd0d75</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-04-16     <span style="text-decoration: underline;">24</span>464. 1                   1 8674bc89254a97d212e3c56a92bd0d75</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-04-17     <span style="text-decoration: underline;">13</span>287. 1                   1 8674bc89254a97d212e3c56a92bd0d75</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-04-12     <span style="text-decoration: underline;">30</span>717. 1                   1 45ae489da17e762115379e5e1dafd796</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-04-13     <span style="text-decoration: underline;">23</span>174. 1                   1 45ae489da17e762115379e5e1dafd796</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-04-14     <span style="text-decoration: underline;">31</span>103. 1                   1 45ae489da17e762115379e5e1dafd796</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-04-15     <span style="text-decoration: underline;">30</span>758. 1                   1 45ae489da17e762115379e5e1dafd796</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-04-16     <span style="text-decoration: underline;">24</span>464. 1                   1 45ae489da17e762115379e5e1dafd796</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-04-17     <span style="text-decoration: underline;">13</span>287. 1                   1 45ae489da17e762115379e5e1dafd796</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points." width="700"></p>
@@ -226,7 +228,9 @@ we can run our ensemble on each age group separately:</p>
 <span>  observable <span class="op">=</span> <span class="st">"n_positive"</span>,</span>
 <span>  stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">age_group</span><span class="op">)</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">30</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  5s</span></span>
+<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span>  67% |  ETA:  3s</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="Plot of the ensemble predictions stratified by age group. Shaded area is ensemble quantiles with observations as points." width="700"></p>
 <p>These stratifications are <em>flexible</em> and we can stratify to
 our hearts desire, limited only by the stratification level in the
@@ -244,7 +248,8 @@ our hearts desire, limited only by the stratification level in the
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">30</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span>  67% |  ETA:  1s</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="Plot of the ensemble predictions stratified by custom age group. Shaded area is ensemble quantiles with observations as points." width="700"></p>
 <p>The <code><a href="../reference/plot.html">plot()</a></code> method has additional optional arguments
 which can be used to customize the plot further:</p>
@@ -291,7 +296,7 @@ parameter settings from before.</p>
 models:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: beaf0), DiseasyModelG0 (hash: c0b55), DiseasyModelG0 (hash: d9dc5), DiseasyModelG1 (hash: 8674b), DiseasyModelG1 (hash: 8bd3b), DiseasyModelG1 (hash: 01eb1)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: f63b9), DiseasyModelG0 (hash: d3462), DiseasyModelG0 (hash: 22a75), DiseasyModelG1 (hash: 45ae4), DiseasyModelG1 (hash: 64501)</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
@@ -302,6 +307,135 @@ predictions from the ensemble:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="Plot of predictions from alternative ensemble. Shaded area is ensemble quantiles with observations as points." width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="example-3---a-large-seir-model-ensemble">Example 3 - A large SEIR model ensemble`<a class="anchor" aria-label="anchor" href="#example-3---a-large-seir-model-ensemble"></a>
+</h3>
+<p>In this example, we will create a large ensemble of SEIR models using
+the <code>DiseasyModelOdeSeir</code> template.</p>
+<p>To do so, we will create a few different instances of the functional
+modules, <code>DiseasyActivity</code>, <code>DiseasySeason</code> and
+<code>DiseasyImmunity</code>. Which each represent different mechanistic
+scenarios to include in the model.</p>
+<div class="section level4">
+<h4 id="activity-module">Activity module<a class="anchor" aria-label="anchor" href="#activity-module"></a>
+</h4>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create three different contact bases for the ensemble</span></span>
+<span><span class="co"># All uses the Danish populations but with different contact matrices</span></span>
+<span><span class="va">contact_basis_1</span> <span class="op">&lt;-</span> <span class="va">contact_basis_2</span> <span class="op">&lt;-</span> <span class="va">contact_basis_3</span> <span class="op">&lt;-</span> <span class="va">contact_basis</span><span class="op">$</span><span class="va">DK</span></span>
+<span><span class="va">contact_basis_2</span><span class="op">$</span><span class="va">contacts</span> <span class="op">&lt;-</span> <span class="va">contact_basis</span><span class="op">$</span><span class="va">SE</span><span class="op">$</span><span class="va">contact</span></span>
+<span><span class="va">contact_basis_3</span><span class="op">$</span><span class="va">contacts</span> <span class="op">&lt;-</span> <span class="va">contact_basis</span><span class="op">$</span><span class="va">NO</span><span class="op">$</span><span class="va">contact</span></span>
+<span></span>
+<span><span class="co"># Create an activity instance with the Danish changes in restrictions</span></span>
+<span><span class="va">activity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">activity</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span><span class="va">dk_activity_units</span><span class="op">)</span></span>
+<span><span class="va">activity</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span>date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span>, opening <span class="op">=</span> <span class="st">"baseline"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Load the different contact bases to create distinct activity instances</span></span>
+<span><span class="va">activities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="va">contact_basis_1</span>,</span>
+<span>  <span class="va">contact_basis_2</span>,</span>
+<span>  <span class="va">contact_basis_3</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="op">{</span></span>
+<span>    <span class="va">act</span> <span class="op">&lt;-</span> <span class="va">activity</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">act</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span>contact_basis <span class="op">=</span> <span class="va">.</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">act</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">activity</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="season-module">Season module<a class="anchor" aria-label="anchor" href="#season-module"></a>
+</h4>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create three different season modules for the ensemble</span></span>
+<span><span class="va">season</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>reference_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seasons</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"constant_season"</span>, <span class="st">"cosine_season"</span>, <span class="st">"covid_season_v1"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="op">{</span></span>
+<span>    <span class="va">s</span> <span class="op">&lt;-</span> <span class="va">season</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">s</span><span class="op">$</span><span class="fu">use_season_model</span><span class="op">(</span><span class="va">.</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">season</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="immunity-module">Immunity module<a class="anchor" aria-label="anchor" href="#immunity-module"></a>
+</h4>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Use different waning immunity models for the ensemble</span></span>
+<span><span class="va">no_immunity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">no_immunity</span><span class="op">$</span><span class="fu">set_waning_model</span><span class="op">(</span><span class="st">"no_waning"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Exponential waning</span></span>
+<span><span class="va">immunities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">120</span>, <span class="fl">180</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="op">{</span></span>
+<span>    <span class="va">immunity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">immunity</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="va">.</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">immunity</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">no_immunity</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="observables-module-1">Observables module<a class="anchor" aria-label="anchor" href="#observables-module-1"></a>
+</h4>
+<p>Beyond setting the different scenarios for the models, we also need
+to define the “incidence” observable for the
+<code>DiseasyModelOdeSeir</code> class. We here use the number of
+observed positive cases adjusted for under-reporting.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create an estimator for the incidence</span></span>
+<span><span class="va">observables</span><span class="op">$</span><span class="fu">define_synthetic_observable</span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"incidence"</span>,</span>
+<span>  mapping <span class="op">=</span> \<span class="op">(</span><span class="va">n_positive</span>, <span class="va">n_population</span><span class="op">)</span> <span class="va">n_positive</span> <span class="op">/</span> <span class="op">(</span><span class="va">n_population</span> <span class="op">*</span> <span class="fl">0.65</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="create-the-ensemble">Create the ensemble<a class="anchor" aria-label="anchor" href="#create-the-ensemble"></a>
+</h4>
+<p>With the functional modules configured, we can now use the
+<code><a href="../reference/combineasy.html">combineasy()</a></code> function to create a large SEIR ensemble. We
+create the models with different compartment structures (i.e. different
+number of exposed, infected and recovered compartments) to provide
+structurally different models.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create the ensemble</span></span>
+<span><span class="va">seir_ensemble</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combineasy.html">combineasy</a></span><span class="op">(</span></span>
+<span>  model_templates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">DiseasyModelOdeSeir</span><span class="op">)</span>,</span>
+<span>  modules <span class="op">=</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">expand_grid</a></span><span class="op">(</span></span>
+<span>    activity <span class="op">=</span> <span class="va">activities</span>,</span>
+<span>    season <span class="op">=</span> <span class="va">seasons</span>,</span>
+<span>    immunity <span class="op">=</span> <span class="va">immunities</span>,</span>
+<span>    observables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">observables</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">expand_grid</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Hyper parameters</span></span>
+<span>    <span class="st">"compartment_structure"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">1L</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">2L</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">2L</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">3L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">1L</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">2L</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">2L</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">3L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="st">"age_cuts_lower"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># Parameters</span></span>
+<span>    <span class="st">"disease_progression_rates"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2.1</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4.5</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="st">"overall_infection_risk"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="fl">0.025</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">seir_ensemble</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">seir_ensemble</span>, observable <span class="op">=</span> <span class="st">"incidence"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

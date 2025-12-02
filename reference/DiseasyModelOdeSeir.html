@@ -101,20 +101,16 @@ number of structurally different SEIR models.</p>
     <p>A new instance of the <code>DiseasyModelOdeSeir</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
     </div>
     <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="DiseasyObservables.html">DiseasyObservables</a></p></div>
+    </div>
+    <div class="section level2">
     <h2 id="super-classes">Super classes<a class="anchor" aria-label="anchor" href="#super-classes"></a></h2>
     <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">diseasy::DiseasyModel</a></code> -&gt; <code><a href="DiseasyModelOde.html">diseasy::DiseasyModelOde</a></code> -&gt; <code>DiseasyModelOdeSeir</code></p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
-    <p></p><div class="r6-active-bindings"><dl><dt><code>compartment_structure</code></dt>
-<dd><p>(<code>named integer()</code>)<br> The structure of the compartments in the model. The names should be <code>E</code>, <code>I</code>, and <code>R</code> for the exposed, infectious, and recovered compartments, respectively.  Read only.</p></dd>
-
-
-<dt><code>disease_progression_rates</code></dt>
-<dd><p>(<code>named numeric()</code>)<br> The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments.  Read only.</p></dd>
-
-
-<dt><code>malthusian_scaling_factor</code></dt>
+    <p></p><div class="r6-active-bindings"><dl><dt><code>malthusian_scaling_factor</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br>
 A scaling factor to apply to the contact matrices to account for structural differences
 in the model. Read only.</p></dd>
@@ -129,29 +125,27 @@ in the model. Read only.</p></dd>
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
 <ul><li><p><a href="#method-DiseasyModelOdeSeir-new"><code>DiseasyModelOdeSeir$new()</code></a></p></li>
+<li><p><a href="#method-DiseasyModelOdeSeir-load_module"><code>DiseasyModelOdeSeir$load_module()</code></a></p></li>
+<li><p><a href="#method-DiseasyModelOdeSeir-get_results"><code>DiseasyModelOdeSeir$get_results()</code></a></p></li>
+<li><p><a href="#method-DiseasyModelOdeSeir-prepare_rhs"><code>DiseasyModelOdeSeir$prepare_rhs()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-set_forcing_functions"><code>DiseasyModelOdeSeir$set_forcing_functions()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-malthusian_growth_rate"><code>DiseasyModelOdeSeir$malthusian_growth_rate()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-initialise_state_vector"><code>DiseasyModelOdeSeir$initialise_state_vector()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-rhs"><code>DiseasyModelOdeSeir$rhs()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-clone"><code>DiseasyModelOdeSeir$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="get_results"><a href="DiseasyModelOde.html#method-get_results"><code>diseasy::DiseasyModelOde$get_results()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href="DiseasyModelOde.html#method-plot"><code>diseasy::DiseasyModelOde$plot()</code></a></span></li>
 </ul></details></p><hr><a id="method-DiseasyModelOdeSeir-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyModelOdeSeir</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyModelOdeSeir.html">DiseasyModelOdeSeir</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
-<span>  <span class="va">observables</span>,</span>
+<span>  observables <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  activity <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  season <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  variant <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  immunity <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  compartment_structure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>E <span class="op">=</span> <span class="fl">1L</span>, I <span class="op">=</span> <span class="fl">1L</span>, R <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span>,</span>
-<span>  disease_progression_rates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>E <span class="op">=</span> <span class="fl">1</span>, I <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  malthusian_matching <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -163,26 +157,17 @@ in the model. Read only.</p></dd>
 <dd><p>(<code>boolean</code> or <code>R6::R6Class instance</code>)<br> If a boolean is given, it dictates whether to load a new instance module of this class.<br> If an instance of the module is provided instead, a copy of this instance is added to the <code>DiseasyModel</code> instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to <code>DiseasyModel</code>.</p></dd>
 
 
-<dt><code>compartment_structure</code></dt>
-<dd><p>(<code>named integer()</code>)<br> The structure of the compartments in the model. The names should be <code>E</code>, <code>I</code>, and <code>R</code> for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.</p></dd>
-
-
-<dt><code>disease_progression_rates</code></dt>
-<dd><p>(<code>named numeric()</code>)<br> The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.</p></dd>
-
-
-<dt><code>malthusian_matching</code></dt>
-<dd><p>(<code>logical(1)</code>)<br>
-Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?</p></dd>
-
-
 <dt><code>parameters</code></dt>
 <dd><p>(<code>named list()</code>)<br>
 List of parameters to set for the model during initialization.</p>
-<p>Parameters controlling the structure of the model:</p><ul><li><p><code>age_cuts_lower</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)<br>
+<p>Parameters controlling the structure of the model:</p><ul><li><p><code>compartment_structure</code> (<code>named integer()</code>)<br> The structure of the compartments in the model. The names should be <code>E</code>, <code>I</code>, and <code>R</code> for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.</p></li>
+<li><p><code>age_cuts_lower</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)<br>
 Determines the age groups in the model.</p></li>
+<li><p><code>malthusian_matching</code> (<code>logical(1)</code>)<br>
+Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?</p></li>
 </ul><p>Parameters controlling the dynamics of the model:</p><ul><li><p><code>overall_infection_risk</code> (<code>numeric(1)</code>)<br>
 A scalar that scales contact rates to infection rates.</p></li>
+<li><p><code>disease_progression_rates</code> (<code>named numeric()</code>)<br> The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.</p></li>
 </ul><p>Parameters controlling initialisation routines</p><ul><li><p><code>incidence_polynomial_order</code> (<code>integer(1)</code>)<br>
 The degree of the polynomial to fit to the incidence curves.</p></li>
 <li><p><code>incidence_polynomial_training_length</code> (<code>integer(1)</code>)<br>
@@ -206,10 +191,71 @@ Arguments passed to <code><a href=".{2}/reference/DiseasyImmunity.html#method-Di
 </dl><p></p></div>
 </div>
 
+</div><p></p><hr><a id="method-DiseasyModelOdeSeir-load_module"></a><div class="section">
+<h3 id="method-load-module-">Method <code>load_module()</code><a class="anchor" aria-label="anchor" href="#method-load-module-"></a></h3>
+<p>Overload the <code>$load_module()</code> to re-initialise the helpers after loading</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">load_module</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<dd><p>Arguments sent to parent method.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-DiseasyModelOdeSeir-get_results"></a><div class="section">
+<h3 id="method-get-results-">Method <code>get_results()</code><a class="anchor" aria-label="anchor" href="#method-get-results-"></a></h3>
+<p>The primary method used to request model results of a given observable at a given stratification</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
+<span>  <span class="va">observable</span>,</span>
+<span>  <span class="va">prediction_length</span>,</span>
+<span>  quantiles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stratification <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>observable</code></dt>
+<dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
+
+
+<dt><code>prediction_length</code></dt>
+<dd><p>(<code>numeric</code>)<br> The number of days to predict. The prediction start is defined by <code>last_queryable_date</code> of the <code><a href="DiseasyObservables.html">?DiseasyObservables</a></code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p></dd>
+
+
+<dt><code>quantiles</code></dt>
+<dd><p>(<code>list</code>(<code>numeric</code>))<br> If given, results are returned at the quantiles given.</p></dd>
+
+
+<dt><code>stratification</code></dt>
+<dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<p>A <code>tibble</code> <a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble::tibble</a> with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:<br><br>  - date (<code>Date</code>) specifying the date of the prediction.<br>  - realisation_id (<code>character</code>) giving a unique id for each realization in the ensemble.<br>  - weight (<code>numeric</code>) giving the weight of the realization in the ensemble.</p>
+</div>
+
+</div><p></p><hr><a id="method-DiseasyModelOdeSeir-prepare_rhs"></a><div class="section">
+<h3 id="method-prepare-rhs-">Method <code>prepare_rhs()</code><a class="anchor" aria-label="anchor" href="#method-prepare-rhs-"></a></h3>
+<p>Allocate the helpers for the rhs method</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">prepare_rhs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-DiseasyModelOdeSeir-set_forcing_functions"></a><div class="section">
 <h3 id="method-set-forcing-functions-">Method <code>set_forcing_functions()</code><a class="anchor" aria-label="anchor" href="#method-set-forcing-functions-"></a></h3>
 <p>Set the forcing functions for the model.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">set_forcing_functions</span><span class="op">(</span></span>
 <span>  infected_forcing <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  state_vector_forcing <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -217,7 +263,7 @@ Arguments passed to <code><a href=".{2}/reference/DiseasyImmunity.html#method-Di
 </div>
 
 <div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>infected_forcing</code></dt>
 <dd><p>(<code>function</code>)<br>
 A function that takes arguments <code>t</code> and <code>infected</code> and modifies the number of infected at time <code>t</code>.</p></dd>
@@ -232,19 +278,19 @@ compartments at time <code>t</code>.</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
 </div><p></p><hr><a id="method-DiseasyModelOdeSeir-malthusian_growth_rate"></a><div class="section">
 <h3 id="method-malthusian-growth-rate-">Method <code>malthusian_growth_rate()</code><a class="anchor" aria-label="anchor" href="#method-malthusian-growth-rate-"></a></h3>
 <p>This function computes the Malthusian growth rate for the given model configuration.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">malthusian_growth_rate</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Parameters passed to <code>$generator_matrix()</code>.</p></dd>
 
@@ -261,7 +307,7 @@ The Malthusian growth rate is therefore not dependent on factors such as cross-i
 </div>
 
 <div class="section">
-<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p>(<code>numeric(1)</code>)<br>
 The Malthusian growth rate for the model.</p>
 </div>
@@ -269,7 +315,7 @@ The Malthusian growth rate for the model.</p>
 </div><p></p><hr><a id="method-DiseasyModelOdeSeir-initialise_state_vector"></a><div class="section">
 <h3 id="method-initialise-state-vector-">Method <code>initialise_state_vector()</code><a class="anchor" aria-label="anchor" href="#method-initialise-state-vector-"></a></h3>
 <p>Infer the state_vector from incidence data</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">initialise_state_vector</span><span class="op">(</span></span>
 <span>  <span class="va">incidence_data</span>,</span>
 <span>  overall_infection_risk <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">parameters</span> <span class="op">%.%</span> <span class="va">overall_infection_risk</span>,</span>
@@ -279,7 +325,7 @@ The Malthusian growth rate for the model.</p>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>incidence_data</code></dt>
 <dd><p>incidence_data (<code>data.frame</code>)<br> Incidence observations as a <code>data.frame</code> with columns - <code>date</code>: The date of the observations - <code>age_group</code>: The age group of the incidence observation (following <code><a href="https://ssi-dk.github.io/diseasystore/reference/age_labels.html">diseasystore::age_labels()</a></code> format) - <code>variant</code>: The variant of the incidence observation. - <code>incidence</code>: The incidence in the age group at the given date</p></dd>
 
@@ -314,7 +360,7 @@ If <code>ei_rs_balance = 0</code>, the estimate for RS states are prioritised.</
 </div>
 
 <div class="section">
-<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)<br>
 The initial state vector for the model (invisibly).</p>
 </div>
@@ -322,7 +368,7 @@ The initial state vector for the model (invisibly).</p>
 </div><p></p><hr><a id="method-DiseasyModelOdeSeir-rhs"></a><div class="section">
 <h3 id="method-rhs-">Method <code>rhs()</code><a class="anchor" aria-label="anchor" href="#method-rhs-"></a></h3>
 <p>The vectorised right hand side (RHS) function of the system of differential equations</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">rhs</span><span class="op">(</span></span>
 <span>  <span class="va">t</span>,</span>
 <span>  <span class="va">state_vector</span>,</span>
@@ -332,7 +378,7 @@ The initial state vector for the model (invisibly).</p>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>t</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br>
 The time to solve for.</p></dd>
@@ -355,7 +401,7 @@ Argument to comply with <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html"
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
 <p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)<br>
 The rate of change for the differential equations.</p>
 </div>
@@ -363,12 +409,12 @@ The rate of change for the differential equations.</p>
 </div><p></p><hr><a id="method-DiseasyModelOdeSeir-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -413,24 +459,24 @@ The rate of change for the differential equations.</p>
 <span class="r-in"><span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    observables <span class="op">=</span> <span class="va">obs</span>,</span></span>
 <span class="r-in"><span>    activity <span class="op">=</span> <span class="va">act</span>,</span></span>
-<span class="r-in"><span>    disease_progression_rates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"age_cuts_lower"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>      <span class="st">"overall_infection_risk"</span> <span class="op">=</span> <span class="fl">0.025</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"age_cuts_lower"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="st">"disease_progression_rates"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Run the model to predict incidence</span></span></span>
 <span class="r-in"><span>  <span class="va">prediction</span> <span class="op">&lt;-</span> <span class="va">m</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span><span class="st">"incidence"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 2</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   date       incidence</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 2020-03-01   0.005<span style="text-decoration: underline;">30</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2020-03-02   0.005<span style="text-decoration: underline;">49</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 2020-03-03   0.005<span style="text-decoration: underline;">68</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 2020-03-04   0.005<span style="text-decoration: underline;">86</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 2020-03-05   0.006<span style="text-decoration: underline;">03</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   date       incidence realisation_id weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 2020-03-01   0.005<span style="text-decoration: underline;">30</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2020-03-02   0.005<span style="text-decoration: underline;">49</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 2020-03-03   0.005<span style="text-decoration: underline;">68</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 2020-03-04   0.005<span style="text-decoration: underline;">86</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 2020-03-05   0.006<span style="text-decoration: underline;">03</span>              1      1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Plot the results</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m</span>, observable <span class="op">=</span> <span class="st">"incidence"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>

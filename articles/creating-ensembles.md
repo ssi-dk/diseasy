@@ -98,7 +98,7 @@ to get a quick overview of the ensemble.
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG1 (hash: 8674b), DiseasyModelG1 (hash: 8bd3b), DiseasyModelG1 (hash: 01eb1)
+#> DiseasyEnsemble: DiseasyModelG1 (hash: 45ae4), DiseasyModelG1 (hash: 64501), DiseasyModelG1 (hash: 80f39)
 ```
 
 ``` r
@@ -116,15 +116,17 @@ specify the following:
 ``` r
 predict(ensemble, observable = "n_positive", prediction_length = 30) |>
   head()
+#>  ■■■■■■■■■■■                       33% |  ETA:  4s
+#>  ■■■■■■■■■■■■■■■■■■■■■             67% |  ETA:  2s
 #> # A tibble: 6 × 5
 #>   date       n_positive realisation_id weight model                           
 #>   <date>          <dbl> <chr>           <dbl> <chr>                           
-#> 1 2020-04-12     30717. 1                   1 8674bc89254a97d212e3c56a92bd0d75
-#> 2 2020-04-13     23174. 1                   1 8674bc89254a97d212e3c56a92bd0d75
-#> 3 2020-04-14     31103. 1                   1 8674bc89254a97d212e3c56a92bd0d75
-#> 4 2020-04-15     30758. 1                   1 8674bc89254a97d212e3c56a92bd0d75
-#> 5 2020-04-16     24464. 1                   1 8674bc89254a97d212e3c56a92bd0d75
-#> 6 2020-04-17     13287. 1                   1 8674bc89254a97d212e3c56a92bd0d75
+#> 1 2020-04-12     30717. 1                   1 45ae489da17e762115379e5e1dafd796
+#> 2 2020-04-13     23174. 1                   1 45ae489da17e762115379e5e1dafd796
+#> 3 2020-04-14     31103. 1                   1 45ae489da17e762115379e5e1dafd796
+#> 4 2020-04-15     30758. 1                   1 45ae489da17e762115379e5e1dafd796
+#> 5 2020-04-16     24464. 1                   1 45ae489da17e762115379e5e1dafd796
+#> 6 2020-04-17     13287. 1                   1 45ae489da17e762115379e5e1dafd796
 ```
 
 ``` r
@@ -147,6 +149,8 @@ plot(
   stratification = rlang::quos(age_group),
   prediction_length = 30
 )
+#>  ■■■■■■■■■■■                       33% |  ETA:  5s
+#>  ■■■■■■■■■■■■■■■■■■■■■             67% |  ETA:  3s
 ```
 
 ![Plot of the ensemble predictions stratified by age group. Shaded area
@@ -170,6 +174,7 @@ plot(
   ),
   prediction_length = 30
 )
+#>  ■■■■■■■■■■■■■■■■■■■■■             67% |  ETA:  1s
 ```
 
 ![Plot of the ensemble predictions stratified by custom age group.
@@ -225,7 +230,7 @@ The ensemble now consists of $2 \times 3 = 6$ models:
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG0 (hash: beaf0), DiseasyModelG0 (hash: c0b55), DiseasyModelG0 (hash: d9dc5), DiseasyModelG1 (hash: 8674b), DiseasyModelG1 (hash: 8bd3b), DiseasyModelG1 (hash: 01eb1)
+#> DiseasyEnsemble: DiseasyModelG0 (hash: f63b9), DiseasyModelG0 (hash: d3462), DiseasyModelG0 (hash: 22a75), DiseasyModelG1 (hash: 45ae4), DiseasyModelG1 (hash: 64501)
 ```
 
 ``` r
@@ -246,3 +251,136 @@ plot(ensemble, observable = "n_positive", prediction_length = 30)
 ![Plot of predictions from alternative ensemble. Shaded area is ensemble
 quantiles with observations as
 points.](creating-ensembles_files/figure-html/unnamed-chunk-14-1.png)
+
+### Example 3 - A large SEIR model ensemble\`
+
+In this example, we will create a large ensemble of SEIR models using
+the `DiseasyModelOdeSeir` template.
+
+To do so, we will create a few different instances of the functional
+modules, `DiseasyActivity`, `DiseasySeason` and `DiseasyImmunity`. Which
+each represent different mechanistic scenarios to include in the model.
+
+#### Activity module
+
+``` r
+# Create three different contact bases for the ensemble
+# All uses the Danish populations but with different contact matrices
+contact_basis_1 <- contact_basis_2 <- contact_basis_3 <- contact_basis$DK
+contact_basis_2$contacts <- contact_basis$SE$contact
+contact_basis_3$contacts <- contact_basis$NO$contact
+
+# Create an activity instance with the Danish changes in restrictions
+activity <- DiseasyActivity$new()
+activity$set_activity_units(dk_activity_units)
+activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+# Load the different contact bases to create distinct activity instances
+activities <- list(
+  contact_basis_1,
+  contact_basis_2,
+  contact_basis_3
+) |>
+  purrr::map(~ {
+    act <- activity$clone()
+    act$set_contact_basis(contact_basis = .)
+    return(act)
+  })
+rm(activity)
+```
+
+#### Season module
+
+``` r
+# Create three different season modules for the ensemble
+season <- DiseasySeason$new(reference_date = as.Date("2020-01-01"))
+
+seasons <- c("constant_season", "cosine_season", "covid_season_v1") |>
+  purrr::map(~ {
+    s <- season$clone()
+    s$use_season_model(.)
+    return(s)
+  })
+rm(season)
+```
+
+#### Immunity module
+
+``` r
+# Use different waning immunity models for the ensemble
+no_immunity <- DiseasyImmunity$new()
+no_immunity$set_waning_model("no_waning")
+
+# Exponential waning
+immunities <- c(60, 120, 180) |>
+  purrr::map(~ {
+    immunity <- DiseasyImmunity$new()
+    immunity$set_exponential_waning(time_scale = .)
+    return(immunity)
+  }) |>
+  c(no_immunity)
+```
+
+#### Observables module
+
+Beyond setting the different scenarios for the models, we also need to
+define the “incidence” observable for the `DiseasyModelOdeSeir` class.
+We here use the number of observed positive cases adjusted for
+under-reporting.
+
+``` r
+# Create an estimator for the incidence
+observables$define_synthetic_observable(
+  name = "incidence",
+  mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
+)
+```
+
+#### Create the ensemble
+
+With the functional modules configured, we can now use the
+[`combineasy()`](https://ssi-dk.github.io/diseasy/reference/combineasy.md)
+function to create a large SEIR ensemble. We create the models with
+different compartment structures (i.e. different number of exposed,
+infected and recovered compartments) to provide structurally different
+models.
+
+``` r
+# Create the ensemble
+seir_ensemble <- combineasy(
+  model_templates = list(DiseasyModelOdeSeir),
+  modules = tidyr::expand_grid(
+    activity = activities,
+    season = seasons,
+    immunity = immunities,
+    observables = list(observables)
+  ),
+  parameters = tidyr::expand_grid(
+    # Hyper parameters
+    "compartment_structure" = list(
+      c("E" = 1L, "I" = 1L, "R" = 1L),
+      c("E" = 2L, "I" = 1L, "R" = 1L),
+      c("E" = 2L, "I" = 3L, "R" = 1L),
+      c("E" = 1L, "I" = 1L, "R" = 3L),
+      c("E" = 2L, "I" = 1L, "R" = 3L),
+      c("E" = 2L, "I" = 3L, "R" = 3L)
+    ),
+    "age_cuts_lower" = list(
+      c(0, 30, 60)
+    ),
+    # Parameters
+    "disease_progression_rates" = list(
+      c("E" = 1 / 2.1, "I" = 1 / 4.5)
+    ),
+    "overall_infection_risk" = list(
+      0.025
+    )
+  )
+)
+
+summary(seir_ensemble)
+```
+
+``` r
+plot(seir_ensemble, observable = "incidence", prediction_length = 30)
+```

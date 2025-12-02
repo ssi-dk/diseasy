@@ -6,7 +6,7 @@ Standard generics for `DiseasyEnsemble` objects
 
 ``` r
 # S3 method for class 'DiseasyEnsemble'
-print(x, width = 200, ...)
+print(x, n = 5, width = 200, ...)
 
 # S3 method for class 'DiseasyEnsemble'
 summary(object, ...)
@@ -40,6 +40,11 @@ plot(
 
   (`DiseasyEnsemble`)  
   Ensemble object to print, summarise or plot.
+
+- n:
+
+  (`integer(1)`)  
+  The number of models to produce output for.
 
 - width:
 
@@ -111,7 +116,7 @@ observable from the ensemble by date, stratification and model
   )
 
   print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG0 (hash: 457a9), DiseasyModelG1 (hash: cd03d) 
+#> DiseasyEnsemble: DiseasyModelG0 (hash: adbbb), DiseasyModelG1 (hash: c754c) 
 
   summary(ensemble)
 #> DiseasyEnsemble consisting of:
@@ -119,6 +124,7 @@ observable from the ensemble by date, stratification and model
 #> DiseasyModelG1: 1 
 
   plot(ensemble, "n_positive", prediction_length = 30)
+#>  ■■■■■■■■■■■■■■■■                  50% |  ETA:  3s
 
 
   rm(ensemble, observables)

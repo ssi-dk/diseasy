@@ -327,18 +327,18 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   m <- DiseasyModelOdeSeir$new(
     observables = obs,
     activity = act,
-    compartment_structure = c("E" = K, "I" = L, "R" = M),
-    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list(
+      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = c(0, 30, 60),
-      "overall_infection_risk" = 0.025
+      "overall_infection_risk" = 0.025,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
 
   return(m)
 }
 
-m <- generate_model(2, 1, 1) # Use the configuration from example data
+m <- generate_model(2L, 1L, 1L) # Use the configuration from example data
 ```
 
 This method relies on fitting a polynomial to the latest period, so we
@@ -475,8 +475,8 @@ get_prediction <- function(
       dplyr::select(!"state") |>
       dplyr::mutate(
         "date" = .data$time + model$observables$last_queryable_date,
-        "incidence_model" = model$disease_progression_rates[["I"]] *
-            model$compartment_structure[["I"]] *
+        "incidence_model" = model$parameters$disease_progression_rates[["I"]] *
+            model$parameters$compartment_structure[["I"]] *
             .data$value
       )
 
@@ -514,8 +514,8 @@ get_prediction <- function(
   out <- out |>
     dplyr::mutate(
       "model_configuration" = paste0(
-        names(model$compartment_structure),
-        model$compartment_structure,
+        names(model$parameters$compartment_structure),
+        model$parameters$compartment_structure,
         collapse = ""
       )
     )
@@ -588,10 +588,10 @@ model predictions may diminish.
 
 ``` r
 models <- list(
-  generate_model(2, 1, 1),
-  generate_model(1, 1, 1),
-  generate_model(2, 2, 2),
-  generate_model(3, 2, 5)
+  generate_model(2L, 1L, 1L),
+  generate_model(1L, 1L, 1L),
+  generate_model(2L, 2L, 2L),
+  generate_model(3L, 2L, 5L)
 )
 
 predictions <- models |>
@@ -635,10 +635,10 @@ increasing.](SEIR-initialisation_files/figure-html/misspecified%20model%20increa
 ``` r
 
 models <- list(
-  generate_model(2, 1, 1),
-  generate_model(1, 1, 1),
-  generate_model(2, 2, 2),
-  generate_model(3, 2, 5)
+  generate_model(2L, 1L, 1L),
+  generate_model(1L, 1L, 1L),
+  generate_model(2L, 2L, 2L),
+  generate_model(3L, 2L, 5L)
 )
 
 # Update the last queryable date to later starting point

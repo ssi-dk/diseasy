@@ -27,6 +27,10 @@ use this model.
 A new instance of the `DiseasyModelOdeSeir`
 [R6](https://r6.r-lib.org/reference/R6Class.html) class.
 
+## See also
+
+[DiseasyObservables](https://ssi-dk.github.io/diseasy/reference/DiseasyObservables.md)
+
 ## Super classes
 
 [`diseasy::DiseasyBaseModule`](https://ssi-dk.github.io/diseasy/reference/DiseasyBaseModule.md)
@@ -37,20 +41,6 @@ A new instance of the `DiseasyModelOdeSeir`
 -\> `DiseasyModelOdeSeir`
 
 ## Active bindings
-
-- `compartment_structure`:
-
-  (`named integer()`)  
-  The structure of the compartments in the model. The names should be
-  `E`, `I`, and `R` for the exposed, infectious, and recovered
-  compartments, respectively. Read only.
-
-- `disease_progression_rates`:
-
-  (`named numeric()`)  
-  The overall progression rates for the disease states. The reciprocal
-  of each rate is the average time spent in the all of the corresponding
-  compartments. Read only.
 
 - `malthusian_scaling_factor`:
 
@@ -64,6 +54,12 @@ A new instance of the `DiseasyModelOdeSeir`
 
 - [`DiseasyModelOdeSeir$new()`](#method-DiseasyModelOdeSeir-new)
 
+- [`DiseasyModelOdeSeir$load_module()`](#method-DiseasyModelOdeSeir-load_module)
+
+- [`DiseasyModelOdeSeir$get_results()`](#method-DiseasyModelOdeSeir-get_results)
+
+- [`DiseasyModelOdeSeir$prepare_rhs()`](#method-DiseasyModelOdeSeir-prepare_rhs)
+
 - [`DiseasyModelOdeSeir$set_forcing_functions()`](#method-DiseasyModelOdeSeir-set_forcing_functions)
 
 - [`DiseasyModelOdeSeir$malthusian_growth_rate()`](#method-DiseasyModelOdeSeir-malthusian_growth_rate)
@@ -76,10 +72,8 @@ A new instance of the `DiseasyModelOdeSeir`
 
 Inherited methods
 
-- [`diseasy::DiseasyBaseModule$load_module()`](https://ssi-dk.github.io/diseasy/reference/DiseasyBaseModule.html#method-load_module)
 - [`diseasy::DiseasyBaseModule$set_moduleowner()`](https://ssi-dk.github.io/diseasy/reference/DiseasyBaseModule.html#method-set_moduleowner)
 - [`diseasy::DiseasyModel$get_data()`](https://ssi-dk.github.io/diseasy/reference/DiseasyModel.html#method-get_data)
-- [`diseasy::DiseasyModelOde$get_results()`](https://ssi-dk.github.io/diseasy/reference/DiseasyModelOde.html#method-get_results)
 - [`diseasy::DiseasyModelOde$plot()`](https://ssi-dk.github.io/diseasy/reference/DiseasyModelOde.html#method-plot)
 
 ------------------------------------------------------------------------
@@ -92,14 +86,11 @@ Creates a new instance of the `DiseasyModelOdeSeir`
 #### Usage
 
     DiseasyModelOdeSeir$new(
-      observables,
+      observables = FALSE,
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
       immunity = TRUE,
-      compartment_structure = c(E = 1L, I = 1L, R = 1L),
-      disease_progression_rates = c(E = 1, I = 1),
-      malthusian_matching = TRUE,
       parameters = NULL,
       ...
     )
@@ -117,27 +108,6 @@ Creates a new instance of the `DiseasyModelOdeSeir`
   changes to the instance will not reflect in the copy that is added to
   `DiseasyModel`.
 
-- `compartment_structure`:
-
-  (`named integer()`)  
-  The structure of the compartments in the model. The names should be
-  `E`, `I`, and `R` for the exposed, infectious, and recovered
-  compartments, respectively. The exposed compartments can optionally be
-  omitted.
-
-- `disease_progression_rates`:
-
-  (`named numeric()`)  
-  The overall progression rates for the disease states. The reciprocal
-  of each rate is the average time spent in the all of the corresponding
-  compartments. The exposed compartments can optionally be omitted.
-
-- `malthusian_matching`:
-
-  (`logical(1)`)  
-  Should the model be scaled such the Malthusian growth rate matches the
-  corresponding SIR model?
-
 - `parameters`:
 
   (`named list()`)  
@@ -145,14 +115,30 @@ Creates a new instance of the `DiseasyModelOdeSeir`
 
   Parameters controlling the structure of the model:
 
+  - `compartment_structure` (`named integer()`)  
+    The structure of the compartments in the model. The names should be
+    `E`, `I`, and `R` for the exposed, infectious, and recovered
+    compartments, respectively. The exposed compartments can optionally
+    be omitted.
+
   - `age_cuts_lower`
     ([`numeric()`](https://rdrr.io/r/base/numeric.html))  
     Determines the age groups in the model.
+
+  - `malthusian_matching` (`logical(1)`)  
+    Should the model be scaled such the Malthusian growth rate matches
+    the corresponding SIR model?
 
   Parameters controlling the dynamics of the model:
 
   - `overall_infection_risk` (`numeric(1)`)  
     A scalar that scales contact rates to infection rates.
+
+  - `disease_progression_rates` (`named numeric()`)  
+    The overall progression rates for the disease states. The reciprocal
+    of each rate is the average time spent in the all of the
+    corresponding compartments. The exposed compartments can optionally
+    be omitted.
 
   Parameters controlling initialisation routines
 
@@ -203,6 +189,88 @@ Creates a new instance of the `DiseasyModelOdeSeir`
 
   Parameters sent to `DiseasyModel`
   [R6](https://r6.r-lib.org/reference/R6Class.html) constructor.
+
+------------------------------------------------------------------------
+
+### Method `load_module()`
+
+Overload the `$load_module()` to re-initialise the helpers after loading
+
+#### Usage
+
+    DiseasyModelOdeSeir$load_module(...)
+
+#### Arguments
+
+- `...`:
+
+  Arguments sent to parent method.
+
+------------------------------------------------------------------------
+
+### Method `get_results()`
+
+The primary method used to request model results of a given observable
+at a given stratification
+
+#### Usage
+
+    DiseasyModelOdeSeir$get_results(
+      observable,
+      prediction_length,
+      quantiles = NULL,
+      stratification = NULL
+    )
+
+#### Arguments
+
+- `observable`:
+
+  (`character`)  
+  The observable to provide data or prediction for.
+
+- `prediction_length`:
+
+  (`numeric`)  
+  The number of days to predict. The prediction start is defined by
+  `last_queryable_date` of the
+  [`?DiseasyObservables`](https://ssi-dk.github.io/diseasy/reference/DiseasyObservables.md)
+  [R6](https://r6.r-lib.org/reference/R6Class.html) class.
+
+- `quantiles`:
+
+  (`list`(`numeric`))  
+  If given, results are returned at the quantiles given.
+
+- `stratification`:
+
+  (`list`(`quosures`) or `NULL`)  
+  Use `rlang::quos(...)` to specify stratification. If given,
+  expressions in stratification evaluated to give the stratification
+  level.
+
+#### Returns
+
+A `tibble`
+[tibble::tibble](https://tibble.tidyverse.org/reference/tibble.html)
+with predictions at the level specified by stratification level. In
+addition to stratification columns, the output has the columns:  
+  
+- date (`Date`) specifying the date of the prediction.  
+- realisation_id (`character`) giving a unique id for each realization
+in the ensemble.  
+- weight (`numeric`) giving the weight of the realization in the
+ensemble.
+
+------------------------------------------------------------------------
+
+### Method `prepare_rhs()`
+
+Allocate the helpers for the rhs method
+
+#### Usage
+
+    DiseasyModelOdeSeir$prepare_rhs()
 
 ------------------------------------------------------------------------
 
@@ -431,24 +499,24 @@ The objects of this class are cloneable with this method.
   m <- DiseasyModelOdeSeir$new(
     observables = obs,
     activity = act,
-    disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
     parameters = list(
+      "age_cuts_lower" = c(0, 30, 60),
       "overall_infection_risk" = 0.025,
-      "age_cuts_lower" = c(0, 30, 60)
+      "disease_progression_rates" = c("E" = 1 / 2, "I" = 1 / 4)
     )
   )
 
   # Run the model to predict incidence
   prediction <- m$get_results("incidence", prediction_length = 30)
   print(head(prediction, 5))
-#> # A tibble: 5 × 2
-#>   date       incidence
-#>   <date>         <dbl>
-#> 1 2020-03-01   0.00530
-#> 2 2020-03-02   0.00549
-#> 3 2020-03-03   0.00568
-#> 4 2020-03-04   0.00586
-#> 5 2020-03-05   0.00603
+#> # A tibble: 5 × 4
+#>   date       incidence realisation_id weight
+#>   <date>         <dbl>          <dbl>  <dbl>
+#> 1 2020-03-01   0.00530              1      1
+#> 2 2020-03-02   0.00549              1      1
+#> 3 2020-03-03   0.00568              1      1
+#> 4 2020-03-04   0.00586              1      1
+#> 5 2020-03-05   0.00603              1      1
 
   # Plot the results
   plot(m, observable = "incidence", prediction_length = 30)
