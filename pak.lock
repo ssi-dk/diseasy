@@ -2808,7 +2808,7 @@
       "ref": "lintr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "dependencies": ["backports", "cli", "codetools", "digest", "glue", "knitr", "rex", "xml2", "xmlparsedata"],
+      "dependencies": ["backports", "cli", "codetools", "digest", "glue", "knitr", "rex", "xfun", "xml2", "xmlparsedata"],
       "direct": false,
       "directpkg": false,
       "install_args": "",
@@ -2819,7 +2819,7 @@
         "RemoteRef": "lintr",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "3.2.0"
+        "RemoteSha": "3.3.0-1"
       },
       "needscompilation": false,
       "package": "lintr",
@@ -2827,12 +2827,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lintr_3.2.0.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lintr_3.3.0-1.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/lintr_3.2.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/lintr_3.3.0-1.tar.gz",
       "type": "standard",
-      "version": "3.2.0",
+      "version": "3.3.0-1",
       "vignettes": false
     },
     {
@@ -4312,7 +4312,7 @@
         "RemoteRef": "reactable",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.4.4"
+        "RemoteSha": "0.4.5"
       },
       "needscompilation": false,
       "package": "reactable",
@@ -4320,12 +4320,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/reactable_0.4.4.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/reactable_0.4.5.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/reactable_0.4.4.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/reactable_0.4.5.tar.gz",
       "type": "standard",
-      "version": "0.4.4",
+      "version": "0.4.5",
       "vignettes": false
     },
     {
@@ -4636,7 +4636,7 @@
         "RemoteRef": "RSQLite",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "2.4.4"
+        "RemoteSha": "2.4.5"
       },
       "needscompilation": false,
       "package": "RSQLite",
@@ -4644,12 +4644,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/RSQLite_2.4.4.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/RSQLite_2.4.5.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/RSQLite_2.4.4.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/RSQLite_2.4.5.tar.gz",
       "type": "standard",
-      "version": "2.4.4",
+      "version": "2.4.5",
       "vignettes": false
     },
     {
@@ -5316,7 +5316,7 @@
         "RemoteRef": "testthat",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "3.3.0"
+        "RemoteSha": "3.3.1"
       },
       "needscompilation": false,
       "package": "testthat",
@@ -5324,12 +5324,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/testthat_3.3.0.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/testthat_3.3.1.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/testthat_3.3.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/testthat_3.3.1.tar.gz",
       "type": "standard",
-      "version": "3.3.0",
+      "version": "3.3.1",
       "vignettes": false
     },
     {
@@ -5807,7 +5807,7 @@
         "RemoteRef": "vroom",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.6.6"
+        "RemoteSha": "1.6.7"
       },
       "needscompilation": false,
       "package": "vroom",
@@ -5815,12 +5815,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/vroom_1.6.6.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/vroom_1.6.7.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/vroom_1.6.6.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/vroom_1.6.7.tar.gz",
       "type": "standard",
-      "version": "1.6.6",
+      "version": "1.6.7",
       "vignettes": false
     },
     {
@@ -5962,7 +5962,7 @@
         "RemoteRef": "xml2",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.5.0"
+        "RemoteSha": "1.5.1"
       },
       "needscompilation": false,
       "package": "xml2",
@@ -5970,7 +5970,7 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xml2_1.5.0.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/xml2_1.5.1.tar.gz",
       "sysreqs": "libxml2: libxml2-dev (deb), libxml2-devel (rpm)",
       "sysreqs_packages": [
         {
@@ -5980,9 +5980,9 @@
           "post_install": {}
         }
       ],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.5.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/xml2_1.5.1.tar.gz",
       "type": "standard",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "vignettes": false
     },
     {
@@ -6093,7 +6093,7 @@
         "RemoteRef": "yaml",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "2.3.10"
+        "RemoteSha": "2.3.11"
       },
       "needscompilation": false,
       "package": "yaml",
@@ -6101,12 +6101,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/yaml_2.3.10.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/yaml_2.3.11.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/yaml_2.3.10.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/yaml_2.3.11.tar.gz",
       "type": "standard",
-      "version": "2.3.10",
+      "version": "2.3.11",
       "vignettes": false
     },
     {
