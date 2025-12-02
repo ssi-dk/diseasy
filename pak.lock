@@ -1,7 +1,7 @@
 {
   "lockfile_version": 1,
   "os": "Ubuntu 24.04.3 LTS",
-  "r_version": "R version 4.5.2 (2025-10-31)",
+  "r_version": "R version 4.5.1 (2025-06-13)",
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
@@ -2314,7 +2314,7 @@
     {
       "ref": "installed::/usr/local/lib/R/library/codetools",
       "binary": true,
-      "built": "R 4.5.2; ; 2025-10-31 11:44:07 UTC; unix",
+      "built": "R 4.5.1; ; 2025-10-02 10:44:28 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
       "direct": false,
@@ -2332,7 +2332,7 @@
       "params": [],
       "platform": "*",
       "repotype": "cran",
-      "rversion": "R 4.5.2",
+      "rversion": "R 4.5.1",
       "sources": [],
       "sysreqs_packages": {},
       "target": "src/contrib/codetools_0.2-20.tar.gz",
@@ -2343,7 +2343,7 @@
     {
       "ref": "installed::/usr/local/lib/R/library/lattice",
       "binary": true,
-      "built": "R 4.5.2; x86_64-pc-linux-gnu; 2025-10-31 11:40:27 UTC; unix",
+      "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:40:57 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": [],
       "direct": false,
@@ -2351,7 +2351,7 @@
       "install_args": "",
       "license": "GPL (>= 2)",
       "metadata": {
-        "RemotePkgRef": "installed::/opt/R/4.5.1/lib/R/library/lattice",
+        "RemotePkgRef": "installed::/usr/local/lib/R/library/lattice",
         "RemoteType": "installed",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
         "RemoteSha": "0.22-7"
@@ -2361,7 +2361,7 @@
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
       "repotype": "cran",
-      "rversion": "R 4.5.2",
+      "rversion": "R 4.5.1",
       "sources": [],
       "sysreqs_packages": {},
       "target": "src/contrib/lattice_0.22-7.tar.gz",
@@ -2372,7 +2372,7 @@
     {
       "ref": "installed::/usr/local/lib/R/library/Matrix",
       "binary": true,
-      "built": "R 4.5.2; x86_64-pc-linux-gnu; 2025-10-31 11:40:38 UTC; unix",
+      "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:41:10 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "lattice",
       "direct": false,
@@ -2383,25 +2383,25 @@
         "RemotePkgRef": "installed::/usr/local/lib/R/library/Matrix",
         "RemoteType": "installed",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
-        "RemoteSha": "1.7-4"
+        "RemoteSha": "1.7-3"
       },
       "needscompilation": true,
       "package": "Matrix",
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
       "repotype": "cran",
-      "rversion": "R 4.5.2",
+      "rversion": "R 4.5.1",
       "sources": [],
       "sysreqs_packages": {},
-      "target": "src/contrib/Matrix_1.7-4.tar.gz",
+      "target": "src/contrib/Matrix_1.7-3.tar.gz",
       "type": "installed",
-      "version": "1.7-4",
+      "version": "1.7-3",
       "vignettes": false
     },
     {
       "ref": "installed::/usr/local/lib/R/library/mgcv",
       "binary": true,
-      "built": "R 4.5.2; x86_64-pc-linux-gnu; 2025-10-31 11:44:22 UTC; unix",
+      "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:44:43 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": ["nlme", "Matrix"],
       "direct": false,
@@ -2419,7 +2419,7 @@
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
       "repotype": "cran",
-      "rversion": "R 4.5.2",
+      "rversion": "R 4.5.1",
       "sources": [],
       "sysreqs_packages": {},
       "target": "src/contrib/mgcv_1.9-3.tar.gz",
@@ -2430,7 +2430,7 @@
     {
       "ref": "installed::/usr/local/lib/R/library/nlme",
       "binary": true,
-      "built": "R 4.5.2; x86_64-pc-linux-gnu; 2025-10-31 11:43:18 UTC; unix",
+      "built": "R 4.5.1; x86_64-pc-linux-gnu; 2025-10-02 10:43:40 UTC; unix",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "dependencies": "lattice",
       "direct": false,
@@ -2448,7 +2448,7 @@
       "params": [],
       "platform": "x86_64-pc-linux-gnu",
       "repotype": "cran",
-      "rversion": "R 4.5.2",
+      "rversion": "R 4.5.1",
       "sources": [],
       "sysreqs_packages": {},
       "target": "src/contrib/nlme_3.1-168.tar.gz",
@@ -2808,7 +2808,7 @@
       "ref": "lintr",
       "binary": true,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "dependencies": ["backports", "cli", "codetools", "digest", "glue", "knitr", "rex", "xml2", "xmlparsedata"],
+      "dependencies": ["backports", "cli", "codetools", "digest", "glue", "knitr", "rex", "xfun", "xml2", "xmlparsedata"],
       "direct": false,
       "directpkg": false,
       "install_args": "",
@@ -2819,7 +2819,7 @@
         "RemoteRef": "lintr",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "3.2.0"
+        "RemoteSha": "3.3.0-1"
       },
       "needscompilation": false,
       "package": "lintr",
@@ -2827,12 +2827,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lintr_3.2.0.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/lintr_3.3.0-1.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/lintr_3.2.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/lintr_3.3.0-1.tar.gz",
       "type": "standard",
-      "version": "3.2.0",
+      "version": "3.3.0-1",
       "vignettes": false
     },
     {
@@ -4636,7 +4636,7 @@
         "RemoteRef": "RSQLite",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "2.4.4"
+        "RemoteSha": "2.4.5"
       },
       "needscompilation": false,
       "package": "RSQLite",
@@ -4644,12 +4644,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/RSQLite_2.4.4.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/RSQLite_2.4.5.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/RSQLite_2.4.4.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/RSQLite_2.4.5.tar.gz",
       "type": "standard",
-      "version": "2.4.4",
+      "version": "2.4.5",
       "vignettes": false
     },
     {
@@ -5316,7 +5316,7 @@
         "RemoteRef": "testthat",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "3.3.0"
+        "RemoteSha": "3.3.1"
       },
       "needscompilation": false,
       "package": "testthat",
@@ -5324,12 +5324,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/testthat_3.3.0.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/testthat_3.3.1.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/testthat_3.3.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/testthat_3.3.1.tar.gz",
       "type": "standard",
-      "version": "3.3.0",
+      "version": "3.3.1",
       "vignettes": false
     },
     {
@@ -5807,7 +5807,7 @@
         "RemoteRef": "vroom",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.6.6"
+        "RemoteSha": "1.6.7"
       },
       "needscompilation": false,
       "package": "vroom",
@@ -5815,12 +5815,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/vroom_1.6.6.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/vroom_1.6.7.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/vroom_1.6.6.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/vroom_1.6.7.tar.gz",
       "type": "standard",
-      "version": "1.6.6",
+      "version": "1.6.7",
       "vignettes": false
     },
     {
@@ -6093,7 +6093,7 @@
         "RemoteRef": "yaml",
         "RemoteRepos": "https://p3m.dev/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "2.3.10"
+        "RemoteSha": "2.3.11"
       },
       "needscompilation": false,
       "package": "yaml",
@@ -6101,12 +6101,12 @@
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "repotype": "cran",
       "rversion": "4.5",
-      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/yaml_2.3.10.tar.gz",
+      "sources": "https://p3m.dev/cran/__linux__/noble/latest/src/contrib/yaml_2.3.11.tar.gz",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/yaml_2.3.10.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.5/yaml_2.3.11.tar.gz",
       "type": "standard",
-      "version": "2.3.10",
+      "version": "2.3.11",
       "vignettes": false
     },
     {
