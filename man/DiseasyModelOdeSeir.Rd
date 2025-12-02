@@ -56,10 +56,10 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   m <- DiseasyModelOdeSeir$new(
     observables = obs,
     activity = act,
-    disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
     parameters = list(
+      "age_cuts_lower" = c(0, 30, 60),
       "overall_infection_risk" = 0.025,
-      "age_cuts_lower" = c(0, 30, 60)
+      "disease_progression_rates" = c("E" = 1 / 2, "I" = 1 / 4)
     )
   )
 
@@ -73,6 +73,9 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   rm(m, act, obs)
 \dontshow{\}) # examplesIf}
 }
+\seealso{
+\link{DiseasyObservables}
+}
 \keyword{model-template}
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelOde]{diseasy::DiseasyModelOde}} -> \code{DiseasyModelOdeSeir}
@@ -80,10 +83,6 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively.  Read only.}
-
-\item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments.  Read only.}
-
 \item{\code{malthusian_scaling_factor}}{(\code{numeric(1)})\cr
 A scaling factor to apply to the contact matrices to account for structural differences
 in the model. Read only.}
@@ -94,6 +93,9 @@ in the model. Read only.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiseasyModelOdeSeir-new}{\code{DiseasyModelOdeSeir$new()}}
+\item \href{#method-DiseasyModelOdeSeir-load_module}{\code{DiseasyModelOdeSeir$load_module()}}
+\item \href{#method-DiseasyModelOdeSeir-get_results}{\code{DiseasyModelOdeSeir$get_results()}}
+\item \href{#method-DiseasyModelOdeSeir-prepare_rhs}{\code{DiseasyModelOdeSeir$prepare_rhs()}}
 \item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
 \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
 \item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
@@ -104,10 +106,8 @@ in the model. Read only.}
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="get_results"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-get_results'><code>diseasy::DiseasyModelOde$get_results()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>diseasy::DiseasyModelOde$plot()</code></a></span></li>
 </ul>
 </details>
@@ -119,14 +119,11 @@ in the model. Read only.}
 Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} class.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$new(
-  observables,
+  observables = FALSE,
   activity = TRUE,
   season = TRUE,
   variant = TRUE,
   immunity = TRUE,
-  compartment_structure = c(E = 1L, I = 1L, R = 1L),
-  disease_progression_rates = c(E = 1, I = 1),
-  malthusian_matching = TRUE,
   parameters = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -137,26 +134,23 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
 \describe{
 \item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
 
-\item{\code{compartment_structure}}{(\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.}
-
-\item{\code{disease_progression_rates}}{(\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.}
-
-\item{\code{malthusian_matching}}{(\code{logical(1)})\cr
-Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?}
-
 \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
 Parameters controlling the structure of the model:
 \itemize{
+\item \code{compartment_structure} (\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.
 \item \code{age_cuts_lower} (\code{numeric()})\cr
 Determines the age groups in the model.
+\item \code{malthusian_matching} (\code{logical(1)})\cr
+Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?
 }
 
 Parameters controlling the dynamics of the model:
 \itemize{
 \item \code{overall_infection_risk} (\code{numeric(1)})\cr
 A scalar that scales contact rates to infection rates.
+\item \code{disease_progression_rates} (\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.
 }
 
 Parameters controlling initialisation routines
@@ -188,6 +182,64 @@ Additional parameters are:
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-load_module"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-load_module}{}}}
+\subsection{Method \code{load_module()}}{
+Overload the \verb{$load_module()} to re-initialise the helpers after loading
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$load_module(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Arguments sent to parent method.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-get_results"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-get_results}{}}}
+\subsection{Method \code{get_results()}}{
+The primary method used to request model results of a given observable at a given stratification
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$get_results(
+  observable,
+  prediction_length,
+  quantiles = NULL,
+  stratification = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+
+\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+
+\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
+
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-prepare_rhs"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-prepare_rhs}{}}}
+\subsection{Method \code{prepare_rhs()}}{
+Allocate the helpers for the rhs method
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$prepare_rhs()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-set_forcing_functions"></a>}}

@@ -174,7 +174,7 @@ The parameters are:
 
 ```{r model configuration, eval = rlang::is_installed("RSQLite")}
 # Hyper parameters
-compartment_structure <- c("E" = 2, "I" = 1, "R" = 1)
+compartment_structure <- c("E" = 2L, "I" = 1L, "R" = 1L)
 age_cuts_lower <- c(0, 30, 60)
 
 # Parameters
@@ -295,12 +295,12 @@ model <- DiseasyModelOdeSeir$new(
   activity = activity,
   observables = observables,
 
-  # Parameter and hyper-parameter configuration
-  compartment_structure = compartment_structure,
-  disease_progression_rates = disease_progression_rates,
   parameters = list(
+    # Parameter and hyper-parameter configuration
+    "compartment_structure" = compartment_structure,
     "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
+    "disease_progression_rates" = disease_progression_rates,
 
     # Mapping to observables
     "model_output_to_observable" = model_output_to_observable
