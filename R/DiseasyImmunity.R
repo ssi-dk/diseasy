@@ -406,6 +406,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Additional arguments to be passed to the optimiser.
     #' @return
     #'   Returns the results from the optimisation with the approximated rates and execution time.
+    #'   The output of the objective function is given as the "error" (the square-root of the integral of the squared
+    #'   difference between approximation and target) and the "penalty" (the penalty controllable
+    #'   by `monotonous` and `individual_level`).
     #' @seealso `vignette("diseasy-immunity")`
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
@@ -635,7 +638,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
           delta <- numeric(0)
 
           # Get the metrics for the solution
-          par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          if (method == "free_delta") {
+            par <- c(inv_p_0inf(delta))
+          } else if (method %in% c("free_gamma", "all_free")) {
+            par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
+          }
+
           metrics <- obj_function(par)
           res <- list("value" = sum(metrics), "message" = "No free parameters to optimise")
 
@@ -733,7 +741,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   optim_control = optim_control,
                   ...
                 ) |>
-                  purrr::pluck("delta")
+                  purrr::pluck("delta") |>
+                  utils::head(1) # For free_gamma method, all delta are the same and algo expects only one value
 
                 # Adjust for the increase in the number of compartments
                 delta_0 <- delta_0 * (M - 1) / (M - 2)
@@ -850,6 +859,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 individual_level = individual_level
               ) |>
                 purrr::pluck("delta") |>
+                utils::head(1) |>
                 rep(M - 1)
 
               # Use free_gamma solution as starting point
@@ -1014,7 +1024,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
-              "sqrt_integral" = purrr::pluck(metrics, "value"),
+              "error" = purrr::pluck(metrics, "value"),
               "penalty" = purrr::pluck(metrics, "penalty"),
               "execution_time" = Sys.time() - tic + execution_time_offset
             )
