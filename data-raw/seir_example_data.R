@@ -118,7 +118,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   admitted <- array(0, dim = dim(true_infected))
 
-  for (i in seq_len(length(frac_to_hosp_after_days))) {
+  for (i in seq_along(frac_to_hosp_after_days)) {
     admitted <- admitted + rbind(
       array(0, dim = c(i, 3)),
       frac_to_hosp_after_days[i] * future_admitted[1: (NROW(future_admitted) - i), ]
