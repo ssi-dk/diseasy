@@ -171,7 +171,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
 # Below we implement a optimisation helper that
 # collects the existing results from the round
-existing_results <- function(M, monotonous, individual_level) {
+existing_results <- function(M, monotonous, individual_level) {                                                         # nolint: object_name_linter
 
   exisitng_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
 
@@ -210,7 +210,8 @@ existing_results <- function(M, monotonous, individual_level) {
               r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
             )
           )
-      }) |>
+      }
+    ) |>
     purrr::list_rbind() |>
     dplyr::select("optim_method", "target_label", "method", "strategy")
 }
