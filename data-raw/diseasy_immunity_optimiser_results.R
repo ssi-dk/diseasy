@@ -121,6 +121,15 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
             try(
               {
+                im_p$plot(
+                  method = method,
+                  strategy = strategy,
+                  M = M,
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control
+                )
+
                 approx <- im_p$approximate_compartmental(
                   method = method,
                   strategy = strategy,
@@ -160,6 +169,53 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 }
 
 
+# Below we implement a optimisation helper that
+# collects the existing results from the round
+existing_results <- function(M, monotonous, individual_level) {
+
+  exisitng_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
+
+  # Early return if no files exist
+  if (length(exisitng_files) == 0) {
+    return(
+      data.frame(
+        "optim_method" = character(0),
+        "target_label" = character(0),
+        "method"       = character(0),
+        "strategy"     = character(0)
+      )
+    )
+  }
+
+
+  # Parse existing files
+  list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds")) |>
+    purrr::map(
+      .progress = TRUE,
+      \(file) {
+        tmp <- file.path(path, file) |>
+          readRDS()
+
+        tmp |>
+          purrr::imap(\(approx, target_label) {
+            approx |>
+              purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
+              modifyList(list("target_label" = target_label))
+          }) |>
+          purrr::list_transpose() |>
+          tibble::as_tibble() |>
+          dplyr::mutate(
+            "optim_method" = stringr::str_extract(
+              !!file,
+              r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
+            )
+          )
+      }) |>
+    purrr::list_rbind() |>
+    dplyr::select("optim_method", "target_label", "method", "strategy")
+}
+
+
 # Run the optimisation
 path <- devtools::package_file("data-raw/diseasy_immunity_optimiser_results/")
 cache <- cachem::cache_disk(dir = path, max_size = Inf)
@@ -167,25 +223,6 @@ cache <- cachem::cache_disk(dir = path, max_size = Inf)
 for (penalty in c(0, 1)) {
   monotonous <- penalty
   individual_level <- penalty
-
-  # Check for the existence of a summery file
-  summery_file_exists <- exists("diseasy_immunity_optimiser_results")
-
-
-  # Load current results
-  if (summery_file_exists) {
-    current_results <- diseasy_immunity_optimiser_results |>
-      dplyr::filter(.data$penalty == !!penalty) |>
-      dplyr::select("optim_method", "target_label", "method", "strategy", "M")
-  } else {
-    current_results <- tibble::tibble(
-      "optim_method" = character(0),
-      "target_label" = character(0),
-      "method" = character(0),
-      "strategy" = character(0),
-      "M" = numeric(0)
-    )
-  }
 
   closeAllConnections()
 
@@ -260,7 +297,7 @@ for (penalty in c(0, 1)) {
   optim_labels <- optim_configs$config |>
     purrr::map_chr(~ {
       .x |>
-        purrr::map_if(is.numeric, ~ sprintf("%1.e", .)) |>
+        purrr::map_if(is.numeric, ~ sprintf("%1.0e", .)) |>
         as.data.frame() |>
         tidyr::unite("label", tidyselect::everything()) |>
         dplyr::pull("label") |>
@@ -287,46 +324,6 @@ for (penalty in c(0, 1)) {
       names = c("method", "strategy")
     )
 
-
-  # Gather the results for the round and eliminate stragglers
-  if (length(list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds"))) > 0) {
-    round_results <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds")) |>
-      purrr::map(
-        .progress = TRUE,
-        \(file) {
-          tmp <- file.path(path, file) |>
-            readRDS()
-
-          tmp |>
-            purrr::imap(\(approx, target_label) {
-              approx |>
-                purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
-                modifyList(list("target_label" = target_label))
-            }) |>
-            purrr::list_transpose() |>
-            tibble::as_tibble() |>
-            dplyr::mutate(
-              "optim_method" = stringr::str_extract(
-                !!file,
-                r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
-              )
-            )
-        }
-      ) |>
-      purrr::list_rbind() |>
-      dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
-      dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
-
-
-    # Eliminate too slow candidates
-    candidates <- dplyr::setdiff(
-      candidates,
-      round_results |>
-        dplyr::select("optim_method", "target_label", "method", "strategy")
-    )
-  }
-
-
   # Define a helper to construct combinations
   zip <- function(...) mapply(list, ..., SIMPLIFY = FALSE)
 
@@ -334,6 +331,10 @@ for (penalty in c(0, 1)) {
   for (M in seq(from = 2, to = 10)) {
     message(glue::glue("M = {M}"))
 
+    # Remove existing computations
+    candidates <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
+
+    # Compute new/missing runs
     combinations <- tidyr::expand_grid(
       "model" = zip(models, model_names, time_scales),
       "method_label" = c(
@@ -350,7 +351,6 @@ for (penalty in c(0, 1)) {
         names = c("method", "strategy")
       ) |>
       dplyr::inner_join(candidates, by = c("optim_method", "target_label", "method", "strategy")) |>
-      dplyr::anti_join(current_results, by = c("optim_method", "target_label", "method", "strategy", "M")) |>
       dplyr::left_join(optim_configs, by = "optim_method")
 
     # Run the approximations for the round
