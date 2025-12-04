@@ -1,9 +1,3 @@
-# We cannot really test the `initialise_state_vector` method in the traditional sense since it is, in essence,
-# a method to approximate another signal. Looking at the current implementation however, we can see that the
-# initialisation works well when the parameters match the true underlying model.
-# We can therefore test that the initialisation works "well" and thereby guard ourselves against future,
-# unintended drops in performance.
-
 if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
   return() # Skip these tests if RSQLite is not installed
 }
@@ -61,12 +55,25 @@ tidyr::expand_grid(
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
       skip_if_not_installed("RSQLite")
 
+      obs$set_last_queryable_date(obs %.% start_date + lubridate::days(45))
+
+      act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+
+      im <- DiseasyImmunity$new()
+      im$set_exponential_waning(time_scale = 180)
+
+      s <- DiseasySeason$new()
+      s$set_reference_date(obs %.% last_queryable_date)
+      s$use_cosine_season()
+
       m <- DiseasyModelOdeSeir$new(
-        activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+        activity = act,
+        immunity = im,
+        season = s,
         observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-          "age_cuts_lower" = age_cuts_lower,
+          "age_cuts_lower" = 0,
           "disease_progression_rates" = c("E" = rE, "I" = rI)
         )
       )
@@ -74,30 +81,26 @@ tidyr::expand_grid(
       m$get_results("n_infected", prediction_length = 10)
 
 
-      # Configure two different methods for measuring "n_infected"
-      #weights_infection_matrix <-
+      ## Configure two different methods for measuring "n_infected"
+      # Both use unit weights but differ in stucture
+      # weights_infection_matrix: must match dimensions of infection_matrix
+      # weights_state_vector: must match dimensions of state_vector
 
-
-      gammas <- rep(1, M)
-
-      (seq_along(age_cuts_lower) - 1) |>
+      weights_infection_matrix <- (seq_along(age_cuts_lower) - 1) |>
         purrr::map(
           \(offset) {
             c(
-              rep(0, M * offset),
-              rep(1, M),
-              rep(0, M * ((length(age_cuts_lower) - 1) - offset))
-            ) * gammas
-        }
+              rep(0, M * offset), # Go to current age-group
+              rep(1, M), # Use weight 1 for each recovered compartment
+              rep(0, M * ((length(age_cuts_lower) - 1) - offset)) # pad rest
+            )
+          }
         ) |>
-          purrr::map2(
-            .y = seq(from = 0, to = length(age_cuts_lower) - 1),
-            ~ c(.x, .y == seq(from = 0, to = length(age_cuts_lower) - 1))
-          )
-
-        }
-      )
-
+        purrr::map2(
+          .y = seq(from = 0, to = length(age_cuts_lower) - 1),
+          ~ c(.x, .y == seq(from = 0, to = length(age_cuts_lower) - 1))
+        ) |>
+        purrr::reduce(rbind)
 
       m$configure_observable(
         weights = weights_infection_matrix,
@@ -105,10 +108,26 @@ tidyr::expand_grid(
         derived_from = "infection_matrix"
       )
 
+
+      weights_state_vector <- (seq_along(age_cuts_lower) - 1) |>
+        purrr::map(
+          \(offset) {
+            c(
+              rep(0, (K + L + M) * offset), # Go to current age-group
+              rep(0, K), # No outputs for E states
+              rI * L, # Weight r_I * L for I1 to get exit rates
+              rep(0, L - 1 + M), # No ouputs for remaining I states
+              rep(0, (K + L + M) * ((length(age_cuts_lower) - 1) - offset)),
+              rep(0, length(age_cuts_lower)) # No output for S states
+            )
+          }
+        ) |>
+        purrr::reduce(rbind)
+
       m$configure_observable(
         weights = weights_state_vector,
         name = "n_infected_state_vector",
-        derived_from = "state-vector"
+        derived_from = "state_vector"
       )
 
       rm(m)
