@@ -59,6 +59,7 @@ The list of models currently being used in the module. Read-only.}
 \item \href{#method-DiseasyImmunity-set_custom_waning}{\code{DiseasyImmunity$set_custom_waning()}}
 \item \href{#method-DiseasyImmunity-approximate_compartmental}{\code{DiseasyImmunity$approximate_compartmental()}}
 \item \href{#method-DiseasyImmunity-plot}{\code{DiseasyImmunity$plot()}}
+\item \href{#method-DiseasyImmunity-describe}{\code{DiseasyImmunity$describe()}}
 \item \href{#method-DiseasyImmunity-clone}{\code{DiseasyImmunity$clone()}}
 }
 }
@@ -469,6 +470,16 @@ Number of compartments to be used in the model.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyImmunity-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-describe}{}}}
+\subsection{Method \code{describe()}}{
+Prints a human readable report of the internal state of the module.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$describe()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-clone"></a>}}
