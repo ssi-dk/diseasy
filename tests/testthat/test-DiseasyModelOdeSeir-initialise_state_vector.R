@@ -40,6 +40,16 @@ incidence_data <- obs$get_observation(
 # Lock the observation data to a simulation start date (30 day period)
 obs$set_last_queryable_date(obs %.% ds %.% max_end_date - 30)
 
+act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+
+im <- DiseasyImmunity$new()
+im$set_exponential_waning(time_scale = 180)
+
+s <- DiseasySeason$new()
+s$set_reference_date(as.Date("2020-01-01"))
+s$use_cosine_season()
+
+
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
   K = seq.int(from = 0, to = 3),
@@ -59,15 +69,6 @@ tidyr::expand_grid(
 
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
       skip_if_not_installed("RSQLite")
-
-      act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
-
-      im <- DiseasyImmunity$new()
-      im$set_exponential_waning(time_scale = 180)
-
-      s <- DiseasySeason$new()
-      s$set_reference_date(as.Date("2020-01-01"))
-      s$use_cosine_season()
 
       m <- DiseasyModelOdeSeir$new(
         activity = act,
