@@ -72,7 +72,7 @@ tidyr::expand_grid(
         observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-          "age_cuts_lower" = 0,
+          "age_cuts_lower" = age_cuts_lower,
           "disease_progression_rates" = c("E" = rE, "I" = rI)
         )
       )
