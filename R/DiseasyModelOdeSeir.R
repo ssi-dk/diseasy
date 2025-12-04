@@ -379,6 +379,38 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$immunity_matrix <- immunity_matrix
 
 
+      # Configure observables for hospitalisation immunity target
+      immunity_approx %.% gamma |>
+        purrr::keep_at(c("hospitalisation", "death")) |>
+        purrr::iwalk(\(gammas, observable) {
+
+          # Compute the weights for the observable
+          weights_infection_matrix <- seq(from = 0, to = private %.% n_age_groups - 1) |>
+            purrr::map(
+              \(offset) {
+                c(
+                  rep(0, compartment_structure %.% R * offset),
+                  rep(1, compartment_structure %.% R),
+                  rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
+                ) * gammas
+              }
+            ) |>
+            purrr::map(~ rep(., private$n_variants)) |>
+            purrr::map2(
+              .y = seq(from = 0, to = private %.% n_age_groups - 1),
+              ~ c(.x, .y == seq(from = 0, to = private %.% n_age_groups - 1))
+            ) |>
+            purrr::reduce(rbind)
+
+          # Configure the observable
+          self$configure_observable(
+            weights = weights_infection_matrix,
+            name = glue::glue("n_{observable}"),
+            derived_from = "infection_matrix"
+          )
+        })
+
+
       # Set the default forcing functions (no forcing)
       self %.% set_forcing_functions(
         infected_forcing = \(t, infected) infected,
