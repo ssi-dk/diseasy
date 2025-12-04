@@ -1016,7 +1016,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       coll <- checkmate::makeAssertCollection()
       if (!private$ready) coll$push("RHS is not configured - call `prepare_rhs()` before configuring observables!")
       checkmate::assert(
-        checkmate::check_matrix(weights, nrows = dim),
+        checkmate::check_matrix(weights, ncols = dim),
         checkmate::check_numeric(weights, len = dim),
         add = coll
       )
@@ -1059,12 +1059,22 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       # Update surveillance indices
-      private$surveillance_indices$infection_matrix <- private %.% n_states +
-        seq(from = 1, to = nrow(private %.% observable_mapping %.% infection_matrix))
+      if (is.null(private %.% surveillance_indices)) {
+        private$surveillance_indices <- list("infection_matrix" = NULL, "state_vector" = NULL)
+      }
 
-      private$surveillance_indices$state_vector <- private %.% n_states +
-        nrow(private %.% observable_mapping %.% infection_matrix) +
-        seq(from = 1, to = nrow(private %.% observable_mapping %.% state_vector))
+      if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
+        private$surveillance_indices$infection_matrix <- private %.% n_states +
+          seq(from = 1, to = nrow(private %.% observable_mapping %.% infection_matrix))
+      }
+
+      if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
+        private$surveillance_indices$state_vector <- private %.% n_states +
+          purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0) +
+          seq(from = 1, to = nrow(private %.% observable_mapping %.% state_vector))
+      }
+
+
 
       # Add observable to external mappings
       # (make the observable visible to $get_results())
@@ -1199,6 +1209,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     r1_state_indices = NULL,
     s_state_indices  = NULL,
     rs_state_indices = NULL,
+    surveillance_indices = NULL,
 
     rs_age_group = NULL,
     infection_matrix_to_rs_indices = NULL,
