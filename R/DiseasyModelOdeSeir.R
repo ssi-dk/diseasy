@@ -965,7 +965,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param derived_from (`character(1)`)\cr
     #'   Which signal source should the observable be derived from?
     #' @details
-    #'  If the signal source is "state-vector" the dot-product of the weights matrix and the state vector
+    #'  If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
     #'  forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
     #'
     #'  If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
@@ -974,13 +974,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     configure_observable = function(
       weights,
       name,
-      derived_from = c("state-vector", "infection_matrix")
+      derived_from = c("state_vector", "infection_matrix")
     ) {
       derived_from <- match.arg(derived_from)
 
       # Compute required dimensions
       dim <- ifelse(
-        derived_from == "state-vector",
+        derived_from == "state_vector",
         private %.% n_states,
         length(private %.% rs_state_indices)
       )

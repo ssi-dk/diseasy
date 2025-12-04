@@ -307,24 +307,24 @@ model_output_to_observable <- list(
 
 ### Custom model output
 The `diseasy` ODE model templates uses a generic system for generating observables
-from the state-vector, $\overline{\psi}$.
+from the state_vector, $\overline{\psi}$.
 
 A observable can be configured to either derive from either the full state vector
 $\overline{\psi}$ or the infection matrix $f$ (see the article `SEIR-implementation`
 in the online documentation).
 
 In either case, the observable is configured by defining a vector of weights.
-For each of such vectors, a "surveillance" state is added to the state-vector which
+For each of such vectors, a "surveillance" state is added to the state_vector which
 integrates the inner-product $\overline{\omega}_o \cdot \overline{\psi}$ or
 $\overline{\omega}_o \cdot \sum_{rows}\overline{\overline{f}}$ depending on which
 element the observable is set to track.
 
-In the former case, the surveillance states derived from the state-vector where as
+In the former case, the surveillance states derived from the state_vector where as
 in the latter the observable is derived from the new infections occurring in the model.
 
 In the case of the "n_infected" observable defined by default in the model, the weights
 are essentially a matrix with weights only for each $I_1$ state[^2] and the observable
-tracks the state-vector.
+tracks the state_vector.
 
 [^2]: The "n_infected" observable does not actually create the additional surveillance states in the implementation
 since it can be computed directly from $\overline{\psi}$, but it used here as a illustrative example.

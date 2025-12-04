@@ -397,7 +397,7 @@ That is, observables must be summarisable by the "sum()" function.
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_observable(
   weights,
   name,
-  derived_from = c("state-vector", "infection_matrix")
+  derived_from = c("state_vector", "infection_matrix")
 )}\if{html}{\out{</div>}}
 }
 
@@ -416,7 +416,7 @@ Which signal source should the observable be derived from?}
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-If the signal source is "state-vector" the dot-product of the weights matrix and the state vector
+If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
 forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
 
 If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
