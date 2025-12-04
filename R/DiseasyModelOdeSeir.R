@@ -366,6 +366,33 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$immunity_matrix <- immunity_matrix
 
 
+      # Configure observables for hospitalisation immunity target
+      c("hospitalisation", "death") |>
+        purrr::keep(~ . %in% names(immunity_approx %.% gamma)) |>
+        purrr::walk(~ {
+          gammas <- purrr::pluck(immunity_approx %.% gamma, .)
+
+          # We create a surveillance state for each age-group and variant
+          seq(from = 0, to = private %.% n_age_groups - 1) |>
+            purrr::map(
+              \(offset) {
+                c(
+                  rep(0, compartment_structure %.% R * offset),
+                  rep(1, compartment_structure %.% R),
+                  rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
+                ) * gammas
+            }
+          ) |>
+            purrr::map(~ rep(., private$n_variants)) |>
+            purrr::map2(
+              .y = seq(from = 0, to = private %.% n_age_groups - 1),
+              ~ c(.x, .y == seq(from = 0, to = private %.% n_age_groups - 1))
+            )
+
+        }
+      )
+
+
       # Set the default forcing functions (no forcing)
       self %.% set_forcing_functions(
         infected_forcing = \(t, infected) infected,
