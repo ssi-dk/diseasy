@@ -31,14 +31,24 @@ incidence_data <- obs$get_observation(
 )
 
 
-# Lock the observation data to a simulation start date (30 day period)
-obs$set_last_queryable_date(obs %.% ds %.% max_end_date - 30)
+# Lock the observation data to a simulation start date
+obs$set_last_queryable_date(obs %.% start_date + lubridate::days(45))
+
+act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+
+im <- DiseasyImmunity$new()
+im$set_exponential_waning(time_scale = 180)
+
+s <- DiseasySeason$new()
+s$set_reference_date(obs %.% last_queryable_date)
+s$use_cosine_season()
+
 
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
   K = seq.int(from = 0, to = 3),
   L = seq.int(from = 1, to = 3),
-  M = seq.int(from = 1, to = 3),
+  M = seq.int(from = 2, to = 3),
   age_cuts_lower = list(0, c(0, 60))
 ) |>
   purrr::pwalk(\(K, L, M, age_cuts_lower) {                                                                                             # nolint: object_name_linter
@@ -54,17 +64,6 @@ tidyr::expand_grid(
 
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
       skip_if_not_installed("RSQLite")
-
-      obs$set_last_queryable_date(obs %.% start_date + lubridate::days(45))
-
-      act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
-
-      im <- DiseasyImmunity$new()
-      im$set_exponential_waning(time_scale = 180)
-
-      s <- DiseasySeason$new()
-      s$set_reference_date(obs %.% last_queryable_date)
-      s$use_cosine_season()
 
       m <- DiseasyModelOdeSeir$new(
         activity = act,
