@@ -100,6 +100,7 @@ in the model. Read only.}
 \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
 \item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
 \item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
+\item \href{#method-DiseasyModelOdeSeir-configure_observable}{\code{DiseasyModelOdeSeir$configure_observable()}}
 \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
 }
 }
@@ -382,6 +383,48 @@ Argument to comply with \code{deSolve::ode} format. Not used.}
 \subsection{Returns}{
 (\code{numeric()})\cr
 The rate of change for the differential equations.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_observable"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_observable}{}}}
+\subsection{Method \code{configure_observable()}}{
+Define new observables via a set of weights.
+
+Currently, only countable observables are supported.
+That is, observables must be summarisable by the "sum()" function.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_observable(
+  weights,
+  name,
+  derived_from = c("state-vector", "infection_matrix")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{weights}}{(\code{matrix})\cr
+A matrix of weights to multiply by the signal source to form the flow into surveillance states.}
+
+\item{\code{name}}{(\code{character(1)})\cr
+A name for the observable (retrievable by \verb{$get_results()})}
+
+\item{\code{derived_from}}{(\code{character(1)})\cr
+Which signal source should the observable be derived from?}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+If the signal source is "state-vector" the dot-product of the weights matrix and the state vector
+forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
+
+If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
+of the infection matrix defines the flow (row-sums correspond to new infections).
+}
+
+\subsection{Returns}{
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
