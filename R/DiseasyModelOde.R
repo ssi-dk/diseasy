@@ -176,7 +176,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         stratification = stratification
       )
 
-      # Retrieve the observations for the observable at the model stratificaiton level
+      # Retrieve the observations for the observable at the model stratification level
       observations <- self %.% get_data(
         observable = observable,
         stratification = private %.% model_stratification(),
@@ -450,7 +450,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
             apply(FUN = which, MARGIN = 1) |>
             purrr::map_dbl(~ tail(., 1))
 
-          # We have to do janky evaluation to get the programatically generated expression
+          # We have to do janky evaluation to get the programmatically generated expression
           age_groups_maps <- purrr::map2(
             age_groups_in_data,
             diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[splits],
