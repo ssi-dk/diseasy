@@ -1118,6 +1118,24 @@ DiseasyImmunity <- R6::R6Class(                                                 
         xpd = TRUE
       )
 
+    },
+
+    #' @description `r rd_describe`
+    describe = function() {
+      printr("# DiseasyImmunity ############################################")
+      printr("Configured waning targets:")
+      purrr::iwalk(
+        self %.% model,
+        \(func, target) {
+          printr("- ", target, ":")
+          printr("  ", attr(func, "name"))
+          printr("  ", attr(func, "srcref"))
+          if (!is.null(attr(func, "dots"))) {
+            printr("  arguments: ", toString(purrr::imap(attr(func, "dots"), ~ paste(.y, "=", .x))))
+          }
+          printr("")
+        }
+      )
     }
   ),
 
