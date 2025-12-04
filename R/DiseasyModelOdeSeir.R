@@ -147,8 +147,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     load_module = function(...) {
       super$load_module(...)
 
-      # Mark that model is not initialised
-      private$initialised <- FALSE
+      # Mark that model is not ready
+      private$ready <- FALSE
     },
 
 
@@ -171,7 +171,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
       checkmate::reportAssertions(coll)
 
-      if (!private$initialised) {
+      if (!private$ready) {
         self$prepare_rhs()
       }
 
@@ -362,8 +362,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
       }
 
-      # Mark that model has been initialised
-      private$initialised <- TRUE
+      # Mark that model has been ready
+      private$ready <- TRUE
     },
 
 
@@ -952,7 +952,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
-    initialised = FALSE,
+    ready = FALSE,
 
     default_parameters = function() {
       modifyList(
