@@ -1249,6 +1249,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Add the forcing of the states
       dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
 
+      # Add the inflow to surveillance states
+      if (!is.null(private$observable_mapping$infection_matrix)) {
+        dy_dt[private$surveillance_indices$infection_matrix] <-
+          private$observable_mapping$infection_matrix %*% infection_matrix
+      }
+
+      if (!is.null(private$surveillance_indices$state_vector)) {
+        dy_dt[private$surveillance_indices$state_vector] <-
+          private$surveillance_indices$state_vector %*% as.matrix(state_vector)
+      }
+
       return(list(dy_dt))
     },
 
@@ -1443,6 +1454,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # Configurations for observables (model outputs)
     output_mapping = list("infection_matrix" = NULL, "state_vector" = NULL),
+
+    # Configurations for observables (model outputs)
+    observable_mapping = list("state_vector" = NULL, "infection_matrix" = NULL),
 
     default_parameters = function() {
       modifyList(
