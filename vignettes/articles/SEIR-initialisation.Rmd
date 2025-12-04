@@ -324,7 +324,7 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   s$set_reference_date(obs$last_queryable_date)
   s$use_cosine_season()
 
-  
+
   # Create a SEIR model to initialise
   m <- DiseasyModelOdeSeir$new(
     activity = act,
