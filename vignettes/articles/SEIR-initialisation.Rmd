@@ -315,14 +315,26 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   act$set_activity_units(dk_activity_units)
   act$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
 
+    # Add a waning immunity scenario
+  im <- DiseasyImmunity$new()
+  im$set_exponential_waning(time_scale = 180)
+
+  # Add a season secnario
+  s <- DiseasySeason$new()
+  s$set_reference_date(obs$last_queryable_date)
+  s$use_cosine_season()
+
+  
   # Create a SEIR model to initialise
   m <- DiseasyModelOdeSeir$new(
-    observables = obs,
     activity = act,
+    immunity = im,
+    season = s,
+    observables = obs,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = c(0, 30, 60),
-      "overall_infection_risk" = 0.025,
+      "overall_infection_risk" = 0.02,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -330,7 +342,7 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   return(m)
 }
 
-m <- generate_model(2L, 1L, 1L) # Use the configuration from example data
+m <- generate_model(2L, 1L, 2L) # Use the configuration from example data
 ```
 
 
@@ -531,8 +543,8 @@ Once we include model fitting, the discrepancy between the data and model predic
 #### Misspecified model in periods of increasing infections
 ```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing."}
 models <- list(
-  generate_model(2L, 1L, 1L),
-  generate_model(1L, 1L, 1L),
+  generate_model(2L, 1L, 2L),
+  generate_model(1L, 1L, 2L),
   generate_model(2L, 2L, 2L),
   generate_model(3L, 2L, 5L)
 )

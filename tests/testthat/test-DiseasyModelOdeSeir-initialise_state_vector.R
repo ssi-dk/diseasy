@@ -12,7 +12,7 @@ if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
+overall_infection_risk <- 0.02
 
 # Configure a observables module for use in the tests
 obs <- DiseasyObservables$new(
@@ -44,7 +44,7 @@ obs$set_last_queryable_date(obs %.% ds %.% max_end_date - 30)
 tidyr::expand_grid(
   K = seq.int(from = 0, to = 3),
   L = seq.int(from = 1, to = 3),
-  M = seq.int(from = 1, to = 3)
+  M = seq.int(from = 2, to = 3)
 ) |>
   purrr::pwalk(\(K, L, M) {                                                                                             # nolint: object_name_linter
 
@@ -60,8 +60,19 @@ tidyr::expand_grid(
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
       skip_if_not_installed("RSQLite")
 
+      act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+
+      im <- DiseasyImmunity$new()
+      im$set_exponential_waning(time_scale = 180)
+
+      s <- DiseasySeason$new()
+      s$set_reference_date(as.Date("2020-01-01"))
+      s$use_cosine_season()
+
       m <- DiseasyModelOdeSeir$new(
-        activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+        activity = act,
+        immunity = im,
+        season = s,
         observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
@@ -102,7 +113,7 @@ tidyr::expand_grid(
       # This will not generally be true, but should be true if the model we fit match the model
       # used to generate the data. If there is a misspecification of the model, the initial
       # behaviour of the model output may be "noisy" and not have the same number of turning points
-      if (identical(c(K, L, M), c(2, 1, 1))) {
+      if (identical(c(K, L, M), c(2L, 1L, 2L))) {
         expect_identical(
           sum(diff(sign(diff(model_incidence))) != 0),
           sum(diff(sign(diff(true_incidence))) != 0)
