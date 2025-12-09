@@ -45,8 +45,12 @@ test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`"
   # (i.e. as.Date("2020-01-01") + lubridate::days(180))
 
   expect_identical(
-    m1 %.% rhs(180, y0),
-    m2 %.% rhs(0, y0)
+    # Lets define t0 = "2020-01-01"
+    # m1 has has reference date: t0 + 0 days
+    m1 %.% rhs(180, y0),  # and we evaluate at (t0 + 0) + 180
+
+    # m2 has has reference date: t0 + 180 days
+    m2 %.% rhs(0, y0)     # and we evaluate at (t0 + 180) + 0
   )
 
   rm(m1, m2, act)
