@@ -53,5 +53,5 @@ test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`"
     m2 %.% rhs(0, y0)     # and we evaluate at (t0 + 180) + 0
   )
 
-  rm(m1, m2, act)
+  rm(m1, m2, act, s)
 })
