@@ -13,7 +13,7 @@ if (!rlang::is_installed("RSQLite")) {
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.02
+overall_infection_risk <- 0.025
 age_cuts_lower <- c(0, 30, 60)
 
 # Configure an activity module using Danish population and contact information

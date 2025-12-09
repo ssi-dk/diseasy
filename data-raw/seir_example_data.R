@@ -7,7 +7,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   rE <- 1 / 2.1                                                                                                         # nolint: object_name_linter
   rI <- 1 / 4.5                                                                                                         # nolint: object_name_linter
 
-  overall_infection_risk <- 0.02
+  overall_infection_risk <- 0.025
 
   # Set the age resolution
   age_cuts_lower <- c(0, 30, 60)
