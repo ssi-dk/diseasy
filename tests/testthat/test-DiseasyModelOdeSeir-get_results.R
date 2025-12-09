@@ -155,7 +155,12 @@ tidyr::expand_grid(
         dplyr::mutate("relative_error" = model / observations) |>
         dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
 
-      expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.15)                          # nolint: expect_identical_linter
+      expect_equal(                                                                                                     # nolint: expect_identical_linter
+        comparison$mean_relative_error,
+        rep(1, nrow(comparison)),
+        tolerance = 0.15,
+        label = glue::glue("mean_relative_error ({observable}, {stratification})")
+      )
     })
   })
 
