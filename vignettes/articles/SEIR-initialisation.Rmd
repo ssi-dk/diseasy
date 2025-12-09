@@ -414,93 +414,20 @@ psi
 ```
 
 And we now test the initial conditions by solving the model using these starting conditions.
+
 ```{r}
-get_prediction <- function(
-  model,
-  psi,
-  signal = "incidence"
-) {
-
-  # Integrate the ODE system with deSolve
-  sol <- deSolve::ode(
-    y = psi$initial_condition,
-    times = seq(0, 100),
-    func = model$rhs
-  )
-
-  # Improve the names of the output
-  colnames(sol) <- c(
-    "time",
-    psi |>
-      tidyr::unite("label", "variant", "age_group", "state", sep = "/") |>
-      dplyr::pull("label")
-  )
-
-  # Convert to long format
-  sol_long <- sol |>
-    as.data.frame() |>
-    tidyr::pivot_longer(
-      !"time",
-      names_sep = "/",
-      names_to = c("variant", "age_group", "state")
+prediction <- m$get_results(
+  "incidence",
+  stratification = rlang::quos(variant, age_group),
+  prediction_length = 100
+) |>
+  dplyr::mutate(
+    model_configuration = paste0(
+      names(m$parameters$compartment_structure),
+      m$parameters$compartment_structure,
+      collapse = ""
     )
-
-  # Extract the solution
-  if (signal == "incidence") {
-    out <- sol_long |>
-      dplyr::filter(.data$state == "I1") |>
-      dplyr::select(!"state") |>
-      dplyr::mutate(
-        "date" = .data$time + model$observables$last_queryable_date,
-        "incidence_model" = model$parameters$disease_progression_rates[["I"]] *
-            model$parameters$compartment_structure[["I"]] *
-            .data$value
-      )
-
-    # Convert to incidence
-    proportion <- model$activity$map_population(
-      model$parameters$age_cuts_lower
-    ) |>
-      dplyr::mutate(
-        "age_group" = diseasystore::age_labels(
-          model$parameters$age_cuts_lower
-        )[.data$age_group_out]
-      ) |>
-      dplyr::summarise(
-        "proportion" = sum(.data$proportion),
-        .by = "age_group"
-      )
-
-    out <- out |>
-      dplyr::left_join(proportion, by = "age_group") |>
-      dplyr::mutate("incidence_model" = .data$incidence_model / .data$proportion) |>
-      dplyr::select(!"proportion")
-
-  } else if (signal == "prevalence") {
-    out <- sol_long |>
-      dplyr::filter(startsWith(.data$state, "I1")) |>
-      dplyr::select(!"state") |>
-      dplyr::summarise(
-        "date" = dplyr::first(.data$time) + model$observables$last_queryable_date,
-        "incidence_model" = sum(.data$value),
-        .by = "time"
-      )
-  }
-
-  # Add the model configuration
-  out <- out |>
-    dplyr::mutate(
-      "model_configuration" = paste0(
-        names(model$parameters$compartment_structure),
-        model$parameters$compartment_structure,
-        collapse = ""
-      )
-    )
-
-  return(out)
-}
-
-prediction <- get_prediction(model = m, psi = psi)
+  )
 
 prediction
 ```
@@ -519,7 +446,7 @@ ggplot2::ggplot() +
   ) +
   ggplot2::geom_line(
     data = prediction,
-    ggplot2::aes(x = date, y = incidence_model, color = model_configuration),
+    ggplot2::aes(x = date, y = incidence, color = model_configuration),
     linewidth = 1.5
   ) +
   ggplot2::geom_vline(
@@ -567,7 +494,18 @@ models <- list(
 
 predictions <- models |>
   purrr::map(\(m) {
-    get_prediction(model = m, psi = m$initialise_state_vector(incidence_data))
+    m$get_results(
+      "incidence",
+      stratification = rlang::quos(variant, age_group),
+      prediction_length = 100
+    ) |>
+      dplyr::mutate(
+        model_configuration = paste0(
+          names(m$parameters$compartment_structure),
+          m$parameters$compartment_structure,
+          collapse = ""
+        )
+  )
   }) |>
   purrr::reduce(rbind)
 
@@ -585,7 +523,7 @@ ggplot2::ggplot() +
   ) +
   ggplot2::geom_line(
     data = predictions,
-    ggplot2::aes(x = date, y = incidence_model, color = model_configuration),
+    ggplot2::aes(x = date, y = incidence, color = model_configuration),
     linewidth = 1.5
   ) +
   ggplot2::geom_vline(
@@ -616,7 +554,18 @@ purrr::walk(models, \(m) {
 
 predictions <- models |>
   purrr::map(\(m) {
-    get_prediction(model = m, psi = m$initialise_state_vector(incidence_data))
+    m$get_results(
+      "incidence",
+      stratification = rlang::quos(variant, age_group),
+      prediction_length = 100
+    ) |>
+      dplyr::mutate(
+        model_configuration = paste0(
+          names(m$parameters$compartment_structure),
+          m$parameters$compartment_structure,
+          collapse = ""
+        )
+      )
   }) |>
   purrr::reduce(rbind)
 
@@ -634,7 +583,7 @@ ggplot2::ggplot() +
   ) +
   ggplot2::geom_line(
     data = predictions,
-    ggplot2::aes(x = date, y = incidence_model, color = model_configuration),
+    ggplot2::aes(x = date, y = incidence, color = model_configuration),
     linewidth = 1.5
   ) +
   ggplot2::geom_vline(
