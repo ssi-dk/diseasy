@@ -7,7 +7,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   rE <- 1 / 2.1                                                                                                         # nolint: object_name_linter
   rI <- 1 / 4.5                                                                                                         # nolint: object_name_linter
 
-  overall_infection_risk <- 0.025
+  overall_infection_risk <- 0.02
 
   # Set the age resolution
   age_cuts_lower <- c(0, 30, 60)
@@ -15,7 +15,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Setup the number of compartments for the generating model
   K <- 2L                                                                                                               # nolint start: object_name_linter
   L <- 1L
-  M <- 1L                                                                                                               # nolint end
+  M <- 2L                                                                                                               # nolint end
 
   # Build model
   act <- DiseasyActivity$new()
@@ -23,6 +23,14 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   act$set_activity_units(dk_activity_units)
   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
+  # Add a waning immunity scenario
+  im <- DiseasyImmunity$new()
+  im$set_exponential_waning(time_scale = 180)
+
+  # Add a season scenario
+  s <- DiseasySeason$new()
+  s$set_reference_date(as.Date("2020-01-01"))
+  s$use_cosine_season()
 
   # We need a dummy observables module
   obs <- DiseasyObservables$new(
@@ -32,6 +40,8 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   m <- DiseasyModelOdeSeir$new(
     activity = act,
+    immunity = im,
+    season = s,
     observables = obs,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
@@ -73,7 +83,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
 
   # Run solver across scenario change to check for long-term leakage
-  tt <- deSolve::ode(y = y0, times = seq(0, 150), func = m %.% rhs)
+  tt <- deSolve::ode(y = y0, times = seq(0, 250), func = m %.% rhs)
 
 
   # Extract the maximal test positive signal from the I1 states
