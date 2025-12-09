@@ -878,7 +878,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
       # rr * beta * beta_v * I * s(t)                                                                                   # nolint: commented_code_linter
       infection_rate <- infected_contact_rate *
-        self$season$model_t(t) *
+        self$season$model_t(t + unclass(self$observables$last_queryable_date - self$season$reference_date)) *
         overall_infection_risk *
         private$indexed_variant_infection_risk
 
