@@ -154,7 +154,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 \if{html}{\out{<a id="method-DiseasyImmunity-set_no_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_no_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_no_waning()}}{
-  Retrieves the waning model with a constant value (1).
+  Use a waning model without waning for a given target (i.e. constant value (1)).
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_no_waning(target = "infection", ...)}
@@ -177,7 +177,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 \if{html}{\out{<a id="method-DiseasyImmunity-set_exponential_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_exponential_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_exponential_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set an exponential model for waning.
+  Use a exponential waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_exponential_waning(
@@ -205,7 +205,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 \if{html}{\out{<a id="method-DiseasyImmunity-set_sigmoidal_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_sigmoidal_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_sigmoidal_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a sigmoidal model for waning.
+  Use a sigmoidal waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_sigmoidal_waning(
@@ -237,7 +237,7 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
 \if{html}{\out{<a id="method-DiseasyImmunity-set_linear_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_linear_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_linear_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a linear model for waning.
+  Use a linear waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_linear_waning(time_scale = 20, target = "infection", ...)}
@@ -261,7 +261,7 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
 \if{html}{\out{<a id="method-DiseasyImmunity-set_heaviside_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_heaviside_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_heaviside_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a Heaviside model for waning.
+  Use a Heaviside waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_heaviside_waning(
@@ -289,7 +289,7 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
 \if{html}{\out{<a id="method-DiseasyImmunity-set_custom_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_custom_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_custom_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a custom waning function.
+  Use a custom waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_custom_waning(
