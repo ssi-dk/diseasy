@@ -116,7 +116,7 @@ observable from the ensemble by date, stratification and model
   )
 
   print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG0 (hash: 81609), DiseasyModelG1 (hash: db505) 
+#> DiseasyEnsemble: DiseasyModelG0 (hash: d3c00), DiseasyModelG1 (hash: 18231) 
 
   summary(ensemble)
 #> DiseasyEnsemble consisting of:
@@ -124,7 +124,6 @@ observable from the ensemble by date, stratification and model
 #> DiseasyModelG1: 1 
 
   plot(ensemble, "n_positive", prediction_length = 30)
-#>  ■■■■■■■■■■■■■■■■                  50% |  ETA:  3s
 
 
   rm(ensemble, observables)
