@@ -116,7 +116,7 @@ predict.DiseasyEnsemble <- function(
           stratification = stratification
         )
       },
-      .progress = TRUE
+      .progress = interactive()
     )
 
   # Confirm that all outputs conform to the requirements
@@ -144,7 +144,7 @@ predict.DiseasyEnsemble <- function(
   results <- purrr::map2(
     results, object,
     \(results, model) dplyr::mutate(results, "model" = !!model$hash),
-    .progress = TRUE
+    .progress = interactive()
   ) |>
     purrr::list_rbind()
 
