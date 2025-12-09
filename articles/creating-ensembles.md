@@ -174,7 +174,7 @@ plot(
   ),
   prediction_length = 30
 )
-#>  ■■■■■■■■■■■■■■■■■■■■■             67% |  ETA:  1s
+#>  ■■■■■■■■■■■                       33% |  ETA:  3s
 ```
 
 ![Plot of the ensemble predictions stratified by custom age group.
