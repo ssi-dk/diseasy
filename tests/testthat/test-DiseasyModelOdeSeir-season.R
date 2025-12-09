@@ -1,4 +1,4 @@
-test_that("", {
+test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`", {
   skip_if_not_installed(c("RSQLite", "deSolve"))
 
   # Define an activity scenario
