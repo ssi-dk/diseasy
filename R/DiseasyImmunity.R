@@ -102,7 +102,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Retrieves the waning model with a constant value (1).
+    #'   Use a waning model without waning for a given target (i.e. constant value (1)).
     #' @param target `r rd_target()`
     #' @param ... `r rd_diseasy_immunity_dots`
     #' @return
@@ -128,7 +128,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to set an exponential model for waning.
+    #'   Use a exponential waning model for a given target.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
     #' @param ... `r rd_diseasy_immunity_dots`
@@ -159,7 +159,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to set a sigmoidal model for waning.
+    #'   Use a sigmoidal waning model for a given target.
     #' @param time_scale `r rd_time_scale()`
     #' @param shape (`numeric(1)`)\cr
     #'   Determines the steepness of the waning curve in the sigmoidal waning model.
@@ -194,7 +194,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to set a linear model for waning.
+    #'   Use a linear waning model for a given target.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
     #' @param ... `r rd_diseasy_immunity_dots`
@@ -225,7 +225,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to set a Heaviside model for waning.
+    #'   Use a Heaviside waning model for a given target.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
     #' @param ... `r rd_diseasy_immunity_dots`
@@ -256,7 +256,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Sets the `DiseasyImmunity` module to set a custom waning function.
+    #'   Use a custom waning model for a given target.
     #' @param custom_function (`function(1)`)\cr
     #'   A function of a single variable `t` that returns the immunity at time `t`.
     #'   If the function has a time scale, it should be included in the function as `time_scale`.
