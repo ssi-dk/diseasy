@@ -121,6 +121,7 @@ The list of models currently being used in the module. Read-only.</p></dd>
 <li><p><a href="#method-DiseasyImmunity-set_custom_waning"><code>DiseasyImmunity$set_custom_waning()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-approximate_compartmental"><code>DiseasyImmunity$approximate_compartmental()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-plot"><code>DiseasyImmunity$plot()</code></a></p></li>
+<li><p><a href="#method-DiseasyImmunity-describe"><code>DiseasyImmunity$describe()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-clone"><code>DiseasyImmunity$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
@@ -516,10 +517,18 @@ Number of compartments to be used in the model.</p></dd>
 </dl><p></p></div>
 </div>
 
+</div><p></p><hr><a id="method-DiseasyImmunity-describe"></a><div class="section">
+<h3 id="method-describe-">Method <code>describe()</code><a class="anchor" aria-label="anchor" href="#method-describe-"></a></h3>
+<p>Prints a human readable report of the internal state of the module.</p><div class="section">
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-DiseasyImmunity-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -548,7 +557,7 @@ Number of compartments to be used in the model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $infection</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function (t) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> exp(-t/time_scale)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55aa66712208&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x56251830bb38&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"name")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "exponential_waning"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")</span>
@@ -560,7 +569,7 @@ Number of compartments to be used in the model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $infection</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function (t) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> exp(-t/time_scale)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55aa66712208&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x56251830bb38&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"name")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "exponential_waning"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")</span>

@@ -39,7 +39,7 @@ im$model
 #> $infection
 #> function (t) 
 #> 1
-#> <environment: 0x55b575497f80>
+#> <environment: 0x557752bf6700>
 #> attr(,"name")
 #> [1] "no_waning"
 ```
@@ -78,7 +78,7 @@ im$set_sigmoidal_waning(time_scale = 9, target = "infection")
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <environment: 0x55b56cf04400>
+#> <environment: 0x55774a620698>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -128,7 +128,7 @@ im$set_custom_waning(
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x55b56b76a5b8>
+#> <environment: 0x557748e6f618>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -174,8 +174,8 @@ im$set_waning_model(model = "sigmoidal_waning", time_scale = 9, target = "infect
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <bytecode: 0x55b561cffad0>
-#> <environment: 0x55b56949b340>
+#> <bytecode: 0x55773f44ab10>
+#> <environment: 0x557746bc91f8>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -193,7 +193,7 @@ im$set_waning_model(
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x55b56f6246c8>
+#> <environment: 0x55774cdcb740>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -218,7 +218,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <environment: 0x55b56949b340>
+#> <environment: 0x557746bc91f8>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -229,7 +229,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x55b56f6246c8>
+#> <environment: 0x55774cdcb740>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -350,13 +350,12 @@ targets defined earlier, which will be approximated.
 ``` r
 im$approximate_compartmental(method = "free_gamma", M = 4)
 #> $par
-#> [1]   0.8668365   0.8329360 -50.6183234  32.9310321  32.9109082   2.5332243
-#> [7]  -1.6389635
+#> [1]  0.9825592  0.3443457 -1.5147353 39.9186534 44.9819378 36.6750318 -1.5891168
 #> attr(,"status")
 #> [1] " " " " " " " " " " " " " "
 #> 
 #> $value
-#> [1] 0.2783246
+#> [1] 0.2235232
 #> attr(,"fname")
 #> function(p) sum(obj_function(p))
 #> attr(,"method")
@@ -371,21 +370,21 @@ im$approximate_compartmental(method = "free_gamma", M = 4)
 #> [1] 19
 #> 
 #> $counts
-#> [1] 3898   NA
+#> [1] 1756   NA
 #> 
 #> $scounts
-#> [1] 3898    0    0
+#> [1] 1756    0    0
 #> 
 #> $gamma
 #> $gamma$infection
-#> [1] 7.040870e-01 6.969754e-01 1.039301e-22 0.000000e+00
+#> [1] 0.7276157 0.5852458 0.1802381 0.0000000
 #> 
 #> $gamma$hospitalisation
-#> [1] 1.0000000 1.0000000 0.9264384 0.2000000
+#> [1] 1.0 1.0 1.0 0.2
 #> 
 #> 
 #> $delta
-#> [1] 0.1774608 0.1774608 0.1774608
+#> [1] 0.1857372 0.1857372 0.1857372
 #> 
 #> $method
 #> [1] "free_gamma"
@@ -397,13 +396,13 @@ im$approximate_compartmental(method = "free_gamma", M = 4)
 #> [1] 4
 #> 
 #> $error
-#> [1] 0.1434377
+#> [1] 0.1422456
 #> 
 #> $penalty
-#> [1] 0.1348869
+#> [1] 0.08127767
 #> 
 #> $execution_time
-#> Time difference of 9.679828 mins
+#> Time difference of 4.951481 mins
 #> 
 #> attr(,"maximize")
 #> [1] FALSE

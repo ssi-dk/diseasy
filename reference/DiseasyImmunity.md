@@ -61,6 +61,8 @@ A new instance of the `DiseasyImmunity`
 
 - [`DiseasyImmunity$plot()`](#method-DiseasyImmunity-plot)
 
+- [`DiseasyImmunity$describe()`](#method-DiseasyImmunity-describe)
+
 - [`DiseasyImmunity$clone()`](#method-DiseasyImmunity-clone)
 
 Inherited methods
@@ -565,6 +567,16 @@ and number of compartments (`M`)
 
 ------------------------------------------------------------------------
 
+### Method `describe()`
+
+Prints a human readable report of the internal state of the module.
+
+#### Usage
+
+    DiseasyImmunity$describe()
+
+------------------------------------------------------------------------
+
 ### Method `clone()`
 
 The objects of this class are cloneable with this method.
@@ -591,7 +603,7 @@ The objects of this class are cloneable with this method.
 #> $infection
 #> function (t) 
 #> exp(-t/time_scale)
-#> <environment: 0x55aa66712208>
+#> <environment: 0x56251830bb38>
 #> attr(,"name")
 #> [1] "exponential_waning"
 #> attr(,"dots")
@@ -603,7 +615,7 @@ The objects of this class are cloneable with this method.
 #> $infection
 #> function (t) 
 #> exp(-t/time_scale)
-#> <environment: 0x55aa66712208>
+#> <environment: 0x56251830bb38>
 #> attr(,"name")
 #> [1] "exponential_waning"
 #> attr(,"dots")

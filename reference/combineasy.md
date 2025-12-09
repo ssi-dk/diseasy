@@ -55,7 +55,7 @@ A list of model instances with the class `DiseasyEnsemble`.
   )
 
   print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG1 (hash: 8204b) 
+#> DiseasyEnsemble: DiseasyModelG1 (hash: 6532f) 
 
   summary(ensemble)
 #> DiseasyEnsemble consisting of:
