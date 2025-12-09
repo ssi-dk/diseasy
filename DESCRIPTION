@@ -69,8 +69,7 @@ Suggests:
     testthat (>= 3.0.0),
     tibble,
     ucminf,
-    usethis,
-    zoo
+    usethis
 VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy, https://ssi-dk.github.io/diseasy/
 BugReports: https://github.com/ssi-dk/diseasy/issues
