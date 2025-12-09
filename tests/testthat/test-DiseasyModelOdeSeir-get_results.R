@@ -13,7 +13,7 @@ if (!rlang::is_installed("RSQLite")) {
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
+overall_infection_risk <- 0.02
 age_cuts_lower <- c(0, 30, 60)
 
 # Configure an activity module using Danish population and contact information
@@ -21,6 +21,15 @@ activity <- DiseasyActivity$new()
 activity$set_contact_basis(contact_basis = contact_basis %.% DK)
 activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+# Configure the immunity module
+immunity <- DiseasyImmunity$new()
+immunity$set_exponential_waning(time_scale = 180)
+
+# Configure the season module
+season <- DiseasySeason$new()
+season$set_reference_date(as.Date("2020-01-01"))
+season$use_cosine_season()
 
 
 # Configure a observables module for use in the tests
@@ -74,11 +83,13 @@ model_output_to_observable <- list(
 # Test the get_results method of the configuration used in the example data
 K <- 2L                                                                                                                 # nolint start: object_name_linter
 L <- 1L
-M <- 1L                                                                                                                 # nolint end: object_name_linter
+M <- 2L                                                                                                                 # nolint end: object_name_linter
 
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
   activity = activity,
+  immunity = immunity,
+  season = season,
   observables = observables,
   parameters = list(
     "compartment_structure" = c("E" = K, "I" = L, "R" = M),
@@ -160,6 +171,8 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
+    immunity = immunity,
+    season = season,
     observables = observables,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
@@ -215,6 +228,8 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
+    immunity = immunity,
+    season = season,
     observables = observables,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),

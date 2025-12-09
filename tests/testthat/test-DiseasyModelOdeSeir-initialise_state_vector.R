@@ -12,7 +12,19 @@ if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
+overall_infection_risk <- 0.02
+
+# Configure the activity module
+activity <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+
+# Configure the immunity module
+immunity <- DiseasyImmunity$new()
+immunity$set_exponential_waning(time_scale = 180)
+
+# Configure the season module
+season <- DiseasySeason$new()
+season$set_reference_date(as.Date("2020-01-01"))
+season$use_cosine_season()
 
 # Configure a observables module for use in the tests
 obs <- DiseasyObservables$new(
@@ -61,7 +73,9 @@ tidyr::expand_grid(
       skip_if_not_installed("RSQLite")
 
       m <- DiseasyModelOdeSeir$new(
-        activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+        activity = activity,
+        immunity = immunity,
+        season = season,
         observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
@@ -102,7 +116,7 @@ tidyr::expand_grid(
       # This will not generally be true, but should be true if the model we fit match the model
       # used to generate the data. If there is a misspecification of the model, the initial
       # behaviour of the model output may be "noisy" and not have the same number of turning points
-      if (identical(c(K, L, M), c(2, 1, 1))) {
+      if (identical(c(K, L, M), c(2L, 1L, 2L))) {
         expect_identical(
           sum(diff(sign(diff(model_incidence))) != 0),
           sum(diff(sign(diff(true_incidence))) != 0)
