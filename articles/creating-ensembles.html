@@ -188,7 +188,7 @@ instances which we give the class <code>DiseasyEnsemble</code>.</p>
 functions to get a quick overview of the ensemble.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 9a16e), DiseasyModelG1 (hash: 408b3), DiseasyModelG1 (hash: fd185)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 8a109), DiseasyModelG1 (hash: 336db), DiseasyModelG1 (hash: cdd97)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
@@ -204,17 +204,17 @@ least specify the following:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  5s</span></span>
+<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  4s</span></span>
 <span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span>  67% |  ETA:  2s</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
 <span><span class="co">#&gt;   date       n_positive realisation_id weight model                           </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-04-12     <span style="text-decoration: underline;">30</span>717. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-04-13     <span style="text-decoration: underline;">23</span>174. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-04-14     <span style="text-decoration: underline;">31</span>103. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-04-15     <span style="text-decoration: underline;">30</span>758. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-04-16     <span style="text-decoration: underline;">24</span>464. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-04-17     <span style="text-decoration: underline;">13</span>287. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-04-12     <span style="text-decoration: underline;">30</span>717. 1                   1 8a1095bc95538ecae2883ac0cea5df76</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-04-13     <span style="text-decoration: underline;">23</span>174. 1                   1 8a1095bc95538ecae2883ac0cea5df76</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-04-14     <span style="text-decoration: underline;">31</span>103. 1                   1 8a1095bc95538ecae2883ac0cea5df76</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-04-15     <span style="text-decoration: underline;">30</span>758. 1                   1 8a1095bc95538ecae2883ac0cea5df76</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-04-16     <span style="text-decoration: underline;">24</span>464. 1                   1 8a1095bc95538ecae2883ac0cea5df76</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-04-17     <span style="text-decoration: underline;">13</span>287. 1                   1 8a1095bc95538ecae2883ac0cea5df76</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points." width="700"></p>
@@ -229,8 +229,7 @@ we can run our ensemble on each age group separately:</p>
 <span>  stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">age_group</span><span class="op">)</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">30</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  5s</span></span>
-<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■■■■■■■■■■■           </span>  67% |  ETA:  3s</span></span></code></pre></div>
+<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  5s</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="Plot of the ensemble predictions stratified by age group. Shaded area is ensemble quantiles with observations as points." width="700"></p>
 <p>These stratifications are <em>flexible</em> and we can stratify to
 our hearts desire, limited only by the stratification level in the
@@ -248,8 +247,7 @@ our hearts desire, limited only by the stratification level in the
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">30</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt;  <span style="color: #00BB00;">■■■■■■■■■■■                     </span>  33% |  ETA:  3s</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="Plot of the ensemble predictions stratified by custom age group. Shaded area is ensemble quantiles with observations as points." width="700"></p>
 <p>The <code><a href="../reference/plot.html">plot()</a></code> method has additional optional arguments
 which can be used to customize the plot further:</p>
@@ -296,7 +294,7 @@ parameter settings from before.</p>
 models:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: d2162), DiseasyModelG0 (hash: 379db), DiseasyModelG0 (hash: 94ae2), DiseasyModelG1 (hash: 9a16e), DiseasyModelG1 (hash: 408b3)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: 5911e), DiseasyModelG0 (hash: a604b), DiseasyModelG0 (hash: 17848), DiseasyModelG1 (hash: 8a109), DiseasyModelG1 (hash: 336db)</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>

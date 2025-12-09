@@ -98,7 +98,7 @@ to get a quick overview of the ensemble.
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG1 (hash: 9a16e), DiseasyModelG1 (hash: 408b3), DiseasyModelG1 (hash: fd185)
+#> DiseasyEnsemble: DiseasyModelG1 (hash: 8a109), DiseasyModelG1 (hash: 336db), DiseasyModelG1 (hash: cdd97)
 ```
 
 ``` r
@@ -116,17 +116,17 @@ specify the following:
 ``` r
 predict(ensemble, observable = "n_positive", prediction_length = 30) |>
   head()
-#>  ■■■■■■■■■■■                       33% |  ETA:  5s
+#>  ■■■■■■■■■■■                       33% |  ETA:  4s
 #>  ■■■■■■■■■■■■■■■■■■■■■             67% |  ETA:  2s
 #> # A tibble: 6 × 5
 #>   date       n_positive realisation_id weight model                           
 #>   <date>          <dbl> <chr>           <dbl> <chr>                           
-#> 1 2020-04-12     30717. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f
-#> 2 2020-04-13     23174. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f
-#> 3 2020-04-14     31103. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f
-#> 4 2020-04-15     30758. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f
-#> 5 2020-04-16     24464. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f
-#> 6 2020-04-17     13287. 1                   1 9a16ec021c3ffc7cbe2f76b68d57435f
+#> 1 2020-04-12     30717. 1                   1 8a1095bc95538ecae2883ac0cea5df76
+#> 2 2020-04-13     23174. 1                   1 8a1095bc95538ecae2883ac0cea5df76
+#> 3 2020-04-14     31103. 1                   1 8a1095bc95538ecae2883ac0cea5df76
+#> 4 2020-04-15     30758. 1                   1 8a1095bc95538ecae2883ac0cea5df76
+#> 5 2020-04-16     24464. 1                   1 8a1095bc95538ecae2883ac0cea5df76
+#> 6 2020-04-17     13287. 1                   1 8a1095bc95538ecae2883ac0cea5df76
 ```
 
 ``` r
@@ -150,7 +150,6 @@ plot(
   prediction_length = 30
 )
 #>  ■■■■■■■■■■■                       33% |  ETA:  5s
-#>  ■■■■■■■■■■■■■■■■■■■■■             67% |  ETA:  3s
 ```
 
 ![Plot of the ensemble predictions stratified by age group. Shaded area
@@ -174,7 +173,6 @@ plot(
   ),
   prediction_length = 30
 )
-#>  ■■■■■■■■■■■                       33% |  ETA:  3s
 ```
 
 ![Plot of the ensemble predictions stratified by custom age group.
@@ -230,7 +228,7 @@ The ensemble now consists of $2 \times 3 = 6$ models:
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG0 (hash: d2162), DiseasyModelG0 (hash: 379db), DiseasyModelG0 (hash: 94ae2), DiseasyModelG1 (hash: 9a16e), DiseasyModelG1 (hash: 408b3)
+#> DiseasyEnsemble: DiseasyModelG0 (hash: 5911e), DiseasyModelG0 (hash: a604b), DiseasyModelG0 (hash: 17848), DiseasyModelG1 (hash: 8a109), DiseasyModelG1 (hash: 336db)
 ```
 
 ``` r
