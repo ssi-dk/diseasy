@@ -392,16 +392,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
                   rep(1, compartment_structure %.% R),
                   rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
                 ) * gammas
-            }
-          ) |>
+              }
+            ) |>
             purrr::map(~ rep(., private$n_variants)) |>
             purrr::map2(
               .y = seq(from = 0, to = private %.% n_age_groups - 1),
               ~ c(.x, .y == seq(from = 0, to = private %.% n_age_groups - 1))
             )
-
-        }
-      )
+        })
 
 
       # Set the default forcing functions (no forcing)
