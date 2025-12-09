@@ -129,7 +129,7 @@ the following code.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 1</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56323b020968&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5631c6414f88&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "no_waning"</span></span></code></pre></div>
 <p>This returns a <code>named list()</code> where the named target are
@@ -165,7 +165,7 @@ parameter.</li>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56323c7350d8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5631c7b296f8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -210,7 +210,7 @@ identification. Default is “custom_waning”.</li>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56323d4faa80&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5631c88f0e50&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -248,8 +248,8 @@ additional arguments.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x56323e902040&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56323e3e8070&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5631c9cf8370&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5631c97f8de0&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -267,7 +267,7 @@ additional arguments.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56323f0a2e30&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5631ca498e60&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -291,7 +291,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56323e3e8070&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5631c97f8de0&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -302,7 +302,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56323f0a2e30&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5631ca498e60&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -631,7 +631,7 @@ For more examples, see the optimisation vignette
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Rasmus Skytte Randløv, Marcus Munch Grünewald, Lasse Engbo Christiansen, Kaare Græsbøll, Sofia Myrup Otero, <a href="https://www.ssi.dk/" class="external-link"><img src="https://www.ssi.dk/assets/images/ssi-logo-optimeret.svg" alt="SSI" height="64" style="margin-bottom: 0.5em; margin-top: 1.5em;"></a>.</p>
+  <p>Developed by Rasmus Skytte Randløv, Lasse Engbo Christiansen, Kaare Græsbøll, Sofia Myrup Otero, Marcus Munch Grünewald, <a href="https://www.ssi.dk/" class="external-link"><img src="https://www.ssi.dk/assets/images/ssi-logo-optimeret.svg" alt="SSI" height="64" style="margin-bottom: 0.5em; margin-top: 1.5em;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

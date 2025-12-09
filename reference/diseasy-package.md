@@ -20,9 +20,6 @@ Useful links:
 
 Authors:
 
-- Marcus Munch Grünewald <mmgr@ssi.dk>
-  ([ORCID](https://orcid.org/0009-0006-8090-406X))
-
 - Lasse Engbo Christiansen <lsec@ssi.dk>
   ([ORCID](https://orcid.org/0000-0001-5019-1931))
 
@@ -30,6 +27,9 @@ Authors:
   ([ORCID](https://orcid.org/0000-0002-6258-8212))
 
 - Sofia Myrup Otero <smot@ssi.dk>
+
+- Marcus Munch Grünewald <mmgr@ssi.dk>
+  ([ORCID](https://orcid.org/0009-0006-8090-406X))
 
 Other contributors:
 

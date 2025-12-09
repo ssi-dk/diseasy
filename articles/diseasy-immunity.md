@@ -39,7 +39,7 @@ im$model
 #> $infection
 #> function (t) 
 #> 1
-#> <environment: 0x56323b020968>
+#> <environment: 0x5631c6414f88>
 #> attr(,"name")
 #> [1] "no_waning"
 ```
@@ -78,7 +78,7 @@ im$set_sigmoidal_waning(time_scale = 9, target = "infection")
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <environment: 0x56323c7350d8>
+#> <environment: 0x5631c7b296f8>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -128,7 +128,7 @@ im$set_custom_waning(
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x56323d4faa80>
+#> <environment: 0x5631c88f0e50>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -174,8 +174,8 @@ im$set_waning_model(model = "sigmoidal_waning", time_scale = 9, target = "infect
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <bytecode: 0x56323e902040>
-#> <environment: 0x56323e3e8070>
+#> <bytecode: 0x5631c9cf8370>
+#> <environment: 0x5631c97f8de0>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -193,7 +193,7 @@ im$set_waning_model(
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x56323f0a2e30>
+#> <environment: 0x5631ca498e60>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")
@@ -218,7 +218,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 #> $infection
 #> function (t) 
 #> exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))
-#> <environment: 0x56323e3e8070>
+#> <environment: 0x5631c97f8de0>
 #> attr(,"name")
 #> [1] "sigmoidal_waning"
 #> attr(,"dots")
@@ -229,7 +229,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 #> $hospitalisation
 #> function (t) 
 #> 0.8 * exp(-(t/time_scale)^2) + 0.2
-#> <environment: 0x56323f0a2e30>
+#> <environment: 0x5631ca498e60>
 #> attr(,"name")
 #> [1] "gaussian_waning"
 #> attr(,"dots")

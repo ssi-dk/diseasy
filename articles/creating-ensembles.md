@@ -150,6 +150,7 @@ plot(
   prediction_length = 30
 )
 #>  ■■■■■■■■■■■                       33% |  ETA:  5s
+#>  ■■■■■■■■■■■■■■■■■■■■■             67% |  ETA:  2s
 ```
 
 ![Plot of the ensemble predictions stratified by age group. Shaded area
