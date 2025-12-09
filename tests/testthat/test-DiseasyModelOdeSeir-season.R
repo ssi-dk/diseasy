@@ -49,5 +49,5 @@ test_that("", {
     m2 %.% rhs(0, y0)
   )
 
-  rm(m1, m2, act, obs)
+  rm(m1, m2, act)
 })
