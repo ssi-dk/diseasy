@@ -439,48 +439,6 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_output"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_output}{}}}
-\subsection{Method \code{configure_output()}}{
-Define new observables via a set of weights.
-
-Currently, only countable observables are supported.
-That is, observables must be summarisable by the "sum()" function.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_output(
-  weights,
-  name,
-  derived_from = c("state_vector", "infection_matrix")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{weights}}{(\code{matrix})\cr
-A matrix of weights to multiply by the signal source to form the flow into surveillance states.}
-
-\item{\code{name}}{(\code{character(1)})\cr
-A name for the observable (retrievable by \verb{$get_results()})}
-
-\item{\code{derived_from}}{(\code{character(1)})\cr
-Which signal source should the observable be derived from?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
-forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
-
-If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
-of the infection matrix defines the flow (row-sums correspond to new infections).
-}
-
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-clone}{}}}
 \subsection{\code{DiseasyModelOdeSeir$clone()}}{

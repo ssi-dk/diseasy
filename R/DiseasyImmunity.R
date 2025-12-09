@@ -104,14 +104,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @description
     #'   Retrieves the waning model with a constant value (1).
     #' @param target `r rd_target()`
+    #' @param ... `r rd_diseasy_immunity_dots`
     #' @return
     #'  Returns the model (invisibly).
-    set_no_waning = function(target = "infection") {
+    set_no_waning = function(target = "infection", ...) {
       checkmate::assert_character(target, len = 1, add = coll)
 
       model <- \(t) 1
 
       attr(model, "name") <- "no_waning"
+
+      # Store additional arguments
+      dots <- list(...)
+      if (!is.null(dots)) attr(model, "dots") <- dots
 
       # Set the model
       private$.model[[target]] <- model
@@ -126,9 +131,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Sets the `DiseasyImmunity` module to set an exponential model for waning.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
+    #' @param ... `r rd_diseasy_immunity_dots`
     #' @return
     #'   Returns the model (invisibly).
-    set_exponential_waning = function(time_scale = 20, target = "infection") {
+    set_exponential_waning = function(time_scale = 20, target = "infection", ...) {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -141,7 +147,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "exponential_waning"
-      attr(model, "dots") <- list(time_scale = time_scale)
+      attr(model, "dots") <- list(time_scale = time_scale, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -159,9 +165,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Determines the steepness of the waning curve in the sigmoidal waning model.
     #'   Higher values of `shape` result in a steeper curve, leading to a more rapid decline in immunity.
     #' @param target `r rd_target()`
+    #' @param ... `r rd_diseasy_immunity_dots`
     #' @return
     #'   Returns the model (invisibly).
-    set_sigmoidal_waning = function(time_scale = 20, shape = 6, target = "infection") {
+    set_sigmoidal_waning = function(time_scale = 20, shape = 6, target = "infection", ...) {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -175,7 +182,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "sigmoidal_waning"
-      attr(model, "dots") <- list(time_scale = time_scale, shape = shape)
+      attr(model, "dots") <- list(time_scale = time_scale, shape = shape, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -190,9 +197,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Sets the `DiseasyImmunity` module to set a linear model for waning.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
+    #' @param ... `r rd_diseasy_immunity_dots`
     #' @return
     #'   Returns the model (invisibly).
-    set_linear_waning = function(time_scale = 20, target = "infection") {
+    set_linear_waning = function(time_scale = 20, target = "infection", ...) {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -205,7 +213,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "linear_waning"
-      attr(model, "dots") <- list(time_scale = time_scale)
+      attr(model, "dots") <- list(time_scale = time_scale, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -220,9 +228,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Sets the `DiseasyImmunity` module to set a Heaviside model for waning.
     #' @param time_scale `r rd_time_scale()`
     #' @param target `r rd_target()`
+    #' @param ... `r rd_diseasy_immunity_dots`
     #' @return
     #'   Returns the model (invisibly).
-    set_heaviside_waning = function(time_scale = 20, target = "infection") {
+    set_heaviside_waning = function(time_scale = 20, target = "infection", ...) {
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -235,7 +244,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "heaviside_waning"
-      attr(model, "dots") <- list(time_scale = time_scale)
+      attr(model, "dots") <- list(time_scale = time_scale, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -255,13 +264,15 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @param target `r rd_target()`
     #' @param name (`character(1)`)\cr
     #'   Set the name of the custom waning function.
+    #' @param ... `r rd_diseasy_immunity_dots`
     #' @return
     #'   Returns the model (invisibly).
     set_custom_waning = function(
       custom_function = NULL,
       time_scale = 20,
       target = "infection",
-      name = "custom_waning"
+      name = "custom_waning",
+      ...
     ) {
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -295,7 +306,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
         )
 
         # Set the attributes
-        attr(model, "dots") <- list(time_scale = time_scale)
+        attr(model, "dots") <- list(time_scale = time_scale, ...)
+      } else {
+        # Store additional arguments
+        dots <- list(...)
+        if (!is.null(dots)) attr(model, "dots") <- dots
       }
 
       # Commit the new environment to the custom function
