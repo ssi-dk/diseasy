@@ -150,10 +150,17 @@ activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 ```
 
-This particular scenario does not include any more dynamics, but this would be the
-stage where the level of seasonality and the variant composition should be defined
-(see `vignette("diseasy-season")` and `vignette("diseasy-variant")` for more details).
+This particular scenario also include simple seasonality and waning immunity:
+```{r diseasy_season}
+# Waning immunity scenario
+immunity <- DiseasyImmunity$new()
+immunity$set_exponential_waning(time_scale = 180)
 
+# Season scenario
+season <- DiseasySeason$new()
+season$set_reference_date(as.Date("2020-01-01"))
+season$use_cosine_season()
+```
 
 # Choosing the model configuration
 The `?DiseasyModelOdeSeir` model template has a number of hyperparameters and
@@ -174,7 +181,7 @@ The parameters are:
 
 ```{r model configuration, eval = rlang::is_installed("RSQLite")}
 # Hyper parameters
-compartment_structure <- c("E" = 2L, "I" = 1L, "R" = 1L)
+compartment_structure <- c("E" = 2L, "I" = 1L, "R" = 2L)
 age_cuts_lower <- c(0, 30, 60)
 
 # Parameters
@@ -293,6 +300,8 @@ With all the configuration done above, we can now create our model instance.
 model <- DiseasyModelOdeSeir$new(
   # Scenario configuration
   activity = activity,
+  immunity = immunity,
+  season = season,
   observables = observables,
 
   parameters = list(
