@@ -148,8 +148,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Delete observable configurations and warn user
       if (!purrr::every(private %.% observable_mapping, is.null)) {
         pkgcond::pkg_warning("Module loaded - user-specified observable configurations deleted!")
-        private$observable_mapping$state_vector     <- NULL
-        private$observable_mapping$infection_matrix <- NULL
+
+        # Get names of configured observables
+        surveillance_labels <- c(
+          attr(private %.% observable_mapping %.% infection_matrix, "name"),
+          attr(private %.% observable_mapping %.% state_vector, "name")
+        ) |>
+          unique()
+
+        # Remove configured observables
+        private$observable_mapping <- list("state_vector" = NULL, "infection_matrix" = NULL)
+        private$.parameters$model_output_to_observable[[surveillance_labels]] <- NULL
       }
     },
 
