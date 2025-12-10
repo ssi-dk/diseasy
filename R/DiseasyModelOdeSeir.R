@@ -1255,9 +1255,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           private$observable_mapping$infection_matrix %*% infection_matrix
       }
 
-      if (!is.null(private$surveillance_indices$state_vector)) {
+      if (!is.null(private$observable_mapping$state_vector)) {
         dy_dt[private$surveillance_indices$state_vector] <-
-          private$surveillance_indices$state_vector %*% as.matrix(state_vector)
+          private$observable_mapping$state_vector %*% as.matrix(state_vector)
       }
 
       return(list(dy_dt))
@@ -1304,6 +1304,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
       checkmate::assert_number(delay, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
+
+      # Mark RHS as un-ready
+      private$ready <- FALSE
 
       # Cast vector weights to matrix
       if (!inherits(weights, "matrix")) {
