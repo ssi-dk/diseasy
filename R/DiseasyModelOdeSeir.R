@@ -146,7 +146,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$ready <- FALSE
 
       # Delete observable configurations and warn user
-      if (!purrr::some(private %.% observable_mapping, is.null)) {
+      if (!purrr::every(private %.% observable_mapping, is.null)) {
         pkgcond::pkg_warning("Module loaded - user-specified observable configurations deleted!")
         private$observable_mapping$state_vector     <- NULL
         private$observable_mapping$infection_matrix <- NULL
