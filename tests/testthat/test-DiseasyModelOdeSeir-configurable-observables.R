@@ -174,3 +174,51 @@ tidyr::expand_grid(
       rm(m)
     })
   })
+
+
+test_that("Loading modules resets user configured observables", {
+
+  m <- DiseasyModelOdeSeir$new(
+    observables = obs
+  )
+
+  m$configure_observable(
+    weights = rep(1, 4),
+    name = "test_observable",
+    derived_from = "state_vector"
+  )
+
+  # Configured observable should be in the set of observables
+  checkmate::expect_subset(
+    "test_observable",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+  # Loading module should produce warning
+  expect_warning(
+    m$load_module(activity),
+    "Module loaded - user-specified observable configurations deleted!"
+  )
+
+  # Configured observable should now be removed from set of observables
+  checkmate::expect_disjunct(
+    "test_observable",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+  # And we should now be able to reconfigure the observable again
+  m$configure_observable(
+    weights = rep(1, 4),
+    name = "test_observable",
+    derived_from = "state_vector"
+  )
+
+  # Configured observable should again be in the set of observables
+  checkmate::expect_subset(
+    "test_observable",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+
+  rm(m)
+})
