@@ -1052,7 +1052,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
         # Add weights (ignoring potential existing zero-padding)
         private$observable_mapping$state_vector <- rbind(
-          private %.% observable_mapping %.% state_vector[ , seq_len(private %.% n_EIR_states)],
+          private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_EIR_states)],
           weights
         )
 
