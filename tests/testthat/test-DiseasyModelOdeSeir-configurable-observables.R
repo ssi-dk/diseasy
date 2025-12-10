@@ -162,11 +162,11 @@ tidyr::expand_grid(
       expect_equal(
         utils::head(
           m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
-          - round(1/ rE + 1 / (L+rI)) # Drop last points to account for time difference
+          - round(1 / rE + 1 / (L + rI)) # Drop last points to account for time difference
         ),
         utils::tail(
           reference_after,
-          - round(1/ rE + 1 / (L+rI)) # Drop first points to account for time difference
+          - round(1 / rE + 1 / (L + rI)) # Drop first points to account for time difference
         ),
         tolerance = 1e-1 # Within 10 %
       )
