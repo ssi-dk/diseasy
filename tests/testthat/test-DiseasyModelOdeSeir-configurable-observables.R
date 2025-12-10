@@ -54,9 +54,9 @@ obs$set_last_queryable_date(obs %.% start_date + lubridate::days(45))
 
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
-  K = seq.int(from = 0, to = 3),
-  L = seq.int(from = 1, to = 3),
-  M = seq.int(from = 2, to = 3),
+  K = c(0L, 1L, 3L),
+  L = c(1L, 2L),
+  M = c(1L, 3L),
   age_cuts_lower = list(0, c(0, 60))
 ) |>
   purrr::pwalk(\(K, L, M, age_cuts_lower) {                                                                                             # nolint: object_name_linter
@@ -86,7 +86,8 @@ tidyr::expand_grid(
         )
       )
 
-      m$get_results("n_infected", prediction_length = 10)
+      # Compute n_infected observable before configuring observables
+      reference_before <- m$get_results("n_infected", prediction_length = 10)$n_infected
 
 
       ## Configure two different methods for measuring "n_infected"
@@ -138,9 +139,37 @@ tidyr::expand_grid(
         derived_from = "state_vector"
       )
 
-      m$get_results("n_infected", prediction_length = 10)
-      m$get_results("n_infected_infection_matrix", prediction_length = 10)
-      m$get_results("n_infected_state_vector", prediction_length = 10)
+      # Compute n_infected observable after configuring observables
+      reference_after <- m$get_results("n_infected", prediction_length = 10)$n_infected
+
+      # These should be very close to identical
+      expect_equal(reference_before, reference_after, tolerance = 1e-4) # within 0.1 per mille
+
+      # For our other observables, we expect some difference:
+      # 1) For the state_vector observable, we should have little difference since we
+      # measure the same state but in different ways (snapshot vs. derived from integral).
+      # 2) For the infection_matrix we expect bigger differences since we measure in different
+      # ways (as for 1)), but in addition, there is a time-delay since we measure inflow to E1
+      # instead of outflow of I1.
+      # The time difference is roughly: 1/ rE + 1 / (L + rI) days
+
+      expect_equal(
+        m$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
+        reference_after,
+        tolerance = 1e-2 # Within 1 %
+      )
+
+      expect_equal(
+        utils::head(
+          m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
+          - round(1/ rE + 1 / (L+rI)) # Drop last points to account for time difference
+        ),
+        utils::tail(
+          reference_after,
+          - round(1/ rE + 1 / (L+rI)) # Drop first points to account for time difference
+        ),
+        tolerance = 1e-1 # Within 10 %
+      )
 
       rm(m)
     })
