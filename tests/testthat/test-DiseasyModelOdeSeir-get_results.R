@@ -50,26 +50,42 @@ observables$define_synthetic_observable(
 # Map model output to observables
 map_to_n_positive <- list(
   "map" = \(.x, .y) {
-    dplyr::mutate(.y, "n_positive" = 0.65 * .x$n_infected)
+    dplyr::cross_join(
+      .y,
+      dplyr::transmute(
+        .x,
+        "date" = .data$date,
+        "n_positive" = 0.65 * .x$n_infected
+      )
+    )
   }
 )
 
 map_to_n_admission <- list(
   "map" = \(.x, .y) {
-    risk_of_admission <- c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1) # Risk per age group
-    delay_distribution <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # Must sum = 1
 
-    n_total_admissions <- .x$n_infected * risk_of_admission[.y$age_group]
+    convolution <- .x |>
+      dplyr::group_by(.data$date) |>
+      dplyr::group_modify(
+        \(.xx, .yy) {
+          # Risk per age group
+          risk_of_admission <- c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1)
+          delay_distribution <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # Must sum = 1
 
-    cbind(
-      .y,
-      data.frame(
-        "delay" = seq_along(delay_distribution) - 1,
-        "n_admission" = n_total_admissions * delay_distribution
-      )
-    ) |>
+          data.frame(
+            "delay" = seq_along(delay_distribution) - 1,
+            "n_admission" = .xx$n_infected * risk_of_admission[.y$age_group] *
+              delay_distribution
+          )
+        }
+      ) |>
       dplyr::mutate("date" = .data$date + .data$delay) |>
       dplyr::select(!"delay")
+
+    dplyr::cross_join(
+      .y,
+      convolution
+    )
   }
 )
 
