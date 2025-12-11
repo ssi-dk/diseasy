@@ -59,7 +59,7 @@ tidyr::expand_grid(
   M = c(1L, 3L),
   age_cuts_lower = list(0, c(0, 60))
 ) |>
-  purrr::pwalk(\(K, L, M, age_cuts_lower) {                                                                                             # nolint: object_name_linter
+  purrr::pwalk(\(K, L, M, age_cuts_lower) {                                                                             # nolint: object_name_linter
 
     # Generate label for the model being tested
     model_string <- c(
