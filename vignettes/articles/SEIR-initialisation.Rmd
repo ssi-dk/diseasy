@@ -529,7 +529,9 @@ y <- m$get_data(
 ) |>
   dplyr::filter(.data$t > 0)
 stopifnot(
-  purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.3)
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.3)
+  }
 )
 ```
 
