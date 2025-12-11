@@ -89,7 +89,10 @@ The input for the predefined waning models include:
   Note that the `no_waning` model does not have a time scale parameter.
 
 The name of the chosen target is arbitrary within the context of the `?DiseasyImmunity` module, but models within the
-`diseasy` framework may expect named targets such as "infection", "hospitalisation", or "death".
+`diseasy` framework may expect named targets such as "infection", "hospitalisation", or "death"[^1].
+
+[^1]: For example, `?DiseasyModelOdeSeir` which creates an observable for "hospitalisation" and "death" when they
+exist in the given `?DiseasyImmunity` module.
 
 Here is an example of how to set the exponential waning model.
 ```{r setting the models}
@@ -259,7 +262,10 @@ compartments. This worsens the absolute fit to the target functions, but means t
 interpreted at the individual level rather than population level.
 
 To see this in effect, we run the approximation with and without the penalties and plot the value of $\gamma$ over
-time[^1].
+time[^2].
+
+[^2]: "time" here is the expectation value of the time of the transition to the compartment with the given
+value of $\gamma$
 
 ```{r effect of penalty, fig.alt = "Adding penalty to approximations smoothens the transitions between compartments.", eval = !missing_suggests}
 # Retrieve gamma and delta values for both cases
@@ -345,6 +351,3 @@ ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
 if (exists("im")) rm(im)
 gc()
 ```
-
-[^1]: "time" here is the expectation value of the time of the transition to the compartment with the given
-value of $\gamma$
