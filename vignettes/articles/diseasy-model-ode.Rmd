@@ -205,6 +205,8 @@ The model then produces a number of observations under the given configuration.
 By default, the model will predict the evolution of the incidence[^1], $\tilde{I}(t)$,
 but other outputs can be configured (see further below).
 
+[^1]: Measured as the rate of individuals exiting the first `I` state.
+
 To get predictions for other real-world observables, we must map from the incidence
 (or other output) to the observable of interest.
 
@@ -322,6 +324,9 @@ in the latter the observable is derived from the new infections occurring in the
 In the case of the "n_infected" observable defined by default in the model, the weights
 are essentially a matrix with weights only for each $I_1$ state[^2] and the observable
 tracks the state_vector.
+
+[^2]: The "n_infected" observable does not actually create the additional surveillance states in the implementation
+since it can be computed directly from $\overline{\psi}$, but it used here as a illustrative example.
 
 For example, in SEIR case ($N = L = M = 1$) with two age-groups, the weights take the
 following form:
@@ -595,7 +600,3 @@ plot(
 if (exists("model")) rm(model)
 gc()
 ```
-
-[^1]: Measured as the rate of individuals exiting the first `I` state.
-[^2]: The "n_infected" observable does not actually create the additional surveillance states in the implementation
-  since it can be computed directly from $\overline{\psi}$, but it used here as a illustrative example.
