@@ -22,7 +22,7 @@ RUN R -e 'getwd(); dir()'
 
 RUN R -e 'pak::pak("jsonlite"); d <- jsonlite::read_json("pak.lock"); d$packages <- Filter(\(x) x$package != "diseasy", d$packages); print(unlist(Map(\(x) x$package, d$packages))); jsonlite::write_json(d, "pak.lock", auto_unbox = TRUE)'
 
-RUN R -e 'pkgs <- jsonlite::fromJSON("pak.lock"); pak::pak(paste0(pkgs, @ ,pkgs))'
+RUN R -e 'pkgs <- jsonlite::fromJSON("pak.lock")$packages; pak::pak(paste0(pkgs$package, "@" ,pkgs$version))'
 
 RUN R -e 'pak::pak(c("jsonlite", "rcmdcheck", "devtools", "lintr", "covr", "roxygen2", "pkgdown", "rmarkdown", "styler"))'
 
