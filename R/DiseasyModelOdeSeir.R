@@ -378,13 +378,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Configure observables for hospitalisation immunity target
-      c("hospitalisation", "death") |>
-        purrr::keep(~ . %in% names(immunity_approx %.% gamma)) |>
-        purrr::walk(~ {
-          gammas <- purrr::pluck(immunity_approx %.% gamma, .)
+      immunity_approx %.% gamma |>
+        purrr::keep_at(c("hospitalisation", "death")) |>
+        purrr::iwalk(\(gammas, observable) {
 
-          # We create a surveillance state for each age-group and variant
-          seq(from = 0, to = private %.% n_age_groups - 1) |>
+          # Compute the weights for the observable
+          weights_infection_matrix <- seq(from = 0, to = private %.% n_age_groups - 1) |>
             purrr::map(
               \(offset) {
                 c(
@@ -398,7 +397,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             purrr::map2(
               .y = seq(from = 0, to = private %.% n_age_groups - 1),
               ~ c(.x, .y == seq(from = 0, to = private %.% n_age_groups - 1))
-            )
+            ) |>
+            purrr::list_rbind()
+
+          # Configure the observable
+          self$configure_observable(
+            weights = weights_infection_matrix,
+            name = glue::glue("n_{observable}"),
+            derived_from = "infection_matrix"
+          )
         })
 
 
