@@ -36,7 +36,7 @@ plot(x, ...)
 #> $hospitalisation
 #> function (t) 
 #> exp(-t/time_scale)
-#> <environment: 0x558147a2dd08>
+#> <environment: 0x564d761f25a0>
 #> attr(,"name")
 #> [1] "exponential_waning"
 #> attr(,"dots")

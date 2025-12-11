@@ -603,7 +603,7 @@ The objects of this class are cloneable with this method.
 #> $infection
 #> function (t) 
 #> exp(-t/time_scale)
-#> <environment: 0x55813de777e0>
+#> <environment: 0x564d681855e8>
 #> attr(,"name")
 #> [1] "exponential_waning"
 #> attr(,"dots")
@@ -615,7 +615,7 @@ The objects of this class are cloneable with this method.
 #> $infection
 #> function (t) 
 #> exp(-t/time_scale)
-#> <environment: 0x55813de777e0>
+#> <environment: 0x564d681855e8>
 #> attr(,"name")
 #> [1] "exponential_waning"
 #> attr(,"dots")
