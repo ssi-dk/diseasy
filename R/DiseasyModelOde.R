@@ -120,16 +120,14 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # Retrieve the map / reduce functions for the observable
         map_fn <- purrr::pluck(self %.% parameters %.% model_output_to_observable, observable, "map")
-        reduce_fn <- purrr::pluck(
-          self %.% parameters %.% model_output_to_observable, observable, "reduce",
-          .default = ~ sum(.)
-        )
+        reduce_fn <- self %.% parameters %.% model_output_to_observable |>
+          purrr::pluck(observable, "reduce", .default = ~ sum(.))
 
         # Map model incidence to the requested observable
         prediction <- data |>
-          dplyr::group_by(dplyr::across(!c("date", "n_infected", dplyr::all_of(surveillance_states), "population"))) |>
-          dplyr::group_map(map_fn) |>
-          purrr::list_rbind()
+          dplyr::group_by(
+            dplyr::across(!c("date", "n_infected", dplyr::all_of(surveillance_states), "population"))) |>
+          dplyr::group_modify(map_fn)
 
         # Reduce (summarise) to the requested stratification level.
         prediction <- prediction |>
@@ -534,26 +532,16 @@ DiseasyModelOde <- R6::R6Class(                                                 
           "model_output_to_observable" = list(
             "n_infected" = list(
               "map" = \(.x, .y) {
-                dplyr::cross_join(
-                  .y,
-                  dplyr::transmute(
-                    .x,
-                    "date" = .data$date,
-                    "n_infected" = .data$n_infected
-                  )
-                )
+                dplyr::transmute(.x, .data$date, .data$n_infected)
               }
             ),
             "incidence" = list(
               "map" = \(.x, .y) {
-                dplyr::cross_join(
-                  .y,
-                  dplyr::transmute(
-                    .x,
-                    "date" = .data$date,
-                    "incidence" = .data$n_infected / .data$population,
-                    "population" = .data$population # Need for the reduce function
-                  )
+                dplyr::transmute(
+                  .x,
+                  .data$date,
+                  "incidence" = .data$n_infected / .data$population,
+                  .data$population # Need for the reduce function
                 )
               },
               "reduce" = ~ sum(. * population / sum(population))

@@ -1124,14 +1124,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
               "map" = eval(parse(text =
                   glue::glue(
                     "\\(.x, .y) {{
-                      dplyr::cross_join(
-                        .y,
-                        dplyr::transmute(
-                          .x,
-                          \"date\" = .data$date,
-                          \"{name}\" = .data${name}
-                        )
-                      )
+                      dplyr::transmute(.x, .data$date, .data${name})
                     }}"
                   )
               ))
