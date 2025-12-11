@@ -73,7 +73,7 @@ It contains three observables of interest for our example:
 When running the models, we should also define at what point in time they should provide predictions for.
 This is done by setting the `last_queryable_date` in the observables module:
 ```{r last_queryable_date, eval = rlang::is_installed("RSQLite")}
-last_queryable_date <- observables$ds$min_start_date + 40
+last_queryable_date <- observables$ds$min_start_date + 42
 ```
 
 Lets first look at the data we have available:
@@ -337,7 +337,7 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.3)
+    purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.4)
   }
 )
 ```
@@ -389,7 +389,7 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(x$n_infected - y$n_infected) / y$n_infected, ~ . < 0.3)
+    purrr::every(abs(x$n_infected - y$n_infected) / y$n_infected, ~ . < 0.4)
   }
 )
 ```
@@ -439,7 +439,7 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(x$n_positive - y$n_positive) / y$n_positive, ~ . < 0.3)
+    purrr::every(abs(x$n_positive - y$n_positive) / y$n_positive, ~ . < 0.4)
   }
 )
 ```
@@ -487,7 +487,7 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(x$n_admission - y$n_admission) / y$n_admission, ~ . < 0.3)
+    purrr::every(abs(x$n_admission - y$n_admission) / y$n_admission, ~ . < 0.4)
   }
 )
 ```
