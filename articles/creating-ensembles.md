@@ -98,7 +98,7 @@ to get a quick overview of the ensemble.
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG1 (hash: a1f94), DiseasyModelG1 (hash: f0148), DiseasyModelG1 (hash: 06b61)
+#> DiseasyEnsemble: DiseasyModelG1 (hash: 479f0), DiseasyModelG1 (hash: 000f8), DiseasyModelG1 (hash: d666e)
 ```
 
 ``` r
@@ -119,12 +119,12 @@ predict(ensemble, observable = "n_positive", prediction_length = 30) |>
 #> # A tibble: 6 × 5
 #>   date       n_positive realisation_id weight model                           
 #>   <date>          <dbl> <chr>           <dbl> <chr>                           
-#> 1 2020-04-12     30717. 1                   1 a1f9403d0f8ed8e7fcd7a8cd78e1f58a
-#> 2 2020-04-13     23174. 1                   1 a1f9403d0f8ed8e7fcd7a8cd78e1f58a
-#> 3 2020-04-14     31103. 1                   1 a1f9403d0f8ed8e7fcd7a8cd78e1f58a
-#> 4 2020-04-15     30758. 1                   1 a1f9403d0f8ed8e7fcd7a8cd78e1f58a
-#> 5 2020-04-16     24464. 1                   1 a1f9403d0f8ed8e7fcd7a8cd78e1f58a
-#> 6 2020-04-17     13287. 1                   1 a1f9403d0f8ed8e7fcd7a8cd78e1f58a
+#> 1 2020-04-12     30717. 1                   1 479f042a24ee60d745a9f72bbac37945
+#> 2 2020-04-13     23174. 1                   1 479f042a24ee60d745a9f72bbac37945
+#> 3 2020-04-14     31103. 1                   1 479f042a24ee60d745a9f72bbac37945
+#> 4 2020-04-15     30758. 1                   1 479f042a24ee60d745a9f72bbac37945
+#> 5 2020-04-16     24464. 1                   1 479f042a24ee60d745a9f72bbac37945
+#> 6 2020-04-17     13287. 1                   1 479f042a24ee60d745a9f72bbac37945
 ```
 
 ``` r
@@ -225,7 +225,7 @@ The ensemble now consists of $2 \times 3 = 6$ models:
 
 ``` r
 print(ensemble)
-#> DiseasyEnsemble: DiseasyModelG0 (hash: 72090), DiseasyModelG0 (hash: 38e2e), DiseasyModelG0 (hash: 77acd), DiseasyModelG1 (hash: a1f94), DiseasyModelG1 (hash: f0148)
+#> DiseasyEnsemble: DiseasyModelG0 (hash: b53c9), DiseasyModelG0 (hash: 06f8d), DiseasyModelG0 (hash: 0a68c), DiseasyModelG1 (hash: 479f0), DiseasyModelG1 (hash: 000f8)
 ```
 
 ``` r
