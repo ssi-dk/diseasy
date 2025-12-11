@@ -118,7 +118,7 @@ tidyr::expand_grid(
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
         expr = {
-          results <- model$get_results(                                                                                     # nolint: implicit_assignment_linter
+          results <- model$get_results(                                                                                 # nolint: implicit_assignment_linter
             observable = observable,
             prediction_length = prediction_length,
             stratification = stratification
