@@ -295,7 +295,11 @@ map_to_n_admission <- list(
         outer(.x$date, seq_along(delay_distribution) - 1, "+")
       ),
       "n_admission" = as.vector(
-        outer(.x$n_infected * risk_of_admission[.y$age_group], delay_distribution, "*")
+        outer(
+          .x$n_infected * risk_of_admission[.y$age_group],
+          delay_distribution,
+          "*"
+        )
       )
     )
   }

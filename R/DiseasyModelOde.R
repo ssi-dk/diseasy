@@ -126,7 +126,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Map model incidence to the requested observable
         prediction <- data |>
           dplyr::group_by(
-            dplyr::across(!c("date", "n_infected", dplyr::all_of(surveillance_states), "population"))) |>
+            dplyr::across(!c("date", "n_infected", dplyr::all_of(surveillance_states), "population"))
+          ) |>
           dplyr::group_modify(map_fn)
 
         # Reduce (summarise) to the requested stratification level.
