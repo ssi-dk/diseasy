@@ -326,6 +326,13 @@ plot(
 )
 ```
 
+```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data - when not, we get informed by an error
+x <- model$get_results(observable = "incidence", prediction_length = 60)
+y <- dplyr::filter(model$get_data(observable = "incidence", prediction_length = 60, period = "plotting"), .data$t > 0)
+stopifnot(purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.3))
+```
 
 The results are easily stratified by the stratifications in the data
 ```{r, eval = rlang::is_installed("RSQLite")}
@@ -363,6 +370,14 @@ plot(
 )
 ```
 
+```{r configuration test - n_infected, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data - when not, we get informed by an error
+x <- model$get_results(observable = "n_infected", prediction_length = 60)
+y <- dplyr::filter(model$get_data(observable = "n_infected", prediction_length = 60, period = "plotting"), .data$t > 0)
+stopifnot(purrr::every(abs(x$n_infected - y$n_infected) / y$n_infected, ~ . < 0.3))
+```
+
 ```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_infected",
@@ -397,6 +412,14 @@ plot(
 )
 ```
 
+```{r configuration test - n_positive, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data - when not, we get informed by an error
+x <- model$get_results(observable = "n_positive", prediction_length = 60)
+y <- dplyr::filter(model$get_data(observable = "n_positive", prediction_length = 60, period = "plotting"), .data$t > 0)
+stopifnot(purrr::every(abs(x$n_positive - y$n_positive) / y$n_positive, ~ . < 0.3))
+```
+
 ```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_positive",
@@ -427,6 +450,14 @@ plot(
   observable = "n_admission",
   prediction_length = 60
 )
+```
+
+```{r configuration test - n_admission, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data - when not, we get informed by an error
+x <- model$get_results(observable = "n_admission", prediction_length = 60)
+y <- dplyr::filter(model$get_data(observable = "n_admission", prediction_length = 60, period = "plotting"), .data$t > 0)
+stopifnot(purrr::every(abs(x$n_admission - y$n_admission) / y$n_admission, ~ . < 0.3))
 ```
 
 ```{r, eval = rlang::is_installed("RSQLite")}
