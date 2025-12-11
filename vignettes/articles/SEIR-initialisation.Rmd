@@ -519,6 +519,14 @@ ggplot2::ggplot() +
   ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```
 
+```{r configuration test - n_positive, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data - when not, we get informed by an error
+x <- m$get_results(observable = "incidence", prediction_length = 100)
+y <- dplyr::filter(m$get_data(observable = "incidence", prediction_length = 100, period = "plotting"), .data$t > 0)
+stopifnot(purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.3))
+```
+
 ### Misspecified model
 Correctly matching the model is the best case scenario.
 However, we can also the method for a couple of cases where the model is misspecified.
