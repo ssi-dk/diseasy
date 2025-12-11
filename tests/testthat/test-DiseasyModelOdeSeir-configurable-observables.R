@@ -70,7 +70,7 @@ tidyr::expand_grid(
     ) |>
       paste(collapse = "")
 
-    test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
+    test_that(glue::glue("$configure_observable() ({model_string} single variant / single age group)"), {
       skip_if_not_installed("RSQLite")
 
       m <- DiseasyModelOdeSeir$new(
