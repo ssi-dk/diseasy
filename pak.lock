@@ -1166,12 +1166,6 @@
       "package": "zip",
       "version": "2.3.3",
       "binary": true
-    },
-    {
-      "ref": "zoo",
-      "package": "zoo",
-      "version": "1.8-14",
-      "binary": true
     }
   ],
   "sysreqs": {

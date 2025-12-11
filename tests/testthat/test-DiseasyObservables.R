@@ -468,8 +468,8 @@ test_that("$get_observation() works", {
       dplyr::summarize(min_date = min(date, na.rm = TRUE),
                        max_date = max(date, na.rm = TRUE))
 
-    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
-    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
+    expect_identical(as.Date(tmp$min_date), obs$start_date)
+    expect_identical(as.Date(tmp$max_date), obs$end_date)
 
 
     # Test externally given dates
@@ -477,16 +477,16 @@ test_that("$get_observation() works", {
       dplyr::summarize(min_date = min(date, na.rm = TRUE),
                        max_date = max(date, na.rm = TRUE))
 
-    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date - lubridate::days(1))
-    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date)
+    expect_identical(as.Date(tmp$min_date), obs$start_date - lubridate::days(1))
+    expect_identical(as.Date(tmp$max_date), obs$end_date)
 
 
     tmp <- obs$get_observation("n_population", end_date = obs$end_date + lubridate::days(1)) |>
       dplyr::summarize(min_date = min(date, na.rm = TRUE),
                        max_date = max(date, na.rm = TRUE))
 
-    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
-    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(1))
+    expect_identical(as.Date(tmp$min_date), obs$start_date)
+    expect_identical(as.Date(tmp$max_date), obs$end_date + lubridate::days(1))
 
 
     # Testing malformed inputs
@@ -510,8 +510,8 @@ test_that("$get_observation() works", {
       dplyr::summarize(min_date = min(date, na.rm = TRUE),
                        max_date = max(date, na.rm = TRUE))
 
-    expect_identical(zoo::as.Date(tmp$min_date), obs$start_date)
-    expect_identical(zoo::as.Date(tmp$max_date), obs$end_date + lubridate::days(2))
+    expect_identical(as.Date(tmp$min_date), obs$start_date)
+    expect_identical(as.Date(tmp$max_date), obs$end_date + lubridate::days(2))
 
     rm(obs)
   }
