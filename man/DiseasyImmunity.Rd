@@ -312,8 +312,8 @@ best matches the waning immunity curves set in the module.
   M,
   method = c("free_gamma", "free_delta", "all_free"),
   strategy = NULL,
-  monotonous = TRUE,
-  individual_level = TRUE,
+  monotonous = FALSE,
+  individual_level = FALSE,
   optim_control = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -419,8 +419,7 @@ The default configuration depends on the method used and whether or not a penalt
 objective function (\code{monotonous} and \code{individual_level}):\tabular{llll}{
    method \tab penalty \tab strategy \tab optimiser \cr
    free_delta \tab No/Yes \tab naive \tab ucminf \cr
-   free_gamma \tab No \tab naive \tab subplex \cr
-   free_gamma \tab Yes \tab naive \tab hjkb \cr
+   free_gamma \tab No/Yes \tab naive \tab ucminf \cr
    all_free \tab No/Yes \tab naive \tab ucminf \cr
 }
 
