@@ -103,15 +103,20 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # (i.e. non-n_infected observable)
         surveillance_states <- unique(purrr::reduce(purrr::map(private$observable_mapping, ~ attr(., "name")), c))
 
-        data <- observations |>
-          dplyr::cross_join(
-            purrr::reduce(
-              purrr::map(surveillance_states, ~ tibble::tibble(!!. := NA)),
-              dplyr::cross_join,
-              .init = data.frame()
+        if (!is.null(surveillance_states)) {
+          observations <- observations |>
+            dplyr::cross_join(
+              purrr::reduce(
+                purrr::map(surveillance_states, ~ tibble::tibble(!!. := NA)),
+                dplyr::cross_join,
+                .init = data.frame()
+              )
             )
-          ) |>
-          rbind(model_output)
+        }
+
+        # Combine to single data object
+        data <- rbind(observations, model_output)
+
 
         # Retrieve the map / reduce functions for the observable
         map_fn <- purrr::pluck(self %.% parameters %.% model_output_to_observable, observable, "map")
