@@ -336,7 +336,9 @@ y <- model$get_data(
 ) |>
   dplyr::filter(.data$t > 0)
 stopifnot(
-  purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.3)
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$incidence - y$incidence) / y$incidence, ~ . < 0.3)
+  }
 )
 ```
 
@@ -386,7 +388,9 @@ y <- model$get_data(
 ) |>
   dplyr::filter(.data$t > 0)
 stopifnot(
-  purrr::every(abs(x$n_infected - y$n_infected) / y$n_infected, ~ . < 0.3)
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$n_infected - y$n_infected) / y$n_infected, ~ . < 0.3)
+  }
 )
 ```
 
@@ -434,7 +438,9 @@ y <- model$get_data(
 ) |>
   dplyr::filter(.data$t > 0)
 stopifnot(
-  purrr::every(abs(x$n_positive - y$n_positive) / y$n_positive, ~ . < 0.3)
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$n_positive - y$n_positive) / y$n_positive, ~ . < 0.3)
+  }
 )
 ```
 
@@ -480,7 +486,9 @@ y <- model$get_data(
 ) |>
   dplyr::filter(.data$t > 0)
 stopifnot(
-  purrr::every(abs(x$n_admission - y$n_admission) / y$n_admission, ~ . < 0.3)
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$n_admission - y$n_admission) / y$n_admission, ~ . < 0.3)
+  }
 )
 ```
 
