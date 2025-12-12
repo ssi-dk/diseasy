@@ -293,4 +293,3 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
 
 # Clean up
 rm(observables, activity)
-
