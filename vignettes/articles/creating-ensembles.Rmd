@@ -18,6 +18,49 @@ knitr::opts_chunk$set(
 library(diseasy)
 ```
 
+```{r options, include = FALSE}
+# Create a cache for this vignette to improve render time
+cache <- cachem::cache_disk(dir = "article_data/cache/creating-ensembles")
+
+r6_hash <- \(r6_generator) {
+  c(
+    "public_methods",
+    "public_fields",
+    "private_methods",
+    "private_fields",
+    "active"
+  ) |>
+    purrr::map(~ purrr::pluck(r6_generator, .x)) |>
+    purrr::reduce(c) |>
+    hash_environment()
+}
+
+source_code_hash <- c(
+  DiseasyBaseModule,
+  DiseasyModel,
+  DiseasyModelOde,
+  DiseasyModelOdeSeir,
+  DiseasystoreSeirExample
+) |>
+  purrr::map(r6_hash) |>
+  rlang::hash()
+
+if (!identical(source_code_hash, cache$get("source-code-hash"))) {
+  cache$reset()
+  cache$set("source-code-hash", source_code_hash)
+}
+
+withr::local_options(
+  "diseasy.logging" = FALSE,
+  "diseasy.cache" = cache
+)
+
+missing_suggests <- !purrr::every(
+  c("dfoptim", "nloptr", "optimx", "subplex", "ucminf"),
+  rlang::is_installed
+)
+```
+
 # Introduction
 
 The goal of `diseasy` is to create and manipulate ensembles of disease models. This vignette will show how to create ensembles and how to use them to make predictions.
