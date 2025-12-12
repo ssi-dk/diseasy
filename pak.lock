@@ -952,8 +952,7 @@
       "ref": "shiny",
       "package": "shiny",
       "version": "1.12.1",
-      "binary": false,
-      "sha256": "b8e6d1641822308453e3d1e511837f67e2213400dacd6370b6846e116b238aa2"
+      "binary": true
     },
     {
       "ref": "sourcetools",
