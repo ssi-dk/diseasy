@@ -12,7 +12,6 @@ diseasy_code_linters <- function() {
     list(
       "nolint_position_linter" = nolint_position_linter(length = 120L),
       "nolint_line_length_linter" = nolint_line_length_linter(length = 120L),
-      "non_ascii_linter" = non_ascii_linter(),
       "param_and_field_linter" = param_and_field_linter(),
       "documentation_template_linter" = documentation_template_linter()
     ),
