@@ -3,7 +3,7 @@
 \docType{data}
 \name{dk_reference_scenario}
 \alias{dk_reference_scenario}
-\title{dk_reference_scenario}
+\title{Danish reference scenario (SARS-CoV-2 pandemic)}
 \description{
 This data set contains the combination of "activity units" (see dk_activity_units for details) that form a
 description of the societal activity in Denmark through out the COVID-19 pandemic.

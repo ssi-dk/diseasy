@@ -1,4 +1,4 @@
-#' @title Diseasy' observables handler
+#' @title Configure data-sources and observables
 #'
 #' @description
 #'   The `DiseasyObservables` module is responsible for interfacing with the available `diseasystores` and provide

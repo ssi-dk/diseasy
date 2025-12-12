@@ -5,7 +5,7 @@
 \alias{DiseasyModelGLM}
 \alias{DiseasyModelG0}
 \alias{DiseasyModelG1}
-\title{Meta module for the GLM class of models}
+\title{Simple generalized linear regression models}
 \value{
 A new instance of the \code{DiseasyModelGLM}, \code{DiseasyModelG0} or
 \code{DiseasyModelG1} \link[R6:R6Class]{R6} class.

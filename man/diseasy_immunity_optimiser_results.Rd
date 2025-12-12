@@ -3,7 +3,7 @@
 \docType{data}
 \name{diseasy_immunity_optimiser_results}
 \alias{diseasy_immunity_optimiser_results}
-\title{diseasy_immunity_optimiser_results}
+\title{Optimiser results for \code{DiseasyImmunity}}
 \description{
 This data set contains a summery of the tested optimiser for \code{?DiseasyImmunity$approximate_compartmental()} method.
 }
@@ -33,6 +33,6 @@ One of: "naive", "recursive" or "combination".
 \link{DiseasyImmunity}
 }
 \author{
-Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
+Rasmus Skytte Randløv \email{rske@ssi.dk}
 }
 \keyword{data}

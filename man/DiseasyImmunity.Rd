@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasyImmunity.R
 \name{DiseasyImmunity}
 \alias{DiseasyImmunity}
-\title{Diseasy' immunity handler}
+\title{Configure (waning) immunity against different outcomes}
 \value{
 A new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class.
 }

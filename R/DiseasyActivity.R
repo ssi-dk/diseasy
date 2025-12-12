@@ -1,4 +1,4 @@
-#' @title Activity handler
+#' @title Configure activity (contact) scenarios
 #'
 #' @description
 #'   The `DiseasyActivity` module is responsible for handling the societal activity.

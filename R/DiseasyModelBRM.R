@@ -1,4 +1,4 @@
-#' @title Meta module for the BRM class of models
+#' @title Simple bayesian regression models
 #' @name Diseasy-BRM-models
 #'
 #' @description `r rd_diseasymodel_glm_brm_description("GLM")`

@@ -3,7 +3,7 @@
 \docType{data}
 \name{dk_activity_units}
 \alias{dk_activity_units}
-\title{dk_activity_units}
+\title{Danish activity "units"}
 \description{
 This data set contains the "units" of activity that was developed for the Danish COVID-19 modelling efforts.
 Each "activity unit" specifies the amount of activity for the four arenas: Home, Work, School, Other.
@@ -24,6 +24,6 @@ Frederik Plesner Lyngse \email{frederik.lyngse@sund.ku.dk}
 
 Adam Mielke \email{admi@dtu.dk}
 
-Rasmus Skytte Randl\\u00F8v \email{rske@dtu.dk}
+Rasmus Skytte Randløv \email{rske@ssi.dk}
 }
 \keyword{data}

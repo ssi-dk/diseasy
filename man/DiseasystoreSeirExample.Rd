@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasystoreSeirExample.R
 \name{DiseasystoreSeirExample}
 \alias{DiseasystoreSeirExample}
-\title{feature store handler for SEIR example data}
+\title{Feature store for SEIR example data}
 \value{
 A new instance of the \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} class.
 }

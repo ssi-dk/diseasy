@@ -1,4 +1,4 @@
-#' @title Diseasy' season handler
+#' @title Configure seasonality scenarios
 #'
 #' @description
 #'   The `DiseasySeason` module is responsible for implementing various models for the seasonal dependency of the

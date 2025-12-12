@@ -1,4 +1,4 @@
-#' @title feature store handler for SEIR example data
+#' @title Feature store for SEIR example data
 #'
 #' @description
 #'   This `DiseasystoreSeirExample` [R6][R6::R6Class] brings support the SEIR example data bundled with `diseasy`.

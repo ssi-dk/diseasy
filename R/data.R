@@ -31,7 +31,7 @@
 #'
 #' @name contact_basis
 #' @docType data
-#' @author Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
+#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
 #' @author Lasse Engbo Christiansen \email{lsec@ssi.dk}
 #' @source
 #'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
@@ -59,7 +59,7 @@
 NULL
 
 
-#' dk_activity_units
+#' Danish activity "units"
 #'
 #' This data set contains the "units" of activity that was developed for the Danish COVID-19 modelling efforts.
 #' Each "activity unit" specifies the amount of activity for the four arenas: Home, Work, School, Other.
@@ -76,12 +76,12 @@ NULL
 #' @author Carsten Kirkeby \email{ckir@sund.ku.dk}
 #' @author Frederik Plesner Lyngse \email{frederik.lyngse@sund.ku.dk}
 #' @author Adam Mielke \email{admi@dtu.dk}
-#' @author Rasmus Skytte Randl\\u00F8v \email{rske@dtu.dk}
+#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
 #' @keywords data
 NULL
 
 
-#' dk_reference_scenario
+#' Danish reference scenario (SARS-CoV-2 pandemic)
 #'
 #' This data set contains the combination of "activity units" (see dk_activity_units for details) that form a
 #' description of the societal activity in Denmark through out the COVID-19 pandemic.
@@ -104,7 +104,7 @@ NULL
 NULL
 
 
-#' diseasy_immunity_optimiser_results
+#' Optimiser results for `DiseasyImmunity`
 #'
 #' This data set contains a summery of the tested optimiser for `?DiseasyImmunity$approximate_compartmental()` method.
 #'
@@ -127,12 +127,12 @@ NULL
 #' @name diseasy_immunity_optimiser_results
 #' @seealso [DiseasyImmunity]
 #' @docType data
-#' @author Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
+#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
 #' @keywords data
 NULL
 
 
-#' seir_example_data
+#' Synthetic epidemiological data
 #'
 #' This data set contains a the simulation output from a SEIR model to use when testing and developing models.
 #'
@@ -154,6 +154,6 @@ NULL
 #'
 #' @name seir_example_data
 #' @docType data
-#' @author Rasmus Skytte Randl\\u00F8v \email{rske@dtu.dk}
+#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
 #' @keywords data
 NULL

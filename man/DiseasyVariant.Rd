@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasyVariant.R
 \name{DiseasyVariant}
 \alias{DiseasyVariant}
-\title{Diseasy' variant handler}
+\title{Configure disease variants}
 \value{
 A new instance of the \code{DiseasyVariant} \link[R6:R6Class]{R6} class.
 }
