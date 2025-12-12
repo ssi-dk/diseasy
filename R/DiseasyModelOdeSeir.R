@@ -1023,6 +1023,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   A name for the observable (retrievable by `$get_results()`)
     #' @param derived_from (`character(1)`)\cr
     #'   Which signal source should the observable be derived from?
+    #' @param delay (`numeric(1)`)\cr
+    #'   The delay (in days) between infection and the occurrence of the given observable.
     #' @details
     #'  If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
     #'  forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
@@ -1033,7 +1035,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     configure_observable = function(
       weights,
       name,
-      derived_from = c("state_vector", "infection_matrix")
+      derived_from = c("state_vector", "infection_matrix"),
+      delay = 0
     ) {
       derived_from <- match.arg(derived_from)
 
@@ -1047,6 +1050,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ),
         add = coll
       )
+      checkmate::assert_numeric(delay, add = coll)
       checkmate::reportAssertions(coll)
 
       # Mark RHS as un-ready
@@ -1131,12 +1135,24 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
           # We use a few combinations of tibble::lst, rlang::parse_expr and
           # glue::glue to create a human readable, dynamically allocated mapping
+          # which accounts for the given delay
           tibble::lst(
             !!name := list(
               "map" = eval(parse(text =
                   glue::glue(
                     "\\(.x, .y) {{
-                      dplyr::transmute(.x, .data$date, .data${name})
+                      rbind(
+                        dplyr::transmute(
+                          .x,
+                          \"date\" = .data$date + lubridate::days(floor(delay)),
+                          \"{name}\" = .data${name} * (1 - (delay %% 1))
+                        ),
+                        dplyr::transmute(
+                          .x,
+                          \"date\" = .data$date + lubridate::days(ceiling(delay)),
+                          \"{name}\" = .data${name} * (delay %% 1)
+                        )
+                      )
                     }}"
                   )
               ))

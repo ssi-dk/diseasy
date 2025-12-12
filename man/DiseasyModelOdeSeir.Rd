@@ -402,7 +402,8 @@ That is, observables must be summarisable by the "sum()" function.
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_observable(
   weights,
   name,
-  derived_from = c("state_vector", "infection_matrix")
+  derived_from = c("state_vector", "infection_matrix"),
+  delay = 0
 )}\if{html}{\out{</div>}}
 }
 
@@ -417,6 +418,9 @@ A name for the observable (retrievable by \verb{$get_results()})}
 
 \item{\code{derived_from}}{(\code{character(1)})\cr
 Which signal source should the observable be derived from?}
+
+\item{\code{delay}}{(\code{numeric(1)})\cr
+The delay (in days) between infection and the occurrence of the given observable.}
 }
 \if{html}{\out{</div>}}
 }
