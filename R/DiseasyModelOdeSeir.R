@@ -1085,8 +1085,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
     ) {
 
-      K <- purrr::pluck(self %.% parameters %.% compartment_structure, "E", .default = 0)                                              # nolint: object_name_linter
-      L <- purrr::pluck(self %.% parameters %.% compartment_structure, "I", .default = 0)                                              # nolint: object_name_linter
+      K <- purrr::pluck(self %.% parameters %.% compartment_structure, "E", .default = 0)                               # nolint: object_name_linter
+      L <- purrr::pluck(self %.% parameters %.% compartment_structure, "I", .default = 0)                               # nolint: object_name_linter
 
       # Early return if no disease compartments
       if (K + L == 0) {
