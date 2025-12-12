@@ -5,6 +5,7 @@ AR
 ARI
 
 CCW
+CoV
 
 backends
 bitemporal
@@ -174,6 +175,7 @@ Rmd
 RS
 rsif
 
+SARS
 SCDB
 Schou
 seir
