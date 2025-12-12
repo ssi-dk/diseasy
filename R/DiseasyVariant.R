@@ -1,4 +1,4 @@
-#' @title Diseasy' variant handler
+#' @title Configure disease variants
 #'
 #' @description
 #'   The `DiseasyVariant` module is responsible for defining scenarios for disease variants to the models

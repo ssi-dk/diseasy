@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasyActivity.R
 \name{DiseasyActivity}
 \alias{DiseasyActivity}
-\title{Activity handler}
+\title{Configure activity (contact) scenarios}
 \value{
 A new instance of the \code{DiseasyActivity} \link[R6:R6Class]{R6} class.
 }

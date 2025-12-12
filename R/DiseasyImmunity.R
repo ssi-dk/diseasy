@@ -1,4 +1,4 @@
-#' @title Diseasy' immunity handler
+#' @title Configure (waning) immunity against different outcomes
 #'
 #' @description
 #'   The `DiseasyImmunity` module is responsible for implementing various models (scenarios) for the immunity

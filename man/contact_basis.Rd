@@ -58,7 +58,7 @@ information of 1-year age-groups to allow transformation of the contact matrices
 This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
 }
 \author{
-Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
+Rasmus Skytte Randløv \email{rske@ssi.dk}
 
 Lasse Engbo Christiansen \email{lsec@ssi.dk}
 }
