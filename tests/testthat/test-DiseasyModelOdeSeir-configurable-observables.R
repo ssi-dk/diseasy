@@ -249,7 +249,7 @@ test_that("Consecutive `$prepare_rhs()` calls works without error", {
 
   m <- DiseasyModelOdeSeir$new(
     immunity = immunity,
-    observables = obs
+    observables = observables
   )
 
   expect_no_condition(m$prepare_rhs())
@@ -258,3 +258,31 @@ test_that("Consecutive `$prepare_rhs()` calls works without error", {
   rm(m)
 })
 
+
+test_that("waning immunity targets 'hospitalisation' and 'death' configures outputs", {
+
+  m <- DiseasyModelOdeSeir$new(
+    activity = activity,
+    immunity = immunity,
+    observables = observables
+  )
+
+  # Configured observable should be in the set of observables
+  checkmate::expect_subset(
+    "n_hospitalisation",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+  checkmate::expect_subset(
+    "n_death",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+
+  # We should be able to get outputs for the outcomes
+  expect_no_condition(m$get_results("n_hospitalisation", prediction_length = 1))
+
+  expect_no_condition(m$get_results("n_death", prediction_length = 1))
+
+  rm(m)
+})
