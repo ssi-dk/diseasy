@@ -704,7 +704,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         purrr::keep_at("I") * self %.% parameters %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
 
       # Generate the reduced model
-      m_forcing <- DiseasyModelOdeSeir$new(
+      private$initialisation_submodel <- DiseasyModelOdeSeir$new(
         observables = self %.% observables,
         activity = self %.% activity,
         variant = self %.% variant,
@@ -765,7 +765,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Use the interpolated signal as a forcing function for I1
-      m_forcing$set_forcing_functions(
+      private$initialisation_submodel$set_forcing_functions(
         infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
         state_vector_forcing = \(t, dy_dt, loss_due_to_infections, new_infections) {
 
@@ -812,7 +812,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       sol <- deSolve::ode(
         y = y0,
         times = rev(seq(from = 0, to = min(incidence_data$date) - self %.% training_period %.% end)),
-        func = m_forcing %.% rhs,
+        func = private %.% initialisation_submodel %.% rhs,
         parms = list("overall_infection_risk" = overall_infection_risk)
       )
 
@@ -1292,6 +1292,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # Forcing functions for the right hand side function
     infected_forcing = NULL,
     state_vector_forcing = NULL,
+
+    # Submodel used initialisation (to infer observables and state_vector from incidence data)
+    initialisation_submodel = NULL,
 
 
     # @description
