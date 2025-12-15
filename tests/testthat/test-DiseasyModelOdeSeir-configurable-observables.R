@@ -237,3 +237,23 @@ test_that("Loading modules resets user configured observables", {
 
   rm(m)
 })
+
+
+# Add additional waning immunity targets
+immunity$set_no_waning(target = "hospitalisation")
+immunity$set_no_waning(target = "death")
+
+
+test_that("Consecutive `$prepare_rhs()` calls works without error", {
+
+  m <- DiseasyModelOdeSeir$new(
+    immunity = immunity,
+    observables = obs
+  )
+
+  expect_no_condition(m$prepare_rhs())
+  expect_no_condition(m$prepare_rhs())
+
+  rm(m)
+})
+
