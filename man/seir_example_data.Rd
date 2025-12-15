@@ -3,7 +3,7 @@
 \docType{data}
 \name{seir_example_data}
 \alias{seir_example_data}
-\title{seir_example_data}
+\title{Synthetic epidemiological data}
 \description{
 This data set contains a the simulation output from a SEIR model to use when testing and developing models.
 }
@@ -27,6 +27,6 @@ accounting for a age dependent risk of admission.
 }
 }
 \author{
-Rasmus Skytte Randl\\u00F8v \email{rske@dtu.dk}
+Rasmus Skytte Randløv \email{rske@ssi.dk}
 }
 \keyword{data}

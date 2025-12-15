@@ -1,4 +1,4 @@
-#' @title Meta module for the GLM class of models
+#' @title Simple generalized linear regression models
 #' @name Diseasy-GLM-models
 #'
 #' @description `r rd_diseasymodel_glm_brm_description("GLM")`
