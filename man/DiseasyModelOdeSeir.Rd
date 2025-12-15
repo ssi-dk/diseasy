@@ -86,6 +86,9 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \item{\code{malthusian_scaling_factor}}{(\code{numeric(1)})\cr
 A scaling factor to apply to the contact matrices to account for structural differences
 in the model. Read only.}
+
+\item{\code{model_outputs}}{(\code{character()})\cr
+Names of the user-configured model outputs. Read only.}
 }
 \if{html}{\out{</div>}}
 }

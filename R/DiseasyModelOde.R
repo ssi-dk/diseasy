@@ -101,13 +101,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # Add NAs to observations for each configured observable in the model
         # (i.e. non-n_infected observable)
-        surveillance_states <- unique(purrr::reduce(purrr::map(private$observable_mapping, ~ attr(., "name")), c))
-
-        if (!is.null(surveillance_states)) {
+        if (!is.null(self %.% model_outputs)) {
           observations <- observations |>
             dplyr::cross_join(
               purrr::reduce(
-                purrr::map(surveillance_states, ~ tibble::tibble(!!. := NA)),
+                purrr::map(self %.% model_outputs, ~ tibble::tibble(!!. := NA)),
                 dplyr::cross_join,
                 .init = data.frame()
               )
@@ -126,7 +124,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Map model incidence to the requested observable
         prediction <- data |>
           dplyr::group_by(
-            dplyr::across(!c("date", "n_infected", dplyr::all_of(surveillance_states), "population"))
+            dplyr::across(!c("date", "n_infected", dplyr::all_of(self %.% model_outputs), "population"))
           ) |>
           dplyr::group_modify(map_fn)
 
@@ -386,14 +384,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
             )
           )
 
-        # Get names of custom observables
-        surveillance_states <- unique(purrr::reduce(purrr::map(private$observable_mapping, ~ attr(., "name")), c))
-
         # Extract rates for the I1-exit (= n_infected) and each configured
         # observable.
         # Custom observables computes from differerences of integrating states
         model_rates <- sol_long |>
-          dplyr::filter(.data$state %in% c("I1", surveillance_states)) |>
+          dplyr::filter(.data$state %in% c("I1", self %.% model_outputs)) |>
           dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter
             "rate" = dplyr::if_else(
               .data$state == "I1",

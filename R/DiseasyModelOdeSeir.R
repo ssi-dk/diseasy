@@ -149,17 +149,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (!purrr::every(private %.% observable_mapping, is.null)) {
         pkgcond::pkg_warning("Module loaded - user-specified observable configurations deleted!")
 
-        # Get names of configured observables
-        surveillance_labels <- c(
-          attr(private %.% observable_mapping %.% infection_matrix, "name"),
-          attr(private %.% observable_mapping %.% state_vector, "name")
-        ) |>
-          unique()
-
         # Remove configured observables
+        private$.parameters$model_output_to_observable[[self %.% model_outputs]] <- NULL
         private$observable_mapping <- list("state_vector" = NULL, "infection_matrix" = NULL)
-        private$.parameters$model_output_to_observable[[surveillance_labels]] <- NULL
       }
+
+      # Attempt to re-initialise helpers with the current inputs
+      tryCatch(self$prepare_rhs(), error = function(e) {})
     },
 
 
@@ -887,11 +883,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         groups_state_vector
       )
 
-      surveillance_labels <- c(
-        attr(private %.% observable_mapping %.% infection_matrix, "name"),
-        attr(private %.% observable_mapping %.% state_vector, "name")
-      )
-
       # Extract groups from initial_state_vector
       initial_surveillance_vector <- groups |>
         purrr::map(~ initial_state_vector[., ]) |>
@@ -904,7 +895,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Set names and start each state at zero
       initial_surveillance_vector <- initial_surveillance_vector |>
         purrr::map2(
-          surveillance_labels,
+          self %.% model_outputs,
           ~ dplyr::mutate(.x, "state" = !!.y, "initial_condition" = 0)
         ) |>
         purrr::list_rbind()
@@ -1042,7 +1033,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_disjunct(
         name,
-        names(self %.% parameters %.% model_output_to_observable),
+        setdiff(
+          names(self %.% parameters %.% model_output_to_observable),
+          self %.% model_outputs
+        ),
         add = coll
       )
       checkmate::reportAssertions(coll)
@@ -1145,7 +1139,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       .f = active_binding,
       name = "malthusian_scaling_factor",
       expr = return(private %.% .malthusian_scaling_factor)
-    )
+    ),
+
+    #' @field model_outputs (`character()`)\cr
+    #'   Names of the user-configured model outputs. Read only.
+    model_outputs = function() {
+      unique(purrr::reduce(purrr::map(private %.% observable_mapping, ~ attr(., "name")), c))
+    }
   ),
 
 
