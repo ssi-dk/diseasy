@@ -5,1164 +5,971 @@
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
-      "ref": "abind",
       "package": "abind",
       "version": "1.4-8",
       "binary": true
     },
     {
-      "ref": "askpass",
       "package": "askpass",
       "version": "1.2.1",
       "binary": true
     },
     {
-      "ref": "assertthat",
       "package": "assertthat",
       "version": "0.2.1",
       "binary": true
     },
     {
-      "ref": "backports",
       "package": "backports",
       "version": "1.5.0",
       "binary": true
     },
     {
-      "ref": "base64enc",
       "package": "base64enc",
       "version": "0.1-3",
       "binary": true
     },
     {
-      "ref": "bayesplot",
       "package": "bayesplot",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "binary": true
     },
     {
-      "ref": "BH",
       "package": "BH",
-      "version": "1.87.0-1",
+      "version": "1.90.0-1",
       "binary": true
     },
     {
-      "ref": "bigD",
       "package": "bigD",
       "version": "0.3.1",
       "binary": true
     },
     {
-      "ref": "bit",
       "package": "bit",
       "version": "4.6.0",
       "binary": true
     },
     {
-      "ref": "bit64",
       "package": "bit64",
       "version": "4.6.0-1",
       "binary": true
     },
     {
-      "ref": "bitops",
       "package": "bitops",
       "version": "1.0-9",
       "binary": true
     },
     {
-      "ref": "blob",
       "package": "blob",
       "version": "1.2.4",
       "binary": true
     },
     {
-      "ref": "brew",
       "package": "brew",
       "version": "1.0-10",
       "binary": true
     },
     {
-      "ref": "bridgesampling",
       "package": "bridgesampling",
       "version": "1.2-1",
       "binary": true
     },
     {
-      "ref": "brio",
       "package": "brio",
       "version": "1.1.5",
       "binary": true
     },
     {
-      "ref": "brms",
       "package": "brms",
       "version": "2.23.0",
       "binary": true
     },
     {
-      "ref": "Brobdingnag",
       "package": "Brobdingnag",
       "version": "1.2-9",
       "binary": true
     },
     {
-      "ref": "bslib",
       "package": "bslib",
       "version": "0.9.0",
       "binary": true
     },
     {
-      "ref": "cachem",
       "package": "cachem",
       "version": "1.1.0",
       "binary": true
     },
     {
-      "ref": "callr",
       "package": "callr",
       "version": "3.7.6",
       "binary": true
     },
     {
-      "ref": "checkmate",
       "package": "checkmate",
       "version": "2.3.3",
       "binary": true
     },
     {
-      "ref": "cli",
       "package": "cli",
       "version": "3.6.5",
       "binary": true
     },
     {
-      "ref": "clipr",
       "package": "clipr",
       "version": "0.8.0",
       "binary": true
     },
     {
-      "ref": "coda",
       "package": "coda",
       "version": "0.19-4.1",
       "binary": true
     },
     {
-      "ref": "commonmark",
+      "package": "codetools",
+      "version": "0.2-20",
+      "binary": true
+    },
+    {
       "package": "commonmark",
       "version": "2.0.0",
       "binary": true
     },
     {
-      "ref": "contactdata",
       "package": "contactdata",
       "version": "1.1.0",
       "binary": true
     },
     {
-      "ref": "countrycode",
       "package": "countrycode",
       "version": "1.6.1",
       "binary": true
     },
     {
-      "ref": "crayon",
       "package": "crayon",
       "version": "1.5.3",
       "binary": true
     },
     {
-      "ref": "credentials",
       "package": "credentials",
       "version": "2.0.3",
       "binary": true
     },
     {
-      "ref": "curl",
       "package": "curl",
       "version": "7.0.0",
       "binary": true
     },
     {
-      "ref": "DBI",
       "package": "DBI",
       "version": "1.2.3",
       "binary": true
     },
     {
-      "ref": "dbplyr",
       "package": "dbplyr",
       "version": "2.5.1",
       "binary": true
     },
     {
-      "ref": "desc",
       "package": "desc",
       "version": "1.4.3",
       "binary": true
     },
     {
-      "ref": "deSolve",
       "package": "deSolve",
       "version": "1.40",
       "binary": true
     },
     {
-      "ref": "devtools",
       "package": "devtools",
       "version": "2.4.6",
       "binary": true
     },
     {
-      "ref": "dfoptim",
       "package": "dfoptim",
       "version": "2023.1.0",
       "binary": true
     },
     {
-      "ref": "diffobj",
       "package": "diffobj",
       "version": "0.3.6",
       "binary": true
     },
     {
-      "ref": "digest",
       "package": "digest",
       "version": "0.6.39",
       "binary": true
     },
     {
-      "ref": "diseasystore",
+      "package": "diseasy",
+      "version": "0.0.0.9000",
+      "binary": false
+    },
+    {
       "package": "diseasystore",
       "version": "0.3.2",
       "binary": true
     },
     {
-      "ref": "distributional",
       "package": "distributional",
       "version": "0.5.0",
       "binary": true
     },
     {
-      "ref": "downlit",
       "package": "downlit",
       "version": "0.4.5",
       "binary": true
     },
     {
-      "ref": "dplyr",
       "package": "dplyr",
       "version": "1.1.4",
       "binary": true
     },
     {
-      "ref": "duckdb",
       "package": "duckdb",
       "version": "1.4.3",
       "binary": true
     },
     {
-      "ref": "ellipsis",
       "package": "ellipsis",
       "version": "0.3.2",
       "binary": true
     },
     {
-      "ref": "evaluate",
       "package": "evaluate",
       "version": "1.0.5",
       "binary": true
     },
     {
-      "ref": "expm",
       "package": "expm",
       "version": "1.0-0",
       "binary": true
     },
     {
-      "ref": "fansi",
       "package": "fansi",
       "version": "1.0.7",
       "binary": true
     },
     {
-      "ref": "farver",
       "package": "farver",
       "version": "2.1.2",
       "binary": true
     },
     {
-      "ref": "fastmap",
       "package": "fastmap",
       "version": "1.2.0",
       "binary": true
     },
     {
-      "ref": "fontawesome",
       "package": "fontawesome",
       "version": "0.5.3",
       "binary": true
     },
     {
-      "ref": "fs",
       "package": "fs",
       "version": "1.6.6",
       "binary": true
     },
     {
-      "ref": "future",
       "package": "future",
       "version": "1.68.0",
       "binary": true
     },
     {
-      "ref": "future.apply",
       "package": "future.apply",
       "version": "1.20.1",
       "binary": true
     },
     {
-      "ref": "generics",
       "package": "generics",
       "version": "0.1.4",
       "binary": true
     },
     {
-      "ref": "gert",
       "package": "gert",
       "version": "2.2.0",
       "binary": true
     },
     {
-      "ref": "ggplot2",
       "package": "ggplot2",
       "version": "4.0.1",
       "binary": true
     },
     {
-      "ref": "ggridges",
       "package": "ggridges",
       "version": "0.5.7",
       "binary": true
     },
     {
-      "ref": "gh",
       "package": "gh",
       "version": "1.5.0",
       "binary": true
     },
     {
-      "ref": "gitcreds",
       "package": "gitcreds",
       "version": "0.1.2",
       "binary": true
     },
     {
-      "ref": "globals",
       "package": "globals",
       "version": "0.18.0",
       "binary": true
     },
     {
-      "ref": "glue",
       "package": "glue",
       "version": "1.8.0",
       "binary": true
     },
     {
-      "ref": "gridExtra",
       "package": "gridExtra",
       "version": "2.3",
       "binary": true
     },
     {
-      "ref": "gt",
       "package": "gt",
       "version": "1.1.0",
       "binary": true
     },
     {
-      "ref": "gtable",
       "package": "gtable",
       "version": "0.3.6",
       "binary": true
     },
     {
-      "ref": "highr",
       "package": "highr",
       "version": "0.11",
       "binary": true
     },
     {
-      "ref": "hms",
       "package": "hms",
       "version": "1.1.4",
       "binary": true
     },
     {
-      "ref": "htmltools",
       "package": "htmltools",
       "version": "0.5.9",
       "binary": true
     },
     {
-      "ref": "htmlwidgets",
       "package": "htmlwidgets",
       "version": "1.6.4",
       "binary": true
     },
     {
-      "ref": "httpuv",
       "package": "httpuv",
       "version": "1.6.16",
       "binary": false,
       "sha256": "51f341aef9499411b4c446205c87d56dcd9e03e5e9ca2a54b33f70a67bed2f64"
     },
     {
-      "ref": "httr2",
       "package": "httr2",
       "version": "1.2.2",
       "binary": true
     },
     {
-      "ref": "hunspell",
       "package": "hunspell",
       "version": "3.0.6",
       "binary": false,
       "sha256": "4023df2eef4e081eac52efa1ecccc4b31f7941439ce276f4094b9d5a02787535"
     },
     {
-      "ref": "ini",
       "package": "ini",
       "version": "0.3.1",
       "binary": true
     },
     {
-      "ref": "inline",
       "package": "inline",
       "version": "0.3.21",
       "binary": true
     },
     {
-      "ref": "installed::/usr/local/lib/R/library/codetools",
-      "package": "codetools",
-      "version": "0.2-20",
-      "binary": true
-    },
-    {
-      "ref": "installed::/usr/local/lib/R/library/lattice",
-      "package": "lattice",
-      "version": "0.22-7",
-      "binary": true
-    },
-    {
-      "ref": "installed::/usr/local/lib/R/library/Matrix",
-      "package": "Matrix",
-      "version": "1.7-4",
-      "binary": true
-    },
-    {
-      "ref": "installed::/usr/local/lib/R/library/mgcv",
-      "package": "mgcv",
-      "version": "1.9-3",
-      "binary": true
-    },
-    {
-      "ref": "installed::/usr/local/lib/R/library/nlme",
-      "package": "nlme",
-      "version": "3.1-168",
-      "binary": true
-    },
-    {
-      "ref": "isoband",
       "package": "isoband",
       "version": "0.3.0",
       "binary": true
     },
     {
-      "ref": "ISOweek",
       "package": "ISOweek",
       "version": "0.6-2",
       "binary": true
     },
     {
-      "ref": "jquerylib",
       "package": "jquerylib",
       "version": "0.1.4",
       "binary": true
     },
     {
-      "ref": "jsonlite",
       "package": "jsonlite",
       "version": "2.0.0",
       "binary": true
     },
     {
-      "ref": "juicyjuice",
       "package": "juicyjuice",
       "version": "0.1.0",
       "binary": true
     },
     {
-      "ref": "knitr",
       "package": "knitr",
       "version": "1.50",
       "binary": true
     },
     {
-      "ref": "labeling",
       "package": "labeling",
       "version": "0.4.3",
       "binary": true
     },
     {
-      "ref": "later",
       "package": "later",
       "version": "1.4.4",
       "binary": false,
       "sha256": "18cec083cdbc3e5e9a491fa10af5cfcabb9cd91231e4e8a18e58e8651da7aa80"
     },
     {
-      "ref": "lazyeval",
+      "package": "lattice",
+      "version": "0.22-7",
+      "binary": true
+    },
+    {
       "package": "lazyeval",
       "version": "0.2.2",
       "binary": true
     },
     {
-      "ref": "lgr",
       "package": "lgr",
       "version": "0.5.0",
       "binary": true
     },
     {
-      "ref": "lifecycle",
       "package": "lifecycle",
       "version": "1.0.4",
       "binary": true
     },
     {
-      "ref": "lintr",
       "package": "lintr",
       "version": "3.3.0-1",
       "binary": true
     },
     {
-      "ref": "listenv",
       "package": "listenv",
       "version": "0.10.0",
       "binary": true
     },
     {
-      "ref": "litedown",
       "package": "litedown",
       "version": "0.8",
       "binary": true
     },
     {
-      "ref": "local::.",
-      "package": "diseasy",
-      "version": "0.0.0.9000",
-      "binary": false
-    },
-    {
-      "ref": "loo",
       "package": "loo",
       "version": "2.8.0",
       "binary": true
     },
     {
-      "ref": "lubridate",
       "package": "lubridate",
       "version": "1.9.4",
       "binary": true
     },
     {
-      "ref": "magrittr",
       "package": "magrittr",
       "version": "2.0.4",
       "binary": true
     },
     {
-      "ref": "markdown",
       "package": "markdown",
       "version": "2.0",
       "binary": true
     },
     {
-      "ref": "matrixStats",
+      "package": "Matrix",
+      "version": "1.7-4",
+      "binary": true
+    },
+    {
       "package": "matrixStats",
       "version": "1.5.0",
       "binary": true
     },
     {
-      "ref": "memoise",
       "package": "memoise",
       "version": "2.0.1",
       "binary": true
     },
     {
-      "ref": "microbenchmark",
+      "package": "mgcv",
+      "version": "1.9-3",
+      "binary": true
+    },
+    {
       "package": "microbenchmark",
       "version": "1.5.0",
       "binary": true
     },
     {
-      "ref": "mime",
       "package": "mime",
       "version": "0.13",
       "binary": true
     },
     {
-      "ref": "miniUI",
       "package": "miniUI",
       "version": "0.1.2",
       "binary": true
     },
     {
-      "ref": "mvtnorm",
       "package": "mvtnorm",
       "version": "1.3-3",
       "binary": true
     },
     {
-      "ref": "nleqslv",
       "package": "nleqslv",
       "version": "3.3.5",
       "binary": true
     },
     {
-      "ref": "nloptr",
+      "package": "nlme",
+      "version": "3.1-168",
+      "binary": true
+    },
+    {
       "package": "nloptr",
       "version": "2.2.1",
       "binary": true
     },
     {
-      "ref": "numDeriv",
       "package": "numDeriv",
       "version": "2016.8-1.1",
       "binary": true
     },
     {
-      "ref": "openssl",
       "package": "openssl",
       "version": "2.3.4",
       "binary": true
     },
     {
-      "ref": "optimx",
       "package": "optimx",
       "version": "2025-4.9",
       "binary": true
     },
     {
-      "ref": "otel",
       "package": "otel",
       "version": "0.2.0",
       "binary": true
     },
     {
-      "ref": "parallelly",
       "package": "parallelly",
-      "version": "1.45.1",
+      "version": "1.46.0",
       "binary": true
     },
     {
-      "ref": "pillar",
       "package": "pillar",
       "version": "1.11.1",
       "binary": true
     },
     {
-      "ref": "pkgbuild",
       "package": "pkgbuild",
       "version": "1.4.8",
       "binary": true
     },
     {
-      "ref": "pkgcond",
       "package": "pkgcond",
       "version": "0.1.1",
       "binary": true
     },
     {
-      "ref": "pkgconfig",
       "package": "pkgconfig",
       "version": "2.0.3",
       "binary": true
     },
     {
-      "ref": "pkgdown",
       "package": "pkgdown",
       "version": "2.2.0",
       "binary": true
     },
     {
-      "ref": "pkgload",
       "package": "pkgload",
       "version": "1.4.1",
       "binary": true
     },
     {
-      "ref": "plyr",
       "package": "plyr",
       "version": "1.8.9",
       "binary": false,
       "sha256": "15b5e7f711d53bf41b8687923983b8ef424563aa2f74c5195feb5b1df1aee103"
     },
     {
-      "ref": "posterior",
       "package": "posterior",
       "version": "1.6.1",
       "binary": true
     },
     {
-      "ref": "pracma",
       "package": "pracma",
       "version": "2.4.6",
       "binary": true
     },
     {
-      "ref": "praise",
       "package": "praise",
       "version": "1.0.0",
       "binary": true
     },
     {
-      "ref": "prettyunits",
       "package": "prettyunits",
       "version": "1.2.0",
       "binary": true
     },
     {
-      "ref": "processx",
       "package": "processx",
       "version": "3.8.6",
       "binary": true
     },
     {
-      "ref": "profvis",
       "package": "profvis",
       "version": "0.4.0",
       "binary": true
     },
     {
-      "ref": "progressr",
       "package": "progressr",
       "version": "0.18.0",
       "binary": true
     },
     {
-      "ref": "promises",
       "package": "promises",
       "version": "1.5.0",
       "binary": true
     },
     {
-      "ref": "ps",
       "package": "ps",
       "version": "1.9.1",
       "binary": true
     },
     {
-      "ref": "purrr",
       "package": "purrr",
       "version": "1.2.0",
       "binary": true
     },
     {
-      "ref": "QuickJSR",
       "package": "QuickJSR",
       "version": "1.8.1",
       "binary": true
     },
     {
-      "ref": "R6",
       "package": "R6",
       "version": "2.6.1",
       "binary": true
     },
     {
-      "ref": "ragg",
       "package": "ragg",
       "version": "1.5.0",
       "binary": true
     },
     {
-      "ref": "rappdirs",
       "package": "rappdirs",
       "version": "0.3.3",
       "binary": true
     },
     {
-      "ref": "rcmdcheck",
       "package": "rcmdcheck",
       "version": "1.4.0",
       "binary": true
     },
     {
-      "ref": "RColorBrewer",
       "package": "RColorBrewer",
       "version": "1.1-3",
       "binary": true
     },
     {
-      "ref": "Rcpp",
       "package": "Rcpp",
       "version": "1.1.0",
       "binary": false,
       "sha256": "84211c2520ba68c839b2e75761e97afc90baeebccbaf216ac8534fa2076cfb4d"
     },
     {
-      "ref": "RcppEigen",
       "package": "RcppEigen",
       "version": "0.3.4.0.2",
       "binary": false,
       "sha256": "ecad7ba2129fd48b7ebb825558d38492ed1f3a8934959e27fcd6688175e542bb"
     },
     {
-      "ref": "RcppParallel",
       "package": "RcppParallel",
       "version": "5.1.11-1",
       "binary": true
     },
     {
-      "ref": "reactable",
       "package": "reactable",
       "version": "0.4.5",
       "binary": true
     },
     {
-      "ref": "reactR",
       "package": "reactR",
       "version": "0.6.1",
       "binary": true
     },
     {
-      "ref": "readr",
       "package": "readr",
       "version": "2.1.6",
       "binary": true
     },
     {
-      "ref": "remotes",
       "package": "remotes",
       "version": "2.5.0",
       "binary": true
     },
     {
-      "ref": "reshape2",
       "package": "reshape2",
       "version": "1.4.5",
       "binary": false,
       "sha256": "0ead5acd0153e5073b3c24e8e782982a4eab3aaa768ba17700d796fb13b68cef"
     },
     {
-      "ref": "rex",
       "package": "rex",
       "version": "1.2.1",
       "binary": true
     },
     {
-      "ref": "rlang",
       "package": "rlang",
       "version": "1.1.6",
       "binary": true
     },
     {
-      "ref": "rmarkdown",
       "package": "rmarkdown",
       "version": "2.30",
       "binary": true
     },
     {
-      "ref": "roxygen2",
       "package": "roxygen2",
       "version": "7.3.3",
       "binary": true
     },
     {
-      "ref": "rprojroot",
       "package": "rprojroot",
       "version": "2.1.1",
       "binary": true
     },
     {
-      "ref": "RSQLite",
       "package": "RSQLite",
       "version": "2.4.5",
       "binary": true
     },
     {
-      "ref": "rstan",
       "package": "rstan",
       "version": "2.32.7",
       "binary": false,
       "sha256": "5931cf77fb01672f962c203c49bb4508f86f55553cac97f58ff0c7a55b72174a"
     },
     {
-      "ref": "rstantools",
       "package": "rstantools",
       "version": "2.5.0",
       "binary": true
     },
     {
-      "ref": "rstudioapi",
       "package": "rstudioapi",
       "version": "0.17.1",
       "binary": true
     },
     {
-      "ref": "rversions",
       "package": "rversions",
       "version": "3.0.0",
       "binary": true
     },
     {
-      "ref": "S7",
       "package": "S7",
       "version": "0.2.1",
       "binary": true
     },
     {
-      "ref": "sass",
       "package": "sass",
       "version": "0.4.10",
       "binary": true
     },
     {
-      "ref": "scales",
       "package": "scales",
       "version": "1.4.0",
       "binary": true
     },
     {
-      "ref": "SCDB",
       "package": "SCDB",
       "version": "0.5.1",
       "binary": true
     },
     {
-      "ref": "sessioninfo",
       "package": "sessioninfo",
       "version": "1.2.3",
       "binary": true
     },
     {
-      "ref": "shiny",
       "package": "shiny",
       "version": "1.12.1",
-      "binary": false,
-      "sha256": "b8e6d1641822308453e3d1e511837f67e2213400dacd6370b6846e116b238aa2"
+      "binary": true
     },
     {
-      "ref": "sourcetools",
       "package": "sourcetools",
       "version": "0.1.7-1",
       "binary": true
     },
     {
-      "ref": "spelling",
       "package": "spelling",
       "version": "2.3.2",
       "binary": true
     },
     {
-      "ref": "StanHeaders",
       "package": "StanHeaders",
       "version": "2.32.10",
       "binary": false,
       "sha256": "c3125b8d7dc4c6b7082258b2fa6c9530c2e4714c89ffd08b8e72f4c9f4108582"
     },
     {
-      "ref": "stringi",
       "package": "stringi",
       "version": "1.8.7",
       "binary": true
     },
     {
-      "ref": "stringr",
       "package": "stringr",
       "version": "1.6.0",
       "binary": true
     },
     {
-      "ref": "subplex",
       "package": "subplex",
       "version": "1.9",
       "binary": true
     },
     {
-      "ref": "sys",
       "package": "sys",
       "version": "3.4.3",
       "binary": true
     },
     {
-      "ref": "systemfonts",
       "package": "systemfonts",
       "version": "1.3.1",
       "binary": true
     },
     {
-      "ref": "tensorA",
       "package": "tensorA",
       "version": "0.36.2.1",
       "binary": true
     },
     {
-      "ref": "testthat",
       "package": "testthat",
       "version": "3.3.1",
       "binary": true
     },
     {
-      "ref": "textshaping",
       "package": "textshaping",
       "version": "1.0.4",
       "binary": true
     },
     {
-      "ref": "tibble",
       "package": "tibble",
       "version": "3.3.0",
       "binary": true
     },
     {
-      "ref": "tidyr",
       "package": "tidyr",
       "version": "1.3.1",
       "binary": true
     },
     {
-      "ref": "tidyselect",
       "package": "tidyselect",
       "version": "1.2.1",
       "binary": true
     },
     {
-      "ref": "timechange",
       "package": "timechange",
       "version": "0.3.0",
       "binary": true
     },
     {
-      "ref": "tinytex",
       "package": "tinytex",
       "version": "0.58",
       "binary": true
     },
     {
-      "ref": "tzdb",
       "package": "tzdb",
       "version": "0.5.0",
       "binary": true
     },
     {
-      "ref": "ucminf",
       "package": "ucminf",
       "version": "1.2.2",
       "binary": true
     },
     {
-      "ref": "urlchecker",
       "package": "urlchecker",
       "version": "1.0.1",
       "binary": true
     },
     {
-      "ref": "usethis",
       "package": "usethis",
       "version": "3.2.1",
       "binary": true
     },
     {
-      "ref": "utf8",
       "package": "utf8",
       "version": "1.2.6",
       "binary": true
     },
     {
-      "ref": "V8",
       "package": "V8",
       "version": "8.0.1",
       "binary": false,
       "sha256": "d5d7da5f367e6d5dde34df73d927bad6d8b36623416c920f2570fe52b589d7ae"
     },
     {
-      "ref": "vctrs",
       "package": "vctrs",
       "version": "0.6.5",
       "binary": true
     },
     {
-      "ref": "viridisLite",
       "package": "viridisLite",
       "version": "0.4.2",
       "binary": true
     },
     {
-      "ref": "vroom",
       "package": "vroom",
       "version": "1.6.7",
       "binary": true
     },
     {
-      "ref": "waldo",
       "package": "waldo",
       "version": "0.6.2",
       "binary": true
     },
     {
-      "ref": "whisker",
       "package": "whisker",
       "version": "0.4.1",
       "binary": true
     },
     {
-      "ref": "withr",
       "package": "withr",
       "version": "3.0.2",
       "binary": true
     },
     {
-      "ref": "xfun",
       "package": "xfun",
       "version": "0.54",
       "binary": true
     },
     {
-      "ref": "xml2",
       "package": "xml2",
       "version": "1.5.1",
       "binary": true
     },
     {
-      "ref": "xmlparsedata",
       "package": "xmlparsedata",
       "version": "1.0.5",
       "binary": true
     },
     {
-      "ref": "xopen",
       "package": "xopen",
       "version": "1.0.1",
       "binary": true
     },
     {
-      "ref": "xtable",
       "package": "xtable",
       "version": "1.8-4",
       "binary": true
     },
     {
-      "ref": "yaml",
       "package": "yaml",
       "version": "2.3.12",
       "binary": true
     },
     {
-      "ref": "zip",
       "package": "zip",
       "version": "2.3.3",
       "binary": true
