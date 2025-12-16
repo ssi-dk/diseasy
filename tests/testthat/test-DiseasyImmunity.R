@@ -544,7 +544,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
     tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
 
   purrr::pwalk(test_combinations, \(M, method, strategy, penalty) {                                                     # nolint: object_name_linter
-    expect_no_error(
+    expect_no_condition(
       im$plot(
         M = !!M,
         method = !!method,
@@ -616,7 +616,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
   # Set the exponential waning model
   im$set_sigmoidal_waning()
 
-  expect_no_error(
+  expect_no_condition(
     im$approximate_compartmental(
       M = 3,
       method = "free_gamma",
