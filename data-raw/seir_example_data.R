@@ -15,24 +15,34 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Setup the number of compartments for the generating model
   K <- 2L                                                                                                               # nolint start: object_name_linter
   L <- 1L
-  M <- 1L                                                                                                               # nolint end
+  M <- 2L                                                                                                               # nolint end
 
   # Build model
-  act <- DiseasyActivity$new()
-  act$set_contact_basis(contact_basis = contact_basis %.% DK)
-  act$set_activity_units(dk_activity_units)
-  act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis %.% DK)
+  activity$set_activity_units(dk_activity_units)
+  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
+  # Add a waning immunity scenario
+  immunity <- DiseasyImmunity$new()
+  immunity$set_exponential_waning(time_scale = 180)
+
+  # Add a season scenario
+  season <- DiseasySeason$new()
+  season$set_reference_date(as.Date("2020-01-01"))
+  season$use_cosine_season()
 
   # We need a dummy observables module
-  obs <- DiseasyObservables$new(
+  observables <- DiseasyObservables$new(
     conn = DBI::dbConnect(RSQLite::SQLite()),
     last_queryable_date = Sys.Date() - 1
   )
 
-  m <- DiseasyModelOdeSeir$new(
-    activity = act,
-    observables = obs,
+  model <- DiseasyModelOdeSeir$new(
+    activity = activity,
+    immunity = immunity,
+    season = season,
+    observables = observables,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = age_cuts_lower,
@@ -42,22 +52,22 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   )
 
   # Get a reference to the private environment
-  private <- m$.__enclos_env__$private
+  private <- model$.__enclos_env__$private
 
   # Generate a initial state_vector
   y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
 
-  population_proportion <- act$map_population(age_cuts_lower) |>
+  population_proportion <- activity$map_population(age_cuts_lower) |>
     dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
     dplyr::pull("proportion")
 
   activity_proportion <- cbind(
-    act$map_population(age_cuts_lower) |>
+    activity$map_population(age_cuts_lower) |>
       dplyr::summarise(
         "proportion" = sum(.data$proportion),
         .by = c("age_group_ref", "age_group_out")
       ),
-    "activity" = rowSums(act$get_scenario_contacts(weights = c(1, 1, 1, 1))[[1]])
+    "activity" = rowSums(activity$get_scenario_contacts(weights = c(1, 1, 1, 1))[[1]])
   ) |>
     dplyr::summarise("activity" = sum(.data$activity), .by = "age_group_out") |>
     dplyr::pull("activity")
@@ -73,7 +83,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
 
   # Run solver across scenario change to check for long-term leakage
-  tt <- deSolve::ode(y = y0, times = seq(0, 150), func = m %.% rhs)
+  tt <- deSolve::ode(y = y0, times = seq(0, 250), func = model %.% rhs)
 
 
   # Extract the maximal test positive signal from the I1 states
