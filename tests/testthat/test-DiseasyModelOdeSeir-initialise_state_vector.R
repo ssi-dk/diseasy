@@ -80,7 +80,8 @@ tidyr::expand_grid(
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
           "age_cuts_lower" = 0,
-          "disease_progression_rates" = c("E" = rE, "I" = rI)
+          "disease_progression_rates" = c("E" = rE, "I" = rI),
+          "overall_infection_risk" = overall_infection_risk
         )
       )
 
