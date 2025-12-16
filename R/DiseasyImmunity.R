@@ -585,7 +585,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               approx <- private$get_approximation(gamma, delta, M)
 
               # Finds diff from approximation and target function
-              integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
+              integrand <- \(t) (stats::approx(t) - self$model[[model_id]](t))^2
 
               # Numerically integrate the differences
               value <- tryCatch(
@@ -703,7 +703,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 t <- c(0, cumsum(1 / delta_0))
 
                 # Time to enter each compartment (M solution)
-                t_prime <- approx(
+                t_prime <- stats::approx(
                   # Progress along compartments (M - 1 solution)
                   x = seq(0, 1, length.out = M - 1),
                   y = t,
@@ -770,7 +770,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
               # Linear interpolation
               gamma_0 <- gamma_0 |>
-                purrr::map(~ approx(x = t, y = .x, xout = t_prime)$y) |>
+                purrr::map(~ stats::approx(x = t, y = .x, xout = t_prime)$y) |>
                 purrr::map(~ utils::head(., -1)) |>
                 purrr::reduce(c)
             }
@@ -836,7 +836,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 t <- c(0, cumsum(1 / delta_0))
 
                 # Time to enter each compartment (M solution)
-                t_prime <- approx(
+                t_prime <- stats::approx(
                   # Progress along compartments (M - 1 solution)
                   x = seq(0, 1, length.out = M - 1),
                   y = t,
@@ -850,7 +850,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Linear interpolation of gamma
                 gamma_0 <- gamma_0 |>
-                  purrr::map(~ approx(x = t, y = .x, xout = t_prime)$y) |>
+                  purrr::map(~ stats::approx(x = t, y = .x, xout = t_prime)$y) |>
                   purrr::map(~ utils::head(., -1)) |>
                   purrr::reduce(c)
               }
