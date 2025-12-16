@@ -155,9 +155,9 @@ given time frame:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
 <span><span class="co">#&gt;   date       n_positive</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01      <span style="text-decoration: underline;">17</span>616</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02      <span style="text-decoration: underline;">25</span>956</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03      <span style="text-decoration: underline;">27</span>263</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01      <span style="text-decoration: underline;">18</span>512</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02      <span style="text-decoration: underline;">27</span>265</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03      <span style="text-decoration: underline;">28</span>818</span></span></code></pre></div>
 <p>If we want to stratify our data, we supply the stratification
 argument. This argument is designed to be flexible, but it means they
 need to be wrapped in <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">rlang::quos()</a></code>. We will see below, why
@@ -173,15 +173,15 @@ that is.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 3</span></span></span>
 <span><span class="co">#&gt;   date       age_group n_admission</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 00-29              12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 30-59             105</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-01 60+               373</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 00-29              13</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-02 30-59             119</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-02 60+               420</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-03-03 00-29              20</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-03-03 30-59             134</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-03-03 60+               431</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 00-29              13</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 30-59             113</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-01 60+               398</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 00-29              17</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-02 30-59             135</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-02 60+               379</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-03-03 00-29              16</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-03-03 30-59             128</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-03-03 60+               460</span></span></code></pre></div>
 <p>Since the stratification is flexible, we can programmatically
 stratify:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -197,12 +197,12 @@ stratify:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
 <span><span class="co">#&gt;   date       young_age_groups n_admission</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 FALSE                    478</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 TRUE                      12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-02 FALSE                    539</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 TRUE                      13</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-03 FALSE                    565</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-03 TRUE                      20</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 FALSE                    511</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 TRUE                      13</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-02 FALSE                    514</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 TRUE                      17</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-03 FALSE                    588</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-03 TRUE                      16</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="creating-synthetic-observables">Creating “synthetic” observables<a class="anchor" aria-label="anchor" href="#creating-synthetic-observables"></a>
@@ -239,9 +239,9 @@ observable renames a existing observable:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
 <span><span class="co">#&gt;   date       n_new_to_hospital</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01               490</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02               552</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03               585</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01               524</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02               531</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03               604</span></span></code></pre></div>
 <p>Note that the stratifications are still available for the synthetic
 observable:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -257,12 +257,12 @@ observable:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
 <span><span class="co">#&gt;   date       young_age_groups n_new_to_hospital</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 FALSE                          478</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 TRUE                            12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-02 FALSE                          539</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 TRUE                            13</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-03 FALSE                          565</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-03 TRUE                            20</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 FALSE                          511</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 TRUE                            13</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-02 FALSE                          514</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 TRUE                            17</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-03 FALSE                          588</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-03 TRUE                            16</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="adjusting-existing-observables">Adjusting existing observables<a class="anchor" aria-label="anchor" href="#adjusting-existing-observables"></a>
@@ -285,9 +285,9 @@ a adjusted observable for the model to use.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
 <span><span class="co">#&gt;   date       n_true_infected</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01           <span style="text-decoration: underline;">27</span>102</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02           <span style="text-decoration: underline;">39</span>932</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03           <span style="text-decoration: underline;">41</span>943</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01           <span style="text-decoration: underline;">28</span>480</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02           <span style="text-decoration: underline;">41</span>946</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03           <span style="text-decoration: underline;">44</span>335</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="constructing-new-observables-from-multiple-observables">Constructing new observables from multiple observables<a class="anchor" aria-label="anchor" href="#constructing-new-observables-from-multiple-observables"></a>
@@ -314,15 +314,15 @@ rate.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 3</span></span></span>
 <span><span class="co">#&gt;   date       age_group incidence</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 00-29       0.003<span style="text-decoration: underline;">87</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 30-59       0.003<span style="text-decoration: underline;">11</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-01 60+         0.001<span style="text-decoration: underline;">65</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 00-29       0.005<span style="text-decoration: underline;">66</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-02 30-59       0.004<span style="text-decoration: underline;">59</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-02 60+         0.002<span style="text-decoration: underline;">48</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-03-03 00-29       0.005<span style="text-decoration: underline;">94</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-03-03 30-59       0.004<span style="text-decoration: underline;">82</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-03-03 60+         0.002<span style="text-decoration: underline;">60</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 00-29       0.004<span style="text-decoration: underline;">06</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 30-59       0.003<span style="text-decoration: underline;">24</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-01 60+         0.001<span style="text-decoration: underline;">76</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-02 00-29       0.005<span style="text-decoration: underline;">98</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-02 30-59       0.004<span style="text-decoration: underline;">82</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-03-02 60+         0.002<span style="text-decoration: underline;">54</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-03-03 00-29       0.006<span style="text-decoration: underline;">27</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-03-03 30-59       0.005<span style="text-decoration: underline;">11</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-03-03 60+         0.002<span style="text-decoration: underline;">73</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># And it works without stratification</span></span>
 <span><span class="va">obs</span><span class="op">$</span><span class="fu">get_observation</span><span class="op">(</span></span>
@@ -333,9 +333,9 @@ rate.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
 <span><span class="co">#&gt;   date       incidence</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01   0.003<span style="text-decoration: underline;">00</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02   0.004<span style="text-decoration: underline;">42</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03   0.004<span style="text-decoration: underline;">65</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01   0.003<span style="text-decoration: underline;">15</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02   0.004<span style="text-decoration: underline;">65</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03   0.004<span style="text-decoration: underline;">91</span></span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

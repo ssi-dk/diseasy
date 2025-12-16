@@ -374,20 +374,20 @@ a reduced probability of testing during weekends.</li>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="st">"variant"</span> <span class="op">=</span> <span class="st">"WT"</span>, .after <span class="op">=</span> <span class="st">"age_group"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 450 × 6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 696 × 6</span></span></span>
 <span><span class="co">#&gt;    date       age_group variant n_infected n_positive_simple n_positive</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            17.2                 7          7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            36.8                26         23</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            49.1                26         19</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            57.4                34         39</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            64.4                47         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            71.6                44         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT            79.2                55         59</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT            87.4                61         64</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT            96.0                59         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           105.                 83         67</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 440 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            17.2                 8          9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            36.7                25         21</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            48.9                28         23</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            56.9                34         40</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            63.6                45         45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            70.4                44         46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT            77.6                52         56</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT            85.2                61         64</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT            93.4                61         49</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           102.                 70         52</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 686 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualise the example data</span></span>
 <span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">model_data</span><span class="op">)</span> <span class="op">+</span></span>
@@ -464,10 +464,22 @@ generate the data to test the best case scenario:</p>
 <span>  <span class="va">act</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span><span class="va">dk_activity_units</span><span class="op">)</span></span>
 <span>  <span class="va">act</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span>date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1900-01-01"</span><span class="op">)</span>, opening <span class="op">=</span> <span class="st">"baseline"</span><span class="op">)</span></span>
 <span></span>
+<span>  <span class="co"># Add a waning immunity scenario</span></span>
+<span>  <span class="va">im</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">im</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Add a season scenario</span></span>
+<span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">s</span><span class="op">$</span><span class="fu">set_reference_date</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">s</span><span class="op">$</span><span class="fu">use_cosine_season</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span></span>
 <span>  <span class="co"># Create a SEIR model to initialise</span></span>
 <span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyModelOdeSeir.html">DiseasyModelOdeSeir</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
-<span>    observables <span class="op">=</span> <span class="va">obs</span>,</span>
 <span>    activity <span class="op">=</span> <span class="va">act</span>,</span>
+<span>    immunity <span class="op">=</span> <span class="va">im</span>,</span>
+<span>    season <span class="op">=</span> <span class="va">s</span>,</span>
+<span>    observables <span class="op">=</span> <span class="va">obs</span>,</span>
 <span>    parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      <span class="st">"compartment_structure"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="va">K</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="va">L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="va">M</span><span class="op">)</span>,</span>
 <span>      <span class="st">"age_cuts_lower"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span>,</span>
@@ -479,7 +491,7 @@ generate the data to test the best case scenario:</p>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">generate_model</span><span class="op">(</span><span class="fl">2L</span>, <span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span> <span class="co"># Use the configuration from example data</span></span></code></pre></div>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">generate_model</span><span class="op">(</span><span class="fl">2L</span>, <span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span> <span class="co"># Use the configuration from example data</span></span></code></pre></div>
 <p>This method relies on fitting a polynomial to the latest period, so
 we here visualise this fitting.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -538,7 +550,7 @@ we here visualise this fitting.</p>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">age_group</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 68 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; Warning: Removed 81 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
 <p><img src="SEIR-initialisation_files/figure-html/incidence%20fitting-1.png" class="r-plt" alt="Fitting a polynomial to the incidence data to estimate derivatives." width="700"></p>
 <p>We can now use the
@@ -548,37 +560,40 @@ infer the initial state vector.</p>
 <code class="sourceCode R"><span><span class="va">psi</span> <span class="op">&lt;-</span> <span class="va">m</span><span class="op">$</span><span class="fu">initialise_state_vector</span><span class="op">(</span><span class="va">incidence_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">psi</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 15 × 4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 18 × 4</span></span></span>
 <span><span class="co">#&gt;    variant age_group state initial_condition</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> All     00-29     E1             0.001<span style="text-decoration: underline;">47</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> All     00-29     E2             0.001<span style="text-decoration: underline;">41</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> All     00-29     I1             0.004<span style="text-decoration: underline;">84</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> All     00-29     R1             0.013<span style="text-decoration: underline;">2</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> All     30-59     E1             0.001<span style="text-decoration: underline;">23</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> All     30-59     E2             0.001<span style="text-decoration: underline;">18</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> All     30-59     I1             0.004<span style="text-decoration: underline;">10</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> All     30-59     R1             0.011<span style="text-decoration: underline;">2</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> All     60+       E1             0.000<span style="text-decoration: underline;">413</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> All     60+       E2             0.000<span style="text-decoration: underline;">398</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> All     60+       I1             0.001<span style="text-decoration: underline;">39</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> All     60+       R1             0.003<span style="text-decoration: underline;">79</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> <span style="color: #BB0000;">NA</span>      00-29     S              0.337   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> <span style="color: #BB0000;">NA</span>      30-59     S              0.368   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> <span style="color: #BB0000;">NA</span>      60+       S              0.250</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> All     00-29     E1             0.001<span style="text-decoration: underline;">56</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> All     00-29     E2             0.001<span style="text-decoration: underline;">49</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> All     00-29     I1             0.005<span style="text-decoration: underline;">05</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> All     00-29     R1             0.012<span style="text-decoration: underline;">4</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> All     00-29     R2             0.000<span style="text-decoration: underline;">756</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> All     30-59     E1             0.001<span style="text-decoration: underline;">28</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> All     30-59     E2             0.001<span style="text-decoration: underline;">23</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> All     30-59     I1             0.004<span style="text-decoration: underline;">24</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> All     30-59     R1             0.010<span style="text-decoration: underline;">6</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> All     30-59     R2             0.000<span style="text-decoration: underline;">655</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> All     60+       E1             0.000<span style="text-decoration: underline;">463</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> All     60+       E2             0.000<span style="text-decoration: underline;">440</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> All     60+       I1             0.001<span style="text-decoration: underline;">48</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> All     60+       R1             0.003<span style="text-decoration: underline;">61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> All     60+       R2             0.000<span style="text-decoration: underline;">222</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> <span style="color: #BB0000;">NA</span>      00-29     S              0.337   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> <span style="color: #BB0000;">NA</span>      30-59     S              0.368   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> <span style="color: #BB0000;">NA</span>      60+       S              0.250</span></span></code></pre></div>
 <p>And we now test the initial conditions by solving the model using
 these starting conditions.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">get_prediction</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>    <span class="va">model</span>,</span>
-<span>    <span class="va">psi</span>,</span>
-<span>    <span class="va">signal</span> <span class="op">=</span> <span class="st">"incidence"</span></span>
-<span>  <span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">psi</span>,</span>
+<span>  <span class="va">signal</span> <span class="op">=</span> <span class="st">"incidence"</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
 <span>  <span class="co"># Integrate the ODE system with deSolve</span></span>
 <span>  <span class="va">sol</span> <span class="op">&lt;-</span> <span class="fu">deSolve</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">ode</a></span><span class="op">(</span></span>
 <span>    y <span class="op">=</span> <span class="va">psi</span><span class="op">$</span><span class="va">initial_condition</span>,</span>
-<span>    times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span><span class="op">)</span>,</span>
+<span>    times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span>,</span>
 <span>    func <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">rhs</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
@@ -657,20 +672,20 @@ these starting conditions.</p>
 <span><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu">get_prediction</span><span class="op">(</span>model <span class="op">=</span> <span class="va">m</span>, psi <span class="op">=</span> <span class="va">psi</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">prediction</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 153 × 7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 303 × 7</span></span></span>
 <span><span class="co">#&gt;     time variant age_group   value date       incidence_model</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0 All     00-29     0.004<span style="text-decoration: underline;">84</span> 2020-02-17         0.003<span style="text-decoration: underline;">02</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     0 All     30-59     0.004<span style="text-decoration: underline;">10</span> 2020-02-17         0.002<span style="text-decoration: underline;">36</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0 All     60+       0.001<span style="text-decoration: underline;">39</span> 2020-02-17         0.001<span style="text-decoration: underline;">20</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1 All     00-29     0.005<span style="text-decoration: underline;">12</span> 2020-02-18         0.003<span style="text-decoration: underline;">19</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1 All     30-59     0.004<span style="text-decoration: underline;">33</span> 2020-02-18         0.002<span style="text-decoration: underline;">49</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1 All     60+       0.001<span style="text-decoration: underline;">47</span> 2020-02-18         0.001<span style="text-decoration: underline;">27</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     2 All     00-29     0.005<span style="text-decoration: underline;">46</span> 2020-02-19         0.003<span style="text-decoration: underline;">41</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     2 All     30-59     0.004<span style="text-decoration: underline;">62</span> 2020-02-19         0.002<span style="text-decoration: underline;">66</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     2 All     60+       0.001<span style="text-decoration: underline;">57</span> 2020-02-19         0.001<span style="text-decoration: underline;">35</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     3 All     00-29     0.005<span style="text-decoration: underline;">86</span> 2020-02-20         0.003<span style="text-decoration: underline;">65</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 143 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0 All     00-29     0.005<span style="text-decoration: underline;">05</span> 2020-02-17         0.003<span style="text-decoration: underline;">15</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     0 All     30-59     0.004<span style="text-decoration: underline;">24</span> 2020-02-17         0.002<span style="text-decoration: underline;">44</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0 All     60+       0.001<span style="text-decoration: underline;">48</span> 2020-02-17         0.001<span style="text-decoration: underline;">28</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1 All     00-29     0.005<span style="text-decoration: underline;">36</span> 2020-02-18         0.003<span style="text-decoration: underline;">34</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1 All     30-59     0.004<span style="text-decoration: underline;">49</span> 2020-02-18         0.002<span style="text-decoration: underline;">58</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1 All     60+       0.001<span style="text-decoration: underline;">58</span> 2020-02-18         0.001<span style="text-decoration: underline;">36</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     2 All     00-29     0.005<span style="text-decoration: underline;">71</span> 2020-02-19         0.003<span style="text-decoration: underline;">57</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     2 All     30-59     0.004<span style="text-decoration: underline;">79</span> 2020-02-19         0.002<span style="text-decoration: underline;">76</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     2 All     60+       0.001<span style="text-decoration: underline;">68</span> 2020-02-19         0.001<span style="text-decoration: underline;">45</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     3 All     00-29     0.006<span style="text-decoration: underline;">11</span> 2020-02-20         0.003<span style="text-decoration: underline;">81</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 293 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: model_configuration &lt;chr&gt;</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -715,7 +730,7 @@ model predictions may diminish.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">2L</span>, <span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span>,</span>
-<span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span>,</span>
+<span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span>,</span>
 <span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">2L</span>, <span class="fl">2L</span>, <span class="fl">2L</span><span class="op">)</span>,</span>
 <span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">3L</span>, <span class="fl">2L</span>, <span class="fl">5L</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -759,7 +774,7 @@ model predictions may diminish.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">2L</span>, <span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span>,</span>
-<span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span>,</span>
+<span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span>,</span>
 <span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">2L</span>, <span class="fl">2L</span>, <span class="fl">2L</span><span class="op">)</span>,</span>
 <span>  <span class="fu">generate_model</span><span class="op">(</span><span class="fl">3L</span>, <span class="fl">2L</span>, <span class="fl">5L</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -767,7 +782,7 @@ model predictions may diminish.</p>
 <span><span class="co"># Update the last queryable date to later starting point</span></span>
 <span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">walk</a></span><span class="op">(</span><span class="va">models</span>, \<span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">m</span><span class="op">$</span><span class="va">observables</span><span class="op">$</span><span class="fu">set_last_queryable_date</span><span class="op">(</span></span>
-<span>    <span class="va">m</span><span class="op">$</span><span class="va">observables</span><span class="op">$</span><span class="va">ds</span><span class="op">$</span><span class="va">max_end_date</span> <span class="op">-</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/period.html" class="external-link">days</a></span><span class="op">(</span><span class="fl">45</span><span class="op">)</span></span>
+<span>    <span class="va">m</span><span class="op">$</span><span class="va">observables</span><span class="op">$</span><span class="va">start_date</span> <span class="op">+</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/period.html" class="external-link">days</a></span><span class="op">(</span><span class="fl">150</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
