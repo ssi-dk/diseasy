@@ -188,7 +188,7 @@ instances which we give the class <code>DiseasyEnsemble</code>.</p>
 functions to get a quick overview of the ensemble.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 7f6e0), DiseasyModelG1 (hash: e53f8), DiseasyModelG1 (hash: 01717)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: b78fe), DiseasyModelG1 (hash: aa8e8), DiseasyModelG1 (hash: 200ca)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
@@ -207,12 +207,12 @@ least specify the following:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
 <span><span class="co">#&gt;   date       n_positive realisation_id weight model                           </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-04-12     <span style="text-decoration: underline;">30</span>717. 1                   1 7f6e0538564bc9902fe83f5f03095a5b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-04-13     <span style="text-decoration: underline;">23</span>174. 1                   1 7f6e0538564bc9902fe83f5f03095a5b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-04-14     <span style="text-decoration: underline;">31</span>103. 1                   1 7f6e0538564bc9902fe83f5f03095a5b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-04-15     <span style="text-decoration: underline;">30</span>758. 1                   1 7f6e0538564bc9902fe83f5f03095a5b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-04-16     <span style="text-decoration: underline;">24</span>464. 1                   1 7f6e0538564bc9902fe83f5f03095a5b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-04-17     <span style="text-decoration: underline;">13</span>287. 1                   1 7f6e0538564bc9902fe83f5f03095a5b</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-04-12     <span style="text-decoration: underline;">30</span>717. 1                   1 b78feeb23af76e339903b62caca9599f</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-04-13     <span style="text-decoration: underline;">23</span>174. 1                   1 b78feeb23af76e339903b62caca9599f</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-04-14     <span style="text-decoration: underline;">31</span>103. 1                   1 b78feeb23af76e339903b62caca9599f</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-04-15     <span style="text-decoration: underline;">30</span>758. 1                   1 b78feeb23af76e339903b62caca9599f</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-04-16     <span style="text-decoration: underline;">24</span>464. 1                   1 b78feeb23af76e339903b62caca9599f</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-04-17     <span style="text-decoration: underline;">13</span>287. 1                   1 b78feeb23af76e339903b62caca9599f</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points." width="700"></p>
@@ -291,7 +291,7 @@ parameter settings from before.</p>
 models:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: 73093), DiseasyModelG0 (hash: 675a6), DiseasyModelG0 (hash: b3156), DiseasyModelG1 (hash: 7f6e0), DiseasyModelG1 (hash: e53f8)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: 09713), DiseasyModelG0 (hash: 748df), DiseasyModelG0 (hash: 91cbc), DiseasyModelG1 (hash: b78fe), DiseasyModelG1 (hash: aa8e8)</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
