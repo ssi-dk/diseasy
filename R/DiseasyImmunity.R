@@ -582,10 +582,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             } else {
 
-              approx <- private$get_approximation(gamma, delta, M)
+              approximation <- private$get_approximation(gamma, delta, M)
 
               # Finds diff from approximation and target function
-              integrand <- \(t) (stats::approx(t) - self$model[[model_id]](t))^2
+              integrand <- \(t) (approximation(t) - self$model[[model_id]](t))^2
 
               # Numerically integrate the differences
               value <- tryCatch(
