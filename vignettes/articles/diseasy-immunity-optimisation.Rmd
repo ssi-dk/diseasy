@@ -49,11 +49,11 @@ These start at 1 and go to 0 within a time scale, $\tau$.
 
 These targets are:
 
-| Function            | Functional form                                                                                |
-| ------------------- | ---------------------------------------------------------------------------------------------- |
-| Exponential         | $\exp\left(-t / \tau\right)$                                                                   |
-| Sigmoidal           | $\exp\left(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6)\right)$                       |
-| Sum of exponentials | $0.3 \cdot 0.8 \cdot \frac{\exp(-0.5 t / \tau) + \exp(-2 t / \tau) + \exp(-3 t / \tau)}{2}$                |
+| Function            | Functional form                                                           |
+| ------------------- | --------------------------------------------------------------------------|
+| Exponential         | $\exp\left(-t / \tau\right)$                                              |
+| Sigmoidal           | $\exp\left(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6)\right)$  |
+| Sum of exponentials | $\frac{\exp(-0.5 t / \tau) + \exp(-2 t / \tau)}{2}$                       |
 
 We then construct more target functions from this family of functions:
 
@@ -69,9 +69,10 @@ a testing schema consisting of a number of "rounds" where we incrementally incre
 problem (and thereby the number of degrees of freedom to optimise).
 
 In addition, we allocate a time limit to each algorithm in each round. If the execution time exceeds this time limit,
-the algorithm is "eliminated" and no more computation is done for the algorithm. Accordingly if the value (error) of the
-objective function for the optimiser is equal or greater than `1e3` it is "eliminated". Note that this is done on per
-method basis as we know the optimisation algorithms fare differently on the different methods for approximation.
+the algorithm is "eliminated" and no more computation is done for that algorithm. Furthermore, if the value (error) of
+the objective function for the optimiser is equal or greater than `1e3` it is also "eliminated".
+Note that this is done on per-method basis as we know the optimisation algorithms fare differently for the different
+methods for approximation.
 
 Once the round is complete, we update the list of eliminated algorithms and then we run the optimisation of $M + 1$ with
 the reduced set of algorithms.
