@@ -200,6 +200,8 @@ disease in the population. The model then predicts the evolution of the incidenc
 under the given configuration. To get predictions for other observables, we must
 map from the incidence to the observable of interest.
 
+[^1]: Measured as the rate of individuals exiting the first `I` state.
+
 Mathematically, we map from the set of observables $\vec{O}(t)$ to the incidence $I(t)$ via the map $f$:
 $$\vec{O}(t) \overset{f}{\rightarrow} I(t)$$
 
@@ -460,5 +462,3 @@ plot(
 if (exists("model")) rm(model)
 gc()
 ```
-
-[^1]: Measured as the rate of individuals exiting the first `I` state.
