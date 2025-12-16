@@ -25,7 +25,7 @@ im <- DiseasyImmunity$new()
 
 
 # Motivation
-From our testing, we have learned that method used to express the waning immunity in a compartmental model[^1]
+From our testing, we have learned that our method used to express the waning immunity in a compartmental model[^1]
 is a hard optimisation problem. Depending on the choice of optimisation algorithm, the quality of the approximation
 will vary wildly as well as the time it takes for the algorithm to converge.
 
@@ -53,9 +53,7 @@ These targets are:
 | ------------------- | ---------------------------------------------------------------------------------------------- |
 | Exponential         | $\exp\left(-t / \tau\right)$                                                                   |
 | Sigmoidal           | $\exp\left(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6)\right)$                       |
-| Heaviside           | $\Theta(\tau - t)$                                                                             |
-| Sum of exponentials | $\frac{1}{3}\left(\exp(-t / \tau) + \exp(-2t / \tau) + \exp(-3t / \tau)\right)$                |
-| Linear              | $\sup\left(\{1 - t/\tau, 0\}\right)$                                                           |
+| Sum of exponentials | $0.3 \cdot 0.8 \cdot \frac{\exp(-0.5 t / \tau) + \exp(-2 t / \tau) + \exp(-3 t / \tau)}{2}$                |
 
 We then construct more target functions from this family of functions:
 
@@ -71,16 +69,18 @@ a testing schema consisting of a number of "rounds" where we incrementally incre
 problem (and thereby the number of degrees of freedom to optimise).
 
 In addition, we allocate a time limit to each algorithm in each round. If the execution time exceeds this time limit,
-the algorithm is "eliminated" and no more computation is done for the algorithm. Note that this is done on per method
-basis as we know the optimisation algorithms fare differently on the different methods for approximation.
+the algorithm is "eliminated" and no more computation is done for the algorithm. Accordingly if the value (error) of the
+objective function for the optimiser is equal or greater than `1e3` it is "eliminated". Note that this is done on per
+method basis as we know the optimisation algorithms fare differently on the different methods for approximation.
 
-Once the round is complete, we update the list of eliminated algorithms and the we run the optimisation of $M + 1$ with
+Once the round is complete, we update the list of eliminated algorithms and then we run the optimisation of $M + 1$ with
 the reduced set of algorithms.
 
 The entire optimisation process is run both without penalty (`monotonous = 0` and `individual_level = 0`) and with a
-penalty (`monotonous = 1` and `individual_level = 1`).
+penalty (`monotonous = 1` and `individual_level = 1`),
+see `vignette("diseasy-immunity")` for `monotonous` and `individual_level` definitions.
 
-The results of the optimisation round in stored in the `?diseasy_immunity_optimiser_results` data-set.
+The results of the optimisation round are stored in the `?diseasy_immunity_optimiser_results` data-set.
 
 ```{r}
 results <- diseasy_immunity_optimiser_results
@@ -127,9 +127,6 @@ below.
 Here we present the top 5 "best" optimiser/strategy combination for each method and penalty setting.
 To define what it means to be the "best" we simply take the total integral difference between the approximation
 and the target function across all target functions and problem sizes ($M$).
-
-Note that we currently filter out the results from the Heaviside and linear targets, which seem to be especially
-difficult for the optimisers to handle (see the [Per target results](#per-target-results) section below).
 
 In addition, we only consider problems up to size $M = 5$ for the general results.
 
