@@ -1164,7 +1164,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     ready = FALSE,
 
     # Configurations for observables (model outputs)
-    observable_mapping = list("state_vector" = NULL, "infection_matrix" = NULL),
+    observable_mapping = list("infection_matrix" = NULL, "state_vector" = NULL),
 
     default_parameters = function() {
       modifyList(
