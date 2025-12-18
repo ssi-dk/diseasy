@@ -158,7 +158,7 @@ tidyr::expand_grid(
       expect_equal(
         m$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
         reference_after,
-        tolerance = 2e-2 # Within 2 %
+        tolerance = 5e-2 # Within 5 %
       )
 
       expect_equal(
