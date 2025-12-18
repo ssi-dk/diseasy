@@ -343,7 +343,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$progression_flow_rates <- c(
         rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
         rep(0, private %.% n_age_groups), # Add a zero for the S compartments
-        rep(0, sum(lengths(private %.% surveillance_indices)))  # Zero-pad for each observable
+        rep(0, sum(length(self %.% model_outputs)))  # Zero-pad for each observable
       )
 
 
@@ -393,9 +393,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Verify observable configurations match model configuration
       checkmate::assert_matrix(
         private %.% observable_mapping %.% state_vector,
-        ncol = private %.% n_states +
-          purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0) +
-          nrow(private %.% observable_mapping %.% state_vector),
+        ncol = private %.% n_states + length(self %.% model_outputs),
         null.ok = TRUE
       )
 
