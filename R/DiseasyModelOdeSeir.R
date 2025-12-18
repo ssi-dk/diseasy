@@ -1154,7 +1154,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @field model_outputs (`character()`)\cr
     #'   Names of the user-configured model outputs. Read only.
     model_outputs = function() {
-      unique(purrr::reduce(purrr::map(private %.% observable_mapping, ~ attr(., "name")), c))
+      purrr::reduce(purrr::map(private %.% observable_mapping, ~ attr(., "name")), c)
     }
   ),
 
