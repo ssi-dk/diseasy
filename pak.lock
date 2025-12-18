@@ -326,7 +326,7 @@
     },
     {
       "package": "gt",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "binary": true
     },
     {
@@ -941,7 +941,7 @@
     },
     {
       "package": "xfun",
-      "version": "0.54",
+      "version": "0.55",
       "binary": true
     },
     {
