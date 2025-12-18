@@ -4,13 +4,22 @@ required_suggested_packages <- c(
   "BB", # Provides spg
   "ucminf",
   "minqa", # Provides uobyqa
+  "nloptr",
   "dfoptim", # Provides nmkb and hjkb
   "subplex",
   "marqLevAlg" # Provides mla
 )
 
+
 coll <- checkmate::makeAssertCollection()
-required_suggested_packages |>
+missing_pkgs <- required_suggested_packages |>
+  purrr::discard(rlang::is_installed)
+
+# Attempt install of missing packages
+if (length(missing_pkgs) > 0 && curl::has_internet()) try(pak::pak(missing_pkgs))
+
+# Throw error for missing
+missing_pkgs |>
   purrr::discard(rlang::is_installed) |>
   purrr::walk(~ coll$push(glue::glue("Missing package: {.}")))
 checkmate::reportAssertions(coll)
@@ -26,16 +35,12 @@ checkmate::reportAssertions(coll)
 f <- list(
   "exponential" = \(t) exp(-t / time_scale),
   "sigmoidal" = \(t) exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
-  "heaviside" = \(t) as.numeric(t < time_scale),
-  "exp_sum" = \(t) (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
-  "linear" = \(t) pmax(1 - t / time_scale, 0)
+  "exp_sum" = \(t) (exp(-0.5 * t / time_scale) + exp(-2 * t / time_scale)) / 2
 )
 g <- list(
   "exponential" = \(t) 0.2 + 0.8 * exp(-t / time_scale),
   "sigmoidal" = \(t) 0.2 + 0.8 * exp(-(t - time_scale) / 6) / (1 + exp(-(t - time_scale) / 6)),
-  "heaviside" = \(t) 0.2 + 0.8 * as.numeric(t < time_scale),
-  "exp_sum" = \(t) 0.2 + 0.8 * (exp(-t / time_scale) + exp(-2 * t / time_scale) + exp(-3 * t / time_scale)) / 3,
-  "linear" = \(t) 0.2 + 0.8 * pmax(1 - t / time_scale, 0)
+  "exp_sum" = \(t) 0.2 + 0.8 * (exp(-0.5 * t / time_scale) + exp(-2 * t / time_scale)) / 2
 )
 h <- f
 
@@ -92,6 +97,7 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
           # Determine the "label" for the optimisation algorithm
           mc <- optim_control |>
+            purrr::map_if(is.numeric, ~ sprintf("%1.e", .)) |>
             as.data.frame() |>
             tidyr::unite("label", tidyselect::everything())
 
@@ -115,6 +121,15 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
             try(
               {
+                im_p$plot(
+                  method = method,
+                  strategy = strategy,
+                  M = M,
+                  monotonous = monotonous,
+                  individual_level = individual_level,
+                  optim_control = optim_control
+                )
+
                 approx <- im_p$approximate_compartmental(
                   method = method,
                   strategy = strategy,
@@ -154,6 +169,54 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 }
 
 
+# Below we implement a optimisation helper that
+# collects the existing results from the round
+existing_results <- function(M, monotonous, individual_level) {                                                         # nolint: object_name_linter
+
+  exisitng_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
+
+  # Early return if no files exist
+  if (length(exisitng_files) == 0) {
+    return(
+      data.frame(
+        "optim_method" = character(0),
+        "target_label" = character(0),
+        "method"       = character(0),
+        "strategy"     = character(0)
+      )
+    )
+  }
+
+
+  # Parse existing files
+  list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds")) |>
+    purrr::map(
+      .progress = TRUE,
+      \(file) {
+        tmp <- file.path(path, file) |>
+          readRDS()
+
+        tmp |>
+          purrr::imap(\(approx, target_label) {
+            approx |>
+              purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
+              modifyList(list("target_label" = target_label))
+          }) |>
+          purrr::list_transpose() |>
+          tibble::as_tibble() |>
+          dplyr::mutate(
+            "optim_method" = stringr::str_extract(
+              !!file,
+              r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
+            )
+          )
+      }
+    ) |>
+    purrr::list_rbind() |>
+    dplyr::select("optim_method", "target_label", "method", "strategy")
+}
+
+
 # Run the optimisation
 path <- devtools::package_file("data-raw/diseasy_immunity_optimiser_results/")
 cache <- cachem::cache_disk(dir = path, max_size = Inf)
@@ -162,28 +225,9 @@ for (penalty in c(0, 1)) {
   monotonous <- penalty
   individual_level <- penalty
 
-  # Check for the existence of a summery file
-  summery_file_exists <- exists("diseasy_immunity_optimiser_results")
-
-
-  # Load current results
-  if (summery_file_exists) {
-    current_results <- diseasy_immunity_optimiser_results |>
-      dplyr::filter(.data$penalty == !!penalty) |>
-      dplyr::select("optim_method", "target_label", "method", "strategy", "M")
-  } else {
-    current_results <- tibble::tibble(
-      "optim_method" = character(0),
-      "target_label" = character(0),
-      "method" = character(0),
-      "strategy" = character(0),
-      "M" = numeric(0)
-    )
-  }
-
   closeAllConnections()
 
-  workers <- unname(floor(future::availableCores() * 0.9))
+  workers <- unname(future::availableCores(omit = 1))
   future::plan("multisession", gc = TRUE, workers = workers)
 
   # Set the optimiser configurations to test
@@ -254,6 +298,7 @@ for (penalty in c(0, 1)) {
   optim_labels <- optim_configs$config |>
     purrr::map_chr(~ {
       .x |>
+        purrr::map_if(is.numeric, ~ sprintf("%1.0e", .)) |>
         as.data.frame() |>
         tidyr::unite("label", tidyselect::everything()) |>
         dplyr::pull("label") |>
@@ -287,6 +332,10 @@ for (penalty in c(0, 1)) {
   for (M in seq(from = 2, to = 10)) {
     message(glue::glue("M = {M}"))
 
+    # Remove existing computations
+    candidates <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
+
+    # Compute new/missing runs
     combinations <- tidyr::expand_grid(
       "model" = zip(models, model_names, time_scales),
       "method_label" = c(
@@ -303,7 +352,6 @@ for (penalty in c(0, 1)) {
         names = c("method", "strategy")
       ) |>
       dplyr::inner_join(candidates, by = c("optim_method", "target_label", "method", "strategy")) |>
-      dplyr::anti_join(current_results, by = c("optim_method", "target_label", "method", "strategy", "M")) |>
       dplyr::left_join(optim_configs, by = "optim_method")
 
     # Run the approximations for the round
@@ -372,7 +420,7 @@ for (penalty in c(0, 1)) {
 
     # Eliminate too slow candidates
     candidates <- round_results |>
-      dplyr::filter(.data$execution_time < 60 * !!M) |>
+      dplyr::filter(.data$execution_time < 60 * !!M, .data$value < 1e3) |>
       dplyr::select("optim_method", "target_label", "method", "strategy")
   }
 }
@@ -424,7 +472,7 @@ results <- results |>
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
-  dplyr::filter(.data$execution_time > 60 * .data$M) |>
+  dplyr::filter(.data$execution_time >= 60 * .data$M, .data$value >= 1e3) |>
   dplyr::slice_min(M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::transmute(
     .data$optim_method,
@@ -443,7 +491,10 @@ should_have_been_eliminated <- results |>
     .by = c("optim_method", "target", "variation", "method", "strategy", "penalty")
   )
 
-print(should_have_been_eliminated)
+if (nrow(should_have_been_eliminated) > 0) {
+  cat("should_have_been_eliminated")
+  print(should_have_been_eliminated)
+}
 
 results <- dplyr::anti_join(
   results,
@@ -458,10 +509,12 @@ results <- dplyr::anti_join(
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
   dplyr::slice_max(.data$M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
-  dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10)
+  dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10, .data$value < 1e3)
 
-print(should_not_have_been_eliminated)
-
+if (nrow(should_not_have_been_eliminated) > 0) {
+  cat("should_not_have_been_eliminated")
+  print(should_not_have_been_eliminated)
+}
 
 # Re-arrange the columns
 results <- results |>

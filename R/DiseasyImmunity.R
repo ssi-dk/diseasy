@@ -359,8 +359,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   | method      | penalty  | strategy    | optimiser |
     #'   |-------------|----------|-------------|-----------|
     #'   | free_delta  | No/Yes   | naive       | ucminf    |
-    #'   | free_gamma  | No       | naive       | subplex   |
-    #'   | free_gamma  | Yes      | naive       | hjkb      |
+    #'   | free_gamma  | No/Yes   | naive       | ucminf    |
     #'   | all_free    | No/Yes   | naive       | ucminf    |
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
@@ -401,7 +400,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   If `optim_method` matches any of the methods in `optimx::optimr`:
     #'   - Additional `optim_control` arguments passed as `control` to `stats::optimr` using the chosen `method`.
-    #'
     #' @param ...
     #'   Additional arguments to be passed to the optimiser.
     #' @return
@@ -414,8 +412,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       M,                                                                                                                # nolint: object_name_linter
       method = c("free_gamma", "free_delta", "all_free"),
       strategy = NULL,
-      monotonous = TRUE,
-      individual_level = TRUE,
+      monotonous = FALSE,
+      individual_level = FALSE,
       optim_control = NULL,
       ...
     ) {
@@ -459,7 +457,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Set default optimisation controls
       default_optim_controls <- list(
         "free_delta" = list("optim_method" = "ucminf"),
-        "free_gamma" = list("optim_method" = ifelse(monotonous || individual_level, "hjkb", "subplex")),
+        "free_gamma" = list("optim_method" = "ucminf"),
         "all_free"   = list("optim_method" = "ucminf")
       )
 
@@ -469,7 +467,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default strategy
       default_optim_strategy <- list(
-        "free_delta" = "recursive",
+        "free_delta" = "naive",
         "free_gamma" = "naive",
         "all_free"   = "naive"
       )
@@ -584,10 +582,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             } else {
 
-              approx <- private$get_approximation(gamma, delta, M)
+              approximation <- private$get_approximation(gamma, delta, M)
 
               # Finds diff from approximation and target function
-              integrand <- \(t) (approx(t) - self$model[[model_id]](t))^2
+              integrand <- \(t) (approximation(t) - self$model[[model_id]](t))^2
 
               # Numerically integrate the differences
               value <- tryCatch(
@@ -659,7 +657,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             # free_delta has no free gamma parameters (uses linearly distributed values)
             gamma_0 <- numeric(0)
 
-            if (strategy == "naive") {
+            if (strategy == "naive" || (strategy == "recursive" && M == 2)) {
 
               # Uniform delta using time scale as (M - 1) / delta
               delta_0 <- rep(
@@ -669,47 +667,59 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             } else if (strategy == "recursive") {
 
-              # Initially using time scale as 1 / delta, then using linear interpolation of 1 / delta from
-              # M - 1 solution to get starting guess for M solution
-              if (M == 2) {
+              # Get the M - 1 solution for delta
+              delta_0 <- self$approximate_compartmental(
+                method = method,
+                strategy = strategy,
+                M = M - 1,                                                                                              # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level,
+                optim_control = optim_control,
+                ...
+              ) |>
+                purrr::pluck("delta")
 
-                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
-
+              # Linearly extrapolate from M - 1 to M
+              if (M == 3) {
+                # If the current requested solution is for M = 3, the M - 1
+                # solution contains only two compartments and only a single
+                # transition rate is defined. This cannot meaningfully be
+                # extrapolated, so instead we "split the difference" and
+                # insert a transition half-way.
+                delta_0 <- c(delta_0, delta_0) * 2
               } else {
 
-                # Get the M - 1 solution for delta
-                delta_0 <- self$approximate_compartmental(
-                  method = method,
-                  strategy = strategy,
-                  M = M - 1,                                                                                            # nolint: object_name_linter
-                  monotonous = monotonous,
-                  individual_level = individual_level,
-                  optim_control = optim_control,
-                  ...
+                # To perform the interpolation as fairly as possible, we need
+                # to consider the temporal evolution from compartment to
+                # compartment.
+                # The average process of going through the compartments in
+                # sequence means that first you spend 1/delta_1 time in
+                # compartment 1 then 1/delta_2 time in compartment 2 etc.
+                # This creates a "staircase" like-discrete function for the
+                # gamma that you experience as you move through the
+                # compartments.
+
+                # Time to enter each compartment (M - 1 solution)
+                t <- c(0, cumsum(1 / delta_0))
+
+                # Time to enter each compartment (M solution)
+                t_prime <- stats::approx(
+                  # Progress along compartments (M - 1 solution)
+                  x = seq(0, 1, length.out = M - 1),
+                  y = t,
+                  # Progress along compartments (M solution)
+                  xout = seq(0, 1, length.out = M)
                 ) |>
-                  purrr::pluck("delta")
+                  purrr::pluck("y")
 
-                # Linearly interpolate from M - 1 to M
-                if (M == 3) { # For M == 3 we cannot use approx so we manually interpolate
-                  delta_0 <- c(delta_0, delta_0) * 2
-                } else {  # Interpolate the time spent in each compartment
-                  t <- approx(
-                    x = seq(0, 1, length.out = M - 2), # Progress along compartments (M - 1 solution)
-                    y = cumsum(1 / delta_0), # Time to reach compartments (M - 1 solution)
-                    xout = seq(0, 1, length.out = M - 1) # Progress along compartments (M solution)
-                  ) |>
-                    purrr::pluck("y") # Time to reach compartments (M solution)
-
-                  # Convert to rates
-                  delta_0 <- c(delta_0[[1]], 1 / diff(t))
-                }
+                # And convert back to transition rates
+                delta_0 <- 1 / diff(t_prime)
               }
-
             }
 
           } else if (method == "free_gamma") {
 
-            if (strategy == "naive") {
+            if (strategy == "naive" || (strategy == "recursive" && M == 2)) {
 
               # Uniform delta using time scale as M / delta
               delta_0 <- (M - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
@@ -721,55 +731,53 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             } else if (strategy == "recursive") {
 
-              # Initially using time scale as 1 / delta, then using M - 1 solution to get starting guess for
-              # M solution for both delta and gamma.
-              # This effectively adds an additional compartment after the last with the same gamma value
-              if (M == 2) {
+              # Get the M - 1 solution for delta
+              delta_0 <- self$approximate_compartmental(
+                method = method,
+                strategy = strategy,
+                M = M - 1,                                                                                              # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level,
+                optim_control = optim_control,
+                ...
+              ) |>
+                purrr::pluck("delta") |>
+                utils::head(1) # For free_gamma method, all delta are the same and algo expects only one value
 
-                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
-                gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
+              # Get the M - 1 solution for gamma
+              gamma_0 <- self$approximate_compartmental(
+                method = method,
+                strategy = strategy,
+                M = M - 1,                                                                                              # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level,
+                optim_control = optim_control,
+                ...
+              ) |>
+                purrr::pluck("gamma")
 
-              } else {
+              # See code comments above for "free_delta" and the "recursive"
+              # strategy for more details on this extrapolation
 
-                # Get the M - 1 solution for delta
-                delta_0 <- self$approximate_compartmental(
-                  method = method,
-                  strategy = strategy,
-                  M = M - 1,                                                                                            # nolint: object_name_linter
-                  monotonous = monotonous,
-                  individual_level = individual_level,
-                  optim_control = optim_control,
-                  ...
-                ) |>
-                  purrr::pluck("delta") |>
-                  utils::head(1) # For free_gamma method, all delta are the same and algo expects only one value
+              # Time to enter each compartment (M - 1 solution)
+              t <- c(0, cumsum(1 / rep(delta_0, M - 2)))
 
-                # Adjust for the increase in the number of compartments
-                delta_0 <- delta_0 * (M - 1) / (M - 2)
+              # Adjust for the increase in the number of compartments
+              delta_0 <- delta_0 * (M - 1) / (M - 2)
 
-                # Get the M - 1 solution for gamma
-                gamma_0 <- self$approximate_compartmental(
-                  method = method,
-                  strategy = strategy,
-                  M = M - 1,                                                                                            # nolint: object_name_linter
-                  monotonous = monotonous,
-                  individual_level = individual_level,
-                  optim_control = optim_control,
-                  ...
-                ) |>
-                  purrr::pluck("gamma")
+              # Time to enter each compartment (M solution)
+              t_prime <- c(0, cumsum(1 / rep(delta_0, M - 1)))
 
-                # Repeat the last gamma level from the M-1 solution to form the M initial guess
-                gamma_0 <-  gamma_0 |>
-                  purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
-                  purrr::reduce(c)
-              }
-
+              # Linear interpolation
+              gamma_0 <- gamma_0 |>
+                purrr::map(~ stats::approx(x = t, y = .x, xout = t_prime)$y) |>
+                purrr::map(~ utils::head(., -1)) |>
+                purrr::reduce(c)
             }
 
           } else if (method == "all_free") {
 
-            if (strategy == "naive") {                                                                                  # nolint: if_switch_linter
+            if (strategy == "naive" || (strategy == "recursive" && M == 2)) {                                           # nolint: if_switch_linter
 
               # Uniform delta using time scale as M / delta
               delta_0 <- (M - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1) |>
@@ -782,71 +790,69 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             } else if (strategy == "recursive") {
 
-              # Initially using time scale as 1 / delta, then using M - 1 solution to get starting guess for
-              # M solution for both delta and gamma.
-              # This effectively adds an additional compartment after the last with the same gamma value
-              if (M == 2) {
+              # Get the M - 1 solution for delta
+              delta_0 <- self$approximate_compartmental(
+                method = method,
+                strategy = strategy,
+                M = M - 1,                                                                                              # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level,
+                optim_control = optim_control,
+                ...
+              ) |>
+                purrr::pluck("delta")
 
-                delta_0 <- 1 / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
-                gamma_0 <- purrr::map_dbl(private$.model, ~ .x(0))
+              # Get the M - 1 solution for gamma
+              gamma_0 <- self$approximate_compartmental(
+                method = method,
+                strategy = strategy,
+                M = M - 1,                                                                                              # nolint: object_name_linter
+                monotonous = monotonous,
+                individual_level = individual_level,
+                optim_control = optim_control,
+                ...
+              ) |>
+                purrr::pluck("gamma")
+
+
+              # Interpolate delta and gamma from M - 1 to M
+              if (M == 3) {
+                # As in the "free_delta" method, we need to manually interpolate M = 3
+                # by "splitting the difference"
+                delta_0 <- c(delta_0, delta_0) * 2
+
+                # For gamma, the M - 1 solution is: gamma_1, gamma_2 = f(infinity)
+                # We use as initial guess: gamma_1, mean(gamma_1, gamma_2), gamma_3 = f(infinity)
+                gamma_0 <- gamma_0 |>
+                  purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
+                  purrr::reduce(c)
 
               } else {
 
-                # Get the M - 1 solution for delta
-                delta_0 <- self$approximate_compartmental(
-                  method = method,
-                  strategy = strategy,
-                  M = M - 1,                                                                                            # nolint: object_name_linter
-                  monotonous = monotonous,
-                  individual_level = individual_level,
-                  optim_control = optim_control,
-                  ...
+                # See code comments above for "free_delta" and "free_gamma" and the "recursive"
+                # strategy for more details on this interpolation
+
+                # Time to enter each compartment (M - 1 solution)
+                t <- c(0, cumsum(1 / delta_0))
+
+                # Time to enter each compartment (M solution)
+                t_prime <- stats::approx(
+                  # Progress along compartments (M - 1 solution)
+                  x = seq(0, 1, length.out = M - 1),
+                  y = t,
+                  # Progress along compartments (M solution)
+                  xout = seq(0, 1, length.out = M)
                 ) |>
-                  purrr::pluck("delta")
+                  purrr::pluck("y")
 
-                # Get the M - 1 solution for gamma
-                gamma_0 <- self$approximate_compartmental(
-                  method = method,
-                  strategy = strategy,
-                  M = M - 1,                                                                                            # nolint: object_name_linter
-                  monotonous = monotonous,
-                  individual_level = individual_level,
-                  optim_control = optim_control,
-                  ...
-                ) |>
-                  purrr::pluck("gamma")
+                # And convert back to transition rates
+                delta_0 <- 1 / diff(t_prime)
 
-
-                # Interpolate gamma from M - 1 to M
-                if (M == 3) { # By repeating the last value when we cannot use approx
-                  gamma_0 <- gamma_0 |>
-                    purrr::map(~ c(head(.x, -1), mean(tail(.x, 2)))) |>
-                    purrr::reduce(c)
-                } else { # And by creating a mapping from time (cumsum(1 / delta)) to gamma
-                  gammas_from_delta <- purrr::map(gamma_0, ~ approxfun(cumsum(1 / delta_0), head(.x, -1), rule = 2))
-                }
-
-                # Interpolate delta from M - 1 to M
-                if (M == 3) { # For M == 3 we cannot use approx so we manually interpolate
-                  delta_0 <- c(delta_0, delta_0) * 2
-                } else { # Interpolate the time spent in each compartment
-                  t <- approx(
-                    x = seq(0, 1, length.out = M - 2), # Progress along compartments (M - 1 solution)
-                    y = cumsum(1 / delta_0), # Time to reach compartments (M - 1 solution)
-                    xout = seq(0, 1, length.out = M - 1) # Progress along compartments (M solution)
-                  ) |>
-                    purrr::pluck("y") # Time to reach compartments (M solution)
-
-                  # Convert to rates
-                  delta_0 <- c(delta_0[[1]], 1 / diff(t))
-                }
-
-                # Now, with delta computed, we must use the mapping that was created for M > 3 to get the gamma values
-                if (M > 3) {
-                  gamma_0 <- purrr::map(gammas_from_delta, ~ .x(cumsum(1 / delta_0))) |>
-                    purrr::reduce(c)
-                }
-
+                # Linear interpolation of gamma
+                gamma_0 <- gamma_0 |>
+                  purrr::map(~ stats::approx(x = t, y = .x, xout = t_prime)$y) |>
+                  purrr::map(~ utils::head(., -1)) |>
+                  purrr::reduce(c)
               }
 
             } else if (strategy == "combination") {
@@ -872,6 +878,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 purrr::pluck("gamma") |>
                 purrr::map(~ utils::head(., M - 1)) |> # Drop last value since it is fixed in the method
                 purrr::reduce(c)
+            }
+
+            if (M == 3) {
+              # We have observed an edge-case where the optimiser gets stuck in
+              # a local minima which we can break by introducing slight variation
+              # in the transition rates
+              delta_0 <- delta_0 * c(0.99, 1.01)
             }
           }
 
@@ -1006,7 +1019,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
             monotonous = monotonous,
             individual_level = individual_level
           ) |>
-            purrr::pluck("execution_time")
+            purrr::pluck("execution_time") |>
+            as.numeric(unit = "secs")
 
         } else {
           execution_time_offset <- 0
@@ -1026,7 +1040,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "M" = M,
               "error" = purrr::pluck(metrics, "value"),
               "penalty" = purrr::pluck(metrics, "penalty"),
-              "execution_time" = Sys.time() - tic + execution_time_offset
+              "execution_time" = lubridate::as.period(Sys.time() - tic) + lubridate::seconds(execution_time_offset)
             )
           )
         )
