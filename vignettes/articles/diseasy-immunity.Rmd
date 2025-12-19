@@ -91,7 +91,7 @@ The input for the predefined waning models include:
 The name of the chosen target is arbitrary within the context of the `?DiseasyImmunity` module, but models within the
 `diseasy` framework may expect named targets such as "infection", "hospitalisation", or "death"[^1].
 
-[^1]: For example, `?DiseasyModelOdeSeir` which creates an observable for "hospitalisation" and "death" when they
+[^1]: For example, `?DiseasyModelOdeSeir` creates an observable for "hospitalisation" and "death" when they
 exist in the given `?DiseasyImmunity` module.
 
 Here is an example of how to set the exponential waning model.
