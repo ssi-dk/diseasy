@@ -193,12 +193,14 @@ Additional parameters are:
 \subsection{Method \code{load_module()}}{
 Overload the \verb{$load_module()} to re-initialise the helpers after loading
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$load_module(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$load_module(module, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{module}}{(\verb{R6::R6Class instance})\cr This instance is cloned to the field with the same name as the class of the module}
+
 \item{\code{...}}{Arguments sent to parent method.}
 }
 \if{html}{\out{</div>}}
