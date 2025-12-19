@@ -389,7 +389,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$progression_flow_rates <- c(
         rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
         rep(0, private %.% n_age_groups), # Add a zero for the S compartments
-        rep(0, sum(length(self %.% model_outputs)))  # Zero-pad for each observable
+        rep(0, sum(length(self %.% mdel_outputs)))  # Zero-pad for each observable
       )
 
 

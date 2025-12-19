@@ -439,15 +439,15 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_observable"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_observable}{}}}
-\subsection{Method \code{configure_observable()}}{
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_output"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_output}{}}}
+\subsection{Method \code{configure_output()}}{
 Define new observables via a set of weights.
 
 Currently, only countable observables are supported.
 That is, observables must be summarisable by the "sum()" function.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_observable(
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_output(
   weights,
   name,
   derived_from = c("state_vector", "infection_matrix")
