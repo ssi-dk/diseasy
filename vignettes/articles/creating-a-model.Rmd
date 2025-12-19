@@ -138,7 +138,7 @@ while leaving others free to be determined by the model during model fitting.
 
 For technical reasons[^2], you should implement the `private$default_parameters()` slot as a function that combines the
 model-specific parameters with the inherited parameters from the superclasses.
-```{r parameters_implementation, eval = FALSE}                                                                         # nolint: assignment_linter, object_usage_linter
+```{r parameters_implementation, eval = FALSE}
 default_parameters = function() {
   modifyList(
     super$default_parameters(), # Obtain parameters from the superclasses
@@ -147,7 +147,7 @@ default_parameters = function() {
     keep.null = TRUE
   )
 }
-```                                                                                                                     # nolint end
+```
 During initialisation, these are then evaluated to a single list of parameters, updated with the user-specified values
 for the parameters and stored in the `private$.parameters` slot. The parameters are then accessible via `$parameters`.
 
@@ -156,7 +156,7 @@ The model template can test the user provided `parameters` by implementing the `
 Note that some parameters may be set inherited from superclasses, so the implementation of the `$validate_parameters()`
 method should also call the parent validation method (`super$validate_parameters()`).
 
-```{r parameter_validation_implementation, eval = FALSE}                                                               # nolint: assignment_linter, object_usage_linter
+```{r parameter_validation_implementation, eval = FALSE}
 validate_parameters = function() {
   checkmate::assert_number(self$parameters$model_specific_param_1)
   checkmate::assert_choice(
@@ -165,7 +165,7 @@ validate_parameters = function() {
   )
   super$validate_parameters()
 }
-```                                                                                                                     # nolint end
+```
 
 ### Getting results
 Once the parameters of the model are set (either by the user or by the model), the user can query the model for results
