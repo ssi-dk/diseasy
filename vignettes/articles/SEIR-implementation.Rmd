@@ -127,7 +127,7 @@ $$
 With the opening considerations in mind, we can now describe the implementation of the model.
 Below, we now link the implementation with the underlying mathematical descriptions of the model.
 
-The `?DiseasyModelOdeSeir` model implements the `?DiseasyModelOdeSeir$rhs` method which computes the
+The `?DiseasyModelOdeSeir` model implements the `DiseasyModelOdeSeir$rhs` method which computes the
 rates needed for the ODE solver. The evaluation of this right-hand side function uses a few intermediate
 variables which are described below.
 
@@ -495,7 +495,7 @@ $$
 
 # Notes on optimisations of the right-hand side function
 
-It is important that the implementation is somewhat optimised for the simulations to run in a reasonable timeframe.
+It is important that the implementation is somewhat optimised for the simulations to run in a reasonable time frame.
 To that end, we here show micro-benchmarks of different implementations of the same steps with the time consumption
 as output, to highlight why a given implementation was chosen.
 
