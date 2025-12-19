@@ -279,15 +279,9 @@ test_that("waning immunity targets 'hospitalisation' and 'death' configures outp
 
 
   # We should be able to get outputs for the outcomes
-  withr::with_options(
-    list("lifecycle_verbosity" = "quiet"),
-    expect_no_condition(m$get_results("n_hospitalisation", prediction_length = 1))
-  )
+  expect_no_error(m$get_results("n_hospitalisation", prediction_length = 1))
 
-  withr::with_options(
-    list("lifecycle_verbosity" = "quiet"),
-    expect_no_condition(m$get_results("n_death", prediction_length = 1))
-  )
+  expect_no_error(m$get_results("n_death", prediction_length = 1))
 
   rm(m)
 })
