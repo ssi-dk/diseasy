@@ -380,7 +380,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             purrr::reduce(rbind)
 
           # Configure the observable
-          self$configure_observable(
+          self$configure_output(
             weights = weights_infection_matrix,
             name = glue::glue("n_{observable}"),
             derived_from = "infection_matrix"
@@ -786,7 +786,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
       )
 
-      # Remove the outputs generated from `$configure_model_output()`
+      # Remove the outputs generated from `$configure_output()`
       # I would do this with utils::modifyList(), this does not work for nested lists.
       # compare:
       # modifyList(list("A" = 2), list("A" = 1)) # Works!                                                               # nolint start: commented_code_linter
@@ -824,7 +824,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% state_vector, "name"),
-          .f = ~ initialisation_submodel %.% configure_model_output(
+          .f = ~ initialisation_submodel %.% configure_output(
             weights = .x,
             name = .y,
             derived_from = "state_vector"
@@ -839,7 +839,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
-          .f = ~ initialisation_submodel %.% configure_model_output(
+          .f = ~ initialisation_submodel %.% configure_output(
             weights = .x,
             name = .y,
             derived_from = "infection_matrix"
@@ -1229,7 +1229,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'  If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
     #'  of the infection matrix defines the flow (row-sums correspond to new infections).
     #' @return `r rd_side_effects`
-    configure_model_output = function(
+    configure_output = function(
       weights,
       name,
       derived_from = c("state_vector", "infection_matrix"),
