@@ -353,7 +353,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           self$configure_output(
             weights = weights_infection_matrix,
             name = glue::glue("n_{observable}"),
-            derived_from = "infection_matrix"
+            derived_from = "infection_matrix",
+            delay = purrr::pluck(
+              self %.% immunity, "model", observable, attributes, "delay",
+              .default = 0
+            )
           )
         })
 
@@ -417,7 +421,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (length(immunity_matrix) == 1) immunity_matrix <- immunity_matrix[[1]]
 
       private$immunity_matrix <- immunity_matrix
-
 
       # Set the default forcing functions (no forcing)
       self %.% set_forcing_functions(
