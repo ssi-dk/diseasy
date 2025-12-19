@@ -346,7 +346,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$progression_flow_rates <- c(
         rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
         rep(0, private %.% n_age_groups), # Add a zero for the S compartments
-        rep(0, sum(length(self %.% model_outputs)))  # Zero-pad for each observable
+        rep(0, sum(length(self %.% mdel_outputs)))  # Zero-pad for each observable
       )
 
 
@@ -400,7 +400,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             purrr::reduce(rbind)
 
           # Configure the observable
-          self$configure_observable(
+          self$configure_output(
             weights = weights_infection_matrix,
             name = glue::glue("n_{observable}"),
             derived_from = "infection_matrix"
@@ -1055,7 +1055,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'  If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
     #'  of the infection matrix defines the flow (row-sums correspond to new infections).
     #' @return `r rd_side_effects`
-    configure_observable = function(
+    configure_output = function(
       weights,
       name,
       derived_from = c("state_vector", "infection_matrix")
