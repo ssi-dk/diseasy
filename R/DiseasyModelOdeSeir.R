@@ -143,7 +143,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       super$load_module(...)
 
       # Mark that model is not ready
-      private$ready <- FALSE
+      private$ready <- NULL
 
       # Delete observable configurations and warn user
       if (!purrr::every(private %.% observable_mapping, is.null)) {
@@ -178,7 +178,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
       checkmate::reportAssertions(coll)
 
-      if (!private$ready) {
+      if (!identical(private$ready, self %.% hash)) {
         self$prepare_rhs()
       }
 
@@ -436,7 +436,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Mark that model is ready
-      private$ready <- TRUE
+      private$ready <- self %.% hash
     },
 
 
@@ -1072,7 +1072,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::reportAssertions(coll)
 
       # Mark RHS as un-ready
-      private$ready <- FALSE
+      private$ready <- NULL
 
       # Cast vector weights to matrix
       if (!inherits(weights, "matrix")) {
@@ -1193,7 +1193,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
-    ready = FALSE,
+    ready = NULL,
 
     # Configurations for observables (model outputs)
     observable_mapping = list("infection_matrix" = NULL, "state_vector" = NULL),
