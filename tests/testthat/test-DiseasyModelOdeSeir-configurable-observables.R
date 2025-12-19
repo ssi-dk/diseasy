@@ -279,9 +279,19 @@ test_that("waning immunity targets 'hospitalisation' and 'death' configures outp
 
 
   # We should be able to get outputs for the outcomes
-  expect_no_condition(m$get_results("n_hospitalisation", prediction_length = 1))
+  expect_no_condition(
+    pkgcond::suppress_conditions(
+      class = "lifecycle_stage",
+      expr = m$get_results("n_hospitalisation", prediction_length = 1)
+    )
+  )
 
-  expect_no_condition(m$get_results("n_death", prediction_length = 1))
+  expect_no_condition(
+    pkgcond::suppress_conditions(
+      class = "lifecycle_stage",
+      expr = m$get_results("n_death", prediction_length = 1)
+    )
+  )
 
   rm(m)
 })
