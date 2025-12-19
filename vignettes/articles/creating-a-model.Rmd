@@ -34,7 +34,7 @@ Developing a model in `diseasy` involves constructing a model template that inco
 into a model design.
 
 For instance, let's consider the creation of a simple SIR (Susceptible, Infectious, Recovered) infection
-model with a seasonal forcing $\sigma(t)$ of the overall infection rate, denoted by \beta.
+model with a seasonal forcing $\sigma(t)$ of the overall infection rate, denoted by $\beta$.
 
 The SEIR model with seasonal forcing can be represented by the following set of differential equations:
 
@@ -76,7 +76,7 @@ the module, and the actual seasonal forcing exposed to the models all have the s
 only time as input ($\sigma(t)$)[^1].
 
 This way, we can easily swap out different seasonal forcing models in our model templates without having to change the
-model equations themselves. If new seasonal forcing models are developed, they are then automatically available to the
+model equations themselves. If new seasonal forcing models are developed, they are automatically available to the
 developed model.
 
 This is the philosophy behind the `diseasy` package, since we can easily swap out different functional modules for the
@@ -109,7 +109,7 @@ purrr::keep(names(DiseasyModel$private_fields), ~ startsWith(., ".Diseasy")) |>
 
 This means, that once a new `DiseasyModel` instance is created, it will have the functional modules internally
 available. Going back to the above example of the SIR model with seasonal forcing, the model template would be
-access the seasonal forcing $\sigma(t)$ via the call `self$season$model_t(t)`.
+accessible for the seasonal forcing $\sigma(t)$ via the call `self$season$model_t(t)`.
 ```{r check_DiseasySeason_function_signature, include = FALSE}
 # If the the signature of DiseasySeason is changed, please update this vignette
 stopifnot("model_t" %in% names(DiseasySeason$active))
@@ -138,7 +138,7 @@ while leaving others free to be determined by the model during model fitting.
 
 For technical reasons[^2], you should implement the `private$default_parameters()` slot as a function that combines the
 model-specific parameters with the inherited parameters from the superclasses.
-```{r .parameters implementation, eval = FALSE}                                                                         # nolint: assignment_linter, object_usage_linter
+```{r parameters_implementation, eval = FALSE}
 default_parameters = function() {
   modifyList(
     super$default_parameters(), # Obtain parameters from the superclasses
@@ -147,7 +147,7 @@ default_parameters = function() {
     keep.null = TRUE
   )
 }
-```                                                                                                                     # nolint end
+```
 During initialisation, these are then evaluated to a single list of parameters, updated with the user-specified values
 for the parameters and stored in the `private$.parameters` slot. The parameters are then accessible via `$parameters`.
 
@@ -156,7 +156,7 @@ The model template can test the user provided `parameters` by implementing the `
 Note that some parameters may be set inherited from superclasses, so the implementation of the `$validate_parameters()`
 method should also call the parent validation method (`super$validate_parameters()`).
 
-```{r .parameter validation implementation, eval = FALSE}                                                               # nolint: assignment_linter, object_usage_linter
+```{r parameter_validation_implementation, eval = FALSE}
 validate_parameters = function() {
   checkmate::assert_number(self$parameters$model_specific_param_1)
   checkmate::assert_choice(
@@ -165,10 +165,10 @@ validate_parameters = function() {
   )
   super$validate_parameters()
 }
-```                                                                                                                     # nolint end
+```
 
 ### Getting results
-Once the parameters of the model is set (either by the user or by the model), the user can query the model for results
+Once the parameters of the model are set (either by the user or by the model), the user can query the model for results
 using the `$get_results()` function. Through this function, the user provides the parameters of the result that should
 be provided (target observable, time-window and stratification level). In return, the function returns a standardised
 `data.frame`-like output that can be used for further analysis in conjunction with the results from other models.
