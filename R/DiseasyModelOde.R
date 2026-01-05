@@ -354,6 +354,12 @@ DiseasyModelOde <- R6::R6Class(                                                 
         psi <- self$initialise_state_vector(incidence_data) |>
           dplyr::filter(.data$time == 0) # psi also contains history for the output states
 
+        # If observables include delays we need to integrate backwards in time
+        # to compute the state-vector earlier such that when we integrate
+        # forward in time, we obtain the delayed observables by t = 0.
+        observable_delays <-
+
+
         # The model has a configured right-hand-side function that
         # can be used to simulate the model in conjunction with `deSolve`.
         # Custom model outputs computes from differences of integrating states,
