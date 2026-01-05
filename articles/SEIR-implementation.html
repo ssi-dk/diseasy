@@ -98,11 +98,11 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>This vignette is a companion to the implementation of the SEIR ode
-model <code>?DiseasyModelOdeSEIR</code>.</p>
+model <code><a href="../reference/DiseasyModelOdeSeir.html">?DiseasyModelOdeSeir</a></code>.</p>
 <p>As the name suggests, this model is a SEIR-like ordinary differential
 equation (ODE) model. Furthermore, the model is designed as flexible as
-possible to allow for a wide range of different model configuration.
-That is, the number of consecutive exposed, infected, and recovered
+possible to allow for a wide range of different model configurations.
+Meaning that the number of consecutive exposed, infected, and recovered
 states can be set arbitrarily, as well as the number of age groups and
 the number of variants.</p>
 <p>Due to the flexibility of the model, the implementation is somewhat
@@ -160,9 +160,10 @@ case letters denote a specific element.</p>
 <div class="section level3">
 <h3 id="the-model-structure">The model structure<a class="anchor" aria-label="anchor" href="#the-model-structure"></a>
 </h3>
-<p>The SEIR model we are building is a compartmental model with (near)
-arbitrary number of exposed, infected, and recovered compartments. The
-model also supports multiple age groups and multiple variants.</p>
+<p>The SEIR model we are building is a compartmental model with an
+(near) arbitrary number of exposed, infected, and recovered
+compartments. The model also supports multiple age groups and multiple
+variants.</p>
 <p>We divide the model into different “tracks” with each track
 implementing the disease progression for a group of individuals. That
 is, if we have
@@ -178,7 +179,7 @@ track through infection and eventually into recovery.</p>
 <p>Schematically, the model can be represented as in the figure
 below:</p>
 <div class="figure" style="text-align: center">
-<img src="SEIR-implementation-model.png" class="r-plt" alt="SEIR model overview for a two variant model" width="120%"><p class="caption">
+<img src="article_data/SEIR-implementation-model.png" class="r-plt" alt="SEIR model overview for a two variant model" width="120%"><p class="caption">
 SEIR model overview for a two variant model
 </p>
 </div>
@@ -189,7 +190,8 @@ the model within these tracks.</p>
 <div class="section level3">
 <h3 id="state-vector">State vector<a class="anchor" aria-label="anchor" href="#state-vector"></a>
 </h3>
-<p>Each “track” of infection is placed in sequence in the state vector,
+<p>Each “track” of infection is placed in a sequence in the state
+vector,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>ψ</mi><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\psi}</annotation></semantics></math>,
 and increments first in age groups then in variants.</p>
 <p>Finally, the susceptible states are placed at the end of the state
@@ -207,7 +209,7 @@ vector.</p>
 <p>Notice that the state vector elements are indexed by state-type,
 state-index, age-index and variant-index:</p>
 <div class="figure" style="text-align: center">
-<img src="SEIR-implementation-index.png" class="r-plt" alt="Index guide for the state vector"><p class="caption">
+<img src="article_data/SEIR-implementation-index.png" class="r-plt" alt="Index guide for the state vector"><p class="caption">
 Index guide for the state vector
 </p>
 </div>
@@ -268,8 +270,8 @@ instead?</p>
 <p>With the opening considerations in mind, we can now describe the
 implementation of the model. Below, we now link the implementation with
 the underlying mathematical descriptions of the model.</p>
-<p>The <code>?DiseasyModelOdeSEIR</code> model implements the
-<code><a href=".{2}/reference/DiseasyModelOdeSEIR.html#active-bindings">$rhs</a></code> method which computes the rates
+<p>The <code><a href="../reference/DiseasyModelOdeSeir.html">?DiseasyModelOdeSeir</a></code> model implements the
+<code>DiseasyModelOdeSeir$rhs</code> method which computes the rates
 needed for the ODE solver. The evaluation of this right-hand side
 function uses a few intermediate variables which are described
 below.</p>
@@ -379,8 +381,13 @@ compartments are susceptible to infection, we need only to consider the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>S</mi></mrow><annotation encoding="application/x-tex">RS</annotation></semantics></math>
 states to compute the new infections in the model.</p>
 <p>The new <code>infection_matrix</code> therefore does not need to
-contain the <code>K</code> exposed states and the <code>L</code>
-infected states, but only the <code>M</code> recovered states and the
+contain the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+exposed states and the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>
+infected states, but only the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
+recovered states and the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
 susceptible states.</p>
 <p>We are therefore interested in the reduced state vector
@@ -779,10 +786,11 @@ the transmission matrix is:</p>
 <h2 id="notes-on-optimisations-of-the-right-hand-side-function">Notes on optimisations of the right-hand side function<a class="anchor" aria-label="anchor" href="#notes-on-optimisations-of-the-right-hand-side-function"></a>
 </h2>
 <p>It is important that the implementation is somewhat optimised for the
-simulations to run in reasonable time. To that end, we here show
-micro-benchmarks of different implementations of the same steps to
-highlight why a given implementation was chosen.</p>
-<p>These benchmarks assume a simple SEIR model with only tree age group
+simulations to run in a reasonable time frame. To that end, we here show
+micro-benchmarks of different implementations of the same steps with the
+time consumption as output, to highlight why a given implementation was
+chosen.</p>
+<p>These benchmarks assume a simple SEIR model with only tree age groups
 and one variant.</p>
 <div class="section level3">
 <h3 id="infected-sum-computation">“infected” sum computation<a class="anchor" aria-label="anchor" href="#infected-sum-computation"></a>
@@ -816,11 +824,13 @@ and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min      lq      mean  median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 24.847 27.2860 31.114053 28.3125 29.4400 2131.458  1000</span></span>
-<span><span class="co">#&gt;              sapply 12.643 13.1540 14.074699 13.5750 14.4775   30.247  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 12.664 13.2245 14.133662 13.5955 14.4570   44.693  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.859  5.2800  5.661979  5.5410  5.8010   29.395  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min      lq      mean  median     uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 25.357 27.5160 31.507095 28.5180 29.500 2328.793  1000</span></span>
+<span><span class="co">#&gt;              sapply 12.814 13.3050 14.247817 13.7405 14.537   33.622  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES 12.744 13.3145 14.270711 13.7160 14.462   37.810  1000</span></span>
+<span><span class="co">#&gt;              vapply  4.849  5.2500  5.602645  5.4700  5.691   21.059  1000</span></span></code></pre></div>
+<p>Note, that the best performing function in this case is
+<code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

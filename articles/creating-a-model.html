@@ -120,7 +120,8 @@ model design.</p>
 (Susceptible, Infectious, Recovered) infection model with a seasonal
 forcing
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma(t)</annotation></semantics></math>
-of the overall infection rate, denoted by .</p>
+of the overall infection rate, denoted by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.</p>
 <p>The SEIR model with seasonal forcing can be represented by the
 following set of differential equations:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>β</mi><mo>⋅</mo><mi>σ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
@@ -170,7 +171,7 @@ signature that takes only time as input
 function.&lt;/p&gt;"><sup>1</sup></a>.</p>
 <p>This way, we can easily swap out different seasonal forcing models in
 our model templates without having to change the model equations
-themselves. If new seasonal forcing models are developed, they are then
+themselves. If new seasonal forcing models are developed, they are
 automatically available to the developed model.</p>
 <p>This is the philosophy behind the <code>diseasy</code> package, since
 we can easily swap out different functional modules for the templates
@@ -212,7 +213,7 @@ functional modules:</p>
 <p>This means, that once a new <code>DiseasyModel</code> instance is
 created, it will have the functional modules internally available. Going
 back to the above example of the SIR model with seasonal forcing, the
-model template would be access the seasonal forcing
+model template would be accessible for the seasonal forcing
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma(t)</annotation></semantics></math>
 via the call <code>self$season$model_t(t)</code>.</p>
 </div>
@@ -256,12 +257,20 @@ function, we can ensure that the parameters from the superclasses are
 available to the model template.&lt;/p&gt;"><sup>2</sup></a>, you should implement the
 <code>private$default_parameters()</code> slot as a function that
 combines the model-specific parameters with the inherited parameters
-from the superclasses.
-<code>{r .parameters implementation, eval = FALSE}                                                                         # nolint: assignment_linter, object_usage_linter default_parameters = function() {   modifyList(     super$default_parameters(), # Obtain parameters from the superclasses     # Overwrite with model-specific parameters     list("model_specific_param_1" = 1, "model_specific_param_2" = "method_1"),     keep.null = TRUE   ) }</code>
-# nolint end During initialisation, these are then evaluated to a single
-list of parameters, updated with the user-specified values for the
-parameters and stored in the <code>private$.parameters</code> slot. The
-parameters are then accessible via <code>$parameters</code>.</p>
+from the superclasses.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">default_parameters</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/modifyList.html" class="external-link">modifyList</a></span><span class="op">(</span></span>
+<span>    <span class="va">super</span><span class="op">$</span><span class="fu">default_parameters</span><span class="op">(</span><span class="op">)</span>, <span class="co"># Obtain parameters from the superclasses</span></span>
+<span>    <span class="co"># Overwrite with model-specific parameters</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"model_specific_param_1"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"model_specific_param_2"</span> <span class="op">=</span> <span class="st">"method_1"</span><span class="op">)</span>,</span>
+<span>    keep.null <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>During initialisation, these are then evaluated to a single list of
+parameters, updated with the user-specified values for the parameters
+and stored in the <code>private$.parameters</code> slot. The parameters
+are then accessible via <code>$parameters</code>.</p>
 <div class="section level5">
 <h5 id="validating-the-parameters">Validating the parameters<a class="anchor" aria-label="anchor" href="#validating-the-parameters"></a>
 </h5>
@@ -271,15 +280,22 @@ Note that some parameters may be set inherited from superclasses, so the
 implementation of the <code>$validate_parameters()</code> method should
 also call the parent validation method
 (<code>super$validate_parameters()</code>).</p>
-<p><code>{r .parameter validation implementation, eval = FALSE}                                                               # nolint: assignment_linter, object_usage_linter validate_parameters = function() {   checkmate::assert_number(self$parameters$model_specific_param_1)   checkmate::assert_choice(     self$parameters$model_specific_param_2,     c("method_1", "method_2")   )   super$validate_parameters() }</code>
-# nolint end</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">validate_parameters</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">checkmate</span><span class="fu">::</span><span class="fu"><a href="https://mllg.github.io/checkmate/reference/checkNumber.html" class="external-link">assert_number</a></span><span class="op">(</span><span class="va">self</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">model_specific_param_1</span><span class="op">)</span></span>
+<span>  <span class="fu">checkmate</span><span class="fu">::</span><span class="fu"><a href="https://mllg.github.io/checkmate/reference/checkChoice.html" class="external-link">assert_choice</a></span><span class="op">(</span></span>
+<span>    <span class="va">self</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">model_specific_param_2</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"method_1"</span>, <span class="st">"method_2"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="va">super</span><span class="op">$</span><span class="fu">validate_parameters</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level4">
 <h4 id="getting-results">Getting results<a class="anchor" aria-label="anchor" href="#getting-results"></a>
 </h4>
-<p>Once the parameters of the model is set (either by the user or by the
-model), the user can query the model for results using the
+<p>Once the parameters of the model are set (either by the user or by
+the model), the user can query the model for results using the
 <code>$get_results()</code> function. Through this function, the user
 provides the parameters of the result that should be provided (target
 observable, time-window and stratification level). In return, the

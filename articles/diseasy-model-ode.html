@@ -166,7 +166,7 @@ data:</p>
 <code class="sourceCode R"><span><span class="co"># Configure a observables module with the example data and database</span></span>
 <span><span class="va">observables</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  diseasystore <span class="op">=</span> <span class="va">DiseasystoreSeirExample</span>,</span>
-<span>  conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DBI/man/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The data is stratified by age and covers a single infection wave. It
 contains three observables of interest for our example:</p>
@@ -184,7 +184,7 @@ infections (risk of hospitalisation dependent on age group).</li>
 they should provide predictions for. This is done by setting the
 <code>last_queryable_date</code> in the observables module:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">last_queryable_date</span> <span class="op">&lt;-</span> <span class="va">observables</span><span class="op">$</span><span class="va">ds</span><span class="op">$</span><span class="va">min_start_date</span> <span class="op">+</span> <span class="fl">40</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">last_queryable_date</span> <span class="op">&lt;-</span> <span class="va">observables</span><span class="op">$</span><span class="va">ds</span><span class="op">$</span><span class="va">min_start_date</span> <span class="op">+</span> <span class="fl">42</span></span></code></pre></div>
 <p>Lets first look at the data we have available:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observables</span><span class="op">$</span><span class="fu">get_observation</span><span class="op">(</span></span>
@@ -267,7 +267,7 @@ immunity:</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-t/time_scale)</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5619c3bd8e08&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x563c9e3b3fd8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "exponential_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -477,11 +477,11 @@ observables.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   date       incidence realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13   0.001<span style="text-decoration: underline;">85</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14   0.002<span style="text-decoration: underline;">04</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15   0.002<span style="text-decoration: underline;">22</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-16   0.002<span style="text-decoration: underline;">41</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-17   0.002<span style="text-decoration: underline;">59</span>              1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15   0.002<span style="text-decoration: underline;">26</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16   0.002<span style="text-decoration: underline;">50</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17   0.002<span style="text-decoration: underline;">73</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-18   0.002<span style="text-decoration: underline;">95</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19   0.003<span style="text-decoration: underline;">18</span>              1      1</span></span></code></pre></div>
 <p>… and we can plot the predictions along with observations for the
 data</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -502,15 +502,15 @@ data</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 5</span></span></span>
 <span><span class="co">#&gt;   date       age_group incidence realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13 00-29      0.002<span style="text-decoration: underline;">41</span>               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14 00-29      0.002<span style="text-decoration: underline;">66</span>               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15 00-29      0.002<span style="text-decoration: underline;">90</span>               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-13 30-59      0.001<span style="text-decoration: underline;">90</span>               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-14 30-59      0.002<span style="text-decoration: underline;">10</span>               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-15 30-59      0.002<span style="text-decoration: underline;">29</span>               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-13 60+        0.000<span style="text-decoration: underline;">987</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-14 60+        0.001<span style="text-decoration: underline;">09</span>               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-15 60+        0.001<span style="text-decoration: underline;">19</span>               1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15 00-29       0.002<span style="text-decoration: underline;">96</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16 00-29       0.003<span style="text-decoration: underline;">28</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17 00-29       0.003<span style="text-decoration: underline;">57</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-15 30-59       0.002<span style="text-decoration: underline;">34</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-16 30-59       0.002<span style="text-decoration: underline;">59</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-17 30-59       0.002<span style="text-decoration: underline;">83</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-15 60+         0.001<span style="text-decoration: underline;">18</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+         0.001<span style="text-decoration: underline;">31</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+         0.001<span style="text-decoration: underline;">43</span>              1      1</span></span></code></pre></div>
 <p>… and we can see the plots for each strata.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
@@ -530,11 +530,11 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   date       n_infected realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13     <span style="text-decoration: underline;">10</span>846.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14     <span style="text-decoration: underline;">11</span>975.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15     <span style="text-decoration: underline;">13</span>057.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-16     <span style="text-decoration: underline;">14</span>124.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-17     <span style="text-decoration: underline;">15</span>221.              1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15     <span style="text-decoration: underline;">13</span>268.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16     <span style="text-decoration: underline;">14</span>701.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17     <span style="text-decoration: underline;">16</span>038.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-18     <span style="text-decoration: underline;">17</span>328.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19     <span style="text-decoration: underline;">18</span>635.              1      1</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
@@ -551,15 +551,15 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 5</span></span></span>
 <span><span class="co">#&gt;   date       age_group n_infected realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13 00-29          <span style="text-decoration: underline;">5</span>043.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14 00-29          <span style="text-decoration: underline;">5</span>568.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15 00-29          <span style="text-decoration: underline;">6</span>071.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-13 30-59          <span style="text-decoration: underline;">4</span>309.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-14 30-59          <span style="text-decoration: underline;">4</span>757.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-15 30-59          <span style="text-decoration: underline;">5</span>187.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-13 60+            <span style="text-decoration: underline;">1</span>494.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-14 60+            <span style="text-decoration: underline;">1</span>651.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-15 60+            <span style="text-decoration: underline;">1</span>799.              1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15 00-29          <span style="text-decoration: underline;">6</span>179.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16 00-29          <span style="text-decoration: underline;">6</span>845.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17 00-29          <span style="text-decoration: underline;">7</span>468.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-15 30-59          <span style="text-decoration: underline;">5</span>297.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-16 30-59          <span style="text-decoration: underline;">5</span>875.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-17 30-59          <span style="text-decoration: underline;">6</span>410.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-15 60+            <span style="text-decoration: underline;">1</span>793.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+            <span style="text-decoration: underline;">1</span>981.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+            <span style="text-decoration: underline;">2</span>160.              1      1</span></span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
@@ -576,11 +576,11 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   date       n_positive realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13      <span style="text-decoration: underline;">7</span>050.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14      <span style="text-decoration: underline;">7</span>784.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15      <span style="text-decoration: underline;">8</span>487.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-16      <span style="text-decoration: underline;">9</span>180.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-17      <span style="text-decoration: underline;">9</span>894.              1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15      <span style="text-decoration: underline;">8</span>624.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16      <span style="text-decoration: underline;">9</span>555.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17     <span style="text-decoration: underline;">10</span>425.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-18     <span style="text-decoration: underline;">11</span>263.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19     <span style="text-decoration: underline;">12</span>113.              1      1</span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
@@ -597,15 +597,15 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 5</span></span></span>
 <span><span class="co">#&gt;   date       age_group n_positive realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13 00-29          <span style="text-decoration: underline;">3</span>278.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14 00-29          <span style="text-decoration: underline;">3</span>619.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15 00-29          <span style="text-decoration: underline;">3</span>946.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-13 30-59          <span style="text-decoration: underline;">2</span>801.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-14 30-59          <span style="text-decoration: underline;">3</span>092.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-15 30-59          <span style="text-decoration: underline;">3</span>371.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-13 60+             971.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-14 60+            <span style="text-decoration: underline;">1</span>073.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-15 60+            <span style="text-decoration: underline;">1</span>169.              1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15 00-29          <span style="text-decoration: underline;">4</span>016.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16 00-29          <span style="text-decoration: underline;">4</span>449.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17 00-29          <span style="text-decoration: underline;">4</span>854.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-15 30-59          <span style="text-decoration: underline;">3</span>443.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-16 30-59          <span style="text-decoration: underline;">3</span>819.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-17 30-59          <span style="text-decoration: underline;">4</span>167.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-15 60+            <span style="text-decoration: underline;">1</span>165.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+            <span style="text-decoration: underline;">1</span>287.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+            <span style="text-decoration: underline;">1</span>404.              1      1</span></span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
@@ -622,11 +622,11 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   date       n_admission realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13        145.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14        169.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15        185.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-16        199.              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-17        211.              1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15        188.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16        207.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17        221.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-18        236.              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19        253.              1      1</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
@@ -643,15 +643,15 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 5</span></span></span>
 <span><span class="co">#&gt;   date       age_group n_admission realisation_id weight</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-13 00-29            3.76              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-14 00-29            4.35              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-15 00-29            4.71              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-13 30-59           32.0               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-14 30-59           37.0               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-15 30-59           40.2               1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-13 60+            110.                1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-14 60+            128.                1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-15 60+            140.                1      1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-02-15 00-29            4.83              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-02-16 00-29            5.35              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17 00-29            5.72              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-15 30-59           41.2               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-16 30-59           45.7               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-02-17 30-59           48.9               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-15 60+            142.                1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+            156.                1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+            166.                1      1</span></span></code></pre></div>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
