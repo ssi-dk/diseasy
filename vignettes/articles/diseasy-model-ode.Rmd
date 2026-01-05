@@ -73,7 +73,7 @@ It contains three observables of interest for our example:
 When running the models, we should also define at what point in time they should provide predictions for.
 This is done by setting the `last_queryable_date` in the observables module:
 ```{r last_queryable_date, eval = rlang::is_installed("RSQLite")}
-last_queryable_date <- observables$ds$min_start_date + 40
+last_queryable_date <- observables$ds$min_start_date + 42
 ```
 
 Lets first look at the data we have available:
@@ -150,10 +150,17 @@ activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 ```
 
-This particular scenario does not include any more dynamics, but this would be the
-stage where the level of seasonality and the variant composition should be defined
-(see `vignette("diseasy-season")` and `vignette("diseasy-variant")` for more details).
+This particular scenario also include simple seasonality and waning immunity:
+```{r diseasy_season}
+# Waning immunity scenario
+immunity <- DiseasyImmunity$new()
+immunity$set_exponential_waning(time_scale = 180)
 
+# Season scenario
+season <- DiseasySeason$new()
+season$set_reference_date(as.Date("2020-01-01"))
+season$use_cosine_season()
+```
 
 # Choosing the model configuration
 The `?DiseasyModelOdeSeir` model template has a number of hyperparameters and
@@ -174,7 +181,7 @@ The parameters are:
 
 ```{r model configuration, eval = rlang::is_installed("RSQLite")}
 # Hyper parameters
-compartment_structure <- c("E" = 2, "I" = 1, "R" = 1)
+compartment_structure <- c("E" = 2L, "I" = 1L, "R" = 2L)
 age_cuts_lower <- c(0, 30, 60)
 
 # Parameters
@@ -192,6 +199,8 @@ infections in the population. These dynamics are inferred from the incidence of 
 disease in the population. The model then predicts the evolution of the incidence[^1]
 under the given configuration. To get predictions for other observables, we must
 map from the incidence to the observable of interest.
+
+[^1]: Measured as the rate of individuals exiting the first `I` state.
 
 Mathematically, we map from the set of observables $\vec{O}(t)$ to the incidence $I(t)$ via the map $f$:
 $$\vec{O}(t) \overset{f}{\rightarrow} I(t)$$
@@ -293,14 +302,16 @@ With all the configuration done above, we can now create our model instance.
 model <- DiseasyModelOdeSeir$new(
   # Scenario configuration
   activity = activity,
+  immunity = immunity,
+  season = season,
   observables = observables,
 
-  # Parameter and hyper-parameter configuration
-  compartment_structure = compartment_structure,
-  disease_progression_rates = disease_progression_rates,
   parameters = list(
+    # Parameter and hyper-parameter configuration
+    "compartment_structure" = compartment_structure,
     "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
+    "disease_progression_rates" = disease_progression_rates,
 
     # Mapping to observables
     "model_output_to_observable" = model_output_to_observable
@@ -326,6 +337,21 @@ plot(
 )
 ```
 
+```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data
+# - when not, we get informed by an error
+x <- model$get_results(observable = "incidence", prediction_length = 60)
+y <- model$get_data(
+  observable = "incidence", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
+stopifnot(
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.4)
+  }
+)
+```
 
 The results are easily stratified by the stratifications in the data
 ```{r, eval = rlang::is_installed("RSQLite")}
@@ -363,6 +389,22 @@ plot(
 )
 ```
 
+```{r configuration test - n_infected, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data
+# - when not, we get informed by an error
+x <- model$get_results(observable = "n_infected", prediction_length = 60)
+y <- model$get_data(
+  observable = "n_infected", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
+stopifnot(
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$n_infected - y$n_infected) / x$n_infected, ~ . < 0.4)
+  }
+)
+```
+
 ```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_infected",
@@ -394,6 +436,22 @@ plot(
   model,
   observable = "n_positive",
   prediction_length = 60
+)
+```
+
+```{r configuration test - n_positive, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data
+# - when not, we get informed by an error
+x <- model$get_results(observable = "n_positive", prediction_length = 60)
+y <- model$get_data(
+  observable = "n_positive", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
+stopifnot(
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$n_positive - y$n_positive) / x$n_positive, ~ . < 0.4)
+  }
 )
 ```
 
@@ -429,6 +487,22 @@ plot(
 )
 ```
 
+```{r configuration test - n_admission, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data
+# - when not, we get informed by an error
+x <- model$get_results(observable = "n_admission", prediction_length = 60)
+y <- model$get_data(
+  observable = "n_admission", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
+stopifnot(
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$n_admission - y$n_admission) / x$n_admission, ~ . < 0.4)
+  }
+)
+```
+
 ```{r, eval = rlang::is_installed("RSQLite")}
 model$get_results(
   observable = "n_admission",
@@ -451,5 +525,3 @@ plot(
 if (exists("model")) rm(model)
 gc()
 ```
-
-[^1]: Measured as the rate of individuals exiting the first `I` state.

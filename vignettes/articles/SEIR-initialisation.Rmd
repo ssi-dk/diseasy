@@ -315,22 +315,34 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   act$set_activity_units(dk_activity_units)
   act$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
 
+  # Add a waning immunity scenario
+  im <- DiseasyImmunity$new()
+  im$set_exponential_waning(time_scale = 180)
+
+  # Add a season scenario
+  s <- DiseasySeason$new()
+  s$set_reference_date(as.Date("2020-01-01"))
+  s$use_cosine_season()
+
+
   # Create a SEIR model to initialise
   m <- DiseasyModelOdeSeir$new(
-    observables = obs,
     activity = act,
-    compartment_structure = c("E" = K, "I" = L, "R" = M),
-    disease_progression_rates = c("E" = rE, "I" = rI),
+    immunity = im,
+    season = s,
+    observables = obs,
     parameters = list(
+      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = c(0, 30, 60),
-      "overall_infection_risk" = 0.025
+      "overall_infection_risk" = 0.025,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
 
   return(m)
 }
 
-m <- generate_model(2, 1, 1) # Use the configuration from example data
+m <- generate_model(2L, 1L, 2L) # Use the configuration from example data
 ```
 
 
@@ -404,15 +416,15 @@ psi
 And we now test the initial conditions by solving the model using these starting conditions.
 ```{r}
 get_prediction <- function(
-    model,
-    psi,
-    signal = "incidence"
-  ) {
+  model,
+  psi,
+  signal = "incidence"
+) {
 
   # Integrate the ODE system with deSolve
   sol <- deSolve::ode(
     y = psi$initial_condition,
-    times = seq(0, 50),
+    times = seq(0, 100),
     func = model$rhs
   )
 
@@ -440,8 +452,8 @@ get_prediction <- function(
       dplyr::select(!"state") |>
       dplyr::mutate(
         "date" = .data$time + model$observables$last_queryable_date,
-        "incidence_model" = model$disease_progression_rates[["I"]] *
-            model$compartment_structure[["I"]] *
+        "incidence_model" = model$parameters$disease_progression_rates[["I"]] *
+            model$parameters$compartment_structure[["I"]] *
             .data$value
       )
 
@@ -479,8 +491,8 @@ get_prediction <- function(
   out <- out |>
     dplyr::mutate(
       "model_configuration" = paste0(
-        names(model$compartment_structure),
-        model$compartment_structure,
+        names(model$parameters$compartment_structure),
+        model$parameters$compartment_structure,
         collapse = ""
       )
     )
@@ -519,6 +531,22 @@ ggplot2::ggplot() +
   ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```
 
+```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed("RSQLite")}
+# This code block is used as a sanity check that the models work as expected
+# When the model works, we should be able to closely match model with data
+# - when not, we get informed by an error
+x <- m$get_results(observable = "incidence", prediction_length = 50)
+y <- m$get_data(
+  observable = "incidence", prediction_length = 50, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
+stopifnot(
+  "Model prediction varies more than expected from example data" = {
+    purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.4)
+  }
+)
+```
+
 ### Misspecified model
 Correctly matching the model is the best case scenario.
 However, we can also the method for a couple of cases where the model is misspecified.
@@ -531,10 +559,10 @@ Once we include model fitting, the discrepancy between the data and model predic
 #### Misspecified model in periods of increasing infections
 ```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing."}
 models <- list(
-  generate_model(2, 1, 1),
-  generate_model(1, 1, 1),
-  generate_model(2, 2, 2),
-  generate_model(3, 2, 5)
+  generate_model(2L, 1L, 1L),
+  generate_model(1L, 1L, 2L),
+  generate_model(2L, 2L, 2L),
+  generate_model(3L, 2L, 5L)
 )
 
 predictions <- models |>
@@ -573,16 +601,16 @@ ggplot2::ggplot() +
 ```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing."}
 
 models <- list(
-  generate_model(2, 1, 1),
-  generate_model(1, 1, 1),
-  generate_model(2, 2, 2),
-  generate_model(3, 2, 5)
+  generate_model(2L, 1L, 1L),
+  generate_model(1L, 1L, 2L),
+  generate_model(2L, 2L, 2L),
+  generate_model(3L, 2L, 5L)
 )
 
 # Update the last queryable date to later starting point
 purrr::walk(models, \(m) {
   m$observables$set_last_queryable_date(
-    m$observables$ds$max_end_date - lubridate::days(45)
+    m$observables$start_date + lubridate::days(150)
   )
 })
 

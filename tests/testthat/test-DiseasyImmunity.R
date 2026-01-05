@@ -544,7 +544,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
     tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
 
   purrr::pwalk(test_combinations, \(M, method, strategy, penalty) {                                                     # nolint: object_name_linter
-    expect_no_error(
+    expect_no_condition(
       im$plot(
         M = !!M,
         method = !!method,
@@ -602,6 +602,28 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
   # In total, we expect 10 items in the cache
   # If we have more, a cache have been missed
   expect_length(cache$keys(), 10)
+
+  rm(im)
+})
+
+
+test_that("`$approximate_compartmental()` works with custom controls", {
+  skip_if_not_installed("BB")
+
+  # Initialize the DiseasyImmunity instance
+  im <- DiseasyImmunity$new()
+
+  # Set the exponential waning model
+  im$set_sigmoidal_waning()
+
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "recursive",
+      optim_control = list("optim_method" = "neldermead", "xtol_rel" = 1e-2)
+    )
+  )
 
   rm(im)
 })

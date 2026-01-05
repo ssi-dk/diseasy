@@ -15,10 +15,12 @@ test_that("helpers works (SR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("I" = 0, "R" = 1),
-    disease_progression_rates = c("I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("I" = 0L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -40,7 +42,9 @@ test_that("helpers works (SR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(0, 0))
 
   # Check risk matrix is correctly set
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -66,9 +70,11 @@ test_that("helpers works (SIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -90,7 +96,9 @@ test_that("helpers works (SIR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(rI, 0, 0))
 
   # Check risk matrix is correctly set
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -122,9 +130,11 @@ test_that("helpers works (SIR double variant / double age group)", {
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 60))
+    parameters = list(
+      "compartment_structure" = c("I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 60),
+      "disease_progression_rates" = c("I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -157,7 +167,9 @@ test_that("helpers works (SIR double variant / double age group)", {
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -187,9 +199,11 @@ test_that("helpers works (SEIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -211,7 +225,9 @@ test_that("helpers works (SEIR single variant / single age group)", {
   expect_identical(private %.% progression_flow_rates, c(rE, rI, 0, 0))
 
   # Check risk matrix is correctly set
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -238,9 +254,11 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -259,14 +277,18 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
   expect_identical(private %.% infection_matrix_to_rs_indices, list(seq.int(3)))
 
   # Check progression flow rates are correctly set
-  delta <- m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% delta
+  delta <- m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% delta
   expect_identical(
     private %.% progression_flow_rates,
     c(2 * rE, 2 * rE, 2 * rI, 2 * rI, delta, 0, 0)
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -298,9 +320,11 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -325,7 +349,9 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
   )
 
   # Check progression flow rates are correctly set
-  delta <- m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% delta
+  delta <- m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% delta
   expect_identical(
     private %.% progression_flow_rates,
     c(
@@ -336,7 +362,9 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -371,9 +399,11 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 60))
+    parameters = list(
+      "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
+      "age_cuts_lower" = c(0, 60),
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -399,7 +429,9 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   )
 
   # Check progression flow rates are correctly set
-  delta <- m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% delta
+  delta <- m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% delta
   expect_identical(
     private %.% progression_flow_rates,
     c(
@@ -412,7 +444,9 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   )
 
   # Check risk matrix is correctly set
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private %.% immunity_matrix,
@@ -447,9 +481,11 @@ test_that("forcing functions can be configured as expected (SIR single variant /
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("I" = rI)
+    )
   )
 
   # Get a reference to the private environment

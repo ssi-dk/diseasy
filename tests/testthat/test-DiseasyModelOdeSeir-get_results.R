@@ -22,6 +22,15 @@ activity$set_contact_basis(contact_basis = contact_basis %.% DK)
 activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
+# Configure the immunity module
+immunity <- DiseasyImmunity$new()
+immunity$set_exponential_waning(time_scale = 180)
+
+# Configure the season module
+season <- DiseasySeason$new()
+season$set_reference_date(as.Date("2020-01-01"))
+season$use_cosine_season()
+
 
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
@@ -72,19 +81,21 @@ model_output_to_observable <- list(
 
 
 # Test the get_results method of the configuration used in the example data
-K <- 2                                                                                                                  # nolint start: object_name_linter
-L <- 1
-M <- 1                                                                                                                  # nolint end: object_name_linter
+K <- 2L                                                                                                                 # nolint start: object_name_linter
+L <- 1L
+M <- 2L                                                                                                                 # nolint end: object_name_linter
 
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
   activity = activity,
+  immunity = immunity,
+  season = season,
   observables = observables,
-  compartment_structure = c("E" = K, "I" = L, "R" = M),
-  disease_progression_rates = c("E" = rE, "I" = rI),
   parameters = list(
+    "compartment_structure" = c("E" = K, "I" = L, "R" = M),
     "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
+    "disease_progression_rates" = c("E" = rE, "I" = rI),
     "model_output_to_observable" = model_output_to_observable
   )
 )
@@ -118,7 +129,7 @@ tidyr::expand_grid(
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
         expr = {
-          results <- model$get_results(                                                                                     # nolint: implicit_assignment_linter
+          results <- model$get_results(                                                                                 # nolint: implicit_assignment_linter
             observable = observable,
             prediction_length = prediction_length,
             stratification = stratification
@@ -137,14 +148,19 @@ tidyr::expand_grid(
 
       # Check accuracy within 15%
       comparison <- rbind(
-        dplyr::mutate(results,      "source" = "model"),
-        dplyr::mutate(observations, "source" = "observations")
+        dplyr::mutate(results, "source" = "model"),
+        dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
       ) |>
         tidyr::pivot_wider(names_from = "source", values_from = dplyr::all_of(observable)) |>
         dplyr::mutate("relative_error" = model / observations) |>
         dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
 
-      expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.15)                          # nolint: expect_identical_linter
+      expect_equal(                                                                                                     # nolint: expect_identical_linter
+        comparison$mean_relative_error,
+        rep(1, nrow(comparison)),
+        tolerance = 0.15,
+        label = glue::glue("mean_relative_error ({observable}, {stratification})")
+      )
     })
   })
 
@@ -160,12 +176,14 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
+    immunity = immunity,
+    season = season,
     observables = observables,
-    compartment_structure = c("E" = K, "I" = L, "R" = M),
-    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list(
+      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = 0,
-      "overall_infection_risk" = overall_infection_risk
+      "overall_infection_risk" = overall_infection_risk,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
 
@@ -192,8 +210,8 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
 
   # Check accuracy within 15%
   comparison <- rbind(
-    dplyr::mutate(results,      "source" = "model"),
-    dplyr::mutate(observations, "source" = "observations")
+    dplyr::mutate(results, "source" = "model"),
+    dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
   ) |>
     tidyr::pivot_wider(names_from = "source", values_from = "n_infected") |>
     dplyr::mutate("relative_error" = model / observations) |>
@@ -215,12 +233,14 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
+    immunity = immunity,
+    season = season,
     observables = observables,
-    compartment_structure = c("E" = K, "I" = L, "R" = M),
-    disease_progression_rates = c("E" = rE, "I" = rI),
     parameters = list(
+      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
       "age_cuts_lower" = c(0, 30),
-      "overall_infection_risk" = overall_infection_risk
+      "overall_infection_risk" = overall_infection_risk,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
 
@@ -247,8 +267,8 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
 
   # Check accuracy within 15%
   comparison <- rbind(
-    dplyr::mutate(results,      "source" = "model"),
-    dplyr::mutate(observations, "source" = "observations")
+    dplyr::mutate(results, "source" = "model"),
+    dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
   ) |>
     tidyr::pivot_wider(names_from = "source", values_from = "n_infected") |>
     dplyr::mutate("relative_error" = model / observations) |>

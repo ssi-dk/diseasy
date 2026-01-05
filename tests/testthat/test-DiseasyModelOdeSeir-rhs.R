@@ -27,9 +27,11 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = as.Date("2020-01-01")
     ),
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -75,9 +77,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -110,9 +114,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -158,9 +164,11 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 2, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 60))
+    parameters = list(
+      "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
+      "age_cuts_lower" = c(0, 60),
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -193,9 +201,11 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -222,9 +232,11 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rI, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 40))
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 40),
+      "disease_progression_rates" = c("E" = rI, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -257,9 +269,11 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -294,9 +308,11 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rI, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 40))
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 40),
+      "disease_progression_rates" = c("E" = rI, "I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -334,10 +350,12 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -374,10 +392,12 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rI, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 40)),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 40),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -418,17 +438,21 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
@@ -459,17 +483,21 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rI, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 40)),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 40),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   # Re-infections should have lower rates of infection due to immunity
   y0 <- rep(0, private$n_states)
@@ -515,10 +543,12 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -569,10 +599,12 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rI, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 40)),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 40),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -619,17 +651,21 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rI, "I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   # Check risk matrix is correctly set
   expect_identical(
@@ -673,17 +709,21 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rI, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 40)),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 40),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Get the immunity information
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   # Check risk matrix is correctly set
   expect_identical(

@@ -12,9 +12,11 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = rI),
-    parameters = list("age_cuts_lower" = 0)
+    parameters = list(
+      "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -27,7 +29,9 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   )
 
   # Then check where everyone is in R
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   expect_identical(
     private$generator_matrix(RS_states = c(1, 0)),
@@ -75,9 +79,11 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("I" = 1, "R" = 1),
-    disease_progression_rates = c("I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 60))
+    parameters = list(
+      "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 60),
+      "disease_progression_rates" = c("I" = rI)
+    )
   )
 
   # Get a reference to the private environment
@@ -112,7 +118,9 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   # Then check where population is uniform and two variants are active
   s <- r <- 1 / (2 * (1 + 2))
 
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
   fr_21 <- 1 - chi_21 * (1 - fr)
@@ -175,10 +183,12 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -211,10 +221,12 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    compartment_structure = c("E" = 1, "I" = 2, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 2L, "R" = 1L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -278,10 +290,12 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 2, "R" = 2),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = 0),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 2L, "R" = 2L),
+      "age_cuts_lower" = 0,
+      "disease_progression_rates" = c("E" = rE, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -319,7 +333,9 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   # Then check where population is uniform and two variants are active
   s <- r <- 1 / (1 + 2 * 2)
 
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
   fr_21 <- 1 - chi_21 * (1 - fr)
@@ -413,10 +429,12 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
-    compartment_structure = c("E" = 1, "I" = 1, "R" = 1),
-    disease_progression_rates = c("E" = rE, "I" = rI),
-    parameters = list("age_cuts_lower" = c(0, 60)),
-    malthusian_matching = FALSE
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "age_cuts_lower" = c(0, 60),
+      "disease_progression_rates" = c("E" = rE, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
   )
 
   # Get a reference to the private environment
@@ -454,7 +472,9 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   # Then check where population is uniform and two variants are active
   s <- r <- 1 / (2 + 2 * 2)
 
-  fr <- 1 - m %.% immunity %.% approximate_compartmental(M = m %.% compartment_structure %.% R) %.% gamma %.% infection
+  fr <- 1 - m %.% immunity %.% approximate_compartmental(
+    M = m %.% parameters %.% compartment_structure %.% R
+  ) %.% gamma %.% infection
 
   fr_12 <- 1 - chi_12 * (1 - fr)   # Cross immunity factors
   fr_21 <- 1 - chi_21 * (1 - fr)

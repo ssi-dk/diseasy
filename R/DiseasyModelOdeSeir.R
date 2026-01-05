@@ -46,10 +46,10 @@
 #'   m <- DiseasyModelOdeSeir$new(
 #'     observables = obs,
 #'     activity = act,
-#'     disease_progression_rates = c("E" = 1 / 2, "I" = 1 / 4),
 #'     parameters = list(
+#'       "age_cuts_lower" = c(0, 30, 60),
 #'       "overall_infection_risk" = 0.025,
-#'       "age_cuts_lower" = c(0, 30, 60)
+#'       "disease_progression_rates" = c("E" = 1 / 2, "I" = 1 / 4)
 #'     )
 #'   )
 #'
@@ -73,21 +73,21 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param compartment_structure `r rd_compartment_structure()`
-    #' @param disease_progression_rates `r rd_disease_progression_rates()`
-    #' @param malthusian_matching (`logical(1)`)\cr
-    #'   Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?
     #' @param observables,activity,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
     #'   Parameters controlling the structure of the model:
+    #'   * `compartment_structure` `r rd_compartment_structure()`
     #'   * `age_cuts_lower` (`numeric()`)\cr
     #'     Determines the age groups in the model.
+    #'   * `malthusian_matching` (`logical(1)`)\cr
+    #'     Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?
     #'
     #'   Parameters controlling the dynamics of the model:
     #'   * `overall_infection_risk` (`numeric(1)`)\cr
     #'     A scalar that scales contact rates to infection rates.
+    #'   * `disease_progression_rates` `r rd_disease_progression_rates()`
     #'
     #'   Parameters controlling initialisation routines
     #'   * `incidence_polynomial_order` (`integer(1)`)\cr
@@ -110,14 +110,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     initialize = function(
-      observables,
+      observables = FALSE,
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
       immunity = TRUE,
-      compartment_structure = c("E" = 1L, "I" = 1L, "R" = 1L),
-      disease_progression_rates = c("E" = 1, "I" = 1),
-      malthusian_matching = TRUE,
       parameters = NULL,
       ...
     ) {
@@ -133,45 +130,56 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ...
       )
 
+      # Attempt to initialise helpers with the current inputs
+      tryCatch(self$prepare_rhs(), error = function(e) {})
+    },
 
-      # Check the input arguments
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_integerish(compartment_structure, lower = 0, add = coll)
-      checkmate::assert_names(
-        names(compartment_structure),
-        subset.of = c("E", "I", "R"),
-        must.include = c("I", "R"),
-        add = coll
-      )
 
-      checkmate::assert_numeric(disease_progression_rates, lower = 0, add = coll)
-      checkmate::assert_names(
-        names(disease_progression_rates),
-        subset.of = c("E", "I"),
-        must.include = "I",
-        add = coll
-      )
+    #' @description
+    #'   Overload the `$load_module()` to re-initialise the helpers after loading
+    #' @param ...
+    #'   Arguments sent to parent method.
+    load_module = function(...) {
+      super$load_module(...)
 
-      checkmate::assert_logical(malthusian_matching, add = coll)
+      # Mark that model is not initialised
+      private$initialised <- FALSE
+    },
+
+
+    #' @description `r rd_get_results_description`
+    #' @param observable `r rd_observable()`
+    #' @param prediction_length `r rd_prediction_length()`
+    #' @param quantiles `r rd_quantiles()`
+    #' @param stratification `r rd_stratification()`
+    #' @return `r rd_get_results_return`
+    #' @seealso `r rd_get_results_seealso`
+    get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
 
       # Check we have the needed modules loaded and configured as needed
+      coll <- checkmate::makeAssertCollection()
       checkmate::assert_class(self %.% observables, "DiseasyObservables")
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
-
-
       checkmate::assert_class(self %.% activity, "DiseasyActivity", add = coll)
-
       checkmate::assert_class(self %.% season, "DiseasySeason", add = coll)
-
       checkmate::assert_class(self %.% variant, "DiseasyVariant", add = coll)
-
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
-
       checkmate::reportAssertions(coll)
 
-      # Cast the compartment structure to a integer to make hash consistent
-      compartment_structure <- stats::setNames(as.integer(compartment_structure), names(compartment_structure))
+      if (!private$initialised) {
+        self$prepare_rhs()
+      }
 
+      super$get_results(observable, prediction_length, quantiles, stratification)
+    },
+
+
+    #' @description
+    #'  Allocate the helpers for the rhs method
+    prepare_rhs = function() {
+
+      compartment_structure <- self %.% parameters %.% compartment_structure
+      disease_progression_rates <- self %.% parameters %.% disease_progression_rates
 
       ### During the initialization of the model, we setup a number of intermediate vectors to speed up the computation
       # of the right-hand-side function in the ODE.
@@ -179,12 +187,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Store a short hand for the number of groups
       private$n_age_groups <- length(self %.% parameters %.% age_cuts_lower)
       private$n_variants   <- max(length(self %.% variant %.% variants), 1)
-      private$n_EIR_states <- sum(compartment_structure)
+      private$n_EIR_states <- sum(self %.% parameters %.% compartment_structure)
       private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
-
-      # Store the given model configuration
-      private$.compartment_structure <- compartment_structure
-      private$.disease_progression_rates <- disease_progression_rates
 
 
       ## Time-varying contact matrices projected onto target age-groups
@@ -367,11 +371,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # This is a scaling that we need to compute and multiply with the infection rate "beta".
       # To optimise, we perform the scaling here onto the contact matrices directly, since we then
       # have to do it only once.
-      if (malthusian_matching) {
+      if (self %.% parameters %.% malthusian_matching) {
         private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
         private$set_contact_matrix(self$malthusian_scaling_factor)
       }
 
+      # Mark that model has been initialised
+      private$initialised <- TRUE
     },
 
 
@@ -572,11 +578,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Compute the per-compartment progression rates
-      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)                                              # nolint: object_name_linter
-      L <- self %.% compartment_structure %.% I                                                                         # nolint: object_name_linter
+      K <- purrr::pluck(self %.% parameters %.% compartment_structure, "E", .default = 0)                               # nolint: object_name_linter
+      L <- self %.% parameters %.% compartment_structure %.% I                                                          # nolint: object_name_linter
 
-      re <- (purrr::pluck(self %.% disease_progression_rates, "E", .default = 0)) * K
-      ri <- (self %.% disease_progression_rates %.% I) * L
+      re <- (purrr::pluck(self %.% parameters %.% disease_progression_rates, "E", .default = 0)) * K
+      ri <- (self %.% parameters %.% disease_progression_rates %.% I) * L
 
 
       # Generate the matrix to compute the states from the derivatives
@@ -654,15 +660,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Now we use the forcing method to generate the initial R and s states
       # To this purpose, we generate the reduced model with no R states and one less I state.
       compartment_structure <- c(
-        "I" = self %.% compartment_structure %.% I - 1,
-        "R" = self %.% compartment_structure %.% R
+        "I" = self %.% parameters %.% compartment_structure %.% I - 1L,
+        "R" = self %.% parameters %.% compartment_structure %.% R
       )
 
       # Correct for the missing I state
       # (we take the max with 1 to ensure non-inf values which triggers an error. If the reduced model
       # has no I states, the disease_progression_rates$I value is not)
-      disease_progression_rates <- self %.% disease_progression_rates |>
-        purrr::keep_at("I") * self %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
+      disease_progression_rates <- self %.% parameters %.% disease_progression_rates |>
+        purrr::keep_at("I") * self %.% parameters %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
 
       # Generate the reduced model
       m_forcing <- DiseasyModelOdeSeir$new(
@@ -671,14 +677,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         variant = self %.% variant,
         season = self %.% season,
         immunity = self %.% immunity,
-        compartment_structure = compartment_structure,
-        disease_progression_rates = disease_progression_rates,
-        malthusian_matching = FALSE, # Since we have different disease_progression_rates, we cannot directly match
         parameters = modifyList(
           self %.% parameters,
           list( # ... but since we can scale the overall_infection_risk to achieve the same effect.
+            "compartment_structure" = compartment_structure,
+            "disease_progression_rates" = disease_progression_rates,
             "overall_infection_risk" = self %.% parameters %.% overall_infection_risk *
-              self %.% malthusian_scaling_factor
+              self %.% malthusian_scaling_factor,
+            "malthusian_matching" = FALSE # Since we have different disease_progression_rates, we cannot directly match
           )
         )
       )
@@ -782,7 +788,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
-        "state" = paste0("R", seq.int(self %.% compartment_structure %.% R))
+        "state" = paste0("R", seq.int(self %.% parameters %.% compartment_structure %.% R))
       ) |>
         dplyr::add_row(
           "variant" = NA,
@@ -872,7 +878,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
       # rr * beta * beta_v * I * s(t)                                                                                   # nolint: commented_code_linter
       infection_rate <- infected_contact_rate *
-        self$season$model_t(t) *
+        self$season$model_t(t + unclass(self$observables$last_queryable_date - self$season$reference_date)) *
         overall_infection_risk *
         private$indexed_variant_infection_risk
 
@@ -918,20 +924,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
   active = list(
-    #' @field compartment_structure `r rd_compartment_structure("field")`
-    compartment_structure = purrr::partial(
-      .f = active_binding,
-      name = "compartment_structure",
-      expr = return(private %.% .compartment_structure)
-    ),
-
-    #' @field disease_progression_rates `r rd_disease_progression_rates("field")`
-    disease_progression_rates = purrr::partial(
-      .f = active_binding,
-      name = "disease_progression_rates",
-      expr = return(private %.% .disease_progression_rates)
-    ),
-
     #' @field malthusian_scaling_factor (`numeric(1)`)\cr
     #'   A scaling factor to apply to the contact matrices to account for structural differences
     #'   in the model. Read only.
@@ -947,6 +939,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
+    initialised = FALSE,
 
     default_parameters = function() {
       modifyList(
@@ -954,10 +947,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         # Overwrite with model-specific parameters
         list(
           # Structural model parameters
+          "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
           "age_cuts_lower" = 0,
+          "malthusian_matching" = TRUE,
 
           # Models determinable by initialisation routines
           "overall_infection_risk" = 1,
+          "disease_progression_rates" = c("E" = 1, "I" = 1),
 
           # Parameters for fitting polynomials to the incidence curves
           "incidence_polynomial_order" = 3,
@@ -980,10 +976,26 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     validate_parameters = function() {
       coll <- checkmate::makeAssertCollection()
       # Validate the structural parameters
+      checkmate::assert_integer(self %.% parameters %.% compartment_structure, lower = 0, add = coll)
+      checkmate::assert_names(
+        names(self %.% parameters %.% compartment_structure),
+        subset.of = c("E", "I", "R"),
+        must.include = c("I", "R"),
+        add = coll
+      )
+
       checkmate::assert_integerish(self %.% parameters %.% age_cuts_lower, lower = 0, add = coll)
+      checkmate::assert_logical(self %.% parameters %.% malthusian_matching, add = coll)
 
       # Validate the dynamical parameters
       checkmate::assert_number(self %.% parameters %.% overall_infection_risk, lower = 0, add = coll)
+      checkmate::assert_numeric(self %.% parameters %.% disease_progression_rates, lower = 0, add = coll)
+      checkmate::assert_names(
+        names(self %.% parameters %.% disease_progression_rates),
+        subset.of = c("E", "I"),
+        must.include = "I",
+        add = coll
+      )
 
       # Validate the incidence polynomial parameters
       checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_order, lower = 0, add = coll)
@@ -998,9 +1010,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       super$validate_parameters() # Validate inherited parameters
     },
-
-    .compartment_structure = NULL,
-    .disease_progression_rates = NULL,
 
     progression_flow_rates = NULL,
 
@@ -1071,13 +1080,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       t = 0,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(                                                                                                    # nolint: object_name_linter
-        rep(0, private %.% n_age_groups * private %.% n_variants * self %.% compartment_structure %.% R),
+        rep(0, private %.% n_age_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R),
         private$population_proportion
       )
     ) {
 
-      K <- purrr::pluck(self %.% compartment_structure, "E", .default = 0)                                              # nolint: object_name_linter
-      L <- purrr::pluck(self %.% compartment_structure, "I", .default = 0)                                              # nolint: object_name_linter
+      K <- purrr::pluck(self %.% parameters %.% compartment_structure, "E", .default = 0)                               # nolint: object_name_linter
+      L <- purrr::pluck(self %.% parameters %.% compartment_structure, "I", .default = 0)                               # nolint: object_name_linter
 
       # Early return if no disease compartments
       if (K + L == 0) {
@@ -1095,8 +1104,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # The diagonal elements of the transition matrix is just (minus) the progression flow rates
       progression_flow_rates <- c(
-        rep(K * purrr::pluck(self %.% disease_progression_rates, "E", .default = 0), K),
-        rep(L * purrr::pluck(self %.% disease_progression_rates, "I", .default = 0), L)
+        rep(K * purrr::pluck(self %.% parameters %.% disease_progression_rates, "E", .default = 0), K),
+        rep(L * purrr::pluck(self %.% parameters %.% disease_progression_rates, "I", .default = 0), L)
       )
       transition_matrix <- diag(
         - rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
@@ -1206,14 +1215,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
       reference_model <- DiseasyModelOdeSeir$new(
-        compartment_structure = c("E" = 0L, "I" = 1L, "R" = 1L),
-        disease_progression_rates = purrr::discard_at(self %.% disease_progression_rates, ~ . == "E"),
-        malthusian_matching = FALSE,
         activity = self %.% activity,
         observables = self %.% observables,
         season = self %.% season,
         variant = self %.% variant,
-        parameters = modifyList(self %.% parameters, list("age_cuts_lower" = 0), keep.null = TRUE)
+        parameters = modifyList(
+          self %.% parameters,
+          list(
+            "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+            "age_cuts_lower" = 0,
+            "disease_progression_rates" = purrr::discard_at(
+              self %.% parameters %.% disease_progression_rates,
+              ~ . == "E"
+            ),
+            "malthusian_matching" = FALSE
+          ),
+          keep.null = TRUE
+        )
       )
 
       reference_growth_rate <- reference_model$malthusian_growth_rate(...)

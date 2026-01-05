@@ -5,7 +5,7 @@
 \alias{DiseasyModelBRM}
 \alias{DiseasyModelB0}
 \alias{DiseasyModelB1}
-\title{Meta module for the BRM class of models}
+\title{Simple bayesian regression models}
 \value{
 A new instance of the \code{DiseasyModelGLM}, \code{DiseasyModelG0} or
 \code{DiseasyModelG1} \link[R6:R6Class]{R6} class.

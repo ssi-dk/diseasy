@@ -5,8 +5,10 @@ AR
 ARI
 
 CCW
+CoV
 
 backends
+bayesian
 bitemporal
 bmatrix
 brm
@@ -174,6 +176,7 @@ Rmd
 RS
 rsif
 
+SARS
 SCDB
 Schou
 seir

@@ -1,4 +1,4 @@
-#' @title Diseasy' season handler
+#' @title Configure seasonality scenarios
 #'
 #' @description
 #'   The `DiseasySeason` module is responsible for implementing various models for the seasonal dependency of the
@@ -372,8 +372,10 @@ DiseasySeason <- R6::R6Class(                                                   
         dplyr::group_by(date) |>
         dplyr::summarise(max_temperature = max(max_temperature, na.rm = TRUE), .groups = "drop") |>
         dplyr::collect() |>
-        dplyr::mutate(date = zoo::as.Date(date),
-                      t = date - !!self$reference_date)
+        dplyr::mutate(
+          date = as.Date(date),
+          t = date - !!self$reference_date
+        )
 
 
       min_date <- min(temperature_dk$date)

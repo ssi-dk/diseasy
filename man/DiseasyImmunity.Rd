@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiseasyImmunity.R
 \name{DiseasyImmunity}
 \alias{DiseasyImmunity}
-\title{Diseasy' immunity handler}
+\title{Configure (waning) immunity against different outcomes}
 \value{
 A new instance of the \code{DiseasyImmunity} \link[R6:R6Class]{R6} class.
 }
@@ -59,6 +59,7 @@ The list of models currently being used in the module. Read-only.}
 \item \href{#method-DiseasyImmunity-set_custom_waning}{\code{DiseasyImmunity$set_custom_waning()}}
 \item \href{#method-DiseasyImmunity-approximate_compartmental}{\code{DiseasyImmunity$approximate_compartmental()}}
 \item \href{#method-DiseasyImmunity-plot}{\code{DiseasyImmunity$plot()}}
+\item \href{#method-DiseasyImmunity-describe}{\code{DiseasyImmunity$describe()}}
 \item \href{#method-DiseasyImmunity-clone}{\code{DiseasyImmunity$clone()}}
 }
 }
@@ -311,8 +312,8 @@ best matches the waning immunity curves set in the module.
   M,
   method = c("free_gamma", "free_delta", "all_free"),
   strategy = NULL,
-  monotonous = TRUE,
-  individual_level = TRUE,
+  monotonous = FALSE,
+  individual_level = FALSE,
   optim_control = NULL,
   ...
 )}\if{html}{\out{</div>}}
@@ -418,8 +419,7 @@ The default configuration depends on the method used and whether or not a penalt
 objective function (\code{monotonous} and \code{individual_level}):\tabular{llll}{
    method \tab penalty \tab strategy \tab optimiser \cr
    free_delta \tab No/Yes \tab naive \tab ucminf \cr
-   free_gamma \tab No \tab naive \tab subplex \cr
-   free_gamma \tab Yes \tab naive \tab hjkb \cr
+   free_gamma \tab No/Yes \tab naive \tab ucminf \cr
    all_free \tab No/Yes \tab naive \tab ucminf \cr
 }
 
@@ -431,6 +431,9 @@ which uses the "free_gamma" default optimiser to determine the starting point.
 
 \subsection{Returns}{
 Returns the results from the optimisation with the approximated rates and execution time.
+The output of the objective function is given as the "error" (the square-root of the integral of the squared
+difference between approximation and target) and the "penalty" (the penalty controllable
+by \code{monotonous} and \code{individual_level}).
 }
 }
 \if{html}{\out{<hr>}}
@@ -466,6 +469,16 @@ Number of compartments to be used in the model.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyImmunity-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyImmunity-describe}{}}}
+\subsection{Method \code{describe()}}{
+Prints a human readable report of the internal state of the module.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyImmunity$describe()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyImmunity-clone"></a>}}

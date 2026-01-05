@@ -21,7 +21,7 @@ library(diseasy)
 ```{r options, include = FALSE}
 # Create a cache for this vignette since the examples take a long time to generate
 # We will destroy the cache if the source code for `DiseasyImmunity` changes
-cache <- cachem::cache_disk(dir = "vignette_data/cache/diseasy-immunity")
+cache <- cachem::cache_disk(dir = "article_data/cache/diseasy-immunity")
 
 r6_hash <- \(r6_generator) {
   c(
@@ -170,7 +170,7 @@ im$set_time_scales(list("infection" = 6, "hospitalisation" = 18))
 The approximation assumes the model has a number of sequential R compartments ($R_1 .., R_M$) and then provides the transition rates
 and associated risks for each compartment that best approximates set waning functions (see Figure 1 for a illustration).
 
-![Figure 1: Illustration of the compartmental model structure.](vignette_data/diseasy-immunity-model-structure.png)
+![Figure 1: Illustration of the compartmental model structure.](article_data/diseasy-immunity-model-structure.png)
 
 Some definitions:
 
@@ -334,7 +334,11 @@ results <- tidyr::expand_grid(
 ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
   ggplot2::geom_line(linewidth = 1) +
   ggplot2::labs(x = "M", y = "Error") +
-  ggplot2::coord_cartesian(xlim = c(1, max(results$M)), expand = FALSE)
+  ggplot2::coord_cartesian(
+    xlim = c(1, max(results$M)),
+    ylim = c(0, NA),
+    expand = FALSE
+  )
 ```
 
 ```{r cleanup, include = FALSE}

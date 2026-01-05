@@ -8,6 +8,8 @@ authors:
     html: >-
       <img src="https://www.ssi.dk/assets/images/ssi-logo-optimeret.svg" alt="SSI" height="64" style="margin-bottom: 0.5em; margin-top: 1.5em;" />
 
+llm-docs: false
+
 reference:
   - title: Functional modules
     desc: The building blocks of `diseasy`.
@@ -37,10 +39,6 @@ reference:
     contents:
     - has_keyword("data")
 
-  - title: Helper functions
-    contents:
-    - plot
-
   - title: Developer functions
     desc: Functions to create model templates and functional modules.
     contents:
@@ -63,7 +61,7 @@ articles:
 - title: Model templates
   navbar: Model templates
   contents:
-  - starts_with("diseasy-model")
+  - matches(r"{^articles/diseasy-model}")
 
 - title: Developer guides
   navbar: Developer guides
@@ -78,4 +76,4 @@ articles:
 - title: Additional information
   navbar: Additional information
   contents:
-  - starts_with("articles/")
+  - articles/diseasy-immunity-optimisation
