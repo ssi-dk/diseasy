@@ -55,7 +55,9 @@ Schematically, the model can be represented as in the figure below:
 
 ```{r SEIR-structure, echo = FALSE, fig.align = "center", fig.cap = "SEIR model overview for a two variant model", out.width = "120%"}
 knitr::include_graphics(
-  devtools::package_file("vignettes/articles/article_data/SEIR-implementation-model.png")
+  devtools::package_file(
+    "vignettes/articles/article_data/SEIR-implementation-model.png"
+  )
 )
 ```
 
@@ -86,7 +88,9 @@ Notice that the state vector elements are indexed by state-type, state-index, ag
 
 ```{r SERI-index, echo = FALSE, fig.align = "center", fig.cap = "Index guide for the state vector"}
 knitr::include_graphics(
-  devtools::package_file("vignettes/articles/article_data/SEIR-implementation-index.png")
+  devtools::package_file(
+    "vignettes/articles/article_data/SEIR-implementation-index.png"
+  )
 )
 ```
 
