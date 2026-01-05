@@ -953,11 +953,6 @@
       "package": "zip",
       "version": "2.3.3",
       "binary": true
-    },
-    {
-      "package": "zoo",
-      "version": "1.8-15",
-      "binary": true
     }
   ],
   "sysreqs": {
