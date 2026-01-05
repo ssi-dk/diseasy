@@ -281,6 +281,7 @@ map_to_n_positive <- list(
     )
   }
 )
+attr(map_to_n_positive$map, "delay") <- 14
 
 map_to_n_admission <- list(
   "map" = \(.x, .y) {
@@ -304,6 +305,8 @@ map_to_n_admission <- list(
     )
   }
 )
+attr(map_to_n_admission$map, "delay") <- 7 # Length of `delay_distribution`
+
 
 # These maps are provided via a list to the model with the names of
 # the elements denoting the observable being mapped to.

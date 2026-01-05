@@ -933,6 +933,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Compute the flow from infections
       # Each variant attempts to infect the population
 
+      state_vector <- pmax(0, state_vector) / sum(state_vector)
+
       ## Step 1, determine the number of infected by age group and variant
 
       # If the number of infected is the tensor I_{v,a,k}, then we need the matrix I_{a,v} = sum_k I_{a,v,k}
@@ -1126,36 +1128,43 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           seq(from = 1, to = nrow(private %.% observable_mapping %.% state_vector))
       }
 
+      # Construct the map for the observable
+      # A fraction of the observable is assigned by rounding down the delay
+      # and the remaining is assigned by rounding up the delay.
+      map_fn <- eval(
+        parse(
+          text = glue::glue(
+            "\\(.x, .y) {{
+              rbind(
+                dplyr::transmute(
+                  .x,
+                  \"date\" = .data$date + lubridate::days(floor(delay)),
+                  \"{name}\" = .data${name} * (1 - (delay %% 1))
+                ),
+                dplyr::transmute(
+                  .x,
+                  \"date\" = .data$date + lubridate::days(ceiling(delay)),
+                  \"{name}\" = .data${name} * (delay %% 1)
+                )
+              )
+            }}"
+          )
+        )
+      )
+
+      # Store the delays for later use
+      if (delay > 0) {
+        attr(map_fn, "delay") <- delay
+      }
 
       # Add observable to external mappings
       # (make the observable visible to $get_results())
       private$.parameters$model_output_to_observable <-
         modifyList(
           self %.% parameters %.% model_output_to_observable,
-
-          # We use a few combinations of tibble::lst, rlang::parse_expr and
-          # glue::glue to create a human readable, dynamically allocated mapping
-          # which accounts for the given delay
           tibble::lst(
             !!name := list(
-              "map" = eval(parse(text =
-                  glue::glue(
-                    "\\(.x, .y) {{
-                      rbind(
-                        dplyr::transmute(
-                          .x,
-                          \"date\" = .data$date + lubridate::days(floor(delay)),
-                          \"{name}\" = .data${name} * (1 - (delay %% 1))
-                        ),
-                        dplyr::transmute(
-                          .x,
-                          \"date\" = .data$date + lubridate::days(ceiling(delay)),
-                          \"{name}\" = .data${name} * (delay %% 1)
-                        )
-                      )
-                    }}"
-                  )
-              ))
+              "map" = map_fn
               # No reduce function implemented yet.
               # Must therefore be simply summarisable (i.e. by sum())
             )
