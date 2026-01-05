@@ -137,25 +137,31 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Overload the `$load_module()` to re-initialise the helpers after loading
+    #' @param module `r rd_module`
     #' @param ...
     #'   Arguments sent to parent method.
-    load_module = function(...) {
-      super$load_module(...)
+    load_module = function(module, ...) {
+      super$load_module(module, ...)
 
-      # Mark that model is not ready
-      private$ready <- FALSE
+      # DiseasyVariant can change the structure of the model which would
+      # require reconfiguration of the RHS function
+      if (inherits(module, "DiseasyVariant")) {
 
-      # Delete observable configurations and warn user
-      if (!purrr::every(private %.% observable_mapping, is.null)) {
-        pkgcond::pkg_warning("Module loaded - user-specified observable configurations deleted!")
+        # Mark that model is not ready
+        private$ready <- FALSE
 
-        # Remove configured observables
-        private$.parameters$model_output_to_observable[[self %.% model_outputs]] <- NULL
-        private$observable_mapping <- list("state_vector" = NULL, "infection_matrix" = NULL)
+        # Delete observable configurations and warn user
+        if (!purrr::every(private %.% observable_mapping, is.null)) {
+          pkgcond::pkg_warning("DiseasyVariant loaded - user-specified observable configurations deleted!")
+
+          # Remove user-configured observables
+          private$.parameters$model_output_to_observable[[self %.% model_outputs]] <- NULL
+          private$observable_mapping <- list("state_vector" = NULL, "infection_matrix" = NULL)
+        }
+
+        # Attempt to re-initialise helpers with the current inputs
+        tryCatch(self$prepare_rhs(), error = function(e) {})
       }
-
-      # Attempt to re-initialise helpers with the current inputs
-      tryCatch(self$prepare_rhs(), error = function(e) {})
     },
 
 

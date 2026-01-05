@@ -196,10 +196,23 @@ test_that("Loading modules resets user configured observables", {
     names(m %.% parameters %.% model_output_to_observable)
   )
 
-  # Loading module should produce warning
-  expect_warning(
+  # Loading activity module should produce no warning
+  expect_no_warning(
     m$load_module(activity),
-    "Module loaded - user-specified observable configurations deleted!"
+    message = "DiseasyActivity loaded - user-specified observable configurations deleted!"
+  )
+
+  # Configured observable should be in the set of observables
+  checkmate::expect_subset(
+    "test_observable",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+  # Loading variant module should produce warning
+  variant <- DiseasyVariant$new()
+  expect_warning(
+    m$load_module(variant),
+    regexp = "DiseasyVariant loaded - user-specified observable configurations deleted!"
   )
 
   # Configured observable should now be removed from set of observables
