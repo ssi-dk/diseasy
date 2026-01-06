@@ -327,7 +327,7 @@ DiseasyModel <- R6::R6Class(                                                    
 
         training_length <- purrr::pluck(self %.% parameters %.% training_length, "training", .default = 0)
 
-        # If training day is infinite, compute the max duration from `ds$min_start_date`
+        # If training length is infinite, compute the max duration from `ds$min_start_date`
         if (is.infinite(training_length)) {
           training_length <- as.numeric(
             lubridate::interval(

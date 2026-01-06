@@ -66,6 +66,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
+        # If the model uses testing and validation periods, add these to the prediction length
+        prediction_length <- prediction_length +
+          purrr::pluck(self %.% parameters %.% training_length, "testing", as.integer, .default = 0L) +
+          purrr::pluck(self %.% parameters %.% training_length, "validation", as.integer, .default = 0L)
+
         # Run the model to determine the raw rates (I*) at the maximal stratification in the model
         model_rates <- private %.% solve_ode(prediction_length = prediction_length)
 
@@ -86,11 +91,10 @@ DiseasyModelOde <- R6::R6Class(                                                 
           dplyr::select(!c("rate", "proportion"))
 
         # "Zero-pad" with observational data (necessary for maps with delays)
-        observations <- self %.% observables %.% get_observation(
+        observations <- self %.% get_data(
           observable = self %.% parameters %.% incidence_feature_name,
           stratification = private %.% model_stratification(),
-          start_date = self %.% training_period %.% start,
-          end_date = self %.% observables %.% last_queryable_date
+          period = "training"
         ) |>
           dplyr::left_join(population_data, by = "age_group") |>
           dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name) |>
@@ -128,8 +132,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Truncate the prediction to the requested period (necessary for maps with delays)
         prediction <- prediction |>
           dplyr::filter(
-            .data$date > self %.% observables %.% last_queryable_date,
-            .data$date <= self %.% observables %.% last_queryable_date + lubridate::days(prediction_length)
+            .data$date > self %.% training_period %.% end,
+            .data$date <= self %.% training_period %.% end + lubridate::days(prediction_length)
           )
 
         # Add realisation_id and weight
@@ -263,9 +267,9 @@ DiseasyModelOde <- R6::R6Class(                                                 
             cex.lab = 1.25
           )
 
-          # Plot the data cut-off
+          # Plot the training period end
           abline(
-            v = self %.% observables %.% last_queryable_date,
+            v = self %.% training_period %.% end,
             col = "grey20",
             lty = "dashed",
             lwd = 2
@@ -369,7 +373,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         model_rates <- sol_long |>
           dplyr::filter(.data$state == "I1") |>
           dplyr::mutate(
-            "date" = .data$time + self %.% observables %.% last_queryable_date,
+            "date" = .data$time + self %.% training_period %.% end,
             .before = dplyr::everything()
           ) |>
           dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter

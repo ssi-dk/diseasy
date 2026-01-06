@@ -542,10 +542,14 @@ ggplot2::ggplot() +
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
 x <- m$get_results(observable = "incidence", prediction_length = 50)
-y <- m$get_data(
-  observable = "incidence", prediction_length = 50, period = "plotting"
-) |>
-  dplyr::filter(.data$t > 0)
+y <- dplyr::setdiff(
+  model$get_data(
+    observable = "incidence", prediction_length = 60, period = "plotting"
+  ),
+  model$get_data(
+    observable = "incidence", period = "training"
+  )
+)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
     purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.4)
