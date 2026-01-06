@@ -276,25 +276,61 @@ DiseasyModelRegression <- R6::R6Class(                                          
             pch = 16
           )
 
-          # Plot the data cut-off
+          # Plot the training period end
           abline(
-            v = self %.% observables %.% last_queryable_date,
+            v = self %.% training_period %.% end,
             col = "grey20",
             lty = "dashed",
             lwd = 2
+          )
+
+          # Plot the testing period end
+          if (purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0) {
+            abline(
+              v = self %.% testing_period %.% end,
+              col = "grey20",
+              lty = "dotdash",
+              lwd = 2
+            )
+          }
+
+          # Plot the validation period end
+          if (purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0) {
+            abline(
+              v = self %.% validation_period %.% end,
+              col = "grey20",
+              lty = "dotted",
+              lwd = 2
+            )
+          }
+
+          # Plot the predictions
+          lines(
+            preds[["date"]],
+            preds[[observable]],
+            col = colour,
+            lwd = 4
           )
 
           # Ensure axis is visible
           box()
 
           # Add legend
+          mask <- c(
+            TRUE,
+            TRUE,
+            purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0,
+            purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0,
+            TRUE
+          )
+
           legend(
             "topleft",
-            legend = c("Observations", "Training cut-off", "Model"),
-            col = c("grey20", "grey20", colour),
-            lty = c(NA,       "dashed", "solid"),
-            pch = c(16,       NA,       NA),
-            lwd = c(NA,       2,        4),
+            legend = c("Observations", "Training cut-off", "Testing cut-off", "Validation cut-off", "Model")[mask],
+            col = c("grey20", "grey20", "grey20", "grey20", colour)[mask],
+            lty = c(NA, "dashed", "dotdash", "dotted", "solid")[mask],
+            pch = c(16, NA, NA, NA, NA)[mask],
+            lwd = c(NA, 2, 2, 2, 4)[mask],
             inset = c(0, 0),
             xpd = TRUE,
             bg = "white"
