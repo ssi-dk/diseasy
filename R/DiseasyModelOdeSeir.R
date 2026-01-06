@@ -904,6 +904,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ) |>
         purrr::list_rbind()
 
+
+      # Check initial state vector is well-formed
+      checkmate::assert_numeric(initial_state_vector$initial_condition, lower = 0, any.missing = FALSE)
+
       return(invisible(rbind(initial_state_vector, initial_surveillance_vector)))
     },
 
