@@ -544,7 +544,7 @@ ggplot2::ggplot() +
 x <- m$get_results(observable = "incidence", prediction_length = 50)
 y <- dplyr::setdiff(
   m$get_data(
-    observable = "incidence", prediction_length = 60, period = "plotting"
+    observable = "incidence", prediction_length = 50, period = "plotting"
   ),
   m$get_data(
     observable = "incidence", period = "training"
