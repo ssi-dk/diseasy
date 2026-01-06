@@ -135,7 +135,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
             ~ {
               prototype_data |>
                 dplyr::mutate(
-                  "t" = as.numeric(.x - self %.% observables %.% last_queryable_date),
+                  "t" = as.numeric(.x - self %.% training_period %.% end),
                   "date" = .x
                 )
             }
