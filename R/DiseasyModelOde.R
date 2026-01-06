@@ -275,7 +275,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
             lwd = 2
           )
 
-          # Plot the training period end
+          # Plot the testing period end
           if (purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0) {
             abline(
               v = self %.% testing_period %.% end,
@@ -285,7 +285,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
             )
           }
 
-          # Plot the training period end
+          # Plot the validation period end
           if (purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0) {
             abline(
               v = self %.% validation_period %.% end,
