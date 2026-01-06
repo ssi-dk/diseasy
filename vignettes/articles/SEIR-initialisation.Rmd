@@ -543,7 +543,7 @@ ggplot2::ggplot() +
 # - when not, we get informed by an error
 x <- m$get_results(observable = "incidence", prediction_length = 50)
 y <- m$get_data(
-  observable = "incidence", prediction_length = 60, period = "plotting"
+  observable = "incidence", prediction_length = 50, period = "plotting"
 ) |>
   dplyr::filter(.data$t > 0)
 stopifnot(
