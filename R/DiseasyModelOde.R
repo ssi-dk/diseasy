@@ -275,6 +275,26 @@ DiseasyModelOde <- R6::R6Class(                                                 
             lwd = 2
           )
 
+          # Plot the training period end
+          if (purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0) {
+            abline(
+              v = self %.% testing_period %.% end,
+              col = "grey20",
+              lty = "dotdash",
+              lwd = 2
+            )
+          }
+
+          # Plot the training period end
+          if (purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0) {
+            abline(
+              v = self %.% validation_period %.% end,
+              col = "grey20",
+              lty = "dotted",
+              lwd = 2
+            )
+          }
+
           # Plot the predictions
           lines(
             preds[["date"]],
@@ -284,13 +304,21 @@ DiseasyModelOde <- R6::R6Class(                                                 
           )
 
           # Add legend
+          mask <- c(
+            TRUE,
+            TRUE,
+            purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0,
+            purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0,
+            TRUE
+          )
+
           legend(
             "topleft",
-            legend = c("Observations", "Training cut-off", "Model"),
-            col = c("grey20", "grey20", colour),
-            lty = c(NA,       "dashed", "solid"),
-            pch = c(16,       NA,       NA),
-            lwd = c(NA,       2,        4),
+            legend = c("Observations", "Training cut-off", "Testing cut-off", "Validation cut-off", "Model")[mask],
+            col = c("grey20", "grey20", "grey20", "grey20", colour)[mask],
+            lty = c(NA, "dashed", "dotdash", "dotted", "solid")[mask],
+            pch = c(16, NA, NA, NA, NA)[mask],
+            lwd = c(NA, 2, 2, 2, 4)[mask],
             inset = c(0, 0),
             xpd = TRUE,
             bg = "white"
