@@ -230,7 +230,7 @@ DiseasyModel <- R6::R6Class(                                                    
       ) |>
         dplyr::mutate(
           t = lubridate::interval(
-            !!self %.% observables %.% last_queryable_date,
+            !!self %.% training_period %.% end,
             as.Date(date)
           ) / lubridate::days(1)
         )
