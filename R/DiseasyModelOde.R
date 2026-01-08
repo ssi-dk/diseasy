@@ -122,7 +122,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           purrr::pluck(observable, "reduce", .default = ~ sum(.))
 
         # Map model incidence to the requested observable
-        prediction <- model_output |>
+        prediction <- data |>
           dplyr::group_by(
             dplyr::across(!c("date", "n_infected", dplyr::all_of(self %.% model_outputs), "population"))
           ) |>
@@ -357,21 +357,6 @@ DiseasyModelOde <- R6::R6Class(                                                 
           times = seq(from = 1, to = prediction_length + 1, by = 1),
           func = self$rhs
         )
-
-        # Add the solution initialisation submodel to "pad" the solution with
-        # data for the observables with delays
-        y0 <- c(
-          rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
-          private %.% population_proportion # S states
-        )
-
-        sol_pad <- deSolve::ode(
-          y = y0,
-          times = rev(seq(from = 0, to = min(incidence_data$date) - self %.% training_period %.% end)),
-          func = private %.% initialisation_submodel %.% rhs
-        )
-
-        sol <- rbind(sol_pad, sol)
 
         # Improve the names of the output
         colnames(sol) <- c(
