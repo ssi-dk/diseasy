@@ -87,42 +87,13 @@ DiseasyModelOde <- R6::R6Class(                                                 
           dplyr::select(!c("rate", "proportion")) |>
           tidyr::pivot_wider(names_from = "state", values_from = "value")
 
-        # "Zero-pad" with observational data (necessary for maps with delays)
-        observations <- self %.% observables %.% get_observation(
-          observable = self %.% parameters %.% incidence_feature_name,
-          stratification = private %.% model_stratification(),
-          start_date = self %.% training_period %.% start,
-          end_date = self %.% observables %.% last_queryable_date
-        ) |>
-          dplyr::left_join(population_data, by = "age_group") |>
-          dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name) |>
-          dplyr::mutate("n_infected" = .data$incidence * .data$population) |>
-          dplyr::select(dplyr::any_of(colnames(model_output)))
-
-        # Add NAs to observations for each configured observable in the model
-        # (i.e. non-n_infected observable)
-        if (!is.null(self %.% model_outputs)) {
-          observations <- observations |>
-            dplyr::cross_join(
-              purrr::reduce(
-                purrr::map(self %.% model_outputs, ~ tibble::tibble(!!. := NA)),
-                dplyr::cross_join,
-                .init = data.frame()
-              )
-            )
-        }
-
-        # Combine to single data object
-        data <- rbind(observations, model_output)
-
-
         # Retrieve the map / reduce functions for the observable
         map_fn <- purrr::pluck(self %.% parameters %.% model_output_to_observable, observable, "map")
         reduce_fn <- self %.% parameters %.% model_output_to_observable |>
           purrr::pluck(observable, "reduce", .default = ~ sum(.))
 
         # Map model incidence to the requested observable
-        prediction <- data |>
+        prediction <- model_output |>
           dplyr::group_by(
             dplyr::across(!c("date", "n_infected", dplyr::all_of(self %.% model_outputs), "population"))
           ) |>
@@ -346,15 +317,16 @@ DiseasyModelOde <- R6::R6Class(                                                 
           )
 
         # Infer the initial state vector
-        psi <- self$initialise_state_vector(incidence_data)
+        psi <- self$initialise_state_vector(incidence_data) |>
+          dplyr::filter(.data$time == 0) # psi also contains history for the output states
 
         # The model has a configured right-hand-side function that
         # can be used to simulate the model in conjunction with `deSolve`.
         # Custom observables computes from differences of integrating states,
         # we need to solve for 1 additional day
         sol <- deSolve::ode(
-          y = psi$initial_condition,
-          times = seq(from = 1, to = prediction_length + 1, by = 1),
+          y = psi$value,
+          times = seq(from = 0, to = prediction_length + 1, by = 1),
           func = self$rhs
         )
 
@@ -384,9 +356,16 @@ DiseasyModelOde <- R6::R6Class(                                                 
             )
           )
 
+        # Add the history for the output states
+        sol_long <- rbind(
+          sol_long,
+          self$initialise_state_vector(incidence_data) |>
+            dplyr::filter(.data$time < 0)
+        )
+
         # Extract rates for the I1-exit (= n_infected) and each configured
         # observable.
-        # Custom observables computes from differerences of integrating states
+        # Custom observables computes from differences of integrating states
         model_rates <- sol_long |>
           dplyr::filter(.data$state %in% c("I1", self %.% model_outputs)) |>
           dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter

@@ -351,8 +351,10 @@ If \code{ei_rs_balance = 0}, the estimate for RS states are prioritised.
 }
 
 \subsection{Returns}{
-(\code{numeric()})\cr
-The initial state vector for the model (invisibly).
+(\code{data.frame()})\cr
+The initialised state vector for the model.
+NOTE: the output includes the complete state for \code{time = 0} and additional
+history (\code{time < 0}) for some states (to allow observables with time-delays).
 }
 }
 \if{html}{\out{<hr>}}

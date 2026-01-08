@@ -480,8 +480,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   - `eigen-value`: Uses the eigenvalues of the generator matrix to infer the state vector.
     #'
     #'   See the article `SEIR-initialisation` in the online documentation for more information.
-    #' @return (`numeric()`)\cr
-    #'   The initial state vector for the model (invisibly).
+    #' @return (`data.frame()`)\cr
+    #'   The initialised state vector for the model.
+    #'   NOTE: the output includes the complete state for `time = 0` and additional
+    #'   history (`time < 0`) for some states (to allow observables with time-delays).
     #' @importFrom tidyr expand_grid
     initialise_state_vector = function(
       incidence_data,
@@ -489,6 +491,24 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ei_rs_balance = 1,
       method = c("derivative", "eigen-value")
     ) {
+      # This method is quite long and complicated since initialisation of ODE
+      # models is complicated. To help describe what is being done in this
+      # method, we also supply the "SEIR: initialisation" article which should
+      # be read beforehand.
+      # In brief, the method estimates the state vector from user-supplied
+      # incidence data in a few steps:
+      # 1) The numerical time-derivatives of the incidence is used to infer the
+      # E and I states in the state vector at t = 0
+      # 2) A "submodel" is created which uses the incidence data to directly
+      # drive the dynamics in the model, which is used to infer the R and S
+      # states in the state vector at t = 0
+      # 3) In addition, if the user has configured custom output in the ODE
+      # model, a number of states are attached to the end of the state-vector
+      # to measure/monitor/compute these outputs and the submodel is used to
+      # extract the states for t < 0
+      # 4) Finally, the user-supplied incidence is used to infer the I1 state
+      # for t < 0.
+
       method <- match.arg(method)
 
       coll <- checkmate::makeAssertCollection()
@@ -564,8 +584,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We first compute the time relative to the training period end date
       incidence_data <- incidence_data |>
-        dplyr::mutate("t" = as.numeric(.data$date - self %.% training_period %.% end, units = "days")) |>
-        dplyr::filter(.data$t <= 0)
+        dplyr::mutate("time" = as.numeric(.data$date - self %.% training_period %.% end, units = "days")) |>
+        dplyr::filter(.data$time <= 0)
 
       # Now we need to fit the polynomials to each age-group / variant in the model, so we group by these
       # and extract the subsets.
@@ -585,7 +605,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           ~ {
             stats::lm(
               incidence ~ poly(t, polynomial_order, raw = TRUE),
-              data = dplyr::filter(., - polynomial_training_length < .data$t, .data$t <= 0)
+              data = dplyr::filter(., - polynomial_training_length < .data$time, .data$time <= 0)
             )
           }
         )
@@ -662,7 +682,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
                 purrr::map_chr(seq_len(K), ~ paste0("E", .)),
                 purrr::map_chr(seq_len(L), ~ paste0("I", .))
               ),
-              "initial_condition" = pmax(0, c(E_k, I_l))
+              "value" = pmax(0, c(E_k, I_l))
             )
           )
         }
@@ -670,22 +690,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         purrr::list_rbind()
 
       # Report negative values
-      if (purrr::some(estimated_exposed_infected_states$initial_condition, ~ . < 0)) {
+      if (purrr::some(estimated_exposed_infected_states$value, ~ . < 0)) {
         message("Negative values in estimated exposed and infected states. Setting to zero.")
 
         estimated_exposed_infected_states <- estimated_exposed_infected_states |>
-          dplyr::mutate("initial_condition" = pmax(0, .data$initial_condition))
+          dplyr::mutate("value" = pmax(0, .data$value))
       }
 
       # Impute zeros for missing states
       estimated_exposed_infected_states <- tidyr::expand_grid(
+        "time" = 0,
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
           purrr::map_chr(seq_len(L), ~ paste0("I", .))
         ),
-        "initial_condition" = 0
+        "value" = 0
       ) |>
         dplyr::rows_update(estimated_exposed_infected_states, by = c("variant", "age_group", "state"))
 
@@ -703,6 +724,43 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       disease_progression_rates <- self %.% parameters %.% disease_progression_rates |>
         purrr::keep_at("I") * self %.% parameters %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
 
+      # Define a modified list of model parameters
+      parameters <- modifyList(
+        self %.% parameters,
+        list(
+          # Replace structural parameters with the reduced set
+          "compartment_structure" = compartment_structure,
+          "disease_progression_rates" = disease_progression_rates,
+          "overall_infection_risk" = self %.% parameters %.% overall_infection_risk *
+            self %.% malthusian_scaling_factor,
+
+          # Since we have different disease_progression_rates, we cannot directly match growth rates
+          "malthusian_matching" = FALSE
+        )
+      )
+
+      # Remove the outputs generated from `$configure_observable()`
+      # I would do this with utils::modifyList(), but since R is not a real
+      # programming language, this just does not work for nested lists.
+      # compare:
+      # modifyList(list("A" = 2), list("A" = 1)) # Works!
+      # modifyList(list("A" = list(2)), list("A" = list(1))) # Does not work???
+      # Also, it is apparently too much to ask for that we can simply replace a
+      # list with another list.
+      # No, simple indexing in R is not allowed
+      # and we get some janky slop instead for reasons^tm.
+      # Example:
+      # t <- list("A" = list(1, 2, 3))
+      # t["A"] <- list(1, 2) # Produces warning???
+      # t[["A"]] <- list(1, 2) # Works without warning.
+      # Lesson: `$` and `[` operators cannot be trusted and we need to write
+      # cumbersome unreadable code with `[[` in R to get somewhat useful results
+      # So that is just great, another operator in R that we cannot trust.
+      parameters[["model_output_to_observable"]] <- purrr::pluck(
+        private %.% default_parameters(),
+        "model_output_to_observable"
+      )
+
       # Generate the reduced model
       private$initialisation_submodel <- DiseasyModelOdeSeir$new(
         observables = self %.% observables,
@@ -710,18 +768,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         variant = self %.% variant,
         season = self %.% season,
         immunity = self %.% immunity,
-        parameters = modifyList(
-          self %.% parameters,
-          list( # ... but since we can scale the overall_infection_risk to achieve the same effect.
-            "compartment_structure" = compartment_structure,
-            "disease_progression_rates" = disease_progression_rates,
-            "overall_infection_risk" = self %.% parameters %.% overall_infection_risk *
-              self %.% malthusian_scaling_factor,
-            "malthusian_matching" = FALSE # Since we have different disease_progression_rates, we cannot directly match
-          )
-        )
+        parameters = parameters
       )
-
 
       # Approximate the signal within each group
       # .. and ensure we have a signal for each group in the model
@@ -731,8 +779,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           to = self %.% training_period %.% end,
           by = "1 day"
         ),
-        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
-        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
+        "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
+        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)
       ) |>
         dplyr::left_join(incidence_data, by = c("date", "age_group", "variant")) |>
         dplyr::group_by(.data$variant, .data$age_group) |>
@@ -803,42 +851,83 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
 
+      # Copy the configured observables from the main model to the initialisation submodel
+      if (!is.null(private %.% observable_mapping %.% state_vector)) {
+        purrr::walk2(
+          .x = private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_EIR_states), drop = FALSE] |>
+            t() |>
+            as.data.frame() |>
+            as.list(),
+          .y = attr(private %.% observable_mapping %.% state_vector, "name"),
+          .f = ~ private %.% initialisation_submodel %.% configure_observable(
+            weights = .x,
+            name = .y,
+            derived_from = "state_vector"
+          )
+        )
+      }
+
+      if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
+        purrr::walk2(
+          .x = private %.% observable_mapping %.% infection_matrix |>
+            t() |>
+            as.data.frame() |>
+            as.list(),
+          .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
+          .f = ~ private %.% initialisation_submodel %.% configure_observable(
+            weights = .x,
+            name = .y,
+            derived_from = "infection_matrix"
+          )
+        )
+      }
+
+      # Ensure RHS is initialised
+      private %.% initialisation_submodel %.% prepare_rhs()
+
       # Run the simulation forward to estimate the R and S states
       y0 <- c(
         rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
-        private %.% population_proportion # S states
+        private %.% population_proportion, # S states
+        rep(0, length(self %.% model_outputs)) # Surveillance states
+      )
+
+      times <- seq(
+        from = - length(
+          seq.Date(from = self %.% training_period %.% start, to = self %.% training_period %.% end, by = "1 day")
+        ) + 1,
+        to = 0,
+        by = 1
       )
 
       sol <- deSolve::ode(
         y = y0,
-        times = rev(seq(from = 0, to = min(incidence_data$date) - self %.% training_period %.% end)),
+        times = times,
         func = private %.% initialisation_submodel %.% rhs,
         parms = list("overall_infection_risk" = overall_infection_risk)
       )
 
-
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
+        "time" = 0,
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
         "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
         "state" = paste0("R", seq.int(self %.% parameters %.% compartment_structure %.% R))
       ) |>
         dplyr::add_row(
+          "time" = 0,
           "variant" = NA,
           "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
           "state" = "S"
         ) |>
-        dplyr::mutate(
-          "initial_condition" = sol[nrow(sol), rs_state_indices + 1]
-        )
+        dplyr::mutate("value" = sol[nrow(sol), rs_state_indices + 1])
 
       # Report negative values
-      if (purrr::some(estimated_recovered_susceptible_states$initial_condition, ~ . < 0)) {
+      if (purrr::some(estimated_recovered_susceptible_states$value, ~ . < 0)) {
         warning("Negative values in estimated recovered and susceptible states. Setting to zero.", call. = FALSE)
         estimated_recovered_susceptible_states <- estimated_recovered_susceptible_states |>
-          dplyr::mutate("initial_condition" = pmax(0, .data$initial_condition))
+          dplyr::mutate("value" = pmax(0, .data$value))
       }
-
 
       # Combine to single output
       initial_state_vector <- dplyr::union_all(
@@ -856,59 +945,102 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             startsWith(.data$state, "I") ~ 1 - ei_rs_balance,
             startsWith(.data$state, "R") ~ ei_rs_balance,
             startsWith(.data$state, "S") ~ ei_rs_balance
-          ) * .data$initial_condition,
-          "initial_condition" = .data$initial_condition +
-            .data$weight * (1 - sum(.data$initial_condition)) / sum(.data$weight)
+          ) * .data$value,
+          "value" = .data$value +
+            .data$weight * (1 - sum(.data$value)) / sum(.data$weight)
         ) |>
         dplyr::select(!"weight")
 
-
-      # Pad with zeros for each configured observable
-
-      # First, determine which age groups / variants are being targeted by
-      # infection matrix observables
-      groups_infection_matrix <- lapply( # Extract each row to list
-        seq_len(purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0)),
-        function(i) private$observable_mapping$infection_matrix[i, ]
-      ) |>
-        purrr::map(~ which(. > 0)) |>
-        purrr::map(~ private %.% rs_state_indices[.])
-
-      # Add with the groups being targeted by state_vector observables
-      groups_state_vector <- lapply( # Extract each row to list
-        seq_len(purrr::pluck(private %.% observable_mapping %.% state_vector, nrow, .default = 0)),
-        function(i) private$observable_mapping$state_vector[i, ]
-      ) |>
-        purrr::map(~ which(. > 0))
-
-      # Combine
-      groups <- c(
-        groups_infection_matrix,
-        groups_state_vector
-      )
-
-      # Extract groups from initial_state_vector
-      initial_surveillance_vector <- groups |>
-        purrr::map(~ initial_state_vector[., ]) |>
-        purrr::map(~ dplyr::select(., !c("state", "initial_condition"))) |>
-        purrr::map(
-          ~ dplyr::filter(., dplyr::if_all(dplyr::everything(), ~!is.na(.)))
-        ) |>
-        purrr::map(~ dplyr::distinct(.))
-
-      # Set names and start each state at zero
-      initial_surveillance_vector <- initial_surveillance_vector |>
-        purrr::map2(
-          self %.% model_outputs,
-          ~ dplyr::mutate(.x, "state" = !!.y, "initial_condition" = 0)
-        ) |>
-        purrr::list_rbind()
-
-
       # Check initial state vector is well-formed
-      checkmate::assert_numeric(initial_state_vector$initial_condition, lower = 0, any.missing = FALSE)
+      checkmate::assert_numeric(initial_state_vector$value, lower = 0, any.missing = FALSE)
 
-      return(invisible(rbind(initial_state_vector, initial_surveillance_vector)))
+
+      # Add the history for the surveillance states
+      if (length(self %.% model_outputs) > 0) {
+
+        # We must first determine which variant and age_group each observable measures
+        # That is. we determine which age groups / variants are being targeted by infection matrix observables
+        groups_infection_matrix <- lapply( # Extract each row to list
+          seq_len(purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0)),
+          function(i) private$observable_mapping$infection_matrix[i, ]
+        ) |>
+          purrr::map(~ which(. > 0)) |>
+          purrr::map(~ private %.% rs_state_indices[.])
+
+        # .. and the groups being targeted by state_vector observables
+        groups_state_vector <- lapply( # Extract each row to list
+          seq_len(purrr::pluck(private %.% observable_mapping %.% state_vector, nrow, .default = 0)),
+          function(i) private$observable_mapping$state_vector[i, ]
+        ) |>
+          purrr::map(~ which(. > 0))
+
+        # Combine
+        # (We now have the list of indices involved for each output)
+        groups <- c(
+          groups_infection_matrix,
+          groups_state_vector
+        )
+
+        # Extract groups from the initial_state_vector
+        groups <- groups |>
+          purrr::map(~ initial_state_vector[., ]) |>
+          purrr::map(~ dplyr::select(., !c("state", "value"))) |>
+          purrr::map(
+            ~ dplyr::filter(., dplyr::if_all(dplyr::everything(), ~!is.na(.)))
+          ) |>
+          purrr::map(~ dplyr::distinct(.))
+
+        # Ensure groups are unique
+        if (max(purrr::map_dbl(groups, nrow)) > 1) {
+          pkgcond::pkg_error("Configured observables are not isolated to single `age_group` and `variant`!")
+        }
+
+        # Collapse and name groups
+        groups <- groups |>
+          purrr::map2(self %.% model_outputs, ~ dplyr::mutate(.x, "state" = .y)) |>
+          purrr::list_rbind() |>
+          dplyr::select(!"time")
+
+        # Pull the full solution from the initialisation submodel for the surveillance_states
+        # (These are located at the end of the state_vector)
+        surveillance_indices <- private %.% n_states -
+          private %.% n_age_groups * private %.% n_variants + # Remember, we have 1 less I state in the submodel
+          seq_along(self %.% model_outputs)
+
+        s <- sol[, c(1, surveillance_indices)] # Extract solution for surveillance states
+        colnames(s) <- c("time", self %.% model_outputs)
+
+        estimated_surveillance_states <- s |>
+          as.data.frame() |>
+          tidyr::pivot_longer(
+            !"time",
+            "names_to" = "state",
+            "values_to" = "value"
+          )
+
+        estimated_surveillance_states <- estimated_surveillance_states |>
+          dplyr::left_join(groups, by = c("state")) |>
+          dplyr::select(c("time", "variant", "age_group", "state", "value"))
+
+        initial_state_vector <- rbind(initial_state_vector, estimated_surveillance_states)
+      }
+
+      # Impute the solution for I1 for (t < 0)
+      estimated_I1_history <- dplyr::cross_join(
+        tibble::tibble("time" = times[times < 0]),
+        tidyr::expand_grid(
+          "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
+          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)
+        ) |>
+          dplyr::mutate(
+            "state" = "I1",
+            "f" = signal_approximations
+          )
+      ) |>
+        dplyr::mutate("value" = purrr::map2_dbl(.data$f, .data$time, ~ .x(.y)) / ri) |>
+        dplyr::select(!"f")
+
+      return(invisible(rbind(initial_state_vector, estimated_I1_history)))
     },
 
 
@@ -1050,7 +1182,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ),
         add = coll
       )
-      checkmate::assert_numeric(delay, add = coll)
+      checkmate::assert_numeric(delay, lower = 0, add = coll)
+      if (delay > 0 && derived_from == "state_vector") {
+        coll$push("`delay` can only be set for observables derived from `infection_matrix`")
+      }
       checkmate::reportAssertions(coll)
 
       # Mark RHS as un-ready
