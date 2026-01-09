@@ -116,7 +116,8 @@ tidyr::expand_grid(
       m$configure_observable(
         weights = weights_infection_matrix,
         name = "n_infected_infection_matrix",
-        derived_from = "infection_matrix"
+        derived_from = "infection_matrix",
+        delay = 1 / (rI * L) # Delay by 1 I state
       )
 
 
