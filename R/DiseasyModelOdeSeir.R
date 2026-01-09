@@ -740,22 +740,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Remove the outputs generated from `$configure_observable()`
-      # I would do this with utils::modifyList(), but since R is not a real
-      # programming language, this just does not work for nested lists.
+      # I would do this with utils::modifyList(), this does not work for nested lists.
       # compare:
       # modifyList(list("A" = 2), list("A" = 1)) # Works!
       # modifyList(list("A" = list(2)), list("A" = list(1))) # Does not work???
-      # Also, it is apparently too much to ask for that we can simply replace a
-      # list with another list.
-      # No, simple indexing in R is not allowed
-      # and we get some janky slop instead for reasons^tm.
+
+      # Also we need special care to overwrite the value in the list for reasons^tm.
       # Example:
       # t <- list("A" = list(1, 2, 3))
       # t["A"] <- list(1, 2) # Produces warning???
       # t[["A"]] <- list(1, 2) # Works without warning.
-      # Lesson: `$` and `[` operators cannot be trusted and we need to write
-      # cumbersome unreadable code with `[[` in R to get somewhat useful results
-      # So that is just great, another operator in R that we cannot trust.
       parameters[["model_output_to_observable"]] <- purrr::pluck(
         private %.% default_parameters(),
         "model_output_to_observable"
