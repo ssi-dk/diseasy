@@ -464,7 +464,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_data_frame(incidence_data, add = coll)
       checkmate::assert_names(
         colnames(incidence_data),
-        must.include = c("date", "t", "incidence"),
+        must.include = c("date", "incidence"),
         add = coll
       )
 
@@ -505,9 +505,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Check date column
       checkmate::assert_date(incidence_data$date, any.missing = FALSE, add = coll)
 
-      # Check t column
-      checkmate::assert_numeric(incidence_data$t, any.missing = FALSE, add = coll)
-
       # Check incidence column
       checkmate::assert_numeric(incidence_data$incidence, lower = 0, upper = 1, any.missing = FALSE, add = coll)
 
@@ -533,7 +530,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         dplyr::select(!"proportion")
 
       # We first compute the time relative to the training period end date
-      incidence_data <- dplyr::filter(incidence_data, .data$t <= 0)
+      incidence_data <- incidence_data |>
+        dplyr::mutate("t" = as.numeric(.data$date - self %.% training_period %.% end, units = "days")) |>
+        dplyr::filter(.data$t <= 0)
 
       # Now we need to fit the polynomials to each age-group / variant in the model, so we group by these
       # and extract the subsets.
