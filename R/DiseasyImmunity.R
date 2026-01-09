@@ -611,10 +611,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
               ## Penalise spread of gamma and delta
 
               # Compute sd of equidistant gamma
-              sd_0_gamma <- sd(seq(from = self$model[[model_id]](0), to = gamma[M], length.out = M))
+              gamma_eq <- seq(from = self$model[[model_id]](0), to = gamma[M], length.out = M)
 
               # Compute penalty spread of gamma and delta
-              gamma_penalty <- ifelse(length(gamma) > 1, abs(sd(gamma) - sd_0_gamma), 0)
+              gamma_penalty <- ifelse(length(gamma) > 1, sd(gamma - gamma_eq), 0)
               delta_penalty <- ifelse(length(delta) > 1, sd(delta), 0)
 
               penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)
