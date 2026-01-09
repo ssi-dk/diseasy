@@ -281,7 +281,7 @@
     },
     {
       "package": "gert",
-      "version": "2.2.0",
+      "version": "2.3.0",
       "binary": true
     },
     {
@@ -411,7 +411,7 @@
     },
     {
       "package": "later",
-      "version": "1.4.4",
+      "version": "1.4.5",
       "binary": true
     },
     {
@@ -431,7 +431,7 @@
     },
     {
       "package": "lifecycle",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "binary": true
     },
     {
@@ -546,7 +546,7 @@
     },
     {
       "package": "parallelly",
-      "version": "1.46.0",
+      "version": "1.46.1",
       "binary": true
     },
     {
@@ -766,7 +766,7 @@
     },
     {
       "package": "SCDB",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "binary": true
     },
     {
