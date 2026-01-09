@@ -221,9 +221,9 @@ existing_results <- function(M, monotonous, individual_level) {                 
 path <- devtools::package_file("data-raw/diseasy_immunity_optimiser_results/")
 cache <- cachem::cache_disk(dir = path, max_size = Inf)
 
-for (penalty in c(0, 1)) {
-  monotonous <- penalty
-  individual_level <- penalty
+for (penalty in c(0, 0.5, 1)) {
+  monotonous <- ceiling(penalty)
+  individual_level <- floor(penalty)
 
   closeAllConnections()
 
@@ -333,7 +333,7 @@ for (penalty in c(0, 1)) {
     message(glue::glue("M = {M}"))
 
     # Remove existing computations
-    candidates <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
+    candidates_needing_compute <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
 
     # Compute new/missing runs
     combinations <- tidyr::expand_grid(
@@ -351,7 +351,7 @@ for (penalty in c(0, 1)) {
         delim = "-",
         names = c("method", "strategy")
       ) |>
-      dplyr::inner_join(candidates, by = c("optim_method", "target_label", "method", "strategy")) |>
+      dplyr::inner_join(candidates_needing_compute, by = c("optim_method", "target_label", "method", "strategy")) |>
       dplyr::left_join(optim_configs, by = "optim_method")
 
     # Run the approximations for the round
@@ -446,7 +446,7 @@ results <- list.files(path) |>
           !!file,
           r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
         ),
-        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}")
+        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}") + 0.5 * stringr::str_detect(!!file, r"{-1-0-[0-9]+.rds}")
       )
   }) |>
   purrr::list_rbind() |>
@@ -493,7 +493,8 @@ should_have_been_eliminated <- results |>
 
 if (nrow(should_have_been_eliminated) > 0) {
   cat("should_have_been_eliminated")
-  print(should_have_been_eliminated)
+  print(dplyr::select(should_have_been_eliminated, !c("target", "variation", "target_label")))
+  print(dplyr::count(should_have_been_eliminated, method, strategy, penalty))
 }
 
 results <- dplyr::anti_join(
@@ -513,7 +514,8 @@ should_not_have_been_eliminated <- results |>
 
 if (nrow(should_not_have_been_eliminated) > 0) {
   cat("should_not_have_been_eliminated")
-  print(should_not_have_been_eliminated)
+  print(dplyr::select(should_not_have_been_eliminated, !c("target", "variation", "target_label")))
+  print(dplyr::count(should_not_have_been_eliminated, method, strategy, penalty))
 }
 
 # Re-arrange the columns
