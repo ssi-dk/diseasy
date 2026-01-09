@@ -50,6 +50,88 @@ model_names <- c(paste0(names(f), "-0"), paste0(names(f), "-c"), paste0(names(f)
 time_scales <- c(rep(20, length(f)), rep(20, length(g)), rep(40, length(h)))
 
 
+# Set the optimiser configurations to test
+optim_configs <- tibble::tibble(
+  config = list(
+    # stats::optim algorithms:
+    list("optim_method" = "Nelder-Mead"),
+    list("optim_method" = "BFGS"),
+    list("optim_method" = "CG"),
+
+    # stats algorithms:
+    list("optim_method" = "nlm"),
+    list("optim_method" = "nlminb"),
+
+    # nloptr algorithms:
+    list("optim_method" = "auglag", "localsolver" = "COBYLA"),
+    list("optim_method" = "auglag", "localsolver" = "LBFGS"),
+    list("optim_method" = "auglag", "localsolver" = "MMA"),
+    list("optim_method" = "auglag", "localsolver" = "SLSQP"),
+    list("optim_method" = "bobyqa"),
+    list("optim_method" = "ccsaq"),
+    list("optim_method" = "cobyla"),
+    #list("optim_method" = "crs2lm"), # Random search
+    #list("optim_method" = "direct"),  # Needs lower/upper bounds
+    #list("optim_method" = "directL"), # Needs lower/upper bounds
+    list("optim_method" = "lbfgs"),
+    list("optim_method" = "mma"),
+    list("optim_method" = "neldermead"),
+    list("optim_method" = "newuoa"),
+    list("optim_method" = "sbplx"),
+    list("optim_method" = "slsqp"),
+    #list("optim_method" = "stogo"), # Random search
+    list("optim_method" = "tnewton"),
+    list("optim_method" = "varmetric"),
+
+
+    # optimx algorithms:
+    list("optim_method" = "lbfgsb3c"),
+    list("optim_method" = "Rcgmin"),
+    list("optim_method" = "Rtnmin"),
+    list("optim_method" = "Rvmmin"),
+    #list("optim_method" = "snewton"), # Needs gradient/Hessian
+    #list("optim_method" = "snewtonm"), # Needs gradient/Hessian
+    list("optim_method" = "spg"),
+    list("optim_method" = "ucminf"),
+    #list("optim_method" = "newuoa"), # Wrapper to minqa::newuoa - masked by nloptr::newuoa
+    #list("optim_method" = "bobyqa"), # Wrapper to minqa::bobyqa - masked by nloptr::bobyqa
+    list("optim_method" = "uobyqa"),
+    list("optim_method" = "nmkb"),
+    list("optim_method" = "hjkb"),
+    list("optim_method" = "hjn"),
+    #list("optim_method" = "lbfgs"), # Wrapper to lfbgs::lfbgs - masked by nloptr::lfbgs
+    list("optim_method" = "subplex"),
+    list("optim_method" = "ncg"),
+    list("optim_method" = "nvm"),
+    list("optim_method" = "mla"),
+    #list("optim_method" = "slsqp"), # Wrapper to nloptr::slsqp
+    #list("optim_method" = "tnewt"), # Wrapper to nloptr::tnewton
+    list("optim_method" = "anms"),
+    list("optim_method" = "pracmanm")
+    #list("optim_method" = "nlnm"), # Wrapper to nloptr::neldermead
+    #list("optim_method" = "snewtm"), # Needs gradient/Hessian
+  )
+)
+
+
+# Set labels for the methods
+optim_labels <- optim_configs$config |>
+  purrr::map_chr(~ {
+    .x |>
+      purrr::map_if(is.numeric, ~ sprintf("%1.0e", .)) |>
+      as.data.frame() |>
+      tidyr::unite("label", tidyselect::everything()) |>
+      dplyr::pull("label") |>
+      paste(collapse = "_") |>
+      stringr::str_replace(stringr::fixed("1e-"), "r1e")
+  }) |>
+  tolower()
+
+optim_configs <- optim_configs |>
+  dplyr::mutate("optim_method" = optim_labels, .before = dplyr::everything())
+
+
+
 
 ## Optimisation helper
 
@@ -229,87 +311,6 @@ for (penalty in c(0, 0.5, 1)) {
 
   workers <- unname(future::availableCores(omit = 1))
   future::plan("multisession", gc = TRUE, workers = workers)
-
-  # Set the optimiser configurations to test
-  optim_configs <- tibble::tibble(
-    config = list(
-      # stats::optim algorithms:
-      list("optim_method" = "Nelder-Mead"),
-      list("optim_method" = "BFGS"),
-      list("optim_method" = "CG"),
-
-      # stats algorithms:
-      list("optim_method" = "nlm"),
-      list("optim_method" = "nlminb"),
-
-      # nloptr algorithms:
-      list("optim_method" = "auglag", "localsolver" = "COBYLA"),
-      list("optim_method" = "auglag", "localsolver" = "LBFGS"),
-      list("optim_method" = "auglag", "localsolver" = "MMA"),
-      list("optim_method" = "auglag", "localsolver" = "SLSQP"),
-      list("optim_method" = "bobyqa"),
-      list("optim_method" = "ccsaq"),
-      list("optim_method" = "cobyla"),
-      #list("optim_method" = "crs2lm"), # Random search
-      #list("optim_method" = "direct"),  # Needs lower/upper bounds
-      #list("optim_method" = "directL"), # Needs lower/upper bounds
-      list("optim_method" = "lbfgs"),
-      list("optim_method" = "mma"),
-      list("optim_method" = "neldermead"),
-      list("optim_method" = "newuoa"),
-      list("optim_method" = "sbplx"),
-      list("optim_method" = "slsqp"),
-      #list("optim_method" = "stogo"), # Random search
-      list("optim_method" = "tnewton"),
-      list("optim_method" = "varmetric"),
-
-
-      # optimx algorithms:
-      list("optim_method" = "lbfgsb3c"),
-      list("optim_method" = "Rcgmin"),
-      list("optim_method" = "Rtnmin"),
-      list("optim_method" = "Rvmmin"),
-      #list("optim_method" = "snewton"), # Needs gradient/Hessian
-      #list("optim_method" = "snewtonm"), # Needs gradient/Hessian
-      list("optim_method" = "spg"),
-      list("optim_method" = "ucminf"),
-      #list("optim_method" = "newuoa"), # Wrapper to minqa::newuoa - masked by nloptr::newuoa
-      #list("optim_method" = "bobyqa"), # Wrapper to minqa::bobyqa - masked by nloptr::bobyqa
-      list("optim_method" = "uobyqa"),
-      list("optim_method" = "nmkb"),
-      list("optim_method" = "hjkb"),
-      list("optim_method" = "hjn"),
-      #list("optim_method" = "lbfgs"), # Wrapper to lfbgs::lfbgs - masked by nloptr::lfbgs
-      list("optim_method" = "subplex"),
-      list("optim_method" = "ncg"),
-      list("optim_method" = "nvm"),
-      list("optim_method" = "mla"),
-      #list("optim_method" = "slsqp"), # Wrapper to nloptr::slsqp
-      #list("optim_method" = "tnewt"), # Wrapper to nloptr::tnewton
-      list("optim_method" = "anms"),
-      list("optim_method" = "pracmanm")
-      #list("optim_method" = "nlnm"), # Wrapper to nloptr::neldermead
-      #list("optim_method" = "snewtm"), # Needs gradient/Hessian
-    )
-  )
-
-
-  # Set labels for the methods
-  optim_labels <- optim_configs$config |>
-    purrr::map_chr(~ {
-      .x |>
-        purrr::map_if(is.numeric, ~ sprintf("%1.0e", .)) |>
-        as.data.frame() |>
-        tidyr::unite("label", tidyselect::everything()) |>
-        dplyr::pull("label") |>
-        paste(collapse = "_") |>
-        stringr::str_replace(stringr::fixed("1e-"), "r1e")
-    }) |>
-    tolower()
-
-  optim_configs <- optim_configs |>
-    dplyr::mutate("optim_method" = optim_labels, .before = dplyr::everything())
-
 
   candidates <- tidyr::expand_grid(
     "optim_method" = optim_labels,
@@ -532,6 +533,9 @@ results <- results |>
     .data$method,
     .data$strategy
   )
+
+# Restore the (potentially) upper-case names for the configuration
+results <- dplyr::left_join(results, optim_configs, by = "optim_method")
 
 # Store results
 diseasy_immunity_optimiser_results <- results
