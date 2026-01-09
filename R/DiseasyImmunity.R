@@ -358,7 +358,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   | method      | penalty  | strategy    | optimiser |
     #'   |-------------|----------|-------------|-----------|
-    #'   | free_delta  | No/Yes   | naive       | ucminf    |
+    #'   | free_delta  | No/Yes   | recursive   | ucminf    |
     #'   | free_gamma  | No/Yes   | naive       | ucminf    |
     #'   | all_free    | No/Yes   | naive       | ucminf    |
     #'
@@ -467,7 +467,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default strategy
       default_optim_strategy <- list(
-        "free_delta" = "naive",
+        "free_delta" = "recursive",
         "free_gamma" = "naive",
         "all_free"   = "naive"
       )
