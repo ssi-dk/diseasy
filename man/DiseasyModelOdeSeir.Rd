@@ -106,7 +106,7 @@ Names of the user-configured model outputs. Read only.}
     \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
     \item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
     \item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
-    \item \href{#method-DiseasyModelOdeSeir-configure_observable}{\code{DiseasyModelOdeSeir$configure_observable()}}
+    \item \href{#method-DiseasyModelOdeSeir-configure_model_output}{\code{DiseasyModelOdeSeir$configure_model_output()}}
     \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
   }
 }
@@ -396,16 +396,16 @@ The rate of change for the differential equations.
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_observable"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_observable}{}}}
-\subsection{\code{DiseasyModelOdeSeir$configure_observable()}}{
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_model_output"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_model_output}{}}}
+\subsection{\code{DiseasyModelOdeSeir$configure_model_output()}}{
   Define new observables via a set of weights.
 
 Currently, only countable observables are supported.
 That is, observables must be summarisable by the "sum()" function.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOdeSeir$configure_observable(
+    \preformatted{DiseasyModelOdeSeir$configure_model_output(
   weights,
   name,
   derived_from = c("state_vector", "infection_matrix"),
