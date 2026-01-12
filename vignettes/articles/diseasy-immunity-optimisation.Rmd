@@ -466,9 +466,6 @@ visualise_methods(total_results, "free_gamma")
 visualise_methods(total_results, "all_free")
 ```
 
-
-In total, we find that there is no clear choice for best, general optimiser/strategy combination.
-
 For the defaults, we have chose the optimiser/strategy combination dependent on the method of parametrisation and the
 inclusion of penalty.
 
