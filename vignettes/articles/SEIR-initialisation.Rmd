@@ -187,9 +187,34 @@ $$
 $$
 \frac{d I_2}{d t} = I^* - r_i I_2
 $$
-If we start this system at a time where there are no new infections, we can initialize $I_l = 0$, and run the
-simulation forward to estimate the $S$ and $R$ populations at the point of interest.
 
+If we create such a submodel and start this system at a time where there are no new infections,
+we can initialize $I_l = 0$, and run the simulation forward to estimate the $S$ and $R$ populations
+at the point of interest.
+
+# Initialising custom model output states
+When the model is asked to deliver a prediction for an observable, these observables
+may be shifted in time (i.e. delayed) relative to the point of infection.
+
+For example, hospitalisation might occur an average of 7 days after infection.
+If the models starts at `time = 0`, then any model output for hospitalisation
+will therefore have a transient period of 7 days before that signal begins being
+exported by the model.
+
+Each model output is derived either from the $I_1$ state or any of the $C$ states
+added when the user defines a custom model output (see the "DiseasyModelOde" article).
+
+To eliminate the transient behavior of the model output when delays are included,
+we can determine the values of the $I_1$ state and the $C$ states for `time < 0`.
+
+This process is two-fold,
+1) To determine $I_1$ for `time < 0` we can simply use the input signal given the
+the initialisation method by re-using the assumption $I^* = r_i I_1$.
+
+2) To determine $C_\cdot$ for `time < 0` we use the same submodel used to infer the R
+and S states and configure the custom model outputs here.
+The forcing function in the submodel thus generates the time evolution of the
+$C_\cdot$ states for `time < 0`.
 
 # Testing the methods
 
