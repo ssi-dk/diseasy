@@ -72,7 +72,7 @@ tidyr::expand_grid(
 
     age_group_string <- ifelse(length(age_cuts_lower) == 0, "single", "multiple")
 
-    test_that(glue::glue("$configure_observable() ({model_string} single variant / {age_group_string} age group)"), {
+    test_that(glue::glue("$configure_model_output() ({model_string} single variant / {age_group_string} age group)"), {
       skip_if_not_installed("RSQLite")
 
       m <- DiseasyModelOdeSeir$new(
@@ -113,7 +113,7 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_observable(
+      m$configure_model_output(
         weights = weights_infection_matrix,
         name = "n_infected_infection_matrix",
         derived_from = "infection_matrix",
@@ -136,7 +136,7 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_observable(
+      m$configure_model_output(
         weights = weights_state_vector,
         name = "n_infected_state_vector",
         derived_from = "state_vector"
@@ -185,7 +185,7 @@ test_that("Loading modules resets user configured observables", {
     observables = obs
   )
 
-  m$configure_observable(
+  m$configure_model_output(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"
@@ -223,7 +223,7 @@ test_that("Loading modules resets user configured observables", {
   )
 
   # And we should now be able to reconfigure the observable again
-  m$configure_observable(
+  m$configure_model_output(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"

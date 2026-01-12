@@ -502,7 +502,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # 2) A "submodel" is created which uses the incidence data to directly
       # drive the dynamics in the model, which is used to infer the R and S
       # states in the state vector at t = 0
-      # 3) In addition, if the user has configured custom output in the ODE
+      # 3) In addition, if the user has configured custom model output in the
       # model, a number of states are attached to the end of the state-vector
       # to measure/monitor/compute these outputs and the submodel is used to
       # extract the states for t < 0
@@ -739,7 +739,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
       )
 
-      # Remove the outputs generated from `$configure_observable()`
+      # Remove the outputs generated from `$configure_model_output()`
       # I would do this with utils::modifyList(), this does not work for nested lists.
       # compare:
       # modifyList(list("A" = 2), list("A" = 1)) # Works!
@@ -853,7 +853,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% state_vector, "name"),
-          .f = ~ private %.% initialisation_submodel %.% configure_observable(
+          .f = ~ private %.% initialisation_submodel %.% configure_model_output(
             weights = .x,
             name = .y,
             derived_from = "state_vector"
@@ -868,7 +868,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
-          .f = ~ private %.% initialisation_submodel %.% configure_observable(
+          .f = ~ private %.% initialisation_submodel %.% configure_model_output(
             weights = .x,
             name = .y,
             derived_from = "infection_matrix"
@@ -1158,7 +1158,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'  If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
     #'  of the infection matrix defines the flow (row-sums correspond to new infections).
     #' @return `r rd_side_effects`
-    configure_observable = function(
+    configure_model_output = function(
       weights,
       name,
       derived_from = c("state_vector", "infection_matrix"),

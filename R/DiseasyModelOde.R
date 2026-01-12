@@ -322,7 +322,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # The model has a configured right-hand-side function that
         # can be used to simulate the model in conjunction with `deSolve`.
-        # Custom observables computes from differences of integrating states,
+        # Custom model outputs computes from differences of integrating states,
         # we need to solve for 1 additional day
         sol <- deSolve::ode(
           y = psi$value,
@@ -365,7 +365,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # Extract rates for the I1-exit (= n_infected) and each configured
         # observable.
-        # Custom observables computes from differences of integrating states
+        # Custom model outputs computes from differences of integrating states
         model_rates <- sol_long |>
           dplyr::filter(.data$state %in% c("I1", self %.% model_outputs)) |>
           dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter
