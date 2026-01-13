@@ -213,15 +213,31 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #'   Function that parses the given module to a hash value (with exclusion)
 #' @param module (`R6 instance`)\cr
 #'   The `R6 instance` to compute hash for
-#' @param exclude (`character`)\cr
-#'   The names of the fields to exclude from the hash (including in nested modules)
-#' @return (`character`)\cr
+#' @param exclude (`named character()`)\cr
+#'   Non-named entries in the `exclude` vector excludes objects from the hash.
+#'
+#'   For named entries, the name defines the object and the value defines the
+#'   attributes of that object that should be excluded from the hash.
+#' @return (`character(1)`)\cr
 #'   The (reduced) hash of the module environment
 hash_module <- function(module, exclude = NULL) {
 
+  # Ensure exclude vector has names. Impute "" if none is given.
+  if (!is.null(exclude)) {
+    names(exclude) <- purrr::pluck(exclude, names, .default = rep("", length(exclude)))
+  }
+
   # Capture module environment (parent of this environment)
   public_names <- ls(module) # public (fields and functions)
-  public_names <- purrr::discard(public_names, public_names %in% c("hash", exclude)) # Exclude fields
+
+  # Determine exclusions
+  # Non-named `exclude` fields interpreted as objects to ignore
+  exclude_objects <- purrr::keep_at(exclude, ~ . == "")
+  exclude_attributes <- purrr::discard_at(exclude, ~ . == "")
+
+  # Exclude fields / objects
+  public_names <- public_names |>
+    purrr::discard(~ . %in% c("hash", exclude_objects))
 
   # Retrieve the subset of fields
   public_env <- public_names |>
@@ -233,11 +249,41 @@ hash_module <- function(module, exclude = NULL) {
     })
   names(public_env) <- public_names
 
+  # Exclude attributes
+  public_env <- public_env |>
+    purrr::imap(\(object, name) {
+
+      # For objects in our exclude list, we clear attributes
+      if (name %in% names(exclude_attributes)) {
+
+        # For each attribute on the object, pattern match with the exclusion criteria
+        # in `exclude_attributes` for the given object
+
+        exclusion_criteria_for_object <- exclude_attributes[names(exclude_attributes) == name]
+        attributes_to_exclude <- names(attributes(object)) |>
+          purrr::keep(
+            ~ any(stringr::str_detect(
+              pattern = paste0("^", exclusion_criteria_for_object),
+              string = .
+            ))
+          )
+
+        # Functions have an attribute called "srcref" which we remove later when we hash
+        # but we keep it here to allow R to recognize them as functions
+        attributes_to_exclude <- setdiff(attributes_to_exclude, "srcref")
+
+        attributes(object) <- purrr::discard_at(attributes(object), attributes_to_exclude)
+      }
+
+      return(object)
+    })
+
   # Iteratively map the public environment to hashes
   hash_list <- public_env |>
-    purrr::map_if(checkmate::test_r6, ~ hash_module(., exclude)) |> # All modules call their hash routines
-    purrr::map_if(checkmate::test_function, # For functions, we hash their attributes
-                  ~ digest::digest(attributes(.)))
+    # Nested R6 modules gets passed the exclusion criteria
+    purrr::map_if(checkmate::test_r6, ~ hash_module(., exclude = exclude)) |>
+    # Remaining objects are hashed with our helper function
+    hash_environment()
 
   # Add the class name to "salt" the hashes
   hash_list <- c(purrr::discard(hash_list, is.null), class = class(module)[1]) |>
