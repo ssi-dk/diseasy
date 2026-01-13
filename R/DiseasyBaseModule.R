@@ -145,7 +145,8 @@ DiseasyBaseModule <- R6::R6Class(                                               
     hash = purrr::partial(
       .f = active_binding,
       name = "hash",
-      expr = return(hash_module(self))) # nolint end
+      expr = return(hash_module(self))
+    )
   ),
 
   private = list(
