@@ -9,13 +9,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, show.warning = FALSE}
 library(diseasy)
 ```
 
 # Introduction
 Let us begin by considering a general SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively,
 which are governed by the rates $r_e$ and $r_i$ respectively.
+
+```{r SEIR-structure, echo = FALSE, fig.align = "center", fig.cap = "SEIR model overview with multiple E and I states", out.width = "120%"}
+knitr::include_graphics(
+  devtools::package_file("vignettes/articles/article_data/SEIR-initialisation.png")
+)
+```
 
 Let us further assume that we have a incidence signal[^1], $I^*(t)$, which we would like our model to match.
 
