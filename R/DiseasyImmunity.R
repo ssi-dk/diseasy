@@ -358,7 +358,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   | method      | penalty  | strategy    | optimiser |
     #'   |-------------|----------|-------------|-----------|
-    #'   | free_delta  | No/Yes   | naive       | ucminf    |
+    #'   | free_delta  | No/Yes   | recursive   | ucminf    |
     #'   | free_gamma  | No/Yes   | naive       | ucminf    |
     #'   | all_free    | No/Yes   | naive       | ucminf    |
     #'
@@ -467,7 +467,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set default strategy
       default_optim_strategy <- list(
-        "free_delta" = "naive",
+        "free_delta" = "recursive",
         "free_gamma" = "naive",
         "all_free"   = "naive"
       )
@@ -611,10 +611,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
               ## Penalise spread of gamma and delta
 
               # Compute sd of equidistant gamma
-              sd_0_gamma <- sd(seq(from = self$model[[model_id]](0), to = gamma[M], length.out = M))
+              gamma_eq <- seq(from = self$model[[model_id]](0), to = gamma[M], length.out = M)
 
               # Compute penalty spread of gamma and delta
-              gamma_penalty <- ifelse(length(gamma) > 1, abs(sd(gamma) - sd_0_gamma), 0)
+              gamma_penalty <- ifelse(length(gamma) > 1, sd(gamma - gamma_eq), 0)
               delta_penalty <- ifelse(length(delta) > 1, sd(delta), 0)
 
               penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)

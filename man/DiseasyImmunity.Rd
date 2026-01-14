@@ -418,7 +418,7 @@ may be better in any specific case when using a different algorithm
 The default configuration depends on the method used and whether or not a penalty was imposed on the
 objective function (\code{monotonous} and \code{individual_level}):\tabular{llll}{
    method \tab penalty \tab strategy \tab optimiser \cr
-   free_delta \tab No/Yes \tab naive \tab ucminf \cr
+   free_delta \tab No/Yes \tab recursive \tab ucminf \cr
    free_gamma \tab No/Yes \tab naive \tab ucminf \cr
    all_free \tab No/Yes \tab naive \tab ucminf \cr
 }

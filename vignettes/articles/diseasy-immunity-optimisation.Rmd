@@ -53,7 +53,7 @@ These targets are:
 | ------------------- | --------------------------------------------------------------------------|
 | Exponential         | $\exp\left(-t / \tau\right)$                                              |
 | Sigmoidal           | $\exp\left(-(t - \tau) / 6)\; /\; (1 + \exp\!\!(-(t - \tau) / 6)\right)$  |
-| Sum of exponentials | $\frac{\exp(-0.5 t / \tau) + \exp(-2 t / \tau)}{2}$                       |
+| Sum of exponentials | $0.5 \cdot \left(\exp(-0.5 t / \tau) + \exp(-2 t / \tau)\right)$          |
 
 We then construct more target functions from this family of functions:
 
@@ -77,9 +77,11 @@ methods for approximation.
 Once the round is complete, we update the list of eliminated algorithms and then we run the optimisation of $M + 1$ with
 the reduced set of algorithms.
 
-The entire optimisation process is run both without penalty (`monotonous = 0` and `individual_level = 0`) and with a
-penalty (`monotonous = 1` and `individual_level = 1`),
-see `vignette("diseasy-immunity")` for `monotonous` and `individual_level` definitions.
+The entire optimisation process is run without penalty (`monotonous = 0` and `individual_level = 0`),
+and with only a monotonicity penalty (`monotonous = 1` and `individual_level = 0`),
+and with both penalties (`monotonous = 1` and `individual_level = 1`).
+
+See `vignette("diseasy-immunity")` for `monotonous` and `individual_level` definitions.
 
 The results of the optimisation round are stored in the `?diseasy_immunity_optimiser_results` data-set.
 
@@ -118,7 +120,11 @@ best_optim_results <- best_optim_results |>
         "Exponential", "Sum of exponentials", "Sigmoidal", "Linear", "Heaviside"
       )
     ),
-    "penalty" = dplyr::if_else(.data$penalty, "yes", "no")
+    "penalty" = dplyr::case_when(
+      .data$penalty == 1 ~ "Both",
+      .data$penalty == 0.5 ~ "Monotonous",
+      .data$penalty == 0 ~ "None"
+    )
   )
 ```
 
@@ -158,6 +164,15 @@ bold_min_value <- function(gt_table) {
       locations = gt::cells_body(
         columns = dplyr::ends_with(min_value$name[[2]]),
         rows =  min_value$row_id[[2]]
+      )
+    ) |>
+    gt::tab_style(
+      style = list(
+        gt::cell_text(weight = "bold")
+      ),
+      locations = gt::cells_body(
+        columns = dplyr::ends_with(min_value$name[[3]]),
+        rows =  min_value$row_id[[3]]
       )
     )
 }
@@ -220,6 +235,7 @@ total_results |>
     with_ties = FALSE,
     by = c("penalty", "method")
   ) |>
+  dplyr::mutate("penalty" = dplyr::if_else(.data$penalty == "Monotonous", "Mon.", .data$penalty)) |>
   dplyr::select(!"execution_time") |>
   tidyr::pivot_wider(
     names_from = "method",
@@ -286,11 +302,11 @@ total_results |>
       color = "grey40"
     ),
     locations = gt::cells_body(
-      rows = 6
+      rows = c(6, 11)
     )
   ) |>
   gt::tab_caption(
-    "Table 1: Global results (excluding heaviside and linear targets)"
+    "Table 1: Global results"
   ) |>
   bold_min_value() |>
   add_footnote()
@@ -299,7 +315,7 @@ total_results |>
 To better choose the default optimisers for `DiseasyImmunity`, we will also consider how fast the different optimisation
 methods are. For that purpose, we have also measured the time to run the optimisation for each problem.
 
-```{r}
+```{r, include=FALSE}
 # Define the defaults for DiseasyImmunity
 chosen_defaults <- tibble::tibble(
   "method" = character(0),
@@ -308,32 +324,47 @@ chosen_defaults <- tibble::tibble(
   "optim_method" = character(0)
 ) |>
   tibble::add_row(
-    "method" = "free_delta", "penalty" = "no",
+    "method" = "free_delta", "penalty" = "None",
+    "strategy" = "recursive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_delta", "penalty" = "Monotonous",
+    "strategy" = "recursive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_delta", "penalty" = "Both",
+    "strategy" = "recursive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_gamma", "penalty" = "None",
     "strategy" = "naive",
     "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
-    "method" = "free_delta", "penalty" = "yes",
+    "method" = "free_gamma", "penalty" = "Monotonous",
     "strategy" = "naive",
     "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
-    "method" = "free_gamma", "penalty" = "no",
-    "strategy" = "naive",
-    "optim_method" = "subplex"
-  ) |>
-  tibble::add_row(
-    "method" = "free_gamma", "penalty" = "yes",
-    "strategy" = "naive",
-    "optim_method" = "hjkb"
-  ) |>
-  tibble::add_row(
-    "method" = "all_free", "penalty" = "no",
+    "method" = "free_gamma", "penalty" = "Both",
     "strategy" = "naive",
     "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
-    "method" = "all_free", "penalty" = "yes",
+    "method" = "all_free", "penalty" = "None",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "all_free", "penalty" = "Monotonous",
+    "strategy" = "naive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "all_free", "penalty" = "Both",
     "strategy" = "naive",
     "optim_method" = "ucminf"
   )
@@ -369,7 +400,7 @@ visualise_methods <- function(total_results, method) {
       "default" = dplyr::if_else(!is.na(.data$default), "Yes", "No")
     ) |>
     dplyr::filter(.data$method == !!method) |>
-    tidyr::unite("optim_strategy", "strategy", "optim_method", sep = "-")
+    tidyr::unite("optim_strategy", "strategy", "optim_method", sep = " - ")
 
   palette <- purrr::reduce(
     purrr::map(
@@ -402,13 +433,14 @@ visualise_methods <- function(total_results, method) {
     ggplot2::facet_wrap(
       ~ penalty,
       labeller = ggplot2::labeller(.cols = ggplot2::label_both),
-      scales = "free"
+      scales = "free",
+      ncol = 1
     ) +
     ggplot2::labs(
       x = "Execution time (hours)",
       y = "Total error",
       title = glue::glue("Best optimisers for {method}"),
-      color = "strategy-optim_method",
+      color = "{strategy} - {optim_method}",
       shape = "Chosen as default?"
     ) +
     ggplot2::guides(
@@ -434,9 +466,6 @@ visualise_methods(total_results, "free_gamma")
 visualise_methods(total_results, "all_free")
 ```
 
-
-In total, we find that there is no clear choice for best, general optimiser/strategy combination.
-
 For the defaults, we have chose the optimiser/strategy combination dependent on the method of parametrisation and the
 inclusion of penalty.
 
@@ -452,7 +481,7 @@ chosen_defaults |>
       color = "grey40"
     ),
     locations = gt::cells_body(
-      rows = c(3, 5)
+      rows = c(4, 7)
     )
   )
 ```
@@ -477,6 +506,7 @@ per_target_results <- best_optim_results |>
 
 # Split per target
 split_data <- per_target_results |>
+  dplyr::mutate("penalty" = dplyr::if_else(.data$penalty == "Monotonous", "Mon.", .data$penalty)) |>
   dplyr::slice_min(
     tibble::tibble(value, execution_time),
     n = 3,
@@ -558,7 +588,7 @@ gt_tables <- split_data |>
           color = "grey40"
         ),
         locations = gt::cells_body(
-          rows = 4
+          rows = c(4, 7)
         )
       ) |>
       gt::cols_hide("target") |>

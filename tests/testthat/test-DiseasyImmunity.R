@@ -517,7 +517,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   test_combinations <- tidyr::expand_grid(
     M = seq(1, 4),
     method = c("free_delta", "free_gamma", "all_free"),
-    penalty = c(TRUE, FALSE)
+    penalty = c(1, 0.5, 0)
   )
 
   purrr::pwalk(test_combinations, \(M, method, penalty) {                                                               # nolint: object_name_linter
@@ -525,8 +525,8 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
       im$plot(
         M = !!M,
         method = !!method,
-        monotonous = !!penalty,
-        individual_level = !!penalty
+        monotonous = !!ceiling(penalty), # 0.5 becomes 1
+        individual_level = !!floor(penalty) # 0.5 becomes 0
       )
     )
   })
@@ -539,7 +539,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
       "free_delta-recursive", "free_gamma-recursive", "all_free-recursive",
       "all_free-combination"
     ),
-    penalty = c(TRUE, FALSE)
+    penalty = c(1, 0.5, 0)
   ) |>
     tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
 
@@ -549,8 +549,8 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
         M = !!M,
         method = !!method,
         strategy = !!strategy,
-        monotonous = !!penalty,
-        individual_level = !!penalty
+        monotonous = !!ceiling(penalty), # 0.5 becomes 1
+        individual_level = !!floor(penalty) # 0.5 becomes 0
       )
     )
   })
