@@ -342,14 +342,10 @@ plot(
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
 x <- model$get_results(observable = "incidence", prediction_length = 60)
-y <- dplyr::setdiff(
-  model$get_data(
-    observable = "incidence", prediction_length = 60, period = "plotting"
-  ),
-  model$get_data(
-    observable = "incidence", period = "training"
-  )
-)
+y <- model$get_data(
+  observable = "incidence", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
     purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.4)
@@ -398,14 +394,10 @@ plot(
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
 x <- model$get_results(observable = "n_infected", prediction_length = 60)
-y <- dplyr::setdiff(
-  model$get_data(
-    observable = "n_infected", prediction_length = 60, period = "plotting"
-  ),
-  model$get_data(
-    observable = "n_infected", period = "training"
-  )
-)
+y <- model$get_data(
+  observable = "n_infected", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
     purrr::every(abs(x$n_infected - y$n_infected) / x$n_infected, ~ . < 0.4)
@@ -452,14 +444,10 @@ plot(
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
 x <- model$get_results(observable = "n_positive", prediction_length = 60)
-y <- dplyr::setdiff(
-  model$get_data(
-    observable = "n_positive", prediction_length = 60, period = "plotting"
-  ),
-  model$get_data(
-    observable = "n_positive", period = "training"
-  )
-)
+y <- model$get_data(
+  observable = "n_positive", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
     purrr::every(abs(x$n_positive - y$n_positive) / x$n_positive, ~ . < 0.4)
@@ -504,14 +492,10 @@ plot(
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
 x <- model$get_results(observable = "n_admission", prediction_length = 60)
-y <- dplyr::setdiff(
-  model$get_data(
-    observable = "n_admission", prediction_length = 60, period = "plotting"
-  ),
-  model$get_data(
-    observable = "n_admission", period = "training"
-  )
-)
+y <- model$get_data(
+  observable = "n_admission", prediction_length = 60, period = "plotting"
+) |>
+  dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
     purrr::every(abs(x$n_admission - y$n_admission) / x$n_admission, ~ . < 0.4)
