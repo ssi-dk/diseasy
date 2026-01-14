@@ -271,7 +271,7 @@ existing_results <- function(M, monotonous, individual_level) {                 
 
 
   # Parse existing files
-  list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds")) |>
+  list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds")) |>
     purrr::map(
       .progress = TRUE,
       \(file) {
