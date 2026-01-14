@@ -281,7 +281,7 @@
     },
     {
       "package": "gert",
-      "version": "2.2.0",
+      "version": "2.3.1",
       "binary": true
     },
     {
@@ -411,7 +411,7 @@
     },
     {
       "package": "later",
-      "version": "1.4.4",
+      "version": "1.4.5",
       "binary": true
     },
     {
@@ -431,7 +431,7 @@
     },
     {
       "package": "lifecycle",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "binary": true
     },
     {
@@ -546,7 +546,7 @@
     },
     {
       "package": "parallelly",
-      "version": "1.46.0",
+      "version": "1.46.1",
       "binary": true
     },
     {
@@ -631,7 +631,7 @@
     },
     {
       "package": "purrr",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "binary": true
     },
     {
@@ -666,7 +666,7 @@
     },
     {
       "package": "Rcpp",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "binary": true
     },
     {
@@ -706,7 +706,7 @@
     },
     {
       "package": "rlang",
-      "version": "1.1.6",
+      "version": "1.1.7",
       "binary": true
     },
     {
@@ -736,7 +736,7 @@
     },
     {
       "package": "rstantools",
-      "version": "2.5.0",
+      "version": "2.6.0",
       "binary": true
     },
     {
@@ -766,8 +766,8 @@
     },
     {
       "package": "SCDB",
-      "version": "0.5.1.9000",
-      "binary": false
+      "version": "0.5.2",
+      "binary": true
     },
     {
       "package": "sessioninfo",
@@ -826,7 +826,7 @@
     },
     {
       "package": "testthat",
-      "version": "3.3.1",
+      "version": "3.3.2",
       "binary": true
     },
     {
@@ -836,7 +836,7 @@
     },
     {
       "package": "tibble",
-      "version": "3.3.0",
+      "version": "3.3.1",
       "binary": true
     },
     {
