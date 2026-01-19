@@ -382,16 +382,16 @@ a reduced probability of testing during weekends.</li>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 696 × 6</span></span></span>
 <span><span class="co">#&gt;    date       age_group variant n_infected n_positive_simple n_positive</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 00-29     WT            68.0                38         42</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 00-29     WT           145.                 97         73</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 00-29     WT           191.                118         87</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 00-29     WT           218.                146        152</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 00-29     WT           239.                152        160</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 00-29     WT           260.                164        176</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 00-29     WT           283.                188        202</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 00-29     WT           308.                188        204</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 00-29     WT           334.                224        170</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 00-29     WT           363.                227        169</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            17.2                 8          9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            36.7                25         21</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            48.9                28         23</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            56.9                34         40</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            63.6                45         45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            70.4                44         46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT            77.6                52         56</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT            85.2                61         64</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT            93.4                61         49</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           102.                 70         52</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 686 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualise the example data</span></span>
@@ -555,7 +555,7 @@ we here visualise this fitting.</p>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">age_group</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 81 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; Warning: Removed 338 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
 <p><img src="SEIR-initialisation_files/figure-html/incidence%20fitting-1.png" class="r-plt" alt="Fitting a polynomial to the incidence data to estimate derivatives." width="700"></p>
 <p>We can now use the

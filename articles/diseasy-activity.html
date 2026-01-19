@@ -189,7 +189,8 @@ that we can expand our existing scenario:</p>
 already open, the module will give an error:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span>date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-11"</span><span class="op">)</span>, opening <span class="op">=</span> <span class="st">"lockdown_2020"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: </span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> </span></span>
 <span><span class="co">#&gt; Some of lockdown_2020 are already open!</span></span></code></pre></div>
 <p>By default, activity units are added with a risk modifier of 1. The
 module includes the option to set an overall risk associated with each
