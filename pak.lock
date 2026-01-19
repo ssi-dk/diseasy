@@ -201,8 +201,8 @@
     },
     {
       "package": "diseasystore",
-      "version": "0.3.2",
-      "binary": true
+      "version": "0.3.2.9000",
+      "binary": false
     },
     {
       "package": "distributional",
