@@ -1,9 +1,15 @@
 aes
+alphanumerics
 alt
 antiphase
 AR
 ARI
 
+birthdate
+birthdates
+bitemporal
+
+checksums
 CCW
 CoV
 
@@ -25,7 +31,9 @@ cdots
 classname
 cloneable
 CMD
+Codecov
 codecov
+coercible
 combinatorial
 combinatorics
 conn
@@ -33,13 +41,18 @@ contactdata
 COVID
 covid
 colname
+conn
+cr
 
 dag
 db
+dbConnect
 dbi
 DBIConnection
 DBIDriver
+dbname
 dbplyr
+dbplyr's
 ddots
 dfoptim
 dI
@@ -62,8 +75,10 @@ DiseasyVariant
 dk
 DMI
 doi
+Donut
 dplyr
 dR
+drv
 ds
 dS
 dt
@@ -84,6 +99,7 @@ fn
 fns
 FeatureHandler
 FeatureHandlers
+funder
 fn
 fns
 frac
@@ -98,6 +114,7 @@ hjkb
 hline
 hypoexponential
 
+IANA
 ij
 ILI
 io
@@ -105,11 +122,13 @@ infty
 Institut
 int
 io
+ip
 
 ji
 Jit
 
 Klepac
+Kimball
 Kirkeby
 kt
 
@@ -119,9 +138,12 @@ linelist
 linter
 linters
 lintr
+LoggerNull
 lubridate
 Lyngse
 
+magrittr
+Margy
 malthusian
 mathcal
 md
@@ -129,7 +151,9 @@ medrxiv
 Mielke
 moduleowner
 Myrup
+myschema
 
+na
 Nelder
 neldermead
 neq
@@ -138,8 +162,10 @@ nlminb
 nloptr
 nolint
 normalise
+notin
 nrow
 
+ODBC
 odot
 optim
 optimr
@@ -153,12 +179,15 @@ parameterise
 parsable
 PascalCase
 pcbi
+pgpass
 pid
 Plesner
 PLoS
 pnr
 POSIXct
+Postgres
 PostgreSQL
+printf
 
 quos
 quosures
@@ -166,6 +195,8 @@ quosures
 R's
 Randl
 Rasmus
+README
+realpath
 regex
 rightarrow
 Rightarrow
@@ -173,14 +204,17 @@ rlang
 rm
 RM
 Rmd
+RPostgres
 RS
 rsif
 
 SARS
 SCDB
+schemas
 Schou
 seir
 SEIR
+SHA
 sigmoidal
 sim
 simulist
@@ -190,21 +224,30 @@ Statens
 subplex
 sql
 SQLite
+SQLiteConnection
+summarises
+superlinear
+Sys
 
 Tamayo
 tbl
 Telkamp
+tempdb
 textrm
 th
 tibble
+tidyr
 tidyselect
+tidyverse
 tnewton
 TODOs
 ts
 
 u
 ucminf
+un
 underbrace
+unmanipulated
 
 vec
 vdots

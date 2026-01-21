@@ -3,8 +3,6 @@ group:
       ssi-dk/diseasystore
       ssi-dk/diseasy
     files:
-      - .github/sync.yaml
-
       - inst/WORDLIST
 
       - R/0_R6_utils.R
@@ -13,9 +11,11 @@ group:
       - R/0_documentation.R
       - tests/testthat/test-0_documentation.R
 
-      - R/0_miscellaneous.R
-
   - repos: |
+      ssi-dk/diseasystore
+      ssi-dk/diseasy
       ssi-dk/SCDB
     files:
+      - .github/sync.yaml
+
       - R/0_miscellaneous.R
