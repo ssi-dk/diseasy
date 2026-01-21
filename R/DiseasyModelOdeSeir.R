@@ -957,7 +957,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       ## Step 3, apply the effect of season, overall infection risk, and variant-specific relative infection risk
       # rr * beta * beta_v * I * s(t)                                                                                   # nolint: commented_code_linter
       infection_rate <- infected_contact_rate *
-        self$season$model_t(t + unclass(self$observables$last_queryable_date - self$season$reference_date)) *
+        self$season$model_t(t + unclass(self$training_period$end - self$season$reference_date)) *
         overall_infection_risk *
         private$indexed_variant_infection_risk
 
@@ -1289,7 +1289,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       scaled_per_capita_contact_matrices <- purrr::map(private$per_capita_contact_matrices, ~ .x * scaling_factor)
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
-      # (here: last_queryable_date from the observables module)
+      # (here: the end of the training period)
       activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrices)) -
         self %.% training_period %.% end
 

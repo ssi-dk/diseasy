@@ -10,11 +10,11 @@ knitr::opts_chunk$set(
 ```
 
 # Introduction
-This vignette is a companion to the implementation of the SEIR ode model `?DiseasyModelOdeSEIR`.
+This vignette is a companion to the implementation of the SEIR ode model `?DiseasyModelOdeSeir`.
 
 As the name suggests, this model is a SEIR-like ordinary differential equation (ODE) model.
-Furthermore, the model is designed as flexible as possible to allow for a wide range of different model configuration.
-That is, the number of consecutive exposed, infected, and recovered states can be set arbitrarily,
+Furthermore, the model is designed as flexible as possible to allow for a wide range of different model configurations.
+Meaning that the number of consecutive exposed, infected, and recovered states can be set arbitrarily,
 as well as the number of age groups and the number of variants.
 
 Due to the flexibility of the model, the implementation is somewhat complex, which is why we include this vignette
@@ -41,7 +41,7 @@ To begin, here we define a fixed meaning to the different indices and accents us
 Where upper case letters denote the number of such elements and lower case letters denote a specific element.
 
 ## The model structure
-The SEIR model we are building is a compartmental model with (near) arbitrary number of exposed, infected,
+The SEIR model we are building is a compartmental model with an (near) arbitrary number of exposed, infected,
 and recovered compartments. The model also supports multiple age groups and multiple variants.
 
 We divide the model into different "tracks" with each track implementing the disease progression for a group of
@@ -55,7 +55,9 @@ Schematically, the model can be represented as in the figure below:
 
 ```{r SEIR-structure, echo = FALSE, fig.align = "center", fig.cap = "SEIR model overview for a two variant model", out.width = "120%"}
 knitr::include_graphics(
-  devtools::package_file("vignettes/articles/SEIR-implementation-model.png")
+  devtools::package_file(
+    "vignettes/articles/article_data/SEIR-implementation-model.png"
+  )
 )
 ```
 
@@ -64,7 +66,7 @@ The arrows in the figure indicates the infections in the model within these trac
 
 ## State vector
 
-Each "track" of infection is placed in sequence in the state vector, $\overline{\psi}$, and increments first in age
+Each "track" of infection is placed in a sequence in the state vector, $\overline{\psi}$, and increments first in age
 groups then in variants.
 
 Finally, the susceptible states are placed at the end of the state vector.
@@ -86,7 +88,9 @@ Notice that the state vector elements are indexed by state-type, state-index, ag
 
 ```{r SERI-index, echo = FALSE, fig.align = "center", fig.cap = "Index guide for the state vector"}
 knitr::include_graphics(
-  devtools::package_file("vignettes/articles/SEIR-implementation-index.png")
+  devtools::package_file(
+    "vignettes/articles/article_data/SEIR-implementation-index.png"
+  )
 )
 ```
 
@@ -127,7 +131,7 @@ $$
 With the opening considerations in mind, we can now describe the implementation of the model.
 Below, we now link the implementation with the underlying mathematical descriptions of the model.
 
-The `?DiseasyModelOdeSEIR` model implements the `?DiseasyModelOdeSEIR$rhs` method which computes the
+The `?DiseasyModelOdeSeir` model implements the `DiseasyModelOdeSeir$rhs` method which computes the
 rates needed for the ODE solver. The evaluation of this right-hand side function uses a few intermediate
 variables which are described below.
 
@@ -198,8 +202,8 @@ For the final computation of infections of the right-hand side, we construct the
 Since only $R$ and $S$ compartments are susceptible to infection, we need only to consider the $RS$ states to
 compute the new infections in the model.
 
-The new `infection_matrix` therefore does not need to contain the `K` exposed states and the `L` infected states,
-but only the `M` recovered states and the $A$ susceptible states.
+The new `infection_matrix` therefore does not need to contain the $K$ exposed states and the $L$ infected states,
+but only the $M$ recovered states and the $A$ susceptible states.
 
 We are therefore interested in the reduced state vector $\overline{\psi}^{RS}$ whose elements $e^*$ are the $R$
 and $S$ elements of the full state vector $\overline{\psi}$.
@@ -495,11 +499,11 @@ $$
 
 # Notes on optimisations of the right-hand side function
 
-It is important that the implementation is somewhat optimised for the simulations to run in reasonable time.
-To that end, we here show micro-benchmarks of different implementations of the same steps to highlight why a given
-implementation was chosen.
+It is important that the implementation is somewhat optimised for the simulations to run in a reasonable time frame.
+To that end, we here show micro-benchmarks of different implementations of the same steps with the time consumption
+as output, to highlight why a given implementation was chosen.
 
-These benchmarks assume a simple SEIR model with only tree age group and one variant.
+These benchmarks assume a simple SEIR model with only tree age groups and one variant.
 
 ## "infected" sum computation
 ```{r, eval = rlang::is_installed("microbenchmark")}
@@ -531,3 +535,4 @@ microbenchmark::microbenchmark( # Microseconds
   check = "equal", times = 1000L
 )
 ```
+Note, that the best performing function in this case is `vapply()`.
