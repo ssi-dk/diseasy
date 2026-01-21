@@ -824,11 +824,11 @@ and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min      lq      mean median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 24.937 27.1855 28.880902 28.348 29.2990  135.242  1000</span></span>
-<span><span class="co">#&gt;              sapply 12.874 13.4705 14.409736 13.886 14.7880   36.298  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 12.875 13.4850 16.993963 13.926 14.7725 2572.944  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.929  5.4100  5.833129  5.661  5.9510   24.376  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min      lq      mean  median      uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 24.616 26.2540 28.202806 27.4765 28.3530  107.250  1000</span></span>
+<span><span class="co">#&gt;              sapply 12.514 13.0145 13.971729 13.3650 14.1460   42.560  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES 12.534 13.0350 15.704523 13.3650 14.1260 1788.005  1000</span></span>
+<span><span class="co">#&gt;              vapply  4.899  5.3300  5.660572  5.5305  5.7455   30.377  1000</span></span></code></pre></div>
 <p>Note, that the best performing function in this case is
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>.</p>
 </div>
