@@ -399,7 +399,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Verify observable configurations match model configuration
       checkmate::assert_matrix(
         private %.% observable_mapping %.% state_vector,
-        ncol = private %.% n_states + length(private %.% surveillance_indices),
+        ncol = private %.% n_states + length(self %.% model_outputs),
         null.ok = TRUE
       )
 
@@ -843,6 +843,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         purrr::map(~ . + seq_len(purrr::pluck(compartment_structure, "R")) - 1) |>
         purrr::reduce(c, .init = s_state_indices, .dir = "backward")
 
+      surveillance_indices <- unlist(private$surveillance_indices) -
+        private %.% n_age_groups * private %.% n_variants
+
+
+      c_state_vector_indicies <- private$surveillance_indices$state_vector -
+        private %.% n_age_groups * private %.% n_variants
 
 
       # Use the interpolated signal as a forcing function for I1
@@ -878,6 +884,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # then subtract the rescaled loss that matches the signal
           dy_dt[rs_state_indices] <- dy_dt[rs_state_indices] +
             loss_due_to_infections * (1 - s[private$rs_age_group] / tmp)
+
+
+          # If the user has configured custom outputs, we need to add the forcing to these states as well
+          dy_dt[c_state_vector_indicies] <- dy_dt[c_state_vector_indicies] +
+            private$observable_mapping$state_vector[, private$i1_state_indices] * s / ri
 
           return(dy_dt)
         }
@@ -1022,7 +1033,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           private %.% n_age_groups * private %.% n_variants + # Remember, we have 1 less I state in the submodel
           seq_along(self %.% model_outputs)
 
-        s <- sol[, c(1, surveillance_indices)] # Extract solution for surveillance states
+        s <- sol[, c(1, surveillance_indices + 1)] # Extract solution for surveillance states
         colnames(s) <- c("time", self %.% model_outputs)
 
         estimated_surveillance_states <- s |>
@@ -1040,22 +1051,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         initial_state_vector <- rbind(initial_state_vector, estimated_surveillance_states)
       }
 
-      # Impute the solution for I1 for (t < 0)
-      estimated_I1_history <- dplyr::cross_join(
-        tibble::tibble("time" = times[times < 0]),
-        tidyr::expand_grid(
-          "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)
-        ) |>
-          dplyr::mutate(
-            "state" = "I1",
-            "f" = signal_approximations
-          )
-      ) |>
-        dplyr::mutate("value" = purrr::map2_dbl(.data$f, .data$time, ~ .x(.y)) / ri) |>
-        dplyr::select(!"f")
-
-      return(invisible(rbind(initial_state_vector, estimated_I1_history)))
+      return(invisible(initial_state_vector))
     },
 
 
@@ -1141,9 +1137,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Add the inflow from infections
       dy_dt[private$e1_state_indices] <- dy_dt[private$e1_state_indices] + new_infections
 
-      # Add the forcing of the states
-      dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
-
       # Add the inflow to surveillance states
       if (!is.null(private$observable_mapping$infection_matrix)) {
         dy_dt[private$surveillance_indices$infection_matrix] <-
@@ -1154,6 +1147,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         dy_dt[private$surveillance_indices$state_vector] <-
           private$observable_mapping$state_vector %*% as.matrix(state_vector)
       }
+
+      # Add the forcing of the states
+      dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
 
       return(list(dy_dt))
     },
