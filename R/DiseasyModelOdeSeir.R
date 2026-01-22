@@ -953,6 +953,22 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Check initial state vector is well-formed
       checkmate::assert_numeric(initial_state_vector$value, lower = 0, any.missing = FALSE)
 
+      # Impute the solution for I1 for (t < 0)
+      estimated_I1_history <- dplyr::cross_join(
+        tibble::tibble("time" = times[times <= 0]),
+        tidyr::expand_grid(
+          "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
+          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)
+        ) |>
+          dplyr::mutate(
+            "state" = "I1",
+            "f" = signal_approximations
+          )
+      ) |>
+        dplyr::mutate("value" = purrr::map2_dbl(.data$f, .data$time, ~ .x(.y)) / ri) |>
+        dplyr::select(!"f")
+
+      initial_state_vector <- rbind(initial_state_vector, dplyr::filter(estimated_I1_history, .data$time < 0))
 
       # Add the history for the surveillance states
       if (length(self %.% model_outputs) > 0) {
