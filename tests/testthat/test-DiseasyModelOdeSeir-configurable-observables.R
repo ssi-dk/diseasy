@@ -6,13 +6,13 @@ if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.02
+overall_infection_risk <- 0.025
 
 # Configure the activity module
 activity <- DiseasyActivity$new()
 activity$set_contact_basis(contact_basis = contact_basis$DK)
 activity$set_activity_units(dk_activity_units)
-activity$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
+activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
 
 # Configure the immunity module
