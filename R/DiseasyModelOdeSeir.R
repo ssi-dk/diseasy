@@ -767,6 +767,40 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         parameters = parameters
       )
 
+      # Copy the configured observables from the main model to the initialisation submodel
+      if (!is.null(private %.% observable_mapping %.% state_vector)) {
+        purrr::walk2(
+          .x = private %.% observable_mapping %.% state_vector[,
+            setdiff(seq_len(private %.% n_states), private %.% i1_state_indices),
+            drop = FALSE
+          ] |>
+            t() |>
+            as.data.frame() |>
+            as.list(),
+          .y = attr(private %.% observable_mapping %.% state_vector, "name"),
+          .f = ~ initialisation_submodel %.% configure_model_output(
+            weights = .x,
+            name = .y,
+            derived_from = "state_vector"
+          )
+        )
+      }
+
+      if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
+        purrr::walk2(
+          .x = private %.% observable_mapping %.% infection_matrix |>
+            t() |>
+            as.data.frame() |>
+            as.list(),
+          .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
+          .f = ~ initialisation_submodel %.% configure_model_output(
+            weights = .x,
+            name = .y,
+            derived_from = "infection_matrix"
+          )
+        )
+      }
+
       # Ensure RHS is initialised
       initialisation_submodel %.% prepare_rhs()
 
@@ -849,37 +883,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         }
       )
 
-
-      # Copy the configured observables from the main model to the initialisation submodel
-      if (!is.null(private %.% observable_mapping %.% state_vector)) {
-        purrr::walk2(
-          .x = private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_EIR_states), drop = FALSE] |>
-            t() |>
-            as.data.frame() |>
-            as.list(),
-          .y = attr(private %.% observable_mapping %.% state_vector, "name"),
-          .f = ~ initialisation_submodel %.% configure_model_output(
-            weights = .x,
-            name = .y,
-            derived_from = "state_vector"
-          )
-        )
-      }
-
-      if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
-        purrr::walk2(
-          .x = private %.% observable_mapping %.% infection_matrix |>
-            t() |>
-            as.data.frame() |>
-            as.list(),
-          .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
-          .f = ~ initialisation_submodel %.% configure_model_output(
-            weights = .x,
-            name = .y,
-            derived_from = "infection_matrix"
-          )
-        )
-      }
 
       # Run the simulation forward to estimate the R and S states
       y0 <- c(
