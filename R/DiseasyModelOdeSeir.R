@@ -1179,9 +1179,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
       checkmate::assert_numeric(delay, lower = 0, add = coll)
-      if (delay > 0 && derived_from == "state_vector") {
-        coll$push("`delay` can only be set for observables derived from `infection_matrix`")
-      }
       checkmate::reportAssertions(coll)
 
       # Mark RHS as un-ready
