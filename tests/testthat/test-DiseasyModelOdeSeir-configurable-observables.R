@@ -117,7 +117,7 @@ tidyr::expand_grid(
         weights = weights_infection_matrix,
         name = "n_infected_infection_matrix",
         derived_from = "infection_matrix",
-        delay = 1 / (rI * L) # Delay by 1 I state
+        delay = (K > 0) / rE + 1 / (rI * L) # Delay by E states and 1 I state
       )
 
 
@@ -154,7 +154,7 @@ tidyr::expand_grid(
       # 2) For the infection_matrix we expect bigger differences since we measure in different
       # ways (as for 1)), but in addition, there is a time-delay since we measure inflow to E1
       # instead of outflow of I1.
-      # The time difference is roughly: 1/ rE + 1 / (L + rI) days
+      # The time difference is roughly: 1 / rE + 1 / (L * rI) days
 
       expect_equal(
         m$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
@@ -163,14 +163,8 @@ tidyr::expand_grid(
       )
 
       expect_equal(
-        utils::head(
-          m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
-          - round(1 / rE + 1 / (L + rI)) # Drop last points to account for time difference
-        ),
-        utils::tail(
-          reference_after,
-          - round(1 / rE + 1 / (L + rI)) # Drop first points to account for time difference
-        ),
+        m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
+        reference_after,
         tolerance = 5e-2 # Within 5 %
       )
 
