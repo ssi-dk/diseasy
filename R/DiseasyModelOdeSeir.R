@@ -858,7 +858,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% state_vector, "name"),
-          .f = ~ private %.% initialisation_submodel %.% configure_model_output(
+          .f = ~ initialisation_submodel %.% configure_model_output(
             weights = .x,
             name = .y,
             derived_from = "state_vector"
@@ -873,7 +873,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
-          .f = ~ private %.% initialisation_submodel %.% configure_model_output(
+          .f = ~ initialisation_submodel %.% configure_model_output(
             weights = .x,
             name = .y,
             derived_from = "infection_matrix"
