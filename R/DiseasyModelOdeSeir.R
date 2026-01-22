@@ -767,7 +767,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Generate the reduced model
-      private$initialisation_submodel <- DiseasyModelOdeSeir$new(
+      initialisation_submodel <- DiseasyModelOdeSeir$new(
         observables = self %.% observables,
         population = self %.% population,
         activity = self %.% activity,
@@ -776,6 +776,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         immunity = self %.% immunity,
         parameters = parameters
       )
+
+      # Ensure RHS is initialised
+      initialisation_submodel %.% prepare_rhs()
 
       # Approximate the signal within each group
       # .. and ensure we have a signal for each group in the model
@@ -822,7 +825,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Use the interpolated signal as a forcing function for I1
-      private$initialisation_submodel$set_forcing_functions(
+      initialisation_submodel$set_forcing_functions(
         infected_forcing = \(t, infected) signal(t) / ri + infected, # If L = 1, infected is numeric(0)
         state_vector_forcing = \(t, dy_dt, loss_due_to_infections, new_infections) {
 
@@ -868,7 +871,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% state_vector, "name"),
-          .f = ~ private %.% initialisation_submodel %.% configure_model_output(
+          .f = ~ initialisation_submodel %.% configure_model_output(
             weights = .x,
             name = .y,
             derived_from = "state_vector"
@@ -883,16 +886,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             as.data.frame() |>
             as.list(),
           .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
-          .f = ~ private %.% initialisation_submodel %.% configure_model_output(
+          .f = ~ initialisation_submodel %.% configure_model_output(
             weights = .x,
             name = .y,
             derived_from = "infection_matrix"
           )
         )
       }
-
-      # Ensure RHS is initialised
-      private %.% initialisation_submodel %.% prepare_rhs()
 
       # Run the simulation forward to estimate the R and S states
       y0 <- c(
@@ -912,7 +912,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       sol <- deSolve::ode(
         y = y0,
         times = times,
-        func = private %.% initialisation_submodel %.% rhs,
+        func = initialisation_submodel %.% rhs,
         parms = list("overall_infection_risk" = overall_infection_risk)
       )
 
@@ -1434,9 +1434,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # Forcing functions for the right hand side function
     infected_forcing = NULL,
     state_vector_forcing = NULL,
-
-    # Submodel used initialisation (to infer observables and state_vector from incidence data)
-    initialisation_submodel = NULL,
 
 
     # @description
