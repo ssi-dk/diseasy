@@ -712,8 +712,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Now we use the forcing method to generate the initial R and s states
-      # To this purpose, we generate the reduced model with no R states and one less I state.
+      # To this purpose, we generate the reduced model with one less I state.
       compartment_structure <- c(
+        "E" = self %.% parameters %.% compartment_structure %.% E,
         "I" = self %.% parameters %.% compartment_structure %.% I - 1L,
         "R" = self %.% parameters %.% compartment_structure %.% R
       )
@@ -722,7 +723,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # (we take the max with 1 to ensure non-inf values which triggers an error. If the reduced model
       # has no I states, the disease_progression_rates$I value is not)
       disease_progression_rates <- self %.% parameters %.% disease_progression_rates |>
-        purrr::keep_at("I") * self %.% parameters %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
+        purrr::map_at("I", ~ . * self %.% parameters %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)) |>
+        unlist()
 
       # Define a modified list of model parameters
       parameters <- modifyList(

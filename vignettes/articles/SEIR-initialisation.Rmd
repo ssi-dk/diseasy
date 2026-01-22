@@ -176,7 +176,7 @@ $R$ states.
 
 We again assume $I^* = r_i I_1$.
 
-We can modify the SEIR equation to take this signal as a forcing function with no $E$ states and one less $I$ state
+We can modify the SEIR equation to take this signal as a forcing function with one less $I$ state
 (no $I_1$ state).
 
 The equations are as normal expect for the following changes:
