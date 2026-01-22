@@ -1191,24 +1191,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Add observables internal mappings
       # (used in $rhs() to map to the surveillance states)
-      if (derived_from == "state_vector") {
 
-        # Current labels
-        existing_outputs <- attr(private$observable_mapping$state_vector, "name")
-
-        # Add weights (ignoring potential existing zero-padding)
-        private$observable_mapping$state_vector <- rbind(
-          private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_EIR_states), drop = FALSE],
-          weights
-        )
-
-        # Update output names
-        attr(private$observable_mapping$state_vector, "name") <- c(
-          existing_outputs,
-          rep(name, nrow(weights))
-        )
-
-      } else {
+      # Update surveillance of infection matrix
+      if (derived_from == "infection_matrix") {
 
         # Current labels
         existing_outputs <- attr(private$observable_mapping$infection_matrix, "name")
@@ -1227,10 +1212,34 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       }
 
+      # Update surveillance of state vector
+      if (derived_from == "state_vector") {
+
+        # Current labels
+        existing_outputs <- attr(private$observable_mapping$state_vector, "name")
+
+        # Add weights (ignoring potential existing zero-padding)
+        private$observable_mapping$state_vector <- rbind(
+          private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_states), drop = FALSE],
+          weights
+        )
+
+        # Update output names
+        attr(private$observable_mapping$state_vector, "name") <- c(
+          existing_outputs,
+          rep(name, nrow(weights))
+        )
+
+      }
+
       # Add zero-padding (state_vector is extended for each surveillance state)
       if (!is.null(private$observable_mapping$state_vector)) {
+
+        # Current labels
+        existing_outputs <- attr(private$observable_mapping$state_vector, "name")
+
         private$observable_mapping$state_vector <- cbind(
-          private %.% observable_mapping %.% state_vector,
+          private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_states), drop = FALSE],
           matrix(
             0,
             nrow = nrow(private %.% observable_mapping %.% state_vector),
@@ -1238,6 +1247,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
               purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0)
           )
         )
+
+        # Update output names
+        attr(private$observable_mapping$state_vector, "name") <- existing_outputs
       }
 
       # Update surveillance indices
