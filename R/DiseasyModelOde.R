@@ -66,6 +66,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
 
+        # If the model uses testing and validation periods, add these to the prediction length
+        prediction_length <- prediction_length +
+          purrr::pluck(self %.% parameters %.% training_length, "testing", as.integer, .default = 0L) +
+          purrr::pluck(self %.% parameters %.% training_length, "validation", as.integer, .default = 0L)
+
         # Run the model to determine the raw rates (I*) at the maximal stratification in the model
         # and any configured observables
         model_rates <- private %.% solve_ode(prediction_length = prediction_length)
@@ -116,8 +121,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Truncate the prediction to the requested period (necessary for maps with delays)
         prediction <- prediction |>
           dplyr::filter(
-            .data$date > self %.% observables %.% last_queryable_date,
-            .data$date <= self %.% observables %.% last_queryable_date + lubridate::days(prediction_length)
+            .data$date > self %.% training_period %.% end,
+            .data$date <= self %.% training_period %.% end + lubridate::days(prediction_length)
           )
 
         # Add realisation_id and weight
@@ -251,13 +256,33 @@ DiseasyModelOde <- R6::R6Class(                                                 
             cex.lab = 1.25
           )
 
-          # Plot the data cut-off
+          # Plot the training period end
           abline(
-            v = self %.% observables %.% last_queryable_date,
+            v = self %.% training_period %.% end,
             col = "grey20",
             lty = "dashed",
             lwd = 2
           )
+
+          # Plot the testing period end
+          if (purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0) {
+            abline(
+              v = self %.% testing_period %.% end,
+              col = "grey20",
+              lty = "dotdash",
+              lwd = 2
+            )
+          }
+
+          # Plot the validation period end
+          if (purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0) {
+            abline(
+              v = self %.% validation_period %.% end,
+              col = "grey20",
+              lty = "dotted",
+              lwd = 2
+            )
+          }
 
           # Plot the predictions
           lines(
@@ -268,13 +293,21 @@ DiseasyModelOde <- R6::R6Class(                                                 
           )
 
           # Add legend
+          mask <- c(
+            TRUE,
+            TRUE,
+            purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0,
+            purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0,
+            TRUE
+          )
+
           legend(
             "topleft",
-            legend = c("Observations", "Training cut-off", "Model"),
-            col = c("grey20", "grey20", colour),
-            lty = c(NA,       "dashed", "solid"),
-            pch = c(16,       NA,       NA),
-            lwd = c(NA,       2,        4),
+            legend = c("Observations", "Training cut-off", "Testing cut-off", "Validation cut-off", "Model")[mask],
+            col = c("grey20", "grey20", "grey20", "grey20", colour)[mask],
+            lty = c(NA, "dashed", "dotdash", "dotted", "solid")[mask],
+            pch = c(16, NA, NA, NA, NA)[mask],
+            lwd = c(NA, 2, 2, 2, 4)[mask],
             inset = c(0, 0),
             xpd = TRUE,
             bg = "white"
@@ -387,7 +420,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # Add date information and truncate to requested prediction length
         model_rates <- model_rates |>
           dplyr::mutate(
-            "date" = .data$time + self %.% observables %.% last_queryable_date,
+            "date" = .data$time + self %.% training_period %.% end,
             .before = dplyr::everything()
           ) |>
           dplyr::filter(.data$time <= prediction_length) |>
