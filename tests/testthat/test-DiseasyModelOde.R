@@ -30,7 +30,7 @@ test_that("initialize works with custom mappings", {
       "model_output_to_observable" = list(
         "n_positive" = list(
           "map" = \(.x, .y) {
-            dplyr::mutate(.y, "n_positive" = 0.65 * .x$n_infected)
+            dplyr::transmute(.x, .data$date, "n_positive" = 0.65 * .data$n_infected)
           }
         )
       )

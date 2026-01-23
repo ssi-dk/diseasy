@@ -74,8 +74,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
     #' @description
     #'   Loads a copy of the provided module into the module.
-    #' @param module (`R6::R6Class instance`)\cr
-    #'   This instance is cloned to the field with the same name as the class of the module
+    #' @param module `r rd_module`
     #' @param clone (`boolean`)\cr
     #'   Toggle whether or not the module should be cloned when loading. Default TRUE.
     #' @details
