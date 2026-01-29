@@ -192,7 +192,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
 
       # Test mp that we lives up to the reciprocity principle:
       N_i <- outer(N, rep(1, length(N)))     # Columns are N: [N; N; N]                                                 # nolint: object_name_linter
-      if (max(abs(N_i * mp -  t(N_i * mp))) > 1e-6) {
+      if (max(abs(N_i * mp - t(N_i * mp))) > 1e-6) {
         rlang::abort("mp is not reciprocal")
       }
 

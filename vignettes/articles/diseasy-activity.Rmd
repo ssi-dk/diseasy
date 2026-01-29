@@ -140,7 +140,24 @@ scenario.
 ## Contact matrices
 Several disease models uses contact matrices to structure the populations.
 
-To retrieve the contact matrices from the module, we use the `$get_scenario_contacts()` method:
+In `diseasy` we use the following definitions:
+
+The _contact matrix_ $\overline{\overline{T}}$ with elements $t_{i,j}$ contains the _number_ of contacts between age
+group $i$ and age group $j$ .
+
+The _population contact matrix_ $\overline{\overline{M}}$ with elements $m_{i,j} = t_{i,j} / N_i$ contains the
+_mean number of contacts from age group $i$ to age group $j$_ with $N_i$ being the population size of age group $i$.
+In `diseasy` we use the symmetric variant $\overline{\overline{M}}'$ where contacts from age group $i$ to $j$ is
+identical with contacts from $j$ to $i$.
+This symmetric variant has the property: $m_{i,j} N_i = m_{j,i} N_j$.[^1] [^2]
+
+[^1]: These are the matrices we get from `socialmixr::contact_matrix()` if we specify `symmetric = TRUE`
+[^2]: This is what Keplac (BBC pandemic study) calls the $C$ matrix
+
+The _per capita contact rates_ $\overline{\overline{C}}$ with elements $c_{i,j} = m_{i,j} / N_j = t_{i,j} / (N_i N_j)$.
+
+To retrieve the _population contact matrix_ $\overline{\overline{M}}$ from the module, we use the
+`$get_scenario_contacts()` method:
 ```{r scenario_contacts}
 # We can project the matrices into custom age-groups by providing the
 # "age_cuts_lower" argument
