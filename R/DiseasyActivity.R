@@ -710,6 +710,50 @@ DiseasyActivity <- R6::R6Class(                                                 
                       "This means that you have to recreate scenarios.")
     },
 
+    #' @description
+    #'   Plot the (weighted) openness for the current scenario.
+    #' @param weights `r rd_activity_weights`
+    #' @return `r rd_side_effects`
+    plot = function(weights = NULL) {
+
+      # Retrieve the openness
+      openness <- private$weight_activities(self$get_scenario_openness(), weights = weights)
+
+      # Collapse to single plottable data.frame
+      ggdata <- purrr::imap(
+        openness, ~ {
+          if (is.null(weights)) {
+            out <- purrr::imap(
+              .x,
+              ~ {
+                tibble::enframe(.x, name = "age_group", value = "openness") |>
+                  dplyr::mutate("arena" = .y)
+              }
+            ) |>
+              purrr::list_rbind()
+          } else {
+            out <- tibble::enframe(.x, name = "age_group", value = "openness")
+          }
+
+          dplyr::mutate(out, "t" = as.Date(.y))
+        }
+      ) |>
+        purrr::list_rbind()
+
+      # Plot
+      gg <- ggplot2::ggplot(ggdata) +
+        ggplot2::geom_line(
+          mapping = ggplot2::aes(x = t, y = openness, colour = factor(age_group))
+        )
+
+      if (is.null(weights)) {
+        gg <- gg + ggplot2::facet_wrap(~ arena)
+      }
+
+      gg
+
+    },
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyActivity ############################################")

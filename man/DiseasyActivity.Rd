@@ -90,6 +90,7 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
 \item \href{#method-DiseasyActivity-rescale_contacts_to_rates}{\code{DiseasyActivity$rescale_contacts_to_rates()}}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
+\item \href{#method-DiseasyActivity-plot}{\code{DiseasyActivity$plot()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
 \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
 }
@@ -361,7 +362,7 @@ Rescale contact matrices to population contact rates
 Re-scale from contacts to rates per individual to fractional population.
 @details
 If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
-this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
+this function returns the rescaled elements \eqn{\left(sum_j N_j\right)  \beta_{i,j} / N_j}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_contacts_to_rates(input, population)}\if{html}{\out{</div>}}
 }
@@ -392,6 +393,26 @@ NOTE: Called automatically when setting/changing activity units.
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$reset_scenario()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+\code{NULL} (called for side effects)
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyActivity-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-plot}{}}}
+\subsection{Method \code{plot()}}{
+Plot the (weighted) openness for the current scenario.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(weights = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 \code{NULL} (called for side effects)
 }
