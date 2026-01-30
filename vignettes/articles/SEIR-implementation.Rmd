@@ -142,10 +142,10 @@ $$
 
 Notice that we obtain terms of the form:
 $$
-\tilde{N}c_{i,j} = \frac{\tilde{N}}{N_i} \frac{t_{i,j}}{N_i} = \frac{\tilde{N}}{N_i} m_{i,j}
+\tilde{N}c_{i,j} = \frac{\tilde{N}}{N_j} \frac{t_{i,j}}{N_i} = \frac{\tilde{N}}{N_j} m_{i,j}
 $$
 
-where $m_{i,j}$ is the output of `$get_scenario_contacts()` and the rescaling $\frac{\tilde{N}}{N_i}$ can be performed
+where $m_{i,j}$ is the output of `$get_scenario_contacts()` and the rescaling $\frac{\tilde{N}}{N_j}$ can be performed
 with `$rescale_contacts_to_rates()` using `DiseasyActivity`.
 
 # The implementation of the right-hand side function
