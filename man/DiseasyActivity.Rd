@@ -403,7 +403,7 @@ NOTE: Called automatically when setting/changing activity units.
 \subsection{Method \code{plot()}}{
 Plot the (weighted) openness for the current scenario.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(age_cuts_lower = NULL, weights = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(age_cuts_lower = 0, weights = rep(0.25, 4))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
