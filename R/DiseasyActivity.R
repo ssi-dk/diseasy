@@ -712,12 +712,16 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     #' @description
     #'   Plot the (weighted) openness for the current scenario.
+    #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param weights `r rd_activity_weights`
     #' @return `r rd_side_effects`
-    plot = function(weights = NULL) {
+    plot = function(age_cuts_lower = NULL, weights = NULL) {
 
       # Retrieve the openness
-      openness <- private$weight_activities(self$get_scenario_openness(), weights = weights)
+      openness <- private$weight_activities(
+        self$get_scenario_openness(age_cuts_lower = age_cuts_lower),
+        weights = weights
+      )
 
       # Collapse to single plottable data.frame
       ggdata <- purrr::imap(
@@ -741,9 +745,18 @@ DiseasyActivity <- R6::R6Class(                                                 
         purrr::list_rbind()
 
       # Plot
-      gg <- ggplot2::ggplot(ggdata) +
+      ggplot2::ggplot(ggdata) +
         ggplot2::geom_line(
-          mapping = ggplot2::aes(x = t, y = openness, colour = factor(age_group))
+          mapping = ggplot2::aes(x = t, y = openness, colour = factor(age_group)),
+          linewidth = 1
+        ) +
+        ggplot2::scale_colour_discrete(
+          guide = ifelse(length(age_cuts_lower), "none", "legend"),
+          name = "Age group"
+        ) +
+        ggplot2::labs(
+          x = NULL,
+          y = "Openness"
         )
 
       if (is.null(weights)) {
