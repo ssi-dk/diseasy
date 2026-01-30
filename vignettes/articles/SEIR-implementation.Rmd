@@ -123,20 +123,20 @@ $$
 
 Then, dividing through by the total population size $N$ yields:
 $$
-\dot{\frac{\tilde{I}_i}{\tilde{N}}}= p\left(\tilde{I}_1 t_{i,1} / (\tilde{N}_1 \tilde{N}_i) + \tilde{I}_2 t_{i,2} / (\tilde{N}_2 \tilde{N}_i) + \dots\right)
+\frac{\dot{\tilde{I}}_i}{\tilde{N}} = p\left(\tilde{I}_1 t_{i,1} / (\tilde{N}_1 \tilde{N}_i) + \tilde{I}_2 t_{i,2} / (\tilde{N}_2 \tilde{N}_i) + \dots\right)
 \cdot \frac{\tilde{S}_i}{\tilde{N}} - r_I \frac{\tilde{I}_i}{\tilde{N}} \Rightarrow
 $$
 
 Then expanding by $N / N$ and expressing in terms of $c_{i,j} = \frac{t_{ij}}{\tilde{N}_i\tilde{N}_j}$.
 $$
-\dot{\frac{\tilde{I}_i}{\tilde{N}}}= p\frac{\tilde{N}}{\tilde{N}}\left(\tilde{I}_1 c_{i,1} + \tilde{I}_2 c_{i,2} + \dots\right) \cdot
+\frac{\dot{\tilde{I}}_i}{\tilde{N}} = p\frac{\tilde{N}}{\tilde{N}}\left(\tilde{I}_1 c_{i,1} + \tilde{I}_2 c_{i,2} + \dots\right) \cdot
 \frac{\tilde{S}_i}{\tilde{N}}
 - r_I \frac{\tilde{I}_i}{\tilde{N}} \Rightarrow
 $$
 
 and finally expressing in terms of normalised quantities
 $$
-\dot{I_i}= p\tilde{N}\left(I_1 c_{i,1} + I_2 c_{i,2} + \dots\right) \cdot
+\dot{I}_i = p\tilde{N}\left(I_1 c_{i,1} + I_2 c_{i,2} + \dots\right) \cdot
 S_i - r_I I_i
 $$
 
