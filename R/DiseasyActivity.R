@@ -745,7 +745,7 @@ DiseasyActivity <- R6::R6Class(                                                 
         purrr::list_rbind()
 
       # Plot
-      ggplot2::ggplot(ggdata) +
+      gg <- ggplot2::ggplot(ggdata) +
         ggplot2::geom_line(
           mapping = ggplot2::aes(x = t, y = openness, colour = factor(age_group)),
           linewidth = 1
