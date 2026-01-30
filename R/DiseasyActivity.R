@@ -751,7 +751,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           linewidth = 1
         ) +
         ggplot2::scale_colour_discrete(
-          guide = ifelse(length(age_cuts_lower), "none", "legend"),
+          guide = ifelse(length(age_cuts_lower) == 1, "none", "legend"),
           name = "Age group"
         ) +
         ggplot2::labs(
