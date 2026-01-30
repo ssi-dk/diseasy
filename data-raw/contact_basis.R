@@ -155,7 +155,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       # m'_ij = 0.5 * (m_ij + m_ji N_j / N_i)
       #
       # NOTE: These are the matrices we get from `socialmixr::contact_matrix()` if we specify `symmetric = TRUE`
-      # NOTE: This is what Keplac (BBC pandemic) calls the C matrix
+      # NOTE: This is what Klepac (BBC pandemic) calls the C matrix
 
 
       # Step 3 (optional):

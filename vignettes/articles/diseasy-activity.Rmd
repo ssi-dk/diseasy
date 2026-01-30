@@ -152,7 +152,7 @@ identical with contacts from $j$ to $i$.
 This symmetric variant has the property: $m_{i,j} N_i = m_{j,i} N_j$.[^1] [^2]
 
 [^1]: These are the matrices we get from `socialmixr::contact_matrix()` if we specify `symmetric = TRUE`
-[^2]: This is what Keplac (BBC pandemic study) calls the $C$ matrix
+[^2]: This is what Klepac (BBC pandemic study) calls the $C$ matrix
 
 The _per capita contact rates_ $\overline{\overline{C}}$ with elements $c_{i,j} = m_{i,j} / N_j = t_{i,j} / (N_i N_j)$.
 
