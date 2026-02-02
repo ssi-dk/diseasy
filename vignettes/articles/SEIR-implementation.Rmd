@@ -98,15 +98,22 @@ knitr::include_graphics(
 If we define a risk of infection per contact, $p$, the differential equation governing the infectious in the simple SIR
 model can then be expressed as:
 $$
-\dot{\tilde{I}}_i =
-\left(\textrm{number of infectious contacts}\right)\left(\textrm{probability of contact being susceptible}\right) -
-\left(\textrm{clearing of infection}\right)
+\dot{\tilde{I}} =
+\left<\textrm{risk of infection per contact}\right> \times
+$$
+$$
+\left<\textrm{number of contacts from infected individuals}\right> \times \left<\textrm{probability of contact being susceptible}\right>
+$$
+$$
+ - \left<\textrm{clearing of infection}\right>
 $$
 
-To compute the number of infectious contacts we need the number of contacts between infected individual of any age
-group and members of the $i$'th age group. If $t_{i,j}$ is the number of contacts from age group $i$ to age group
-$j$, then $p \tilde{I}_j t_{i,j} / \tilde{N}_j$ is the number of infectious contacts (infected individual of age group
-$j$ times mean number of contacts to age group $i$ with each contact carrying a risk of infection $p$).
+To compute the number of infectious contacts we need the number of contacts between infected individuals of any age
+group and individuals in the $i$'th age group. If $t_{i,j} = t_{j,i}$ is the (symmetric) number of contacts between
+age group $i$ and age group $j$, then $p \tilde{I}_j t_{i,j} / \tilde{N}_j$ is the number of infectious contacts from
+$j$ to $i$
+(infected individual of age group $j$ times mean number of contacts to age group $i$ with each contact carrying a
+risk of infection $p$).
 
 The probability that a contact is susceptible is simply its proportion relative to the age group leading to:
 
@@ -142,10 +149,10 @@ $$
 
 Notice that we obtain terms of the form:
 $$
-\tilde{N}c_{i,j} = \frac{\tilde{N}}{N_j} \frac{t_{i,j}}{N_i} = \frac{\tilde{N}}{N_j} m_{i,j}
+\tilde{N}c_{i,j} = \frac{\tilde{N}}{\tilde{N}_j} \frac{t_{i,j}}{\tilde{N}_i} = \frac{\tilde{N}}{\tilde{N}_j} m_{i,j}
 $$
 
-where $m_{i,j}$ is the output of `$get_scenario_contacts()` and the rescaling $\frac{\tilde{N}}{N_j}$ can be performed
+where $m_{i,j}$ is the output of `$get_scenario_contacts()` and the rescaling $\frac{\tilde{N}}{\tilde{N}_j}$ can be performed
 with `$rescale_contacts_to_rates()` using `DiseasyActivity`.
 
 # The implementation of the right-hand side function
