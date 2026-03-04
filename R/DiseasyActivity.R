@@ -726,8 +726,136 @@ DiseasyActivity <- R6::R6Class(                                                 
       } else {
         printr("Contact basis: ", self$contact_basis$description, max_width = 100)
       }
-    }
+    },
 
+    #' @description
+    #'   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
+    #' @param age_cuts_lower `r rd_age_cuts_lower`
+    #' @param weights `r rd_activity_weights`
+    plot = function(age_cuts_lower = NULL, weights = NULL) {
+
+      # Retrieve the contact matrices
+      contacts <- self$get_scenario_contacts(
+        age_cuts_lower = age_cuts_lower,
+        weights = weights
+      )
+
+      # Collapse the first contact matrix to single plottable data.frame
+      gg_contacts <- purrr::imap(
+        contacts[1], ~ {
+          if (is.null(weights)) {
+            out <- purrr::imap(
+              .x,
+              ~ dplyr::mutate(
+                reshape2::melt(.x, varnames = c("in", "out")),
+                "arena" = .y
+              )
+            ) |>
+              purrr::list_rbind()
+          } else {
+            out <- dplyr::mutate(reshape2::melt(.x, varnames = c("in", "out")))
+          }
+
+          dplyr::mutate(out, "t" = as.Date(.y))
+        }
+      ) |>
+        purrr::list_rbind() |>
+        tibble::as_tibble()
+
+      # Plot contacts
+      contacts_plot <- gg_contacts |>
+        ggplot2::ggplot(ggplot2::aes(x = `in`, y = out, fill = value)) +
+        ggplot2::geom_raster() +
+        ggplot2::scale_fill_viridis_c() +
+        ggplot2::labs(
+          x = "Contacts from",
+          y = "Contacts to"
+        ) +
+        ggplot2::theme(
+          aspect.ratio = 1,
+          axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)
+        )
+
+      if (is.null(weights)) {
+        contacts_plot <- contacts_plot +
+          ggplot2::facet_wrap(
+            ~ arena,
+            labeller = ggplot2::labeller(arena = stringr::str_to_sentence)
+          )
+      }
+
+
+      # Retrieve the openness
+      openness <- self$get_scenario_openness(
+        age_cuts_lower = age_cuts_lower,
+        weights = weights
+      )
+
+      # Collapse to single plottable data.frame
+      gg_openness <- purrr::imap(
+        openness, ~ {
+          if (is.null(weights)) {
+            out <- purrr::imap(
+              .x,
+              ~ {
+                tibble::enframe(.x, name = "age_group", value = "openness") |>
+                  dplyr::mutate("arena" = .y)
+              }
+            ) |>
+              purrr::list_rbind()
+          } else {
+            out <- tibble::enframe(.x, name = "age_group", value = "openness")
+          }
+
+          dplyr::mutate(out, "t" = as.Date(.y))
+        }
+      ) |>
+        purrr::list_rbind()
+
+      if (!is.null(weights)) {
+        gg_openness <- dplyr::mutate(gg_openness, "arena" = "all")
+      }
+
+      # Add padding to the end
+      gg_openness <- rbind(
+        gg_openness,
+        gg_openness |>
+          dplyr::summarise(
+            "openness" = dplyr::last(.data$openness),
+            "t" = max(.data$t) + (max(.data$t) - min(.data$t)) / length(unique(.data$t)),
+            .by = c("age_group", "arena")
+          )
+      )
+
+      # Plot openness
+      openness_plot <- gg_openness |>
+        ggplot2::ggplot() +
+        ggplot2::geom_step(
+          mapping = ggplot2::aes(x = t, y = openness, colour = factor(age_group)),
+          linewidth = 1
+        ) +
+        ggplot2::scale_y_continuous(
+          labels = scales::label_percent(),
+          limits = c(0, 1),
+          expand = c(0, 0)
+        ) +
+        ggplot2::labs(
+          x = NULL,
+          y = "Openness",
+          colour = "Age group"
+        ) +
+        ggplot2::guides(colour = ggplot2::guide_legend(ncol = 2))
+
+      if (is.null(weights)) {
+        openness_plot <- openness_plot +
+          ggplot2::facet_wrap(
+            ~ arena,
+            labeller = ggplot2::labeller(arena = stringr::str_to_sentence)
+          )
+      }
+
+      return(list(contacts_plot, openness_plot))
+    }
   ),
 
   active = list(
