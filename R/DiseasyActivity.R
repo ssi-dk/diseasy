@@ -711,84 +711,10 @@ DiseasyActivity <- R6::R6Class(                                                 
     },
 
     #' @description
-    #'   Plot the (weighted) openness for the current scenario.
-    #' @param age_cuts_lower `r rd_age_cuts_lower`
-    #' @param weights `r rd_activity_weights`
-    #' @return `r rd_side_effects`
-    plot = function(age_cuts_lower = 0, weights = rep(0.25, 4)) {
-
-      # Retrieve the openness
-      openness <- private$weight_activities(
-        self$get_scenario_openness(age_cuts_lower = age_cuts_lower),
-        weights = weights
-      )
-
-      # Collapse to single plottable data.frame
-      ggdata <- purrr::imap(
-        openness, ~ {
-          if (is.null(weights)) {
-            out <- purrr::imap(
-              .x,
-              ~ {
-                tibble::enframe(.x, name = "age_group", value = "openness") |>
-                  dplyr::mutate("arena" = .y)
-              }
-            ) |>
-              purrr::list_rbind()
-          } else {
-            out <- tibble::enframe(.x, name = "age_group", value = "openness")
-          }
-
-          dplyr::mutate(out, "t" = as.Date(.y))
-        }
-      ) |>
-        purrr::list_rbind()
-
-      # Plot
-      gg <- ggplot2::ggplot(ggdata) +
-        ggplot2::geom_line(
-          mapping = ggplot2::aes(x = t, y = openness, colour = factor(age_group)),
-          linewidth = 1
-        ) +
-        ggplot2::scale_colour_discrete(
-          guide = ifelse(length(age_cuts_lower) == 1, "none", "legend"),
-          name = "Age group"
-        ) +
-        ggplot2::labs(
-          x = NULL,
-          y = "Openness"
-        )
-
-      if (is.null(weights)) {
-        gg <- gg + ggplot2::facet_wrap(~ arena)
-      }
-
-      gg
-
-    },
-
-    #' @description `r rd_describe`
-    describe = function() {
-      printr("# DiseasyActivity ############################################")
-      if (is.null(self$scenario_matrix)) {
-        printr("Scenario: Activity scenario not yet set")
-      } else {
-        printr("Scenario: Overview")
-        print(self$scenario_matrix)
-        cat("\n")
-      }
-
-      if (is.null(self$contact_basis)) {
-        printr("Contact basis: not yet set")
-      } else {
-        printr("Contact basis: ", self$contact_basis$description, max_width = 100)
-      }
-    },
-
-    #' @description
     #'   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param weights `r rd_activity_weights`
+    #' @return `r rd_side_effects`
     plot = function(age_cuts_lower = NULL, weights = NULL) {
 
       # Retrieve the contact matrices
@@ -912,6 +838,24 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       return(list(contacts_plot, openness_plot))
+    },
+
+    #' @description `r rd_describe`
+    describe = function() {
+      printr("# DiseasyActivity ############################################")
+      if (is.null(self$scenario_matrix)) {
+        printr("Scenario: Activity scenario not yet set")
+      } else {
+        printr("Scenario: Overview")
+        print(self$scenario_matrix)
+        cat("\n")
+      }
+
+      if (is.null(self$contact_basis)) {
+        printr("Contact basis: not yet set")
+      } else {
+        printr("Contact basis: ", self$contact_basis$description, max_width = 100)
+      }
     }
   ),
 
