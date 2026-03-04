@@ -92,6 +92,7 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
 \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
 \item \href{#method-DiseasyActivity-plot}{\code{DiseasyActivity$plot()}}
 \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
+\item \href{#method-DiseasyActivity-plot}{\code{DiseasyActivity$plot()}}
 \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
 }
 }
@@ -428,6 +429,25 @@ Prints a human readable report of the internal state of the module.
 \if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$describe()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyActivity-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-plot}{}}}
+\subsection{Method \code{plot()}}{
+Plot the first set of contact matrices of the scenario as well as the "openness" over time.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(age_cuts_lower = NULL, weights = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+
+\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-clone"></a>}}
