@@ -715,7 +715,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param weights `r rd_activity_weights`
     #' @return `r rd_side_effects`
-    plot = function(age_cuts_lower = NULL, weights = NULL) {
+    plot = function(age_cuts_lower = NULL, weights = rep(1, 4)) {
 
       # Retrieve the contact matrices
       contacts <- self$get_scenario_contacts(
