@@ -279,8 +279,68 @@ ways to get contact metrics from the module for the scenario.</p>
 </h3>
 <p>Several disease models uses contact matrices to structure the
 populations.</p>
-<p>To retrieve the contact matrices from the module, we use the
-<code>$get_scenario_contacts()</code> method:</p>
+<p>In <code>diseasy</code> we use the following definitions:</p>
+<p>The <em>contact matrix</em>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>T</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{T}}</annotation></semantics></math>
+with elements
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>t</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">t_{i,j}</annotation></semantics></math>
+contains the <em>number</em> of contacts between age group
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and age group
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+.</p>
+<p>The <em>population contact matrix</em>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>M</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{M}}</annotation></semantics></math>
+with elements
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>m</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>t</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mi>/</mi><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">m_{i,j} = t_{i,j} / \tilde{N}_i</annotation></semantics></math>
+contains the <em>mean number of contacts from age group
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+to age group
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math></em>
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><annotation encoding="application/x-tex">\tilde{N}_i</annotation></semantics></math>
+being the population size of age group
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;To see why
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;msub&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;j&lt;/mi&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;annotation encoding="application/x-tex"&gt;m_{i,j}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+is the mean number of contacts, consider a population of
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;mo accent="true"&gt;̃&lt;/mo&gt;&lt;/mover&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/msub&gt;&lt;annotation encoding="application/x-tex"&gt;\tilde{N}_1&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+= 1 and
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;mo accent="true"&gt;̃&lt;/mo&gt;&lt;/mover&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msub&gt;&lt;annotation encoding="application/x-tex"&gt;\tilde{N}_2&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+= 2, with contact matrix
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mover&gt;&lt;mover&gt;&lt;mi&gt;T&lt;/mi&gt;&lt;mo accent="true"&gt;¯&lt;/mo&gt;&lt;/mover&gt;&lt;mo accent="true"&gt;¯&lt;/mo&gt;&lt;/mover&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;[&lt;/mo&gt;&lt;mtable&gt;&lt;mtr&gt;&lt;mtd columnalign="center" style="text-align: center"&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd columnalign="center" style="text-align: center"&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd columnalign="center" style="text-align: center"&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mtd&gt;&lt;mtd columnalign="center" style="text-align: center"&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;mo stretchy="true" form="postfix"&gt;]&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\overline{\overline{T}} = \begin{bmatrix} 0 &amp;amp; 2\\ 2 &amp;amp; 2\end{bmatrix}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.
+In this case, there are 2 contacts between age groups
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msub&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;j&lt;/mi&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;j&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;t_{i,j} = t_{j,i} = 2&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;,
+and
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msub&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mrow&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mrow&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mi&gt;/&lt;/mi&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;mo accent="true"&gt;̃&lt;/mo&gt;&lt;/mover&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;m_{1,2} = t_{1,2} / \tilde{N}_1 = 2&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+average contacts from the individual in age group 1 with the individuals
+in age group 2, and
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msub&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mrow&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mrow&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mi&gt;/&lt;/mi&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;mo accent="true"&gt;̃&lt;/mo&gt;&lt;/mover&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;m_{2,1} = t_{2,1} / \tilde{N}_2 = 1&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+average contacts from individuals in age group 2 with the individual in
+age group 1.&lt;/p&gt;'><sup>1</sup></a>.</p>
+<p>In <code>diseasy</code> we use the symmetric variant
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>M</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mi>′</mi></mrow><annotation encoding="application/x-tex">\overline{\overline{M}}'</annotation></semantics></math>
+where contacts from age group
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+is identical with contacts from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+This symmetric variant has the property:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>m</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo>=</mo><msub><mi>m</mi><mrow><mi>j</mi><mo>,</mo><mi>i</mi></mrow></msub><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">m_{i,j} \tilde{N}_i = m_{j,i} \tilde{N}_j</annotation></semantics></math>.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;These are the matrices we get from
+&lt;code&gt;socialmixr::contact_matrix()&lt;/code&gt; if we specify
+&lt;code&gt;symmetric = TRUE&lt;/code&gt;&lt;/p&gt;"><sup>2</sup></a> <a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;This is what Klepac (BBC pandemic study) calls the
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;C&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;C&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+matrix&lt;/p&gt;'><sup>3</sup></a></p>
+<p>The <em>per capita contact rates</em>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>C</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{C}}</annotation></semantics></math>
+with elements
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>m</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mi>/</mi><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>j</mi></msub><mo>=</mo><msub><mi>t</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>j</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">c_{i,j} = m_{i,j} / \tilde{N}_j = t_{i,j} / (\tilde{N}_i \tilde{N}_j)</annotation></semantics></math>.</p>
+<p>To retrieve the <em>population contact matrix</em>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>M</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{M}}</annotation></semantics></math>
+from the module, we use the <code>$get_scenario_contacts()</code>
+method:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># We can project the matrices into custom age-groups by providing the</span></span>
 <span><span class="co"># "age_cuts_lower" argument</span></span>
@@ -397,6 +457,7 @@ the loaded scenario.</p>
 <span><span class="co">#&gt; school          1</span></span>
 <span><span class="co">#&gt; other           1</span></span></code></pre></div>
 </div>
+
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
