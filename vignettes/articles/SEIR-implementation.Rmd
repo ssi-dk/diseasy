@@ -95,37 +95,65 @@ knitr::include_graphics(
 ```
 
 ## Contact matrix
-The contact matrix, $\tilde{\overline{\overline{C}}}$, is a $A \times A$ matrix. The elements $\tilde{c}_{ij}$
-can denotes the contacts from age group $j$ to age group $i$.
-(It may be helpful to memorise as $\tilde{c}_{i\leftarrow j}$)
-
-In the model, these are normalised to the "per capita" contact matrix $\overline{\overline{C}}$, meaning that the
-elements are $c_{ij} = \frac{\tilde{c}_{ij}}{N_j}$ where $\tilde{N}_i$ is the population of age group $i$.
-
-This way, when used in the model, the equations' infections terms becomes:
-$\frac{\tilde{c}_{ij}}{\tilde{N}_j} \sum_l I_j^l S_i$
-and the equations can be normalised via the transformations $\psi^e = \frac{\tilde{\psi}^e_{i|e}}{\tilde{N}_{i}}$,
-where $i|e$ is the age group of element $e$.
-
-NOTE: Shouldn't we then have $c_{ij} = \tilde{c}_{ij} \tilde{N}_j$ instead?
-
+If we define a risk of infection per contact, $p$, the differential equation governing the infectious in the simple SIR
+model can then be expressed as:
 $$
-\dot{\tilde{I}} = \tilde{\beta}\, \tilde{I} \tilde{S} - r_I \tilde{I} \Rightarrow
+\dot{\tilde{I}} =
+\left<\textrm{risk of infection per contact}\right> \times
 $$
 $$
-\frac{\dot{\tilde{I}}}{N} = \frac{\tilde{\beta}\, \tilde{I} \tilde{S}}{N} - \frac{ r_I \tilde{I}}{N} \Rightarrow
+\left<\textrm{number of contacts from infected individuals}\right> \times \left<\textrm{probability of contact being susceptible}\right>
 $$
 $$
-\dot{I} = \tilde{\beta}\, I \tilde{S} - r_I I \Rightarrow
+ - \left<\textrm{clearing of infection}\right>
 $$
 
-$$
-\dot{I} = N\tilde{\beta}\, I \frac{\tilde{S}}{N} - r_I I \Rightarrow
-$$
+To compute the number of infectious contacts we need the number of contacts between infected individuals of any age
+group and individuals in the $i$'th age group. If $t_{i,j} = t_{j,i}$ is the (symmetric) number of contacts between
+age group $i$ and age group $j$, then $p \tilde{I}_j t_{i,j} / \tilde{N}_j$ is the number of infectious contacts from
+$j$ to $i$
+(infected individual of age group $j$ times mean number of contacts to age group $i$ with each contact carrying a
+risk of infection $p$).
+
+The probability that a contact is susceptible is simply its proportion relative to the age group leading to:
 
 $$
-\dot{I} = \underbrace{N\tilde{\beta}}_{\beta}\, I S - r_I I
+\dot{\tilde{I}}_i = p\left(\tilde{I}_1 t_{i,1} / \tilde{N}_1 + \tilde{I}_2 t_{i,2} / \tilde{N}_2 + \dots\right) \cdot
+\frac{\tilde{S}_i}{\tilde{N}_i} - r_I \tilde{I}_i
 $$
+
+Collecting $N$ terms:
+$$
+= p\left(\tilde{I}_1 t_{i,1} / (\tilde{N}_1 \tilde{N}_i) + \tilde{I}_2 t_{i,2} / (\tilde{N}_2 \tilde{N}_i) + \dots\right)
+\cdot \tilde{S}_i - r_I \tilde{I}_i \Rightarrow
+$$
+
+Then, dividing through by the total population size $N$ yields:
+$$
+\frac{\dot{\tilde{I}}_i}{\tilde{N}} = p\left(\tilde{I}_1 t_{i,1} / (\tilde{N}_1 \tilde{N}_i) + \tilde{I}_2 t_{i,2} / (\tilde{N}_2 \tilde{N}_i) + \dots\right)
+\cdot \frac{\tilde{S}_i}{\tilde{N}} - r_I \frac{\tilde{I}_i}{\tilde{N}} \Rightarrow
+$$
+
+Then expanding by $N / N$ and expressing in terms of $c_{i,j} = \frac{t_{ij}}{\tilde{N}_i\tilde{N}_j}$.
+$$
+\frac{\dot{\tilde{I}}_i}{\tilde{N}} = p\frac{\tilde{N}}{\tilde{N}}\left(\tilde{I}_1 c_{i,1} + \tilde{I}_2 c_{i,2} + \dots\right) \cdot
+\frac{\tilde{S}_i}{\tilde{N}}
+- r_I \frac{\tilde{I}_i}{\tilde{N}} \Rightarrow
+$$
+
+and finally expressing in terms of normalised quantities
+$$
+\dot{I}_i = p\tilde{N}\left(I_1 c_{i,1} + I_2 c_{i,2} + \dots\right) \cdot
+S_i - r_I I_i
+$$
+
+Notice that we obtain terms of the form:
+$$
+\tilde{N}c_{i,j} = \frac{\tilde{N}}{\tilde{N}_j} \frac{t_{i,j}}{\tilde{N}_i} = \frac{\tilde{N}}{\tilde{N}_j} m_{i,j}
+$$
+
+where $m_{i,j}$ is the output of `$get_scenario_contacts()` and the rescaling $\frac{\tilde{N}}{\tilde{N}_j}$ can be performed
+with `$rescale_contacts_to_rates()` using `DiseasyActivity`.
 
 # The implementation of the right-hand side function
 With the opening considerations in mind, we can now describe the implementation of the model.

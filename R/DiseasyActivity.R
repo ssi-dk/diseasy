@@ -617,9 +617,10 @@ DiseasyActivity <- R6::R6Class(                                                 
           # For each contact matrix, m, in the scenario, we perform the transformation
           # (p %*% (m * N_original) %*% t(p)) / N_new                                                                   # nolint: commented_code_linter
           # As m is the number of contacts from each individual m * N_original scales to all contacts between
-          # age groups.
+          # age groups ("t" domain).
           # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-          # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
+          # Finally, the division by N_new transforms back to contacts per individual in the new age groups
+          # ("m" domain).
           scenario_contacts <- scenario_contacts |>
             lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
         }
@@ -669,7 +670,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   Re-scale from contacts to rates per individual to fractional population.
     #'  @details
     #'   If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
-    #'   this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
+    #'   this function returns the rescaled elements \eqn{\left(sum_j N_j\right)  \beta_{i,j} / N_j}.
     #' @param input (`matrix array` or `list`(`matrix array`))\cr
     #'   Contacts to be re-scaled.
     #' @param population (`numeric`)\cr
