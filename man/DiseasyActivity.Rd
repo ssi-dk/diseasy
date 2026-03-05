@@ -403,7 +403,7 @@ NOTE: Called automatically when setting/changing activity units.
 \subsection{Method \code{plot()}}{
 Plot the first set of contact matrices of the scenario as well as the "openness" over time.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(age_cuts_lower = NULL, weights = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(age_cuts_lower = NULL, weights = rep(1, 4))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
