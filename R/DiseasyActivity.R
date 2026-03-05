@@ -714,8 +714,20 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param weights `r rd_activity_weights`
+    #' @param contacts_date (`Date(1)`)\cr
+    #'   The date to plot contact matrix for (default is earliest contact matrix).
     #' @return `r rd_side_effects`
-    plot = function(age_cuts_lower = NULL, weights = rep(1, 4)) {
+    plot = function(age_cuts_lower = NULL, weights = rep(1, 4), contacts_date = NULL) {
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_numeric(
+        age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
+        lower = 0, unique = TRUE, add = coll
+      )
+      checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
+      checkmate::assert_date(contacts_date, null.ok = TRUE, add = coll)
+      checkmate::reportAssertions(coll)
 
       # Retrieve the contact matrices
       contacts <- self$get_scenario_contacts(
@@ -723,9 +735,17 @@ DiseasyActivity <- R6::R6Class(                                                 
         weights = weights
       )
 
+      if (is.null(contacts_date)) {
+        contacts_date <- as.Date(names(contacts[1]))
+      }
+
+      # Select latest valid contact matrix at contacts_date
+      contact_matrix_to_plot <- purrr::keep_at(contacts, ~ as.Date(.) <= contacts_date) |>
+        utils::tail(1)
+
       # Collapse the first contact matrix to single plottable data.frame
       gg_contacts <- purrr::imap(
-        contacts[1], ~ {
+        contact_matrix_to_plot, ~ {
           if (is.null(weights)) {
             out <- purrr::imap(
               .x,

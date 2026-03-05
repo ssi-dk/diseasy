@@ -403,7 +403,11 @@ NOTE: Called automatically when setting/changing activity units.
 \subsection{Method \code{plot()}}{
 Plot the first set of contact matrices of the scenario as well as the "openness" over time.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(age_cuts_lower = NULL, weights = rep(1, 4))}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(
+  age_cuts_lower = NULL,
+  weights = rep(1, 4),
+  contacts_date = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -412,6 +416,9 @@ Plot the first set of contact matrices of the scenario as well as the "openness"
 \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
+
+\item{\code{contacts_date}}{(\code{Date(1)})\cr
+The date to plot contact matrix for (default is earliest contact matrix).}
 }
 \if{html}{\out{</div>}}
 }
