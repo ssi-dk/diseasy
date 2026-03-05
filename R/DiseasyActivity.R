@@ -839,7 +839,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           )
       }
 
-      return(list(contacts_plot, openness_plot))
+      return(list("contact_matrix" = contacts_plot, "openness" = openness_plot))
     },
 
     #' @description `r rd_describe`
