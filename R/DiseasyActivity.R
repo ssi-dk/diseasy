@@ -752,7 +752,9 @@ DiseasyActivity <- R6::R6Class(                                                 
         ggplot2::scale_fill_viridis_c() +
         ggplot2::labs(
           x = "Contacts from",
-          y = "Contacts to"
+          y = "Contacts to",
+          title = "Mean number of daily contacts",
+          fill = "Contacts"
         ) +
         ggplot2::theme(
           aspect.ratio = 1,
