@@ -756,7 +756,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             ) |>
               purrr::list_rbind()
           } else {
-            out <- dplyr::mutate(reshape2::melt(.x, varnames = c("in", "out")))
+            out <- reshape2::melt(.x, varnames = c("in", "out"))
           }
 
           dplyr::mutate(out, "t" = as.Date(.y))
