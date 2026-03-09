@@ -91,14 +91,14 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (base_scenario == "dk_reference") {
 
         # Use the Danish activity units
-        self$set_activity_units(dk_activity_units)
+        self$set_activity_units(diseasy::dk_activity_units)
 
         # Use the Danish restrictions
-        self$change_activity(dk_reference_scenario)
+        self$change_activity(diseasy::dk_reference_scenario)
 
         # The "social_distance_work" parameter varies across activity units. If several activity units are active
         # on the same date, we compute the mean "social_distance_work" use this risk for all units on that date
-        work_risk <- stats::aggregate(social_distance_work ~ date, data = dk_reference_scenario, FUN = mean)
+        work_risk <- stats::aggregate(social_distance_work ~ date, data = diseasy::dk_reference_scenario, FUN = mean)
         self$change_risk(date = work_risk$date, type = "work", risk = work_risk$social_distance_work)
 
         private$lg$info("Initialised 'dk_reference' scenario")
@@ -617,9 +617,10 @@ DiseasyActivity <- R6::R6Class(                                                 
           # For each contact matrix, m, in the scenario, we perform the transformation
           # (p %*% (m * N_original) %*% t(p)) / N_new                                                                   # nolint: commented_code_linter
           # As m is the number of contacts from each individual m * N_original scales to all contacts between
-          # age groups.
+          # age groups ("t" domain).
           # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-          # Finally, the division by N_new transforms back to contacts per individual in the new age groups.
+          # Finally, the division by N_new transforms back to contacts per individual in the new age groups
+          # ("m" domain).
           scenario_contacts <- scenario_contacts |>
             lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
         }
@@ -669,7 +670,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   Re-scale from contacts to rates per individual to fractional population.
     #'  @details
     #'   If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
-    #'   this function returns the rescaled elements \eqn{\beta_{i,j} / N_j}.
+    #'   this function returns the rescaled elements \eqn{\left(sum_j N_j\right)  \beta_{i,j} / N_j}.
     #' @param input (`matrix array` or `list`(`matrix array`))\cr
     #'   Contacts to be re-scaled.
     #' @param population (`numeric`)\cr
