@@ -741,41 +741,42 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       # Select latest valid contact matrix at contacts_date
-      contact_matrix_to_plot <- purrr::keep_at(contacts, ~ as.Date(.) <= contacts_date) |>
-        utils::tail(1)
+      contact_matrix_to_plot <- contacts |>
+        purrr::keep_at(~ as.Date(.) <= contacts_date) |>
+        utils::tail(1) |>
+        purrr::pluck(1)
 
       # Collapse the first contact matrix to single plottable data.frame
-      gg_contacts <- purrr::imap(
-        contact_matrix_to_plot, ~ {
-          if (is.null(weights)) {
-            out <- purrr::imap(
-              .x,
-              ~ dplyr::mutate(
-                reshape2::melt(.x, varnames = c("in", "out")),
-                "arena" = .y
-              )
+      if (is.null(weights)) {
+        gg_contacts <- purrr::imap(
+          contact_matrix_to_plot,
+          ~ tidyr::expand_grid(
+              "to" = colnames(.x),
+              "from" = rownames(.x),
+              "arena" = .y
             ) |>
-              purrr::list_rbind()
-          } else {
-            out <- reshape2::melt(.x, varnames = c("in", "out"))
-          }
-
-          dplyr::mutate(out, "t" = as.Date(.y))
-        }
-      ) |>
-        purrr::list_rbind() |>
-        tibble::as_tibble()
+              dplyr::mutate("contacts" = as.vector(.x))
+        ) |>
+          purrr::list_rbind()
+      } else {
+        gg_contacts <- tidyr::expand_grid(
+          "to" = colnames(contact_matrix_to_plot),
+          "from" = rownames(contact_matrix_to_plot)
+        ) |>
+          dplyr::mutate("contacts" = as.vector(contact_matrix_to_plot))
+      }
 
       # Plot contacts
       contacts_plot <- gg_contacts |>
-        ggplot2::ggplot(ggplot2::aes(x = `in`, y = out, fill = value)) +
+        ggplot2::ggplot(ggplot2::aes(x = `to`, y = from, fill = contacts)) +
         ggplot2::geom_raster() +
         ggplot2::scale_fill_viridis_c() +
         ggplot2::labs(
           x = "Contacts from",
           y = "Contacts to",
-          title = "Mean number of daily contacts",
-          fill = "Contacts"
+          title = "Mean number of daily contacts ",
+          fill = "Contacts",
+          caption = glue::glue("Contact matrix as of {contacts_date}")
         ) +
         ggplot2::theme(
           aspect.ratio = 1,
