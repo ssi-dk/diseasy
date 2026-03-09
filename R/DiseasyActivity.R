@@ -750,12 +750,14 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (is.null(weights)) {
         gg_contacts <- purrr::imap(
           contact_matrix_to_plot,
-          ~ tidyr::expand_grid(
+          ~ {
+            tidyr::expand_grid(
               "to" = colnames(.x),
               "from" = rownames(.x),
               "arena" = .y
             ) |>
               dplyr::mutate("contacts" = as.vector(.x))
+          }
         ) |>
           purrr::list_rbind()
       } else {
