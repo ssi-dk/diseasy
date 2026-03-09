@@ -91,14 +91,14 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (base_scenario == "dk_reference") {
 
         # Use the Danish activity units
-        self$set_activity_units(dk_activity_units)
+        self$set_activity_units(diseasy::dk_activity_units)
 
         # Use the Danish restrictions
-        self$change_activity(dk_reference_scenario)
+        self$change_activity(diseasy::dk_reference_scenario)
 
         # The "social_distance_work" parameter varies across activity units. If several activity units are active
         # on the same date, we compute the mean "social_distance_work" use this risk for all units on that date
-        work_risk <- stats::aggregate(social_distance_work ~ date, data = dk_reference_scenario, FUN = mean)
+        work_risk <- stats::aggregate(social_distance_work ~ date, data = diseasy::dk_reference_scenario, FUN = mean)
         self$change_risk(date = work_risk$date, type = "work", risk = work_risk$social_distance_work)
 
         private$lg$info("Initialised 'dk_reference' scenario")
