@@ -261,7 +261,7 @@
     },
     {
       "package": "fs",
-      "version": "1.6.6",
+      "version": "1.6.7",
       "binary": true
     },
     {
@@ -331,7 +331,7 @@
     },
     {
       "package": "highr",
-      "version": "0.11",
+      "version": "0.12",
       "binary": true
     },
     {
@@ -411,7 +411,7 @@
     },
     {
       "package": "later",
-      "version": "1.4.7",
+      "version": "1.4.8",
       "binary": true
     },
     {
@@ -511,7 +511,7 @@
     },
     {
       "package": "nleqslv",
-      "version": "3.3.5",
+      "version": "3.3.6",
       "binary": true
     },
     {
@@ -646,7 +646,7 @@
     },
     {
       "package": "ragg",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "binary": true
     },
     {
@@ -671,7 +671,7 @@
     },
     {
       "package": "RcppParallel",
-      "version": "5.1.11-1",
+      "version": "5.1.11-2",
       "binary": true
     },
     {
@@ -816,7 +816,7 @@
     },
     {
       "package": "systemfonts",
-      "version": "1.3.1",
+      "version": "1.3.2",
       "binary": true
     },
     {
@@ -831,7 +831,7 @@
     },
     {
       "package": "textshaping",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "binary": true
     },
     {
