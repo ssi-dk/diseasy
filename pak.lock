@@ -1,7 +1,7 @@
 {
   "lockfile_version": 1,
   "os": "Ubuntu 24.04.4 LTS",
-  "r_version": "R version 4.5.2 (2025-10-31)",
+  "r_version": "R version 4.5.3 (2026-03-11)",
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
@@ -416,7 +416,7 @@
     },
     {
       "package": "lattice",
-      "version": "0.22-7",
+      "version": "0.22-9",
       "binary": true
     },
     {
@@ -486,7 +486,7 @@
     },
     {
       "package": "mgcv",
-      "version": "1.9-3",
+      "version": "1.9-4",
       "binary": true
     },
     {
