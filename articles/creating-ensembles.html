@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasy</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -188,7 +188,7 @@ instances which we give the class <code>DiseasyEnsemble</code>.</p>
 functions to get a quick overview of the ensemble.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: bd7d4), DiseasyModelG1 (hash: d7832), DiseasyModelG1 (hash: d3f7e)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 74b1a), DiseasyModelG1 (hash: d696d), DiseasyModelG1 (hash: e66f1)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
@@ -207,12 +207,12 @@ least specify the following:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
 <span><span class="co">#&gt;   date       n_positive realisation_id weight model                           </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-07-03       80.1 1                   1 bd7d44ae59ba3bbc71bf3b3212cc1e7b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-07-04       63.0 1                   1 bd7d44ae59ba3bbc71bf3b3212cc1e7b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-07-05       76.5 1                   1 bd7d44ae59ba3bbc71bf3b3212cc1e7b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-07-06       73.7 1                   1 bd7d44ae59ba3bbc71bf3b3212cc1e7b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-07-07       60.3 1                   1 bd7d44ae59ba3bbc71bf3b3212cc1e7b</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-07-08       37.1 1                   1 bd7d44ae59ba3bbc71bf3b3212cc1e7b</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-07-03       80.1 1                   1 74b1ad0c9f32f81b70032d4f83f5c3e9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-07-04       63.0 1                   1 74b1ad0c9f32f81b70032d4f83f5c3e9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-07-05       76.5 1                   1 74b1ad0c9f32f81b70032d4f83f5c3e9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-07-06       73.7 1                   1 74b1ad0c9f32f81b70032d4f83f5c3e9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-07-07       60.3 1                   1 74b1ad0c9f32f81b70032d4f83f5c3e9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2020-07-08       37.1 1                   1 74b1ad0c9f32f81b70032d4f83f5c3e9</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points." width="700"></p>
@@ -291,7 +291,7 @@ parameter settings from before.</p>
 models:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: bb685), DiseasyModelG0 (hash: 60834), DiseasyModelG0 (hash: 63afe), DiseasyModelG1 (hash: bd7d4), DiseasyModelG1 (hash: d7832)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: ee76e), DiseasyModelG0 (hash: c0da2), DiseasyModelG0 (hash: 674d7), DiseasyModelG1 (hash: 74b1a), DiseasyModelG1 (hash: d696d)</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
