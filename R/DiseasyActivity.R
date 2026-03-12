@@ -711,6 +711,161 @@ DiseasyActivity <- R6::R6Class(                                                 
                       "This means that you have to recreate scenarios.")
     },
 
+    #' @description
+    #'   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
+    #' @param age_cuts_lower `r rd_age_cuts_lower`
+    #' @param weights `r rd_activity_weights`
+    #' @param contacts_date (`Date(1)`)\cr
+    #'   The date to plot contact matrix for (default is earliest contact matrix).
+    #' @return `r rd_side_effects`
+    plot = function(age_cuts_lower = NULL, weights = rep(1, 4), contacts_date = NULL) {
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_numeric(
+        age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
+        lower = 0, unique = TRUE, add = coll
+      )
+      checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
+      checkmate::assert_date(contacts_date, null.ok = TRUE, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Retrieve the contact matrices
+      contacts <- self$get_scenario_contacts(
+        age_cuts_lower = age_cuts_lower,
+        weights = weights
+      )
+
+      if (is.null(contacts_date)) {
+        contacts_date <- as.Date(names(contacts[1]))
+      }
+
+      # Select latest valid contact matrix at contacts_date
+      contact_matrix_to_plot <- contacts |>
+        purrr::keep_at(~ as.Date(.) <= contacts_date) |>
+        utils::tail(1) |>
+        purrr::pluck(1)
+
+      # Collapse the first contact matrix to single plottable data.frame
+      if (is.null(weights)) {
+        gg_contacts <- purrr::imap(
+          contact_matrix_to_plot,
+          ~ {
+            tidyr::expand_grid(
+              "to" = colnames(.x),
+              "from" = rownames(.x),
+              "arena" = .y
+            ) |>
+              dplyr::mutate("contacts" = as.vector(.x))
+          }
+        ) |>
+          purrr::list_rbind()
+      } else {
+        gg_contacts <- tidyr::expand_grid(
+          "to" = colnames(contact_matrix_to_plot),
+          "from" = rownames(contact_matrix_to_plot)
+        ) |>
+          dplyr::mutate("contacts" = as.vector(contact_matrix_to_plot))
+      }
+
+      # Plot contacts
+      contacts_plot <- gg_contacts |>
+        ggplot2::ggplot(ggplot2::aes(x = `to`, y = from, fill = contacts)) +
+        ggplot2::geom_raster() +
+        ggplot2::scale_fill_viridis_c() +
+        ggplot2::labs(
+          x = "Contacts from",
+          y = "Contacts to",
+          title = "Mean number of daily contacts ",
+          fill = "Contacts",
+          caption = glue::glue("Contact matrix as of {contacts_date}")
+        ) +
+        ggplot2::theme(
+          aspect.ratio = 1,
+          axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)
+        )
+
+      if (is.null(weights)) {
+        contacts_plot <- contacts_plot +
+          ggplot2::facet_wrap(
+            ~ arena,
+            labeller = ggplot2::labeller(arena = stringr::str_to_sentence)
+          )
+      }
+
+
+      # Retrieve the openness
+      openness <- self$get_scenario_openness(
+        age_cuts_lower = age_cuts_lower,
+        weights = weights
+      )
+
+      # Collapse to single plottable data.frame
+      gg_openness <- purrr::imap(
+        openness, ~ {
+          if (is.null(weights)) {
+            out <- purrr::imap(
+              .x,
+              ~ {
+                tibble::enframe(.x, name = "age_group", value = "openness") |>
+                  dplyr::mutate("arena" = .y)
+              }
+            ) |>
+              purrr::list_rbind()
+          } else {
+            out <- tibble::enframe(.x, name = "age_group", value = "openness")
+          }
+
+          dplyr::mutate(out, "t" = as.Date(.y))
+        }
+      ) |>
+        purrr::list_rbind()
+
+      if (!is.null(weights)) {
+        gg_openness <- dplyr::mutate(gg_openness, "arena" = "all")
+      }
+
+      # Add padding to the end
+      gg_openness <- rbind(
+        gg_openness,
+        gg_openness |>
+          dplyr::summarise(
+            "openness" = dplyr::last(.data$openness),
+            "t" = max(.data$t) + (max(.data$t) - min(.data$t)) / length(unique(.data$t)),
+            .by = c("age_group", "arena")
+          )
+      )
+
+      # Plot openness
+      openness_plot <- gg_openness |>
+        ggplot2::ggplot() +
+        ggplot2::geom_step(
+          mapping = ggplot2::aes(x = t, y = openness, colour = factor(age_group)),
+          linewidth = 1
+        ) +
+        ggplot2::scale_y_continuous(
+          labels = scales::label_percent(),
+          limits = c(0, 1),
+          expand = c(0, 0)
+        ) +
+        ggplot2::labs(
+          x = NULL,
+          y = "Openness",
+          colour = "Age group"
+        ) +
+        ggplot2::guides(colour = ggplot2::guide_legend(ncol = 2))
+
+      if (is.null(weights)) {
+        openness_plot <- openness_plot +
+          ggplot2::facet_wrap(
+            ~ arena,
+            labeller = ggplot2::labeller(arena = stringr::str_to_sentence)
+          )
+      }
+
+      return(list("contact_matrix" = contacts_plot, "openness" = openness_plot))
+    },
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyActivity ############################################")
@@ -728,7 +883,6 @@ DiseasyActivity <- R6::R6Class(                                                 
         printr("Contact basis: ", self$contact_basis$description, max_width = 100)
       }
     }
-
   ),
 
   active = list(
