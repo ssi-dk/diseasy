@@ -137,13 +137,31 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Overload the `$load_module()` to re-initialise the helpers after loading
+    #' @param module `r rd_module`
     #' @param ...
     #'   Arguments sent to parent method.
-    load_module = function(...) {
-      super$load_module(...)
+    load_module = function(module, ...) {
+      super$load_module(module, ...)
 
-      # Mark that model is not initialised
-      private$initialised <- FALSE
+      # DiseasyVariant can change the structure of the model which would
+      # require reconfiguration of the RHS function
+      if (inherits(module, "DiseasyVariant")) {
+
+        # Mark that model is not ready
+        private$ready <- FALSE
+
+        # Delete observable configurations and warn user
+        if (!purrr::every(private %.% observable_mapping, is.null)) {
+          pkgcond::pkg_warning("DiseasyVariant loaded - user-specified observable configurations deleted!")
+
+          # Remove user-configured observables
+          private$.parameters$model_output_to_observable[[self %.% model_outputs]] <- NULL
+          private$observable_mapping <- list("state_vector" = NULL, "infection_matrix" = NULL)
+        }
+
+        # Attempt to re-initialise helpers with the current inputs
+        tryCatch(self$prepare_rhs(), error = function(e) {})
+      }
     },
 
 
@@ -166,7 +184,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
       checkmate::reportAssertions(coll)
 
-      if (!private$initialised) {
+      if (!private$ready) {
         self$prepare_rhs()
       }
 
@@ -328,9 +346,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Above, we have the progression rate for each "track" in the model
       # We now repeat for each track the model to construct the full vector
       # and add rates for the S states at the end.
-      private$progression_flow_rates <- progression_flow_rates |>
-        rep(private %.% n_age_groups * private %.% n_variants) |>
-        (\(.) c(., rep(0, private %.% n_age_groups)))() # Add a zero for the S compartments
+      private$progression_flow_rates <- c(
+        rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
+        rep(0, private %.% n_age_groups), # Add a zero for the S compartments
+        rep(0, sum(length(self %.% model_outputs)))  # Zero-pad for each observable
+      )
 
 
 
@@ -376,8 +396,21 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         private$set_contact_matrix(self$malthusian_scaling_factor)
       }
 
-      # Mark that model has been initialised
-      private$initialised <- TRUE
+      # Verify observable configurations match model configuration
+      checkmate::assert_matrix(
+        private %.% observable_mapping %.% state_vector,
+        ncol = private %.% n_states + length(self %.% model_outputs),
+        null.ok = TRUE
+      )
+
+      checkmate::assert_matrix(
+        private %.% observable_mapping %.% infection_matrix,
+        ncol = length(private %.% rs_state_indices),
+        null.ok = TRUE
+      )
+
+      # Mark that model is ready
+      private$ready <- TRUE
     },
 
 
@@ -829,7 +862,53 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ) |>
         dplyr::select(!"weight")
 
-      return(invisible(initial_state_vector))
+
+      # Pad with zeros for each configured observable
+
+      # First, determine which age groups / variants are being targeted by
+      # infection matrix observables
+      groups_infection_matrix <- lapply( # Extract each row to list
+        seq_len(purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0)),
+        function(i) private$observable_mapping$infection_matrix[i, ]
+      ) |>
+        purrr::map(~ which(. > 0)) |>
+        purrr::map(~ private %.% rs_state_indices[.])
+
+      # Add with the groups being targeted by state_vector observables
+      groups_state_vector <- lapply( # Extract each row to list
+        seq_len(purrr::pluck(private %.% observable_mapping %.% state_vector, nrow, .default = 0)),
+        function(i) private$observable_mapping$state_vector[i, ]
+      ) |>
+        purrr::map(~ which(. > 0))
+
+      # Combine
+      groups <- c(
+        groups_infection_matrix,
+        groups_state_vector
+      )
+
+      # Extract groups from initial_state_vector
+      initial_surveillance_vector <- groups |>
+        purrr::map(~ initial_state_vector[., ]) |>
+        purrr::map(~ dplyr::select(., !c("state", "initial_condition"))) |>
+        purrr::map(
+          ~ dplyr::filter(., dplyr::if_all(dplyr::everything(), ~!is.na(.)))
+        ) |>
+        purrr::map(~ dplyr::distinct(.))
+
+      # Set names and start each state at zero
+      initial_surveillance_vector <- initial_surveillance_vector |>
+        purrr::map2(
+          self %.% model_outputs,
+          ~ dplyr::mutate(.x, "state" = !!.y, "initial_condition" = 0)
+        ) |>
+        purrr::list_rbind()
+
+
+      # Check initial state vector is well-formed
+      checkmate::assert_numeric(initial_state_vector$initial_condition, lower = 0, any.missing = FALSE)
+
+      return(invisible(rbind(initial_state_vector, initial_surveillance_vector)))
     },
 
 
@@ -918,7 +997,154 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Add the forcing of the states
       dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
 
+      # Add the inflow to surveillance states
+      if (!is.null(private$observable_mapping$infection_matrix)) {
+        dy_dt[private$surveillance_indices$infection_matrix] <-
+          private$observable_mapping$infection_matrix %*% infection_matrix
+      }
+
+      if (!is.null(private$observable_mapping$state_vector)) {
+        dy_dt[private$surveillance_indices$state_vector] <-
+          private$observable_mapping$state_vector %*% as.matrix(state_vector)
+      }
+
       return(list(dy_dt))
+    },
+
+
+    #' @description
+    #'   Define new observables via a set of weights.
+    #'
+    #'   Currently, only countable observables are supported.
+    #'   That is, observables must be summarisable by the "sum()" function.
+    #' @param weights (`matrix`)\cr
+    #'   A matrix of weights to multiply by the signal source to form the flow into surveillance states.
+    #' @param name (`character(1)`)\cr
+    #'   A name for the observable (retrievable by `$get_results()`)
+    #' @param derived_from (`character(1)`)\cr
+    #'   Which signal source should the observable be derived from?
+    #' @details
+    #'  If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
+    #'  forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
+    #'
+    #'  If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
+    #'  of the infection matrix defines the flow (row-sums correspond to new infections).
+    #' @return `r rd_side_effects`
+    configure_observable = function(
+      weights,
+      name,
+      derived_from = c("state_vector", "infection_matrix")
+    ) {
+      derived_from <- match.arg(derived_from)
+
+      # Check inputs
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_disjunct(
+        name,
+        setdiff(
+          names(self %.% parameters %.% model_output_to_observable),
+          self %.% model_outputs
+        ),
+        add = coll
+      )
+      checkmate::reportAssertions(coll)
+
+      # Mark RHS as un-ready
+      private$ready <- FALSE
+
+      # Cast vector weights to matrix
+      if (!inherits(weights, "matrix")) {
+        weights <- matrix(weights, nrow = 1)
+      }
+
+      # Add observables internal mappings
+      # (used in $rhs() to map to the surveillance states)
+      if (derived_from == "state_vector") {
+
+        # Current labels
+        existing_outputs <- attr(private$observable_mapping$state_vector, "name")
+
+        # Add weights (ignoring potential existing zero-padding)
+        private$observable_mapping$state_vector <- rbind(
+          private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_EIR_states)],
+          weights
+        )
+
+        # Add zero-padding (state_vector is extended for each surveillance state)
+        private$observable_mapping$state_vector <- cbind(
+          private %.% observable_mapping %.% state_vector,
+          matrix(
+            0,
+            nrow = nrow(private %.% observable_mapping %.% state_vector),
+            ncol = nrow(private %.% observable_mapping %.% state_vector) +
+              purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0)
+          )
+        )
+
+        # Update output names
+        attr(private$observable_mapping$state_vector, "name") <- c(
+          existing_outputs,
+          rep(name, nrow(weights))
+        )
+
+      } else {
+
+        # Current labels
+        existing_outputs <- attr(private$observable_mapping$infection_matrix, "name")
+
+        # Add weights
+        private$observable_mapping$infection_matrix <- rbind(
+          private %.% observable_mapping %.% infection_matrix,
+          weights
+        )
+
+        # Update output names
+        attr(private$observable_mapping$infection_matrix, "name") <- c(
+          existing_outputs,
+          rep(name, nrow(weights))
+        )
+
+      }
+
+      # Update surveillance indices
+      if (is.null(private %.% surveillance_indices)) { # Allocate on first call
+        private$surveillance_indices <- list("infection_matrix" = NULL, "state_vector" = NULL)
+      }
+
+      if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
+        private$surveillance_indices$infection_matrix <- private %.% n_states +
+          seq(from = 1, to = nrow(private %.% observable_mapping %.% infection_matrix))
+      }
+
+      if (!is.null(private %.% observable_mapping %.% state_vector)) {
+        private$surveillance_indices$state_vector <- private %.% n_states +
+          purrr::pluck(private %.% observable_mapping %.% infection_matrix, nrow, .default = 0) +
+          seq(from = 1, to = nrow(private %.% observable_mapping %.% state_vector))
+      }
+
+
+      # Add observable to external mappings
+      # (make the observable visible to $get_results())
+      private$.parameters$model_output_to_observable <-
+        modifyList(
+          self %.% parameters %.% model_output_to_observable,
+
+          # We use a few combinations of tibble::lst, rlang::parse_expr and
+          # glue::glue to create a human readable, dynamically allocated mapping
+          tibble::lst(
+            !!name := list(
+              "map" = eval(parse(text =
+                  glue::glue(
+                    "\\(.x, .y) {{
+                      dplyr::transmute(.x, .data$date, .data${name})
+                    }}"
+                  )
+              ))
+              # No reduce function implemented yet.
+              # Must therefore be simply summarisable (i.e. by sum())
+            )
+          )
+        )
     }
   ),
 
@@ -931,7 +1157,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       .f = active_binding,
       name = "malthusian_scaling_factor",
       expr = return(private %.% .malthusian_scaling_factor)
-    )
+    ),
+
+    #' @field model_outputs (`character()`)\cr
+    #'   Names of the user-configured model outputs. Read only.
+    model_outputs = function() {
+      purrr::reduce(purrr::map(private %.% observable_mapping, ~ attr(., "name")), c)
+    }
   ),
 
 
@@ -939,7 +1171,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
-    initialised = FALSE,
+    ready = FALSE,
+
+    # Configurations for observables (model outputs)
+    observable_mapping = list("infection_matrix" = NULL, "state_vector" = NULL),
 
     default_parameters = function() {
       modifyList(
@@ -1026,6 +1261,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     r1_state_indices = NULL,
     s_state_indices  = NULL,
     rs_state_indices = NULL,
+    surveillance_indices = NULL,
 
     rs_age_group = NULL,
     infection_matrix_to_rs_indices = NULL,

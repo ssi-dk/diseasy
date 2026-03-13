@@ -213,6 +213,11 @@ rd_diseasy_module <- paste(
   "instance will not reflect in the copy that is added to `DiseasyModel`."
 )
 
+rd_module <- paste(
+  "(`R6::R6Class instance`)\\cr",
+  "This instance is cloned to the field with the same name as the class of the module"
+)
+
 ## Templates for DiseasyModelOde
 rd_initialise_state_vector_description <- paste(
   "Infer the state_vector from incidence data"
