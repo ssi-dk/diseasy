@@ -92,13 +92,13 @@ tidyr::expand_grid(
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
         expr = {
-          y0 <- m$initialise_state_vector(incidence_data)                                                               # nolint: implicit_assignment_linter
+          psi <- m$initialise_state_vector(incidence_data)                                                              # nolint: implicit_assignment_linter
         }
       )
 
       # Solve model, and get the incidence data to compare with the data
       sol <- deSolve::ode(
-        y = y0 %.% initial_condition,
+        y = psi %.% value,
         times = seq_along(seq(from = obs$last_queryable_date, obs$end_date, by = "1 day")) - 1,
         func = m %.% rhs
       )

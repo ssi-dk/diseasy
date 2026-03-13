@@ -69,7 +69,10 @@ The arrows in the figure indicates the infections in the model within these trac
 Each "track" of infection is placed in a sequence in the state vector, $\overline{\psi}$, and increments first in age
 groups then in variants.
 
-Finally, the susceptible states are placed at the end of the state vector.
+Finally, the susceptible states are placed at the end of the state vector[^1].
+
+[^1]: If the user has configured custom model outputs (see the "DiseasyModelOde" article) each such output needs a state
+(here called `C_\cdot` state) which is placed after the susceptible states in the state vector.
 
 $$
 \overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Age group 1, Variant 1}}
