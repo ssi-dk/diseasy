@@ -40,7 +40,7 @@ install.packages("diseasy")
 
 # Alternatively, install the development version from github:
 # install.packages("devtools")
-pak::pak("ssi-dk/diseasy")
+devtools::install_github("ssi-dk/diseasy")
 ```
 
 ## Usage
