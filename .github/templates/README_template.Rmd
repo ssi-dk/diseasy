@@ -34,7 +34,7 @@ install.packages("{{ repo_name }}")
 
 # Alternatively, install the development version from github:
 # install.packages("devtools")
-devtools::install_github("ssi-dk/{{ repo_name }}")
+pak::pak("ssi-dk/{{ repo_name }}")
 ```
 
 ## Usage
