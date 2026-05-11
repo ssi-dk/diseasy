@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 install.packages("{{ repo_name }}")
 
 # Alternatively, install the development version from github:
-# install.packages("devtools")
+# install.packages("pak")
 pak::pak("ssi-dk/{{ repo_name }}")
 ```
 
