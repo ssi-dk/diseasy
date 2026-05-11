@@ -24,6 +24,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Rasmus Skytte Randløv \email{rske@ssi.dk} (\href{https://orcid.org/0000-0002-5860-3838}{ORCID})
   \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID})
   \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID})
   \item Sofia Myrup Otero \email{smot@ssi.dk} (\href{https://orcid.org/0009-0006-4953-614X}{ORCID})

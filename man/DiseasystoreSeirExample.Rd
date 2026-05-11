@@ -25,55 +25,58 @@ This \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} brings support the SEI
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasystoreSeirExample-new}{\code{DiseasystoreSeirExample$new()}}
-\item \href{#method-DiseasystoreSeirExample-clone}{\code{DiseasystoreSeirExample$clone()}}
+  \itemize{
+    \item \href{#method-DiseasystoreSeirExample-initialize}{\code{DiseasystoreSeirExample$new()}}
+    \item \href{#method-DiseasystoreSeirExample-clone}{\code{DiseasystoreSeirExample$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="determine_missing_ranges"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-determine_missing_ranges'><code>diseasystore::DiseasystoreBase$determine_missing_ranges()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasystoreSeirExample-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasystoreSeirExample-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} class.
+\if{html}{\out{<a id="method-DiseasystoreSeirExample-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasystoreSeirExample-initialize}{}}}
+\subsection{\code{DiseasystoreSeirExample$new()}}{
+  Creates a new instance of the \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} class.
 This module is typically not constructed directly but rather through \verb{DiseasyModel*} classes.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreSeirExample$new(...)}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreSeirExample$new(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{Parameters sent to \code{?diseasystore::DiseasystoreBase} \link[R6:R6Class]{R6} constructor.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new instance of the \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} class.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Parameters sent to \code{?diseasystore::DiseasystoreBase} \link[R6:R6Class]{R6} constructor.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} class.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreSeirExample-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreSeirExample-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreSeirExample$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasystoreSeirExample$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreSeirExample$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
