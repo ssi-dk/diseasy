@@ -86,6 +86,9 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 \item{\code{malthusian_scaling_factor}}{(\code{numeric(1)})\cr
 A scaling factor to apply to the contact matrices to account for structural differences
 in the model. Read only.}
+
+\item{\code{model_outputs}}{(\code{character()})\cr
+Names of the user-configured model outputs. Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -100,6 +103,7 @@ in the model. Read only.}
 \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
 \item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
 \item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
+\item \href{#method-DiseasyModelOdeSeir-configure_model_output}{\code{DiseasyModelOdeSeir$configure_model_output()}}
 \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
 }
 }
@@ -189,12 +193,14 @@ Additional parameters are:
 \subsection{Method \code{load_module()}}{
 Overload the \verb{$load_module()} to re-initialise the helpers after loading
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$load_module(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$load_module(module, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{module}}{(\verb{R6::R6Class instance})\cr This instance is cloned to the field with the same name as the class of the module}
+
 \item{\code{...}}{Arguments sent to parent method.}
 }
 \if{html}{\out{</div>}}
@@ -345,8 +351,10 @@ If \code{ei_rs_balance = 0}, the estimate for RS states are prioritised.
 }
 
 \subsection{Returns}{
-(\code{numeric()})\cr
-The initial state vector for the model (invisibly).
+(\code{data.frame()})\cr
+The initialised state vector for the model.
+NOTE: the output includes the complete state for \code{time = 0} and additional
+history (\code{time < 0}) for some states (to allow observables with time-delays).
 }
 }
 \if{html}{\out{<hr>}}
@@ -382,6 +390,52 @@ Argument to comply with \code{deSolve::ode} format. Not used.}
 \subsection{Returns}{
 (\code{numeric()})\cr
 The rate of change for the differential equations.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_model_output"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_model_output}{}}}
+\subsection{Method \code{configure_model_output()}}{
+Define new observables via a set of weights.
+
+Currently, only countable observables are supported.
+That is, observables must be summarisable by the "sum()" function.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_model_output(
+  weights,
+  name,
+  derived_from = c("state_vector", "infection_matrix"),
+  delay = 0
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{weights}}{(\code{matrix})\cr
+A matrix of weights to multiply by the signal source to form the flow into surveillance states.}
+
+\item{\code{name}}{(\code{character(1)})\cr
+A name for the observable (retrievable by \verb{$get_results()})}
+
+\item{\code{derived_from}}{(\code{character(1)})\cr
+Which signal source should the observable be derived from?}
+
+\item{\code{delay}}{(\code{numeric(1)})\cr
+The delay (in days) between infection and the occurrence of the given observable.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
+forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
+
+If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
+of the infection matrix defines the flow (row-sums correspond to new infections).
+}
+
+\subsection{Returns}{
+\code{NULL} (called for side effects)
 }
 }
 \if{html}{\out{<hr>}}
