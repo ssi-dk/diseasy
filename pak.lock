@@ -1,7 +1,7 @@
 {
   "lockfile_version": 1,
   "os": "Ubuntu 24.04.4 LTS",
-  "r_version": "R version 4.6.0 (2026-04-24)",
+  "r_version": "R version 4.5.3 (2026-03-11)",
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
@@ -466,7 +466,7 @@
     },
     {
       "package": "Matrix",
-      "version": "1.7-5",
+      "version": "1.7-4",
       "binary": true
     },
     {
@@ -511,7 +511,7 @@
     },
     {
       "package": "nlme",
-      "version": "3.1-169",
+      "version": "3.1-168",
       "binary": true
     },
     {
@@ -721,7 +721,7 @@
     },
     {
       "package": "RSQLite",
-      "version": "2.4.6",
+      "version": "3.52.0",
       "binary": true
     },
     {
