@@ -97,7 +97,7 @@ Each season model has varying number of parameters. See documentation for each f
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code>DiseasySeason</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code>DiseasySeason</code></p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
@@ -106,22 +106,22 @@ Each season model has varying number of parameters. See documentation for each f
 The reference date of the season models. Read-only.</p></dd>
 
 
-<dt><code>model_t</code></dt>
+    <dt><code>model_t</code></dt>
 <dd><p>(<code>function</code>)<br>
 The model currently being used in the module (days past reference date). Read-only.</p></dd>
 
 
-<dt><code>model_date</code></dt>
+    <dt><code>model_date</code></dt>
 <dd><p>(<code>function</code>)<br>
 The model currently being used in the module (date of interest). Read-only.</p></dd>
 
 
-<dt><code>available_season_models</code></dt>
+    <dt><code>available_season_models</code></dt>
 <dd><p>(<code>character</code>)<br>
 The list of available season models</p></dd>
 
 
-<dt><code>observables</code></dt>
+    <dt><code>observables</code></dt>
 <dd><p>(<code><a href="DiseasyObservables.html">diseasy::DiseasyObservables</a></code>)<br>
 The local copy of an DiseasyObservables module. Read-only.</p></dd>
 
@@ -133,8 +133,7 @@ The local copy of an DiseasyObservables module. Read-only.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasySeason-new"><code>DiseasySeason$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasySeason-initialize"><code>DiseasySeason$new()</code></a></p></li>
 <li><p><a href="#method-DiseasySeason-set_reference_date"><code>DiseasySeason$set_reference_date()</code></a></p></li>
 <li><p><a href="#method-DiseasySeason-set_scale"><code>DiseasySeason$set_scale()</code></a></p></li>
 <li><p><a href="#method-DiseasySeason-get_season_model"><code>DiseasySeason$get_season_model()</code></a></p></li>
@@ -149,42 +148,38 @@ The local copy of an DiseasyObservables module. Read-only.</p></dd>
 <li><p><a href="#method-DiseasySeason-use_covid_season_v2"><code>DiseasySeason$use_covid_season_v2()</code></a></p></li>
 <li><p><a href="#method-DiseasySeason-describe"><code>DiseasySeason$describe()</code></a></p></li>
 <li><p><a href="#method-DiseasySeason-clone"><code>DiseasySeason$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasySeason-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasySeason-initialize"></a><div class="section">
+<h3 id="diseasyseason-new-"><code>DiseasySeason$new()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasySeason</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>reference_date <span class="op">=</span> <span class="cn">NULL</span>, observables <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>reference_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
 Date the season modifier is computed relatively to.</p></dd>
 
-
-<dt><code>observables</code></dt>
+      <dt><code>observables</code></dt>
 <dd><p>(<code>R6::R6Class instance</code>)<br>
 A instance of <code>DiseasyObservables</code> are needed for some season models.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>parameters sent to <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-set_reference_date"></a><div class="section">
-<h3 id="method-set-reference-date-">Method <code>set_reference_date()</code><a class="anchor" aria-label="anchor" href="#method-set-reference-date-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-set_reference_date"></a><div class="section">
+<h3 id="diseasyseason-set-reference-date-"><code>DiseasySeason$set_reference_date()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-set-reference-date-"></a></h3>
 <p>Sets the reference_date for the <code>DiseasySeason</code> module.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">set_reference_date</span><span class="op">(</span><span class="va">reference_date</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>reference_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
@@ -194,14 +189,14 @@ Date the season modifier is computed relatively to.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-set_scale"></a><div class="section">
-<h3 id="method-set-scale-">Method <code>set_scale()</code><a class="anchor" aria-label="anchor" href="#method-set-scale-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-set_scale"></a><div class="section">
+<h3 id="diseasyseason-set-scale-"><code>DiseasySeason$set_scale()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-set-scale-"></a></h3>
 <p>Sets the scale for the active season model.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">set_scale</span><span class="op">(</span><span class="va">scale</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>scale</code></dt>
 <dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. Read only.</p></dd>
@@ -210,21 +205,20 @@ Date the season modifier is computed relatively to.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-get_season_model"></a><div class="section">
-<h3 id="method-get-season-model-">Method <code>get_season_model()</code><a class="anchor" aria-label="anchor" href="#method-get-season-model-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-get_season_model"></a><div class="section">
+<h3 id="diseasyseason-get-season-model-"><code>DiseasySeason$get_season_model()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-get-season-model-"></a></h3>
 <p>Retrieves the specified season model.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">get_season_model</span><span class="op">(</span><span class="va">model_name</span>, dots <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>model_name</code></dt>
 <dd><p>(<code>character</code>)<br>
 Name of the season_model to use (calls the equivalent $get_&lt;model_name&gt;()).</p></dd>
 
-
-<dt><code>dots</code></dt>
+      <dt><code>dots</code></dt>
 <dd><p>(<code>list</code>)<br>
 Named list of arguments that will be passed at dot-ellipsis to the season model.</p></dd>
 
@@ -232,21 +226,20 @@ Named list of arguments that will be passed at dot-ellipsis to the season model.
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-use_season_model"></a><div class="section">
-<h3 id="method-use-season-model-">Method <code>use_season_model()</code><a class="anchor" aria-label="anchor" href="#method-use-season-model-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-use_season_model"></a><div class="section">
+<h3 id="diseasyseason-use-season-model-"><code>DiseasySeason$use_season_model()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-use-season-model-"></a></h3>
 <p>Sets the <code>DiseasySeason</code> module to use the specified season model.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">use_season_model</span><span class="op">(</span><span class="va">model_name</span>, dots <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>model_name</code></dt>
 <dd><p>(<code>character</code>)<br>
 Name of the season_model to use (calls the equivalent $use_&lt;model_name&gt;()).</p></dd>
 
-
-<dt><code>dots</code></dt>
+      <dt><code>dots</code></dt>
 <dd><p>(<code>list</code>)<br>
 Named list of arguments that will be passed at dot-ellipsis to the season model.</p></dd>
 
@@ -254,74 +247,74 @@ Named list of arguments that will be passed at dot-ellipsis to the season model.
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-get_constant_season"></a><div class="section">
-<h3 id="method-get-constant-season-">Method <code>get_constant_season()</code><a class="anchor" aria-label="anchor" href="#method-get-constant-season-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-get_constant_season"></a><div class="section">
+<h3 id="diseasyseason-get-constant-season-"><code>DiseasySeason$get_constant_season()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-get-constant-season-"></a></h3>
 <p>Retrieves the season model with a constant value (1).</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">get_constant_season</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasySeason-use_constant_season"></a><div class="section">
-<h3 id="method-use-constant-season-">Method <code>use_constant_season()</code><a class="anchor" aria-label="anchor" href="#method-use-constant-season-"></a></h3>
+<p></p><hr><a id="method-DiseasySeason-use_constant_season"></a><div class="section">
+<h3 id="diseasyseason-use-constant-season-"><code>DiseasySeason$use_constant_season()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-use-constant-season-"></a></h3>
 <p>Sets the season module to use a constant value (1).</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">use_constant_season</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasySeason-get_cosine_season"></a><div class="section">
-<h3 id="method-get-cosine-season-">Method <code>get_cosine_season()</code><a class="anchor" aria-label="anchor" href="#method-get-cosine-season-"></a></h3>
+<p></p><hr><a id="method-DiseasySeason-get_cosine_season"></a><div class="section">
+<h3 id="diseasyseason-get-cosine-season-"><code>DiseasySeason$get_cosine_season()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-get-cosine-season-"></a></h3>
 <p>Retrieves the season model with a cosine relationship.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">get_cosine_season</span><span class="op">(</span>peak <span class="op">=</span> <span class="fl">20.09946</span>, scale <span class="op">=</span> <span class="fl">0.5726693</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>peak</code></dt>
 <dd><p>(<code>numeric</code>)<br>
 Sets the period of maximal activity (days past new-year).
 By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.</p></dd>
 
-
-<dt><code>scale</code></dt>
+      <dt><code>scale</code></dt>
 <dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-use_cosine_season"></a><div class="section">
-<h3 id="method-use-cosine-season-">Method <code>use_cosine_season()</code><a class="anchor" aria-label="anchor" href="#method-use-cosine-season-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-use_cosine_season"></a><div class="section">
+<h3 id="diseasyseason-use-cosine-season-"><code>DiseasySeason$use_cosine_season()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-use-cosine-season-"></a></h3>
 <p>Sets the <code>DiseasySeason</code> module to use a cosine model for season.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">use_cosine_season</span><span class="op">(</span>peak <span class="op">=</span> <span class="fl">20.09946</span>, scale <span class="op">=</span> <span class="fl">0.5726693</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>peak</code></dt>
 <dd><p>(<code>numeric</code>)<br>
 Sets the period of maximal activity (days past new-year).
 By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.</p></dd>
 
-
-<dt><code>scale</code></dt>
+      <dt><code>scale</code></dt>
 <dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-get_covid_season_v1"></a><div class="section">
-<h3 id="method-get-covid-season-v-">Method <code>get_covid_season_v1()</code><a class="anchor" aria-label="anchor" href="#method-get-covid-season-v-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-get_covid_season_v1"></a><div class="section">
+<h3 id="diseasyseason-get-covid-season-v-"><code>DiseasySeason$get_covid_season_v1()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-get-covid-season-v-"></a></h3>
 <p>Retrieves the first version of the COVID-19 season model.</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">get_covid_season_v1</span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">0.4825524</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>scale</code></dt>
 <dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
@@ -330,14 +323,14 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-use_covid_season_v1"></a><div class="section">
-<h3 id="method-use-covid-season-v-">Method <code>use_covid_season_v1()</code><a class="anchor" aria-label="anchor" href="#method-use-covid-season-v-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-use_covid_season_v1"></a><div class="section">
+<h3 id="diseasyseason-use-covid-season-v-"><code>DiseasySeason$use_covid_season_v1()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-use-covid-season-v-"></a></h3>
 <p>Sets the <code>DiseasySeason</code> module to use the first version of the covid 19 season model</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">use_covid_season_v1</span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">0.4825524</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>scale</code></dt>
 <dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
@@ -346,14 +339,14 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-get_covid_season_v2"></a><div class="section">
-<h3 id="method-get-covid-season-v--1">Method <code>get_covid_season_v2()</code><a class="anchor" aria-label="anchor" href="#method-get-covid-season-v--1"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-get_covid_season_v2"></a><div class="section">
+<h3 id="diseasyseason-get-covid-season-v--1"><code>DiseasySeason$get_covid_season_v2()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-get-covid-season-v--1"></a></h3>
 <p>Retrieves the second version of the COVID-19 season model.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">get_covid_season_v2</span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">0.5042782</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>scale</code></dt>
 <dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
@@ -362,14 +355,14 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-use_covid_season_v2"></a><div class="section">
-<h3 id="method-use-covid-season-v--1">Method <code>use_covid_season_v2()</code><a class="anchor" aria-label="anchor" href="#method-use-covid-season-v--1"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-use_covid_season_v2"></a><div class="section">
+<h3 id="diseasyseason-use-covid-season-v--1"><code>DiseasySeason$use_covid_season_v2()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-use-covid-season-v--1"></a></h3>
 <p>Sets the <code>DiseasySeason</code> module to use the second version of the COVID-19 season model</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">use_covid_season_v2</span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">0.5042782</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>scale</code></dt>
 <dd><p>(<code>numeric</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.</p></dd>
@@ -378,22 +371,23 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasySeason-describe"></a><div class="section">
-<h3 id="method-describe-">Method <code>describe()</code><a class="anchor" aria-label="anchor" href="#method-describe-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasySeason-describe"></a><div class="section">
+<h3 id="diseasyseason-describe-"><code>DiseasySeason$describe()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-describe-"></a></h3>
 <p>Prints a human readable report of the internal state of the module.</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasySeason-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p></p><hr><a id="method-DiseasySeason-clone"></a><div class="section">
+<h3 id="diseasyseason-clone-"><code>DiseasySeason$clone()</code><a class="anchor" aria-label="anchor" href="#diseasyseason-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasySeason</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -403,6 +397,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
 </div>
 
 </div>
+
 
     </div>
 

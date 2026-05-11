@@ -127,12 +127,12 @@ SEIR model overview with multiple E and I states
 &lt;code&gt;?DiseasyModelOdeSeir$initialise_state_vector()&lt;/code&gt; is computed
 from the incidence rate. There is a small but important difference
 between the incidence rate and the signal need for initialisation,
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msup&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;I^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msup&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mo stretchy="false" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="false" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;I^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.
 Specifically,
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msup&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;I^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msup&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mo stretchy="false" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="false" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;I^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
 should be the number of true infections in the group divided by the
 total population not the group population.&lt;/p&gt;'><sup>1</sup></a>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>,
 which we would like our model to match.</p>
 <p>The general approach is to consider the derivatives of the incidence
 and link these to the states of the model.</p>
@@ -172,7 +172,7 @@ from the SEIR equations which in turn relates to
 <p>This process can be iterated through the derivatives until all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>K</mi></msub><annotation encoding="application/x-tex">E_K</annotation></semantics></math>
 states are expressed in terms of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>
 and its derivatives.</p>
 <p>In this case, we can relate the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>k</mi></msub><annotation encoding="application/x-tex">E_k</annotation></semantics></math>
@@ -200,7 +200,7 @@ I^* \\
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><msub><mi>M</mi><mi>K</mi></msub><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{M_K}}</annotation></semantics></math>
 can be computed via a simple recursion.</p>
 <p>To see why, start the equation for the derivative of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><msup><mi>I</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">
 \frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
 </annotation></semantics></math></p>
@@ -292,7 +292,7 @@ only relates to
 then we can determine the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mrow><mi>l</mi><mo>&gt;</mo><mn>1</mn></mrow></msub><annotation encoding="application/x-tex">I_{l&gt;1}</annotation></semantics></math>
 states by evaluating the signal at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>l</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">I^*(t - (l - 1) / r_i)</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>l</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t - (l - 1) / r_i)</annotation></semantics></math>.</p>
 </div>
 <div class="section level2">
 <h2 id="initialising-sr-states">Initialising SR states<a class="anchor" aria-label="anchor" href="#initialising-sr-states"></a>

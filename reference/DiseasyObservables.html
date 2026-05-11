@@ -85,12 +85,11 @@ will therefore depend on the data made available by the diseasystores.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="https://ssi-dk.github.io/diseasystore/reference/diseasystore-package.html">diseasystore::diseasystore</a></p>
-<p><a href="https://ssi-dk.github.io/SCDB/reference/get_table.html" class="external-link">SCDB::get_table</a></p>
 <p><a href="https://ssi-dk.github.io/SCDB/reference/get_table.html" class="external-link">SCDB::get_table</a></p></div>
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code>DiseasyObservables</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code>DiseasyObservables</code></p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
@@ -99,44 +98,44 @@ will therefore depend on the data made available by the diseasystores.</p>
 The set diseasystore to get DiseasyObservables for. Read-only.</p></dd>
 
 
-<dt><code>start_date</code></dt>
+    <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period start. Read only.</p></dd>
 
 
-<dt><code>end_date</code></dt>
+    <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period end. Read only.</p></dd>
 
 
-<dt><code>last_queryable_date</code></dt>
+    <dt><code>last_queryable_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
 The latest date that can be queried. Read-only.</p></dd>
 
 
-<dt><code>ds</code></dt>
+    <dt><code>ds</code></dt>
 <dd><p>(<code>Diseasystore*</code>)<br>
 The currently loaded diseasystore which provides the features. Read-only.</p></dd>
 
 
-<dt><code>available_observables</code></dt>
+    <dt><code>available_observables</code></dt>
 <dd><p>(<code>character</code>)<br>
 The currently available observables in the loaded diseasystore. Read-only.</p></dd>
 
 
-<dt><code>available_stratifications</code></dt>
+    <dt><code>available_stratifications</code></dt>
 <dd><p>(<code>character</code>)<br>
 The currently available stratifications in the loaded diseasystore. Read-only.</p></dd>
 
 
-<dt><code>synthetic_observables</code></dt>
+    <dt><code>synthetic_observables</code></dt>
 <dd><p>(<code>character</code>)<br>
 The synthetic features defined in the module. Read-only.</p></dd>
 
 
-<dt><code>slice_ts</code></dt>
+    <dt><code>slice_ts</code></dt>
 <dd><p>(<code>Date</code> or <code>character</code>)<br> Date or timestamp (parsable by <code>as.POSIXct</code>) to slice the (time-versioned) data on. Read only.</p></dd>
 
 
-<dt><code>conn</code></dt>
+    <dt><code>conn</code></dt>
 <dd><p>(<code>DBIConnection</code> or <code>function</code>)<br> A database connection or function that opens a database connection. Read only.</p></dd>
 
 
@@ -147,8 +146,7 @@ The synthetic features defined in the module. Read-only.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyObservables-new"><code>DiseasyObservables$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyObservables-initialize"><code>DiseasyObservables$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyObservables-set_diseasystore"><code>DiseasyObservables$set_diseasystore()</code></a></p></li>
 <li><p><a href="#method-DiseasyObservables-set_last_queryable_date"><code>DiseasyObservables$set_last_queryable_date()</code></a></p></li>
 <li><p><a href="#method-DiseasyObservables-set_study_period"><code>DiseasyObservables$set_study_period()</code></a></p></li>
@@ -158,10 +156,10 @@ The synthetic features defined in the module. Read-only.</p></dd>
 <li><p><a href="#method-DiseasyObservables-stratification_names"><code>DiseasyObservables$stratification_names()</code></a></p></li>
 <li><p><a href="#method-DiseasyObservables-describe"><code>DiseasyObservables$describe()</code></a></p></li>
 <li><p><a href="#method-DiseasyObservables-clone"><code>DiseasyObservables$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyObservables-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyObservables-initialize"></a><div class="section">
+<h3 id="diseasyobservables-new-"><code>DiseasyObservables$new()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyObservables</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
@@ -173,65 +171,55 @@ The synthetic features defined in the module. Read-only.</p></dd>
 <span>  slice_ts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>diseasystore</code></dt>
 <dd><p>(<code>character</code> or <code>diseasystore</code>)<br>
 Either the name of or an instance of the feature store to get data from.</p></dd>
 
-
-<dt><code>start_date</code></dt>
+      <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period start.
 Used as default values for <code>$get_observation()</code>.</p></dd>
 
-
-<dt><code>end_date</code></dt>
+      <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period end.
 Used as default values for <code>$get_observation()</code>.</p></dd>
 
-
-<dt><code>last_queryable_date</code></dt>
+      <dt><code>last_queryable_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
 Enforce a limit on data that can be pulled (not after this date).</p></dd>
 
-
-<dt><code>conn</code></dt>
+      <dt><code>conn</code></dt>
 <dd><p>(<code>DBIConnection</code> or <code>function</code>)<br> A database connection or function that opens a database connection.</p></dd>
 
-
-<dt><code>slice_ts</code></dt>
+      <dt><code>slice_ts</code></dt>
 <dd><p>(<code>Date</code> or <code>character</code>)<br> Date or timestamp (parsable by <code>as.POSIXct</code>) to slice the (time-versioned) data on.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Parameters sent to <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>A new instance of the <code>DiseasyObservables</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-set_diseasystore"></a><div class="section">
-<h3 id="method-set-diseasystore-">Method <code>set_diseasystore()</code><a class="anchor" aria-label="anchor" href="#method-set-diseasystore-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-set_diseasystore"></a><div class="section">
+<h3 id="diseasyobservables-set-diseasystore-"><code>DiseasyObservables$set_diseasystore()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-set-diseasystore-"></a></h3>
 <p>Set the case definition to get DiseasyObservables for.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">set_diseasystore</span><span class="op">(</span><span class="va">diseasystore</span>, verbose <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>diseasystore</code></dt>
 <dd><p>(<code>character</code>)<br>
 Text label of the disease to get DiseasyObservables for.<br>
 Must match case definition implemented in <code>diseasystore</code> package.</p></dd>
 
-
-<dt><code>verbose</code></dt>
+      <dt><code>verbose</code></dt>
 <dd><p>(<code>logical</code>)<br>
 Should the <code>diseasystore</code> use verbose outputs?</p></dd>
 
@@ -239,14 +227,14 @@ Should the <code>diseasystore</code> use verbose outputs?</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-set_last_queryable_date"></a><div class="section">
-<h3 id="method-set-last-queryable-date-">Method <code>set_last_queryable_date()</code><a class="anchor" aria-label="anchor" href="#method-set-last-queryable-date-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-set_last_queryable_date"></a><div class="section">
+<h3 id="diseasyobservables-set-last-queryable-date-"><code>DiseasyObservables$set_last_queryable_date()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-set-last-queryable-date-"></a></h3>
 <p>Enforce a limit on data that can be pulled.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">set_last_queryable_date</span><span class="op">(</span><span class="va">last_queryable_date</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>last_queryable_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
@@ -256,34 +244,33 @@ DiseasyObservables module will not return data after this date.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-set_study_period"></a><div class="section">
-<h3 id="method-set-study-period-">Method <code>set_study_period()</code><a class="anchor" aria-label="anchor" href="#method-set-study-period-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-set_study_period"></a><div class="section">
+<h3 id="diseasyobservables-set-study-period-"><code>DiseasyObservables$set_study_period()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-set-study-period-"></a></h3>
 <p>Set the (default) time period to get observations from.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">set_study_period</span><span class="op">(</span><span class="va">start_date</span>, <span class="va">end_date</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period start.</p></dd>
 
-
-<dt><code>end_date</code></dt>
+      <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period end.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-set_slice_ts"></a><div class="section">
-<h3 id="method-set-slice-ts-">Method <code>set_slice_ts()</code><a class="anchor" aria-label="anchor" href="#method-set-slice-ts-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-set_slice_ts"></a><div class="section">
+<h3 id="diseasyobservables-set-slice-ts-"><code>DiseasyObservables$set_slice_ts()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-set-slice-ts-"></a></h3>
 <p>Set the slice_ts to get data for</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">set_slice_ts</span><span class="op">(</span><span class="va">slice_ts</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>slice_ts</code></dt>
 <dd><p>(<code>Date</code> or <code>character</code>)<br> Date or timestamp (parsable by <code>as.POSIXct</code>) to slice the (time-versioned) data on.</p></dd>
@@ -292,21 +279,20 @@ DiseasyObservables module will not return data after this date.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-define_synthetic_observable"></a><div class="section">
-<h3 id="method-define-synthetic-observable-">Method <code>define_synthetic_observable()</code><a class="anchor" aria-label="anchor" href="#method-define-synthetic-observable-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-define_synthetic_observable"></a><div class="section">
+<h3 id="diseasyobservables-define-synthetic-observable-"><code>DiseasyObservables$define_synthetic_observable()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-define-synthetic-observable-"></a></h3>
 <p>Adds a synthetic feature computed from existing features.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">define_synthetic_observable</span><span class="op">(</span><span class="va">name</span>, <span class="va">mapping</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>(<code>character</code>)<br>
 The name of the new feature.</p></dd>
 
-
-<dt><code>mapping</code></dt>
+      <dt><code>mapping</code></dt>
 <dd><p>(<code>function</code>)<br>
 The mapping to compute the new feature from existing features.
 Existing features should be included as formal arguments to the function.</p></dd>
@@ -315,8 +301,10 @@ Existing features should be included as formal arguments to the function.</p></d
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-get_observation"></a><div class="section">
-<h3 id="method-get-observation-">Method <code>get_observation()</code><a class="anchor" aria-label="anchor" href="#method-get-observation-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-get_observation"></a><div class="section">
+<h3 id="diseasyobservables-get-observation-"><code>DiseasyObservables$get_observation()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-get-observation-"></a></h3>
 <p>Retrieve an "observable" in the data set corresponding to the set diseasystore.<br>
 By default, the internal values for start_date and end_date are used to return data,
 but these can be overwritten.<br>
@@ -329,75 +317,68 @@ The results are cached for faster retrieval at subsequent calls.</p><div class="
 <span>  end_date <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">end_date</span>,</span>
 <span>  respect_last_queryable_date <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
 <dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
-
-<dt><code>stratification</code></dt>
+      <dt><code>stratification</code></dt>
 <dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
 
-
-<dt><code>start_date</code></dt>
+      <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period start.</p></dd>
 
-
-<dt><code>end_date</code></dt>
+      <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br> Study period end.</p></dd>
 
-
-<dt><code>respect_last_queryable_date</code></dt>
+      <dt><code>respect_last_queryable_date</code></dt>
 <dd><p>(<code>logical</code>)<br>
 Should the module be able to return data past <code>$last_queryable_date</code>?</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p>If the observable is found, the function returns the corresponding data at the stratification level.<br>
 Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-stratification_names"></a><div class="section">
-<h3 id="method-stratification-names-">Method <code>stratification_names()</code><a class="anchor" aria-label="anchor" href="#method-stratification-names-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-stratification_names"></a><div class="section">
+<h3 id="diseasyobservables-stratification-names-"><code>DiseasyObservables$stratification_names()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-stratification-names-"></a></h3>
 <p>Get the names of the stratifications.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">stratification_names</span><span class="op">(</span><span class="va">stratification</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>stratification</code></dt>
 <dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p>The names of the stratifications.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-describe"></a><div class="section">
-<h3 id="method-describe-">Method <code>describe()</code><a class="anchor" aria-label="anchor" href="#method-describe-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyObservables-describe"></a><div class="section">
+<h3 id="diseasyobservables-describe-"><code>DiseasyObservables$describe()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-describe-"></a></h3>
 <p>Prints a human readable report of the internal state of the module.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasyObservables-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p></p><hr><a id="method-DiseasyObservables-clone"></a><div class="section">
+<h3 id="diseasyobservables-clone-"><code>DiseasyObservables$clone()</code><a class="anchor" aria-label="anchor" href="#diseasyobservables-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyObservables</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -407,6 +388,7 @@ Otherwise, the function fails and lists the available DiseasyObservables from th
 </div>
 
 </div>
+
 
     </div>
 

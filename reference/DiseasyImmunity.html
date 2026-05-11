@@ -88,7 +88,7 @@ their own, custom waning function.</p>
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code>DiseasyImmunity</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code>DiseasyImmunity</code></p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
@@ -97,7 +97,7 @@ their own, custom waning function.</p>
 The waning models implemented in <code>DiseasyImmunity</code>. Read only.</p></dd>
 
 
-<dt><code>model</code></dt>
+    <dt><code>model</code></dt>
 <dd><p>(<code>list(function())</code>)<br>
 The list of models currently being used in the module. Read-only.</p></dd>
 
@@ -109,8 +109,7 @@ The list of models currently being used in the module. Read-only.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyImmunity-new"><code>DiseasyImmunity$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyImmunity-initialize"><code>DiseasyImmunity$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-set_time_scales"><code>DiseasyImmunity$set_time_scales()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-set_waning_model"><code>DiseasyImmunity$set_waning_model()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-set_no_waning"><code>DiseasyImmunity$set_no_waning()</code></a></p></li>
@@ -123,16 +122,14 @@ The list of models currently being used in the module. Read-only.</p></dd>
 <li><p><a href="#method-DiseasyImmunity-plot"><code>DiseasyImmunity$plot()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-describe"><code>DiseasyImmunity$describe()</code></a></p></li>
 <li><p><a href="#method-DiseasyImmunity-clone"><code>DiseasyImmunity$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyImmunity-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyImmunity-initialize"></a><div class="section">
+<h3 id="diseasyimmunity-new-"><code>DiseasyImmunity$new()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyImmunity</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Parameters sent to <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
@@ -141,14 +138,14 @@ The list of models currently being used in the module. Read-only.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_time_scales"></a><div class="section">
-<h3 id="method-set-time-scales-">Method <code>set_time_scales()</code><a class="anchor" aria-label="anchor" href="#method-set-time-scales-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-set_time_scales"></a><div class="section">
+<h3 id="diseasyimmunity-set-time-scales-"><code>DiseasyImmunity$set_time_scales()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-time-scales-"></a></h3>
 <p>Sets the characteristic time scale for the waning of the model.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_time_scales</span><span class="op">(</span>time_scales <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>time_scales</code></dt>
 <dd><p>(<code>named list()</code>)<br>
@@ -157,12 +154,10 @@ Multiple targets can be updated simultaneously.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>Returns the updated model(s) (invisibly).</p>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h4>
 <p></p><div class="r example copy"><div class="sourceCode"><pre><code><span>  <span class="va">im</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="va">im</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span><span class="op">)</span></span>
@@ -171,15 +166,14 @@ Multiple targets can be updated simultaneously.</p></dd>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">im</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_waning_model"></a><div class="section">
-<h3 id="method-set-waning-model-">Method <code>set_waning_model()</code><a class="anchor" aria-label="anchor" href="#method-set-waning-model-"></a></h3>
+<p></p><hr><a id="method-DiseasyImmunity-set_waning_model"></a><div class="section">
+<h3 id="diseasyimmunity-set-waning-model-"><code>DiseasyImmunity$set_waning_model()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-waning-model-"></a></h3>
 <p>Sets the <code>DiseasyImmunity</code> module to use the specified waning model.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_waning_model</span><span class="op">(</span><span class="va">model</span>, target <span class="op">=</span> <span class="st">"infection"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>model</code></dt>
 <dd><p>(<code>character(1)</code> or <code>function(1)</code>)<br>
@@ -187,68 +181,64 @@ If a <code>character</code> is given, it is treated as the name of the waning fu
 the corresponding <code>$set_&lt;model&gt;()</code> is called).</p>
 <p>If a <code>function</code> is given, it is treated as a custom waning function and is set via <code>$set_custom_waning()</code>.</p></dd>
 
-
-<dt><code>target</code></dt>
+      <dt><code>target</code></dt>
 <dd><p>(<code>character(1)</code>)<br> The target of the waning model (e.g. "infection", "hospitalisation", "death").</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Additional arguments to be passed to the waning model function.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p>Returns the model (invisibly).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_no_waning"></a><div class="section">
-<h3 id="method-set-no-waning-">Method <code>set_no_waning()</code><a class="anchor" aria-label="anchor" href="#method-set-no-waning-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-set_no_waning"></a><div class="section">
+<h3 id="diseasyimmunity-set-no-waning-"><code>DiseasyImmunity$set_no_waning()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-no-waning-"></a></h3>
 <p>Retrieves the waning model with a constant value (1).</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_no_waning</span><span class="op">(</span>target <span class="op">=</span> <span class="st">"infection"</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target</code></dt>
 <dd><p>(<code>character(1)</code>)<br> The target of the waning model (e.g. "infection", "hospitalisation", "death").</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p>Returns the model (invisibly).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_exponential_waning"></a><div class="section">
-<h3 id="method-set-exponential-waning-">Method <code>set_exponential_waning()</code><a class="anchor" aria-label="anchor" href="#method-set-exponential-waning-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-set_exponential_waning"></a><div class="section">
+<h3 id="diseasyimmunity-set-exponential-waning-"><code>DiseasyImmunity$set_exponential_waning()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-exponential-waning-"></a></h3>
 <p>Sets the <code>DiseasyImmunity</code> module to set an exponential model for waning.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">20</span>, target <span class="op">=</span> <span class="st">"infection"</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>time_scale</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br> Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning</p></dd>
 
-
-<dt><code>target</code></dt>
+      <dt><code>target</code></dt>
 <dd><p>(<code>character(1)</code>)<br> The target of the waning model (e.g. "infection", "hospitalisation", "death").</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p>Returns the model (invisibly).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_sigmoidal_waning"></a><div class="section">
-<h3 id="method-set-sigmoidal-waning-">Method <code>set_sigmoidal_waning()</code><a class="anchor" aria-label="anchor" href="#method-set-sigmoidal-waning-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-set_sigmoidal_waning"></a><div class="section">
+<h3 id="diseasyimmunity-set-sigmoidal-waning-"><code>DiseasyImmunity$set_sigmoidal_waning()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-sigmoidal-waning-"></a></h3>
 <p>Sets the <code>DiseasyImmunity</code> module to set a sigmoidal model for waning.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_sigmoidal_waning</span><span class="op">(</span></span>
@@ -256,81 +246,74 @@ the corresponding <code>$set_&lt;model&gt;()</code> is called).</p>
 <span>  shape <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>  target <span class="op">=</span> <span class="st">"infection"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>time_scale</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br> Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning</p></dd>
 
-
-<dt><code>shape</code></dt>
+      <dt><code>shape</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br>
 Determines the steepness of the waning curve in the sigmoidal waning model.
 Higher values of <code>shape</code> result in a steeper curve, leading to a more rapid decline in immunity.</p></dd>
 
-
-<dt><code>target</code></dt>
+      <dt><code>target</code></dt>
 <dd><p>(<code>character(1)</code>)<br> The target of the waning model (e.g. "infection", "hospitalisation", "death").</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
 <p>Returns the model (invisibly).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_linear_waning"></a><div class="section">
-<h3 id="method-set-linear-waning-">Method <code>set_linear_waning()</code><a class="anchor" aria-label="anchor" href="#method-set-linear-waning-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-set_linear_waning"></a><div class="section">
+<h3 id="diseasyimmunity-set-linear-waning-"><code>DiseasyImmunity$set_linear_waning()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-linear-waning-"></a></h3>
 <p>Sets the <code>DiseasyImmunity</code> module to set a linear model for waning.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_linear_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">20</span>, target <span class="op">=</span> <span class="st">"infection"</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>time_scale</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br> Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning</p></dd>
 
-
-<dt><code>target</code></dt>
+      <dt><code>target</code></dt>
 <dd><p>(<code>character(1)</code>)<br> The target of the waning model (e.g. "infection", "hospitalisation", "death").</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
 <p>Returns the model (invisibly).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_heaviside_waning"></a><div class="section">
-<h3 id="method-set-heaviside-waning-">Method <code>set_heaviside_waning()</code><a class="anchor" aria-label="anchor" href="#method-set-heaviside-waning-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-set_heaviside_waning"></a><div class="section">
+<h3 id="diseasyimmunity-set-heaviside-waning-"><code>DiseasyImmunity$set_heaviside_waning()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-heaviside-waning-"></a></h3>
 <p>Sets the <code>DiseasyImmunity</code> module to set a Heaviside model for waning.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_heaviside_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">20</span>, target <span class="op">=</span> <span class="st">"infection"</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>time_scale</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br> Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning</p></dd>
 
-
-<dt><code>target</code></dt>
+      <dt><code>target</code></dt>
 <dd><p>(<code>character(1)</code>)<br> The target of the waning model (e.g. "infection", "hospitalisation", "death").</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p>Returns the model (invisibly).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-set_custom_waning"></a><div class="section">
-<h3 id="method-set-custom-waning-">Method <code>set_custom_waning()</code><a class="anchor" aria-label="anchor" href="#method-set-custom-waning-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-set_custom_waning"></a><div class="section">
+<h3 id="diseasyimmunity-set-custom-waning-"><code>DiseasyImmunity$set_custom_waning()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-set-custom-waning-"></a></h3>
 <p>Sets the <code>DiseasyImmunity</code> module to set a custom waning function.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">set_custom_waning</span><span class="op">(</span></span>
@@ -339,38 +322,34 @@ Higher values of <code>shape</code> result in a steeper curve, leading to a more
 <span>  target <span class="op">=</span> <span class="st">"infection"</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"custom_waning"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>custom_function</code></dt>
 <dd><p>(<code>function(1)</code>)<br>
 A function of a single variable <code>t</code> that returns the immunity at time <code>t</code>.
 If the function has a time scale, it should be included in the function as <code>time_scale</code>.</p></dd>
 
-
-<dt><code>time_scale</code></dt>
+      <dt><code>time_scale</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br> Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning</p></dd>
 
-
-<dt><code>target</code></dt>
+      <dt><code>target</code></dt>
 <dd><p>(<code>character(1)</code>)<br> The target of the waning model (e.g. "infection", "hospitalisation", "death").</p></dd>
 
-
-<dt><code>name</code></dt>
+      <dt><code>name</code></dt>
 <dd><p>(<code>character(1)</code>)<br>
 Set the name of the custom waning function.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
 <p>Returns the model (invisibly).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-approximate_compartmental"></a><div class="section">
-<h3 id="method-approximate-compartmental-">Method <code>approximate_compartmental()</code><a class="anchor" aria-label="anchor" href="#method-approximate-compartmental-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-approximate_compartmental"></a><div class="section">
+<h3 id="diseasyimmunity-approximate-compartmental-"><code>DiseasyImmunity$approximate_compartmental()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-approximate-compartmental-"></a></h3>
 <p>Assuming a compartmental disease model with M recovered compartments, this function approximates the
 transition rates and associated risk of infection for each compartment such the effective immunity
 best matches the waning immunity curves set in the module.</p><div class="section">
@@ -384,38 +363,31 @@ best matches the waning immunity curves set in the module.</p><div class="sectio
 <span>  optim_control <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>M</code></dt>
 <dd><p>(<code>integer(1)</code>)<br>
 Number of compartments to be used in the model.</p></dd>
 
-
-<dt><code>method</code></dt>
+      <dt><code>method</code></dt>
 <dd><p>(<code>character(1)</code>)<br>
 Specifies the parametrisation method to be used from the available methods. See details.</p></dd>
 
-
-<dt><code>strategy</code></dt>
+      <dt><code>strategy</code></dt>
 <dd><p>(<code>character(1)</code>)<br>
 Specifies the optimisation strategy ("naive", "recursive" or "combination"). See details.</p></dd>
 
-
-<dt><code>monotonous</code></dt>
+      <dt><code>monotonous</code></dt>
 <dd><p>(<code>logical(1)</code> or <code>numeric(1)</code>)<br>
 Should non-monotonous approximations be penalised?
 If a numeric value supplied, it is used as a penalty factor.</p></dd>
 
-
-<dt><code>individual_level</code></dt>
+      <dt><code>individual_level</code></dt>
 <dd><p>(<code>logical(1)</code> or <code>numeric(1)</code>)<br>
 Should the approximation penalise rapid changes in immunity levels?
 If a numeric value supplied, it is used as a penalty factor.</p></dd>
 
-
-<dt><code>optim_control</code></dt>
+      <dt><code>optim_control</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>)<br>
 Optional controls for the optimisers.
 Each method has their own default controls for the optimiser.
@@ -429,14 +401,12 @@ entries are passed as argument to the optimiser as described below.</p>
 </ul><p>If <code>optim_method</code> matches any of the methods in <code><a href="https://rdrr.io/pkg/optimx/man/optimr.html" class="external-link">optimx::optimr</a></code>:</p><ul><li><p>Additional <code>optim_control</code> arguments passed as <code>control</code> to <code>stats::optimr</code> using the chosen <code>method</code>.</p></li>
 </ul></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Additional arguments to be passed to the optimiser.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
 <p>Due to the M recovered compartments being sequential, the waiting time distribution between compartments
 is a phase-type distribution (with Erlang distribution as a special case when all transition rates are equal).
@@ -468,9 +438,7 @@ may be better in any specific case when using a different algorithm
 objective function (<code>monotonous</code> and <code>individual_level</code>):</p><table class="table table"><tr><td>method</td><td>penalty</td><td>strategy</td><td>optimiser</td></tr><tr><td>free_delta</td><td>No/Yes</td><td>naive</td><td>ucminf</td></tr><tr><td>free_gamma</td><td>No/Yes</td><td>naive</td><td>ucminf</td></tr><tr><td>all_free</td><td>No/Yes</td><td>naive</td><td>ucminf</td></tr></table><p>Optimiser defaults can be changed via the <code>optim_control</code> argument.
 NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
 which uses the "free_gamma" default optimiser to determine the starting point.</p>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
 <p>Returns the results from the optimisation with the approximated rates and execution time.
 The output of the objective function is given as the "error" (the square-root of the integral of the squared
@@ -478,8 +446,10 @@ difference between approximation and target) and the "penalty" (the penalty cont
 by <code>monotonous</code> and <code>individual_level</code>).</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-plot"></a><div class="section">
-<h3 id="method-plot-">Method <code><a href="plot.html">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-plot"></a><div class="section">
+<h3 id="diseasyimmunity-plot-"><code>DiseasyImmunity$plot()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-plot-"></a></h3>
 <p>If desired to additionally plot the approximations, supply the <code>method</code> and number of compartments (<code>M</code>)</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
@@ -488,51 +458,47 @@ by <code>monotonous</code> and <code>individual_level</code>).</p>
 <span>  M <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>t_max</code></dt>
 <dd><p>(<code>numeric</code>)<br>
 The maximal time to plot the waning over. If t_max is not defined, default is 3 times the median of the
 accumulated time scales.</p></dd>
 
-
-<dt><code>method</code></dt>
+      <dt><code>method</code></dt>
 <dd><p>(<code>str</code> or <code>numeric</code>)<br>
 Specifies the method to be used from the available methods.
 It can be provided as a string with the method name "free_gamma", "free_delta" or "all_free".
 or as a numeric value representing the method index 1, 2, or 3.</p></dd>
 
-
-<dt><code>M</code></dt>
+      <dt><code>M</code></dt>
 <dd><p>(<code>numeric</code>)<br>
 Number of compartments to be used in the model.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Additional arguments to be passed to <code>$approximate_compartmental()</code>.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-describe"></a><div class="section">
-<h3 id="method-describe-">Method <code>describe()</code><a class="anchor" aria-label="anchor" href="#method-describe-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyImmunity-describe"></a><div class="section">
+<h3 id="diseasyimmunity-describe-"><code>DiseasyImmunity$describe()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-describe-"></a></h3>
 <p>Prints a human readable report of the internal state of the module.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasyImmunity-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p></p><hr><a id="method-DiseasyImmunity-clone"></a><div class="section">
+<h3 id="diseasyimmunity-clone-"><code>DiseasyImmunity$clone()</code><a class="anchor" aria-label="anchor" href="#diseasyimmunity-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -543,13 +509,14 @@ Number of compartments to be used in the model.</p></dd>
 
 </div>
 
+
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
-<span class="r-in"><span><span class="co">## Method `DiseasyImmunity$set_time_scales`</span></span></span>
+<span class="r-in"><span><span class="co">## Method `DiseasyImmunity$set_time_scales()`</span></span></span>
 <span class="r-in"><span><span class="co">## ------------------------------------------------</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">im</span> <span class="op">&lt;-</span> <span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
@@ -557,7 +524,7 @@ Number of compartments to be used in the model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $infection</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function (t) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> exp(-t/time_scale)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x5606d29e8e68&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x559bd7a37260&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"name")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "exponential_waning"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")</span>
@@ -569,7 +536,7 @@ Number of compartments to be used in the model.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $infection</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function (t) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> exp(-t/time_scale)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x5606d29e8e68&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x559bd7a37260&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"name")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "exponential_waning"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")</span>

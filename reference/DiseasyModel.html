@@ -121,13 +121,12 @@ These functions define the "API" of the models and ensure the models can take pa
 <p><a href="DiseasyObservables.html">DiseasyObservables</a></p>
 <p><a href="DiseasyActivity.html">DiseasyActivity</a></p>
 <p><a href="DiseasyImmunity.html">DiseasyImmunity</a></p>
-<p><a href="DiseasyObservables.html">DiseasyObservables</a></p>
 <p><a href="DiseasySeason.html">DiseasySeason</a></p>
 <p><a href="DiseasyVariant.html">DiseasyVariant</a></p></div>
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code>DiseasyModel</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code>DiseasyModel</code></p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
@@ -136,42 +135,42 @@ These functions define the "API" of the models and ensure the models can take pa
 The local copy of an DiseasyActivity module. Read-only.</p></dd>
 
 
-<dt><code>immunity</code></dt>
+    <dt><code>immunity</code></dt>
 <dd><p>(<code><a href="DiseasyImmunity.html">diseasy::DiseasyImmunity</a></code>)<br>
 The local copy of a DiseasyImmunity module. Read-only.</p></dd>
 
 
-<dt><code>observables</code></dt>
+    <dt><code>observables</code></dt>
 <dd><p>(<code><a href="DiseasyObservables.html">diseasy::DiseasyObservables</a></code>)<br>
 The local copy of a DiseasyObservables module. Read-only.</p></dd>
 
 
-<dt><code>season</code></dt>
+    <dt><code>season</code></dt>
 <dd><p>(<code><a href="DiseasySeason.html">diseasy::DiseasySeason</a></code>)<br>
 The local copy of a DiseasySeason module. Read-only.</p></dd>
 
 
-<dt><code>variant</code></dt>
+    <dt><code>variant</code></dt>
 <dd><p>(<code>diseasy::.DiseasyVariant</code>)<br>
 The local copy of a DiseasyVariant module. Read-only.</p></dd>
 
 
-<dt><code>parameters</code></dt>
+    <dt><code>parameters</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>)<br>
 The parameters used in the model. Read-only.</p></dd>
 
 
-<dt><code>training_period</code></dt>
+    <dt><code>training_period</code></dt>
 <dd><p>(<code>list</code>(<code>Date</code>))<br>
 The start and end dates of the training period. Read-only.</p></dd>
 
 
-<dt><code>testing_period</code></dt>
+    <dt><code>testing_period</code></dt>
 <dd><p>(<code>list</code>(<code>Date</code>))<br>
 The start and end dates of the testing period. Read-only.</p></dd>
 
 
-<dt><code>validation_period</code></dt>
+    <dt><code>validation_period</code></dt>
 <dd><p>(<code>list</code>(<code>Date</code>))<br>
 The start and end dates of the validation period. Read-only.</p></dd>
 
@@ -183,15 +182,14 @@ The start and end dates of the validation period. Read-only.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyModel-new"><code>DiseasyModel$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyModel-initialize"><code>DiseasyModel$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-get_results"><code>DiseasyModel$get_results()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-get_data"><code>DiseasyModel$get_data()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-clone"><code>DiseasyModel$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyModel-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyModel-initialize"></a><div class="section">
+<h3 id="diseasymodel-new-"><code>DiseasyModel$new()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyModel</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.
 This module is typically not constructed directly but rather through <code>DiseasyModel*</code> classes.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
@@ -205,47 +203,41 @@ This module is typically not constructed directly but rather through <code>Disea
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observables, activity, season, variant, immunity</code></dt>
 <dd><p>(<code>boolean</code> or <code>R6::R6Class instance</code>)<br> If a boolean is given, it dictates whether to load a new instance module of this class.<br> If an instance of the module is provided instead, a copy of this instance is added to the <code>DiseasyModel</code> instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to <code>DiseasyModel</code>.</p></dd>
 
-
-<dt><code>parameters</code></dt>
+      <dt><code>parameters</code></dt>
 <dd><p>(<code>named list()</code>)<br>
 List of parameters to set for the model during initialization.</p>
 <p>Each model has their own parameters.</p>
 <p>Common parameters are:</p><ul><li><p><code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></li>
 </ul></dd>
 
-
-<dt><code>label</code></dt>
+      <dt><code>label</code></dt>
 <dd><p>(<code>character</code>)<br>
 A human readable label for the model instance.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Parameters sent to <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
 <p>The <code>DiseasyModel</code> is the main template that the individual models should inherit from since this defines the
 set of methods the later framework expects from each model. In addition, it provides the main interface with
 the other modules of the framework.</p>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>A new instance of the <code>DiseasyModel</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModel-get_results"></a><div class="section">
-<h3 id="method-get-results-">Method <code>get_results()</code><a class="anchor" aria-label="anchor" href="#method-get-results-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModel-get_results"></a><div class="section">
+<h3 id="diseasymodel-get-results-"><code>DiseasyModel$get_results()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-get-results-"></a></h3>
 <p>The primary method used to request model results of a given observable at a given stratification</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
@@ -254,35 +246,31 @@ the other modules of the framework.</p>
 <span>  quantiles <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stratification <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
 <dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
-
-<dt><code>prediction_length</code></dt>
+      <dt><code>prediction_length</code></dt>
 <dd><p>(<code>numeric</code>)<br> The number of days to predict. The prediction start is defined by <code>last_queryable_date</code> of the <code><a href="DiseasyObservables.html">?DiseasyObservables</a></code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p></dd>
 
-
-<dt><code>quantiles</code></dt>
+      <dt><code>quantiles</code></dt>
 <dd><p>(<code>list</code>(<code>numeric</code>))<br> If given, results are returned at the quantiles given.</p></dd>
 
-
-<dt><code>stratification</code></dt>
+      <dt><code>stratification</code></dt>
 <dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p>A <code>tibble</code> <a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble::tibble</a> with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:<br><br>  - date (<code>Date</code>) specifying the date of the prediction.<br>  - realisation_id (<code>character</code>) giving a unique id for each realization in the ensemble.<br>  - weight (<code>numeric</code>) giving the weight of the realization in the ensemble.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModel-get_data"></a><div class="section">
-<h3 id="method-get-data-">Method <code>get_data()</code><a class="anchor" aria-label="anchor" href="#method-get-data-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModel-get_data"></a><div class="section">
+<h3 id="diseasymodel-get-data-"><code>DiseasyModel$get_data()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-get-data-"></a></h3>
 <p>A method that returns training data for the models based on the model value of <code>training_length</code> and
 the <code>last_queryable_date</code> of the <code>DiseasyObservables</code> module.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
@@ -292,42 +280,36 @@ the <code>last_queryable_date</code> of the <code>DiseasyObservables</code> modu
 <span>  period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"training"</span>, <span class="st">"testing"</span>, <span class="st">"validation"</span>, <span class="st">"plotting"</span><span class="op">)</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
 <dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
-
-<dt><code>stratification</code></dt>
+      <dt><code>stratification</code></dt>
 <dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
 
-
-<dt><code>period</code></dt>
+      <dt><code>period</code></dt>
 <dd><p>(<code>character</code>)<br>
 The period to return data for. That is, the training, testing, validation or plotting period.</p></dd>
 
-
-<dt><code>prediction_length</code></dt>
+      <dt><code>prediction_length</code></dt>
 <dd><p>(<code>numeric</code>)<br> The number of days to predict. The prediction start is defined by <code>last_queryable_date</code> of the <code><a href="DiseasyObservables.html">?DiseasyObservables</a></code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p>The output of <code>DiseasyObservables$get_observation</code> constrained to the training period.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModel-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModel-clone"></a><div class="section">
+<h3 id="diseasymodel-clone-"><code>DiseasyModel$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -337,6 +319,7 @@ The period to return data for. That is, the training, testing, validation or plo
 </div>
 
 </div>
+
 
     </div>
 

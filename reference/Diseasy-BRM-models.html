@@ -113,56 +113,50 @@ examples of how this can be done.</p>
     </div>
     <div class="section level2">
     <h2 id="super-classes">Super classes<a class="anchor" aria-label="anchor" href="#super-classes"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">diseasy::DiseasyModel</a></code> -&gt; <code><a href="DiseasyModelRegression.html">diseasy::DiseasyModelRegression</a></code> -&gt; <code>DiseasyModelBRM</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">DiseasyModel</a></code> -&gt; <code><a href="DiseasyModelRegression.html">DiseasyModelRegression</a></code> -&gt; <code>DiseasyModelBRM</code></p>
     </div>
     <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyModelBRM-new"><code>DiseasyModelBRM$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyModelBRM-initialize"><code>DiseasyModelBRM$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelBRM-clone"><code>DiseasyModelBRM$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href="DiseasyModelRegression.html#method-get_results"><code>diseasy::DiseasyModelRegression$get_results()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href="DiseasyModelRegression.html#method-plot"><code>diseasy::DiseasyModelRegression$plot()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyModelBRM-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href="DiseasyModelRegression.html#method-get_results"><code>DiseasyModelRegression$get_results()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href="DiseasyModelRegression.html#method-plot"><code>DiseasyModelRegression$plot()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyModelBRM-initialize"></a><div class="section">
+<h3 id="diseasymodelbrm-new-"><code>DiseasyModelBRM$new()</code><a class="anchor" aria-label="anchor" href="#diseasymodelbrm-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyModelBRM</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.
 This module is typically not constructed directly but rather through <code>DiseasyModelB*</code> classes,
 such as DiseasyModelB0 and DiseasyModelB1.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Diseasy-BRM-models.html">DiseasyModelBRM</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>parameters sent to <code>DiseasyModelRegression</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
 <p>Helper class for the the <code>DiseasyModelB*</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> classes.</p>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>A new instance of the <code>DiseasyModelBRM</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModelBRM-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModelBRM-clone"></a><div class="section">
+<h3 id="diseasymodelbrm-clone-"><code>DiseasyModelBRM$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodelbrm-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelBRM</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -173,53 +167,49 @@ such as DiseasyModelB0 and DiseasyModelB1.</p><div class="section">
 
 </div>
 
+
     </div>
     <div class="section level2">
     <h2 id="super-classes-1">Super classes<a class="anchor" aria-label="anchor" href="#super-classes-1"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">diseasy::DiseasyModel</a></code> -&gt; <code><a href="DiseasyModelRegression.html">diseasy::DiseasyModelRegression</a></code> -&gt; <code>diseasy::DiseasyModelBRM</code> -&gt; <code>diseasy::NA</code> -&gt; <code>DiseasyModelB0</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">DiseasyModel</a></code> -&gt; <code><a href="DiseasyModelRegression.html">DiseasyModelRegression</a></code> -&gt; <code>DiseasyModelBRM</code> -&gt; <code>NA</code> -&gt; <code>DiseasyModelB0</code></p>
     </div>
     <div class="section level2">
     <h2 id="methods-1">Methods<a class="anchor" aria-label="anchor" href="#methods-1"></a></h2>
 
 <div class="section">
 <h3 id="public-methods-1">Public methods<a class="anchor" aria-label="anchor" href="#public-methods-1"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyModelB0-new"><code>DiseasyModelB0$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyModelB0-initialize"><code>DiseasyModelB0$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelB0-clone"><code>DiseasyModelB0$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href="DiseasyModelRegression.html#method-get_results"><code>diseasy::DiseasyModelRegression$get_results()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href="DiseasyModelRegression.html#method-plot"><code>diseasy::DiseasyModelRegression$plot()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyModelB0-new"></a><div class="section">
-<h3 id="method-new--1">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new--1"></a></h3>
-
-<div class="section">
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href="DiseasyModelRegression.html#method-get_results"><code>DiseasyModelRegression$get_results()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href="DiseasyModelRegression.html#method-plot"><code>DiseasyModelRegression$plot()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyModelB0-initialize"></a><div class="section">
+<h3 id="diseasymodelb-new-"><code>DiseasyModelB0$new()</code><a class="anchor" aria-label="anchor" href="#diseasymodelb-new-"></a></h3>
+<p></p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Diseasy-BRM-models.html">DiseasyModelB0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>parameters sent to <code>DiseasyModelB_</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p>A new instance of the <code>DiseasyModelB0</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModelB0-clone"></a><div class="section">
-<h3 id="method-clone--1">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--1"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModelB0-clone"></a><div class="section">
+<h3 id="diseasymodelb-clone-"><code>DiseasyModelB0$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodelb-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelB0</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -230,53 +220,49 @@ such as DiseasyModelB0 and DiseasyModelB1.</p><div class="section">
 
 </div>
 
+
     </div>
     <div class="section level2">
     <h2 id="super-classes-2">Super classes<a class="anchor" aria-label="anchor" href="#super-classes-2"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">diseasy::DiseasyModel</a></code> -&gt; <code><a href="DiseasyModelRegression.html">diseasy::DiseasyModelRegression</a></code> -&gt; <code>diseasy::DiseasyModelBRM</code> -&gt; <code>diseasy::NA</code> -&gt; <code>DiseasyModelB1</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">DiseasyModel</a></code> -&gt; <code><a href="DiseasyModelRegression.html">DiseasyModelRegression</a></code> -&gt; <code>DiseasyModelBRM</code> -&gt; <code>NA</code> -&gt; <code>DiseasyModelB1</code></p>
     </div>
     <div class="section level2">
     <h2 id="methods-2">Methods<a class="anchor" aria-label="anchor" href="#methods-2"></a></h2>
 
 <div class="section">
 <h3 id="public-methods-2">Public methods<a class="anchor" aria-label="anchor" href="#public-methods-2"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyModelB1-new"><code>DiseasyModelB1$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyModelB1-initialize"><code>DiseasyModelB1$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelB1-clone"><code>DiseasyModelB1$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href="DiseasyModelRegression.html#method-get_results"><code>diseasy::DiseasyModelRegression$get_results()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href="DiseasyModelRegression.html#method-plot"><code>diseasy::DiseasyModelRegression$plot()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyModelB1-new"></a><div class="section">
-<h3 id="method-new--2">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new--2"></a></h3>
-
-<div class="section">
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href="DiseasyModelRegression.html#method-get_results"><code>DiseasyModelRegression$get_results()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href="DiseasyModelRegression.html#method-plot"><code>DiseasyModelRegression$plot()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyModelB1-initialize"></a><div class="section">
+<h3 id="diseasymodelb-new--1"><code>DiseasyModelB1$new()</code><a class="anchor" aria-label="anchor" href="#diseasymodelb-new--1"></a></h3>
+<p></p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Diseasy-BRM-models.html">DiseasyModelB1</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>parameters sent to <code>DiseasyModelB_</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p>A new instance of the <code>DiseasyModelB1</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModelB1-clone"></a><div class="section">
-<h3 id="method-clone--2">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--2"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModelB1-clone"></a><div class="section">
+<h3 id="diseasymodelb-clone--1"><code>DiseasyModelB1$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodelb-clone--1"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelB1</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -286,6 +272,7 @@ such as DiseasyModelB0 and DiseasyModelB1.</p><div class="section">
 </div>
 
 </div>
+
 
     </div>
 

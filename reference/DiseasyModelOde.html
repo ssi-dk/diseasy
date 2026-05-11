@@ -85,45 +85,43 @@ This implementation requires the subclass to implement the <code>$rhs()</code> a
     </div>
     <div class="section level2">
     <h2 id="super-classes">Super classes<a class="anchor" aria-label="anchor" href="#super-classes"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">diseasy::DiseasyModel</a></code> -&gt; <code>DiseasyModelOde</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code><a href="DiseasyModel.html">DiseasyModel</a></code> -&gt; <code>DiseasyModelOde</code></p>
     </div>
     <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyModelOde-new"><code>DiseasyModelOde$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyModelOde-initialize"><code>DiseasyModelOde$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOde-get_results"><code>DiseasyModelOde$get_results()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOde-initialise_state_vector"><code>DiseasyModelOde$initialise_state_vector()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOde-plot"><code>DiseasyModelOde$plot()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOde-clone"><code>DiseasyModelOde$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyModelOde-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>DiseasyModel$get_data()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyModelOde-initialize"></a><div class="section">
+<h3 id="diseasymodelode-new-"><code>DiseasyModelOde$new()</code><a class="anchor" aria-label="anchor" href="#diseasymodelode-new-"></a></h3>
 <p>Merge the user provided mappings with the default mappings during initialisation.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyModelOde.html">DiseasyModelOde</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>parameters <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>parameters</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>)<br>
 List of parameters given to the model.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Parameters sent to <code>DiseasyModel</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModelOde-get_results"></a><div class="section">
-<h3 id="method-get-results-">Method <code>get_results()</code><a class="anchor" aria-label="anchor" href="#method-get-results-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModelOde-get_results"></a><div class="section">
+<h3 id="diseasymodelode-get-results-"><code>DiseasyModelOde$get_results()</code><a class="anchor" aria-label="anchor" href="#diseasymodelode-get-results-"></a></h3>
 <p>The primary method used to request model results of a given observable at a given stratification</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOde</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
@@ -132,41 +130,35 @@ List of parameters given to the model.</p></dd>
 <span>  quantiles <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stratification <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
 <dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
-
-<dt><code>prediction_length</code></dt>
+      <dt><code>prediction_length</code></dt>
 <dd><p>(<code>numeric</code>)<br> The number of days to predict. The prediction start is defined by <code>last_queryable_date</code> of the <code><a href="DiseasyObservables.html">?DiseasyObservables</a></code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p></dd>
 
-
-<dt><code>quantiles</code></dt>
+      <dt><code>quantiles</code></dt>
 <dd><p>(<code>list</code>(<code>numeric</code>))<br> If given, results are returned at the quantiles given.</p></dd>
 
-
-<dt><code>stratification</code></dt>
+      <dt><code>stratification</code></dt>
 <dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>A <code>tibble</code> <a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble::tibble</a> with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:<br><br>  - date (<code>Date</code>) specifying the date of the prediction.<br>  - realisation_id (<code>character</code>) giving a unique id for each realization in the ensemble.<br>  - weight (<code>numeric</code>) giving the weight of the realization in the ensemble.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModelOde-initialise_state_vector"></a><div class="section">
-<h3 id="method-initialise-state-vector-">Method <code>initialise_state_vector()</code><a class="anchor" aria-label="anchor" href="#method-initialise-state-vector-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModelOde-initialise_state_vector"></a><div class="section">
+<h3 id="diseasymodelode-initialise-state-vector-"><code>DiseasyModelOde$initialise_state_vector()</code><a class="anchor" aria-label="anchor" href="#diseasymodelode-initialise-state-vector-"></a></h3>
 <p>Infer the state_vector from incidence data</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOde</span><span class="op">$</span><span class="fu">initialise_state_vector</span><span class="op">(</span><span class="va">incidence_data</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>incidence_data</code></dt>
 <dd><p>incidence_data (<code>data.frame</code>)<br> Incidence observations as a <code>data.frame</code> with columns - <code>date</code>: The date of the observations - <code>age_group</code>: The age group of the incidence observation (following <code><a href="https://ssi-dk.github.io/diseasystore/reference/age_labels.html">diseasystore::age_labels()</a></code> format) - <code>variant</code>: The variant of the incidence observation. - <code>incidence</code>: The incidence in the age group at the given date</p></dd>
@@ -175,38 +167,36 @@ List of parameters given to the model.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModelOde-plot"></a><div class="section">
-<h3 id="method-plot-">Method <code><a href="plot.html">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModelOde-plot"></a><div class="section">
+<h3 id="diseasymodelode-plot-"><code>DiseasyModelOde$plot()</code><a class="anchor" aria-label="anchor" href="#diseasymodelode-plot-"></a></h3>
 <p>Plot the predictions from the current model.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOde</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="va">observable</span>, <span class="va">prediction_length</span>, stratification <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
 <dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
-
-<dt><code>prediction_length</code></dt>
+      <dt><code>prediction_length</code></dt>
 <dd><p>(<code>numeric</code>)<br> The number of days to predict. The prediction start is defined by <code>last_queryable_date</code> of the <code><a href="DiseasyObservables.html">?DiseasyObservables</a></code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p></dd>
 
-
-<dt><code>stratification</code></dt>
+      <dt><code>stratification</code></dt>
 <dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyModelOde-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyModelOde-clone"></a><div class="section">
+<h3 id="diseasymodelode-clone-"><code>DiseasyModelOde$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodelode-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOde</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -216,6 +206,7 @@ List of parameters given to the model.</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

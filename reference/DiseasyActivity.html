@@ -118,7 +118,7 @@ independently "opened" or "closed". Opening (closing) a activity unit means the 
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code>DiseasyActivity</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code>DiseasyActivity</code></p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
@@ -127,12 +127,12 @@ independently "opened" or "closed". Opening (closing) a activity unit means the 
 A reduced view of the internal state of restrictions (showing only used activity units). Read-only.</p></dd>
 
 
-<dt><code>risk_matrix</code></dt>
+    <dt><code>risk_matrix</code></dt>
 <dd><p>(<code>matrix</code> <code>array</code>)<br>
 A reduced view of the internal state of overall risk multipliers. Read-only.</p></dd>
 
 
-<dt><code>contact_basis</code></dt>
+    <dt><code>contact_basis</code></dt>
 <dd><p>(<code>list(list())</code>)<br> A nested list with all the needed information for the contact_basis<br> * <code>counts</code> contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')<br> * <code>proportion</code> contains a list of the proportion of population in each age-group<br> * <code>demography</code> contains a <code>data.frame</code> with the columns<br>   * <code>age</code> (<code><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer()</a></code>) 1-year age group<br>   * <code>population</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) size of population in age group<br>   * <code>proportion</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) proportion of total population in age group<br> * <code>description</code> contains information about the source of the contact basis. Read only.</p></dd>
 
 
@@ -143,8 +143,7 @@ A reduced view of the internal state of overall risk multipliers. Read-only.</p>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyActivity-new"><code>DiseasyActivity$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyActivity-initialize"><code>DiseasyActivity$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyActivity-set_activity_units"><code>DiseasyActivity$set_activity_units()</code></a></p></li>
 <li><p><a href="#method-DiseasyActivity-set_contact_basis"><code>DiseasyActivity$set_contact_basis()</code></a></p></li>
 <li><p><a href="#method-DiseasyActivity-change_activity"><code>DiseasyActivity$change_activity()</code></a></p></li>
@@ -159,10 +158,10 @@ A reduced view of the internal state of overall risk multipliers. Read-only.</p>
 <li><p><a href="#method-DiseasyActivity-plot"><code>DiseasyActivity$plot()</code></a></p></li>
 <li><p><a href="#method-DiseasyActivity-describe"><code>DiseasyActivity$describe()</code></a></p></li>
 <li><p><a href="#method-DiseasyActivity-clone"><code>DiseasyActivity$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasyActivity-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+</ul></details></p><hr><a id="method-DiseasyActivity-initialize"></a><div class="section">
+<h3 id="diseasyactivity-new-"><code>DiseasyActivity$new()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyActivity</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
@@ -171,46 +170,40 @@ A reduced view of the internal state of overall risk multipliers. Read-only.</p>
 <span>  contact_basis <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>base_scenario</code></dt>
 <dd><p>(<code>character(1)</code>)<br>
 Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"</p></dd>
 
-
-<dt><code>activity_units</code></dt>
+      <dt><code>activity_units</code></dt>
 <dd><p>(<code>list(list())</code>)<br> A nested list of all possible 'units' of activity that can be opened or closed.</p></dd>
 
-
-<dt><code>contact_basis</code></dt>
+      <dt><code>contact_basis</code></dt>
 <dd><p>(<code>list(list())</code>)<br> A nested list with all the needed information for the contact_basis<br> * <code>counts</code> contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')<br> * <code>proportion</code> contains a list of the proportion of population in each age-group<br> * <code>demography</code> contains a <code>data.frame</code> with the columns<br>   * <code>age</code> (<code><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer()</a></code>) 1-year age group<br>   * <code>population</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) size of population in age group<br>   * <code>proportion</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) proportion of total population in age group<br> * <code>description</code> contains information about the source of the contact basis.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Parameters sent to <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-set_activity_units"></a><div class="section">
-<h3 id="method-set-activity-units-">Method <code>set_activity_units()</code><a class="anchor" aria-label="anchor" href="#method-set-activity-units-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-set_activity_units"></a><div class="section">
+<h3 id="diseasyactivity-set-activity-units-"><code>DiseasyActivity$set_activity_units()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-set-activity-units-"></a></h3>
 <p>Sets the list of all possible "units" of activity that can be opened or closed</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span><span class="va">activity_units</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>activity_units</code></dt>
 <dd><p>(<code>list(list())</code>)<br> A nested list of all possible 'units' of activity that can be opened or closed.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
 <p>Each element in the activity_units list should be a list with the following elements:</p><ul><li><p>activity: a programmatic short hand for activity (character, snake_case),</p></li>
 <li><p>label: a human readable label for activity (character),</p></li>
@@ -221,259 +214,241 @@ Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"</p>
 <li><p>risk:   numeric greater than zero</p></li>
 </ul><p>If a single number is provider, the number is applied across all age-groups
 If a vector is provided, the vector must match the number of age groups in the contact_basis</p>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-set_contact_basis"></a><div class="section">
-<h3 id="method-set-contact-basis-">Method <code>set_contact_basis()</code><a class="anchor" aria-label="anchor" href="#method-set-contact-basis-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-set_contact_basis"></a><div class="section">
+<h3 id="diseasyactivity-set-contact-basis-"><code>DiseasyActivity$set_contact_basis()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-set-contact-basis-"></a></h3>
 <p>Sets the contact matrix basis the activity is computed from</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span><span class="va">contact_basis</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>contact_basis</code></dt>
 <dd><p>(<code>list(list())</code>)<br> A nested list with all the needed information for the contact_basis<br> * <code>counts</code> contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')<br> * <code>proportion</code> contains a list of the proportion of population in each age-group<br> * <code>demography</code> contains a <code>data.frame</code> with the columns<br>   * <code>age</code> (<code><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer()</a></code>) 1-year age group<br>   * <code>population</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) size of population in age group<br>   * <code>proportion</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>) proportion of total population in age group<br> * <code>description</code> contains information about the source of the contact basis.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="details-1">Details<a class="anchor" aria-label="anchor" href="#details-1"></a></h4>
 <p>Loads the given <code>contact_basis</code> into the module</p>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-change_activity"></a><div class="section">
-<h3 id="method-change-activity-">Method <code>change_activity()</code><a class="anchor" aria-label="anchor" href="#method-change-activity-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-change_activity"></a><div class="section">
+<h3 id="diseasyactivity-change-activity-"><code>DiseasyActivity$change_activity()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-change-activity-"></a></h3>
 <p>Adds the specified openings and closings to the scenario</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span><span class="va">date</span>, opening <span class="op">=</span> <span class="cn">NA</span>, closing <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>date</code></dt>
 <dd><p>(<code>Date()</code> | <code>data.frame</code>)<br>
 Either a vector of dates when activity changes or a data.frame with columns 'date', 'opening' and 'closing'</p></dd>
 
-
-<dt><code>opening</code></dt>
+      <dt><code>opening</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 Names of activities to open on given date.
 Omitted if <code>data.frame</code> is given to date argument</p></dd>
 
-
-<dt><code>closing</code></dt>
+      <dt><code>closing</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 Names of activities to close on given date.
 Omitted if <code>data.frame</code> is given to date argument</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-change_risk"></a><div class="section">
-<h3 id="method-change-risk-">Method <code>change_risk()</code><a class="anchor" aria-label="anchor" href="#method-change-risk-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-change_risk"></a><div class="section">
+<h3 id="diseasyactivity-change-risk-"><code>DiseasyActivity$change_risk()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-change-risk-"></a></h3>
 <p>Sets the overall risk of types of activity</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">change_risk</span><span class="op">(</span><span class="va">date</span>, type <span class="op">=</span> <span class="cn">NULL</span>, risk <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>date</code></dt>
 <dd><p>(<code>Date()</code>)<br>
 Dates where risk changes.
 The first argument can also be a data.frame with columns "date", "type" and "risk"</p></dd>
 
-
-<dt><code>type</code></dt>
+      <dt><code>type</code></dt>
 <dd><p>(<code>character(1)</code>)<br>
 Name of activity type to change. Must be in "work", "school", "home" and "other"</p></dd>
 
-
-<dt><code>risk</code></dt>
+      <dt><code>risk</code></dt>
 <dd><p>(<code>numeric(1)</code>)<br>
 Relative risk for the given type from the given date</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-crop_scenario"></a><div class="section">
-<h3 id="method-crop-scenario-">Method <code>crop_scenario()</code><a class="anchor" aria-label="anchor" href="#method-crop-scenario-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-crop_scenario"></a><div class="section">
+<h3 id="diseasyactivity-crop-scenario-"><code>DiseasyActivity$crop_scenario()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-crop-scenario-"></a></h3>
 <p>Helper function to crop the scenario matrix in time</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">crop_scenario</span><span class="op">(</span>first_date <span class="op">=</span> <span class="cn">NULL</span>, last_date <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>first_date</code></dt>
 <dd><p>(<code>Date(1)</code>)<br>
 New first date in scenario. The column for the lasted prior date will be new first column</p></dd>
 
-
-<dt><code>last_date</code></dt>
+      <dt><code>last_date</code></dt>
 <dd><p>(<code>Date(1)</code>)<br>
 All columns after this date are deleted</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-get_scenario_activities"></a><div class="section">
-<h3 id="method-get-scenario-activities-">Method <code>get_scenario_activities()</code><a class="anchor" aria-label="anchor" href="#method-get-scenario-activities-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-get_scenario_activities"></a><div class="section">
+<h3 id="diseasyactivity-get-scenario-activities-"><code>DiseasyActivity$get_scenario_activities()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-get-scenario-activities-"></a></h3>
 <p>Return <code>list</code> containing the active activity units on dates where there are changes.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">get_scenario_activities</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
 <p>(<code>list</code>)<br>
 The activity units active in the scenario.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-get_scenario_openness"></a><div class="section">
-<h3 id="method-get-scenario-openness-">Method <code>get_scenario_openness()</code><a class="anchor" aria-label="anchor" href="#method-get-scenario-openness-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-get_scenario_openness"></a><div class="section">
+<h3 id="diseasyactivity-get-scenario-openness-"><code>DiseasyActivity$get_scenario_openness()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-get-scenario-openness-"></a></h3>
 <p>Return openness [0 ; 1] for all age groups and activities on all dates.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">get_scenario_openness</span><span class="op">(</span>age_cuts_lower <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>age_cuts_lower</code></dt>
 <dd><p>(<code>numeric</code>)<br> vector of ages defining the lower bound for each age group. If <code>NULL</code>, age groups of contact_basis is used.</p></dd>
 
-
-<dt><code>weights</code></dt>
+      <dt><code>weights</code></dt>
 <dd><p>(<code>numeric(4)</code>)<br> vector of weights for the four types of contacts. If <code>NULL</code>, no weighting is done. The weights are normalized before applying.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p>(<code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>)<br>
-Returns a list with depth of two: value[<a href="https://lubridate.tidyverse.org/reference/date.html" class="external-link">lubridate::date</a>][<a href="https://rdrr.io/r/base/typeof.html" class="external-link">type</a>]</p>
+Returns a list with depth of two: value[<a href="https://rdrr.io/r/base/date.html" class="external-link">date</a>][<a href="https://rdrr.io/r/base/typeof.html" class="external-link">type</a>]</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-get_scenario_contacts"></a><div class="section">
-<h3 id="method-get-scenario-contacts-">Method <code>get_scenario_contacts()</code><a class="anchor" aria-label="anchor" href="#method-get-scenario-contacts-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-get_scenario_contacts"></a><div class="section">
+<h3 id="diseasyactivity-get-scenario-contacts-"><code>DiseasyActivity$get_scenario_contacts()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-get-scenario-contacts-"></a></h3>
 <p>Return contacts across age groups and activities on all dates.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">get_scenario_contacts</span><span class="op">(</span>age_cuts_lower <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>age_cuts_lower</code></dt>
 <dd><p>(<code>numeric</code>)<br> vector of ages defining the lower bound for each age group. If <code>NULL</code>, age groups of contact_basis is used.</p></dd>
 
-
-<dt><code>weights</code></dt>
+      <dt><code>weights</code></dt>
 <dd><p>(<code>numeric(4)</code>)<br> vector of weights for the four types of contacts. If <code>NULL</code>, no weighting is done.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
-<p>If no weights are supplied, a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of depth of two: value[<a href="https://lubridate.tidyverse.org/reference/date.html" class="external-link">lubridate::date</a>][<a href="https://rdrr.io/r/base/typeof.html" class="external-link">type</a>] is returned.
+<p>If no weights are supplied, a <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of depth of two: value[<a href="https://rdrr.io/r/base/date.html" class="external-link">date</a>][<a href="https://rdrr.io/r/base/typeof.html" class="external-link">type</a>] is returned.
 Map population between age groups</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-map_population"></a><div class="section">
-<h3 id="method-map-population-">Method <code>map_population()</code><a class="anchor" aria-label="anchor" href="#method-map-population-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-map_population"></a><div class="section">
+<h3 id="diseasyactivity-map-population-"><code>DiseasyActivity$map_population()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-map-population-"></a></h3>
 <p>The function computes the proportion of population in the new and old age groups.</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">map_population</span><span class="op">(</span><span class="va">age_cuts_lower</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>age_cuts_lower</code></dt>
 <dd><p>(<code>numeric</code>)<br> vector of ages defining the lower bound for each age group. If <code>NULL</code>, age groups of contact_basis is used.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
 <p>A <code>data.frame</code> which maps the age groups from their reference in <code>contact_basis</code> to
 those supplied to the function.
 Rescale contact matrices to population contact rates</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-rescale_contacts_to_rates"></a><div class="section">
-<h3 id="method-rescale-contacts-to-rates-">Method <code>rescale_contacts_to_rates()</code><a class="anchor" aria-label="anchor" href="#method-rescale-contacts-to-rates-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-rescale_contacts_to_rates"></a><div class="section">
+<h3 id="diseasyactivity-rescale-contacts-to-rates-"><code>DiseasyActivity$rescale_contacts_to_rates()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-rescale-contacts-to-rates-"></a></h3>
 <p>Re-scale from contacts to rates per individual to fractional population.
 @details
 If the contact matrix is \(\beta_{i,j}\) and the population is \(N_j\), then
 this function returns the rescaled elements \(\left(sum_j N_j\right)  \beta_{i,j} / N_j\).</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">rescale_contacts_to_rates</span><span class="op">(</span><span class="va">input</span>, <span class="va">population</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>input</code></dt>
 <dd><p>(<code>matrix array</code> or <code>list</code>(<code>matrix array</code>))<br>
 Contacts to be re-scaled.</p></dd>
 
-
-<dt><code>population</code></dt>
+      <dt><code>population</code></dt>
 <dd><p>(<code>numeric</code>)<br>
 Population vector to weight contacts by.
 Must use same age_groups as the contact matrix input.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-9">Returns<a class="anchor" aria-label="anchor" href="#returns-9"></a></h4>
 <p>Returns an object with the same structure as the input</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-reset_scenario"></a><div class="section">
-<h3 id="method-reset-scenario-">Method <code>reset_scenario()</code><a class="anchor" aria-label="anchor" href="#method-reset-scenario-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-reset_scenario"></a><div class="section">
+<h3 id="diseasyactivity-reset-scenario-"><code>DiseasyActivity$reset_scenario()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-reset-scenario-"></a></h3>
 <p>Resets the scenario in the module.
 NOTE: Called automatically when setting/changing activity units.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">reset_scenario</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-10">Returns<a class="anchor" aria-label="anchor" href="#returns-10"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-plot"></a><div class="section">
-<h3 id="method-plot-">Method <code><a href="plot.html">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-plot"></a><div class="section">
+<h3 id="diseasyactivity-plot-"><code>DiseasyActivity$plot()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-plot-"></a></h3>
 <p>Plot the first set of contact matrices of the scenario as well as the "openness" over time.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span></span>
@@ -481,46 +456,42 @@ NOTE: Called automatically when setting/changing activity units.</p><div class="
 <span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
 <span>  contacts_date <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>age_cuts_lower</code></dt>
 <dd><p>(<code>numeric</code>)<br> vector of ages defining the lower bound for each age group. If <code>NULL</code>, age groups of contact_basis is used.</p></dd>
 
-
-<dt><code>weights</code></dt>
+      <dt><code>weights</code></dt>
 <dd><p>(<code>numeric(4)</code>)<br> vector of weights for the four types of contacts. If <code>NULL</code>, no weighting is done.</p></dd>
 
-
-<dt><code>contacts_date</code></dt>
+      <dt><code>contacts_date</code></dt>
 <dd><p>(<code>Date(1)</code>)<br>
 The date to plot contact matrix for (default is earliest contact matrix).</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-describe"></a><div class="section">
-<h3 id="method-describe-">Method <code>describe()</code><a class="anchor" aria-label="anchor" href="#method-describe-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyActivity-describe"></a><div class="section">
+<h3 id="diseasyactivity-describe-"><code>DiseasyActivity$describe()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-describe-"></a></h3>
 <p>Prints a human readable report of the internal state of the module.</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasyActivity-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p></p><hr><a id="method-DiseasyActivity-clone"></a><div class="section">
+<h3 id="diseasyactivity-clone-"><code>DiseasyActivity$clone()</code><a class="anchor" aria-label="anchor" href="#diseasyactivity-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyActivity</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -530,6 +501,7 @@ The date to plot contact matrix for (default is earliest contact matrix).</p></d
 </div>
 
 </div>
+
 
     </div>
 

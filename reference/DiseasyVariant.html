@@ -75,7 +75,7 @@ See vignette("diseasy-variant")'><meta property="og:image" content="https://ssi-
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="DiseasyBaseModule.html">diseasy::DiseasyBaseModule</a></code> -&gt; <code>DiseasyVariant</code></p>
+    <p><code><a href="DiseasyBaseModule.html">DiseasyBaseModule</a></code> -&gt; <code>DiseasyVariant</code></p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
@@ -84,7 +84,7 @@ See vignette("diseasy-variant")'><meta property="og:image" content="https://ssi-
 The variants currently in the module. Read-only.</p></dd>
 
 
-<dt><code>cross_immunity</code></dt>
+    <dt><code>cross_immunity</code></dt>
 <dd><p>(<code>matrix</code>)<br>
 A matrix indicating the cross immunity interactions of the variants.
 Index ij indicates the overlap in immunity when variant j infects variant i.
@@ -99,28 +99,24 @@ Read-only.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-DiseasyVariant-add_variant"><code>DiseasyVariant$add_variant()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-DiseasyVariant-add_variant"><code>DiseasyVariant$add_variant()</code></a></p></li>
 <li><p><a href="#method-DiseasyVariant-describe"><code>DiseasyVariant$describe()</code></a></p></li>
 <li><p><a href="#method-DiseasyVariant-clone"><code>DiseasyVariant$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="initialize"><a href="DiseasyBaseModule.html#method-initialize"><code>diseasy::DiseasyBaseModule$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="initialize"><a href="DiseasyBaseModule.html#method-initialize"><code>DiseasyBaseModule$initialize()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul></details></p><hr><a id="method-DiseasyVariant-add_variant"></a><div class="section">
-<h3 id="method-add-variant-">Method <code>add_variant()</code><a class="anchor" aria-label="anchor" href="#method-add-variant-"></a></h3>
+<h3 id="diseasyvariant-add-variant-"><code>DiseasyVariant$add_variant()</code><a class="anchor" aria-label="anchor" href="#diseasyvariant-add-variant-"></a></h3>
 <p>Add a variant to the scenario.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyVariant</span><span class="op">$</span><span class="fu">add_variant</span><span class="op">(</span><span class="va">name</span>, characteristics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>(<code>character(1)</code>)<br>
 The name of the variant.</p></dd>
 
-
-<dt><code>characteristics</code></dt>
+      <dt><code>characteristics</code></dt>
 <dd><p>(<code>list</code>)<br>
 A named list of characteristics of the variant.</p>
 <p>Characteristics can be:</p>
@@ -133,22 +129,23 @@ A named list of characteristics of the variant.</p>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-DiseasyVariant-describe"></a><div class="section">
-<h3 id="method-describe-">Method <code>describe()</code><a class="anchor" aria-label="anchor" href="#method-describe-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-DiseasyVariant-describe"></a><div class="section">
+<h3 id="diseasyvariant-describe-"><code>DiseasyVariant$describe()</code><a class="anchor" aria-label="anchor" href="#diseasyvariant-describe-"></a></h3>
 <p>Prints a human readable report of the internal state of the module.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyVariant</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-DiseasyVariant-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p></p><hr><a id="method-DiseasyVariant-clone"></a><div class="section">
+<h3 id="diseasyvariant-clone-"><code>DiseasyVariant$clone()</code><a class="anchor" aria-label="anchor" href="#diseasyvariant-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyVariant</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -158,6 +155,7 @@ A named list of characteristics of the variant.</p>
 </div>
 
 </div>
+
 
     </div>
 
