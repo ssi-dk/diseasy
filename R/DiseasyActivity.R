@@ -442,7 +442,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
-    #'   Returns a list with depth of two: value[[date]][[type]]
+    #'   Returns a list with depth of two: value\[\[date\]\]\[\[type\]\]
     #' @importFrom pkgcond pkg_warning
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
@@ -530,8 +530,8 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param age_cuts_lower `r rd_age_cuts_lower`
     #' @param weights `r rd_activity_weights`
     #' @return
-    #'   If no weights are supplied, a `list()` of depth of two: value[[date]][[type]] is returned.
-    #    If weights are supplied, a `list()` of depth one: value[[date]] is returned
+    #'   If no weights are supplied, a `list()` of depth of two: value\[\[date\]\]\[\[type\]\] is returned.
+    #    If weights are supplied, a `list()` of depth one: value\[\[date\]\] is returned
     get_scenario_contacts = function(age_cuts_lower = NULL, weights = NULL) {
 
       # Input checks

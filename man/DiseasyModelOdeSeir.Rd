@@ -78,51 +78,50 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 }
 \keyword{model-template}
 \section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{\link[diseasy:DiseasyModelOde]{diseasy::DiseasyModelOde}} -> \code{DiseasyModelOdeSeir}
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{DiseasyModel}} -> \code{\link[diseasy:DiseasyModelOde]{DiseasyModelOde}} -> \code{DiseasyModelOdeSeir}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{malthusian_scaling_factor}}{(\code{numeric(1)})\cr
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{malthusian_scaling_factor}}{(\code{numeric(1)})\cr
 A scaling factor to apply to the contact matrices to account for structural differences
 in the model. Read only.}
 
-\item{\code{model_outputs}}{(\code{character()})\cr
+    \item{\code{model_outputs}}{(\code{character()})\cr
 Names of the user-configured model outputs. Read only.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasyModelOdeSeir-new}{\code{DiseasyModelOdeSeir$new()}}
-\item \href{#method-DiseasyModelOdeSeir-load_module}{\code{DiseasyModelOdeSeir$load_module()}}
-\item \href{#method-DiseasyModelOdeSeir-get_results}{\code{DiseasyModelOdeSeir$get_results()}}
-\item \href{#method-DiseasyModelOdeSeir-prepare_rhs}{\code{DiseasyModelOdeSeir$prepare_rhs()}}
-\item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
-\item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
-\item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
-\item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
-\item \href{#method-DiseasyModelOdeSeir-configure_observable}{\code{DiseasyModelOdeSeir$configure_observable()}}
-\item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
+  \itemize{
+    \item \href{#method-DiseasyModelOdeSeir-initialize}{\code{DiseasyModelOdeSeir$new()}}
+    \item \href{#method-DiseasyModelOdeSeir-load_module}{\code{DiseasyModelOdeSeir$load_module()}}
+    \item \href{#method-DiseasyModelOdeSeir-get_results}{\code{DiseasyModelOdeSeir$get_results()}}
+    \item \href{#method-DiseasyModelOdeSeir-prepare_rhs}{\code{DiseasyModelOdeSeir$prepare_rhs()}}
+    \item \href{#method-DiseasyModelOdeSeir-set_forcing_functions}{\code{DiseasyModelOdeSeir$set_forcing_functions()}}
+    \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
+    \item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
+    \item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
+    \item \href{#method-DiseasyModelOdeSeir-configure_observable}{\code{DiseasyModelOdeSeir$configure_observable()}}
+    \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>diseasy::DiseasyModelOde$plot()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>DiseasyModelOde$plot()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModelOdeSeir-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$new(
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-initialize}{}}}
+\subsection{\code{DiseasyModelOdeSeir$new()}}{
+  Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$new(
   observables = FALSE,
   activity = TRUE,
   season = TRUE,
@@ -130,15 +129,14 @@ Creates a new instance of the \code{DiseasyModelOdeSeir} \link[R6:R6Class]{R6} c
   immunity = TRUE,
   parameters = NULL,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
-
-\item{\code{parameters}}{(\verb{named list()})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
 Parameters controlling the structure of the model:
@@ -181,154 +179,156 @@ Additional parameters are:
 \item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 \item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.  * \code{model_rate_to_observable} (\verb{named list}(\verb{named list}(\code{function}(2))))\cr   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a \code{map} and \code{reduce} function contained in a list (the first nested list).   The \code{map} function is applied in a \code{dplyr::group_map()} call and should take two arguments:   - The first argument contains the model \code{rate} and information about group size: \code{proportion} and \code{population}.   - The second argument contains the groups (stratification).   The \code{reduce} function is applied in a \code{dplyr::summarise()} call to summarise across stratification levels.   By default, the \code{sum} function is used and will work for all counting observables.
 }}
+      \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-load_module"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-load_module}{}}}
-\subsection{Method \code{load_module()}}{
-Overload the \verb{$load_module()} to re-initialise the helpers after loading
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$load_module(module, ...)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyModelOdeSeir$load_module()}}{
+  Overload the \verb{$load_module()} to re-initialise the helpers after loading
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$load_module(module, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{module}}{(\verb{R6::R6Class instance})\cr This instance is cloned to the field with the same name as the class of the module}
+      \item{\code{...}}{Arguments sent to parent method.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{module}}{(\verb{R6::R6Class instance})\cr This instance is cloned to the field with the same name as the class of the module}
-
-\item{\code{...}}{Arguments sent to parent method.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-get_results"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-get_results}{}}}
-\subsection{Method \code{get_results()}}{
-The primary method used to request model results of a given observable at a given stratification
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$get_results(
+\subsection{\code{DiseasyModelOdeSeir$get_results()}}{
+  The primary method used to request model results of a given observable at a given stratification
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$get_results(
   observable,
   prediction_length,
   quantiles = NULL,
   stratification = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+      \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+      \item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
-
-\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
-
-\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
-
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-prepare_rhs"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-prepare_rhs}{}}}
-\subsection{Method \code{prepare_rhs()}}{
-Allocate the helpers for the rhs method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$prepare_rhs()}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyModelOdeSeir$prepare_rhs()}}{
+  Allocate the helpers for the rhs method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$prepare_rhs()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-set_forcing_functions"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-set_forcing_functions}{}}}
-\subsection{Method \code{set_forcing_functions()}}{
-Set the forcing functions for the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$set_forcing_functions(
+\subsection{\code{DiseasyModelOdeSeir$set_forcing_functions()}}{
+  Set the forcing functions for the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$set_forcing_functions(
   infected_forcing = NULL,
   state_vector_forcing = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{infected_forcing}}{(\code{function})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{infected_forcing}}{(\code{function})\cr
 A function that takes arguments \code{t} and \code{infected} and modifies the number of infected at time \code{t}.}
-
-\item{\code{state_vector_forcing}}{(\code{function})\cr
+      \item{\code{state_vector_forcing}}{(\code{function})\cr
 A function that takes arguments \code{t} and\code{dy_dt} and modifies the flow into the
 compartments at time \code{t}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-malthusian_growth_rate"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-malthusian_growth_rate}{}}}
-\subsection{Method \code{malthusian_growth_rate()}}{
-This function computes the Malthusian growth rate for the given model configuration.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$malthusian_growth_rate(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Parameters passed to \verb{$generator_matrix()}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-This section follows the method outlined in doi: 10.1098/rsif.2009.0386
+\subsection{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}{
+  This function computes the Malthusian growth rate for the given model configuration.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$malthusian_growth_rate(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{Parameters passed to \verb{$generator_matrix()}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    This section follows the method outlined in doi: 10.1098/rsif.2009.0386
 To compute the scaling, we need to compute the Jacobian matrix of the linearised system.
 Here, we linearise around S = 1.
 In this limit, there is no interaction with variants (since everyone is susceptible).
 The Malthusian growth rate is therefore not dependent on factors such as cross-immunity.
+  }
+  \subsection{Returns}{
+    (\code{numeric(1)})\cr
+The Malthusian growth rate for the model.
+  }
 }
 
-\subsection{Returns}{
-(\code{numeric(1)})\cr
-The Malthusian growth rate for the model.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-initialise_state_vector"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-initialise_state_vector}{}}}
-\subsection{Method \code{initialise_state_vector()}}{
-Infer the state_vector from incidence data
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$initialise_state_vector(
+\subsection{\code{DiseasyModelOdeSeir$initialise_state_vector()}}{
+  Infer the state_vector from incidence data
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$initialise_state_vector(
   incidence_data,
   overall_infection_risk = self \%.\% parameters \%.\% overall_infection_risk,
   ei_rs_balance = 1,
   method = c("derivative", "eigen-value")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{incidence_data}}{incidence_data (\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format) - \code{variant}: The variant of the incidence observation. - \code{incidence}: The incidence in the age group at the given date}
-
-\item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
-
-\item{\code{ei_rs_balance}}{(\code{numeric(1)})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{incidence_data}}{incidence_data (\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format) - \code{variant}: The variant of the incidence observation. - \code{incidence}: The incidence in the age group at the given date}
+      \item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
+      \item{\code{ei_rs_balance}}{(\code{numeric(1)})\cr
 Which estimate should be priorities when normalising? See details.}
-
-\item{\code{method}}{(\code{character(1)})\cr
+      \item{\code{method}}{(\code{character(1)})\cr
 The method to use for initialising the state vector.
 \itemize{
 \item \code{derivative}: Directly infers the EI compartments from derivatives of the incidence signal.
@@ -336,11 +336,11 @@ The method to use for initialising the state vector.
 }
 
 See the article \code{SEIR-initialisation} in the online documentation for more information.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-The inference of the state_vector from incidence data is two-fold: EI states are inferred with one method and
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    The inference of the state_vector from incidence data is two-fold: EI states are inferred with one method and
 the RS states are inferred with another. The methods are described in detail in the initialisation article
 \code{vignette("SEIR-initialisation")}.
 
@@ -348,105 +348,105 @@ When these estimates are combined, there is a degree of freedom in how to weight
 normalising the state vector. This is controlled by the \code{ei_rs_balance} parameter.
 If \code{ei_rs_balance = 1}, the estimate for EI states are prioritised, and only the RS states are modified.
 If \code{ei_rs_balance = 0}, the estimate for RS states are prioritised.
+  }
+  \subsection{Returns}{
+    (\code{numeric()})\cr
+The initial state vector for the model (invisibly).
+  }
 }
 
-\subsection{Returns}{
-(\code{numeric()})\cr
-The initial state vector for the model (invisibly).
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-rhs"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-rhs}{}}}
-\subsection{Method \code{rhs()}}{
-The vectorised right hand side (RHS) function of the system of differential equations
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$rhs(
+\subsection{\code{DiseasyModelOdeSeir$rhs()}}{
+  The vectorised right hand side (RHS) function of the system of differential equations
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$rhs(
   t,
   state_vector,
   parms = NULL,
   overall_infection_risk = self \%.\% parameters \%.\% overall_infection_risk
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{(\code{numeric(1)})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{(\code{numeric(1)})\cr
 The time to solve for.}
-
-\item{\code{state_vector}}{(\code{numeric()})\cr
+      \item{\code{state_vector}}{(\code{numeric()})\cr
 The state vector to compute the RHS from.}
-
-\item{\code{parms}}{(\code{list})\cr
+      \item{\code{parms}}{(\code{list})\cr
 Argument to comply with \code{deSolve::ode} format. Not used.}
-
-\item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-(\code{numeric()})\cr
+      \item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    (\code{numeric()})\cr
 The rate of change for the differential equations.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_observable"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_observable}{}}}
-\subsection{Method \code{configure_observable()}}{
-Define new observables via a set of weights.
+\subsection{\code{DiseasyModelOdeSeir$configure_observable()}}{
+  Define new observables via a set of weights.
 
 Currently, only countable observables are supported.
 That is, observables must be summarisable by the "sum()" function.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$configure_observable(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$configure_observable(
   weights,
   name,
   derived_from = c("state_vector", "infection_matrix")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{weights}}{(\code{matrix})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{weights}}{(\code{matrix})\cr
 A matrix of weights to multiply by the signal source to form the flow into surveillance states.}
-
-\item{\code{name}}{(\code{character(1)})\cr
+      \item{\code{name}}{(\code{character(1)})\cr
 A name for the observable (retrievable by \verb{$get_results()})}
-
-\item{\code{derived_from}}{(\code{character(1)})\cr
+      \item{\code{derived_from}}{(\code{character(1)})\cr
 Which signal source should the observable be derived from?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
 forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).
 
 If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
 of the infection matrix defines the flow (row-sums correspond to new infections).
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOdeSeir-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOdeSeir$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyModelOdeSeir$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
