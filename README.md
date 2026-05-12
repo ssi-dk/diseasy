@@ -39,7 +39,7 @@ and pandemic preparedness.
 install.packages("diseasy")
 
 # Alternatively, install the development version from github:
-# install.packages("devtools")
+# install.packages("pak")
 pak::pak("ssi-dk/diseasy")
 ```
 
