@@ -37,77 +37,74 @@ See vignette("diseasy-observables")
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\link[diseasystore:diseasystore-package]{diseasystore::diseasystore}
-
-\link[SCDB:get_table]{SCDB::get_table}
+\link[diseasystore:diseasystore]{diseasystore::diseasystore}
 
 \link[SCDB:get_table]{SCDB::get_table}
 }
 \keyword{functional-module}
 \section{Super class}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyObservables}
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyObservables}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{diseasystore}}{(\code{character})\cr
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{diseasystore}}{(\code{character})\cr
 The set diseasystore to get DiseasyObservables for. Read-only.}
 
-\item{\code{start_date}}{(\code{Date})\cr Study period start. Read only.}
+    \item{\code{start_date}}{(\code{Date})\cr Study period start. Read only.}
 
-\item{\code{end_date}}{(\code{Date})\cr Study period end. Read only.}
+    \item{\code{end_date}}{(\code{Date})\cr Study period end. Read only.}
 
-\item{\code{last_queryable_date}}{(\code{Date})\cr
+    \item{\code{last_queryable_date}}{(\code{Date})\cr
 The latest date that can be queried. Read-only.}
 
-\item{\code{ds}}{(\verb{Diseasystore*})\cr
+    \item{\code{ds}}{(\verb{Diseasystore*})\cr
 The currently loaded diseasystore which provides the features. Read-only.}
 
-\item{\code{available_observables}}{(\code{character})\cr
+    \item{\code{available_observables}}{(\code{character})\cr
 The currently available observables in the loaded diseasystore. Read-only.}
 
-\item{\code{available_stratifications}}{(\code{character})\cr
+    \item{\code{available_stratifications}}{(\code{character})\cr
 The currently available stratifications in the loaded diseasystore. Read-only.}
 
-\item{\code{synthetic_observables}}{(\code{character})\cr
+    \item{\code{synthetic_observables}}{(\code{character})\cr
 The synthetic features defined in the module. Read-only.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
+    \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
 
-\item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection. Read only.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection. Read only.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasyObservables-new}{\code{DiseasyObservables$new()}}
-\item \href{#method-DiseasyObservables-set_diseasystore}{\code{DiseasyObservables$set_diseasystore()}}
-\item \href{#method-DiseasyObservables-set_last_queryable_date}{\code{DiseasyObservables$set_last_queryable_date()}}
-\item \href{#method-DiseasyObservables-set_study_period}{\code{DiseasyObservables$set_study_period()}}
-\item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
-\item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
-\item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
-\item \href{#method-DiseasyObservables-stratification_names}{\code{DiseasyObservables$stratification_names()}}
-\item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
-\item \href{#method-DiseasyObservables-clone}{\code{DiseasyObservables$clone()}}
+  \itemize{
+    \item \href{#method-DiseasyObservables-initialize}{\code{DiseasyObservables$new()}}
+    \item \href{#method-DiseasyObservables-set_diseasystore}{\code{DiseasyObservables$set_diseasystore()}}
+    \item \href{#method-DiseasyObservables-set_last_queryable_date}{\code{DiseasyObservables$set_last_queryable_date()}}
+    \item \href{#method-DiseasyObservables-set_study_period}{\code{DiseasyObservables$set_study_period()}}
+    \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
+    \item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
+    \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
+    \item \href{#method-DiseasyObservables-stratification_names}{\code{DiseasyObservables$stratification_names()}}
+    \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
+    \item \href{#method-DiseasyObservables-clone}{\code{DiseasyObservables$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyObservables-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyObservables-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$new(
+\if{html}{\out{<a id="method-DiseasyObservables-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-initialize}{}}}
+\subsection{\code{DiseasyObservables$new()}}{
+  Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$new(
   diseasystore = NULL,
   start_date = NULL,
   end_date = NULL,
@@ -115,218 +112,224 @@ Creates a new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} cl
   conn = diseasyoption("conn", class = "DiseasyObservables"),
   slice_ts = NULL,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{diseasystore}}{(\code{character} or \code{diseasystore})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{diseasystore}}{(\code{character} or \code{diseasystore})\cr
 Either the name of or an instance of the feature store to get data from.}
-
-\item{\code{start_date}}{(\code{Date})\cr Study period start.
+      \item{\code{start_date}}{(\code{Date})\cr Study period start.
 Used as default values for \verb{$get_observation()}.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.
+      \item{\code{end_date}}{(\code{Date})\cr Study period end.
 Used as default values for \verb{$get_observation()}.}
-
-\item{\code{last_queryable_date}}{(\code{Date})\cr
+      \item{\code{last_queryable_date}}{(\code{Date})\cr
 Enforce a limit on data that can be pulled (not after this date).}
+      \item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection.}
+      \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+      \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
+  }
+}
 
-\item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection.}
-
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
-
-\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{DiseasyObservables} \link[R6:R6Class]{R6} class.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-set_diseasystore"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-set_diseasystore}{}}}
-\subsection{Method \code{set_diseasystore()}}{
-Set the case definition to get DiseasyObservables for.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_diseasystore(diseasystore, verbose = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{diseasystore}}{(\code{character})\cr
+\subsection{\code{DiseasyObservables$set_diseasystore()}}{
+  Set the case definition to get DiseasyObservables for.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$set_diseasystore(diseasystore, verbose = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{diseasystore}}{(\code{character})\cr
 Text label of the disease to get DiseasyObservables for.\cr
 Must match case definition implemented in \code{diseasystore} package.}
-
-\item{\code{verbose}}{(\code{logical})\cr
+      \item{\code{verbose}}{(\code{logical})\cr
 Should the \code{diseasystore} use verbose outputs?}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-set_last_queryable_date"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-set_last_queryable_date}{}}}
-\subsection{Method \code{set_last_queryable_date()}}{
-Enforce a limit on data that can be pulled.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_last_queryable_date(last_queryable_date)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyObservables$set_last_queryable_date()}}{
+  Enforce a limit on data that can be pulled.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$set_last_queryable_date(last_queryable_date)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{last_queryable_date}}{(\code{Date})\cr
+DiseasyObservables module will not return data after this date.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{last_queryable_date}}{(\code{Date})\cr
-DiseasyObservables module will not return data after this date.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-set_study_period"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-set_study_period}{}}}
-\subsection{Method \code{set_study_period()}}{
-Set the (default) time period to get observations from.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_study_period(start_date, end_date)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyObservables$set_study_period()}}{
+  Set the (default) time period to get observations from.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$set_study_period(start_date, end_date)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{start_date}}{(\code{Date})\cr Study period start.}
+      \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-set_slice_ts"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-set_slice_ts}{}}}
-\subsection{Method \code{set_slice_ts()}}{
-Set the slice_ts to get data for
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$set_slice_ts(slice_ts)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyObservables$set_slice_ts()}}{
+  Set the slice_ts to get data for
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$set_slice_ts(slice_ts)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-define_synthetic_observable"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-define_synthetic_observable}{}}}
-\subsection{Method \code{define_synthetic_observable()}}{
-Adds a synthetic feature computed from existing features.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$define_synthetic_observable(name, mapping)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{(\code{character})\cr
+\subsection{\code{DiseasyObservables$define_synthetic_observable()}}{
+  Adds a synthetic feature computed from existing features.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$define_synthetic_observable(name, mapping)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{name}}{(\code{character})\cr
 The name of the new feature.}
-
-\item{\code{mapping}}{(\code{function})\cr
+      \item{\code{mapping}}{(\code{function})\cr
 The mapping to compute the new feature from existing features.
 Existing features should be included as formal arguments to the function.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-get_observation"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-get_observation}{}}}
-\subsection{Method \code{get_observation()}}{
-Retrieve an "observable" in the data set corresponding to the set diseasystore.\cr
+\subsection{\code{DiseasyObservables$get_observation()}}{
+  Retrieve an "observable" in the data set corresponding to the set diseasystore.\cr
 By default, the internal values for start_date and end_date are used to return data,
 but these can be overwritten.\cr
 The results are cached for faster retrieval at subsequent calls.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$get_observation(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$get_observation(
   observable,
   stratification = NULL,
   start_date = self \%.\% start_date,
   end_date = self \%.\% end_date,
   respect_last_queryable_date = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
-
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-
-\item{\code{respect_last_queryable_date}}{(\code{logical})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+      \item{\code{start_date}}{(\code{Date})\cr Study period start.}
+      \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+      \item{\code{respect_last_queryable_date}}{(\code{logical})\cr
 Should the module be able to return data past \verb{$last_queryable_date}?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-If the observable is found, the function returns the corresponding data at the stratification level.\cr
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    If the observable is found, the function returns the corresponding data at the stratification level.\cr
 Otherwise, the function fails and lists the available DiseasyObservables from the diseasystore.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-stratification_names"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-stratification_names}{}}}
-\subsection{Method \code{stratification_names()}}{
-Get the names of the stratifications.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$stratification_names(stratification)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyObservables$stratification_names()}}{
+  Get the names of the stratifications.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$stratification_names(stratification)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The names of the stratifications.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The names of the stratifications.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-describe"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-describe}{}}}
-\subsection{Method \code{describe()}}{
-Prints a human readable report of the internal state of the module.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$describe()}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyObservables$describe()}}{
+  Prints a human readable report of the internal state of the module.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$describe()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyObservables-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyObservables$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyObservables$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
