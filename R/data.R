@@ -31,7 +31,7 @@
 #'
 #' @name contact_basis
 #' @docType data
-#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
+#' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @author Lasse Engbo Christiansen \email{lsec@ssi.dk}
 #' @source
 #'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
@@ -76,7 +76,7 @@ NULL
 #' @author Carsten Kirkeby \email{ckir@sund.ku.dk}
 #' @author Frederik Plesner Lyngse \email{frederik.lyngse@sund.ku.dk}
 #' @author Adam Mielke \email{admi@dtu.dk}
-#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
+#' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @keywords data
 NULL
 
@@ -127,7 +127,7 @@ NULL
 #' @name diseasy_immunity_optimiser_results
 #' @seealso [DiseasyImmunity]
 #' @docType data
-#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
+#' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @keywords data
 NULL
 
@@ -154,6 +154,6 @@ NULL
 #'
 #' @name seir_example_data
 #' @docType data
-#' @author Rasmus Skytte Randløv \email{rske@ssi.dk}
+#' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @keywords data
 NULL

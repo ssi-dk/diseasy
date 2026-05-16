@@ -28,53 +28,55 @@ See vignette("diseasy-variant")
 }
 \keyword{functional-module}
 \section{Super class}{
-\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyVariant}
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyVariant}
 }
 \section{Active bindings}{
-  \if{html}{\out{<div class="r6-active-bindings">}}
-  \describe{
-    \item{\code{variants}}{(\code{list})\cr
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{variants}}{(\code{list})\cr
 The variants currently in the module. Read-only.}
 
-    \item{\code{cross_immunity}}{(\code{matrix})\cr
+\item{\code{cross_immunity}}{(\code{matrix})\cr
 A matrix indicating the cross immunity interactions of the variants.
 Index ij indicates the overlap in immunity when variant j infects variant i.
 Thus, an overlap of 1 means immunisation with variant i protects against infection by variant j.
 Read-only.}
-  }
-  \if{html}{\out{</div>}}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-  \itemize{
-    \item \href{#method-DiseasyVariant-add_variant}{\code{DiseasyVariant$add_variant()}}
-    \item \href{#method-DiseasyVariant-describe}{\code{DiseasyVariant$describe()}}
-    \item \href{#method-DiseasyVariant-clone}{\code{DiseasyVariant$clone()}}
-  }
+\itemize{
+\item \href{#method-DiseasyVariant-add_variant}{\code{DiseasyVariant$add_variant()}}
+\item \href{#method-DiseasyVariant-describe}{\code{DiseasyVariant$describe()}}
+\item \href{#method-DiseasyVariant-clone}{\code{DiseasyVariant$clone()}}
 }
-\if{html}{\out{<details open><summary>Inherited methods</summary>
+}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
 <ul>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="initialize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-initialize'><code>DiseasyBaseModule$initialize()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="initialize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-initialize'><code>diseasy::DiseasyBaseModule$initialize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
-</details>}}
+</details>
+}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyVariant-add_variant"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyVariant-add_variant}{}}}
-\subsection{\code{DiseasyVariant$add_variant()}}{
-  Add a variant to the scenario.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyVariant$add_variant(name, characteristics = list())}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{name}}{(\code{character(1)})\cr
+\subsection{Method \code{add_variant()}}{
+Add a variant to the scenario.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$add_variant(name, characteristics = list())}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{(\code{character(1)})\cr
 The name of the variant.}
-      \item{\code{characteristics}}{(\code{list})\cr
+
+\item{\code{characteristics}}{(\code{list})\cr
 A named list of characteristics of the variant.
 
 Characteristics can be:
@@ -84,40 +86,35 @@ Characteristics can be:
   a host previously infected by the current variant. If not specified, the default is 1.
 - `introduction_date` (`Date(1)`): The date the variant was introduced into the population.
 }\if{html}{\out{</div>}}}
-    }
-    \if{html}{\out{</div>}}
-  }
 }
-
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyVariant-describe"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyVariant-describe}{}}}
-\subsection{\code{DiseasyVariant$describe()}}{
-  Prints a human readable report of the internal state of the module.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyVariant$describe()}
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{describe()}}{
+Prints a human readable report of the internal state of the module.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$describe()}\if{html}{\out{</div>}}
 }
 
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyVariant-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyVariant-clone}{}}}
-\subsection{\code{DiseasyVariant$clone()}}{
-  The objects of this class are cloneable with this method.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyVariant$clone(deep = FALSE)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{deep}}{Whether to make a deep clone.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyVariant$clone(deep = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
 }
