@@ -155,7 +155,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       # m'_ij = 0.5 * (m_ij + m_ji N_j / N_i)
       #
       # NOTE: These are the matrices we get from `socialmixr::contact_matrix()` if we specify `symmetric = TRUE`
-      # NOTE: This is what Keplac (BBC pandemic) calls the C matrix
+      # NOTE: This is what Klepac (BBC pandemic) calls the C matrix
 
 
       # Step 3 (optional):
@@ -192,7 +192,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
 
       # Test mp that we lives up to the reciprocity principle:
       N_i <- outer(N, rep(1, length(N)))     # Columns are N: [N; N; N]                                                 # nolint: object_name_linter
-      if (max(abs(N_i * mp -  t(N_i * mp))) > 1e-6) {
+      if (max(abs(N_i * mp - t(N_i * mp))) > 1e-6) {
         rlang::abort("mp is not reciprocal")
       }
 

@@ -1,6 +1,6 @@
 Package: diseasy
 Title: Disease Ensemble Modelling Made Easy
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R:
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-5860-3838")),
@@ -74,3 +74,4 @@ VignetteBuilder: knitr,
 URL: https://github.com/ssi-dk/diseasy, https://ssi-dk.github.io/diseasy/
 BugReports: https://github.com/ssi-dk/diseasy/issues
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3

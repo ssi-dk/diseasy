@@ -140,7 +140,35 @@ scenario.
 ## Contact matrices
 Several disease models uses contact matrices to structure the populations.
 
-To retrieve the contact matrices from the module, we use the `$get_scenario_contacts()` method:
+In `diseasy` we use the following definitions:
+
+The _contact matrix_ $\overline{\overline{T}}$ with elements $t_{i,j}$ contains the _number_ of contacts between age
+group $i$ and age group $j$ .
+
+The _population contact matrix_ $\overline{\overline{M}}$ with elements $m_{i,j} = t_{i,j} / \tilde{N}_i$ contains the
+_mean number of contacts from age group $i$ to age group $j$_ with $\tilde{N}_i$ being the population size of age group
+$i$[^1].
+
+[^1]: To see why $m_{i,j}$ is the mean number of contacts, consider a population of $\tilde{N}_1$ = 1 and
+$\tilde{N}_2$ = 2, with contact matrix $\overline{\overline{T}} = \begin{bmatrix} 0 & 2\\ 2 & 2\end{bmatrix}$.
+In this case, there are 2 contacts between age groups $t_{i,j} = t_{j,i} = 2$, and $m_{1,2} = t_{1,2} / \tilde{N}_1 = 2$
+average contacts from the individual in age group 1 with the individuals in age group 2, and
+$m_{2,1} = t_{2,1} / \tilde{N}_2 = 1$ average contacts from individuals in age group 2 with the individual in
+age group 1.
+
+
+In `diseasy` we use the symmetric variant $\overline{\overline{M}}'$ where contacts from age group $i$ to $j$ is
+identical with contacts from $j$ to $i$.
+This symmetric variant has the property: $m_{i,j} \tilde{N}_i = m_{j,i} \tilde{N}_j$.[^2] [^3]
+
+[^2]: These are the matrices we get from `socialmixr::contact_matrix()` if we specify `symmetric = TRUE`
+[^3]: This is what Klepac (BBC pandemic study) calls the $C$ matrix
+
+The _per capita contact rates_ $\overline{\overline{C}}$ with elements
+$c_{i,j} = m_{i,j} / \tilde{N}_j = t_{i,j} / (\tilde{N}_i \tilde{N}_j)$.
+
+To retrieve the _population contact matrix_ $\overline{\overline{M}}$ from the module, we use the
+`$get_scenario_contacts()` method:
 ```{r scenario_contacts}
 # We can project the matrices into custom age-groups by providing the
 # "age_cuts_lower" argument
