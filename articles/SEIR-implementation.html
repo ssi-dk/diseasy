@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="SEIR: Implementation">
 </head>
@@ -857,11 +857,11 @@ and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min      lq      mean median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 25.107 27.2410 29.177662 28.443 29.4350  127.107  1000</span></span>
-<span><span class="co">#&gt;              sapply 12.974 13.6250 14.504788 14.016 14.8775   40.385  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 13.054 13.6505 17.042669 14.046 14.8930 2425.745  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.939  5.4555  5.765322  5.681  5.9110   19.757  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min      lq      mean median     uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 21.282 22.3930 25.839381 22.773 23.385 2462.547  1000</span></span>
+<span><span class="co">#&gt;              sapply 11.387 12.0075 12.565293 12.248 12.604   35.413  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES 11.467 12.0080 12.634818 12.268 12.679   55.101  1000</span></span>
+<span><span class="co">#&gt;              vapply  4.527  4.7770  5.085814  4.918  5.108   17.476  1000</span></span></code></pre></div>
 <p>Note, that the best performing function in this case is
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>.</p>
 </div>

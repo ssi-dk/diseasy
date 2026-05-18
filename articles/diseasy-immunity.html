@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="DiseasyImmunity">
 </head>
@@ -129,7 +129,7 @@ the following code.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 1</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5555e87dd0a0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555bb5b50460&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "no_waning"</span></span></code></pre></div>
 <p>This returns a <code>named list()</code> where the named target are
@@ -165,7 +165,7 @@ parameter.</li>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5555e0124c40&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555bb7268110&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -210,7 +210,7 @@ identification. Default is “custom_waning”.</li>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5555dee7cc40&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555bb8023be0&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -248,8 +248,8 @@ additional arguments.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5555d69fc050&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5555dc9ce5c8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x555bb9425170&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555bb8f28420&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -267,7 +267,7 @@ additional arguments.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5555e1aeea00&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555bb9bc9588&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -291,7 +291,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5555dc9ce5c8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555bb8f28420&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -302,7 +302,7 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5555e1aeea00&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x555bb9bc9588&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
