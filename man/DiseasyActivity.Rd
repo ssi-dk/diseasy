@@ -60,96 +60,94 @@ See vignette("diseasy-activity") for examples of use.
 }
 \keyword{functional-module}
 \section{Super class}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyActivity}
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyActivity}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{scenario_matrix}}{(\code{matrix} \code{array})\cr
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{scenario_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of restrictions (showing only used activity units). Read-only.}
 
-\item{\code{risk_matrix}}{(\code{matrix} \code{array})\cr
+    \item{\code{risk_matrix}}{(\code{matrix} \code{array})\cr
 A reduced view of the internal state of overall risk multipliers. Read-only.}
 
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis. Read only.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis. Read only.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasyActivity-new}{\code{DiseasyActivity$new()}}
-\item \href{#method-DiseasyActivity-set_activity_units}{\code{DiseasyActivity$set_activity_units()}}
-\item \href{#method-DiseasyActivity-set_contact_basis}{\code{DiseasyActivity$set_contact_basis()}}
-\item \href{#method-DiseasyActivity-change_activity}{\code{DiseasyActivity$change_activity()}}
-\item \href{#method-DiseasyActivity-change_risk}{\code{DiseasyActivity$change_risk()}}
-\item \href{#method-DiseasyActivity-crop_scenario}{\code{DiseasyActivity$crop_scenario()}}
-\item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
-\item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
-\item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
-\item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
-\item \href{#method-DiseasyActivity-rescale_contacts_to_rates}{\code{DiseasyActivity$rescale_contacts_to_rates()}}
-\item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
-\item \href{#method-DiseasyActivity-plot}{\code{DiseasyActivity$plot()}}
-\item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
-\item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
+  \itemize{
+    \item \href{#method-DiseasyActivity-initialize}{\code{DiseasyActivity$new()}}
+    \item \href{#method-DiseasyActivity-set_activity_units}{\code{DiseasyActivity$set_activity_units()}}
+    \item \href{#method-DiseasyActivity-set_contact_basis}{\code{DiseasyActivity$set_contact_basis()}}
+    \item \href{#method-DiseasyActivity-change_activity}{\code{DiseasyActivity$change_activity()}}
+    \item \href{#method-DiseasyActivity-change_risk}{\code{DiseasyActivity$change_risk()}}
+    \item \href{#method-DiseasyActivity-crop_scenario}{\code{DiseasyActivity$crop_scenario()}}
+    \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
+    \item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
+    \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
+    \item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
+    \item \href{#method-DiseasyActivity-rescale_contacts_to_rates}{\code{DiseasyActivity$rescale_contacts_to_rates()}}
+    \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
+    \item \href{#method-DiseasyActivity-plot}{\code{DiseasyActivity$plot()}}
+    \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
+    \item \href{#method-DiseasyActivity-clone}{\code{DiseasyActivity$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasyActivity} \link[R6:R6Class]{R6} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$new(
+\if{html}{\out{<a id="method-DiseasyActivity-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyActivity-initialize}{}}}
+\subsection{\code{DiseasyActivity$new()}}{
+  Creates a new instance of the \code{DiseasyActivity} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$new(
   base_scenario = "closed",
   activity_units = NULL,
   contact_basis = NULL,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{base_scenario}}{(\code{character(1)})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{base_scenario}}{(\code{character(1)})\cr
 Baseline scenario. Must be either fully "open" or "closed" or "dk_reference"}
-
-\item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
-
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
-
-\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+      \item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
+      \item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+      \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-set_activity_units"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-set_activity_units}{}}}
-\subsection{Method \code{set_activity_units()}}{
-Sets the list of all possible "units" of activity that can be opened or closed
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$set_activity_units(activity_units)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-Each element in the activity_units list should be a list with the following elements:
+\subsection{\code{DiseasyActivity$set_activity_units()}}{
+  Sets the list of all possible "units" of activity that can be opened or closed
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$set_activity_units(activity_units)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{activity_units}}{(\code{list(list())})\cr A nested list of all possible 'units' of activity that can be opened or closed.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Each element in the activity_units list should be a list with the following elements:
 \itemize{
 \item activity: a programmatic short hand for activity (character, snake_case),
 \item label: a human readable label for activity (character),
@@ -162,295 +160,310 @@ Each element in the activity_units list should be a list with the following elem
 
 If a single number is provider, the number is applied across all age-groups
 If a vector is provided, the vector must match the number of age groups in the contact_basis
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-set_contact_basis"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-set_contact_basis}{}}}
-\subsection{Method \code{set_contact_basis()}}{
-Sets the contact matrix basis the activity is computed from
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$set_contact_basis(contact_basis)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyActivity$set_contact_basis()}}{
+  Sets the contact matrix basis the activity is computed from
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$set_contact_basis(contact_basis)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    Loads the given \code{contact_basis} into the module
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{contact_basis}}{(\code{list(list())})\cr A nested list with all the needed information for the contact_basis\cr * \code{counts} contains the age stratified contact counts across the arenas of the basis   (e.g. 'work', 'home', 'school', 'other')\cr * \code{proportion} contains a list of the proportion of population in each age-group\cr * \code{demography} contains a \code{data.frame} with the columns\cr   * \code{age} (\code{integer()}) 1-year age group\cr   * \code{population} (\code{numeric()}) size of population in age group\cr   * \code{proportion} (\code{numeric()}) proportion of total population in age group\cr * \code{description} contains information about the source of the contact basis.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-Loads the given \code{contact_basis} into the module
-}
-
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-change_activity"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-change_activity}{}}}
-\subsection{Method \code{change_activity()}}{
-Adds the specified openings and closings to the scenario
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$change_activity(date, opening = NA, closing = NA)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{date}}{(\code{Date()} | \code{data.frame})\cr
+\subsection{\code{DiseasyActivity$change_activity()}}{
+  Adds the specified openings and closings to the scenario
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$change_activity(date, opening = NA, closing = NA)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{date}}{(\code{Date()} | \code{data.frame})\cr
 Either a vector of dates when activity changes or a data.frame with columns 'date', 'opening' and 'closing'}
-
-\item{\code{opening}}{(\code{character()})\cr
+      \item{\code{opening}}{(\code{character()})\cr
 Names of activities to open on given date.
 Omitted if \code{data.frame} is given to date argument}
-
-\item{\code{closing}}{(\code{character()})\cr
+      \item{\code{closing}}{(\code{character()})\cr
 Names of activities to close on given date.
 Omitted if \code{data.frame} is given to date argument}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-change_risk"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-change_risk}{}}}
-\subsection{Method \code{change_risk()}}{
-Sets the overall risk of types of activity
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$change_risk(date, type = NULL, risk = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{date}}{(\code{Date()})\cr
+\subsection{\code{DiseasyActivity$change_risk()}}{
+  Sets the overall risk of types of activity
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$change_risk(date, type = NULL, risk = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{date}}{(\code{Date()})\cr
 Dates where risk changes.
 The first argument can also be a data.frame with columns "date", "type" and "risk"}
-
-\item{\code{type}}{(\code{character(1)})\cr
+      \item{\code{type}}{(\code{character(1)})\cr
 Name of activity type to change. Must be in "work", "school", "home" and "other"}
-
-\item{\code{risk}}{(\code{numeric(1)})\cr
+      \item{\code{risk}}{(\code{numeric(1)})\cr
 Relative risk for the given type from the given date}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-crop_scenario"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-crop_scenario}{}}}
-\subsection{Method \code{crop_scenario()}}{
-Helper function to crop the scenario matrix in time
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$crop_scenario(first_date = NULL, last_date = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{first_date}}{(\code{Date(1)})\cr
+\subsection{\code{DiseasyActivity$crop_scenario()}}{
+  Helper function to crop the scenario matrix in time
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$crop_scenario(first_date = NULL, last_date = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{first_date}}{(\code{Date(1)})\cr
 New first date in scenario. The column for the lasted prior date will be new first column}
-
-\item{\code{last_date}}{(\code{Date(1)})\cr
+      \item{\code{last_date}}{(\code{Date(1)})\cr
 All columns after this date are deleted}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_activities"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_activities}{}}}
-\subsection{Method \code{get_scenario_activities()}}{
-Return \code{list} containing the active activity units on dates where there are changes.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_activities()}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyActivity$get_scenario_activities()}}{
+  Return \code{list} containing the active activity units on dates where there are changes.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$get_scenario_activities()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    (\code{list})\cr
+The activity units active in the scenario.
+  }
 }
 
-\subsection{Returns}{
-(\code{list})\cr
-The activity units active in the scenario.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_openness"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_openness}{}}}
-\subsection{Method \code{get_scenario_openness()}}{
-Return openness [0 ; 1] for all age groups and activities on all dates.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_openness(age_cuts_lower = NULL, weights = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyActivity$get_scenario_openness()}}{
+  Return openness [0 ; 1] for all age groups and activities on all dates.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$get_scenario_openness(age_cuts_lower = NULL, weights = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done. The weights are normalized before applying.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    (\code{list()})\cr
+Returns a list with depth of two: value[\link{date}][\link{type}]
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-
-\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done. The weights are normalized before applying.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-(\code{list()})\cr
-Returns a list with depth of two: value[\link[lubridate:date]{lubridate::date}][\link{type}]
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-get_scenario_contacts"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-get_scenario_contacts}{}}}
-\subsection{Method \code{get_scenario_contacts()}}{
-Return contacts across age groups and activities on all dates.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$get_scenario_contacts(age_cuts_lower = NULL, weights = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-
-\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-If no weights are supplied, a \code{list()} of depth of two: value[\link[lubridate:date]{lubridate::date}][\link{type}] is returned.
+\subsection{\code{DiseasyActivity$get_scenario_contacts()}}{
+  Return contacts across age groups and activities on all dates.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$get_scenario_contacts(age_cuts_lower = NULL, weights = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
 Map population between age groups
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-map_population"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-map_population}{}}}
-\subsection{Method \code{map_population()}}{
-The function computes the proportion of population in the new and old age groups.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$map_population(age_cuts_lower)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{data.frame} which maps the age groups from their reference in \code{contact_basis} to
+\subsection{\code{DiseasyActivity$map_population()}}{
+  The function computes the proportion of population in the new and old age groups.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$map_population(age_cuts_lower)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{data.frame} which maps the age groups from their reference in \code{contact_basis} to
 those supplied to the function.
 Rescale contact matrices to population contact rates
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-rescale_contacts_to_rates"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_contacts_to_rates}{}}}
-\subsection{Method \code{rescale_contacts_to_rates()}}{
-Re-scale from contacts to rates per individual to fractional population.
+\subsection{\code{DiseasyActivity$rescale_contacts_to_rates()}}{
+  Re-scale from contacts to rates per individual to fractional population.
 @details
 If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
 this function returns the rescaled elements \eqn{\left(sum_j N_j\right)  \beta_{i,j} / N_j}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$rescale_contacts_to_rates(input, population)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$rescale_contacts_to_rates(input, population)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
 Contacts to be re-scaled.}
-
-\item{\code{population}}{(\code{numeric})\cr
+      \item{\code{population}}{(\code{numeric})\cr
 Population vector to weight contacts by.
 Must use same age_groups as the contact matrix input.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns an object with the same structure as the input
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns an object with the same structure as the input
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-reset_scenario"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-reset_scenario}{}}}
-\subsection{Method \code{reset_scenario()}}{
-Resets the scenario in the module.
+\subsection{\code{DiseasyActivity$reset_scenario()}}{
+  Resets the scenario in the module.
 NOTE: Called automatically when setting/changing activity units.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$reset_scenario()}\if{html}{\out{</div>}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$reset_scenario()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-plot}{}}}
-\subsection{Method \code{plot()}}{
-Plot the first set of contact matrices of the scenario as well as the "openness" over time.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$plot(
+\subsection{\code{DiseasyActivity$plot()}}{
+  Plot the first set of contact matrices of the scenario as well as the "openness" over time.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$plot(
   age_cuts_lower = NULL,
   weights = rep(1, 4),
   contacts_date = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-
-\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
-
-\item{\code{contacts_date}}{(\code{Date(1)})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
+      \item{\code{contacts_date}}{(\code{Date(1)})\cr
 The date to plot contact matrix for (default is earliest contact matrix).}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-describe"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-describe}{}}}
-\subsection{Method \code{describe()}}{
-Prints a human readable report of the internal state of the module.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$describe()}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyActivity$describe()}}{
+  Prints a human readable report of the internal state of the module.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$describe()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyActivity-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyActivity-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyActivity$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyActivity$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyActivity$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

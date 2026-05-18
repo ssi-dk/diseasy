@@ -35,7 +35,7 @@ These functions define the "API" of the models and ensure the models can take pa
   rm(m)
 }
 \seealso{
-\link[lgr:lgr-package]{lgr}
+\link[lgr:lgr]{lgr}
 
 \link{DiseasyObservables}
 
@@ -43,73 +43,70 @@ These functions define the "API" of the models and ensure the models can take pa
 
 \link{DiseasyImmunity}
 
-\link{DiseasyObservables}
-
 \link{DiseasySeason}
 
 \link{DiseasyVariant}
 }
 \keyword{model-template-builder}
 \section{Super class}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyModel}
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyModel}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
 The local copy of an DiseasyActivity module. Read-only.}
 
-\item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
+    \item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
 The local copy of a DiseasyImmunity module. Read-only.}
 
-\item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
+    \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
 The local copy of a DiseasyObservables module. Read-only.}
 
-\item{\code{season}}{(\code{diseasy::DiseasySeason})\cr
+    \item{\code{season}}{(\code{diseasy::DiseasySeason})\cr
 The local copy of a DiseasySeason module. Read-only.}
 
-\item{\code{variant}}{(\code{diseasy::.DiseasyVariant})\cr
+    \item{\code{variant}}{(\code{diseasy::.DiseasyVariant})\cr
 The local copy of a DiseasyVariant module. Read-only.}
 
-\item{\code{parameters}}{(\code{list()})\cr
+    \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
 
-\item{\code{training_period}}{(\code{list}(\code{Date}))\cr
+    \item{\code{training_period}}{(\code{list}(\code{Date}))\cr
 The start and end dates of the training period. Read-only.}
 
-\item{\code{testing_period}}{(\code{list}(\code{Date}))\cr
+    \item{\code{testing_period}}{(\code{list}(\code{Date}))\cr
 The start and end dates of the testing period. Read-only.}
 
-\item{\code{validation_period}}{(\code{list}(\code{Date}))\cr
+    \item{\code{validation_period}}{(\code{list}(\code{Date}))\cr
 The start and end dates of the validation period. Read-only.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasyModel-new}{\code{DiseasyModel$new()}}
-\item \href{#method-DiseasyModel-get_results}{\code{DiseasyModel$get_results()}}
-\item \href{#method-DiseasyModel-get_data}{\code{DiseasyModel$get_data()}}
-\item \href{#method-DiseasyModel-clone}{\code{DiseasyModel$clone()}}
+  \itemize{
+    \item \href{#method-DiseasyModel-initialize}{\code{DiseasyModel$new()}}
+    \item \href{#method-DiseasyModel-get_results}{\code{DiseasyModel$get_results()}}
+    \item \href{#method-DiseasyModel-get_data}{\code{DiseasyModel$get_data()}}
+    \item \href{#method-DiseasyModel-clone}{\code{DiseasyModel$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModel-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModel-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
+\if{html}{\out{<a id="method-DiseasyModel-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModel-initialize}{}}}
+\subsection{\code{DiseasyModel$new()}}{
+  Creates a new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
 This module is typically not constructed directly but rather through \verb{DiseasyModel*} classes.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$new(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModel$new(
   observables = FALSE,
   activity = FALSE,
   season = FALSE,
@@ -118,15 +115,14 @@ This module is typically not constructed directly but rather through \verb{Disea
   parameters = NULL,
   label = NULL,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
-
-\item{\code{parameters}}{(\verb{named list()})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
 Each model has their own parameters.
@@ -135,103 +131,101 @@ Common parameters are:
 \itemize{
 \item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 }}
-
-\item{\code{label}}{(\code{character})\cr
+      \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance.}
-
-\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Details}{
-The \code{DiseasyModel} is the main template that the individual models should inherit from since this defines the
+      \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    The \code{DiseasyModel} is the main template that the individual models should inherit from since this defines the
 set of methods the later framework expects from each model. In addition, it provides the main interface with
 the other modules of the framework.
+  }
+  \subsection{Returns}{
+    A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
+  }
 }
 
-\subsection{Returns}{
-A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModel-get_results"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModel-get_results}{}}}
-\subsection{Method \code{get_results()}}{
-The primary method used to request model results of a given observable at a given stratification
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_results(
+\subsection{\code{DiseasyModel$get_results()}}{
+  The primary method used to request model results of a given observable at a given stratification
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModel$get_results(
   observable,
   prediction_length,
   quantiles = NULL,
   stratification = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+      \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+      \item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
-
-\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
-
-\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
-
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModel-get_data"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModel-get_data}{}}}
-\subsection{Method \code{get_data()}}{
-A method that returns training data for the models based on the model value of \code{training_length} and
+\subsection{\code{DiseasyModel$get_data()}}{
+  A method that returns training data for the models based on the model value of \code{training_length} and
 the \code{last_queryable_date} of the \code{DiseasyObservables} module.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$get_data(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModel$get_data(
   observable,
   stratification = NULL,
   period = c("training", "testing", "validation", "plotting"),
   prediction_length = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
-
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-
-\item{\code{period}}{(\code{character})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+      \item{\code{period}}{(\code{character})\cr
 The period to return data for. That is, the training, testing, validation or plotting period.}
+      \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The output of \code{DiseasyObservables$get_observation} constrained to the training period.
+  }
+}
 
-\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The output of \code{DiseasyObservables$get_observation} constrained to the training period.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModel-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModel-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyModel$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyModel$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModel$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
