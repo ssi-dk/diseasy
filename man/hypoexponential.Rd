@@ -24,8 +24,9 @@ shape parameter}
 
 \item{rate}{an alternative way to specify the scale.}
 
-\item{lower.tail}{logical; if TRUE (default), probabilities are
-    \eqn{P[X \le x]}, otherwise, \eqn{P[X > x]}.}
+\item{lower.tail}{logical; if \code{TRUE} (default), probabilities are
+    \eqn{P[X < x]}, otherwise, \eqn{P[X \ge x]} (exceptionally not
+    \emph{cadlag} here, to ensure, e.g., \code{pgamma(0, shape=0)} remains zero).}
 
 \item{p}{vector of probabilities.}
 }
