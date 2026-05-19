@@ -19,20 +19,10 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 }
 \seealso{
 \link{DiseasyObservables}
-
-\link{DiseasyPopulation}
 }
 \keyword{model-template-builder}
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{DiseasyModelOde}
-}
-\section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{population}}{(\code{diseasy::DiseasyPopulation})\cr
-The local copy of a DiseasyPopulation module. Read-only.}
-}
-\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
