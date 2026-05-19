@@ -1,0 +1,46 @@
+---
+title: "DiseasyDemography"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyDemography}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r options, include = FALSE}
+withr::local_options("digits" = 2, "tibble.print_min" = 5)
+```
+
+# Introduction
+The `DiseasyDemography` is the module responsible for configuring the demography available to the model.
+
+# Configuring the module
+The module can be initialized without setting any parameters which configures the use of the default demography.
+```{r initialization}
+demography <- DiseasyDemography$new()
+
+demography
+```
+
+This demography is pulled from the US Census Bureau and covers most of the world for 2020 but is not stratified beyond
+the country-level.
+
+If you have more specific demography information, you can change the configuration:
+```{r user configuration}
+demography$set_demography(demography = demography)
+# which in this example does not actually change the configuration since
+# `diseasy_demography` is used by default.
+
+demography
+```
