@@ -636,7 +636,7 @@
     },
     {
       "package": "QuickJSR",
-      "version": "1.9.2",
+      "version": "1.10.0",
       "binary": true
     },
     {
@@ -761,7 +761,7 @@
     },
     {
       "package": "SCDB",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "binary": true
     },
     {
