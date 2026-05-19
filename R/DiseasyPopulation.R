@@ -37,17 +37,17 @@ DiseasyPopulation <- R6::R6Class(                                               
     stratify_age = function(age_cuts_lower) {
 
       # Check the input is well-formed
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE, lower = 0, unique = TRUE)
+      checkmate::assert_integerish(age_cuts_lower, any.missing = FALSE, null.ok = FALSE, lower = 0, unique = TRUE)
 
-      # Store the variant
-      private$.age_cuts_lower <- age_cuts_lower
+      # Store the age_cuts as integer
+      private$.age_cuts_lower <- as.integer(age_cuts_lower)
     },
 
 
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyPopulation ##########################################")
-      if (is.null(self %.% age_cuts_lower)) {
+      if (self %.% age_cuts_lower == 0L) {
         printr("No age stratification has been configured")
       } else {
         printr(glue::glue("Stratified by age: {diseasystore::age_labels(self %.% age_cuts_lower)}"))
@@ -66,6 +66,6 @@ DiseasyPopulation <- R6::R6Class(                                               
   ),
 
   private = list(
-    .age_cuts_lower = NULL
+    .age_cuts_lower = 0L
   )
 )

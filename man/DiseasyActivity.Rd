@@ -299,7 +299,7 @@ Return openness [0 ; 1] for all age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done. The weights are normalized before applying.}
 }
@@ -322,7 +322,7 @@ Return contacts across age groups and activities on all dates.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
 }
@@ -345,7 +345,7 @@ The function computes the proportion of population in the new and old age groups
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 }
 \if{html}{\out{</div>}}
 }
@@ -413,7 +413,7 @@ Plot the first set of contact matrices of the scenario as well as the "openness"
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 
 \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
 

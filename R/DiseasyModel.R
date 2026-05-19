@@ -37,7 +37,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param observables,activity,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -57,6 +57,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     initialize = function(
       observables = FALSE,
+      population  = TRUE,
       activity    = FALSE,
       season      = FALSE,
       variant     = FALSE,
@@ -70,6 +71,11 @@ DiseasyModel <- R6::R6Class(                                                    
       checkmate::assert(
         checkmate::check_logical(observables, null.ok = TRUE),
         checkmate::check_class(observables, "DiseasyObservables", null.ok = TRUE),
+        add = coll
+      )
+      checkmate::assert(
+        checkmate::check_true(population),
+        checkmate::check_class(population, "DiseasyPopulation"),
         add = coll
       )
       checkmate::assert(
@@ -112,6 +118,12 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(DiseasyObservables$new())
       } else if (inherits(observables, "DiseasyObservables")) {
         self$load_module(observables)
+      }
+
+      if (isTRUE(population)) {
+        self$load_module(DiseasyPopulation$new())
+      } else if (inherits(population, "DiseasyPopulation")) {
+        self$load_module(population)
       }
 
       if (isTRUE(activity)) {
@@ -241,6 +253,17 @@ DiseasyModel <- R6::R6Class(                                                    
 
   # Make active bindings to the private variables
   active  = list(
+
+    #' @field population (`diseasy::DiseasyPopulation`)\cr
+    #'   The local copy of a DiseasyPopulation module. Read-only.
+    #' @seealso [diseasy::DiseasyPopulation]
+    #' @importFrom diseasystore `%.%`
+    population = purrr::partial(
+      .f = active_binding,
+      name = "population",
+      expr = return(private %.% .DiseasyPopulation)
+    ),
+
 
     #' @field activity (`diseasy::DiseasyActivity`)\cr
     #'   The local copy of an DiseasyActivity module. Read-only.
@@ -421,6 +444,7 @@ DiseasyModel <- R6::R6Class(                                                    
 
   private = list(
 
+    .DiseasyPopulation  = NULL,
     .DiseasyActivity    = NULL,
     .DiseasyImmunity    = NULL,
     .DiseasyObservables = NULL,

@@ -185,7 +185,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # of the right-hand-side function in the ODE.
 
       # Store a short hand for the number of groups
-      private$n_age_groups <- length(self %.% parameters %.% age_cuts_lower)
+      private$n_age_groups <- length(self %.% population %.% age_cuts_lower)
       private$n_variants   <- max(length(self %.% variant %.% variants), 1)
       private$n_EIR_states <- sum(self %.% parameters %.% compartment_structure)
       private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
@@ -193,7 +193,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       ## Time-varying contact matrices projected onto target age-groups
       contact_matrices <- self %.% activity %.% get_scenario_contacts(
-        age_cuts_lower = self %.% parameters %.% age_cuts_lower,
+        age_cuts_lower = self %.% population %.% age_cuts_lower,
         weights = self %.% parameters %.% activity.weights
       )
 
@@ -208,7 +208,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
         private$population_proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
       } else {
-        private$population_proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+        private$population_proportion <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
           dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
           dplyr::pull("proportion")
       }
@@ -484,7 +484,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_character(
         incidence_data$age_group,
         any.missing = FALSE,
-        pattern = paste(diseasystore::age_labels(self %.% parameters %.% age_cuts_lower), collapse = "|"),
+        pattern = paste(diseasystore::age_labels(self %.% population %.% age_cuts_lower), collapse = "|"),
         add = coll
       )
 
@@ -515,9 +515,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::reportAssertions(coll)
 
       # Rescale to the number of infections relative to the full population
-      proportion <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+      proportion <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
         dplyr::mutate(
-          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
+          "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower)[.data$age_group_out]
         ) |>
         dplyr::summarise(
           "proportion" = sum(.data$proportion),
@@ -647,7 +647,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Impute zeros for missing states
       estimated_exposed_infected_states <- tidyr::expand_grid(
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+        "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
           purrr::map_chr(seq_len(L), ~ paste0("I", .))
@@ -698,7 +698,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           to = self %.% training_period %.% end,
           by = "1 day"
         ),
-        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+        "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
       ) |>
         dplyr::left_join(incidence_data, by = c("date", "age_group", "variant")) |>
@@ -787,12 +787,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+        "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
         "state" = paste0("R", seq.int(self %.% parameters %.% compartment_structure %.% R))
       ) |>
         dplyr::add_row(
           "variant" = NA,
-          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower),
+          "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
           "state" = "S"
         ) |>
         dplyr::mutate(
@@ -948,7 +948,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         list(
           # Structural model parameters
           "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-          "age_cuts_lower" = 0,
           "malthusian_matching" = TRUE,
 
           # Models determinable by initialisation routines
@@ -984,7 +983,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
 
-      checkmate::assert_integerish(self %.% parameters %.% age_cuts_lower, lower = 0, add = coll)
+      checkmate::assert_integerish(self %.% population %.% age_cuts_lower, lower = 0, add = coll)
       checkmate::assert_logical(self %.% parameters %.% malthusian_matching, add = coll)
 
       # Validate the dynamical parameters

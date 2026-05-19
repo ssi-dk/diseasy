@@ -24,10 +24,6 @@ See vignette("diseasy-population").
   population$stratify_age(age_cuts_lower = c(0, 60)) # 2 age groups
   # NB: Age cuts must be available in demography and disease data.
 
-  # Stratifying spatially
-  population$stratify_spatial(resolution = "region")
-  # NB: Demography and diseasy data must have same spatial resolution.
-
   population
 
   rm(population)
@@ -39,7 +35,7 @@ See vignette("diseasy-population").
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
+\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -72,7 +68,7 @@ Sets the age stratification of the model population.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
 }
 \if{html}{\out{</div>}}
 }

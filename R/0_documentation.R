@@ -197,7 +197,7 @@ rd_side_effects <- "`NULL` (called for side effects)"
 rd_age_cuts_lower <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste(
-    "(`numeric`)\\cr",
+    "(`integer()`)\\cr",
     "vector of ages defining the lower bound for each age group. If `NULL`, age groups of contact_basis is used.",
     ifelse(type == "field", "Read only.", "")
   )
