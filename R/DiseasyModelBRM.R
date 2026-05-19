@@ -150,37 +150,6 @@ DiseasyModelB_ <- R6::R6Class(                                                  
     initialize = function(...) {
       super$initialize(formula = self$formula, family = stats::poisson(), ...)
     }
-  ),
-
-  private = list(
-    update_formula = function(formula, stratification) {
-
-      # When stratification is given, we treat each group as having their own rates and intercepts
-      if (!is.null(stratification)) {
-
-        # stats::update.formula does not update formulas with only intercept term as expected
-        # with the `*` operator so we need to manually detect if the formula initially is only
-        # intercept and use the `+` operator for the first reduction.
-        initial_operator <- ifelse(rlang::is_empty(labels(terms(formula))), "+", "*")
-
-        # Now we can reduce with the operators set
-        purrr::pmap(
-          tibble::lst(
-            "label" = names(stratification),
-            "stratification" = stratification,
-            "operator" = c(initial_operator, rep("*", length(stratification) - 1))
-          ),
-          \(label, stratification, operator) {
-            glue::glue("~ . {operator} {ifelse(label != '', label, dplyr::as_label(stratification))}") |>
-              stats::as.formula()
-          }
-        ) |>
-          purrr::reduce(stats::update.formula, .init = formula)
-
-      } else { # Do nothing
-        return(formula)
-      }
-    }
   )
 )
 

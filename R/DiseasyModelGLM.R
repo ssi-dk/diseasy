@@ -111,33 +111,6 @@ DiseasyModelG_ <- R6::R6Class(                                                  
                        family = stats::quasipoisson(),
                        ...)
     }
-  ),
-
-  private = list(
-    update_formula = function(formula, aggregation) {
-
-      # When aggregation is given, we treat each group as having their own rates and intercepts
-      if (!is.null(aggregation)) {
-
-        # stats::update.formula does not update formulas with only intercept term as expected
-        # when using the `*` operator so we need to manually detect if the formula initially is only
-        # intercept and use the `+` operator for the first reduction.
-        initial_operator <- ifelse(rlang::is_empty(labels(terms(formula))), "+", "*")
-
-        # Now we can reduce with the operators set
-        purrr::pmap(tibble::lst(label = names(aggregation),
-                                aggregation = aggregation,
-                                operator = c(initial_operator, rep("*", length(label) - 1))),
-                    \(label, aggregation, operator) {
-                      glue::glue("~ . {operator} {ifelse(label != '', label, dplyr::as_label(aggregation))}") |>
-                        stats::as.formula()
-                    }) |>
-          purrr::reduce(stats::update.formula, .init = formula)
-
-      } else { # Do nothing
-        return(formula)
-      }
-    }
   )
 )
 
