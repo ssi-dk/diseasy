@@ -14,7 +14,6 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("I" = rI)
     )
   )
@@ -73,6 +72,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -81,7 +81,6 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 60),
       "disease_progression_rates" = c("I" = rI)
     )
   )
@@ -185,7 +184,6 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -223,7 +221,6 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 2L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -292,7 +289,6 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -423,6 +419,7 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -431,7 +428,6 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 60),
       "disease_progression_rates" = c("E" = rE, "I" = rI),
       "malthusian_matching" = FALSE
     )

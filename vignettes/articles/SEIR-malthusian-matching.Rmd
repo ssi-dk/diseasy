@@ -58,10 +58,9 @@ combinations |>
           conn = DBI::dbConnect(RSQLite::SQLite()),
           last_queryable_date = Sys.Date() - 1
         ),
-        variant = DiseasyVariant$new(),
+        population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = 1L),
-          "age_cuts_lower" = 0,
           "overall_infection_risk" = 0.6,
           "disease_progression_rates" = c("E" = rE, "I" = rI),
           "malthusian_matching" = match

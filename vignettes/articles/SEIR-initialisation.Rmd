@@ -315,15 +315,18 @@ obs$set_last_queryable_date(obs$start_date + lubridate::days(50))
 
 generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
 
+  # Define the population for the model
+  population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
+
   # Define the activity for the scenario
-  act <- DiseasyActivity$new()
-  act$set_contact_basis(contact_basis = contact_basis$DK)
-  act$set_activity_units(dk_activity_units)
-  act$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis$DK)
+  activity$set_activity_units(dk_activity_units)
+  activity$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
 
   # Add a waning immunity scenario
-  im <- DiseasyImmunity$new()
-  im$set_exponential_waning(time_scale = 180)
+  immunity <- DiseasyImmunity$new()
+  immunity$set_exponential_waning(time_scale = 180)
 
   # Add a season scenario
   s <- DiseasySeason$new()
@@ -333,13 +336,12 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
 
   # Create a SEIR model to initialise
   m <- DiseasyModelOdeSeir$new(
-    activity = act,
-    immunity = im,
-    season = s,
+    activity = activity,
+    immunity = immunity,
+    season = season,
     observables = obs,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "age_cuts_lower" = c(0, 30, 60),
       "overall_infection_risk" = 0.025,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
@@ -465,11 +467,11 @@ get_prediction <- function(
 
     # Convert to incidence
     proportion <- model$activity$map_population(
-      model$parameters$age_cuts_lower
+      model$population$age_cuts_lower
     ) |>
       dplyr::mutate(
         "age_group" = diseasystore::age_labels(
-          model$parameters$age_cuts_lower
+          model$population$age_cuts_lower
         )[.data$age_group_out]
       ) |>
       dplyr::summarise(
