@@ -42,6 +42,7 @@ See vignette("diseasy-population").
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-DiseasyPopulation-new}{\code{DiseasyPopulation$new()}}
 \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
 \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
 \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
@@ -50,12 +51,30 @@ See vignette("diseasy-population").
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="initialize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-initialize'><code>diseasy::DiseasyBaseModule$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-new}{}}}
+\subsection{Method \code{new()}}{
+Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+
+\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyPopulation-stratify_age"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-stratify_age}{}}}

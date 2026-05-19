@@ -20,7 +20,7 @@
 #'
 #'   # First, we add a observables modules with example data bundled
 #'   # with the package.
-#'   obs <- DiseasyObservables$new(
+#'   observables <- DiseasyObservables$new(
 #'     diseasystore = DiseasystoreSeirExample,
 #'     conn = DBI::dbConnect(duckdb::duckdb())
 #'   )
@@ -28,26 +28,29 @@
 #'   # The observables module also defines the time if interest via
 #'   # the `last_queryable_date` field. Data before this date are
 #'   # used to train the models, and predictions start on this date.
-#'   obs$set_last_queryable_date(as.Date("2020-02-29"))
+#'   observables$set_last_queryable_date(as.Date("2020-02-29"))
 #'
 #'   # Define the incidence data to initialise the model
-#'   obs$define_synthetic_observable(
+#'   observables$define_synthetic_observable(
 #'     name = "incidence",
 #'     mapping = \(n_positive, n_population) n_positive / (n_population * 0.65)
 #'   )
 #'
 #'   # The example data uses a simple activity scenario for Denmark,
 #'   # which we replicate here
-#'   act <- DiseasyActivity$new(contact_basis = contact_basis$DK)
-#'   act$set_activity_units(dk_activity_units)
-#'   act$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+#'   activity <- DiseasyActivity$new(contact_basis = contact_basis$DK)
+#'   activity$set_activity_units(dk_activity_units)
+#'   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+#'
+#'   # The example stratifies the population into three age groups
+#'   population <- DiseasyPopulation(age_cuts_lower = c(0, 30, 60))
 #'
 #'   # We create a simple model instance
 #'   m <- DiseasyModelOdeSeir$new(
-#'     observables = obs,
-#'     activity = act,
+#'     observables = observables,
+#'     population = population,
+#'     activity = activity,
 #'     parameters = list(
-#'       "age_cuts_lower" = c(0, 30, 60),
 #'       "overall_infection_risk" = 0.025,
 #'       "disease_progression_rates" = c("E" = 1 / 2, "I" = 1 / 4)
 #'     )

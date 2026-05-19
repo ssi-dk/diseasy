@@ -136,7 +136,21 @@ The first step to creating a `?DiseasyModelOdeSeir` model is to define the scena
 In this case, as we stated above, we can exactly match the scenario to the data since
 the data was created using this class of models.
 
-First we define the activity scenario via the `?DiseasyActivity` module.
+
+First we define the population to include in the model via the `?DiseasyPopulation`
+module, and then we define the activity scenario via the `?DiseasyActivity` module,
+before finally defining the seasonality scenario via the `?DiseasySeason` module.
+
+## Model population
+We here use a simple three age-group stratification of the population in the model.
+
+```{r diseasy_population}
+# Split the model population into three age groups
+population <- DiseasyPopulation$new()
+population$stratify_age(age_cuts_lower = c(0, 30, 60))
+```
+
+## Activity scenario
 This scenario describes the changes in activity in the society (e.g. restrictions).
 To see more on how to configure this module, see `vignette("diseasy-activity")`.
 
@@ -150,6 +164,7 @@ activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 ```
 
+## Seasonality scenario
 This particular scenario also include simple seasonality and waning immunity:
 ```{r diseasy_season}
 # Waning immunity scenario
@@ -170,7 +185,6 @@ The hyperparameters are:
 
 - *compartment_structure*: A named vector specifying the number of consecutive
   $E$, $I$ and $R$ states in the model.
-- *age_cuts_lower*: A vector of age cuts for the age groups in the model.
 
 The parameters are:
 
@@ -182,7 +196,6 @@ The parameters are:
 ```{r model configuration, eval = rlang::is_installed("RSQLite")}
 # Hyper parameters
 compartment_structure <- c("E" = 2L, "I" = 1L, "R" = 2L)
-age_cuts_lower <- c(0, 30, 60)
 
 # Parameters
 disease_progression_rates <- c("E" = 1 / 2.1, "I" = 1 / 4.5)
@@ -309,7 +322,6 @@ model <- DiseasyModelOdeSeir$new(
   parameters = list(
     # Parameter and hyper-parameter configuration
     "compartment_structure" = compartment_structure,
-    "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
     "disease_progression_rates" = disease_progression_rates,
 

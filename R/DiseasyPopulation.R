@@ -32,6 +32,21 @@ DiseasyPopulation <- R6::R6Class(                                               
   public = list(
 
     #' @description
+    #'   Creates a new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param ...
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
+    initialize = function(age_cuts_lower = 0L, ...) {
+
+      # Pass arguments to methods
+      self$stratify_age(age_cuts_lower)
+
+      # Pass further arguments to the DiseasyBaseModule initializer
+      super$initialize(...)
+    },
+
+
+    #' @description
     #'   Sets the age stratification of the model population.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
     stratify_age = function(age_cuts_lower) {
