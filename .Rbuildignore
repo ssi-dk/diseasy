@@ -13,3 +13,5 @@
 ^vignettes/articles$
 ^pkg-build$
 ^dockerfile$
+^\.positai$
+^\.claude$
