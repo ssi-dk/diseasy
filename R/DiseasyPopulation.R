@@ -62,10 +62,10 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyPopulation ##########################################")
-      if (self %.% age_cuts_lower == 0L) {
+      if (identical(self %.% age_cuts_lower, 0L)) {
         printr("No age stratification has been configured")
       } else {
-        printr(glue::glue("Stratified by age: {diseasystore::age_labels(self %.% age_cuts_lower)}"))
+        printr(glue::glue("Stratified by age: {toString(diseasystore::age_labels(self %.% age_cuts_lower))}"))
       }
     }
   ),
