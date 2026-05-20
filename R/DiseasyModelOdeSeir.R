@@ -989,7 +989,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
 
-      checkmate::assert_integerish(self %.% population %.% age_cuts_lower, lower = 0, add = coll)
       checkmate::assert_logical(self %.% parameters %.% malthusian_matching, add = coll)
 
       # Validate the dynamical parameters
@@ -1220,7 +1219,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
       reference_model <- DiseasyModelOdeSeir$new(
-        population = self %.% population,
         activity = self %.% activity,
         observables = self %.% observables,
         season = self %.% season,
