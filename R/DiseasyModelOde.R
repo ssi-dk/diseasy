@@ -72,6 +72,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           purrr::pluck(self %.% parameters %.% training_length, "validation", as.integer, .default = 0L)
 
         # Run the model to determine the raw rates (I*) at the maximal stratification in the model
+        # and any configured observables
         model_rates <- private %.% solve_ode(prediction_length = prediction_length)
 
         # .. get population data
@@ -86,9 +87,10 @@ DiseasyModelOde <- R6::R6Class(                                                 
         model_output <- model_rates |>
           dplyr::left_join(population_data, by = "age_group") |>
           dplyr::mutate(
-            "n_infected" = .data$rate / .data$proportion * .data$population
+            "value" = .data$rate / .data$proportion * .data$population
           ) |>
-          dplyr::select(!c("rate", "proportion"))
+          dplyr::select(!c("rate", "proportion")) |>
+          tidyr::pivot_wider(names_from = "state", values_from = "value")
 
         # "Zero-pad" with observational data (necessary for maps with delays)
         observations <- self %.% get_data(
@@ -99,22 +101,36 @@ DiseasyModelOde <- R6::R6Class(                                                 
           dplyr::left_join(population_data, by = "age_group") |>
           dplyr::rename("incidence" = self %.% parameters %.% incidence_feature_name) |>
           dplyr::mutate("n_infected" = .data$incidence * .data$population) |>
-          dplyr::select(colnames(model_output))
+          dplyr::select(dplyr::any_of(colnames(model_output)))
 
+        # Add NAs to observations for each configured observable in the model
+        # (i.e. non-n_infected observable)
+        if (!is.null(self %.% model_outputs)) {
+          observations <- observations |>
+            dplyr::cross_join(
+              purrr::reduce(
+                purrr::map(self %.% model_outputs, ~ tibble::tibble(!!. := NA)),
+                dplyr::cross_join,
+                .init = data.frame()
+              )
+            )
+        }
+
+        # Combine to single data object
         data <- rbind(observations, model_output)
+
 
         # Retrieve the map / reduce functions for the observable
         map_fn <- purrr::pluck(self %.% parameters %.% model_output_to_observable, observable, "map")
-        reduce_fn <- purrr::pluck(
-          self %.% parameters %.% model_output_to_observable, observable, "reduce",
-          .default = ~ sum(.)
-        )
+        reduce_fn <- self %.% parameters %.% model_output_to_observable |>
+          purrr::pluck(observable, "reduce", .default = ~ sum(.))
 
         # Map model incidence to the requested observable
         prediction <- data |>
-          dplyr::group_by(dplyr::across(!c("n_infected", "population"))) |>
-          dplyr::group_map(map_fn) |>
-          purrr::list_rbind()
+          dplyr::group_by(
+            dplyr::across(!c("date", "n_infected", dplyr::all_of(self %.% model_outputs), "population"))
+          ) |>
+          dplyr::group_modify(map_fn)
 
         # Reduce (summarise) to the requested stratification level.
         prediction <- prediction |>
@@ -127,7 +143,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
             ),
             .groups = "drop"
           ) |>
-          dplyr::relocate("date", .before = dplyr::everything())
+          dplyr::relocate("date", .before = dplyr::everything()) |>
+          dplyr::relocate(dplyr::all_of(observable), .after = dplyr::everything())
 
         # Truncate the prediction to the requested period (necessary for maps with delays)
         prediction <- prediction |>
@@ -180,7 +197,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         stratification = stratification
       )
 
-      # Retrieve the observations for the observable at the model stratificaiton level
+      # Retrieve the observations for the observable at the model stratification level
       observations <- self %.% get_data(
         observable = observable,
         stratification = private %.% model_stratification(),
@@ -365,9 +382,11 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # The model has a configured right-hand-side function that
         # can be used to simulate the model in conjunction with `deSolve`.
+        # Custom observables computes from differences of integrating states,
+        # we need to solve for 1 additional day
         sol <- deSolve::ode(
           y = psi$initial_condition,
-          times = seq(from = 1, to = prediction_length, by = 1),
+          times = seq(from = 1, to = prediction_length + 1, by = 1),
           func = self$rhs
         )
 
@@ -397,18 +416,35 @@ DiseasyModelOde <- R6::R6Class(                                                 
             )
           )
 
-        # Get the raw rates from the model solution
+        # Extract rates for the I1-exit (= n_infected) and each configured
+        # observable.
+        # Custom observables computes from differerences of integrating states
         model_rates <- sol_long |>
-          dplyr::filter(.data$state == "I1") |>
+          dplyr::filter(.data$state %in% c("I1", self %.% model_outputs)) |>
+          dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter
+            "rate" = dplyr::if_else(
+              .data$state == "I1",
+              self %.% parameters %.% disease_progression_rates[["I"]] *
+                self %.% parameters %.% compartment_structure[["I"]] * .data$value,
+              dplyr::lead(.data$value, order_by = .data$time) - .data$value
+            ),
+            "state" = dplyr::if_else(
+              .data$state == "I1",
+              "n_infected",
+              .data$state
+            ),
+            .by = !c("time", "value")
+          ) |>
+          dplyr::select(!"value")
+
+        # Add date information and truncate to requested prediction length
+        model_rates <- model_rates |>
           dplyr::mutate(
             "date" = .data$time + self %.% training_period %.% end,
             .before = dplyr::everything()
           ) |>
-          dplyr::mutate(                                                                                                # nolint: consecutive_mutate_linter
-            "rate" = self %.% parameters %.% disease_progression_rates[["I"]] *
-              self %.% parameters %.% compartment_structure[["I"]] * .data$value
-          ) |>
-          dplyr::select(!c("time", "state", "value"))
+          dplyr::filter(.data$time <= prediction_length) |>
+          dplyr::select(!"time")
 
         # Store in cache
         private$cache(hash, model_rates)
@@ -482,7 +518,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
             apply(FUN = which, MARGIN = 1) |>
             purrr::map_dbl(~ tail(., 1))
 
-          # We have to do janky evaluation to get the programatically generated expression
+          # We have to do janky evaluation to get the programmatically generated expression
           age_groups_maps <- purrr::map2(
             age_groups_in_data,
             diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[splits],
@@ -524,15 +560,16 @@ DiseasyModelOde <- R6::R6Class(                                                 
           "model_output_to_observable" = list(
             "n_infected" = list(
               "map" = \(.x, .y) {
-                dplyr::mutate(.y, "n_infected" = .x$n_infected)
+                dplyr::transmute(.x, .data$date, .data$n_infected)
               }
             ),
             "incidence" = list(
               "map" = \(.x, .y) {
-                dplyr::mutate(
-                  .y,
-                  "incidence" = .x$n_infected / .x$population,
-                  "population" = .x$population # Need for the reduce function
+                dplyr::transmute(
+                  .x,
+                  .data$date,
+                  "incidence" = .data$n_infected / .data$population,
+                  .data$population # Need for the reduce function
                 )
               },
               "reduce" = ~ sum(. * population / sum(population))

@@ -32,17 +32,17 @@ This template allows for any number of $E$, $I$ or $R$ states in the model and i
 The workflow for creating a specific `?DiseasyModelOdeSeir` model would roughly follow these steps:
 
 1) **Defining the scenario.**
-   The first step to using most models in `diseasy` is to define the scenario. That is, to configure the functional
-   modules that the model templates takes as argument (e.g. `?DiseasyActivity`).
-   These steps provide the model template with information about the population, the activity, variants to include etc.
+  The first step to using most models in `diseasy` is to define the scenario. That is, to configure the functional
+  modules that the model templates takes as argument (e.g. `?DiseasyActivity`).
+  These steps provide the model template with information about the population, the activity, variants to include etc.
 2) **Choosing the model configuration.**
-   The model template may have some configurability that you control. In the case of `?DiseasyModelOdeSeir` for example,
-   you must choose the number of consecutive $E$, $I$ and $R$ states in the model.
+  The model template may have some configurability that you control. In the case of `?DiseasyModelOdeSeir` for example,
+  you must choose the number of consecutive $E$, $I$ and $R$ states in the model.
 3) **Mapping to observables.**
-   The ODE family of models is in some ways bespoke in the sense that the user needs provide a mapping from the
-   observables to the "true" incidence of infections. The model is then initialised from this estimated incidence.
-   If the model should provide predictions for observables other than the "true" incidence, the user needs to provide
-   mapping between the model incidence and the observables in question.
+  The ODE family of models is in some ways bespoke in the sense that the user needs provide a mapping from the
+  observables to the "true" incidence of infections. The model is then initialised from this estimated incidence.
+  If the model should provide predictions for observables other than the "true" incidence, the user needs to provide
+  mapping between the model incidence and the observables in question.
 
 These steps are outlined in individual sections below where we work through defining a model in a specific example.
 Note that this example is contrived in the sense that the data we use in this example have been generated with this
@@ -196,16 +196,23 @@ observables$set_last_queryable_date(last_queryable_date)
 # Mapping observables to model and back
 Being a SEIR model, the `?DiseasyModelOdeSeir` model template runs the dynamics of the
 infections in the population. These dynamics are inferred from the incidence of the
-disease in the population. The model then predicts the evolution of the incidence[^1]
-under the given configuration. To get predictions for other observables, we must
-map from the incidence to the observable of interest.
+disease in the population.
+
+Mathematically, we map from the set of real-world observables $\vec{O}(t)$ to the
+incidence $I(t)$ via the map $f$:
+$$\vec{O}(t) \overset{f}{\rightarrow} I(t)$$
+The model then produces a number of observations under the given configuration.
+
+By default, the model will predict the evolution of the incidence[^1], $\tilde{I}(t)$,
+but other outputs can be configured (see further below).
 
 [^1]: Measured as the rate of individuals exiting the first `I` state.
 
-Mathematically, we map from the set of observables $\vec{O}(t)$ to the incidence $I(t)$ via the map $f$:
-$$\vec{O}(t) \overset{f}{\rightarrow} I(t)$$
+To get predictions for other real-world observables, we must map from the incidence
+(or other output) to the observable of interest.
 
-From the model incidence $\tilde{I}(t)$, we then map to the observable estimates $\tilde{O}_i(t)$ via the maps $g_i$:
+From the model incidence $\tilde{I}(t)$, we then map to the observable estimates
+$\tilde{O}_i(t)$ via the maps $g_i$:
 $$\tilde{I}(t) \overset{g_1}{\rightarrow} \tilde{O}_1(t)$$
 $$\tilde{I}(t) \overset{g_2}{\rightarrow} \tilde{O}_2(t)$$
 $$\vdots$$
@@ -238,10 +245,14 @@ observables$define_synthetic_observable(
 ## Mapping from model incidence to observables
 By default, the model can only return predictions for the true number of infected
 (`n_infected`) and the incidence (`incidence`) since these are the only observables
-"known" to the model. Any additional observables must be mapped from the incidence
-provided by the model.
+"known" to the model.
 
-To this purpose, we define a "map" and a "reduce" function:
+Any additional observables must be mapped from the incidence provided by the model, or
+other output must be defined to map from (see further below).
+
+To convert from model outputs to real-world observables, we define a "map" and a
+"reduce" function:
+
 The *map* function is passed to a `dplyr::group_map()` call on a `data.frame` grouped
 by the stratification.
 The function should be a two-argument function where the first argument contains a
@@ -263,26 +274,34 @@ the number of hospital admissions. These are both counting observables and the d
 # Maps between the internal model incidence and observables
 map_to_n_positive <- list(
   "map" = \(.x, .y) {
-    dplyr::mutate(.y, "n_positive" = 0.65 * .x$n_infected)
+    dplyr::transmute(
+      .x,
+      .data$date,
+      "n_positive" = 0.65 * .x$n_infected
+    )
   }
 )
 
 map_to_n_admission <- list(
   "map" = \(.x, .y) {
+    # Risk per age group
     risk_of_admission <- c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1)
+
+    # Delay admissions by a fixed distribution
     delay_distribution <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # Must sum = 1
 
-    n_total_admissions <- .x$n_infected * risk_of_admission[.y$age_group]
-
-    cbind(
-      .y,
-      data.frame(
-        "delay" = seq_along(delay_distribution) - 1,
-        "n_admission" = n_total_admissions * delay_distribution
+    data.frame(
+      "date" = as.vector(
+        outer(.x$date, seq_along(delay_distribution) - 1, "+")
+      ),
+      "n_admission" = as.vector(
+        outer(
+          .x$n_infected * risk_of_admission[.y$age_group],
+          delay_distribution,
+          "*"
+        )
       )
-    ) |>
-      dplyr::mutate("date" = .data$date + .data$delay) |>
-      dplyr::select(!"delay")
+    )
   }
 )
 
@@ -293,6 +312,72 @@ model_output_to_observable <- list(
   "n_admission" = map_to_n_admission
 )
 ```
+
+### Custom model output
+The `diseasy` ODE model templates uses a generic system for generating observables
+from the state_vector, $\overline{\psi}$.
+
+A observable can be configured to either derive from either the full state vector
+$\overline{\psi}$ or the infection matrix $f$ (see the article `SEIR-implementation`
+in the online documentation).
+
+In either case, the observable is configured by defining a vector of weights.
+For each of such vectors, a "surveillance" state is added to the state_vector which
+integrates the inner-product $\overline{\omega}_o \cdot \overline{\psi}$ or
+$\overline{\omega}_o \cdot \sum_{rows}\overline{\overline{f}}$ depending on which
+element the observable is set to track.
+
+In the former case, the surveillance states derived from the state_vector where as
+in the latter the observable is derived from the new infections occurring in the model.
+
+In the case of the "n_infected" observable defined by default in the model, the weights
+are essentially a matrix with weights only for each $I_1$ state[^2] and the observable
+tracks the state_vector.
+
+[^2]: The "n_infected" observable does not actually create the additional surveillance states in the implementation
+since it can be computed directly from $\overline{\psi}$, but it used here as a illustrative example.
+
+
+For example, in SEIR case ($N = L = M = 1$) with two age-groups, the weights take the
+following form:
+
+$$ \overline{\overline{\Omega}}_{n_{infected}} = \underbrace{\begin{bmatrix}
+  0 &  r_i & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 &  r_i & 0 & 0 & 0
+\end{bmatrix}}_{\begin{matrix}
+  E_1 & I_1 & R_1 & E_2 & I_2 & R_2 & S_1 & S_2
+\end{matrix}}
+$$
+where $r_i$is the rate of transition out of $I$ (i.e. the reciprocal of the time spent
+in $I$ state).
+
+As stated above, the model always provides a prediction for the "n_infected" observable
+but there are cases where other observables are automatically configured by `diseasy`.
+
+For example, when the model includes a `?DiseasyImmunity` module, observables are
+configured to track outcomes related to immunity.
+
+Here, waning target named "hospitalisation" or "death" in the immunity scenario are
+assigned their own observables which is derived from the infection matrix
+(Note that there is no difference in waning between variants included in the model).
+
+In the SEIR3 case ($N = L = 1, M = 3$) with two age-groups, the weights take the following form:
+$$ \overline{\overline{\Omega}}_{immunity} = \underbrace{\begin{bmatrix}
+  \gamma_1 & \gamma_2 & \gamma_3 & 0        & 0        & 0        & 1 & 0 \\
+  0        & 0       & 0         & \gamma_1 & \gamma_2 & \gamma_3 & 0 & 1
+\end{bmatrix}}_{\begin{matrix}
+  \;\;R^1_1\; & R^2_1\; & R^3_1\;\; & R^1_2\; & R^2_2\; & R^3_2\;\; & S_1\; & S_2
+\end{matrix}}
+$$
+
+In the SEIR2 case ($N = L = 1, M = 2$) with two age-groups and two variants, the weights take the following form:
+$$ \overline{\overline{\Omega}}_{immunity} = \underbrace{\begin{bmatrix}
+  \gamma_1 & \gamma_2 & 0        & 0        & \gamma_1 & \gamma_2 & 0        & 0        & 1 & 0 \\
+  0        & 0        & \gamma_1 & \gamma_2 & 0        & 0        & \gamma_1 & \gamma_2 & 0 & 1
+\end{bmatrix}}_{\begin{matrix}
+  R^1_{1,1} & R^2_{1,1} & R^1_{2,1} & R^2_{2,1} & R^1_{1,2} & R^2_{1,2} & R^1_{2,2} & R^2_{2,2} & S_1 & S_2
+\end{matrix}}
+$$
 
 
 # Putting it all together

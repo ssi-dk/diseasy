@@ -309,7 +309,7 @@ The activity units active in the scenario.
   }
   \subsection{Returns}{
     (\code{list()})\cr
-Returns a list with depth of two: value[\link{date}][\link{type}]
+Returns a list with depth of two: value[[date]][[type]]
   }
 }
 
@@ -332,7 +332,7 @@ Returns a list with depth of two: value[\link{date}][\link{type}]
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
+    If no weights are supplied, a \code{list()} of depth of two: value[[date]][[type]] is returned.
 Map population between age groups
   }
 }

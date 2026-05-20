@@ -9,6 +9,7 @@ birthdate
 birthdates
 bitemporal
 
+cadlag
 checksums
 CCW
 CoV
@@ -222,6 +223,7 @@ Skytte
 SSI
 Statens
 subplex
+summarisable
 sql
 SQLite
 SQLiteConnections
