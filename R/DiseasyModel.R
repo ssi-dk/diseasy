@@ -57,7 +57,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   A new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     initialize = function(
       observables = FALSE,
-      population  = TRUE,
+      population  = FALSE,
       activity    = FALSE,
       season      = FALSE,
       variant     = FALSE,
@@ -74,7 +74,7 @@ DiseasyModel <- R6::R6Class(                                                    
         add = coll
       )
       checkmate::assert(
-        checkmate::check_true(population),
+        checkmate::check_logical(population, null.ok = TRUE),
         checkmate::check_class(population, "DiseasyPopulation"),
         add = coll
       )
