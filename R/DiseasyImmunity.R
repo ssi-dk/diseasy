@@ -1099,7 +1099,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Plot lines for each model
       purrr::walk2(private$.model, seq_along(private$.model), ~ {
-        lines(t, purrr::map_dbl(t, .x), col = colours[1 + .y], lwd = 2)
+        lines(t, purrr::map_dbl(t, .x), col = colours[1 + .y], lwd = 1)
       })
 
 
