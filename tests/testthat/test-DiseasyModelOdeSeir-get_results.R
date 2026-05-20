@@ -87,7 +87,7 @@ M <- 2L                                                                         
 
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
-  population = DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60)),
+  population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
   activity = activity,
   immunity = immunity,
   season = season,

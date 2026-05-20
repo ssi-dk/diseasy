@@ -327,7 +327,6 @@ DiseasyModelOde <- R6::R6Class(                                                 
     }
   ),
 
-
   private = list(
 
     # @description
