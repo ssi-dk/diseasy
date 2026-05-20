@@ -15,7 +15,7 @@ This vignette is a companion to the implementation of the SEIR ode model `?Disea
 As the name suggests, this model is a SEIR-like ordinary differential equation (ODE) model.
 Furthermore, the model is designed as flexible as possible to allow for a wide range of different model configurations.
 Meaning that the number of consecutive exposed, infected, and recovered states can be set arbitrarily,
-as well as the number of age groups and the number of variants.
+as well as the number of demographic groups (e.g. age groups or sex) and the number of variants.
 
 Due to the flexibility of the model, the implementation is somewhat complex, which is why we include this vignette
 outlining the mathematical implementation of the model and connect it to the code.
@@ -34,7 +34,7 @@ To begin, here we define a fixed meaning to the different indices and accents us
 | $K,k$   | Exposed states             |
 | $L,l$   | Infected states            |
 | $M,m$   | Recovered states           |
-| $A,i,j$ | Age groups                 |
+| $D,i,j$ | Demographic groups         |
 | $V,a,b$ | Variants                   |
 | $^\sim$ | Non-normalised quantity    |
 
@@ -42,11 +42,11 @@ Where upper case letters denote the number of such elements and lower case lette
 
 ## The model structure
 The SEIR model we are building is a compartmental model with an (near) arbitrary number of exposed, infected,
-and recovered compartments. The model also supports multiple age groups and multiple variants.
+and recovered compartments. The model also supports multiple demographic groups and multiple variants.
 
 We divide the model into different "tracks" with each track implementing the disease progression for a group of
 individuals.
-That is, if we have $A$ age groups and $V$ variants, we have $A \cdot V$ tracks which each start with the first
+That is, if we have $D$ demographic groups and $V$ variants, we have $D \cdot V$ tracks which each start with the first
 exposed state (or the first infected state if no exposed states are included in the model).
 As the infection progresses within each individual, they are moved down the track through infection and eventually
 into recovery.
@@ -61,30 +61,30 @@ knitr::include_graphics(
 )
 ```
 
-This figure shows the disease progression for two variant tracks for a single age group.
+This figure shows the disease progression for two variant tracks for a single demographic group.
 The arrows in the figure indicates the infections in the model within these tracks.
 
 ## State vector
 
-Each "track" of infection is placed in a sequence in the state vector, $\overline{\psi}$, and increments first in age
+Each "track" of infection is placed in a sequence in the state vector, $\overline{\psi}$, and increments first in demographic
 groups then in variants.
 
 Finally, the susceptible states are placed at the end of the state vector.
 
 $$
-\overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Age group 1, Variant 1}}
+\overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Demographic group 1, Variant 1}}
 $$
 $$
-\underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Age group 2, Variant 1}}
+\underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Demographic group 2, Variant 1}}
 \; \cdots
 $$
 $$
-\underbrace{\begin{matrix} E_{A,V}^1 \, \cdots \, E_{A,V}^K \;\;\; I_{A,V}^1 \, \cdots \, I_{A,V}^L \;\;\; R_{A,V}^1 \, \cdots \, R_{A,V}^M \end{matrix}}_{\text{Age group A, Variant V}}
+\underbrace{\begin{matrix} E_{D,V}^1 \, \cdots \, E_{D,V}^K \;\;\; I_{D,V}^1 \, \cdots \, I_{D,V}^L \;\;\; R_{D,V}^1 \, \cdots \, R_{D,V}^M \end{matrix}}_{\text{Demographic group D, Variant V}}
 \;\; S_1 \, \cdots \, S_A]
 $$
 NOTE: State vector uses normalised (unit) populations.
 
-Notice that the state vector elements are indexed by state-type, state-index, age-index and variant-index:
+Notice that the state vector elements are indexed by state-type, state-index, demography-index and variant-index:
 
 ```{r SERI-index, echo = FALSE, fig.align = "center", fig.cap = "Index guide for the state vector"}
 knitr::include_graphics(
@@ -108,14 +108,14 @@ $$
  - \left<\textrm{clearing of infection}\right>
 $$
 
-To compute the number of infectious contacts we need the number of contacts between infected individuals of any age
-group and individuals in the $i$'th age group. If $t_{i,j} = t_{j,i}$ is the (symmetric) number of contacts between
-age group $i$ and age group $j$, then $p \tilde{I}_j t_{i,j} / \tilde{N}_j$ is the number of infectious contacts from
+To compute the number of infectious contacts we need the number of contacts between infected individuals of any demographic
+group and individuals in the $i$'th demographic group. If $t_{i,j} = t_{j,i}$ is the (symmetric) number of contacts between
+demographic group $i$ and demographic group $j$, then $p \tilde{I}_j t_{i,j} / \tilde{N}_j$ is the number of infectious contacts from
 $j$ to $i$
-(infected individual of age group $j$ times mean number of contacts to age group $i$ with each contact carrying a
+(infected individual of demographic group $j$ times mean number of contacts to demographic group $i$ with each contact carrying a
 risk of infection $p$).
 
-The probability that a contact is susceptible is simply its proportion relative to the age group leading to:
+The probability that a contact is susceptible is simply its proportion relative to the demographic group leading to:
 
 $$
 \dot{\tilde{I}}_i = p\left(\tilde{I}_1 t_{i,1} / \tilde{N}_1 + \tilde{I}_2 t_{i,2} / \tilde{N}_2 + \dots\right) \cdot
@@ -167,18 +167,18 @@ variables which are described below.
 In the computation of the right-hand side of the ODE, we have a helper matrix $\overline{\overline{I}}$ stored
 as `infected` in the implementation.
 
-This $\overline{\overline{I}}$ matrix is a $A \times V$ matrix with elements
+This $\overline{\overline{I}}$ matrix is a $D \times V$ matrix with elements
 
 $$
 \overline{\overline{I}} = \begin{bmatrix}
 \sum_l I^l_{1,1} & \cdots & \sum_l I^l_{1,V} \\
 \vdots & \ddots & \vdots \\
-\sum_l I^l_{A,1} & \cdots & \sum_l I^l_{A,V}
+\sum_l I^l_{D,1} & \cdots & \sum_l I^l_{D,V}
 \end{bmatrix}
 $$
 
 That is, the element $i_{a, v}$ contains the sum of all infected compartments for the track associated with
-age group $a$ and variant $v$.
+demographic group $a$ and variant $v$.
 
 
 ## The `infected_contact_rate` matrix
@@ -190,12 +190,12 @@ $$
 \overline{\overline{CI}} = \overline{\overline{C}}\; \overline{\overline{I}} = \begin{bmatrix}
 \sum_i c_{1\leftarrow i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{1\leftarrow i} \sum_l I^l_{i,V} \\
 \vdots & \ddots & \vdots \\
-\sum_i c_{A\leftarrow i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{A\leftarrow i} \sum_l I^l_{i,V}
+\sum_i c_{D\leftarrow i} \sum_l I^l_{i,1} & \cdots & \sum_i c_{D\leftarrow i} \sum_l I^l_{i,V}
 \end{bmatrix}
 $$
 
-That is, the element $(\overline{\overline{CI}})_{i, a}$ contains the rate of contact for age
-group $i$ with persons infected with variant $a$ across all age groups.
+That is, the element $(\overline{\overline{CI}})_{i, a}$ contains the rate of contact for demographic
+group $i$ with persons infected with variant $a$ across all demographic groups.
 
 ## The `infection_rate` matrix
 
@@ -211,7 +211,7 @@ $$
 $$
 
 Where $\odot$ is the Hadamard product (element-wise multiplication), and $\overline{\overline{\mathcal{E}}}$ is the
-$A \times V$ matrix:
+$D \times V$ matrix:
 
 $$
 \overline{\overline{\mathcal{E}}} = \begin{bmatrix}
@@ -231,18 +231,18 @@ Since only $R$ and $S$ compartments are susceptible to infection, we need only t
 compute the new infections in the model.
 
 The new `infection_matrix` therefore does not need to contain the $K$ exposed states and the $L$ infected states,
-but only the $M$ recovered states and the $A$ susceptible states.
+but only the $M$ recovered states and the $D$ susceptible states.
 
 We are therefore interested in the reduced state vector $\overline{\psi}^{RS}$ whose elements $e^*$ are the $R$
 and $S$ elements of the full state vector $\overline{\psi}$.
 
 
 We now create an intermediate matrix $\overline{\overline{U}}$ by expanding the `infection_rate` matrix
-($\overline{\overline{T}}$) to a $A \cdot (V \cdot M + 1) \times V$ matrix by repeating the rows of the
+($\overline{\overline{T}}$) to a $D \cdot (V \cdot M + 1) \times V$ matrix by repeating the rows of the
 `infection_rate` matrix.
-This repeating is done by matching the age group of the `infection_rate` matrix to the age group of the reduced state
+This repeating is done by matching the demographic group of the `infection_rate` matrix to the demographic group of the reduced state
 vector.
-Each element, $e$, in the state vector, $\psi$ has a corresponding age group which we can write as $i|e$.
+Each element, $e$, in the state vector, $\psi$ has a corresponding demographic group which we can write as $i|e$.
 
 The intermediate matrix $\overline{\overline{U}}$, has a row for all states in $R$ or $S$ compartments and column
 for each variant. The form is as follows:
@@ -252,7 +252,7 @@ $$
   t_{i|e^*_1, 1} & \cdots & t_{i|e^*_1, V} \\
   t_{i|e^*_2, 1} & \cdots & t_{i|e^*_2, V} \\
   \vdots & \vdots &\vdots \\
-  t_{i|e^*_{A \cdot (V \cdot M + 1)}, 1} & \cdots & t_{i|e^*_{A \cdot (V \cdot M + 1)}, V} \\
+  t_{i|e^*_{D \cdot (V \cdot M + 1)}, 1} & \cdots & t_{i|e^*_{D \cdot (V \cdot M + 1)}, V} \\
 \end{bmatrix}
 $$
 
@@ -268,7 +268,7 @@ That is, we need to construct the matrix that accounts for the waning of immunit
 factors $\chi_{a\leftarrow b}$ (Variant $b$ infecting a person with immunity for variant $a$).
 
 All together, this is implemented via the immunity matrix (`immunity_matrix`) $\overline{\overline{\rho}}$ which is
-$A \cdot (V \cdot M + 1) \times V$ matrix on the form:
+$D \cdot (V \cdot M + 1) \times V$ matrix on the form:
 
 $$
 \overline{\overline{\rho}} = \begin{bmatrix}
@@ -299,7 +299,7 @@ $$
 \end{bmatrix}
 $$
 
-Where $\overline{1}_A$ is a ones vector of length $A$.
+Where $\overline{1}_A$ is a ones vector of length $D$.
 
 In $\overline{\overline{\rho}}$, the sub-matrices of the form:
 
@@ -311,9 +311,9 @@ $$
 \end{bmatrix}
 $$
 
-are $A \cdot M \times 1$ matrices with repeated sub-matrices.
+are $D \cdot M \times 1$ matrices with repeated sub-matrices.
 That is, $1 - \chi_{a\leftarrow b} (1 - \overline{\gamma})$ is a vector of length $M$ which is repeated
-for each age group, to form the $A \cdot M \times 1$ matrix.
+for each demographic group, to form the $D \cdot M \times 1$ matrix.
 
 In total, the matrix accounts for the cross-variant $\chi_{a\leftarrow b}$ reductions of immunity ($1-\overline{\gamma}$).
 
@@ -337,14 +337,14 @@ contacts between the corresponding compartment and the infected population in th
 every risk modifying mechanism included in the model.
 
 The row sums of this matrix is then equal to the loss from the compartment due to infectious contacts.
-The sums by variant/age group combination can also be extracted from the matrix to form the in-flow of new infections
+The sums by variant/demographic group combination can also be extracted from the matrix to form the in-flow of new infections
 to the $E_1$ compartments.
 
 
 # Generator matrix
 Beyond implementing the right-hand side of the ODE, we also implement the generator matrix for the model.
 
-The generator matrix, $\overline{\overline{G}}$, is a $A \cdot V \cdot (K+L) \times A \cdot V \cdot (K+L)$ matrix
+The generator matrix, $\overline{\overline{G}}$, is a $D \cdot V \cdot (K+L) \times D \cdot V \cdot (K+L)$ matrix
 containing the dynamics of the $E$ and $I$ states under the assumption of static $R$ and $S$ states.
 
 Formally, the generator matrix is the linearisation:
@@ -359,7 +359,7 @@ The matrix can be decomposed into two contributions:
   sequential compartments
 - The transmission matrix, $\overline{\overline{G}}_\beta$ which contains the flows stemming from infections.
 
-The transition matrix is block-diagonal and has the form (here for $K = 1$ and $L = 1$ and $A + V > 2)$:
+The transition matrix is block-diagonal and has the form (here for $K = 1$ and $L = 1$ and $D + V > 2)$:
 
 $$
 \overline{\overline{G}}_T =
@@ -407,7 +407,7 @@ $$
 \end{array}\right]
 $$
 
-Notice that the off-diagonal has zero-elements where the (reduced) state vector changes age groups
+Notice that the off-diagonal has zero-elements where the (reduced) state vector changes demographic groups
 ($I_i^L \rightarrow E_{i+1}^1$).
 
 The form of the transmission matrix is more difficult to write up.
@@ -417,7 +417,7 @@ a single factor $\beta$.
 
 Some examples:
 
-### Double age group, single variant
+### Two demographic groups, single variant
 
 As long as we have only a single variant, cross immunity can be ignored and we can lump the effect of the balance
 between $R$ to $S$ into $\beta$.
@@ -449,8 +449,8 @@ $$
 \end{bmatrix}
 $$
 
-### Single age group, double variant
-With only one age group, the contact matrix is the scalar $c$.
+### Single demographic group, double variant
+With only one demographic group, the contact matrix is the scalar $c$.
 
 With two variants, we need to also account for the relative infectivity of the variants $\epsilon_a$.
 
@@ -498,9 +498,9 @@ $$
 \right]
 $$
 
-### Double age group, double variant
+### Two demographic groups, double variant
 
-When including age groups, the $\hat{\rho}$ factor becomes a $A \times V$ matrix of elements
+When including demographic groups, the $\hat{\rho}$ factor becomes a $D \times V$ matrix of elements
 
 $$
 \hat{\rho}_{i, a} = S_i + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R^m_{i,b}
@@ -531,11 +531,11 @@ It is important that the implementation is somewhat optimised for the simulation
 To that end, we here show micro-benchmarks of different implementations of the same steps with the time consumption
 as output, to highlight why a given implementation was chosen.
 
-These benchmarks assume a simple SEIR model with only tree age groups and one variant.
+These benchmarks assume a simple SEIR model with only three demographic groups and one variant.
 
 ## "infected" sum computation
 ```{r, eval = rlang::is_installed("microbenchmark")}
-## Step 1, determine the number of infected by age group and variant
+## Step 1, determine the number of infected by demographic group and variant
 i_state_indices <- list(2, 5, 8)
 state_vector <- rep(0, 9)
 
