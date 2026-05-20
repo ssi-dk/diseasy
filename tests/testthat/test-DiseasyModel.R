@@ -8,43 +8,55 @@ test_that("initialize works with functional modules", {
   hash_new_instance <- m$hash
 
   # Check module instances can be loaded into new model instance
-  act <- DiseasyActivity$new()
-  s   <- DiseasySeason$new()
-  immunity <- DiseasyImmunity$new()
-  obs <- DiseasyObservables$new()
-  var <- DiseasyVariant$new()
+  population  <- DiseasyPopulation$new()
+  activity    <- DiseasyActivity$new()
+  season      <- DiseasySeason$new()
+  immunity    <- DiseasyImmunity$new()
+  observables <- DiseasyObservables$new()
+  variant     <- DiseasyVariant$new()
 
-  m_act_instance <- DiseasyModel$new(activity = act)
-  m_s_instance   <- DiseasyModel$new(season = s)
-  m_immunity_instance <- DiseasyModel$new(immunity = immunity)
-  m_obs_instance <- DiseasyModel$new(observables = obs)
-  m_var_instance <- DiseasyModel$new(variant = var)
+  m_population_instance  <- DiseasyModel$new(population = population)
+  m_activity_instance    <- DiseasyModel$new(activity = activity)
+  m_season_instance      <- DiseasyModel$new(season = season)
+  m_immunity_instance    <- DiseasyModel$new(immunity = immunity)
+  m_observables_instance <- DiseasyModel$new(observables = observables)
+  m_variant_instance     <- DiseasyModel$new(variant = variant)
 
   # Check the hash is unique for each module when created this way
-  modules <- list(m, m_act_instance, m_s_instance, m_immunity_instance, m_obs_instance, m_var_instance)
+  modules <- list(
+    m, m_population_instance, m_activity_instance,
+    m_season_instance, m_immunity_instance,
+    m_observables_instance, m_variant_instance
+  )
   expect_length(unique(purrr::map(modules, ~ .x$hash)), length(modules))
 
 
   # Check modules can be created during model instantiation
-  m_act_boolean <- DiseasyModel$new(activity = TRUE)
-  m_s_boolean   <- DiseasyModel$new(season = TRUE)
-  m_immunity_boolean <- DiseasyModel$new(immunity = TRUE)
-  m_obs_boolean <- DiseasyModel$new(observables = TRUE)
-  m_var_boolean <- DiseasyModel$new(variant = TRUE)
+  m_population_boolean  <- DiseasyModel$new(population = TRUE)
+  m_activity_boolean    <- DiseasyModel$new(activity = TRUE)
+  m_season_boolean      <- DiseasyModel$new(season = TRUE)
+  m_immunity_boolean    <- DiseasyModel$new(immunity = TRUE)
+  m_observables_boolean <- DiseasyModel$new(observables = TRUE)
+  m_variant_boolean     <- DiseasyModel$new(variant = TRUE)
 
   # Check the hash is the same when created this way
-  expect_identical(m_act_instance$hash, m_act_boolean$hash)
-  expect_identical(m_s_instance$hash,   m_s_boolean$hash)
-  expect_identical(m_immunity_instance$hash, m_immunity_boolean$hash)
-  expect_identical(m_obs_instance$hash, m_obs_boolean$hash)
-  expect_identical(m_var_instance$hash, m_var_boolean$hash)
+  expect_identical(m_population_instance$hash,  m_population_boolean$hash)
+  expect_identical(m_activity_instance$hash,    m_activity_boolean$hash)
+  expect_identical(m_season_instance$hash,      m_season_boolean$hash)
+  expect_identical(m_immunity_instance$hash,    m_immunity_boolean$hash)
+  expect_identical(m_observables_instance$hash, m_observables_boolean$hash)
+  expect_identical(m_variant_instance$hash,     m_variant_boolean$hash)
 
   # Check a label can be set
   m_label <- DiseasyModel$new(label = "test")
   expect_identical(m_label$hash, m$hash) # label should not change the hash
 
-  rm(m, m_act_instance, m_s_instance, m_immunity_instance, m_obs_instance)
-  rm(m_act_boolean, m_s_boolean, m_immunity_boolean, m_obs_boolean, m_var_boolean, m_label)
+  rm(
+    m, m_population_instance, m_activity_instance,
+    m_season_instance, m_immunity_instance, m_observables_instance,
+    m_population_boolean, m_activity_boolean, m_season_boolean,
+    m_immunity_boolean, m_observables_boolean, m_variant_boolean, m_label
+  )
 })
 
 
@@ -127,19 +139,19 @@ test_that("$load_module() works", {
 
   # We then create and load a observables module into the model module.
   # This should propagate the observables module to the season module.
-  obs <- DiseasyObservables$new()
-  m$load_module(obs)
+  observables <- DiseasyObservables$new()
+  m$load_module(observables)
   checkmate::expect_class(m %.% season, "DiseasySeason")
   checkmate::expect_class(m %.% season %.% observables, "DiseasyObservables")
   expect_identical(m %.% season %.% observables, m %.% observables) # Observables should be propagated to Season module
 
-  # We also check that a clone has been made, and that changes to obs after loading does not change m
-  expect_false(identical(m %.% observables, obs))
-  expect_identical(m %.% observables %.% hash, obs %.% hash)
-  obs$set_slice_ts(today())
+  # We also check that a clone has been made, and that changes to observables after loading does not change m
+  expect_false(identical(m %.% observables, observables))
+  expect_identical(m %.% observables %.% hash, observables %.% hash)
+  observables$set_slice_ts(today())
 
-  expect_false(identical(m %.% observables, obs))
-  expect_false(identical(m %.% observables %.% hash, obs %.% hash))
+  expect_false(identical(m %.% observables, observables))
+  expect_false(identical(m %.% observables %.% hash, observables %.% hash))
 
   rm(m)
 
@@ -149,8 +161,8 @@ test_that("$load_module() works", {
   checkmate::expect_class(m %.% observables, "DiseasyObservables")
   expect_null(m %.% season)
 
-  s <- DiseasySeason$new()
-  m$load_module(s)
+  season <- DiseasySeason$new()
+  m$load_module(season)
   checkmate::expect_class(m %.% season, "DiseasySeason")
   checkmate::expect_class(m %.% season %.% observables, "DiseasyObservables")
   expect_identical(m %.% season %.% observables, m %.% observables)
@@ -169,8 +181,8 @@ test_that("$hash works", {
   hash_new_instance <- m$hash
 
   # Load modules into the module
-  act <- DiseasyActivity$new()
-  act$set_activity_units(dk_activity_units)
+  activity <- DiseasyActivity$new()
+  activity$set_activity_units(dk_activity_units)
 
   scenario_1 <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
     dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",                         closing = NA) |>
@@ -178,33 +190,33 @@ test_that("$hash works", {
     dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020",                    closing = NA) |>
     dplyr::add_row(date = as.Date("2020-04-15"), opening = "secondary_education_phase_1_2020", closing = NA)
 
-  act$change_activity(scenario_1)
+  activity$change_activity(scenario_1)
 
-  s   <- DiseasySeason$new()
-  obs <- DiseasyObservables$new()
-  var <- DiseasyVariant$new()
+  season   <- DiseasySeason$new()
+  observables <- DiseasyObservables$new()
+  variant <- DiseasyVariant$new()
   immunity <- DiseasyImmunity$new()
 
   # Loading DiseasyActivity
-  m$load_module(act)
+  m$load_module(activity)
   hash_1 <- m$hash
   expect_false(hash_1 == hash_new_instance)
 
   # Loading DiseasySeason
-  m$load_module(s)
+  m$load_module(season)
   hash_2 <- m$hash
   expect_false(hash_2 == hash_new_instance)
   expect_false(hash_2 == hash_1)
 
   # Loading DiseasyObservables
-  m$load_module(obs)
+  m$load_module(observables)
   hash_3 <- m$hash
   expect_false(hash_3 == hash_new_instance)
   expect_false(hash_3 == hash_1)
   expect_false(hash_3 == hash_2)
 
   # Loading DiseasyVariant
-  m$load_module(var)
+  m$load_module(variant)
   hash_4 <- m$hash
   expect_false(hash_4 == hash_new_instance)
   expect_false(hash_4 == hash_1)
@@ -221,16 +233,16 @@ test_that("$hash works", {
   expect_false(hash_5 == hash_4)
 
   # Check reloading modules works
-  m$load_module(act)
+  m$load_module(activity)
   expect_identical(m$hash, hash_5)
 
-  m$load_module(s)
+  m$load_module(season)
   expect_identical(m$hash, hash_5)
 
-  m$load_module(obs)
+  m$load_module(observables)
   expect_identical(m$hash, hash_5)
 
-  m$load_module(var)
+  m$load_module(variant)
   expect_identical(m$hash, hash_5)
 
   m$load_module(immunity)
@@ -242,26 +254,26 @@ test_that("$hash works", {
   act_alt$change_activity(head(scenario_1, 3))
   m$load_module(act_alt)
   expect_false(m$hash == hash_5)
-  m$load_module(act) # Reset to original
+  m$load_module(activity) # Reset to original
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
   expect_identical(m$hash, hash_5)
   m$load_module(s_alt)
   expect_false(m$hash == hash_5)
-  m$load_module(s) # Reset to original
+  m$load_module(season) # Reset to original
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
   expect_identical(m$hash, hash_5)
   m$load_module(obs_alt)
   expect_false(m$hash == hash_5)
-  m$load_module(obs) # Reset to original
+  m$load_module(observables) # Reset to original
 
   var_alt <- DiseasyVariant$new()
   var_alt$add_variant(name = "WT")
   expect_identical(m$hash, hash_5)
   m$load_module(var_alt)
   expect_false(m$hash == hash_5)
-  m$load_module(var) # Reset to original
+  m$load_module(variant) # Reset to original
 
   immunity_alt <- DiseasyImmunity$new()
   immunity_alt$set_linear_waning()
@@ -270,7 +282,7 @@ test_that("$hash works", {
   expect_false(m$hash == hash_5)
   m$load_module(immunity) # Reset to original
 
-  rm(m, s, act, obs, var, immunity, s_alt, act_alt, obs_alt, var_alt, immunity_alt)
+  rm(m, season, activity, observables, variant, immunity, s_alt, act_alt, obs_alt, var_alt, immunity_alt)
 
 
   # Create a simple model that takes parameters
@@ -313,8 +325,8 @@ test_that("cloning works", {
   skip_if_not_installed("RSQLite")
 
   # Creating modules for the model module
-  act <- DiseasyActivity$new()
-  act$set_activity_units(dk_activity_units)
+  activity <- DiseasyActivity$new()
+  activity$set_activity_units(dk_activity_units)
 
   scenario_1 <- data.frame(date = as.Date(character(0)), opening = character(0), closing = character(0)) |>
     dplyr::add_row(date = as.Date("2020-01-01"), opening = "baseline",                            closing = NA) |>
@@ -322,17 +334,17 @@ test_that("cloning works", {
     dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020",                    closing = NA) |>
     dplyr::add_row(date = as.Date("2020-04-15"), opening = "secondary_education_phase_1_2020", closing = NA)
 
-  act$change_activity(scenario_1)
+  activity$change_activity(scenario_1)
 
-  s   <- DiseasySeason$new()
-  obs <- DiseasyObservables$new()
+  season   <- DiseasySeason$new()
+  observables <- DiseasyObservables$new()
 
 
 
   # Create instance of the DiseasyModel with the modules
-  m <- DiseasyModel$new(activity = act,
-                        season = s,
-                        observables = obs)
+  m <- DiseasyModel$new(activity = activity,
+                        season = season,
+                        observables = observables)
   hash_loaded <- m$hash
 
 
@@ -351,14 +363,14 @@ test_that("cloning works", {
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
-  m_c$load_module(act)
+  m_c$load_module(activity)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$load_module(s_alt)
   expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
-  m_c$load_module(s)
+  m_c$load_module(season)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$load_module(obs_alt)
   expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
@@ -367,7 +379,7 @@ test_that("cloning works", {
 
 
   # If we change the module inside of one, it should not change in the other
-  m_c$load_module(obs)
+  m_c$load_module(observables)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
 
 
@@ -375,25 +387,25 @@ test_that("cloning works", {
   m_c$activity$reset_scenario()
   expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
-  expect_false(act$hash == m_c$activity$hash) # module hashes should also be different
+  expect_false(activity$hash == m_c$activity$hash) # module hashes should also be different
 
   # - season
-  m_c$load_module(act)
+  m_c$load_module(activity)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$season$set_reference_date(as.Date("2020-03-01"))
   expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
-  expect_false(s$hash == m_c$season$hash) # module hashes should also be different
+  expect_false(season$hash == m_c$season$hash) # module hashes should also be different
 
   # - observables
-  m_c$load_module(s)
+  m_c$load_module(season)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$observables$set_last_queryable_date(as.Date("2020-03-01"))
   expect_identical(m$hash,  hash_loaded)   # Hash "202should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
-  expect_false(obs$hash == m_c$observables$hash) # module hashes should also be different
+  expect_false(observables$hash == m_c$observables$hash) # module hashes should also be different
 
-  rm(m, m_c, s, act, obs, s_alt, act_alt, obs_alt)
+  rm(m, m_c, season, activity, observables, s_alt, act_alt, obs_alt)
 })
 
 
@@ -415,18 +427,18 @@ test_that("$get_data() works", {
   skip_if_not_installed("RSQLite")
 
   # Use a random diseasystore for the tests
-  obs <- DiseasyObservables$new(diseasystore = case_defs[[1]])
+  observables <- DiseasyObservables$new(diseasystore = case_defs[[1]])
 
   # Set the last queryable date relative to the minimum start date
   last_queryable_offset <- 20
-  obs$set_last_queryable_date(obs %.% ds %.% min_start_date + lubridate::days(last_queryable_offset))
+  observables$set_last_queryable_date(observables %.% ds %.% min_start_date + lubridate::days(last_queryable_offset))
 
 
 
   # Test the returned data
 
   # -- Default parameters -- all available data is training data
-  m <- DiseasyModel$new(observables = obs)
+  m <- DiseasyModel$new(observables = observables)
   training_data <- m$get_data("n_positive")
 
   # The default argument for period is "training", but check that the data is the same
@@ -448,7 +460,7 @@ test_that("$get_data() works", {
 
   # -- Using a non-default training period
   m <- DiseasyModel$new(
-    observables = obs,
+    observables = observables,
     parameters = list("training_length" = c("training" = 10))
   )
   training_data <- m$get_data("n_positive", period = "training")
@@ -462,7 +474,7 @@ test_that("$get_data() works", {
 
   # -- Using a non-default training and testing period
   m <- DiseasyModel$new(
-    observables = obs,
+    observables = observables,
     parameters = list("training_length" = c("training" = 10, "testing" = 5))
   )
   training_data <- m$get_data("n_positive", period = "training")
@@ -481,7 +493,7 @@ test_that("$get_data() works", {
 
   # -- Using a non-default training, testing and validation period
   m <- DiseasyModel$new(
-    observables = obs,
+    observables = observables,
     parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
   )
   training_data <- m$get_data("n_positive", period = "training")
@@ -505,10 +517,10 @@ test_that("$get_data() works", {
 
 
   # -- Getting data for the plotting period
-  m <- DiseasyModel$new(observables = obs)
+  m <- DiseasyModel$new(observables = observables)
   plotting_data <- m$get_data("n_positive", period = "plotting", prediction_length = 10)
   expect_equal(min(plotting_data$date), m %.% training_period %.% start)                                                # nolint: expect_identical_linter
-  expect_equal(max(plotting_data$date), obs %.% last_queryable_date + lubridate::days(10))                              # nolint: expect_identical_linter
+  expect_equal(max(plotting_data$date), observables %.% last_queryable_date + lubridate::days(10))                              # nolint: expect_identical_linter
   expect_identical(min(plotting_data$t), -last_queryable_offset)
   expect_identical(max(plotting_data$t), 10)
   rm(m)
@@ -630,8 +642,8 @@ test_that("active binding: training_period, testing_period and validation_period
   rm(m)
 
   # Creating a module with an observables module without a `last_queryable_date`
-  obs <- DiseasyObservables$new("Google COVID-19", conn = DBI::dbConnect(RSQLite::SQLite()))
-  m <- DiseasyModel$new(observables = obs)
+  observables <- DiseasyObservables$new("Google COVID-19", conn = DBI::dbConnect(RSQLite::SQLite()))
+  m <- DiseasyModel$new(observables = observables)
   expect_error(m %.% training_period,   r"{`\$last_queryable_date` not configured in observables module!}")
   expect_error(m %.% testing_period,    r"{`\$last_queryable_date` not configured in observables module!}")
   expect_error(m %.% validation_period, r"{`\$last_queryable_date` not configured in observables module!}")
@@ -640,11 +652,11 @@ test_that("active binding: training_period, testing_period and validation_period
 
 
   # Creating a fully configured module
-  last_queryable_date <- obs %.% ds %.% min_start_date + lubridate::days(20)
-  obs$set_last_queryable_date(last_queryable_date)
+  last_queryable_date <- observables %.% ds %.% min_start_date + lubridate::days(20)
+  observables$set_last_queryable_date(last_queryable_date)
 
   # - with defaults
-  m <- DiseasyModel$new(observables = obs)
+  m <- DiseasyModel$new(observables = observables)
   expect_identical(
     m %.% training_period,
     list("start" = m %.% observables %.% ds %.% min_start_date, "end" = last_queryable_date)
@@ -654,7 +666,7 @@ test_that("active binding: training_period, testing_period and validation_period
   rm(m)
 
   # - with only training period
-  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10)))
+  m <- DiseasyModel$new(observables = observables, parameters = list("training_length" = c("training" = 10)))
   expect_identical(
     m %.% training_period,
     list("start" = last_queryable_date - 10 + 1, "end" = last_queryable_date)
@@ -667,7 +679,7 @@ test_that("active binding: training_period, testing_period and validation_period
 
 
   # - with training and testing periods
-  m <- DiseasyModel$new(observables = obs, parameters = list("training_length" = c("training" = 10, "testing" = 5)))
+  m <- DiseasyModel$new(observables = observables, parameters = list("training_length" = c("training" = 10, "testing" = 5)))
   expect_identical(
     m %.% training_period,
     list("start" = last_queryable_date - 10 - 5 + 1, "end" = last_queryable_date - 5)
@@ -685,7 +697,7 @@ test_that("active binding: training_period, testing_period and validation_period
 
   # - with training, testing and validation periods.
   m <- DiseasyModel$new(
-    observables = obs,
+    observables = observables,
     parameters = list("training_length" = c("training" = 10, "testing" = 5, "validation" = 2))
   )
   expect_identical(

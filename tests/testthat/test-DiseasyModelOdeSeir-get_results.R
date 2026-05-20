@@ -87,7 +87,7 @@ M <- 2L                                                                         
 
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
-  population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
+  population = DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60)),
   activity = activity,
   immunity = immunity,
   season = season,
@@ -181,7 +181,6 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
     observables = observables,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "age_cuts_lower" = 0,
       "overall_infection_risk" = overall_infection_risk,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
@@ -232,13 +231,13 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 30)),
     activity = activity,
     immunity = immunity,
     season = season,
     observables = observables,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "age_cuts_lower" = c(0, 30),
       "overall_infection_risk" = overall_infection_risk,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
