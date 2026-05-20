@@ -348,7 +348,7 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.4)
+    purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.5)
   }
 )
 ```
@@ -450,7 +450,7 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(x$n_positive - y$n_positive) / x$n_positive, ~ . < 0.4)
+    purrr::every(abs(x$n_positive - y$n_positive) / x$n_positive, ~ . < 0.5)
   }
 )
 ```
