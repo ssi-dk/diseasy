@@ -76,7 +76,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param observables,activity,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -114,6 +114,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
     initialize = function(
       observables = FALSE,
+      population = TRUE,
       activity = TRUE,
       season = TRUE,
       variant = TRUE,
@@ -125,6 +126,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Pass arguments to the DiseasyModel initialiser
       super$initialize(
         observables = observables,
+        population = population,
         activity = activity,
         season = season,
         variant = variant,
@@ -676,6 +678,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Generate the reduced model
       m_forcing <- DiseasyModelOdeSeir$new(
         observables = self %.% observables,
+        population = self %.% population,
         activity = self %.% activity,
         variant = self %.% variant,
         season = self %.% season,
@@ -1217,6 +1220,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
       reference_model <- DiseasyModelOdeSeir$new(
+        population = self %.% population,
         activity = self %.% activity,
         observables = self %.% observables,
         season = self %.% season,
@@ -1225,7 +1229,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           self %.% parameters,
           list(
             "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
-            "age_cuts_lower" = 0,
             "disease_progression_rates" = purrr::discard_at(
               self %.% parameters %.% disease_progression_rates,
               ~ . == "E"
