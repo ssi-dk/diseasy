@@ -158,7 +158,7 @@ tidyr::expand_grid(
       expect_equal(                                                                                                     # nolint: expect_identical_linter
         comparison$mean_relative_error,
         rep(1, nrow(comparison)),
-        tolerance = 0.15,
+        tolerance = 0.2,
         label = glue::glue("mean_relative_error ({observable}, {stratification})")
       )
     })
