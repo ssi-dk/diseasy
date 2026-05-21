@@ -28,6 +28,9 @@ See vignette("diseasy-population").
 
   rm(population)
 }
+\seealso{
+\link{DiseasyActivity}
+}
 \keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyPopulation}
@@ -36,6 +39,12 @@ See vignette("diseasy-population").
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
     \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
+
+    \item{\code{population_proportion}}{(\code{numeric()})\cr
+The distribution of individuals across the demography groups defined in the module.}
+
+    \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
+The local copy of an DiseasyActivity module. Read-only.}
   }
   \if{html}{\out{</div>}}
 }
@@ -44,6 +53,7 @@ See vignette("diseasy-population").
   \itemize{
     \item \href{#method-DiseasyPopulation-initialize}{\code{DiseasyPopulation$new()}}
     \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
+    \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
     \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
     \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
   }
@@ -93,6 +103,29 @@ See vignette("diseasy-population").
   }
   \subsection{Returns}{
     \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-per_capita_contact_matrices"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-per_capita_contact_matrices}{}}}
+\subsection{\code{DiseasyPopulation$per_capita_contact_matrices()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$per_capita_contact_matrices(weights = rep(1, 4))}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{list}(\code{matrix})\cr
+A \code{list} (with names indicating the dates of changes in contacts)
+of contact rates (\code{matrix}).
   }
 }
 
