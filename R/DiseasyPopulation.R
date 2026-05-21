@@ -49,6 +49,7 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @description
     #'   Sets the age stratification of the model population.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @return `r rd_side_effects`
     stratify_age = function(age_cuts_lower) {
 
       # Check the input is well-formed
@@ -79,6 +80,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       expr = return(private %.% .age_cuts_lower)
     )
   ),
+
 
   private = list(
     .age_cuts_lower = 0L
