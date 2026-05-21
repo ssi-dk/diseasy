@@ -302,14 +302,14 @@ The activity units active in the scenario.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done. The weights are normalized before applying.}
     }
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
     (\code{list()})\cr
-Returns a list with depth of two: value[\link{date}][\link{type}]
+Returns a list with depth of two: value[[date]][[type]]
   }
 }
 
@@ -326,13 +326,13 @@ Returns a list with depth of two: value[\link{date}][\link{type}]
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
     }
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    If no weights are supplied, a \code{list()} of depth of two: value[\link{date}][\link{type}] is returned.
+    If no weights are supplied, a \code{list()} of depth of two: value[[date]][[type]] is returned.
 Map population between age groups
   }
 }
@@ -350,7 +350,7 @@ Map population between age groups
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
     }
     \if{html}{\out{</div>}}
   }
@@ -423,7 +423,7 @@ NOTE: Called automatically when setting/changing activity units.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{numeric})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
       \item{\code{contacts_date}}{(\code{Date(1)})\cr
 The date to plot contact matrix for (default is earliest contact matrix).}

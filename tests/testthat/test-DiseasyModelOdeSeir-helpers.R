@@ -5,6 +5,11 @@ rI <- 1 / 4 # Overall disease progression rate from I to R                      
 
 test_that("helpers works (SR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   # This may seem a weird test case, but in some of the initialisation code, we run a model with
   # one less I states, and we need to ensure the index helpers still works in this case
@@ -17,7 +22,6 @@ test_that("helpers works (SR single variant / single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("I" = 0L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -63,6 +67,11 @@ test_that("helpers works (SR single variant / single age group)", {
 
 test_that("helpers works (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
@@ -72,7 +81,6 @@ test_that("helpers works (SIR single variant / single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("I" = rI)
     )
   )
@@ -117,6 +125,11 @@ test_that("helpers works (SIR single variant / single age group)", {
 
 test_that("helpers works (SIR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -124,6 +137,7 @@ test_that("helpers works (SIR double variant / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -132,7 +146,6 @@ test_that("helpers works (SIR double variant / double age group)", {
     variant = var,
     parameters = list(
       "compartment_structure" = c("I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 60),
       "disease_progression_rates" = c("I" = rI)
     )
   )
@@ -192,6 +205,11 @@ test_that("helpers works (SIR double variant / double age group)", {
 
 test_that("helpers works (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
@@ -201,7 +219,6 @@ test_that("helpers works (SEIR single variant / single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -246,6 +263,11 @@ test_that("helpers works (SEIR single variant / single age group)", {
 
 test_that("helpers works (SEEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -256,7 +278,6 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -307,6 +328,11 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
 
 test_that("helpers works (SEEIIRR double variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -322,7 +348,6 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -386,6 +411,11 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
 
 test_that("helpers works (SEEIIRR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -393,6 +423,7 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -401,7 +432,6 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = c(0, 60),
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -483,7 +513,6 @@ test_that("forcing functions can be configured as expected (SIR single variant /
     ),
     parameters = list(
       "compartment_structure" = c("I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("I" = rI)
     )
   )
