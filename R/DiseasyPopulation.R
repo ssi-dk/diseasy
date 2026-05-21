@@ -53,7 +53,11 @@ DiseasyPopulation <- R6::R6Class(                                               
     stratify_age = function(age_cuts_lower) {
 
       # Check the input is well-formed
-      checkmate::assert_integerish(age_cuts_lower, any.missing = FALSE, null.ok = FALSE, lower = 0, unique = TRUE)
+      checkmate::assert_integerish(
+        age_cuts_lower,
+        any.missing = FALSE, null.ok = FALSE,
+        lower = 0, unique = TRUE, sorted = TRUE
+      )
 
       # Store the age_cuts as integer
       private$.age_cuts_lower <- as.integer(age_cuts_lower)
