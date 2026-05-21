@@ -314,6 +314,7 @@ With all the configuration done above, we can now create our model instance.
 ```{r model creation, eval = rlang::is_installed("RSQLite")}
 model <- DiseasyModelOdeSeir$new(
   # Scenario configuration
+  population = population,
   activity = activity,
   immunity = immunity,
   season = season,
