@@ -255,16 +255,16 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
 test_that("RHS sanity check 2: Only infected (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rE, "I" = rI)
@@ -286,16 +286,16 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
     )
   )
 
-  rm(m, variant)
+  rm(m, var)
 
 })
 
 test_that("RHS sanity check 2: Only infected (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
@@ -303,7 +303,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rI, "I" = rI)
@@ -327,7 +327,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
     )
   )
 
-  rm(m, variant)
+  rm(m, var)
 
 })
 
@@ -335,16 +335,16 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
 test_that("RHS sanity check 3: Infected and susceptible (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rE, "I" = rI),
@@ -369,16 +369,16 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
     )
   )
 
-  rm(m, variant)
+  rm(m, var)
 
 })
 
 test_that("RHS sanity check 3: Infected and susceptible (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
@@ -386,7 +386,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
@@ -414,7 +414,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
     )
   )
 
-  rm(m, variant)
+  rm(m, var)
 
 })
 
@@ -422,16 +422,16 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
 test_that("RHS sanity check 4: Re-infections (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rE, "I" = rI),
@@ -460,15 +460,15 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
     )
   )
 
-  rm(m, variant)
+  rm(m, var)
 })
 
 test_that("RHS sanity check 4: Re-infections (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
@@ -476,7 +476,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
@@ -507,7 +507,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
     )
   )
 
-  rm(m, variant)
+  rm(m, var)
 
 })
 
@@ -525,9 +525,9 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   act$change_risk(Sys.Date(), type = "school", risk = 0.5)
   act$change_risk(Sys.Date(), type = "other",  risk = 0.5)
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     activity = act,
@@ -535,7 +535,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rE, "I" = rI),
@@ -561,7 +561,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
     )
   )
 
-  rm(m, act, variant)
+  rm(m, act, var)
 
 })
 
@@ -580,9 +580,9 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   act$change_risk(Sys.Date(), type = "school", risk = 0.5)
   act$change_risk(Sys.Date(), type = "other",  risk = 0.5)
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant("Variant 1")
-  variant$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
+  var <- DiseasyVariant$new()
+  var$add_variant("Variant 1")
+  var$add_variant("Variant 2", characteristics = list("relative_infection_risk" = fv))
 
   m <- DiseasyModelOdeSeir$new(
     activity = act,
@@ -591,7 +591,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
@@ -619,7 +619,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
     )
   )
 
-  rm(m, act, variant)
+  rm(m, act, var)
 
 })
 
@@ -627,12 +627,12 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
 test_that("RHS sanity check 6: Cross-immunity (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant(
+  var <- DiseasyVariant$new()
+  var$add_variant(
     name = "WT",
     characteristics = list("cross_immunity" = c("Mutant" = 0.5)) # WT-induced immunity is 50% effective against mutant
   )
-  variant$add_variant(
+  var$add_variant(
     name = "Mutant",
     characteristics = list("cross_immunity" = c("WT" = 0.75)) # Mutant-induced immunity is 75% effective against WT
   )
@@ -642,7 +642,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
@@ -684,12 +684,12 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
 test_that("RHS sanity check 6: Cross-immunity (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
 
-  variant <- DiseasyVariant$new()
-  variant$add_variant(
+  var <- DiseasyVariant$new()
+  var$add_variant(
     name = "WT",
     characteristics = list("cross_immunity" = c("Mutant" = 0.5)) # WT-induced immunity is 50% effective against mutant
   )
-  variant$add_variant(
+  var$add_variant(
     name = "Mutant",
     characteristics = list("cross_immunity" = c("WT" = 0.75)) # Mutant-induced immunity is 75% effective against WT
   )
@@ -700,7 +700,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    variant = variant,
+    variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
