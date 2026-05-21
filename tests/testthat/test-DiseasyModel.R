@@ -520,7 +520,7 @@ test_that("$get_data() works", {
   m <- DiseasyModel$new(observables = observables)
   plotting_data <- m$get_data("n_positive", period = "plotting", prediction_length = 10)
   expect_equal(min(plotting_data$date), m %.% training_period %.% start)                                                # nolint: expect_identical_linter
-  expect_equal(max(plotting_data$date), observables %.% last_queryable_date + lubridate::days(10))                              # nolint: expect_identical_linter
+  expect_equal(max(plotting_data$date), observables %.% last_queryable_date + lubridate::days(10))                      # nolint: expect_identical_linter
   expect_identical(min(plotting_data$t), -last_queryable_offset)
   expect_identical(max(plotting_data$t), 10)
   rm(m)
@@ -679,7 +679,10 @@ test_that("active binding: training_period, testing_period and validation_period
 
 
   # - with training and testing periods
-  m <- DiseasyModel$new(observables = observables, parameters = list("training_length" = c("training" = 10, "testing" = 5)))
+  m <- DiseasyModel$new(
+    observables = observables,
+    parameters = list("training_length" = c("training" = 10, "testing" = 5))
+  )
   expect_identical(
     m %.% training_period,
     list("start" = last_queryable_date - 10 - 5 + 1, "end" = last_queryable_date - 5)

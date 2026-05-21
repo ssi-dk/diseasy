@@ -329,13 +329,14 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   immunity$set_exponential_waning(time_scale = 180)
 
   # Add a season scenario
-  s <- DiseasySeason$new()
-  s$set_reference_date(as.Date("2020-01-20"))
-  s$use_cosine_season()
+  season <- DiseasySeason$new()
+  season$set_reference_date(as.Date("2020-01-20"))
+  season$use_cosine_season()
 
 
   # Create a SEIR model to initialise
   m <- DiseasyModelOdeSeir$new(
+    population = population,
     activity = activity,
     immunity = immunity,
     season = season,
