@@ -1,5 +1,11 @@
 test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`", {
-  skip_if_not_installed(c("RSQLite", "deSolve"))
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
