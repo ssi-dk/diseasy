@@ -68,8 +68,12 @@ combinations |>
       )
 
       # Generate a uniform initial state_vector that sums to 1
-      y0 <- c(rep(0, K + L + 1), 0.999)
-      y0[1] <- 0.001
+      n_age_groups <- length(age_cuts_lower)
+      y0 <- c(
+        rep(0, (K + L + 1) * n_age_groups),
+        rep(0.999 / n_age_groups, n_age_groups)
+      )
+      y0[((seq_len(n_age_groups)) - 1) * (K + L + 1) + 1] <- 0.001 / n_age_groups
 
       # Run solver across scenario change to check for long-term leakage
       sol <- deSolve::ode(
