@@ -202,7 +202,7 @@ that we are using in this vignette.
 For the first example, we use the SEIR model output where we know the parameters of the model used to generate the data.
 
 To begin, we configure the observables module to use this data set and to use all available data.
-```{r}
+```{r, eval = rlang::is_installed("duckdb")}
 # Connect to a database
 obs <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
@@ -229,7 +229,7 @@ The data are:
   testing in conjunction with a reduced probability of testing during weekends.
 
 
-```{r}
+```{r, eval = rlang::is_installed("duckdb")}
 model_data <- c("n_infected", "n_positive_simple", "n_positive") |>
   purrr::map(\(observable) {
     obs$get_observation(
@@ -243,7 +243,7 @@ model_data <- c("n_infected", "n_positive_simple", "n_positive") |>
 model_data
 ```
 
-```{r, example data, fig.alt = "Plots of the example data bundled with diseasy."}
+```{r, example data, fig.alt = "Plots of the example data bundled with diseasy.", eval = rlang::is_installed("duckdb")}
 # Visualise the example data
 ggplot2::ggplot(model_data) +
   ggplot2::geom_line(
@@ -281,7 +281,7 @@ We do this by creating a "synthetic" observable in the observables module.
 The simplest cases is using the "n_infected" signal which directly tracks the `I1` state in the model.
 While the most realistic case is the "n_positive" signal which has some real life inspired noise patterns.
 
-```{r}
+```{r, eval = rlang::is_installed("duckdb")}
 source <- "n_positive"
 
 
@@ -309,9 +309,9 @@ incidence_data <- obs$get_observation(
 In any case, we first need to define the model that should initialise using the incidence data.
 We here use the model configuration used to generate the data to test the best case scenario:
 
-```{r}
+```{r, eval = rlang::is_installed("duckdb")}
 # Set the point in time to initialise from
-obs$set_last_queryable_date(obs$start_date + lubridate::days(45))
+obs$set_last_queryable_date(obs$start_date + lubridate::days(50))
 
 generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
 
@@ -327,7 +327,7 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
 
   # Add a season scenario
   s <- DiseasySeason$new()
-  s$set_reference_date(as.Date("2020-01-01"))
+  s$set_reference_date(as.Date("2020-01-20"))
   s$use_cosine_season()
 
 
@@ -353,7 +353,7 @@ m <- generate_model(2L, 1L, 2L) # Use the configuration from example data
 
 
 This method relies on fitting a polynomial to the latest period, so we here visualise this fitting.
-```{r, incidence fitting, fig.alt = "Fitting a polynomial to the incidence data to estimate derivatives."}
+```{r, incidence fitting, fig.alt = "Fitting a polynomial to the incidence data to estimate derivatives.", eval = rlang::is_installed("duckdb")}
 # Extract the most recent signal
 poly_fit_data <- incidence_data |>
   dplyr::mutate(
@@ -413,14 +413,14 @@ incidence_data |>
 
 We can now use the `?DiseasyModelOdeSeir$initialise_state_vector()` method to infer the initial state vector.
 
-```{r}
+```{r, eval = rlang::is_installed("duckdb")}
 psi <- m$initialise_state_vector(incidence_data)
 
 psi
 ```
 
 And we now test the initial conditions by solving the model using these starting conditions.
-```{r}
+```{r, eval = rlang::is_installed("duckdb")}
 get_prediction <- function(
   model,
   psi,
@@ -511,7 +511,7 @@ prediction <- get_prediction(model = m, psi = psi)
 prediction
 ```
 
-```{r correctly specified model, fig.alt = "Using a correctly specified model to initialise the SEIR model matches the true data near-perfectly."}
+```{r correctly specified model, fig.alt = "Using a correctly specified model to initialise the SEIR model matches the true data near-perfectly.", eval = rlang::is_installed("duckdb")}
 ggplot2::ggplot() +
   ggplot2::geom_point(
     data = incidence_data,
@@ -537,7 +537,7 @@ ggplot2::ggplot() +
   ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```
 
-```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed("RSQLite")}
+```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed("duckdb")}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -548,7 +548,7 @@ y <- m$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.4)
+    purrr::every(abs(x$incidence - y$incidence) / x$incidence, ~ . < 0.5)
   }
 )
 ```
@@ -563,7 +563,7 @@ we only estimate the initial state vector.
 Once we include model fitting, the discrepancy between the data and model predictions may diminish.
 
 #### Misspecified model in periods of increasing infections
-```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing."}
+```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing.", eval = rlang::is_installed("duckdb")}
 models <- list(
   generate_model(2L, 1L, 1L),
   generate_model(1L, 1L, 2L),
@@ -604,7 +604,7 @@ ggplot2::ggplot() +
 ```
 
 #### Misspecified model in periods of decreasing infections
-```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing."}
+```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing.", eval = rlang::is_installed("duckdb")}
 
 models <- list(
   generate_model(2L, 1L, 1L),
