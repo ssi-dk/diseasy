@@ -608,7 +608,7 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
 
 
 test_that("`$approximate_compartmental()` works with custom controls", {
-  skip_if_not_installed("BB")
+  skip_if_not_installed("nloptr")
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
