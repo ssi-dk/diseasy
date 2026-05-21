@@ -75,9 +75,9 @@ DiseasyModelOde <- R6::R6Class(                                                 
         model_rates <- private %.% solve_ode(prediction_length = prediction_length)
 
         # .. get population data
-        population_data <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+        population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
           dplyr::mutate(
-            "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
+            "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower)[.data$age_group_out]
           ) |>
           dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
           dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
@@ -189,9 +189,9 @@ DiseasyModelOde <- R6::R6Class(                                                 
       )
 
       # .. get population data
-      population_data <- self %.% activity %.% map_population(self %.% parameters %.% age_cuts_lower) |>
+      population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
         dplyr::mutate(
-          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[.data$age_group_out]
+          "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower)[.data$age_group_out]
         ) |>
         dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
         dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
@@ -434,7 +434,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
       ## Age group
       # If age groups are defined in the model, check it is supported by the data
-      if (length(self %.% parameters %.% age_cuts_lower) > 1) {
+      if (length(self %.% population %.% age_cuts_lower) > 1) {
 
         # Can we map from the age groups in the data to the age groups in the model?
         # We use `checkmate::test_choice` because `%in%` randomly does not work in this case.
@@ -444,9 +444,9 @@ DiseasyModelOde <- R6::R6Class(                                                 
           age_group_stratification <- rlang::quos(
             "age_group" = cut(
               .data$age,
-              breaks = !!c(self %.% parameters %.% age_cuts_lower, Inf),
+              breaks = !!c(self %.% population %.% age_cuts_lower, Inf),
               right = FALSE,
-              labels = !!diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)
+              labels = !!diseasystore::age_labels(self %.% population %.% age_cuts_lower)
             )
           )
 
@@ -467,25 +467,25 @@ DiseasyModelOde <- R6::R6Class(                                                 
             as.numeric()
 
           # Assert that the model uses a subset of these stratifications
-          if (!checkmate::test_subset(self %.% parameters %.% age_cuts_lower, age_cuts_lower_data)) {
+          if (!checkmate::test_subset(self %.% population %.% age_cuts_lower, age_cuts_lower_data)) {
             stop(
               glue::glue(
                 "The age groups in the data ({toString(age_groups_in_data)}) cannot be mapped to the ",
-                "models age groups ({toString(diseasystore::age_labels(self %.% parameters %.% age_cuts_lower))})."
+                "models age groups ({toString(diseasystore::age_labels(self %.% population %.% age_cuts_lower))})."
               ),
               call. = FALSE
             )
           }
 
           # Map the age groups in the data to the model age groups
-          splits <- outer(age_cuts_lower_data, self %.% parameters %.% age_cuts_lower, FUN = ">=") |>
+          splits <- outer(age_cuts_lower_data, self %.% population %.% age_cuts_lower, FUN = ">=") |>
             apply(FUN = which, MARGIN = 1) |>
             purrr::map_dbl(~ tail(., 1))
 
           # We have to do janky evaluation to get the programatically generated expression
           age_groups_maps <- purrr::map2(
             age_groups_in_data,
-            diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)[splits],
+            diseasystore::age_labels(self %.% population %.% age_cuts_lower)[splits],
             \(from, to) glue::glue('"{from}" ~ "{to}"')
           ) |>
             purrr::reduce(~ paste(.x, .y, sep = ", "), .init = "age_group")

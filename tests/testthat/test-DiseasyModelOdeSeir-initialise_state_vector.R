@@ -23,7 +23,7 @@ immunity$set_exponential_waning(time_scale = 180)
 
 # Configure the season module
 season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-01"))
+season$set_reference_date(as.Date("2020-01-20"))
 season$use_cosine_season()
 
 # Configure a observables module for use in the tests
@@ -49,8 +49,8 @@ incidence_data <- obs$get_observation(
 )
 
 
-# Lock the observation data to a simulation start date (30 day period)
-obs$set_last_queryable_date(obs %.% ds %.% max_end_date - 30)
+# Lock the observation data to a simulation start date
+obs$set_last_queryable_date(obs %.% ds %.% min_start_date + 30)
 
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
@@ -79,7 +79,6 @@ tidyr::expand_grid(
         observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-          "age_cuts_lower" = 0,
           "disease_progression_rates" = c("E" = rE, "I" = rI),
           "overall_infection_risk" = overall_infection_risk
         )
@@ -99,7 +98,7 @@ tidyr::expand_grid(
       # Solve model, and get the incidence data to compare with the data
       sol <- deSolve::ode(
         y = y0 %.% initial_condition,
-        times = seq_along(seq(from = obs$last_queryable_date, obs$end_date, by = "1 day")) - 1,
+        times = seq_along(seq(from = obs$last_queryable_date, obs$last_queryable_date + 60, by = "1 day")) - 1,
         func = m %.% rhs
       )
 
@@ -107,7 +106,9 @@ tidyr::expand_grid(
 
       # Check that the initialisation works "well" - always within 10% of the true incidence
       true_incidence <- incidence_data |>
-        dplyr::filter(date >= obs$last_queryable_date) |>
+        dplyr::filter(
+          dplyr::between(.data$date, obs$last_queryable_date, obs$last_queryable_date + 60)
+        ) |>
         dplyr::pull("incidence")
 
       expect_equal(model_incidence, true_incidence, tolerance = 1e-1)                                                   # nolint: expect_identical_linter

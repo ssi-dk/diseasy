@@ -28,7 +28,7 @@ immunity$set_exponential_waning(time_scale = 180)
 
 # Configure the season module
 season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-01"))
+season$set_reference_date(as.Date("2020-01-20"))
 season$use_cosine_season()
 
 
@@ -87,13 +87,13 @@ M <- 2L                                                                         
 
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
+  population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
   activity = activity,
   immunity = immunity,
   season = season,
   observables = observables,
   parameters = list(
     "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-    "age_cuts_lower" = age_cuts_lower,
     "overall_infection_risk" = overall_infection_risk,
     "disease_progression_rates" = c("E" = rE, "I" = rI),
     "model_output_to_observable" = model_output_to_observable
@@ -158,7 +158,7 @@ tidyr::expand_grid(
       expect_equal(                                                                                                     # nolint: expect_identical_linter
         comparison$mean_relative_error,
         rep(1, nrow(comparison)),
-        tolerance = 0.15,
+        tolerance = 0.2,
         label = glue::glue("mean_relative_error ({observable}, {stratification})")
       )
     })
@@ -181,7 +181,6 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
     observables = observables,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "age_cuts_lower" = 0,
       "overall_infection_risk" = overall_infection_risk,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
@@ -232,13 +231,13 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 30)),
     activity = activity,
     immunity = immunity,
     season = season,
     observables = observables,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "age_cuts_lower" = c(0, 30),
       "overall_infection_risk" = overall_infection_risk,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )

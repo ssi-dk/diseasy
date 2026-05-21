@@ -10,7 +10,6 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = 0,
       "malthusian_matching" = FALSE
     )
   )
@@ -47,6 +46,7 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -54,7 +54,6 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = c(0, 60),
       "malthusian_matching" = FALSE
     )
   )
@@ -91,6 +90,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40, 80)),
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -98,7 +98,6 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = c(0, 40, 80),
       "malthusian_matching" = FALSE
     )
   )
@@ -156,7 +155,6 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = 0,
       "malthusian_matching" = FALSE
     )
   )
@@ -234,6 +232,9 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(
+      age_cuts_lower = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))
+    ),
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -241,7 +242,6 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}")),
       "malthusian_matching" = FALSE
     )
   )

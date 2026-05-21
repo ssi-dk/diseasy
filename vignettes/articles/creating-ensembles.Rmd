@@ -302,9 +302,6 @@ seir_ensemble <- combineasy(
       c("E" = 2L, "I" = 1L, "R" = 3L),
       c("E" = 2L, "I" = 3L, "R" = 3L)
     ),
-    "age_cuts_lower" = list(
-      c(0, 30, 60)
-    ),
     # Parameters
     "disease_progression_rates" = list(
       c("E" = 1 / 2.1, "I" = 1 / 4.5)
