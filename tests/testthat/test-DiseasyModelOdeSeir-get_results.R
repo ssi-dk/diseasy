@@ -5,8 +5,18 @@
 # We can therefore test that the initialisation works "well" and thereby guard ourselves against future,
 # unintended drops in performance.
 
-if (!rlang::is_installed("RSQLite")) {
-  return() # Skip these tests if RSQLite is not installed
+if (!all(rlang::is_installed(c("RSQLite", "dfoptim", "nloptr", "optimx", "subplex", "ucminf")))) {
+  # Skip these tests if dependencies are not installed
+  test_that("missing dependencies", {
+    skip_if_not_installed("RSQLite")
+    skip_if_not_installed("dfoptim")
+    skip_if_not_installed("nloptr")
+    skip_if_not_installed("optimx")
+    skip_if_not_installed("subplex")
+    skip_if_not_installed("ucminf")
+  })
+
+  return(NULL)
 }
 
 # We here use the parameters of the generating model

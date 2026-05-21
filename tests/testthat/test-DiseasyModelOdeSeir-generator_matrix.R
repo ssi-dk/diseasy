@@ -5,6 +5,11 @@ rI <- 1 / 4 # Overall disease progression rate from I to R                      
 
 test_that("$generator_matrix() (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
@@ -42,6 +47,11 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
 
 test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   # Define variant parameters
   e2 <- 1.5      # Variant 2 has higher relative infection risk
@@ -176,6 +186,11 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
 
 test_that("$generator_matrix() (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
@@ -212,6 +227,11 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
 
 test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
@@ -251,6 +271,11 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
 
 test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   # Define variant parameters
   e2 <- 1.5      # Variant 2 has higher relative infection risk
@@ -395,6 +420,11 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
 
 test_that("$generator_matrix() (SEIR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dfoptim")
+  skip_if_not_installed("nloptr")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("subplex")
+  skip_if_not_installed("ucminf")
 
   # Define variant parameters
   e2 <- 1.5      # Variant 2 has higher relative infection risk
