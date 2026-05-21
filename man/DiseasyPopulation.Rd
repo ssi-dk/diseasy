@@ -91,6 +91,9 @@ See vignette("diseasy-population").
     }
     \if{html}{\out{</div>}}
   }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
 \if{html}{\out{<hr>}}
