@@ -232,7 +232,9 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    population = DiseasyPopulation$new(age_cuts_lower = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))),
+    population = DiseasyPopulation$new(
+      age_cuts_lower = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))
+    ),
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
