@@ -43,7 +43,7 @@
 #'   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 #'
 #'   # The example stratifies the population into three age groups
-#'   population <- DiseasyPopulation(age_cuts_lower = c(0, 30, 60))
+#'   population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
 #'
 #'   # We create a simple model instance
 #'   m <- DiseasyModelOdeSeir$new(
