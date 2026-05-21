@@ -64,6 +64,29 @@ DiseasyPopulation <- R6::R6Class(                                               
     },
 
 
+    #' @description
+    #'
+    #' @param weights `r rd_activity_weights`
+    #' @return `list`(`matrix`)\cr
+    #'  A `list` (with names indicating the dates of changes in contacts)
+    #'  of contact rates (`matrix`).
+    per_capita_contact_matrices = function(weights = rep(1, 4)) {
+
+      checkmate::assert_numeric(weights, lower = 0, len = 4)
+
+      # Retrieve the time-varying contact matrices projected onto target age-groups
+      contact_matrices <- self %.% activity %.% get_scenario_contacts(
+        age_cuts_lower = self %.% age_cuts_lower,
+        weights = weights
+      )
+
+      # We then construct the normalised matrices
+      per_capita_contact_matrices <- contact_matrices |>
+        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
+
+      return(per_capita_contact_matrices)
+    },
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyPopulation ##########################################")
@@ -77,16 +100,52 @@ DiseasyPopulation <- R6::R6Class(                                               
 
 
   active = list(
+
     #' @field age_cuts_lower `r rd_age_cuts_lower("field")`
     age_cuts_lower = purrr::partial(
       .f = active_binding,
       name = "age_cuts_lower",
       expr = return(private %.% .age_cuts_lower)
+    ),
+
+
+    #' @field population_proportion (`numeric()`)\cr
+    #'   The distribution of individuals across the demography groups defined in the module.
+    population_proportion = function() {
+
+      if (length(self %.% activity %.% get_scenario_activities()) == 0) {
+
+        # If no scenario is defined then no contact matrix between age groups is provided and we
+        # assume an even distribution of contacts
+        population_proportion <- rep(1 / length(self %.% age_cuts_lower), length(self %.% age_cuts_lower))
+
+      } else {
+
+        population_proportion <- self %.% activity %.% map_population(self %.% age_cuts_lower) |>
+          dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
+          dplyr::pull("proportion")
+
+      }
+
+      return(population_proportion)
+    },
+
+
+    #' @field activity (`diseasy::DiseasyActivity`)\cr
+    #'   The local copy of an DiseasyActivity module. Read-only.
+    #' @seealso [diseasy::DiseasyActivity]
+    #' @importFrom diseasystore `%.%`
+    activity = purrr::partial(
+      .f = active_binding,
+      name = "activity",
+      expr = return(private %.% .DiseasyActivity)
     )
   ),
 
 
   private = list(
+    .DiseasyActivity = NULL,
+
     .age_cuts_lower = 0L
   )
 )
