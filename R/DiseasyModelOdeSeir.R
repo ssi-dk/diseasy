@@ -666,12 +666,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         immunity = self %.% immunity,
         parameters = modifyList(
           self %.% parameters,
-          list( # ... but since we can scale the overall_infection_risk to achieve the same effect.
+          list(
             "compartment_structure" = compartment_structure,
             "disease_progression_rates" = disease_progression_rates,
+            "malthusian_matching" = FALSE, # Since we have different disease_progression_rates, we cannot directly match
             "overall_infection_risk" = self %.% parameters %.% overall_infection_risk *
-              self %.% malthusian_scaling_factor,
-            "malthusian_matching" = FALSE # Since we have different disease_progression_rates, we cannot directly match
+              self %.% malthusian_scaling_factor  # ... but we can scale the overall_infection_risk instead.
           )
         )
       )
