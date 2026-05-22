@@ -2,22 +2,22 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="1110.948"
    height="386.06757"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="SEIR-implementation-model.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   sodipodi:docname="SEIR-implementation.svg"
    inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
    inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4">
     <marker
@@ -70,15 +70,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="1353.8993"
-     inkscape:cy="-24.308747"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="912.16775"
+     inkscape:cy="-97.984797"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="1912"
+     inkscape:window-height="1009"
+     inkscape:window-x="3832"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      showguides="true"
@@ -98,11 +98,13 @@
     <sodipodi:guide
        orientation="0,1"
        position="675.2402,374.5246"
-       id="guide3244" />
+       id="guide3244"
+       inkscape:locked="false" />
     <sodipodi:guide
        orientation="0,1"
        position="1608.3929,196.96429"
-       id="guide5357" />
+       id="guide5357"
+       inkscape:locked="false" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -112,7 +114,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -246,9 +248,8 @@
        id="text4521-6"
        y="2361.1667"
        x="-122.11835"
-       style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1"
        xml:space="preserve"
-       sodipodi:linespacing="0%"
        inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-model.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"><tspan
@@ -256,7 +257,7 @@
          x="-122.11835"
          id="tspan4523-1"
          sodipodi:role="line"
-         style="font-size:40px;line-height:1.25;stroke-width:1;font-family:sans-serif">S</tspan></text>
+         style="font-size:40px;line-height:1.25;font-family:sans-serif;stroke-width:1">S</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 369.35408,2343.9608 -439.285723,0"
@@ -273,9 +274,8 @@
        id="text5523-7"
        y="2242.8933"
        x="-298.01428"
-       style="font-size:4.94696999px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:sans-serif"
-       xml:space="preserve"
-       sodipodi:linespacing="0%"><tspan
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
          y="2242.8933"
          x="-298.01428"
          id="tspan5525-5"
@@ -288,9 +288,8 @@
        id="text5527-0"
        y="2466.1755"
        x="-300.74875"
-       style="font-size:4.94696999px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none;font-family:sans-serif"
-       xml:space="preserve"
-       sodipodi:linespacing="0%"><tspan
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
          y="2466.1755"
          x="-300.74875"
          id="tspan5529-8"
@@ -306,24 +305,22 @@
          id="text4186-6"
          y="2247.1462"
          x="-30.045588"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
-         xml:space="preserve"
-         sodipodi:linespacing="0%"><tspan
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         xml:space="preserve"><tspan
            style="font-size:40px;line-height:1.25;font-family:sans-serif"
            y="2247.1462"
            x="-30.045588"
            id="tspan4188-7"
            sodipodi:role="line">E<tspan
    id="tspan4190-3"
-   style="font-size:65.00091553%;baseline-shift:super;font-family:sans-serif">1</tspan></tspan></text>
+   style="font-size:65.0009%;font-family:sans-serif;baseline-shift:super">1</tspan></tspan></text>
       <text
-         sodipodi:linespacing="125%"
          id="text3321"
          y="2247.3918"
          x="-3.0980871"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
            y="2247.3918"
            x="-3.0980871"
            id="tspan3323"
@@ -337,30 +334,28 @@
        inkscape:export-ydpi="300">
       <text
          xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          x="-30.045588"
          y="2247.1462"
-         id="text4152"
-         sodipodi:linespacing="0%"><tspan
+         id="text4152"><tspan
            sodipodi:role="line"
            id="tspan4154"
            x="-30.045588"
            y="2247.1462"
            style="font-size:40px;line-height:1.25;font-family:sans-serif">E<tspan
-   style="font-size:65.00091553%;baseline-shift:super"
+   style="font-size:65.0009%;baseline-shift:super"
    id="tspan3233">K</tspan></tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
          x="-3.0980871"
          y="2247.3918"
-         id="text4158"
-         sodipodi:linespacing="125%"><tspan
+         id="text4158"><tspan
            sodipodi:role="line"
            id="tspan4160"
            x="-3.0980871"
            y="2247.3918"
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none">1</tspan></text>
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none">1</tspan></text>
     </g>
     <rect
        style="fill:#ececec;fill-opacity:1;stroke:#00b9bf;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -380,30 +375,28 @@
        inkscape:export-ydpi="300">
       <text
          xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          x="145.28944"
          y="2077.9458"
-         id="text4178"
-         sodipodi:linespacing="0%"><tspan
+         id="text4178"><tspan
            sodipodi:role="line"
            id="tspan4180"
            x="145.28944"
            y="2077.9458"
            style="font-size:40px;line-height:1.25;font-family:sans-serif">I<tspan
-   style="font-size:65.00091553%;baseline-shift:super"
+   style="font-size:65.0009%;baseline-shift:super"
    id="tspan3231">L</tspan></tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
          x="156.46921"
          y="2078.1914"
-         id="text4184"
-         sodipodi:linespacing="125%"><tspan
+         id="text4184"><tspan
            sodipodi:role="line"
            id="tspan4186"
            x="156.46921"
            y="2078.1914"
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none">1</tspan></text>
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none">1</tspan></text>
     </g>
     <g
        id="g4355"
@@ -412,27 +405,25 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <text
-         sodipodi:linespacing="0%"
          id="text4190"
          y="2079.4609"
          x="254.89099"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
            style="font-size:40px;line-height:1.25;font-family:sans-serif"
            y="2079.4609"
            x="254.89099"
            id="tspan4192"
            sodipodi:role="line">I<tspan
-   style="font-size:65.00091553%;baseline-shift:super"
+   style="font-size:65.0009%;baseline-shift:super"
    id="tspan4228">1</tspan></tspan></text>
       <text
-         sodipodi:linespacing="125%"
          id="text4196"
          y="2079.7065"
          x="266.09103"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
            y="2079.7065"
            x="266.09103"
            id="tspan4198"
@@ -455,27 +446,25 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <text
-         sodipodi:linespacing="0%"
          id="text4214"
          y="2079.9661"
          x="661.98248"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
            style="font-size:40px;line-height:1.25;font-family:sans-serif"
            y="2079.9661"
            x="661.98248"
            id="tspan4216"
            sodipodi:role="line">R<tspan
-   style="font-size:65.00091553%;baseline-shift:super"
+   style="font-size:65.0009%;baseline-shift:super"
    id="tspan3235">M</tspan></tspan></text>
       <text
-         sodipodi:linespacing="125%"
          id="text4220"
          y="2080.2117"
          x="690.92999"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
            y="2080.2117"
            x="690.92999"
            id="tspan4222"
@@ -507,11 +496,10 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <text
-         sodipodi:linespacing="0%"
          id="text4326"
          y="2082.8589"
          x="321.89175"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
            style="font-size:40px;line-height:1.25;font-family:sans-serif"
            y="2082.8589"
@@ -519,15 +507,14 @@
            id="tspan4328"
            sodipodi:role="line">R<tspan
    id="tspan4336"
-   style="font-size:65.00091553%;baseline-shift:super">1</tspan></tspan></text>
+   style="font-size:65.0009%;baseline-shift:super">1</tspan></tspan></text>
       <text
-         sodipodi:linespacing="125%"
          id="text4332"
          y="2083.1045"
          x="350.83926"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none"
            y="2083.1045"
            x="350.83926"
            id="tspan4334"
@@ -928,9 +915,8 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <text
-         sodipodi:linespacing="0%"
          xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          x="-30.045588"
          y="2247.1462"
          id="text3272"><tspan
@@ -939,20 +925,19 @@
            x="-30.045588"
            y="2247.1462"
            style="font-size:40px;line-height:1.25;font-family:sans-serif">E<tspan
-   style="font-size:65.00091553%;baseline-shift:super;font-family:sans-serif"
+   style="font-size:65.0009%;font-family:sans-serif;baseline-shift:super"
    id="tspan3276">1</tspan></tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none"
          x="-3.0980871"
          y="2247.3918"
-         id="text3278"
-         sodipodi:linespacing="125%"><tspan
+         id="text3278"><tspan
            sodipodi:role="line"
            id="tspan3280"
            x="-3.0980871"
            y="2247.3918"
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
     </g>
     <g
        transform="translate(188.76053,222.36146)"
@@ -961,11 +946,10 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <text
-         sodipodi:linespacing="0%"
          id="text3284"
          y="2247.1462"
          x="-30.045588"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
            style="font-size:40px;line-height:1.25;font-family:sans-serif"
            y="2247.1462"
@@ -973,15 +957,14 @@
            id="tspan3286"
            sodipodi:role="line">E<tspan
    id="tspan3288"
-   style="font-size:65.00091553%;baseline-shift:super">K</tspan></tspan></text>
+   style="font-size:65.0009%;baseline-shift:super">K</tspan></tspan></text>
       <text
-         sodipodi:linespacing="125%"
          id="text3290"
          y="2247.3918"
          x="-3.0980871"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none"
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none"
            y="2247.3918"
            x="-3.0980871"
            id="tspan3292"
@@ -1004,11 +987,10 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <text
-         sodipodi:linespacing="0%"
          id="text3298"
          y="2077.9458"
          x="145.28944"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
            style="font-size:40px;line-height:1.25;font-family:sans-serif"
            y="2077.9458"
@@ -1016,15 +998,14 @@
            id="tspan3300"
            sodipodi:role="line">I<tspan
    id="tspan3302"
-   style="font-size:65.00091553%;baseline-shift:super">L</tspan></tspan></text>
+   style="font-size:65.0009%;baseline-shift:super">L</tspan></tspan></text>
       <text
-         sodipodi:linespacing="125%"
          id="text3304"
          y="2078.1914"
          x="156.46921"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none"
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none"
            y="2078.1914"
            x="156.46921"
            id="tspan3306"
@@ -1038,30 +1019,28 @@
        inkscape:export-ydpi="300">
       <text
          xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          x="254.89099"
          y="2079.4609"
-         id="text3310"
-         sodipodi:linespacing="0%"><tspan
+         id="text3310"><tspan
            sodipodi:role="line"
            id="tspan3312"
            x="254.89099"
            y="2079.4609"
            style="font-size:40px;line-height:1.25;font-family:sans-serif">I<tspan
    id="tspan3314"
-   style="font-size:65.00091553%;baseline-shift:super">1</tspan></tspan></text>
+   style="font-size:65.0009%;baseline-shift:super">1</tspan></tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none"
          x="266.09103"
          y="2079.7065"
-         id="text3316"
-         sodipodi:linespacing="125%"><tspan
+         id="text3316"><tspan
            sodipodi:role="line"
            id="tspan3318"
            x="266.09103"
            y="2079.7065"
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
     </g>
     <rect
        y="2418.2131"
@@ -1081,30 +1060,28 @@
        inkscape:export-ydpi="300">
       <text
          xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          x="661.98248"
          y="2079.9661"
-         id="text3324"
-         sodipodi:linespacing="0%"><tspan
+         id="text3324"><tspan
            sodipodi:role="line"
            id="tspan3326"
            x="661.98248"
            y="2079.9661"
            style="font-size:40px;line-height:1.25;font-family:sans-serif">R<tspan
    id="tspan3328"
-   style="font-size:65.00091553%;baseline-shift:super">M</tspan></tspan></text>
+   style="font-size:65.0009%;baseline-shift:super">M</tspan></tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none"
          x="690.92999"
          y="2080.2117"
-         id="text3330"
-         sodipodi:linespacing="125%"><tspan
+         id="text3330"><tspan
            sodipodi:role="line"
            id="tspan3332"
            x="690.92999"
            y="2080.2117"
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
     </g>
     <rect
        y="2418.1917"
@@ -1124,30 +1101,28 @@
        inkscape:export-ydpi="300">
       <text
          xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          x="321.89175"
          y="2082.8589"
-         id="text3338"
-         sodipodi:linespacing="0%"><tspan
+         id="text3338"><tspan
            sodipodi:role="line"
            id="tspan3340"
            x="321.89175"
            y="2082.8589"
            style="font-size:40px;line-height:1.25;font-family:sans-serif">R<tspan
-   style="font-size:65.00091553%;baseline-shift:super"
+   style="font-size:65.0009%;baseline-shift:super"
    id="tspan3342">1</tspan></tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#219324;fill-opacity:1;stroke:none"
          x="350.83926"
          y="2083.1045"
-         id="text3344"
-         sodipodi:linespacing="125%"><tspan
+         id="text3344"><tspan
            sodipodi:role="line"
            id="tspan3346"
            x="350.83926"
            y="2083.1045"
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#219324;fill-opacity:1;stroke:none">2</tspan></text>
     </g>
     <g
        transform="translate(66.852677,496.32973)"
@@ -1469,9 +1444,8 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <text
-         sodipodi:linespacing="0%"
          xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          x="-30.045588"
          y="2247.1462"
          id="text4202"><tspan
@@ -1480,240 +1454,19 @@
            x="-30.045588"
            y="2247.1462"
            style="font-size:40px;line-height:1.25;font-family:sans-serif">E<tspan
-   style="font-size:65.00091553%;baseline-shift:super;font-family:sans-serif"
+   style="font-size:65.0009%;font-family:sans-serif;baseline-shift:super"
    id="tspan4206">1</tspan></tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none;font-family:Sans"
+         style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00b9bf;fill-opacity:1;stroke:none"
          x="-3.0980871"
          y="2247.3918"
-         id="text4208"
-         sodipodi:linespacing="125%"><tspan
+         id="text4208"><tspan
            sodipodi:role="line"
            id="tspan4210"
            x="-3.0980871"
            y="2247.3918"
-           style="font-size:65.00091553%;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none">1</tspan></text>
+           style="font-size:65.0009%;line-height:1.25;font-family:sans-serif;baseline-shift:sub;fill:#00b9bf;fill-opacity:1;stroke:none">1</tspan></text>
     </g>
-    <rect
-       y="2239.0037"
-       x="1288.5516"
-       height="76.266518"
-       width="76.266518"
-       id="rect4212"
-       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <text
-       sodipodi:linespacing="0%"
-       id="text4216"
-       y="2290.3201"
-       x="1296.8141"
-       style="font-size:12px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
-       xml:space="preserve"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"><tspan
-         style="font-size:40px;line-height:1.25;font-family:sans-serif"
-         y="2290.3201"
-         x="1296.8141"
-         id="tspan4218"
-         sodipodi:role="line">E<tspan
-   id="tspan4606"
-   style="font-size:65.00091553%;baseline-shift:super">2</tspan></tspan></text>
-    <text
-       sodipodi:linespacing="1000%"
-       id="text4222"
-       y="2290.5657"
-       x="1321.2565"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:1000%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"><tspan
-         style="font-size:65.00091553000000000%;letter-spacing:0px;baseline-shift:sub;fill:#000000;fill-opacity:1"
-         y="2290.5657"
-         x="1321.2565"
-         id="tspan4224"
-         sodipodi:role="line"
-         dx="0 -0.039999999 0.039999999"
-         dy="0 8.1400003"><tspan
-   style="line-height:1000%;letter-spacing:-2.62999999999999990px;fill:#000000;fill-opacity:1"
-   id="tspan5153"
-   dy="-8.1400003">1</tspan>,2</tspan></text>
-    <rect
-       y="2278.4561"
-       x="1323.1448"
-       height="22.388002"
-       width="10.266171"
-       id="rect4226"
-       style="fill:none;stroke:#b51412;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <text
-       sodipodi:linespacing="125%"
-       id="text4228"
-       y="2338.4263"
-       x="1277.3848"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#b51412;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"><tspan
-         style="font-size:22px;fill:#b51412;fill-opacity:1"
-         y="2338.4263"
-         x="1277.3848"
-         id="tspan4230"
-         sodipodi:role="line">age-index</tspan></text>
-    <g
-       id="g4803"
-       style="fill:#b51412;fill-opacity:1;stroke:none"
-       transform="translate(1.7474618,0)"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96">
-      <path
-         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#b51412;fill-opacity:1;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
-         d="m 1319.0312,2299.2188 c 0,0 -17.2636,7.0349 -16.7187,25.5624 l 1,-0.031 c -0.5265,-17.901 16.0937,-24.625 16.0937,-24.625 l -0.375,-0.9062 z"
-         id="path4232"
-         inkscape:connector-curvature="0" />
-      <path
-         inkscape:connector-curvature="0"
-         style="fill:#b51412;fill-opacity:1;fill-rule:evenodd;stroke:none"
-         d="m 1316.9002,2300.6375 -1.1016,2.605 5.735,-4.4844 -7.2385,0.7777 z"
-         id="path4809" />
-    </g>
-    <rect
-       style="fill:none;stroke:#da7b27;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect4811"
-       width="23.465811"
-       height="31.30719"
-       x="1298.6776"
-       y="2260.3142"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#da7b27;fill-opacity:1;stroke:none;font-family:Sans"
-       x="1189.6882"
-       y="2255.9016"
-       id="text4813"
-       sodipodi:linespacing="125%"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"><tspan
-         sodipodi:role="line"
-         id="tspan4815"
-         x="1189.6882"
-         y="2255.9016"
-         style="font-size:22px;fill:#da7b27;fill-opacity:1">state-type</tspan></text>
-    <g
-       id="g4827"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96">
-      <path
-         id="path4821"
-         d="m 1293.6118,2275.9073 -1.963,2.0362 6.9623,-2.1277 -7.0355,-1.8716 z"
-         style="fill:#da7b27;fill-opacity:1;fill-rule:evenodd;stroke:none"
-         inkscape:connector-curvature="0" />
-      <path
-         sodipodi:nodetypes="cc"
-         transform="translate(-300.57297,2109.4012)"
-         inkscape:connector-curvature="0"
-         id="path4825"
-         d="m 1571.0397,148.80799 c 0,11.99556 6.1872,17.55139 23.6123,17.67766"
-         style="fill:none;stroke:#da7b27;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    </g>
-    <rect
-       style="fill:none;stroke:#367f68;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect4831"
-       width="16.092466"
-       height="22.142868"
-       x="1339.6245"
-       y="2278.5786"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <g
-       id="g4839"
-       transform="matrix(-1,0,0,1,2654.9705,14.821429)"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96">
-      <path
-         inkscape:connector-curvature="0"
-         style="fill:#367f68;fill-opacity:1;fill-rule:evenodd;stroke:none"
-         d="m 1293.6118,2275.9073 -1.963,2.0362 6.9623,-2.1277 -7.0355,-1.8716 z"
-         id="path4841" />
-      <path
-         style="fill:none;stroke:#367f68;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 1571.0397,148.80799 c 0,11.99556 6.1872,17.55139 23.6123,17.67766"
-         id="path4843"
-         inkscape:connector-curvature="0"
-         transform="translate(-300.57297,2109.4012)"
-         sodipodi:nodetypes="cc" />
-    </g>
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#367f68;fill-opacity:1;stroke:none;font-family:Sans"
-       x="1366.9536"
-       y="2271.4263"
-       id="text5455"
-       sodipodi:linespacing="125%"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"><tspan
-         sodipodi:role="line"
-         id="tspan5457"
-         x="1366.9536"
-         y="2271.4263"
-         style="font-size:22px;fill:#367f68;fill-opacity:1">variant-index</tspan></text>
-    <rect
-       y="2254.293"
-       x="1323.1436"
-       height="22.142868"
-       width="16.092466"
-       id="rect5459"
-       style="fill:none;stroke:#8092c6;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <g
-       transform="matrix(-1,0,0,-1,2661.2952,4556.9322)"
-       style="fill:#8092c6;fill-opacity:1;stroke:none"
-       id="g5461"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96">
-      <path
-         inkscape:connector-curvature="0"
-         id="path5463"
-         d="m 1319.0312,2299.2188 c 0,0 -17.2636,7.0349 -16.7187,25.5624 l 1,-0.031 c -0.5265,-17.901 16.0937,-24.625 16.0937,-24.625 l -0.375,-0.9062 z"
-         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#8092c6;fill-opacity:1;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
-      <path
-         id="path5465"
-         d="m 1316.9002,2300.6375 -1.1016,2.605 5.735,-4.4844 -7.2385,0.7777 z"
-         style="fill:#8092c6;fill-opacity:1;fill-rule:evenodd;stroke:none"
-         inkscape:connector-curvature="0" />
-    </g>
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#b51412;fill-opacity:1;stroke:none;font-family:Sans"
-       x="1288.4562"
-       y="2230.9263"
-       id="text5467"
-       sodipodi:linespacing="125%"
-       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"><tspan
-         sodipodi:role="line"
-         id="tspan5469"
-         x="1288.4562"
-         y="2230.9263"
-         style="font-size:22px;fill:#8092c6;fill-opacity:1">state-index</tspan></text>
   </g>
 </svg>
