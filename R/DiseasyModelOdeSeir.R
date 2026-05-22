@@ -784,12 +784,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # to match the signal
 
           # loss_due_to_infections per demography group
-          loss_due_to_infections_per_demography_group <- loss_due_to_infections |>
+          loss_due_to_infections_per_group <- loss_due_to_infections |>
             split(private$rs_age_group) |>
             vapply(sum, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 
           # Match the RS entries of the state_vector
-          tmp <- loss_due_to_infections_per_demography_group[private$rs_age_group]
+          tmp <- loss_due_to_infections_per_group[private$rs_age_group]
 
           # Scale the loss to match the signal
           # We first add the original loss due to infections (= no flow out of the RS states due to infections),
