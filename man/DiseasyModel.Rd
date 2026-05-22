@@ -39,6 +39,8 @@ These functions define the "API" of the models and ensure the models can take pa
 
 \link{DiseasyObservables}
 
+\link{DiseasyPopulation}
+
 \link{DiseasyActivity}
 
 \link{DiseasyImmunity}
@@ -54,6 +56,9 @@ These functions define the "API" of the models and ensure the models can take pa
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
+    \item{\code{population}}{(\code{diseasy::DiseasyPopulation})\cr
+The local copy of a DiseasyPopulation module. Read-only.}
+
     \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
 The local copy of an DiseasyActivity module. Read-only.}
 
@@ -108,6 +113,7 @@ This module is typically not constructed directly but rather through \verb{Disea
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyModel$new(
   observables = FALSE,
+  population = FALSE,
   activity = FALSE,
   season = FALSE,
   variant = FALSE,
@@ -121,7 +127,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{observables, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{observables, population, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
       \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 

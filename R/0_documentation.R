@@ -194,10 +194,14 @@ rd_get_results_seealso <- "[diseasy::DiseasyObservables]"
 rd_side_effects <- "`NULL` (called for side effects)"
 
 
-rd_age_cuts_lower <- paste(
-  "(`numeric`)\\cr",
-  "vector of ages defining the lower bound for each age group. If `NULL`, age groups of contact_basis is used."
-)
+rd_age_cuts_lower <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`integer()`)\\cr",
+    "vector of ages defining the lower bound for each age group. If `NULL`, age groups of contact_basis is used.",
+    ifelse(type == "field", "Read only.", "")
+  )
+}
 
 rd_activity_weights <- paste(
   "(`numeric(4)`)\\cr",

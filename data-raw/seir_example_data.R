@@ -18,6 +18,12 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   M <- 2L                                                                                                               # nolint end
 
   # Build model
+
+  # Define the model population
+  population <- DiseasyPopulation$new()
+  population$stratify_age(age_cuts_lower = age_cuts_lower)
+
+  # Define the activity scenario
   activity <- DiseasyActivity$new()
   activity$set_contact_basis(contact_basis = contact_basis %.% DK)
   activity$set_activity_units(dk_activity_units)
@@ -43,9 +49,9 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     immunity = immunity,
     season = season,
     observables = observables,
+    population = population,
     parameters = list(
       "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "age_cuts_lower" = age_cuts_lower,
       "overall_infection_risk" = overall_infection_risk,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )

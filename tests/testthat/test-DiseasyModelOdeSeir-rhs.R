@@ -29,7 +29,6 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
     ),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -79,7 +78,6 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -116,7 +114,6 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -159,6 +156,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -166,7 +164,6 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     ),
     parameters = list(
       "compartment_structure" = c("E" = 2L, "I" = 2L, "R" = 2L),
-      "age_cuts_lower" = c(0, 60),
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -203,7 +200,6 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
     ),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -232,9 +228,9 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 40),
       "disease_progression_rates" = c("E" = rI, "I" = rI)
     )
   )
@@ -271,7 +267,6 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
@@ -307,10 +302,10 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 40),
       "disease_progression_rates" = c("E" = rI, "I" = rI)
     )
   )
@@ -352,7 +347,6 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -391,10 +385,10 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 40),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -440,7 +434,6 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -482,10 +475,10 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 40),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -545,7 +538,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rE, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -598,10 +590,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 40),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -653,7 +645,6 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = 0,
       "disease_progression_rates" = c("E" = rI, "I" = rI),
       "malthusian_matching" = FALSE
     )
@@ -708,10 +699,10 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
-      "age_cuts_lower" = c(0, 40),
       "disease_progression_rates" = c("E" = rI, "I" = rI),
       "malthusian_matching" = FALSE
     )

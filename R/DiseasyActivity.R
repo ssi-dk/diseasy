@@ -439,10 +439,10 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
-    #' @param age_cuts_lower `r rd_age_cuts_lower`
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
-    #'   Returns a list with depth of two: value[[date]][[type]]
+    #'   Returns a list with depth of two: value\[\[date\]\]\[\[type\]\]
     #' @importFrom pkgcond pkg_warning
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
@@ -527,11 +527,11 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     #' @description
     #'   Return contacts across age groups and activities on all dates.
-    #' @param age_cuts_lower `r rd_age_cuts_lower`
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param weights `r rd_activity_weights`
     #' @return
-    #'   If no weights are supplied, a `list()` of depth of two: value[[date]][[type]] is returned.
-    #    If weights are supplied, a `list()` of depth one: value[[date]] is returned
+    #'   If no weights are supplied, a `list()` of depth of two: value\[\[date\]\]\[\[type\]\] is returned.
+    #    If weights are supplied, a `list()` of depth one: value\[\[date\]\] is returned
     get_scenario_contacts = function(age_cuts_lower = NULL, weights = NULL) {
 
       # Input checks
@@ -637,7 +637,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'
     #' @description
     #'   The function computes the proportion of population in the new and old age groups.
-    #' @param age_cuts_lower `r rd_age_cuts_lower`
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @return
     #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
     #'   those supplied to the function.
@@ -713,7 +713,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     #' @description
     #'   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
-    #' @param age_cuts_lower `r rd_age_cuts_lower`
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param weights `r rd_activity_weights`
     #' @param contacts_date (`Date(1)`)\cr
     #'   The date to plot contact matrix for (default is earliest contact matrix).
@@ -1084,7 +1084,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     # Compute the population proportion matrix
     # @description
     #   The function provides the population proportion matrix `p` used to project age_groups.
-    # @param age_cuts_lower `r rd_age_cuts_lower`
+    # @param age_cuts_lower `r rd_age_cuts_lower()`
     population_transform_matrix = function(age_cuts_lower = NULL) {
 
       # Early return if no projection is requested
