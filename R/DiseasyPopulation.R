@@ -77,16 +77,66 @@ DiseasyPopulation <- R6::R6Class(                                               
 
 
   active = list(
+
+    #' @field groups (`named character()`)\cr
+    #'   The names of the demographic groups that have been configured in the module.
+    groups = function() {
+
+      groups <- c(
+        "age_group" = diseasystore::age_labels(self %.% age_cuts_lower)
+      )
+
+      # Sort by name
+      return(groups[order(names(groups))])
+    },
+
+
+    #' @field population (`tibble`)\cr
+    #'   The population groups and their sizes configured in the module.
+    population = function() {
+
+      tidyr::expand_grid(!!!self %.% groups) |>
+        dplyr::left_join(
+          self %.% activity %.% map_population(self %.% age_cuts_lower) |>
+            dplyr::summarise(
+              "proportion" = sum(.data$proportion),
+              "age_cuts_lower" = min(.data$age),
+              .by = "age_group_out"
+            ) |>
+            dplyr::transmute(
+              "population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population),
+              .data$proportion,
+              "age_group" = diseasystore::age_labels(.data$age_cuts_lower)
+            ),
+          by = "age_group"
+        )
+
+    },
+
+
     #' @field age_cuts_lower `r rd_age_cuts_lower("field")`
     age_cuts_lower = purrr::partial(
       .f = active_binding,
       name = "age_cuts_lower",
       expr = return(private %.% .age_cuts_lower)
+    ),
+
+
+    #' @field activity (`diseasy::DiseasyActivity`)\cr
+    #'   The local copy of an DiseasyActivity module. Read-only.
+    #' @seealso [diseasy::DiseasyActivity]
+    #' @importFrom diseasystore `%.%`
+    activity = purrr::partial(
+      .f = active_binding,
+      name = "activity",
+      expr = return(private %.% .DiseasyActivity)
     )
   ),
 
 
   private = list(
+    .DiseasyActivity = NULL,
+
     .age_cuts_lower = 0L
   )
 )

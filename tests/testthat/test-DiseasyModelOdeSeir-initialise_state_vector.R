@@ -32,22 +32,11 @@ obs <- DiseasyObservables$new(
   conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
-obs$set_study_period(
-  start_date = obs %.% ds %.% min_start_date,
-  end_date = obs %.% ds %.% max_end_date
-)
-
-
 # Get incidence data to infer initial state vector from
 obs$define_synthetic_observable(
   name = "incidence",
   mapping = \(n_infected, n_population) n_infected / n_population
 )
-
-incidence_data <- obs$get_observation(
-  observable = "incidence"
-)
-
 
 # Lock the observation data to a simulation start date
 obs$set_last_queryable_date(obs %.% ds %.% min_start_date + 30)
@@ -87,6 +76,14 @@ tidyr::expand_grid(
       # Get a reference to the private environment
       private <- m$.__enclos_env__$private
 
+      # Retrieve incidence data
+      incidence_data <- obs$get_observation(
+        observable = "incidence",
+        stratification = private$model_stratification(),
+        start_date = obs %.% ds %.% min_start_date,
+        end_date = obs %.% last_queryable_date
+      )
+
       # Estimate the initial state vector but suppress messages about negative states being set to zero
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
@@ -105,10 +102,13 @@ tidyr::expand_grid(
       model_incidence <- rI * rowSums(sol[, private$i1_state_indices + 1, drop = FALSE])
 
       # Check that the initialisation works "well" - always within 10% of the true incidence
-      true_incidence <- incidence_data |>
-        dplyr::filter(
-          dplyr::between(.data$date, obs$last_queryable_date, obs$last_queryable_date + 60)
-        ) |>
+      true_incidence <- obs$get_observation(
+        observable = "incidence",
+        stratification = private$model_stratification(),
+        start_date = obs %.% last_queryable_date,
+        end_date = obs %.% last_queryable_date + 60,
+        respect_last_queryable_date = FALSE
+      ) |>
         dplyr::pull("incidence")
 
       expect_equal(model_incidence, true_incidence, tolerance = 1e-1)                                                   # nolint: expect_identical_linter
