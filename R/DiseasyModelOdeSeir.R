@@ -487,7 +487,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       for (group in names(self %.% population %.% groups)) {
         checkmate::assert_set_equal(
           dplyr::pull(incidence_data, group),
-          self %.% population %.% groups[group],
+          self %.% population %.% groups[[group]],
           add = coll
         )
       }

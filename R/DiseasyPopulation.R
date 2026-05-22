@@ -82,7 +82,7 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   The names of the demographic groups that have been configured in the module.
     groups = function() {
 
-      groups <- c(
+      groups <- list(
         "age_group" = diseasystore::age_labels(self %.% age_cuts_lower)
       )
 
