@@ -1,3 +1,5 @@
+# auto-generate (keep this line to automatically re-generate during CI)
+
 if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # Generate synthetic disease data for testing from a simple SEIR model with some noise added
