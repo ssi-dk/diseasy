@@ -29,13 +29,13 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # Add a season scenario
   season <- DiseasySeason$new()
-  season$set_reference_date(as.Date("2020-01-01"))
+  season$set_reference_date(as.Date("2020-01-20"))
   season$use_cosine_season()
 
   # We need a dummy observables module
   observables <- DiseasyObservables$new(
     conn = DBI::dbConnect(RSQLite::SQLite()),
-    last_queryable_date = Sys.Date() - 1
+    last_queryable_date = as.Date("2020-01-20")
   )
 
   model <- DiseasyModelOdeSeir$new(
@@ -83,7 +83,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
 
   # Run solver across scenario change to check for long-term leakage
-  tt <- deSolve::ode(y = y0, times = seq(0, 250), func = model %.% rhs)
+  tt <- deSolve::ode(y = y0, times = seq(0, 500), func = model %.% rhs)
 
 
   # Extract the maximal test positive signal from the I1 states

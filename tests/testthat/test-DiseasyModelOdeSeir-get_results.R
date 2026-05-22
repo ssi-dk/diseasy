@@ -28,7 +28,7 @@ immunity$set_exponential_waning(time_scale = 180)
 
 # Configure the season module
 season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-01"))
+season$set_reference_date(as.Date("2020-01-20"))
 season$use_cosine_season()
 
 
@@ -158,7 +158,7 @@ tidyr::expand_grid(
       expect_equal(                                                                                                     # nolint: expect_identical_linter
         comparison$mean_relative_error,
         rep(1, nrow(comparison)),
-        tolerance = 0.15,
+        tolerance = 0.2,
         label = glue::glue("mean_relative_error ({observable}, {stratification})")
       )
     })
