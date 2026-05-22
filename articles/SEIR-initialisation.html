@@ -382,16 +382,16 @@ a reduced probability of testing during weekends.</li>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,500 × 6</span></span></span>
 <span><span class="co">#&gt;    date       age_group variant n_infected n_positive_simple n_positive</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 30-59     WT            64.2                37         41</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 30-59     WT           136.                 85         64</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 30-59     WT           179.                107         79</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 30-59     WT           203.                136        138</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 30-59     WT           221.                137        144</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 30-59     WT           239.                159        169</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 30-59     WT           257.                170        181</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 30-59     WT           278.                188        196</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 30-59     WT           301.                203        159</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 30-59     WT           325.                198        142</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            17.2                 7          7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            36.8                26         23</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            49.1                26         19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            57.4                34         39</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            64.4                47         47</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            71.6                44         47</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT            79.2                55         59</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT            87.3                61         64</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT            96.0                59         47</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           105.                 83         67</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,490 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualise the example data</span></span>
@@ -463,31 +463,34 @@ generate the data to test the best case scenario:</p>
 <span></span>
 <span><span class="va">generate_model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">K</span>, <span class="va">L</span>, <span class="va">M</span>, <span class="va">rE</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2.1</span>, <span class="va">rI</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4.5</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
+<span>  <span class="co"># Define the population for the model</span></span>
+<span>  <span class="va">population</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span>  <span class="co"># Define the activity for the scenario</span></span>
-<span>  <span class="va">act</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">act</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span>contact_basis <span class="op">=</span> <span class="va">contact_basis</span><span class="op">$</span><span class="va">DK</span><span class="op">)</span></span>
-<span>  <span class="va">act</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span><span class="va">dk_activity_units</span><span class="op">)</span></span>
-<span>  <span class="va">act</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span>date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1900-01-01"</span><span class="op">)</span>, opening <span class="op">=</span> <span class="st">"baseline"</span><span class="op">)</span></span>
+<span>  <span class="va">activity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">activity</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span>contact_basis <span class="op">=</span> <span class="va">contact_basis</span><span class="op">$</span><span class="va">DK</span><span class="op">)</span></span>
+<span>  <span class="va">activity</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span><span class="va">dk_activity_units</span><span class="op">)</span></span>
+<span>  <span class="va">activity</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span>date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1900-01-01"</span><span class="op">)</span>, opening <span class="op">=</span> <span class="st">"baseline"</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Add a waning immunity scenario</span></span>
-<span>  <span class="va">im</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">im</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span>
+<span>  <span class="va">immunity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">immunity</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># Add a season scenario</span></span>
-<span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">s</span><span class="op">$</span><span class="fu">set_reference_date</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-20"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">s</span><span class="op">$</span><span class="fu">use_cosine_season</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">season</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">season</span><span class="op">$</span><span class="fu">set_reference_date</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-20"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">season</span><span class="op">$</span><span class="fu">use_cosine_season</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span>  <span class="co"># Create a SEIR model to initialise</span></span>
 <span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyModelOdeSeir.html">DiseasyModelOdeSeir</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
-<span>    activity <span class="op">=</span> <span class="va">act</span>,</span>
-<span>    immunity <span class="op">=</span> <span class="va">im</span>,</span>
-<span>    season <span class="op">=</span> <span class="va">s</span>,</span>
+<span>    population <span class="op">=</span> <span class="va">population</span>,</span>
+<span>    activity <span class="op">=</span> <span class="va">activity</span>,</span>
+<span>    immunity <span class="op">=</span> <span class="va">immunity</span>,</span>
+<span>    season <span class="op">=</span> <span class="va">season</span>,</span>
 <span>    observables <span class="op">=</span> <span class="va">obs</span>,</span>
 <span>    parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      <span class="st">"compartment_structure"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="va">K</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="va">L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="va">M</span><span class="op">)</span>,</span>
-<span>      <span class="st">"age_cuts_lower"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span>,</span>
 <span>      <span class="st">"overall_infection_risk"</span> <span class="op">=</span> <span class="fl">0.025</span>,</span>
 <span>      <span class="st">"disease_progression_rates"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="va">rE</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="va">rI</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
@@ -633,11 +636,11 @@ these starting conditions.</p>
 <span></span>
 <span>    <span class="co"># Convert to incidence</span></span>
 <span>    <span class="va">proportion</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">activity</span><span class="op">$</span><span class="fu">map_population</span><span class="op">(</span></span>
-<span>      <span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">age_cuts_lower</span></span>
+<span>      <span class="va">model</span><span class="op">$</span><span class="va">population</span><span class="op">$</span><span class="va">age_cuts_lower</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>        <span class="st">"age_group"</span> <span class="op">=</span> <span class="fu">diseasystore</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/diseasystore/reference/age_labels.html">age_labels</a></span><span class="op">(</span></span>
-<span>          <span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">age_cuts_lower</span></span>
+<span>          <span class="va">model</span><span class="op">$</span><span class="va">population</span><span class="op">$</span><span class="va">age_cuts_lower</span></span>
 <span>        <span class="op">)</span><span class="op">[</span><span class="va">.data</span><span class="op">$</span><span class="va">age_group_out</span><span class="op">]</span></span>
 <span>      <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>

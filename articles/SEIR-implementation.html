@@ -103,8 +103,8 @@ model <code><a href="../reference/DiseasyModelOdeSeir.html">?DiseasyModelOdeSeir
 equation (ODE) model. Furthermore, the model is designed as flexible as
 possible to allow for a wide range of different model configurations.
 Meaning that the number of consecutive exposed, infected, and recovered
-states can be set arbitrarily, as well as the number of age groups and
-the number of variants.</p>
+states can be set arbitrarily, as well as the number of demographic
+groups (e.g. age groups or sex) and the number of variants.</p>
 <p>Due to the flexibility of the model, the implementation is somewhat
 complex, which is why we include this vignette outlining the
 mathematical implementation of the model and connect it to the code.</p>
@@ -141,8 +141,8 @@ accents used in the vignette:</p>
 <td>Recovered states</td>
 </tr>
 <tr class="even">
-<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>,</mo><mi>i</mi><mo>,</mo><mi>j</mi></mrow><annotation encoding="application/x-tex">A,i,j</annotation></semantics></math></td>
-<td>Age groups</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>,</mo><mi>i</mi><mo>,</mo><mi>j</mi></mrow><annotation encoding="application/x-tex">D,i,j</annotation></semantics></math></td>
+<td>Demographic groups</td>
 </tr>
 <tr class="odd">
 <td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">V,a,b</annotation></semantics></math></td>
@@ -162,16 +162,16 @@ case letters denote a specific element.</p>
 </h3>
 <p>The SEIR model we are building is a compartmental model with an
 (near) arbitrary number of exposed, infected, and recovered
-compartments. The model also supports multiple age groups and multiple
-variants.</p>
+compartments. The model also supports multiple demographic groups and
+multiple variants.</p>
 <p>We divide the model into different “tracks” with each track
 implementing the disease progression for a group of individuals. That
 is, if we have
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
-age groups and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>D</mi><annotation encoding="application/x-tex">D</annotation></semantics></math>
+demographic groups and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>V</mi><annotation encoding="application/x-tex">V</annotation></semantics></math>
 variants, we have
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>⋅</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">A \cdot V</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>⋅</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">D \cdot V</annotation></semantics></math>
 tracks which each start with the first exposed state (or the first
 infected state if no exposed states are included in the model). As the
 infection progresses within each individual, they are moved down the
@@ -184,8 +184,8 @@ SEIR model overview for a two variant model
 </p>
 </div>
 <p>This figure shows the disease progression for two variant tracks for
-a single age group. The arrows in the figure indicates the infections in
-the model within these tracks.</p>
+a single demographic group. The arrows in the figure indicates the
+infections in the model within these tracks.</p>
 </div>
 <div class="section level3">
 <h3 id="state-vector">State vector<a class="anchor" aria-label="anchor" href="#state-vector"></a>
@@ -193,21 +193,21 @@ the model within these tracks.</p>
 <p>Each “track” of infection is placed in a sequence in the state
 vector,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>ψ</mi><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\psi}</annotation></semantics></math>,
-and increments first in age groups then in variants.</p>
+and increments first in demographic groups then in variants.</p>
 <p>Finally, the susceptible states are placed at the end of the state
 vector.</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>ψ</mi><mo accent="true">¯</mo></mover><mo>=</mo><mo stretchy="false" form="prefix">[</mo><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Age group 1, Variant 1</mtext></munder></mrow><annotation encoding="application/x-tex">
-\overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Age group 1, Variant 1}}
-</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Age group 2, Variant 1</mtext></munder><mspace width="0.278em"></mspace><mi>⋯</mi></mrow><annotation encoding="application/x-tex">
-\underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Age group 2, Variant 1}}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>ψ</mi><mo accent="true">¯</mo></mover><mo>=</mo><mo stretchy="false" form="prefix">[</mo><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Demographic group 1, Variant 1</mtext></munder></mrow><annotation encoding="application/x-tex">
+\overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Demographic group 1, Variant 1}}
+</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Demographic group 2, Variant 1</mtext></munder><mspace width="0.278em"></mspace><mi>⋯</mi></mrow><annotation encoding="application/x-tex">
+\underbrace{\begin{matrix} E_{2,1}^1 \, \cdots \, E_{2,1}^K \;\;\; I_{2,1}^1 \, \cdots \, I_{2,1}^L \;\;\; R_{2,1}^1 \, \cdots \, R_{2,1}^M \end{matrix}}_{\text{Demographic group 2, Variant 1}}
 \; \cdots
-</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mi>A</mi><mo>,</mo><mi>V</mi></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mi>A</mi><mo>,</mo><mi>V</mi></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mi>A</mi><mo>,</mo><mi>V</mi></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mi>A</mi><mo>,</mo><mi>V</mi></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mi>A</mi><mo>,</mo><mi>V</mi></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mi>A</mi><mo>,</mo><mi>V</mi></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Age group A, Variant V</mtext></munder><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msub><mi>S</mi><mn>1</mn></msub><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msub><mi>S</mi><mi>A</mi></msub><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">
-\underbrace{\begin{matrix} E_{A,V}^1 \, \cdots \, E_{A,V}^K \;\;\; I_{A,V}^1 \, \cdots \, I_{A,V}^L \;\;\; R_{A,V}^1 \, \cdots \, R_{A,V}^M \end{matrix}}_{\text{Age group A, Variant V}}
+</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mi>D</mi><mo>,</mo><mi>V</mi></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mi>D</mi><mo>,</mo><mi>V</mi></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mi>D</mi><mo>,</mo><mi>V</mi></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mi>D</mi><mo>,</mo><mi>V</mi></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mi>D</mi><mo>,</mo><mi>V</mi></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mi>D</mi><mo>,</mo><mi>V</mi></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Demographic group D, Variant V</mtext></munder><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msub><mi>S</mi><mn>1</mn></msub><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msub><mi>S</mi><mi>A</mi></msub><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">
+\underbrace{\begin{matrix} E_{D,V}^1 \, \cdots \, E_{D,V}^K \;\;\; I_{D,V}^1 \, \cdots \, I_{D,V}^L \;\;\; R_{D,V}^1 \, \cdots \, R_{D,V}^M \end{matrix}}_{\text{Demographic group D, Variant V}}
 \;\; S_1 \, \cdots \, S_A]
 </annotation></semantics></math> NOTE: State vector uses normalised
 (unit) populations.</p>
 <p>Notice that the state vector elements are indexed by state-type,
-state-index, age-index and variant-index:</p>
+state-index, demography-index and variant-index:</p>
 <div class="figure" style="text-align: center">
 <img src="article_data/SEIR-implementation-index.png" class="r-plt" alt="Index guide for the state vector"><p class="caption">
 Index guide for the state vector
@@ -230,14 +230,14 @@ model can then be expressed as:
  - \left&lt;\textrm{clearing of infection}\right&gt;
 </annotation></semantics></math></p>
 <p>To compute the number of infectious contacts we need the number of
-contacts between infected individuals of any age group and individuals
-in the
+contacts between infected individuals of any demographic group and
+individuals in the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>’th
-age group. If
+demographic group. If
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>t</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>t</mi><mrow><mi>j</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{i,j} = t_{j,i}</annotation></semantics></math>
-is the (symmetric) number of contacts between age group
+is the (symmetric) number of contacts between demographic group
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-and age group
+and demographic group
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>,
 then
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><msub><mover><mi>I</mi><mo accent="true">̃</mo></mover><mi>j</mi></msub><msub><mi>t</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mi>/</mi><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">p \tilde{I}_j t_{i,j} / \tilde{N}_j</annotation></semantics></math>
@@ -245,14 +245,14 @@ is the number of infectious contacts from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-(infected individual of age group
+(infected individual of demographic group
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
-times mean number of contacts to age group
+times mean number of contacts to demographic group
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 with each contact carrying a risk of infection
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>).</p>
 <p>The probability that a contact is susceptible is simply its
-proportion relative to the age group leading to:</p>
+proportion relative to the demographic group leading to:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mover><mi>I</mi><mo accent="true">̃</mo></mover><mo accent="true">̇</mo></mover><mi>i</mi></msub><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>I</mi><mo accent="true">̃</mo></mover><mn>1</mn></msub><msub><mi>t</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow></msub><mi>/</mi><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mn>1</mn></msub><mo>+</mo><msub><mover><mi>I</mi><mo accent="true">̃</mo></mover><mn>2</mn></msub><msub><mi>t</mi><mrow><mi>i</mi><mo>,</mo><mn>2</mn></mrow></msub><mi>/</mi><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mn>2</mn></msub><mo>+</mo><mi>…</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mfrac><msub><mover><mi>S</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><msub><mover><mi>N</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub></mfrac><mo>−</mo><msub><mi>r</mi><mi>I</mi></msub><msub><mover><mi>I</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">
 \dot{\tilde{I}}_i = p\left(\tilde{I}_1 t_{i,1} / \tilde{N}_1 + \tilde{I}_2 t_{i,2} / \tilde{N}_2 + \dots\right) \cdot
 \frac{\tilde{S}_i}{\tilde{N}_i} - r_I \tilde{I}_i
@@ -318,19 +318,19 @@ stored as <code>infected</code> in the implementation.</p>
 <p>This
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>I</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{I}}</annotation></semantics></math>
 matrix is a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">A \times V</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">D \times V</annotation></semantics></math>
 matrix with elements</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>I</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>A</mi><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>A</mi><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>I</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>D</mi><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>D</mi><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \overline{\overline{I}} = \begin{bmatrix}
 \sum_l I^l_{1,1} &amp; \cdots &amp; \sum_l I^l_{1,V} \\
 \vdots &amp; \ddots &amp; \vdots \\
-\sum_l I^l_{A,1} &amp; \cdots &amp; \sum_l I^l_{A,V}
+\sum_l I^l_{D,1} &amp; \cdots &amp; \sum_l I^l_{D,V}
 \end{bmatrix}
 </annotation></semantics></math></p>
 <p>That is, the element
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>i</mi><mrow><mi>a</mi><mo>,</mo><mi>v</mi></mrow></msub><annotation encoding="application/x-tex">i_{a, v}</annotation></semantics></math>
 contains the sum of all infected compartments for the track associated
-with age group
+with demographic group
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
 and variant
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>.</p>
@@ -341,20 +341,20 @@ and variant
 <p>During the right-hand side computation, we also have a helper matrix
 <code>infected_contact_rate</code> which is
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>C</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mspace width="0.278em"></mspace><mover><mover><mi>I</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover></mrow><annotation encoding="application/x-tex">\overline{\overline{C}}\; \overline{\overline{I}}</annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mrow><mi>C</mi><mi>I</mi></mrow><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mover><mover><mi>C</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mspace width="0.278em"></mspace><mover><mover><mi>I</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mn>1</mn><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mn>1</mn><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mi>A</mi><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mi>A</mi><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mrow><mi>C</mi><mi>I</mi></mrow><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mover><mover><mi>C</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mspace width="0.278em"></mspace><mover><mover><mi>I</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mn>1</mn><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mn>1</mn><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mi>D</mi><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mn>1</mn></mrow><mi>l</mi></msubsup></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>c</mi><mrow><mi>D</mi><mo>←</mo><mi>i</mi></mrow></msub><munder><mo>∑</mo><mi>l</mi></munder><msubsup><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mi>V</mi></mrow><mi>l</mi></msubsup></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \overline{\overline{CI}} = \overline{\overline{C}}\; \overline{\overline{I}} = \begin{bmatrix}
 \sum_i c_{1\leftarrow i} \sum_l I^l_{i,1} &amp; \cdots &amp; \sum_i c_{1\leftarrow i} \sum_l I^l_{i,V} \\
 \vdots &amp; \ddots &amp; \vdots \\
-\sum_i c_{A\leftarrow i} \sum_l I^l_{i,1} &amp; \cdots &amp; \sum_i c_{A\leftarrow i} \sum_l I^l_{i,V}
+\sum_i c_{D\leftarrow i} \sum_l I^l_{i,1} &amp; \cdots &amp; \sum_i c_{D\leftarrow i} \sum_l I^l_{i,V}
 \end{bmatrix}
 </annotation></semantics></math></p>
 <p>That is, the element
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mover><mover><mrow><mi>C</mi><mi>I</mi></mrow><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><msub><mo stretchy="false" form="postfix">)</mo><mrow><mi>i</mi><mo>,</mo><mi>a</mi></mrow></msub></mrow><annotation encoding="application/x-tex">(\overline{\overline{CI}})_{i, a}</annotation></semantics></math>
-contains the rate of contact for age group
+contains the rate of contact for demographic group
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 with persons infected with variant
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
-across all age groups.</p>
+across all demographic groups.</p>
 </div>
 <div class="section level3">
 <h3 id="the-infection_rate-matrix">The <code>infection_rate</code> matrix<a class="anchor" aria-label="anchor" href="#the-infection_rate-matrix"></a>
@@ -386,7 +386,7 @@ Overall infection rate scaling factor</li>
 is the Hadamard product (element-wise multiplication), and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>ℰ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{\mathcal{E}}}</annotation></semantics></math>
 is the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">A \times V</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">D \times V</annotation></semantics></math>
 matrix:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>ℰ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ϵ</mi><mn>1</mn></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>ϵ</mi><mi>V</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>ϵ</mi><mn>1</mn></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>ϵ</mi><mi>V</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \overline{\overline{\mathcal{E}}} = \begin{bmatrix}
@@ -421,7 +421,7 @@ exposed states and the
 infected states, but only the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
 recovered states and the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>D</mi><annotation encoding="application/x-tex">D</annotation></semantics></math>
 susceptible states.</p>
 <p>We are therefore interested in the reduced state vector
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mover><mi>ψ</mi><mo accent="true">¯</mo></mover><mrow><mi>R</mi><mi>S</mi></mrow></msup><annotation encoding="application/x-tex">\overline{\psi}^{RS}</annotation></semantics></math>
@@ -438,15 +438,15 @@ elements of the full state vector
 by expanding the <code>infection_rate</code> matrix
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>T</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{T}}</annotation></semantics></math>)
 to a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">A \cdot (V \cdot M + 1) \times V</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">D \cdot (V \cdot M + 1) \times V</annotation></semantics></math>
 matrix by repeating the rows of the <code>infection_rate</code> matrix.
-This repeating is done by matching the age group of the
-<code>infection_rate</code> matrix to the age group of the reduced state
-vector. Each element,
+This repeating is done by matching the demographic group of the
+<code>infection_rate</code> matrix to the demographic group of the
+reduced state vector. Each element,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
 in the state vector,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math>
-has a corresponding age group which we can write as
+has a corresponding demographic group which we can write as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">i|e</annotation></semantics></math>.</p>
 <p>The intermediate matrix
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>U</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{U}}</annotation></semantics></math>,
@@ -455,12 +455,12 @@ has a row for all states in
 or
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
 compartments and column for each variant. The form is as follows:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>U</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>1</mn><mo>*</mo></msubsup><mo>,</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>1</mn><mo>*</mo></msubsup><mo>,</mo><mi>V</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>2</mn><mo>*</mo></msubsup><mo>,</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>2</mn><mo>*</mo></msubsup><mo>,</mo><mi>V</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mrow><mi>A</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mo>*</mo></msubsup><mo>,</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mrow><mi>A</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mo>*</mo></msubsup><mo>,</mo><mi>V</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>U</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>1</mn><mo>*</mo></msubsup><mo>,</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>1</mn><mo>*</mo></msubsup><mo>,</mo><mi>V</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>2</mn><mo>*</mo></msubsup><mo>,</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mn>2</mn><mo>*</mo></msubsup><mo>,</mo><mi>V</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mrow><mi>D</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mo>*</mo></msubsup><mo>,</mo><mn>1</mn></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mi>t</mi><mrow><mi>i</mi><mo stretchy="false" form="prefix">|</mo><msubsup><mi>e</mi><mrow><mi>D</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mo>*</mo></msubsup><mo>,</mo><mi>V</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \overline{\overline{U}} = \begin{bmatrix}
   t_{i|e^*_1, 1} &amp; \cdots &amp; t_{i|e^*_1, V} \\
   t_{i|e^*_2, 1} &amp; \cdots &amp; t_{i|e^*_2, V} \\
   \vdots &amp; \vdots &amp;\vdots \\
-  t_{i|e^*_{A \cdot (V \cdot M + 1)}, 1} &amp; \cdots &amp; t_{i|e^*_{A \cdot (V \cdot M + 1)}, V} \\
+  t_{i|e^*_{D \cdot (V \cdot M + 1)}, 1} &amp; \cdots &amp; t_{i|e^*_{D \cdot (V \cdot M + 1)}, V} \\
 \end{bmatrix}
 </annotation></semantics></math></p>
 <p>We now have a matrix, whose elements are the infection rate for each
@@ -488,7 +488,7 @@ infecting a person with immunity for variant
 (<code>immunity_matrix</code>)
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>ρ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{\rho}}</annotation></semantics></math>
 which is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">A \cdot (V \cdot M + 1) \times V</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>⋅</mo><mi>M</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">D \cdot (V \cdot M + 1) \times V</annotation></semantics></math>
 matrix on the form:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><mi>ρ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mn>1</mn><mo>←</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mn>1</mn><mo>←</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mn>1</mn><mo>←</mo><mi>V</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mn>1</mn><mo>←</mo><mi>V</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mi>V</mi><mo>←</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mi>V</mi><mo>←</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mi>V</mi><mo>←</mo><mi>V</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mi>V</mi><mo>←</mo><mi>V</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mover><mn>1</mn><mo accent="true">¯</mo></mover><mi>A</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><msub><mover><mn>1</mn><mo accent="true">¯</mo></mover><mi>A</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \overline{\overline{\rho}} = \begin{bmatrix}
@@ -521,7 +521,7 @@ matrix on the form:</p>
 <p>Where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mn>1</mn><mo accent="true">¯</mo></mover><mi>A</mi></msub><annotation encoding="application/x-tex">\overline{1}_A</annotation></semantics></math>
 is a ones vector of length
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>D</mi><annotation encoding="application/x-tex">D</annotation></semantics></math>.</p>
 <p>In
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>ρ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{\rho}}</annotation></semantics></math>,
 the sub-matrices of the form:</p>
@@ -533,13 +533,13 @@ the sub-matrices of the form:</p>
 \end{bmatrix}
 </annotation></semantics></math></p>
 <p>are
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>⋅</mo><mi>M</mi><mo>×</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">A \cdot M \times 1</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>⋅</mo><mi>M</mi><mo>×</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">D \cdot M \times 1</annotation></semantics></math>
 matrices with repeated sub-matrices. That is,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mi>a</mi><mo>←</mo><mi>b</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mover><mi>γ</mi><mo accent="true">¯</mo></mover><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">1 - \chi_{a\leftarrow b} (1 - \overline{\gamma})</annotation></semantics></math>
 is a vector of length
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
-which is repeated for each age group, to form the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>⋅</mo><mi>M</mi><mo>×</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">A \cdot M \times 1</annotation></semantics></math>
+which is repeated for each demographic group, to form the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>⋅</mo><mi>M</mi><mo>×</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">D \cdot M \times 1</annotation></semantics></math>
 matrix.</p>
 <p>In total, the matrix accounts for the cross-variant
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>χ</mi><mrow><mi>a</mi><mo>←</mo><mi>b</mi></mrow></msub><annotation encoding="application/x-tex">\chi_{a\leftarrow b}</annotation></semantics></math>
@@ -574,9 +574,9 @@ contacts between the corresponding compartment and the infected
 population in the model. These elements account for every risk modifying
 mechanism included in the model.</p>
 <p>The row sums of this matrix is then equal to the loss from the
-compartment due to infectious contacts. The sums by variant/age group
-combination can also be extracted from the matrix to form the in-flow of
-new infections to the
+compartment due to infectious contacts. The sums by variant/demographic
+group combination can also be extracted from the matrix to form the
+in-flow of new infections to the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mn>1</mn></msub><annotation encoding="application/x-tex">E_1</annotation></semantics></math>
 compartments.</p>
 </div>
@@ -589,7 +589,7 @@ the generator matrix for the model.</p>
 <p>The generator matrix,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>G</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{G}}</annotation></semantics></math>,
 is a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>⋅</mo><mi>V</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>K</mi><mo>+</mo><mi>L</mi><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mi>A</mi><mo>⋅</mo><mi>V</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>K</mi><mo>+</mo><mi>L</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">A \cdot V \cdot (K+L) \times A \cdot V \cdot (K+L)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>⋅</mo><mi>V</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>K</mi><mo>+</mo><mi>L</mi><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mi>D</mi><mo>⋅</mo><mi>V</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>K</mi><mo>+</mo><mi>L</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">D \cdot V \cdot (K+L) \times D \cdot V \cdot (K+L)</annotation></semantics></math>
 matrix containing the dynamics of the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>E</mi><annotation encoding="application/x-tex">E</annotation></semantics></math>
 and
@@ -618,7 +618,7 @@ which contains the flows stemming from infections.</li>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">L = 1</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>+</mo><mi>V</mi><mo>&gt;</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">A + V &gt; 2)</annotation></semantics></math>:</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>+</mo><mi>V</mi><mo>&gt;</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">D + V &gt; 2)</annotation></semantics></math>:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mover><mi>G</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mi>T</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>−</mi><msub><mi>r</mi><mi>e</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>r</mi><mi>e</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><msub><mi>r</mi><mi>i</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="center" style="text-align: center"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable></mtd><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>−</mi><msub><mi>r</mi><mi>e</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>r</mi><mi>e</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><msub><mi>r</mi><mi>i</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd><mtd columnalign="center" style="text-align: center"><mo>⋱</mo></mtd><mtd columnalign="center" style="text-align: center"><mi>⋮</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable></mtd><mtd columnalign="center" style="text-align: center"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable></mtd><mtd columnalign="center" style="text-align: center"><mi>⋯</mi></mtd><mtd columnalign="center" style="text-align: center"><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>−</mi><msub><mi>r</mi><mi>e</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>r</mi><mi>e</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><msub><mi>r</mi><mi>i</mi></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 \overline{\overline{G}}_T =
 \left[\begin{array}{cccc}
@@ -665,7 +665,7 @@ and
 \end{array}\right]
 </annotation></semantics></math></p>
 <p>Notice that the off-diagonal has zero-elements where the (reduced)
-state vector changes age groups
+state vector changes demographic groups
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>I</mi><mi>i</mi><mi>L</mi></msubsup><mo>→</mo><msubsup><mi>E</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow><mn>1</mn></msubsup></mrow><annotation encoding="application/x-tex">I_i^L \rightarrow E_{i+1}^1</annotation></semantics></math>).</p>
 <p>The form of the transmission matrix is more difficult to write
 up.</p>
@@ -677,7 +677,7 @@ into a single factor
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.</p>
 <p>Some examples:</p>
 <div class="section level4">
-<h4 id="double-age-group-single-variant">Double age group, single variant<a class="anchor" aria-label="anchor" href="#double-age-group-single-variant"></a>
+<h4 id="two-demographic-groups-single-variant">Two demographic groups, single variant<a class="anchor" aria-label="anchor" href="#two-demographic-groups-single-variant"></a>
 </h4>
 <p>As long as we have only a single variant, cross immunity can be
 ignored and we can lump the effect of the balance between
@@ -718,9 +718,9 @@ the transmission matrix is:</p>
 </annotation></semantics></math></p>
 </div>
 <div class="section level4">
-<h4 id="single-age-group-double-variant">Single age group, double variant<a class="anchor" aria-label="anchor" href="#single-age-group-double-variant"></a>
+<h4 id="single-demographic-group-double-variant">Single demographic group, double variant<a class="anchor" aria-label="anchor" href="#single-demographic-group-double-variant"></a>
 </h4>
-<p>With only one age group, the contact matrix is the scalar
+<p>With only one demographic group, the contact matrix is the scalar
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>.</p>
 <p>With two variants, we need to also account for the relative
 infectivity of the variants
@@ -783,12 +783,12 @@ the transmission matrix is:</p>
 </annotation></semantics></math></p>
 </div>
 <div class="section level4">
-<h4 id="double-age-group-double-variant">Double age group, double variant<a class="anchor" aria-label="anchor" href="#double-age-group-double-variant"></a>
+<h4 id="two-demographic-groups-double-variant">Two demographic groups, double variant<a class="anchor" aria-label="anchor" href="#two-demographic-groups-double-variant"></a>
 </h4>
-<p>When including age groups, the
+<p>When including demographic groups, the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>ρ</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{\rho}</annotation></semantics></math>
 factor becomes a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">A \times V</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>×</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">D \times V</annotation></semantics></math>
 matrix of elements</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>ρ</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mo>,</mo><mi>a</mi></mrow></msub><mo>=</mo><msub><mi>S</mi><mi>i</mi></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><mi>V</mi></munderover><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mn>1</mn></mrow><mi>M</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>χ</mi><mrow><mi>b</mi><mo>←</mo><mi>a</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>γ</mi><mi>m</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow><msubsup><mi>R</mi><mrow><mi>i</mi><mo>,</mo><mi>b</mi></mrow><mi>m</mi></msubsup></mrow><annotation encoding="application/x-tex">
 \hat{\rho}_{i, a} = S_i + \sum_{b = 1}^V\sum_{m=1}^M \left(1 - \chi_{b \leftarrow a}(1 - \gamma_m)\right) R^m_{i,b}
@@ -823,13 +823,13 @@ simulations to run in a reasonable time frame. To that end, we here show
 micro-benchmarks of different implementations of the same steps with the
 time consumption as output, to highlight why a given implementation was
 chosen.</p>
-<p>These benchmarks assume a simple SEIR model with only tree age groups
-and one variant.</p>
+<p>These benchmarks assume a simple SEIR model with only three
+demographic groups and one variant.</p>
 <div class="section level3">
 <h3 id="infected-sum-computation">“infected” sum computation<a class="anchor" aria-label="anchor" href="#infected-sum-computation"></a>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Step 1, determine the number of infected by age group and variant</span></span>
+<code class="sourceCode R"><span><span class="co">## Step 1, determine the number of infected by demographic group and variant</span></span>
 <span><span class="va">i_state_indices</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">8</span><span class="op">)</span></span>
 <span><span class="va">state_vector</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">9</span><span class="op">)</span></span>
 <span></span>
@@ -857,11 +857,11 @@ and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min     lq      mean median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 21.652 22.664 26.471972 23.094 23.7805 2615.203  1000</span></span>
-<span><span class="co">#&gt;              sapply 11.677 12.318 12.860508 12.579 12.9740   39.058  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 11.707 12.328 12.959333 12.609 12.9850   49.603  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.516  4.847  5.143618  4.988  5.1680   17.006  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min     lq      mean  median      uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 21.612 22.703 23.873569 23.1545 23.8505  132.487  1000</span></span>
+<span><span class="co">#&gt;              sapply 11.718 12.288 15.515680 12.5590 12.8890 2665.119  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES 11.658 12.329 13.064146 12.5990 12.9890   49.774  1000</span></span>
+<span><span class="co">#&gt;              vapply  4.607  4.898  5.165446  5.0575  5.2380   18.617  1000</span></span></code></pre></div>
 <p>Note, that the best performing function in this case is
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>.</p>
 </div>

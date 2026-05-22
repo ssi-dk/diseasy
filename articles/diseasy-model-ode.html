@@ -245,12 +245,28 @@ they should provide predictions for. This is done by setting the
 is to define the scenario. In this case, as we stated above, we can
 exactly match the scenario to the data since the data was created using
 this class of models.</p>
-<p>First we define the activity scenario via the
-<code><a href="../reference/DiseasyActivity.html">?DiseasyActivity</a></code> module. This scenario describes the
-changes in activity in the society (e.g. restrictions). To see more on
-how to configure this module, see
-<code>vignette("diseasy-activity")</code>.</p>
+<p>First we define the population to include in the model via the
+<code><a href="../reference/DiseasyPopulation.html">?DiseasyPopulation</a></code> module, and then we define the activity
+scenario via the <code><a href="../reference/DiseasyActivity.html">?DiseasyActivity</a></code> module, before finally
+defining the seasonality scenario via the <code><a href="../reference/DiseasySeason.html">?DiseasySeason</a></code>
+module.</p>
+<div class="section level3">
+<h3 id="model-population">Model population<a class="anchor" aria-label="anchor" href="#model-population"></a>
+</h3>
+<p>We here use a simple three age-group stratification of the population
+in the model.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Split the model population into three age groups</span></span>
+<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">population</span><span class="op">$</span><span class="fu">stratify_age</span><span class="op">(</span>age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="activity-scenario">Activity scenario<a class="anchor" aria-label="anchor" href="#activity-scenario"></a>
+</h3>
+<p>This scenario describes the changes in activity in the society
+(e.g. restrictions). To see more on how to configure this module, see
+<code>vignette("diseasy-activity")</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Configure an activity module using Danish population and contact information.</span></span>
 <span><span class="va">activity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">activity</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span>contact_basis <span class="op">=</span> <span class="va">contact_basis</span><span class="op">$</span><span class="va">DK</span><span class="op">)</span></span>
@@ -258,16 +274,20 @@ how to configure this module, see
 <span></span>
 <span><span class="co"># The level of activity is fixed to the "baseline" level throughout the simulation.</span></span>
 <span><span class="va">activity</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span>date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span>, opening <span class="op">=</span> <span class="st">"baseline"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="seasonality-scenario">Seasonality scenario<a class="anchor" aria-label="anchor" href="#seasonality-scenario"></a>
+</h3>
 <p>This particular scenario also include simple seasonality and waning
 immunity:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Waning immunity scenario</span></span>
 <span><span class="va">immunity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyImmunity.html">DiseasyImmunity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">immunity</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-t/time_scale)</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55b7471899e0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5637865add88&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "exponential_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -278,6 +298,7 @@ immunity:</p>
 <span><span class="va">season</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">season</span><span class="op">$</span><span class="fu">set_reference_date</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-20"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">season</span><span class="op">$</span><span class="fu">use_cosine_season</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="choosing-the-model-configuration">Choosing the model configuration<a class="anchor" aria-label="anchor" href="#choosing-the-model-configuration"></a>
@@ -295,9 +316,6 @@ of consecutive
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
 states in the model.</li>
-<li>
-<em>age_cuts_lower</em>: A vector of age cuts for the age groups in
-the model.</li>
 </ul>
 <p>The parameters are:</p>
 <ul>
@@ -316,10 +334,9 @@ to
 <em>overall_infection_risk</em>: The overall risk of infection in
 the population (the overall scaling of infectivity).</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Hyper parameters</span></span>
 <span><span class="va">compartment_structure</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">2L</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1L</span>, <span class="st">"R"</span> <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
-<span><span class="va">age_cuts_lower</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Parameters</span></span>
 <span><span class="va">disease_progression_rates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2.1</span>, <span class="st">"I"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">4.5</span><span class="op">)</span></span>
@@ -370,7 +387,7 @@ for the incidence which maps from the number of positive cases to the
 incidence. In many cases, testing data may not be reliable, and you may
 want to infer the incidence from other sources such as waste water data
 or admissions data.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Map observables to incidence</span></span>
 <span><span class="va">observables</span><span class="op">$</span><span class="fu">define_synthetic_observable</span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"incidence"</span>,</span>
@@ -404,7 +421,7 @@ weighted sum must be made.</p>
 positive cases and the number of hospital admissions. These are both
 counting observables and the default <em>reduce</em> function can be
 used.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Maps between the internal model incidence and observables</span></span>
 <span><span class="va">map_to_n_positive</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="st">"map"</span> <span class="op">=</span> \<span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span><span class="op">)</span> <span class="op">{</span></span>
@@ -444,9 +461,10 @@ used.</p>
 </h2>
 <p>With all the configuration done above, we can now create our model
 instance.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyModelOdeSeir.html">DiseasyModelOdeSeir</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  <span class="co"># Scenario configuration</span></span>
+<span>  population <span class="op">=</span> <span class="va">population</span>,</span>
 <span>  activity <span class="op">=</span> <span class="va">activity</span>,</span>
 <span>  immunity <span class="op">=</span> <span class="va">immunity</span>,</span>
 <span>  season <span class="op">=</span> <span class="va">season</span>,</span>
@@ -455,7 +473,6 @@ instance.</p>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="co"># Parameter and hyper-parameter configuration</span></span>
 <span>    <span class="st">"compartment_structure"</span> <span class="op">=</span> <span class="va">compartment_structure</span>,</span>
-<span>    <span class="st">"age_cuts_lower"</span> <span class="op">=</span> <span class="va">age_cuts_lower</span>,</span>
 <span>    <span class="st">"overall_infection_risk"</span> <span class="op">=</span> <span class="va">overall_infection_risk</span>,</span>
 <span>    <span class="st">"disease_progression_rates"</span> <span class="op">=</span> <span class="va">disease_progression_rates</span>,</span>
 <span></span>
@@ -469,7 +486,7 @@ instance.</p>
 </h2>
 <p>From this point, we can easily get predictions for the individual
 observables.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"incidence"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">5</span></span>
@@ -484,7 +501,7 @@ observables.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19   0.002<span style="text-decoration: underline;">57</span>              1      1</span></span></code></pre></div>
 <p>… and we can plot the predictions along with observations for the
 data</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"incidence"</span>,</span>
@@ -493,7 +510,7 @@ data</p>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="Model prediction for the number of incidence - stratified by age group." width="700"></p>
 <p>The results are easily stratified by the stratifications in the
 data</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"incidence"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -512,7 +529,7 @@ data</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+        0.001<span style="text-decoration: underline;">06</span>               1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+        0.001<span style="text-decoration: underline;">15</span>               1      1</span></span></code></pre></div>
 <p>… and we can see the plots for each strata.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"incidence"</span>,</span>
@@ -522,7 +539,7 @@ data</p>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="Model prediction for the number of incidence - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-5-2.png" class="r-plt" alt="Model prediction for the number of incidence - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-5-3.png" class="r-plt" alt="Model prediction for the number of incidence - stratified by age group." width="700"></p>
 <p>This can be done for all the observables we have mapped in the
 model.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"n_infected"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">5</span></span>
@@ -535,14 +552,14 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17     <span style="text-decoration: underline;">13</span>040.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-18     <span style="text-decoration: underline;">14</span>049.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19     <span style="text-decoration: underline;">15</span>080.              1      1</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"n_infected"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">60</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="Model prediction for the number of infected - stratified by age group." width="700"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"n_infected"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -560,7 +577,7 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-15 60+            <span style="text-decoration: underline;">1</span>461.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+            <span style="text-decoration: underline;">1</span>602.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+            <span style="text-decoration: underline;">1</span>740.              1      1</span></span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"n_infected"</span>,</span>
@@ -568,7 +585,7 @@ model.</p>
 <span>  stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">age_group</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="Model prediction for the number of infected - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-9-2.png" class="r-plt" alt="Model prediction for the number of infected - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-9-3.png" class="r-plt" alt="Model prediction for the number of infected - stratified by age group." width="700"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"n_positive"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">5</span></span>
@@ -581,14 +598,14 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17      <span style="text-decoration: underline;">8</span>476.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-18      <span style="text-decoration: underline;">9</span>132.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19      <span style="text-decoration: underline;">9</span>802.              1      1</span></span></code></pre></div>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"n_positive"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">60</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="Model prediction for the number of positive." width="700"></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"n_positive"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -606,7 +623,7 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-15 60+             950.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+            <span style="text-decoration: underline;">1</span>041.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+            <span style="text-decoration: underline;">1</span>131.              1      1</span></span></code></pre></div>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"n_positive"</span>,</span>
@@ -614,7 +631,7 @@ model.</p>
 <span>  stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">age_group</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="Model prediction for the number of positive - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-13-2.png" class="r-plt" alt="Model prediction for the number of positive - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-13-3.png" class="r-plt" alt="Model prediction for the number of positive - stratified by age group." width="700"></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"n_admission"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">5</span></span>
@@ -627,14 +644,14 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-02-17        182.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-02-18        192.              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-02-19        206.              1      1</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"n_admission"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">60</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="Model prediction for the number of hospital admissions." width="700"></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  observable <span class="op">=</span> <span class="st">"n_admission"</span>,</span>
 <span>  prediction_length <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -652,7 +669,7 @@ model.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> 2020-02-15 60+            118.                1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> 2020-02-16 60+            129.                1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> 2020-02-17 60+            137.                1      1</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  observable <span class="op">=</span> <span class="st">"n_admission"</span>,</span>

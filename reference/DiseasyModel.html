@@ -119,6 +119,7 @@ These functions define the "API" of the models and ensure the models can take pa
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><a href="https://s-fleck.github.io/lgr/reference/lgr-package.html" class="external-link">lgr</a></p>
 <p><a href="DiseasyObservables.html">DiseasyObservables</a></p>
+<p><a href="DiseasyPopulation.html">DiseasyPopulation</a></p>
 <p><a href="DiseasyActivity.html">DiseasyActivity</a></p>
 <p><a href="DiseasyImmunity.html">DiseasyImmunity</a></p>
 <p><a href="DiseasySeason.html">DiseasySeason</a></p>
@@ -130,7 +131,12 @@ These functions define the "API" of the models and ensure the models can take pa
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
-    <p></p><div class="r6-active-bindings"><dl><dt><code>activity</code></dt>
+    <p></p><div class="r6-active-bindings"><dl><dt><code>population</code></dt>
+<dd><p>(<code><a href="DiseasyPopulation.html">diseasy::DiseasyPopulation</a></code>)<br>
+The local copy of a DiseasyPopulation module. Read-only.</p></dd>
+
+
+    <dt><code>activity</code></dt>
 <dd><p>(<code><a href="DiseasyActivity.html">diseasy::DiseasyActivity</a></code>)<br>
 The local copy of an DiseasyActivity module. Read-only.</p></dd>
 
@@ -195,6 +201,7 @@ This module is typically not constructed directly but rather through <code>Disea
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyModel.html">DiseasyModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  observables <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  population <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  activity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  season <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  variant <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -205,7 +212,7 @@ This module is typically not constructed directly but rather through <code>Disea
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>observables, activity, season, variant, immunity</code></dt>
+<p></p><div class="arguments"><dl><dt><code>observables, population, activity, season, variant, immunity</code></dt>
 <dd><p>(<code>boolean</code> or <code>R6::R6Class instance</code>)<br> If a boolean is given, it dictates whether to load a new instance module of this class.<br> If an instance of the module is provided instead, a copy of this instance is added to the <code>DiseasyModel</code> instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to <code>DiseasyModel</code>.</p></dd>
 
       <dt><code>parameters</code></dt>
