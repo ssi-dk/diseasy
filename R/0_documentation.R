@@ -223,11 +223,11 @@ rd_initialise_state_vector_description <- paste(
 )
 
 rd_incidence_data <- paste(
-  "incidence_data (`data.frame`)\\cr",
+  "(`data.frame`)\\cr",
   "Incidence observations as a `data.frame` with columns",
   "- `date`: The date of the observations",
-  "- `age_group`: The age group of the incidence observation (following `diseasystore::age_labels()` format)",
-  "- `variant`: The variant of the incidence observation.",
+  "- `...`: Columns corresponding to the demographic groups configured in the scenario (see `$population$groups`).",
+  "- `variant`: The variant of the incidence observation (if configured in the scenario).",
   "- `incidence`: The incidence in the age group at the given date"
 )
 

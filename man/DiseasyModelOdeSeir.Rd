@@ -323,7 +323,7 @@ The Malthusian growth rate for the model.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{incidence_data}}{incidence_data (\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{age_group}: The age group of the incidence observation (following \code{diseasystore::age_labels()} format) - \code{variant}: The variant of the incidence observation. - \code{incidence}: The incidence in the age group at the given date}
+      \item{\code{incidence_data}}{(\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{...}: Columns corresponding to the demographic groups configured in the scenario (see \verb{$population$groups}). - \code{variant}: The variant of the incidence observation (if configured in the scenario). - \code{incidence}: The incidence in the age group at the given date}
       \item{\code{overall_infection_risk}}{(\code{numeric})\cr The overall multiplier for the infection risk for the model.}
       \item{\code{ei_rs_balance}}{(\code{numeric(1)})\cr
 Which estimate should be priorities when normalising? See details.}
