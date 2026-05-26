@@ -111,7 +111,7 @@
     },
     {
       "package": "clipr",
-      "version": "0.8.0",
+      "version": "0.8.1",
       "binary": true
     },
     {
@@ -721,7 +721,7 @@
     },
     {
       "package": "RSQLite",
-      "version": "3.52.0",
+      "version": "3.53.1",
       "binary": true
     },
     {
