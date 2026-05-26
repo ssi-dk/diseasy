@@ -1,5 +1,7 @@
 test_that("$hash works", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Create a observables module for the tests
   observables <- DiseasyObservables$new(

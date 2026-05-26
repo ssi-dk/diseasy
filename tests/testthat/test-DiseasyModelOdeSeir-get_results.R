@@ -5,14 +5,11 @@
 # We can therefore test that the initialisation works "well" and thereby guard ourselves against future,
 # unintended drops in performance.
 
-if (!all(rlang::is_installed(c("RSQLite", "dfoptim", "nloptr", "optimx", "subplex", "ucminf")))) {
+if (!all(rlang::is_installed(c("RSQLite", "optimx", "ucminf")))) {
   # Skip these tests if dependencies are not installed
   test_that("missing dependencies", {
     skip_if_not_installed("RSQLite")
-    skip_if_not_installed("dfoptim")
-    skip_if_not_installed("nloptr")
     skip_if_not_installed("optimx")
-    skip_if_not_installed("subplex")
     skip_if_not_installed("ucminf")
   })
 
@@ -132,6 +129,8 @@ tidyr::expand_grid(
 
     test_that(test_label, {
       skip_if_not_installed("RSQLite")
+      skip_if_not_installed("optimx")
+      skip_if_not_installed("ucminf")
 
       # Estimate the initial state vector but suppress messages about negative states being set to zero
       prediction_length <- 30
@@ -182,6 +181,8 @@ rm(model)
 # We should also be able to run the model with a no age groups
 test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: NULL)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
@@ -238,6 +239,8 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
 # We should also be able to run the model with sub sets of the data age groups groups
 test_that("$get_results() (SEEIR, subset age groups - n_infected - stratification: NULL)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(

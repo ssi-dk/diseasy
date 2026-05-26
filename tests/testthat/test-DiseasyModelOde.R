@@ -67,11 +67,6 @@ test_that("initialize works with custom mappings", {
 
 test_that("$hash works", {
   skip_if_not_installed("RSQLite")
-  skip_if_not_installed("dfoptim")
-  skip_if_not_installed("nloptr")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("subplex")
-  skip_if_not_installed("ucminf")
 
   # Identical model instances should have the same hash
   m1 <- DiseasyModelOde$new()
