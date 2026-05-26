@@ -116,6 +116,7 @@ The local copy of an DiseasyActivity module. Read-only.}
 \if{html}{\out{<a id="method-DiseasyPopulation-per_capita_contact_matrices"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-per_capita_contact_matrices}{}}}
 \subsection{\code{DiseasyPopulation$per_capita_contact_matrices()}}{
+  Compute the per-capita contact matrices. See vignette("diseasy-activity") for details.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyPopulation$per_capita_contact_matrices(weights = rep(1, 4))}

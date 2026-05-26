@@ -65,11 +65,11 @@ DiseasyPopulation <- R6::R6Class(                                               
 
 
     #' @description
-    #'
+    #'   Compute the per-capita contact matrices. See vignette("diseasy-activity") for details.
     #' @param weights `r rd_activity_weights`
     #' @return `list`(`matrix`)\cr
-    #'  A `list` (with names indicating the dates of changes in contacts)
-    #'  of contact rates (`matrix`).
+    #'   A `list` (with names indicating the dates of changes in contacts)
+    #'   of contact rates (`matrix`).
     per_capita_contact_matrices = function(weights = rep(1, 4)) {
 
       checkmate::assert_numeric(weights, lower = 0, len = 4)
