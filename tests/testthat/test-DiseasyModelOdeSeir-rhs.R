@@ -12,11 +12,6 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   skip_if_not_installed("optimx")
   skip_if_not_installed("subplex")
   skip_if_not_installed("ucminf")
-  skip_if_not_installed("dfoptim")
-  skip_if_not_installed("nloptr")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("subplex")
-  skip_if_not_installed("ucminf")
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
@@ -72,11 +67,6 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   skip_if_not_installed("optimx")
   skip_if_not_installed("subplex")
   skip_if_not_installed("ucminf")
-  skip_if_not_installed("dfoptim")
-  skip_if_not_installed("nloptr")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("subplex")
-  skip_if_not_installed("ucminf")
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
@@ -127,11 +117,6 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
 test_that("RHS does not leak and solution is non-negative (SEEIIRR double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
-  skip_if_not_installed("dfoptim")
-  skip_if_not_installed("nloptr")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("subplex")
-  skip_if_not_installed("ucminf")
   skip_if_not_installed("dfoptim")
   skip_if_not_installed("nloptr")
   skip_if_not_installed("optimx")
