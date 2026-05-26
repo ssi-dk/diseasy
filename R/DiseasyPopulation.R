@@ -137,14 +137,6 @@ DiseasyPopulation <- R6::R6Class(                                               
     },
 
 
-    #' @field age_cuts_lower `r rd_age_cuts_lower("field")`
-    age_cuts_lower = purrr::partial(
-      .f = active_binding,
-      name = "age_cuts_lower",
-      expr = return(private %.% .age_cuts_lower)
-    ),
-
-
     #' @field population_proportion (`numeric()`)\cr
     #'   The distribution of individuals across the demography groups defined in the module.
     population_proportion = function() {
@@ -165,6 +157,15 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       return(population_proportion)
     },
+
+
+
+    #' @field age_cuts_lower `r rd_age_cuts_lower("field")`
+    age_cuts_lower = purrr::partial(
+      .f = active_binding,
+      name = "age_cuts_lower",
+      expr = return(private %.% .age_cuts_lower)
+    ),
 
 
     #' @field activity (`diseasy::DiseasyActivity`)\cr
