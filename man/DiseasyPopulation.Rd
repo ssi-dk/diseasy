@@ -28,6 +28,9 @@ See vignette("diseasy-population").
 
   rm(population)
 }
+\seealso{
+\link{DiseasyActivity}
+}
 \keyword{functional-module}
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyPopulation}
@@ -35,7 +38,16 @@ See vignette("diseasy-population").
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
+    \item{\code{groups}}{(\verb{named character()})\cr
+The names of the demographic groups that have been configured in the module.}
+
+    \item{\code{population}}{(\code{tibble})\cr
+The population groups and their sizes configured in the module.}
+
     \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
+
+    \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
+The local copy of an DiseasyActivity module. Read-only.}
   }
   \if{html}{\out{</div>}}
 }

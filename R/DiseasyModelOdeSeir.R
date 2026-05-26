@@ -469,14 +469,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_data_frame(incidence_data, add = coll)
       checkmate::assert_names(
         colnames(incidence_data),
-        must.include = c("date", "incidence"),
+        must.include = c("date", "incidence", names(self %.% population %.% groups)),
         add = coll
       )
 
-      # Add defaults for missing age_group and variant columns
-      if (!"age_group" %in% colnames(incidence_data)) {
-        incidence_data <- dplyr::mutate(incidence_data, "age_group" = "0+")
-      }
+      # Add defaults for missing variant column
       if (!"variant" %in% colnames(incidence_data)) {
         incidence_data <- incidence_data |>
           dplyr::mutate(
@@ -485,13 +482,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
 
-      # Check age_group column
-      checkmate::assert_character(
-        incidence_data$age_group,
-        any.missing = FALSE,
-        pattern = paste(diseasystore::age_labels(self %.% population %.% age_cuts_lower), collapse = "|"),
-        add = coll
-      )
+      # Check demography columns
+      # (Input data must include the stratifications in the model)
+      for (group in names(self %.% population %.% groups)) {
+        checkmate::assert_set_equal(
+          dplyr::pull(incidence_data, group),
+          self %.% population %.% groups[[group]],
+          add = coll
+        )
+      }
+
 
       # Check variant column
       if (length(unique(incidence_data$variant)) > 1) {
@@ -520,31 +520,50 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::reportAssertions(coll)
 
       # Rescale to the number of infections relative to the full population
-      proportion <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-        dplyr::mutate(
-          "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower)[.data$age_group_out]
+      incidence_data <- incidence_data |>
+        dplyr::left_join(
+          self %.% population %.% population,
+          by = names(self %.% population %.% groups)
         ) |>
-        dplyr::summarise(
-          "proportion" = sum(.data$proportion),
-          .by = "age_group"
+        dplyr::mutate("incidence" = .data$incidence * .data$proportion) |>
+        dplyr::select(c(colnames(incidence_data), "incidence"))
+
+      # Ensure we have complete information
+      missing_data <- incidence_data |>
+        dplyr::filter(
+          dplyr::if_any(
+            .cols = dplyr::everything(),
+            .fns = is.na
+          )
         )
 
-      incidence_data <- incidence_data |>
-        dplyr::left_join(proportion, by = "age_group") |>
-        dplyr::mutate("incidence" = .data$incidence * .data$proportion) |>
-        dplyr::select(!"proportion")
+      if (nrow(missing_data) > 0) {
+        groups_w_missing_data <- missing_data |>
+          dplyr::select(c(names(self %.% population %.% groups), "variant")) |>
+          dplyr::distinct() |>
+          dplyr::rowwise() |>
+          dplyr::group_map(~ unlist(as.vector(.x[1, ]))) |>
+          purrr::map(~ paste(names(.x), .x, collapse = " / ", sep = " = ")) |>
+          toString()
+
+        pkgcond::pkg_error(
+          glue::glue(
+            "Missing `incidence_data` or `population_proportion` for {groups_w_missing_data}!"
+          )
+        )
+      }
 
       # We first compute the time relative to the training period end date
       incidence_data <- incidence_data |>
         dplyr::mutate("t" = as.numeric(.data$date - self %.% training_period %.% end, units = "days")) |>
         dplyr::filter(.data$t <= 0)
 
-      # Now we need to fit the polynomials to each age-group / variant in the model, so we group by these
+      # Now we need to fit the polynomials to each demography-group / variant in the model, so we group by these
       # and extract the subsets.
       # We also need to ensure the variants are ordered as the state vector is
       incidence_subsets <- incidence_data |>
-        dplyr::arrange(.data$variant, .data$age_group) |>
-        dplyr::group_by(.data$variant, .data$age_group) |>
+        dplyr::arrange(dplyr::across(.cols = c("variant", names(self %.% population %.% groups)))) |>
+        dplyr::group_by(dplyr::across(.cols = c("variant", names(self %.% population %.% groups)))) |>
         dplyr::group_split()
 
 
@@ -604,10 +623,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
 
-      # Generate the labels for each subset (age_group/ variant combination in the data)
-      incidence_subset_labels <- purrr::map(incidence_subsets, ~ dplyr::distinct(., .data$age_group, .data$variant))
+      # Generate the labels for each subset (demography_group / variant combination in the data)
+      incidence_subset_labels <- incidence_subsets |>
+        purrr::map(~ dplyr::distinct(., dplyr::across(.cols = c(names(self %.% population %.% groups), "variant"))))
 
-      # For each age_group / variant combination, compute the E_k and I_l states
+      # For each demography_group / variant combination, compute the E_k and I_l states
       estimated_exposed_infected_states <- purrr::map(
         seq_along(incidence_subset_labels),
         \(group_id) {
@@ -652,14 +672,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Impute zeros for missing states
       estimated_exposed_infected_states <- tidyr::expand_grid(
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
+        !!!self %.% population %.% groups,
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
           purrr::map_chr(seq_len(L), ~ paste0("I", .))
         ),
         "initial_condition" = 0
       ) |>
-        dplyr::rows_update(estimated_exposed_infected_states, by = c("variant", "age_group", "state"))
+        dplyr::rows_update(
+          estimated_exposed_infected_states,
+          by = c("variant", names(self %.% population %.% groups), "state")
+        )
 
 
       # Now we use the forcing method to generate the initial R and s states
@@ -704,11 +727,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           to = self %.% training_period %.% end,
           by = "1 day"
         ),
-        "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
+        !!!self %.% population %.% groups,
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
       ) |>
-        dplyr::left_join(incidence_data, by = c("date", "age_group", "variant")) |>
-        dplyr::group_by(.data$variant, .data$age_group) |>
+        dplyr::left_join(
+          incidence_data,
+          by = c("date", names(self %.% population %.% groups), "variant")
+        ) |>
+        dplyr::group_by(dplyr::across(c("variant", names(self %.% population %.% groups)))) |>
         dplyr::group_map(~ {
           stats::approxfun(
             x = as.numeric(.x$date - max(.x$date), unit = "days"),
@@ -757,13 +783,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # Since we now remove the new_infections contribution, we need to rescale the loss_due_to_infections
           # to match the signal
 
-          # loss_due_to_infections per age group
-          loss_due_to_infections_per_age_group <- loss_due_to_infections |>
+          # loss_due_to_infections per demography group
+          loss_due_to_infections_per_group <- loss_due_to_infections |>
             split(private$rs_age_group) |>
             vapply(sum, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 
           # Match the RS entries of the state_vector
-          tmp <- loss_due_to_infections_per_age_group[private$rs_age_group]
+          tmp <- loss_due_to_infections_per_group[private$rs_age_group]
 
           # Scale the loss to match the signal
           # We first add the original loss due to infections (= no flow out of the RS states due to infections),
@@ -793,12 +819,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
+        !!!self %.% population %.% groups,
         "state" = paste0("R", seq.int(self %.% parameters %.% compartment_structure %.% R))
       ) |>
         dplyr::add_row(
           "variant" = NA,
-          "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower),
+          !!!self %.% population %.% groups,
           "state" = "S"
         ) |>
         dplyr::mutate(
@@ -818,7 +844,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         estimated_exposed_infected_states,
         estimated_recovered_susceptible_states
       ) |>
-        dplyr::arrange(.data$variant, .data$age_group, .data$state)
+        dplyr::arrange(dplyr::across(c("variant", names(self %.% population %.% groups), "state")))
 
 
       # Normalise
