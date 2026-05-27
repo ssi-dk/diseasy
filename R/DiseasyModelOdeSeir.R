@@ -195,36 +195,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$n_EIR_states <- sum(self %.% parameters %.% compartment_structure)
       private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
-
-      ## Time-varying contact matrices projected onto target age-groups
-      contact_matrices <- self %.% activity %.% get_scenario_contacts(
-        age_cuts_lower = self %.% population %.% age_cuts_lower,
-        weights = self %.% parameters %.% activity.weights
+      # We retrieve normalised matrices
+      private$set_contact_matrix(
+        per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
+          weights = self %.% parameters %.% activity.weights
+        )
       )
-
-      # These matrices are the contact matrices (i.e. the largest eigen value is conserved when projecting into
-      # different age groups). In the model, we want to use the per capita rates of contacts so that the infection
-      # pressure is conserved when projecting into different age groups.
-      # To be more specific, we also want to use the density of population (i.e. the state vector should sum to 1).
-      # So instead of population, we use the proportion of population in the age groups.
-
-      # To convert to per capita-ish we need the proportion to use.
-      if (length(self %.% activity %.% get_scenario_activities()) == 0) {
-        # Assume even distribution for non-informative activity scenario (i.e. no activity scenario)
-        private$population_proportion <- rep(1 / private %.% n_age_groups, private %.% n_age_groups)
-      } else {
-        private$population_proportion <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-          dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
-          dplyr::pull("proportion")
-      }
-
-      # We then construct the normalised matrices
-      private$per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, private$population_proportion))
-
-      # Call `$set_contact_matrix` to store this initial scaling of the contact matrices
-      private$set_contact_matrix()
-
 
 
 
@@ -378,7 +354,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # have to do it only once.
       if (self %.% parameters %.% malthusian_matching) {
         private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
-        private$set_contact_matrix(self$malthusian_scaling_factor)
+        private$set_contact_matrix(
+          per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
+            weights = self %.% parameters %.% activity.weights
+          ),
+          scaling_factor = self$malthusian_scaling_factor
+        )
       }
 
       # Mark that model has been initialised
@@ -708,12 +689,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         immunity = self %.% immunity,
         parameters = modifyList(
           self %.% parameters,
-          list( # ... but since we can scale the overall_infection_risk to achieve the same effect.
+          list(
             "compartment_structure" = compartment_structure,
             "disease_progression_rates" = disease_progression_rates,
+            "malthusian_matching" = FALSE, # Since we have different disease_progression_rates, we cannot directly match
             "overall_infection_risk" = self %.% parameters %.% overall_infection_risk *
-              self %.% malthusian_scaling_factor,
-            "malthusian_matching" = FALSE # Since we have different disease_progression_rates, we cannot directly match
+              self %.% malthusian_scaling_factor  # ... but we can scale the overall_infection_risk instead.
           )
         )
       )
@@ -805,7 +786,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Run the simulation forward to estimate the R and S states
       y0 <- c(
         rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
-        private %.% population_proportion # S states
+        self %.% population %.% population_proportion # S states
       )
 
       sol <- deSolve::ode(
@@ -1061,8 +1042,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     infection_matrix_to_rs_indices = NULL,
 
     # Variable storage
-    population_proportion = NULL,
-    per_capita_contact_matrices = NULL,
     contact_matrix = NULL,
     immunity_matrix = NULL,
     indexed_variant_infection_risk = NULL,
@@ -1074,13 +1053,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # @description
     #  Configure the contact matrix helper in the model.
+    # @param per_capita_contact_matrices (`list`(`list`(`matrix`)))\cr
+    #   A `list` (named with dates signifying when contact matrix takes effect
+    #   of `lists` of per-arena ("home", "school", "work", "other") contact matrices (`matrix`).
     # @param scaling_factor (`numeric(1)`)\cr
     #   The scaling factor to apply to the contact matrices.
     # @return `r rd_side_effects()`
-    set_contact_matrix = function(scaling_factor = 1) {
+    set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
 
       # Apply the scaling factor to the contact matrices
-      scaled_per_capita_contact_matrices <- purrr::map(private$per_capita_contact_matrices, ~ .x * scaling_factor)
+      scaled_per_capita_contact_matrices <- purrr::map(per_capita_contact_matrices, ~ .x * scaling_factor)
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: the end of the training period)
@@ -1111,7 +1093,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(                                                                                                    # nolint: object_name_linter
         rep(0, private %.% n_age_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R),
-        private$population_proportion
+        self %.% population %.% population_proportion
       )
     ) {
 

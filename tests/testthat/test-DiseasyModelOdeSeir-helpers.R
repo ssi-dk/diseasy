@@ -243,6 +243,8 @@ test_that("helpers works (SEIR single variant / single age group)", {
 
 test_that("helpers works (SEEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -303,6 +305,8 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
 
 test_that("helpers works (SEEIIRR double variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -381,6 +385,8 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
 
 test_that("helpers works (SEEIIRR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")

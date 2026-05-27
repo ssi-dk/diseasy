@@ -1,5 +1,7 @@
 test_that("$contact_matrix() works (no scenario - single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -43,6 +45,8 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
 
 test_that("$contact_matrix() works (no scenario - two age groups)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -87,6 +91,8 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
 
 test_that("$contact_matrix() works (no scenario - three age groups)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -131,6 +137,8 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
 
 test_that("$contact_matrix() works (with scenario - single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
@@ -215,6 +223,8 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
 
 test_that("$contact_matrix() works (with scenario - all age groups)", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)

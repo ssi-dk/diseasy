@@ -4,8 +4,15 @@
 # We can therefore test that the initialisation works "well" and thereby guard ourselves against future,
 # unintended drops in performance.
 
-if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
-  return() # Skip these tests if RSQLite is not installed
+if (!all(rlang::is_installed(c("RSQLite", "optimx", "ucminf")))) {
+  # Skip these tests if dependencies are not installed
+  test_that("missing dependencies", {
+    skip_if_not_installed("RSQLite")
+    skip_if_not_installed("optimx")
+    skip_if_not_installed("ucminf")
+  })
+
+  return(NULL)
 }
 
 # We here use the parameters of the generating model
@@ -60,6 +67,8 @@ tidyr::expand_grid(
 
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
       skip_if_not_installed("RSQLite")
+      skip_if_not_installed("optimx")
+      skip_if_not_installed("ucminf")
 
       m <- DiseasyModelOdeSeir$new(
         activity = activity,

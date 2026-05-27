@@ -418,18 +418,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
       ...
     ) {
 
-      missing_packages <- c("dfoptim", "nloptr", "optimx", "subplex", "ucminf") |>
-        purrr::discard(rlang::is_installed) |>
-        toString()
-
-      if (missing_packages != "") {
-        stop(glue::glue("The following packages are required but not installed: {missing_packages}"), call. = FALSE)
-      }
-
-
       # Determine the method to use
       method <- match.arg(method)
-
 
       # Check parameters
       coll <- checkmate::makeAssertCollection()
@@ -894,6 +884,21 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Run the optimisation
+          missing_packages <- c("dfoptim", "nloptr", "subplex", "ucminf") |>
+            purrr::discard(rlang::is_installed) |>
+            toString()
+
+          if (missing_packages != "") {
+            warning(
+              glue::glue("The following packages are suggested but not installed: {missing_packages}"),
+              call. = FALSE
+            )
+          }
+
+          if (!rlang::is_installed("optimx")) {
+            stop(glue::glue("The following packages are required but not installed: `optimx`"), call. = FALSE)
+          }
+
           optimx_methods <- switch(rlang::is_installed("optimx") + 1, list(), optimx::ctrldefault(1)$allmeth)
 
           # Infer and call the optimiser
