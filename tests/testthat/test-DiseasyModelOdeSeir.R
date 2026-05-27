@@ -133,6 +133,13 @@ test_that("$hash works", {
 })
 
 
+test_that("$describe() works", {
+  m <- DiseasyModelOdeSeir$new()
+  expect_no_error(withr::with_output_sink(nullfile(), m$describe()))
+  expect_no_error(withr::with_output_sink(nullfile(), print(m)))
+})
+
+
 test_that("active binding: malthusian_scaling_factor works", {
   skip_if_not_installed("RSQLite")
 

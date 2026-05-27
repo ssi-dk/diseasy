@@ -103,6 +103,7 @@ in the model. Read only.}
     \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
     \item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
     \item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
+    \item \href{#method-DiseasyModelOdeSeir-describe}{\code{DiseasyModelOdeSeir$describe()}}
     \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
   }
 }
@@ -385,6 +386,18 @@ Argument to comply with \code{deSolve::ode} format. Not used.}
   \subsection{Returns}{
     (\code{numeric()})\cr
 The rate of change for the differential equations.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-describe"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-describe}{}}}
+\subsection{\code{DiseasyModelOdeSeir$describe()}}{
+  Prints a human readable report of the internal state of the module.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModelOdeSeir$describe()}
+    \if{html}{\out{</div>}}
   }
 }
 

@@ -932,6 +932,28 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       dy_dt <- private$state_vector_forcing(t, dy_dt, loss_due_to_infections, new_infections)
 
       return(list(dy_dt))
+    },
+
+    #' @description `r rd_describe`
+    describe = function() {
+      printr("# DiseasyModelOdeSeir ########################################")
+      printr("Structure:")
+      printr(" - compartments: ", toString(paste(
+        names(self %.% parameters %.% compartment_structure),
+        self %.% parameters %.% compartment_structure,
+        sep = " = "
+      )))
+      printr(" - RHS helpers: ", ifelse(private %.% initialised, "prepared", "not prepared"))
+
+      printr("Dynamics:")
+      printr(glue::glue(" - overall infection risk: {self %.% parameters %.% overall_infection_risk}"))
+      printr(" - disease progression rates: ", toString(paste(
+        names(self %.% parameters %.% disease_progression_rates),
+        self %.% parameters %.% disease_progression_rates,
+        sep = " = "
+      )))
+      printr(glue::glue(" - malthusian matching: {self %.% parameters %.% malthusian_matching}"))
+      printr(glue::glue(" - malthusian scaling factor: {self %.% malthusian_scaling_factor}"))
     }
   ),
 
