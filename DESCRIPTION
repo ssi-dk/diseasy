@@ -57,6 +57,7 @@ Suggests:
     knitr,
     lintr,
     nloptr,
+    nuts,
     microbenchmark,
     optimx,
     progressr,

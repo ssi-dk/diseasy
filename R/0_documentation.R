@@ -208,6 +208,53 @@ rd_activity_weights <- paste(
   "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
 
+## Templates for DiseasyRegions
+rd_regions <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`character()`)\\cr",
+    "The geographic area of interest (expressed in NUTS codes). ",
+    ifelse(type == "param", "The specified NUTS regions must be available in the `demography` and `adjacency` data.", ""),
+    ifelse(type == "field", "Read only.", "")
+  )
+}
+
+rd_adjacency <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`data.frame(1)`)\\cr",
+    "The adjacency (connectedness) of the regions (identified by NUTS codes).",
+    "Effectively, the `adjacency` is a long-form of the adjacency-matrix".,
+
+    "The `data.frame` must include the following columns:\\cr",
+    "- `from`", switch(type == "param", "(NUTS 1/2/3 code *)"), "\\cr",
+    "- `to`",   switch(type == "param", "(NUTS 1/2/3 code *)"), "\\cr",
+    "- `adjacency`: strength of the connectedness (will be normalised).\\cr",
+
+    switch(type == "param", "* only one NUTS level should be specified"),
+
+    switch(type == "param", 'Only "upper" or "lower" triangle of the adjacency needs to be specified'),
+    switch(type == "param", "if the full matrix is specified, a symmetric variant is formed."),
+    switch(type == "field", "Read only.")
+  )
+}
+
+rd_demography <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+
+  paste(
+    "(`data.frame(1)`)\\cr",
+    "The demography of the population per region.",
+
+    "The `data.frame` must include the following columns:\\cr",
+    "* `nuts` (`character`) The NUTS 1/2/3 code for the stratification.",
+    "Only one NUTS level is needed.\\cr",
+    "* `...` Optional additional stratification columns (e.g. sex, ethnicity).\\cr",
+    "* `population` (`numeric`) Number of individuals in the group.",
+    ifelse(type == "field", "Read only.", "")
+  )
+}
+
 ## Templates for DiseasyModel
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",
