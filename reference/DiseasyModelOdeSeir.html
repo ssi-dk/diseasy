@@ -315,7 +315,7 @@ The Malthusian growth rate for the model.</p>
 </div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>incidence_data</code></dt>
-<dd><p>incidence_data (<code>data.frame</code>)<br> Incidence observations as a <code>data.frame</code> with columns - <code>date</code>: The date of the observations - <code>age_group</code>: The age group of the incidence observation (following <code><a href="https://ssi-dk.github.io/diseasystore/reference/age_labels.html">diseasystore::age_labels()</a></code> format) - <code>variant</code>: The variant of the incidence observation. - <code>incidence</code>: The incidence in the age group at the given date</p></dd>
+<dd><p>(<code>data.frame</code>)<br> Incidence observations as a <code>data.frame</code> with columns - <code>date</code>: The date of the observations - <code>...</code>: Columns corresponding to the demographic groups configured in the scenario (see <code>$population$groups</code>). - <code>variant</code>: The variant of the incidence observation (if configured in the scenario). - <code>incidence</code>: The incidence in the age group at the given date</p></dd>
 
       <dt><code>overall_infection_risk</code></dt>
 <dd><p>(<code>numeric</code>)<br> The overall multiplier for the infection risk for the model.</p></dd>
