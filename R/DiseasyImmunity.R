@@ -889,7 +889,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
             toString()
 
           if (missing_packages != "") {
-            warning(glue::glue("The following packages are suggested but not installed: {missing_packages}"), call. = FALSE)
+            warning(
+              glue::glue("The following packages are suggested but not installed: {missing_packages}"),
+              call. = FALSE
+            )
           }
 
           if (!rlang::is_installed("optimx")) {
