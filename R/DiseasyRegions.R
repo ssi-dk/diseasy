@@ -1,9 +1,10 @@
 #' @title Diseasy's region (spatial) handler
 #'
 #' @description
-#'   TODO
+#'   The `DiseasyRegions` module is responsible for handling geographic regions
+#'   included in the model.
 #'
-#'   See the vignette("diseasy-region") for examples of use.
+#'   See the vignette("diseasy-regions") for examples of use.
 #' @examples
 #'   # TODO
 #' @return
@@ -22,15 +23,8 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
     #' @param ...
-    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
+    #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     initialize = function(regions, adjacency, demography, ...) {
-
-      # Validate completeness of the adjacency and demography given the regions
-      private %.% validate_data_completeness(
-        regions = regions,
-        adjacency = adjacency,
-        demography = demography
-      )
 
       # Load objects
       self$set_demography(demography)
@@ -42,7 +36,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     },
 
 
+    #' @description
+    #'   Sets the geographic regions of interest.
     #' @param regions `r rd_regions()`
+    #' @return `r rd_side_effects`
     set_regions = function(regions) {
       coll <- checkmate::makeAssertCollection()
 
@@ -56,20 +53,28 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       if (!is.null(private %.% .demography)) {
         # Must have codes in demography
-        checkmate::assert_subset(regions, unique(dplyr::pull(private %.% .demography, "nuts")), add = coll)
+        checkmate::assert_subset(regions, unique(dplyr::pull(private %.% .demography, "region")), add = coll)
       }
 
       checkmate::reportAssertions(coll)
 
-
-      # Validate completeness of regions
-      private %.% validate_data_completeness(regions = regions)
+      # Check configuration works with existing adjacency and demography
+      self$validate_configuration(
+        regions = sort(regions),
+        adjacency = private %.% .adjacency,
+        demography = private %.% .demography
+      )
 
       private$.regions <- sort(regions)
+
+      return(invisible(NULL))
     },
 
 
+    #' @description
+    #'   Sets the region adjacency data.
     #' @param adjacency `r rd_adjacency()`
+    #' @return `r rd_side_effects`
     set_adjacency = function(adjacency) {
 
       coll <- checkmate::makeAssertCollection()
@@ -81,35 +86,104 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "to")),   add = coll)
       checkmate::reportAssertions(coll)
 
-      # Determine resolution
-      attr(adjacency, "nuts_resolution") <- unique(purrr::map_dbl(c(adjacency$from, adjacency$to), nchar)) - 2
-
-      # Validate completeness of adjacency
-      private %.% validate_data_completeness(adjacency = adjacency)
+      # Check configuration works with existing region and demography
+      self$validate_configuration(
+        regions = self %.% regions,
+        adjacency = adjacency,
+        demography = private %.% .demography
+      )
 
       private$.adjacency <- adjacency
+
+      return(invisible(NULL))
     },
 
 
+    #' @description
+    #'   Sets the demography data for all regions.
     #' @param demography `r rd_demography()`
+    #' @return `r rd_side_effects`
     set_demography = function(demography) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(demography, add = coll)
-      checkmate::assert_subset(c("nuts", "population"), colnames(demography), add = coll)
-      checkmate::assert_character(demography[["nuts"]], any.missing = FALSE, add = coll)
+      checkmate::assert_subset(c("region", "population"), colnames(demography), add = coll)
+      checkmate::assert_character(demography[["region"]], any.missing = FALSE, add = coll)
       checkmate::assert_numeric(demography[["population"]], lower = 0, any.missing = FALSE, add = coll)
 
       # Must have codes corresponding to selected regions
-      checkmate::assert_subset(self %.% regions, unique(dplyr::pull(demography, "nuts")),   add = coll)
+      checkmate::assert_subset(self %.% regions, unique(dplyr::pull(demography, "region")),   add = coll)
       checkmate::reportAssertions(coll)
 
-      # Determine resolution
-      attr(demography, "nuts_resolution") <- unique(purrr::map_dbl(demography$nuts, nchar)) - 2
 
-      # Validate completeness of demography
-      private %.% validate_data_completeness(demography = demography)
+      # Check configuration works with existing regions and adjacency
+      self$validate_configuration(
+        regions = self %.% regions,
+        adjacency = private %.% .adjacency,
+        demography = demography
+      )
 
       private$.demography <- demography
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Check whether `regions`, `adjacency`, and `demography` are mutually consistent.
+    #' @param regions `r rd_regions()`
+    #' @param adjacency `r rd_adjacency()`
+    #' @param demography `r rd_demography()`
+    #' @return `r rd_side_effects`
+    #' @keywords internal
+    validate_configuration = function(
+      regions,
+      adjacency,
+      demography
+    ) {
+      coll <- checkmate::makeAssertCollection()
+
+      checkmate::assert_subset(
+        regions,
+        unique(c(adjacency[["from"]], adjacency[["to"]])),
+        add = coll
+      )
+
+      checkmate::assert_subset(
+        regions,
+        unique(demography[["region"]]),
+        add = coll
+      )
+
+      checkmate::reportAssertions(coll)
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Create a logical filter for values matching one or more regions.
+    #'
+    #'   The generic implementation uses exact matching. `DiseasyRegionsNuts`
+    #'   overrides this method with hierarchical NUTS prefix matching.
+    #' @param values (`character()`)\cr
+    #'   Values to filter, typically region identifiers.
+    #' @param regions (`character()` or `NULL`)\cr
+    #'   Region identifiers to match against. Defaults to the currently selected
+    #'   regions. If `NULL`, all values are matched.
+    #' @return
+    #'   A `logical()` vector with the same length as `values`.
+    #' @keywords internal
+    region_filter = function(values, regions = self %.% regions) {
+      checkmate::assert_character(values, any.missing = FALSE)
+
+      if (is.null(regions)) {
+        region_filter <- rep(TRUE, length(values))
+        return(region_filter)
+      }
+
+      region_filter <- values %in% regions
+
+      return(region_filter)
     },
 
 
@@ -118,9 +192,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       printr("# DiseasyRegions #############################################")
       printr(glue::glue("Regions: {toString(self %.% regions)}"))
       printr(glue::glue("Total population: {sum((self %.% demography)[['population']])}"))
-      # TODO meta data telling where demography data is from
-
-      # TODO add output for adjacency
+      # TODO: More outputs
     }
   ),
 
@@ -139,14 +211,11 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "adjacency",
       expr = {
-        # Filter adjacency to the given regions
-        adjacency <- private %.% .adjacency |>
-          dplyr::filter(
-            private$region_filter(.data$from),
-            private$region_filter(.data$to)
+        private %.% .adjacency |>
+          dplyr::filter( # Filter adjacency to the given regions
+            self$region_filter(values = .data$from),
+            self$region_filter(values = .data$to)
           )
-
-        return(adjacency)
       }
     ),
 
@@ -156,11 +225,10 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "demography",
       expr = {
-        # Filter demography to the given regions
-        demography <- private %.% .demography |>
-          dplyr::filter(private$region_filter(.data$nuts))
-
-        return(demography)
+        private %.% .demography |>
+          dplyr::filter( # Filter demography to the given regions
+            self$region_filter(values = .data$region)
+          )
       }
     )
   ),
@@ -169,110 +237,6 @@ DiseasyRegions <- R6::R6Class(                                                  
   private = list(
     .regions = NULL,
     .adjacency = NULL,
-    .demography = NULL,
-
-
-    # @description
-    #   Check whether the selected regions have complete adjacency and demography data.
-    #
-    # @details
-    #   Data completeness is checked against the latest available NUTS codes from
-    #   `nuts::all_nuts_codes`. Expected NUTS codes are derived for the selected
-    #   `regions` at the resolution recorded in the `"nuts_resolution"` attribute of
-    #   `adjacency` and `demography`.
-    #
-    #   If `adjacency` is supplied, the combined `from` and `to` columns must contain
-    #   the complete set of expected NUTS codes at the adjacency resolution.
-    #
-    #   If `demography` is supplied, the `nuts` column must contain the complete set
-    #   of expected NUTS codes at the demography resolution.
-    #
-    # @param regions `r rd_regions()`
-    # @param adjacency `r rd_adjacency()`
-    # @param demography `r rd_demography()`
-    #
-    # @return `r rd_side_effects`
-    validate_data_completeness = function(
-      regions = self %.% regions,
-      adjacency = private %.% .adjacency,
-      demography = private %.% .demography
-    ) {
-      if (!rlang::is_installed("nuts")) {
-         pkgcond::pkg_warning("`nuts` package required to check data coverage for given `regions`.")
-      }
-
-      valid_nuts <- nuts::all_nuts_codes |>
-        dplyr::slice_max(version) |>
-        dplyr::pull("code")
-
-      if (!checkmate::test_subset(self %.% regions, valid_nuts)) {
-        pkgcond::pkg_warning(
-          glue::glue(
-            "Some configured regions are not valid NUTS regions: {toString(setdiff(self %.% regions, valid_nuts))}"
-          )
-        )
-      }
-
-      # Helper function to retrieve all NUTS codes for the given regions
-      nuts_at_resolution <- function(nuts_level) {
-        nuts::all_nuts_codes |>
-          dplyr::slice_max(version) |>
-          dplyr::filter(nchar(.data$code) - 2 <= nuts_level) |>
-          dplyr::slice_max(
-            nchar(.data$code),
-            by = "country"
-          ) |>
-          dplyr::filter(region_filter(.data$code, regions)) |>
-          dplyr::pull("code")
-      }
-
-      coll <- checkmate::makeAssertCollection()
-
-      # adjacency must include a complete set of NUTS codes at its resolution
-      if (!is.null(adjacency)) {
-        checkmate::assert_set_equal(
-          c(adjacency$from, adjacency$to),
-          nuts_at_resolution(attr(adjacency, "nuts_resolution")),
-          add = coll
-        )
-      }
-
-      # demography must include a complete set of NUTS codes at its resolution
-      if (!is.null(demography)) {
-        checkmate::assert_set_equal(
-          demography$nuts,
-          nuts_at_resolution(attr(demography, "nuts_resolution")),
-          add = coll
-        )
-      }
-
-      checkmate::reportAssertions(coll)
-    },
-
-
-    # @description
-    #   Create a logical filter for values matching one or more regions.
-    #
-    #   Values are matched by checking whether they start with any of the supplied
-    #   region codes. If `regions` is `NULL`, all values are matched.
-    #
-    # @param values (`character()`)\cr
-    #   Values to filter, typically NUTS codes.
-    # @param regions `r rd_regions()`
-    #
-    # @return
-    #   A `logical()` vector with the same length as `values`.
-    region_filter = function(values, regions = self %.% regions) {
-      region_filter <- purrr::reduce(
-        .x = purrr::map(
-          purrr::pluck(regions, .default = "^"),
-          ~ stringr::str_starts(values, .x)
-        ),
-        .f = `|`
-      )
-
-      return(region_filter)
-    }
+    .demography = NULL
   )
 )
-

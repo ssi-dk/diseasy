@@ -213,14 +213,22 @@ rd_regions <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste(
     "(`character()`)\\cr",
-    "The geographic area of interest (expressed in NUTS codes). ",
-    ifelse(type == "param", "The specified NUTS regions must be available in the `demography` and `adjacency` data.", ""),
-    ifelse(type == "field", "Read only.", "")
+    "The geographic regions of interest.",
+    "For `DiseasyRegions`, regions may be arbitrary region identifiers.",
+
+    switch(
+      type == "param",
+      "The specified regions must be available in the `demography` and `adjacency` data."
+    ),
+    switch(type == "field", "Read only.")
   )
 }
 
 rd_adjacency <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
+
+  from_to_description <- "(`character`) Region identifier."
+
   paste(
     "(`data.frame(1)`)\\cr",
     "The adjacency (connectedness) of the regions (identified by NUTS codes).",
@@ -247,11 +255,10 @@ rd_demography <- function(type = "param") {
     "The demography of the population per region.",
 
     "The `data.frame` must include the following columns:\\cr",
-    "* `nuts` (`character`) The NUTS 1/2/3 code for the stratification.",
-    "Only one NUTS level is needed.\\cr",
+    "* `region` (`character`) Region identifier.",
     "* `...` Optional additional stratification columns (e.g. sex, ethnicity).\\cr",
     "* `population` (`numeric`) Number of individuals in the group.",
-    ifelse(type == "field", "Read only.", "")
+    switch(type == "field", "Read only.")
   )
 }
 
