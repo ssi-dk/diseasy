@@ -196,18 +196,18 @@ test_that("regions are matched exactly", {
     demography = test_demography
   )
 
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
     region_1$adjacency_matrix,
     region_2$adjacency_matrix,
     tolerance = 1e-10
   )
 
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
     rowSums(region_1$adjacency_matrix),
     stats::setNames(rep(1, length(region_1 %.% regions)), region_1 %.% regions)
   )
 
-  expect_equal(
+  expect_equal(                                                                                                         # nolint: expect_identical_linter
     colSums(region_1$adjacency_matrix),
     stats::setNames(rep(1, length(region_1 %.% regions)), region_1 %.% regions)
   )

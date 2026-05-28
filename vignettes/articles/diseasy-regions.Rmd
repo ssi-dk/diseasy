@@ -183,30 +183,30 @@ The demography and adjacency can also be updated after the module has been creat
 they are stored, so an invalid update leaves the existing object state unchanged.
 
 ```{r update_demography}
-demography_updated <- demography
-demography_updated[
-  demography_updated[["region"]] == "north" & demography_updated[["age_group"]] == "18+",
+demography_new <- demography
+demography_new[
+  demography_new[["region"]] == "north" & demography_new[["age_group"]] == "18+",
   "population"
 ] <- 260000
 
-region$set_demography(demography = demography_updated)
+region$set_demography(demography = demography_new)
 
 region %.% demography
 ```
 
 ```{r update_adjacency}
-adjacency_updated <- adjacency
-adjacency_updated[
-  adjacency_updated[["from"]] == "north" & adjacency_updated[["to"]] == "south",
+adjacency_new <- adjacency
+adjacency_new[
+  adjacency_new[["from"]] == "north" & adjacency_new[["to"]] == "south",
   "adjacency"
 ] <- 0.75
-adjacency_updated[
-  adjacency_updated[["from"]] == "south" & adjacency_updated[["to"]] == "north",
+adjacency_new[
+  adjacency_new[["from"]] == "south" & adjacency_new[["to"]] == "north",
   "adjacency"
 ] <- 0.75
 
 region$set_regions(regions = c("north", "south"))
-region$set_adjacency(adjacency = adjacency_updated)
+region$set_adjacency(adjacency = adjacency_new)
 
 region %.% adjacency
 ```
@@ -236,10 +236,10 @@ region$set_adjacency(adjacency = bad_adjacency)
 ```{r cleanup, include = FALSE}
 rm(
   adjacency,
-  adjacency_updated,
+  adjacency_new,
   all_regions,
   demography,
-  demography_updated,
+  demography_new,
   region
 )
 gc()
