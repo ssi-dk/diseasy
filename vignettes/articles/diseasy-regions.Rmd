@@ -64,12 +64,12 @@ The adjacency data must include exactly the columns `from`, `to`, and `adjacency
 The `from` and `to` columns should contain the same set of region identifiers.
 
 ```{r adjacency_data}
-adjacency <- expand.grid(
+adjacency <- tidyr::expand_grid(
   from = all_regions,
   to = all_regions
 )
 
-adjacency[["adjacency"]] <- 0
+adjacency[["adjacency"]] <- 0.1
 adjacency[adjacency$from == adjacency$to, "adjacency"] <- 1
 adjacency[adjacency$from == "north" & adjacency$to == "south", "adjacency"] <- 0.5
 adjacency[adjacency$from == "south" & adjacency$to == "north", "adjacency"] <- 0.5
