@@ -143,17 +143,34 @@ DiseasyRegions <- R6::R6Class(                                                  
     ) {
       coll <- checkmate::makeAssertCollection()
 
-      checkmate::assert_subset(
-        regions,
-        unique(c(adjacency[["from"]], adjacency[["to"]])),
-        add = coll
-      )
+      # Check regions are consistent with adjacency
+      if (!is.null(regions) && !is.null(adjacency)) {
 
-      checkmate::assert_subset(
-        regions,
-        unique(demography[["region"]]),
-        add = coll
-      )
+        checkmate::assert_subset(
+          regions,
+          unique(c(adjacency[["from"]], adjacency[["to"]])),
+          add = coll
+        )
+      }
+
+      # Check regions are consistent with demography
+      if (!is.null(regions) && !is.null(demography)) {
+        checkmate::assert_subset(
+          regions,
+          unique(demography[["region"]]),
+          add = coll
+        )
+      }
+
+      # Check adjacency is consistent with demography
+      if (!is.null(adjacency) && !is.null(demography)) {
+        overlap <- intersect(
+          unique(c(adjacency[["from"]], adjacency[["to"]])),
+          unique(demography[["region"]])
+        )
+
+        checkmate::expect_atomic_vector(overlap, min.len = 1)
+      }
 
       checkmate::reportAssertions(coll)
 
