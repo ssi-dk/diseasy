@@ -44,7 +44,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
   contact_basis <- purrr::imap(common_country_codes, \(country_code, country) {
 
     # Store 5-year age group populations
-    N <- demography |>                                                                                              # nolint: object_name_linter
+    N <- demography |>                                                                                                  # nolint: object_name_linter
       dplyr::filter(.data$key_country == !!country_code) |>
       dplyr::mutate("age_group" = cut(age, c(age_cuts, Inf), right = FALSE, labels = age_labels)) |>
       dplyr::summarise("n_population" = sum(n_population), .by = "age_group") |>
@@ -74,7 +74,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       # Step 1:
       # Compute the mean number of contacts who are in age group j as reported by age group i in the survey.
       # Mathematically, we determine the elements of matrix M
-      # m_ij = t_ij / n_i                                                                                         # nolint: commented_code_linter
+      # m_ij = t_ij / n_i                                                                                               # nolint: commented_code_linter
       # Where t_ij is the number of daily contacts reported in the survey from age group i to age group j
       # (their estimate) and n_i is the number of participants in age group i
       # This matrix M is the "raw contact matrix" or "survey contact matrix"
@@ -153,7 +153,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       # NOTE: `outer(N, N, FUN = "/")` gives us the matrix elements N_i / N_j, so we transpose to get N_j / N_i
 
       # Test mp that we lives up to the reciprocity principle:
-      N_i <- outer(N, rep(1, length(N)))     # Columns are N: [N; N; N]                                           # nolint: object_name_linter
+      N_i <- outer(N, rep(1, length(N)))     # Columns are N: [N; N; N]                                                 # nolint: object_name_linter
       if (max(abs(N_i * mp - t(N_i * mp))) > 1e-6) {
         rlang::abort("mp is not reciprocal")
       }
