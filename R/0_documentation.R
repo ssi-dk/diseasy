@@ -226,22 +226,17 @@ rd_regions <- function(type = "param") {
 rd_adjacency <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
 
-  from_to_description <- "(`character`) Region identifier."
-
   paste(
     "(`data.frame(1)`)\\cr",
-    "The adjacency (connectedness) of the regions (identified by NUTS codes).",
+    "The adjacency (connectedness) of the regions.",
     "Effectively, the `adjacency` is a long-form of the adjacency-matrix",
 
     "The `data.frame` must include the following columns:\\cr",
-    "- `from`", switch(type == "param", from_to_description), "\\cr",
-    "- `to`",   switch(type == "param", from_to_description), "\\cr",
-    "- `adjacency`: strength of the connectedness (will be normalised).\\cr",
-
-    switch(type == "param", "* only one NUTS level should be specified"),
+    "- `from` (`character`): Region identifier.\\cr",
+    "- `to`   (`character`): Region identifier.\\cr",
+    "- `adjacency` (`numeric`): Strength of the connectedness (will be normalised).\\cr",
 
     switch(type == "param", 'Only "upper" or "lower" triangle of the adjacency needs to be specified'),
-    switch(type == "param", "if the full matrix is specified, a symmetric variant is formed."),
     switch(type == "field", "Read only.")
   )
 }
