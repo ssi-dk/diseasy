@@ -23,7 +23,7 @@ See the vignette("diseasy-regions") for examples of use.
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
-    \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. For \code{DiseasyRegions}, regions may be arbitrary region identifiers.  Read only.}
+    \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest.  Read only.}
 
     \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions (identified by NUTS codes). Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from}  \cr - \code{to}  \cr - \code{adjacency}: strength of the connectedness (will be normalised).\cr    Read only.}
 
@@ -63,8 +63,8 @@ See the vignette("diseasy-regions") for examples of use.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. For \code{DiseasyRegions}, regions may be arbitrary region identifiers. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions (identified by NUTS codes). Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (NUTS 1/2/3 code *) \cr - \code{to} (NUTS 1/2/3 code *) \cr - \code{adjacency}: strength of the connectedness (will be normalised).\cr * only one NUTS level should be specified Only "upper" or "lower" triangle of the adjacency needs to be specified if the full matrix is specified, a symmetric variant is formed.}
+      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions (identified by NUTS codes). Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}) Region identifier. \cr - \code{to} (\code{character}) Region identifier. \cr - \code{adjacency}: strength of the connectedness (will be normalised).\cr * only one NUTS level should be specified Only "upper" or "lower" triangle of the adjacency needs to be specified if the full matrix is specified, a symmetric variant is formed.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier. * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
     }
@@ -85,7 +85,7 @@ See the vignette("diseasy-regions") for examples of use.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. For \code{DiseasyRegions}, regions may be arbitrary region identifiers. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
     }
     \if{html}{\out{</div>}}
   }
@@ -107,7 +107,7 @@ See the vignette("diseasy-regions") for examples of use.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions (identified by NUTS codes). Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (NUTS 1/2/3 code *) \cr - \code{to} (NUTS 1/2/3 code *) \cr - \code{adjacency}: strength of the connectedness (will be normalised).\cr * only one NUTS level should be specified Only "upper" or "lower" triangle of the adjacency needs to be specified if the full matrix is specified, a symmetric variant is formed.}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions (identified by NUTS codes). Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}) Region identifier. \cr - \code{to} (\code{character}) Region identifier. \cr - \code{adjacency}: strength of the connectedness (will be normalised).\cr * only one NUTS level should be specified Only "upper" or "lower" triangle of the adjacency needs to be specified if the full matrix is specified, a symmetric variant is formed.}
     }
     \if{html}{\out{</div>}}
   }
@@ -151,8 +151,8 @@ See the vignette("diseasy-regions") for examples of use.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. For \code{DiseasyRegions}, regions may be arbitrary region identifiers. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions (identified by NUTS codes). Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (NUTS 1/2/3 code *) \cr - \code{to} (NUTS 1/2/3 code *) \cr - \code{adjacency}: strength of the connectedness (will be normalised).\cr * only one NUTS level should be specified Only "upper" or "lower" triangle of the adjacency needs to be specified if the full matrix is specified, a symmetric variant is formed.}
+      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions (identified by NUTS codes). Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}) Region identifier. \cr - \code{to} (\code{character}) Region identifier. \cr - \code{adjacency}: strength of the connectedness (will be normalised).\cr * only one NUTS level should be specified Only "upper" or "lower" triangle of the adjacency needs to be specified if the full matrix is specified, a symmetric variant is formed.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier. * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
     }
     \if{html}{\out{</div>}}
@@ -180,7 +180,7 @@ overrides this method with hierarchical NUTS prefix matching.
     \describe{
       \item{\code{values}}{(\code{character()})\cr
 Values to filter, typically region identifiers.}
-      \item{\code{regions}}{(\code{character()} or \code{NULL})\cr
+      \item{\code{regions}}{(\code{character()} or \code{NULL})\cr                                                                      # nolint: documentation_template_linter
 Region identifiers to match against. Defaults to the currently selected
 regions. If \code{NULL}, all values are matched.}
     }

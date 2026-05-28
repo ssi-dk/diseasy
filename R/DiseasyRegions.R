@@ -185,7 +185,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   overrides this method with hierarchical NUTS prefix matching.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically region identifiers.
-    #' @param regions (`character()` or `NULL`)\cr
+    #' @param regions (`character()` or `NULL`)\cr                                                                      # nolint: documentation_template_linter
     #'   Region identifiers to match against. Defaults to the currently selected
     #'   regions. If `NULL`, all values are matched.
     #' @return

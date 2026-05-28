@@ -214,7 +214,6 @@ rd_regions <- function(type = "param") {
   paste(
     "(`character()`)\\cr",
     "The geographic regions of interest.",
-    "For `DiseasyRegions`, regions may be arbitrary region identifiers.",
 
     switch(
       type == "param",
@@ -235,8 +234,8 @@ rd_adjacency <- function(type = "param") {
     "Effectively, the `adjacency` is a long-form of the adjacency-matrix",
 
     "The `data.frame` must include the following columns:\\cr",
-    "- `from`", switch(type == "param", "(NUTS 1/2/3 code *)"), "\\cr",
-    "- `to`",   switch(type == "param", "(NUTS 1/2/3 code *)"), "\\cr",
+    "- `from`", switch(type == "param", from_to_description), "\\cr",
+    "- `to`",   switch(type == "param", from_to_description), "\\cr",
     "- `adjacency`: strength of the connectedness (will be normalised).\\cr",
 
     switch(type == "param", "* only one NUTS level should be specified"),
