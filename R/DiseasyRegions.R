@@ -365,7 +365,8 @@ DiseasyRegions <- R6::R6Class(                                                  
       }
     ),
 
-    #' @field adjacency_matrix
+    #' @field adjacency_matrix (`matrix`)\cr
+    #'   The symmetric, normalised matrix form of the adjacency for the given regions.
     adjacency_matrix = purrr::partial(
       .f = active_binding,
       name = "adjacency_matrix",
