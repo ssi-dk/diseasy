@@ -115,7 +115,6 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_character(adjacency$from, any.missing = FALSE, add = coll)
       checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
-      checkmate::assert_false(anyDuplicated(adjacency[c("from", "to")]), add = coll)
 
       # Must have codes corresponding to selected regions
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "from")), add = coll)
