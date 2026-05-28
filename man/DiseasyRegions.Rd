@@ -13,7 +13,38 @@ included in the model.
 See the vignette("diseasy-regions") for examples of use.
 }
 \examples{
-  # TODO
+  # Create simple demography for three generic regions.
+  demography <- data.frame(
+    region = c("north", "north", "south", "south", "east", "east"),
+    age_group = rep(c("0-17", "18+"), times = 3),
+    population = c(100, 300, 80, 220, 60, 140)
+  )
+
+  # Adjacency is a long-form representation of connectedness.
+  adjacency <- data.frame(
+    from = c("north", "north", "north", "south", "south", "east"),
+    to   = c("north", "south", "east",  "south", "east",  "east"),
+    adjacency = c(1, 0.25, 0.5, 1, 0.25, 1)
+  )
+
+  # Restrict the model scope to two regions.
+  region <- DiseasyRegions$new(
+    regions = c("north", "south"),
+    adjacency = adjacency,
+    demography = demography
+  )
+
+  # Active bindings return data for configured regions.
+  region \%.\% regions
+  region \%.\% demography
+  region \%.\% adjacency
+
+  # Update the configured regional scope.
+  region$set_regions(regions = c("north", "south", "east"))
+  region$describe()
+
+  rm(region, demography, adjacency)
+
 }
 \keyword{functional-module}
 \keyword{internal}
