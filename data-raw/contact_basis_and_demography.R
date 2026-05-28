@@ -199,7 +199,6 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
         )
       }
     ) |>
-    purrr::reduce(append, .init = list()) |>
     stats::setNames(common_country_codes)
 
 
