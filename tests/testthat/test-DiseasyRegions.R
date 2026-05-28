@@ -104,7 +104,56 @@ test_that("initialize works", {
 })
 
 
-test_that("setters works", {
+test_that("`$set_regions()`` works", {
+
+  region_1 <- DiseasyRegions$new()
+  region_1$set_regions(c("north", "south"))
+
+  region_2 <- DiseasyRegions$new()
+  region_2$set_regions(c("south", "north"))
+
+  expect_identical(region_1 %.% regions, region_2 %.% regions)
+  expect_identical(region_1 %.% hash, region_2 %.% hash)
+
+  rm(region_1)
+  rm(region_2)
+})
+
+
+test_that("`$set_adjacency()`` works", {
+
+  region_1 <- DiseasyRegions$new()
+  region_1$set_adjacency(test_adjacency)
+
+  region_2 <- DiseasyRegions$new()
+  region_2$set_adjacency(test_adjacency[sample(nrow(test_adjacency)), ])
+
+  expect_identical(region_1 %.% adjacency, region_2 %.% adjacency)
+  expect_identical(region_1 %.% adjacency_matrix, region_2 %.% adjacency_matrix)
+  expect_identical(region_1 %.% hash, region_2 %.% hash)
+
+  rm(region_1)
+  rm(region_2)
+})
+
+
+test_that("`$set_demography()`` works", {
+
+  region_1 <- DiseasyRegions$new()
+  region_1$set_demography(test_demography)
+
+  region_2 <- DiseasyRegions$new()
+  region_2$set_demography(test_demography[sample(nrow(test_demography)), ])
+
+  expect_identical(region_1 %.% demography, region_2 %.% demography)
+  expect_identical(region_1 %.% hash, region_2 %.% hash)
+
+  rm(region_1)
+  rm(region_2)
+})
+
+
+test_that("Setters are commutative", {
 
   # Permutaiton 1
   region <- DiseasyRegions$new()
