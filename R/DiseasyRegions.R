@@ -112,6 +112,10 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_data_frame(adjacency, add = coll)
       checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
       checkmate::assert_set_equal(adjacency$from, adjacency$to, add = coll)
+      checkmate::assert_character(adjacency$from, any.missing = FALSE, add = coll)
+      checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
+      checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
+      checkmate::assert_false(any(duplicated(adjacency[c("from", "to")])), add = coll)
 
       # Must have codes corresponding to selected regions
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "from")), add = coll)
@@ -236,6 +240,92 @@ DiseasyRegions <- R6::R6Class(                                                  
     },
 
 
+    #' @description
+    #'   Converts long form adjacency to a normalised and symmetric matrix form.
+    #' @param adjacency `r rd_adjacency()`
+    #' @param tolerance (`numeric(1)`)\cr
+    #'   Numerical tolerance for row and column sums.
+    #' @param max_iterations (`integer(1)`)\cr
+    #'   Maximum number of scaling iterations.
+    adjacency_to_matrix = function(
+      adjacency,
+      tolerance = 1e-10,
+      max_iterations = 1000
+    ) {
+      checkmate::assert_number(tolerance, lower = 0)
+      checkmate::assert_integerish(max_iterations, lower = 1, len = 1)
+
+
+      # Allocate empty adjacency matrix
+      regions <- sort(unique(c(adjacency[["from"]], adjacency[["to"]])))
+
+      adjacency_matrix <- matrix(
+        NA_real_,
+        nrow = length(regions),
+        ncol = length(regions),
+        dimnames = list(regions, regions)
+      )
+
+      # Fill with existing values
+      adjacency_matrix[
+        cbind(
+          match(adjacency[["from"]], regions),
+          match(adjacency[["to"]], regions)
+        )
+      ] <- adjacency[["adjacency"]]
+
+
+      # Make symmetric
+      symmetric_adjacency_matrix <- purrr::map2_dbl(
+        as.numeric(adjacency_matrix),
+        as.numeric(t(adjacency_matrix)),
+        ~ sum(c(.x, .y), na.rm = TRUE) / (is.finite(.x) + is.finite(.y))
+      ) |>
+        matrix(
+          ncol = nrow(adjacency_matrix),
+          nrow = nrow(adjacency_matrix),
+          dimnames = dimnames(adjacency_matrix)
+        )
+
+
+      # Start normalisation
+      if (any(rowSums(symmetric_adjacency_matrix) == 0)) {
+        pkgcond::pkg_error("Cannot normalise adjacency because at least one row sums to zero.")
+      }
+
+      if (any(colSums(symmetric_adjacency_matrix) == 0)) {
+        pkgcond::pkg_error("Cannot normalise adjacency because at least one column sums to zero.")
+      }
+
+      scaling <- rep(1, nrow(symmetric_adjacency_matrix))
+
+      for (iteration in seq_len(max_iterations)) {
+        normalised_adjacency_matrix <- symmetric_adjacency_matrix |>
+          sweep(MARGIN = 1, STATS = scaling, FUN = "*") |>
+          sweep(MARGIN = 2, STATS = scaling, FUN = "*")
+
+        normalisation_error <- max(
+          abs(rowSums(normalised_adjacency_matrix) - 1),
+          abs(colSums(normalised_adjacency_matrix) - 1)
+        )
+
+        if (normalisation_error <= tolerance) {
+          return(normalised_adjacency_matrix)
+        }
+
+        row_sums <- rowSums(normalised_adjacency_matrix)
+
+        if (any(row_sums == 0)) {
+          pkgcond::pkg_error("Cannot normalise adjacency because at least one row sums to zero.")
+        }
+
+        scaling <- scaling / sqrt(row_sums)
+      }
+
+      pkgcond::pkg_error("Could not normalise adjacency within the configured number of iterations.")
+    },
+
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyRegions #############################################")
@@ -259,11 +349,35 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "adjacency",
       expr = {
-        private %.% .adjacency |>
+        # Unpack the upper triangle of the symmetric and normalised adjacecny matrix
+        adjacency_matrix <- self %.% adjacency_matrix
+
+        adjacency_index <- which(
+          upper.tri(adjacency_matrix, diag = TRUE),
+          arr.ind = TRUE
+        )
+
+        data.frame(
+          "from" = rownames(adjacency_matrix)[adjacency_index[, "row"]],
+          "to" = colnames(adjacency_matrix)[adjacency_index[, "col"]],
+          "adjacency" = adjacency_matrix[adjacency_index]
+        )
+      }
+    ),
+
+    #' @field adjacency_matrix
+    adjacency_matrix = purrr::partial(
+      .f = active_binding,
+      name = "adjacency_matrix",
+      expr = {
+        adjacency <- private %.% .adjacency |>
           dplyr::filter( # Filter adjacency to the given regions
             self$region_filter(values = .data$from),
             self$region_filter(values = .data$to)
           )
+
+        # Normalise and make symmetric
+        return(self$adjacency_to_matrix(adjacency = adjacency))
       }
     ),
 

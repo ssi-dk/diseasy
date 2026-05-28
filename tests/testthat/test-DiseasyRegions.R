@@ -184,6 +184,41 @@ test_that("region filtering works", {
 
 test_that("regions are matched exactly", {
 
+  region_1 <- DiseasyRegions$new(
+    regions = c("north", "south", "east", "north_subregion"),
+    adjacency = test_adjacency,
+    demography = test_demography
+  )
+
+  region_2 <- DiseasyRegions$new(
+    regions = c("north", "south", "east", "north_subregion"),
+    adjacency = dplyr::mutate(test_adjacency, "adjacency" = 2 * .data$adjacency),
+    demography = test_demography
+  )
+
+  expect_equal(
+    region_1$adjacency_matrix,
+    region_2$adjacency_matrix,
+    tolerance = 1e-10
+  )
+
+  expect_equal(
+    rowSums(region_1$adjacency_matrix),
+    stats::setNames(rep(1, length(region_1 %.% regions)), region_1 %.% regions)
+  )
+
+  expect_equal(
+    colSums(region_1$adjacency_matrix),
+    stats::setNames(rep(1, length(region_1 %.% regions)), region_1 %.% regions)
+  )
+
+  rm(region_1)
+  rm(region_2)
+})
+
+
+test_that("adjacency matrix normalisation works", {
+
   region <- DiseasyRegions$new(
     regions = "north",
     adjacency = test_adjacency,
