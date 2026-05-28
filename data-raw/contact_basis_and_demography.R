@@ -189,14 +189,27 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
           stats::setNames(arenas)
 
 
-        tibble::lst(
-          "contacts" = list(contacts),
+        out <- tibble::lst(
+          "contacts" = NULL,
+          "population" = N,
+          "proportion" = N / sum(N),
+          "demography" = demography |>
+            dplyr::filter(.data$key_country == country_code) |>
+            dplyr::select(!"key_country") |>
+            dplyr::rename("population" = "n_population") |>
+            dplyr::mutate("proportion" = .data$population / sum(.data$population)),
           "description" = glue::glue(
             "Contact matrices for ",
             "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
-            "from the `contactdata` package"
+            "from the `contactdata` package and population data for ",
+            "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
+            "from the US Census Bureau."
           )
         )
+
+        out$contacts <- contacts
+
+        return(out)
       }
     ) |>
     stats::setNames(common_country_codes)
