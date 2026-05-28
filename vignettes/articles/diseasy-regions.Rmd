@@ -1,0 +1,214 @@
+---
+title: "DiseasyRegions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyRegions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r hidden_options, include = FALSE}
+withr::local_options("diseasystore.verbose" = FALSE)
+withr::local_options("tibble.print_min" = 5)
+```
+
+# Overview
+
+The `DiseasyRegions` module defines the regional scope for model models.
+In addition, it provides a common place to define the demography available for those regions,
+and the adjacency between regions.
+
+The module is intentionally generic. Region identifiers are treated as ordinary character values and are matched
+exactly. This means that the region `"north"` is not interpreted as a parent of `"north_subregion"`.
+
+# Data structure
+
+`DiseasyRegions` uses three inputs:
+
+- `regions`: a `character()` vector defining the selected region scope.
+- `demography`: a `data.frame` with one region column, optional stratification columns, and one population column.
+- `adjacency`: a `data.frame` describing connectedness between pairs of regions.
+
+The demography data must include the columns `region` and `population`. Any additional columns are treated as
+stratification variables.
+
+```{r demography_data}
+all_regions <- c("north", "south", "east", "north_subregion")
+
+demography <- data.frame(
+  region = rep(all_regions, each = 2),
+  age_group = rep(c("0-17", "18+"), times = length(all_regions)),
+  population = c(
+    100000, 250000,
+    80000, 180000,
+    60000, 140000,
+    20000, 50000
+  )
+)
+
+demography
+```
+
+The adjacency data must include exactly the columns `from`, `to`, and `adjacency`.
+The `from` and `to` columns should contain the same set of region identifiers.
+
+```{r adjacency_data}
+adjacency <- expand.grid(
+  from = all_regions,
+  to = all_regions
+)
+
+adjacency[["adjacency"]] <- 0
+adjacency[adjacency$from == adjacency$to, "adjacency"] <- 1
+adjacency[adjacency$from == "north" & adjacency$to == "south", "adjacency"] <- 0.5
+adjacency[adjacency$from == "south" & adjacency$to == "north", "adjacency"] <- 0.5
+
+adjacency
+```
+
+# Creating a regional module
+
+A `DiseasyRegions` object can be created and then configured with the selected regions, demography, and adjacency
+data. Each setter validates the candidate input before storing it.
+
+```{r create_module}
+region <- DiseasyRegions$new()
+region$set_regions(regions = c("north", "south", "east"))
+region$set_demography(demography = demography)
+region$set_adjacency(adjacency = adjacency)
+
+region
+```
+
+The active `demography` and `adjacency` fields return data filtered to the currently selected regions.
+
+```{r filtered_demography}
+region %.% demography
+```
+
+```{r filtered_adjacency}
+region %.% adjacency
+```
+
+Population totals can be computed directly from the filtered demography.
+
+```{r population_totals}
+aggregate(
+  population ~ region,
+  data = region %.% demography,
+  FUN = sum
+)
+```
+
+# Changing the selected regions
+
+The selected regional scope can be changed with `$set_regions()`. The new regions must be available in the stored
+adjacency and demography data.
+
+```{r change_regions}
+region$set_regions(regions = c("north", "south"))
+
+region %.% regions
+```
+
+The active fields now reflect the updated scope.
+
+```{r changed_demography}
+region %.% demography
+```
+
+```{r changed_adjacency}
+region %.% adjacency
+```
+
+# Exact matching
+
+The generic module does not use hierarchical matching. In the example data, `"north"` and `"north_subregion"` are two
+different region identifiers.
+
+```{r exact_matching}
+region$set_regions(regions = "north")
+
+region %.% demography
+```
+
+The result includes rows for `"north"`, but not for `"north_subregion"`.
+
+# Updating demography and adjacency
+
+The demography and adjacency can also be updated after the module has been created. Candidate data are validated before
+they are stored, so an invalid update leaves the existing object state unchanged.
+
+```{r update_demography}
+demography_updated <- demography
+demography_updated[
+  demography_updated[["region"]] == "north" & demography_updated[["age_group"]] == "18+",
+  "population"
+] <- 260000
+
+region$set_demography(demography = demography_updated)
+
+region %.% demography
+```
+
+```{r update_adjacency}
+adjacency_updated <- adjacency
+adjacency_updated[
+  adjacency_updated[["from"]] == "north" & adjacency_updated[["to"]] == "south",
+  "adjacency"
+] <- 0.75
+adjacency_updated[
+  adjacency_updated[["from"]] == "south" & adjacency_updated[["to"]] == "north",
+  "adjacency"
+] <- 0.75
+
+region$set_regions(regions = c("north", "south"))
+region$set_adjacency(adjacency = adjacency_updated)
+
+region %.% adjacency
+```
+
+# Validation
+
+The module checks that selected regions are available in the stored demography and adjacency. For example, trying to
+select a region that is not present in the data will fail.
+
+```{r invalid_region, eval = FALSE}
+region$set_regions(regions = "west")
+```
+
+The adjacency data must also contain the same region identifiers in the `from` and `to` columns.
+
+```{r invalid_adjacency, eval = FALSE}
+bad_adjacency <- data.frame(
+  from = c("north", "south"),
+  to = c("south", "east"),
+  adjacency = c(1, 1)
+)
+
+region$set_adjacency(adjacency = bad_adjacency)
+```
+
+
+```{r cleanup, include = FALSE}
+rm(
+  adjacency,
+  adjacency_updated,
+  all_regions,
+  demography,
+  demography_updated,
+  region
+)
+gc()
+```
