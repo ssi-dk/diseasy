@@ -212,7 +212,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       return(invisible(NULL))
     },
 
-
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' @description
     #'   Create a logical filter for values matching one or more regions.
     #'
@@ -220,13 +220,12 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   overrides this method with hierarchical NUTS prefix matching.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically region identifiers.
-    #' @param regions (`character()` or `NULL`)\cr                                                                      # nolint: documentation_template_linter
+    #' @param regions (`character()` or `NULL`)\cr
     #'   Region identifiers to match against. Defaults to the currently selected
     #'   regions. If `NULL`, all values are matched.
     #' @return
     #'   A `logical()` vector with the same length as `values`.
-    #' @keywords internal
-    region_filter = function(values, regions = self %.% regions) {
+    region_filter = function(values, regions = self %.% regions) {                                                      # nolint end: documentation_template_linter, identation_linter
       checkmate::assert_character(values, any.missing = FALSE)
 
       if (is.null(regions)) {

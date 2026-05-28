@@ -229,7 +229,7 @@ rd_adjacency <- function(type = "param") {
   paste(
     "(`data.frame(1)`)\\cr",
     "The adjacency (connectedness) of the regions.",
-    "Effectively, the `adjacency` is a long-form of the adjacency-matrix",
+    "Effectively, the `adjacency` is a long-form of the adjacency-matrix\\cr",
 
     "The `data.frame` must include the following columns:\\cr",
     "- `from` (`character`): Region identifier.\\cr",
@@ -249,7 +249,7 @@ rd_demography <- function(type = "param") {
     "The demography of the population per region.\\cr",
 
     "The `data.frame` must include the following columns:\\cr",
-    "* `region` (`character`) Region identifier.",
+    "* `region` (`character`) Region identifier.\\cr",
     "* `...` Optional additional stratification columns (e.g. sex, ethnicity).\\cr",
     "* `population` (`numeric`) Number of individuals in the group.",
     switch(type == "field", "Read only.")

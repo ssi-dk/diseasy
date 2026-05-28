@@ -56,12 +56,12 @@ See the vignette("diseasy-regions") for examples of use.
   \describe{
     \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest.  Read only.}
 
-    \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr  Read only.}
+    \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr  Read only.}
 
     \item{\code{adjacency_matrix}}{(\code{matrix})\cr
 The symmetric, normalised matrix form of the adjacency for the given regions.}
 
-    \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier. * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group. Read only.}
+    \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group. Read only.}
   }
   \if{html}{\out{</div>}}
 }
@@ -99,8 +99,8 @@ The symmetric, normalised matrix form of the adjacency for the given regions.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
-      \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier. * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
     }
     \if{html}{\out{</div>}}
@@ -142,7 +142,7 @@ The symmetric, normalised matrix form of the adjacency for the given regions.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
     }
     \if{html}{\out{</div>}}
   }
@@ -164,7 +164,7 @@ The symmetric, normalised matrix form of the adjacency for the given regions.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier. * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
+      \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
     }
     \if{html}{\out{</div>}}
   }
@@ -187,8 +187,8 @@ The symmetric, normalised matrix form of the adjacency for the given regions.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
-      \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier. * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
     }
     \if{html}{\out{</div>}}
   }
@@ -215,7 +215,7 @@ overrides this method with hierarchical NUTS prefix matching.
     \describe{
       \item{\code{values}}{(\code{character()})\cr
 Values to filter, typically region identifiers.}
-      \item{\code{regions}}{(\code{character()} or \code{NULL})\cr                                                                      # nolint: documentation_template_linter
+      \item{\code{regions}}{(\code{character()} or \code{NULL})\cr
 Region identifiers to match against. Defaults to the currently selected
 regions. If \code{NULL}, all values are matched.}
     }
@@ -243,7 +243,7 @@ regions. If \code{NULL}, all values are matched.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
       \item{\code{tolerance}}{(\code{numeric(1)})\cr
 Numerical tolerance for row and column sums.}
       \item{\code{max_iterations}}{(\code{integer(1)})\cr
