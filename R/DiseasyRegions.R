@@ -80,6 +80,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(adjacency, add = coll)
       checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
+      checkmate::assert_set_equal(adjacency$from, adjacency$to, add = coll)
 
       # Must have codes corresponding to selected regions
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "from")), add = coll)
