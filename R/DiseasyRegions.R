@@ -241,7 +241,6 @@ DiseasyRegions <- R6::R6Class(                                                  
       printr("# DiseasyRegions #############################################")
       printr(glue::glue("Regions: {toString(self %.% regions)}"))
       printr(glue::glue("Total population: {sum((self %.% demography)[['population']])}"))
-      # TODO: More outputs
     }
   ),
 
