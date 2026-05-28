@@ -24,12 +24,12 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param demography `r rd_demography()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    initialize = function(regions, adjacency, demography, ...) {
+    initialize = function(regions = NULL, adjacency = NULL, demography = NULL, ...) {
 
       # Load objects
-      self$set_demography(demography)
-      self$set_adjacency(adjacency)
-      self$set_regions(regions)
+      if (!is.null(demography)) self$set_demography(demography)
+      if (!is.null(adjacency))  self$set_adjacency(adjacency)
+      if (!is.null(regions))    self$set_regions(regions)
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)

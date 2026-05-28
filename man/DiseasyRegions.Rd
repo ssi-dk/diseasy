@@ -57,7 +57,7 @@ See the vignette("diseasy-regions") for examples of use.
   Creates a new instance of the \code{DiseasyRegions} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$new(regions, adjacency, demography, ...)}
+    \preformatted{DiseasyRegions$new(regions = NULL, adjacency = NULL, demography = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
