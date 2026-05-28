@@ -389,6 +389,11 @@ DiseasyRegions <- R6::R6Class(                                                  
         private %.% .demography |>
           dplyr::filter( # Filter demography to the given regions
             self$region_filter(values = .data$region)
+          ) |>
+          dplyr::arrange(
+            dplyr::across(
+              c("region", sort(setdiff(dplyr::everything(), c("region", "population"))))
+            )
           )
       }
     )

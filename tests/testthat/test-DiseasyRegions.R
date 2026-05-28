@@ -148,6 +148,16 @@ test_that("`$set_demography()`` works", {
   expect_identical(region_1 %.% demography, region_2 %.% demography)
   expect_identical(region_1 %.% hash, region_2 %.% hash)
 
+
+  region_1 <- DiseasyRegions$new()
+  region_1$set_demography(test_demography_stratified)
+
+  region_2 <- DiseasyRegions$new()
+  region_2$set_demography(test_demography_stratified[sample(nrow(test_demography_stratified)), ])
+
+  expect_identical(region_1 %.% demography, region_2 %.% demography)
+  expect_identical(region_1 %.% hash, region_2 %.% hash)
+
   rm(region_1)
   rm(region_2)
 })
