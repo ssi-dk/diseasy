@@ -91,15 +91,43 @@ region$set_adjacency(adjacency = adjacency)
 region
 ```
 
-The active `demography` and `adjacency` fields return data filtered to the currently selected regions.
+The `?DiseasyRegions$demography` field returns demography filtered to the currently selected regions.
 
 ```{r filtered_demography}
 region %.% demography
 ```
 
+The active bindings `?DiseasyRegions$adjacency` and `?DiseasyRegions$adjacency_matirx`
+expose derived views of this input after filtering to the selected regions.
+
 ```{r filtered_adjacency}
 region %.% adjacency
 ```
+
+# Adjacency matrix binding
+
+The stored adjacency input is long form, but the module also exposes an `?DiseasyRegions$adjacency_matirx` field.
+This field returns a matrix representation of adjacency for the currently selected regions.
+
+The matrix is derived in three steps:
+
+- the stored adjacency data are filtered to the selected regions;
+- the filtered adjacency is made symmetric;
+- the symmetric matrix is normalised so that row sums and column sums are both one, up to numerical tolerance.
+
+```{r adjacency_matrix}
+region %.% adjacency_matrix
+```
+
+The `adjacency` active binding is unpacked from this matrix. It returns the upper triangle of the normalised
+symmetric matrix, including the diagonal.
+
+```{r adjacency_from_matrix}
+region %.% adjacency
+```
+
+This means that `region %.% adjacency` is not necessarily identical to the raw adjacency data supplied to
+`$set_adjacency()`. It is a selected, symmetric, normalised view of those data.
 
 Population totals can be computed directly from the filtered demography.
 
@@ -130,6 +158,10 @@ region %.% demography
 
 ```{r changed_adjacency}
 region %.% adjacency
+```
+
+```{r changed_adjacency_matrix}
+region %.% adjacency_matrix
 ```
 
 # Exact matching
