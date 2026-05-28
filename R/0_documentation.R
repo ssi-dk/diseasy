@@ -232,7 +232,7 @@ rd_adjacency <- function(type = "param") {
   paste(
     "(`data.frame(1)`)\\cr",
     "The adjacency (connectedness) of the regions (identified by NUTS codes).",
-    "Effectively, the `adjacency` is a long-form of the adjacency-matrix".,
+    "Effectively, the `adjacency` is a long-form of the adjacency-matrix",
 
     "The `data.frame` must include the following columns:\\cr",
     "- `from`", switch(type == "param", "(NUTS 1/2/3 code *)"), "\\cr",
@@ -252,7 +252,7 @@ rd_demography <- function(type = "param") {
 
   paste(
     "(`data.frame(1)`)\\cr",
-    "The demography of the population per region.",
+    "The demography of the population per region.\\cr",
 
     "The `data.frame` must include the following columns:\\cr",
     "* `region` (`character`) Region identifier.",
