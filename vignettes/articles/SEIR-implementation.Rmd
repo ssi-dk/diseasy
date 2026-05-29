@@ -80,7 +80,7 @@ $$
 $$
 $$
 \underbrace{\begin{matrix} E_{D,V}^1 \, \cdots \, E_{D,V}^K \;\;\; I_{D,V}^1 \, \cdots \, I_{D,V}^L \;\;\; R_{D,V}^1 \, \cdots \, R_{D,V}^M \end{matrix}}_{\text{Demographic group D, Variant V}}
-\;\; S_1 \, \cdots \, S_A]
+\;\; S_1 \, \cdots \, S_D]
 $$
 NOTE: State vector uses normalised (unit) populations.
 
@@ -293,11 +293,11 @@ $$
     \vdots \\
     1 - \chi_{V\leftarrow V} (1 - \overline{\gamma})
   \end{bmatrix} \\
-  \overline{1}_A & \cdots & \overline{1}_A
+  \overline{1}_D & \cdots & \overline{1}_D
 \end{bmatrix}
 $$
 
-Where $\overline{1}_A$ is a ones vector of length $D$.
+Where $\overline{1}_D$ is a ones vector of length $D$.
 
 In $\overline{\overline{\rho}}$, the sub-matrices of the form:
 
