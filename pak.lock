@@ -296,7 +296,7 @@
     },
     {
       "package": "gh",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "binary": true
     },
     {
@@ -501,7 +501,7 @@
     },
     {
       "package": "mvtnorm",
-      "version": "1.3-7",
+      "version": "1.4-0",
       "binary": true
     },
     {
