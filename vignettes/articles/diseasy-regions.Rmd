@@ -127,9 +127,9 @@ $$
 Where $\circ$ is the Hadamard product (element-wise multiplication).
 
 The matrix elements of $\overline{\overline{\Theta}}$ contains the probability that individual interact across regions,
-with elements $\Theta_{p,q} = \sum_z \phi_{z,p} \phi_{z,q}$.
+with elements $\Theta_{x,y} = \sum_z \phi_{z,x} \phi_{z,y}$.
 
-These elements compute the probability that individuals in region $p$ travel to region $z$ AND individuals in region $q$
+These elements compute the probability that individuals in region $x$ travel to region $z$ AND individuals in region $y$
 travel to region $z$.
 
 For the 2-region system, the mixing can be expressed in matrix form as:
@@ -157,7 +157,7 @@ S_2 (\phi_{2,2}^2 + \phi_{1,2}^2) I_2 + S_2 (\phi_{2,2}\phi_{2,1} + \phi_{1,2}\p
 $$
 
 If we assume there is no spatial structure and therefore all matrix elements are identical:
-$\phi_{p,q} = \phi$
+$\phi_{x,y} = \phi$
 
 Then we can reduce the expression
 $$
@@ -192,7 +192,7 @@ on how individuals travel, such as from survey or mobility data.
 
 Alternatively, we can consider the $\overline{\overline{\Theta}}$ matrix which we can
 think of as a "disease flow" matrix. This matrix identifies the flow of infections from
-individuals residing in regions $p$ to individuals residing in regions $q$.
+individuals residing in regions $x$ to individuals residing in regions $y$.
 Such matrix may be estimated from more direct measurements of disease flow such as from
 genetic data or contact tracing.
 
