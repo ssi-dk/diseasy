@@ -179,7 +179,6 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Check regions are consistent with adjacency
       if (!is.null(regions) && !is.null(adjacency)) {
-
         checkmate::assert_subset(
           regions,
           unique(c(adjacency[["from"]], adjacency[["to"]])),
