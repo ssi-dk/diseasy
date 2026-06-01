@@ -76,15 +76,17 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       checkmate::assert_character(regions, min.len = 1, any.missing = FALSE, unique = TRUE, add = coll)
 
+      available_regions <- NULL
       if (!is.null(private %.% .adjacency)) {
-        # Must have codes in adjacency
-        checkmate::assert_subset(regions, unique(dplyr::pull(private %.% .adjacency, "from")), add = coll)
-        checkmate::assert_subset(regions, unique(dplyr::pull(private %.% .adjacency, "to")),   add = coll)
+        available_regions <- unique(dplyr::pull(private %.% .adjacency, "from"))
       }
 
       if (!is.null(private %.% .demography)) {
-        # Must have codes in demography
-        checkmate::assert_subset(regions, unique(dplyr::pull(private %.% .demography, "region")), add = coll)
+        available_regions <- intersect(available_regions, unique(dplyr::pull(private %.% .demography, "region")))
+      }
+
+      if (!is.null(available_regions)) {
+        checkmate::assert_subset(regions, available_regions, add = coll)
       }
 
       checkmate::reportAssertions(coll)
