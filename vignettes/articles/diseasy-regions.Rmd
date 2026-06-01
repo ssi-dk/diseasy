@@ -30,13 +30,13 @@ In addition, it provides a common place to define the demography available for t
 and the adjacency between regions.
 
 The module is intentionally generic. Region identifiers are treated as ordinary character values and are matched
-exactly. This means that the region `"north"` is not interpreted as a parent of `"north_subregion"`.
+exactly. This means that, e.g., the region `"north"` is not interpreted as a parent of `"north_subregion"`.
 
 # Data structure
 
 `DiseasyRegions` uses three inputs:
 
-- `regions`: a `character()` vector defining the selected region scope.
+- `regions`: a `character` vector defining the selected region scope.
 - `demography`: a `data.frame` with one region column, optional stratification columns, and one population column.
 - `adjacency`: a `data.frame` describing connectedness between pairs of regions
   (see the [Regional adjacency](#regional-adjacency) section for further details).
@@ -327,20 +327,20 @@ region %.% adjacency
 The module checks that selected regions are available in the stored demography and adjacency. For example, trying to
 select a region that is not present in the data will fail.
 
-```{r invalid_region, eval = FALSE}
-region$set_regions(regions = "west")
+```{r invalid_region}
+try(region$set_regions(regions = "west"))
 ```
 
 The adjacency data must also contain the same region identifiers in the `from` and `to` columns.
 
-```{r invalid_adjacency, eval = FALSE}
+```{r invalid_adjacency}
 bad_adjacency <- data.frame(
   from = c("north", "south"),
   to = c("south", "east"),
   adjacency = c(1, 1)
 )
 
-region$set_adjacency(adjacency = bad_adjacency)
+try(region$set_adjacency(adjacency = bad_adjacency))
 ```
 
 
