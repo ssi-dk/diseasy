@@ -81,9 +81,9 @@ adjacency
 # Regional adjacency
 
 `DiseasyRegions` builds on the concept of a degree of "connectedness" between the different regions.
-Here, this "connectedness" is refered to as "adjacency" in alignment with other models.
+Here, this "connectedness" is referred to as "adjacency" in alignment with other models.
 
-Different measures for adjacency can be extracted from real-world data which have different interpertations.
+Different measures for adjacency can be extracted from real-world data which have different interpretations.
 
 In `diseasy`, the adjacency of `DiseasyRegions` are implemented in SEIR-like models and it helps to be clear on
 how this adjacency is used.
