@@ -38,7 +38,8 @@ exactly. This means that the region `"north"` is not interpreted as a parent of 
 
 - `regions`: a `character()` vector defining the selected region scope.
 - `demography`: a `data.frame` with one region column, optional stratification columns, and one population column.
-- `adjacency`: a `data.frame` describing connectedness between pairs of regions.
+- `adjacency`: a `data.frame` describing connectedness between pairs of regions
+  (see the [Regional adjacency](#regional-adjacency) section for further details).
 
 The demography data must include the columns `region` and `population`. Any additional columns are treated as
 stratification variables.
@@ -77,6 +78,136 @@ adjacency[adjacency$from == "south" & adjacency$to == "north", "adjacency"] <- 0
 adjacency
 ```
 
+# Regional adjacency
+
+`DiseasyRegions` builds on the concept of a degree of "connectedness" between the different regions.
+Here, this "connectedness" is refered to as "adjacency" in alignment with other models.
+
+Different measures for adjacency can be extracted from real-world data which have different interpertations.
+
+In `diseasy`, the adjacency of `DiseasyRegions` are implemented in SEIR-like models and it helps to be clear on
+how this adjacency is used.
+
+To begin, lets define the "movement matrix" $\Phi$ between $R$ connected regions:
+
+$$
+\overline{\overline{\Phi}} = \begin{bmatrix}
+\phi_{1,1} & \cdots & \phi_{1,R} \\
+\vdots & \ddots & \vdots \\
+\phi_{R,1} & \cdots & \phi_{R,R}
+\end{bmatrix}
+$$
+
+If we interpret these adjacencies as "the average fraction of contacts between regions", we can diagram the SEIR compartments
+of a two-region model as:
+
+```{r SEIR-structure, echo = FALSE, fig.align = "center", fig.cap = "SEIR model overview for a two region model", out.width = "120%"}
+knitr::include_graphics(
+  devtools::package_file(
+    "vignettes/articles/article_data/diseasy-regions-model-structure.png"
+  )
+)
+```
+
+With the following equations for the infectious compartments in region $1$
+$$
+\dot{I}_1 = \beta\left(
+\underbrace{S_1 \phi_{1,1}}_\textrm{stay}  \underbrace{\phi_{1,1} I_1}_\textrm{stay} +
+\underbrace{S_1 \phi_{1,1}}_\textrm{stay}  \underbrace{\phi_{1,2} I_2}_\textrm{travel} +
+\underbrace{S_1 \phi_{2,1}}_\textrm{travel}\underbrace{\phi_{2,2} I_2}_\textrm{stay} +
+\underbrace{S_1 \phi_{2,1}}_\textrm{travel}\underbrace{\phi_{2,1} I_1}_\textrm{travel}\right) -
+r_I I_1
+$$
+
+In general, we can express the dynamics in matrix form assuming $R$ different regions
+$$
+\dot{\overline{I}} = \beta\overline{S}\circ\overline{\overline{\Theta}}\cdot\overline{I} - r_I \overline{I}
+$$
+
+Where $\circ$ is the Hadamard product (element-wise multiplication).
+
+The matrix elements of $\overline{\overline{\Theta}}$ contains the probability that individual interact across regions,
+with elements $\Theta_{p,q} = \sum_z \phi_{z,p} \phi_{z,q}$.
+
+These elements compute the probability that individuals in region $p$ travel to region $z$ AND individuals in region $q$
+travel to region $z$.
+
+For the 2-region system, the mixing can be expressed in matrix form as:
+$$
+\overline{\overline{\Theta}} = \begin{bmatrix}
+  \phi_{1,1}^2 + \phi_{2,1}^2 & \phi_{1,1}\phi_{1,2} + \phi_{2,1}\phi_{2,2} \\
+  \phi_{2,2}\phi_{2,1} + \phi_{1,2}\phi_{1,1} & \phi_{2,2}^2 + \phi_{1,2}^2
+\end{bmatrix}
+$$
+
+In this formalism, the $\Theta$ which satisfies:
+$$
+\dot{I} = \dot{I}_1 + \dot{I}_2 = \beta S I - r_I I
+$$
+
+requires
+$$
+\overline{S}\cdot\overline{\overline{\Theta}}\cdot\overline{I} = S I
+$$
+
+That leads to the following expression:
+$$
+S_1 (\phi_{1,1}^2 + \phi_{2,1}^2) I_1 + S_1 (\phi_{1,1}\phi_{1,2} + \phi_{2,1}\phi_{2,2}) I_2 +
+S_2 (\phi_{2,2}^2 + \phi_{1,2}^2) I_2 + S_2 (\phi_{2,2}\phi_{2,1} + \phi_{1,2}\phi_{1,1}) I_1
+$$
+
+If we assume there is no spatial structure and therefore all matrix elements are identical:
+$\phi_{p,q} = \phi$
+
+Then we can reduce the expression
+$$
+\Rightarrow
+S_1 (2\phi^2) I_1 + S_1 (2\phi^2) I_2 +
+S_2 (2\phi^2) I_2 + S_2 (2\phi^2) I_1
+$$
+
+$$
+\Rightarrow
+S_1 (2\phi^2) (I_1 + I_2) +
+S_2 (2\phi^2) (I_1 + I_2)
+$$
+
+$$
+\Rightarrow
+(2\phi^2) (S_1 + S_2) (I_1 + I_2)
+$$
+
+$$
+\Rightarrow
+(2\phi^2) S I
+$$
+
+Which means that the neutral matrix elements are:
+$$
+\phi = \frac{1}{\sqrt{2}}
+$$
+
+This "movement matrix" $\overline{\overline{\Phi}}$ can be estimated from information
+on how individuals travel, such as from survey or mobility data.
+
+Alternatively, we can consider the $\overline{\overline{\Theta}}$ matrix which we can
+think of as a "disease flow" matrix. This matrix identifies the flow of infections from
+individuals residing in regions $p$ to individuals residing in regions $q$.
+Such matrix may be estimated from more direct measurements of disease flow such as from
+genetic data or contact tracing.
+
+Both matrices are required to be normalised such that their row sums are 1.
+
+`DiseasyRegions` can take either type of adjacency matrix.
+
+The stored adjacency input is long form, but the module also exposes an `?DiseasyRegions$adjacency_matirx` field.
+This field returns a matrix representation of adjacency for the currently selected regions.
+
+The matrix is derived in three steps:
+
+- the stored adjacency data are filtered to the selected regions;
+- the matrix is normalised so that row sums are 1.
+
 # Creating a regional module
 
 A `DiseasyRegions` object can be created and then configured with the selected regions, demography, and adjacency
@@ -97,38 +228,6 @@ The `?DiseasyRegions$demography` field returns demography filtered to the curren
 region %.% demography
 ```
 
-The active bindings `?DiseasyRegions$adjacency` and `?DiseasyRegions$adjacency_matirx`
-expose derived views of this input after filtering to the selected regions.
-
-```{r filtered_adjacency}
-region %.% adjacency
-```
-
-# Adjacency matrix binding
-
-The stored adjacency input is long form, but the module also exposes an `?DiseasyRegions$adjacency_matirx` field.
-This field returns a matrix representation of adjacency for the currently selected regions.
-
-The matrix is derived in three steps:
-
-- the stored adjacency data are filtered to the selected regions;
-- the filtered adjacency is made symmetric;
-- the symmetric matrix is normalised so that row sums and column sums are both one, up to numerical tolerance.
-
-```{r adjacency_matrix}
-region %.% adjacency_matrix
-```
-
-The `adjacency` active binding is unpacked from this matrix. It returns the upper triangle of the normalised
-symmetric matrix, including the diagonal.
-
-```{r adjacency_from_matrix}
-region %.% adjacency
-```
-
-This means that `region %.% adjacency` is not necessarily identical to the raw adjacency data supplied to
-`$set_adjacency()`. It is a selected, symmetric, normalised view of those data.
-
 Population totals can be computed directly from the filtered demography.
 
 ```{r population_totals}
@@ -138,6 +237,18 @@ aggregate(
   FUN = sum
 )
 ```
+
+The active bindings `?DiseasyRegions$adjacency` and `?DiseasyRegions$adjacency_matrix`
+expose derived views of `adjacency` input after filtering to the selected regions.
+
+```{r filtered_adjacency}
+region %.% adjacency
+```
+
+```{r filtered_adjacency_matrix}
+region %.% adjacency_matrix
+```
+
 
 # Changing the selected regions
 
