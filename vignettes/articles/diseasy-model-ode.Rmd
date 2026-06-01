@@ -193,7 +193,7 @@ The parameters are:
 - *overall_infection_risk*: The overall risk of infection in the population
   (the overall scaling of infectivity).
 
-```{r model configuration, eval = rlang::is_installed("RSQLite")}
+```{r model configuration, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # Hyper parameters
 compartment_structure <- c("E" = 2L, "I" = 1L, "R" = 2L)
 
@@ -311,7 +311,7 @@ model_output_to_observable <- list(
 # Putting it all together
 With all the configuration done above, we can now create our model instance.
 
-```{r model creation, eval = rlang::is_installed("RSQLite")}
+```{r model creation, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model <- DiseasyModelOdeSeir$new(
   # Scenario configuration
   population = population,
@@ -334,7 +334,7 @@ model <- DiseasyModelOdeSeir$new(
 
 # Predicting the incidence
 From this point, we can easily get predictions for the individual observables.
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "incidence",
   prediction_length = 5
@@ -342,7 +342,7 @@ model$get_results(
 ```
 
 ... and we can plot the predictions along with observations for the data
-```{r, fig.alt = "Model prediction for the number of incidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of incidence - stratified by age group.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "incidence",
@@ -350,7 +350,7 @@ plot(
 )
 ```
 
-```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed("RSQLite")}
+```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -367,7 +367,7 @@ stopifnot(
 ```
 
 The results are easily stratified by the stratifications in the data
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "incidence",
   prediction_length = 3,
@@ -376,7 +376,7 @@ model$get_results(
 ```
 
 ... and we can see the plots for each strata.
-```{r, fig.alt = "Model prediction for the number of incidence - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of incidence - stratified by age group.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "incidence",
@@ -387,14 +387,14 @@ plot(
 
 
 This can be done for all the observables we have mapped in the model.
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "n_infected",
   prediction_length = 5
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of infected - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of infected - stratified by age group.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "n_infected",
@@ -402,7 +402,7 @@ plot(
 )
 ```
 
-```{r configuration test - n_infected, include = FALSE, eval = rlang::is_installed("RSQLite")}
+```{r configuration test - n_infected, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -418,7 +418,7 @@ stopifnot(
 )
 ```
 
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "n_infected",
   prediction_length = 3,
@@ -427,7 +427,7 @@ model$get_results(
 ```
 
 
-```{r, fig.alt = "Model prediction for the number of infected - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of infected - stratified by age group.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "n_infected",
@@ -437,14 +437,14 @@ plot(
 ```
 
 
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "n_positive",
   prediction_length = 5
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of positive.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of positive.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "n_positive",
@@ -452,7 +452,7 @@ plot(
 )
 ```
 
-```{r configuration test - n_positive, include = FALSE, eval = rlang::is_installed("RSQLite")}
+```{r configuration test - n_positive, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -468,7 +468,7 @@ stopifnot(
 )
 ```
 
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "n_positive",
   prediction_length = 3,
@@ -476,7 +476,7 @@ model$get_results(
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of positive - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of positive - stratified by age group.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "n_positive",
@@ -485,14 +485,14 @@ plot(
 )
 ```
 
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "n_admission",
   prediction_length = 5
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of hospital admissions.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of hospital admissions.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "n_admission",
@@ -500,7 +500,7 @@ plot(
 )
 ```
 
-```{r configuration test - n_admission, include = FALSE, eval = rlang::is_installed("RSQLite")}
+```{r configuration test - n_admission, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -516,7 +516,7 @@ stopifnot(
 )
 ```
 
-```{r, eval = rlang::is_installed("RSQLite")}
+```{r, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 model$get_results(
   observable = "n_admission",
   prediction_length = 3,
@@ -524,7 +524,7 @@ model$get_results(
 )
 ```
 
-```{r, fig.alt = "Model prediction for the number of hospital admissions - stratified by age group.", eval = rlang::is_installed("RSQLite")}
+```{r, fig.alt = "Model prediction for the number of hospital admissions - stratified by age group.", eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 plot(
   model,
   observable = "n_admission",

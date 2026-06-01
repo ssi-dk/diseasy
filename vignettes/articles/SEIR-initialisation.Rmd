@@ -416,14 +416,14 @@ incidence_data |>
 
 We can now use the `?DiseasyModelOdeSeir$initialise_state_vector()` method to infer the initial state vector.
 
-```{r, eval = rlang::is_installed("duckdb")}
+```{r, eval = rlang::is_installed(c("duckdb", "optimx", "ucminf"))}
 psi <- m$initialise_state_vector(incidence_data)
 
 psi
 ```
 
 And we now test the initial conditions by solving the model using these starting conditions.
-```{r, eval = rlang::is_installed("duckdb")}
+```{r, eval = rlang::is_installed(c("duckdb", "optimx", "ucminf"))}
 get_prediction <- function(
   model,
   psi,
@@ -514,7 +514,7 @@ prediction <- get_prediction(model = m, psi = psi)
 prediction
 ```
 
-```{r correctly specified model, fig.alt = "Using a correctly specified model to initialise the SEIR model matches the true data near-perfectly.", eval = rlang::is_installed("duckdb")}
+```{r correctly specified model, fig.alt = "Using a correctly specified model to initialise the SEIR model matches the true data near-perfectly.", eval = rlang::is_installed(c("duckdb", "optimx", "ucminf"))}
 ggplot2::ggplot() +
   ggplot2::geom_point(
     data = incidence_data,
@@ -540,7 +540,7 @@ ggplot2::ggplot() +
   ggplot2::labs(y = "Model output", color = "Model Configuration")
 ```
 
-```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed("duckdb")}
+```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed(c("duckdb", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -566,7 +566,7 @@ we only estimate the initial state vector.
 Once we include model fitting, the discrepancy between the data and model predictions may diminish.
 
 #### Misspecified model in periods of increasing infections
-```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing.", eval = rlang::is_installed("duckdb")}
+```{r misspecified model increasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are increasing.", eval = rlang::is_installed(c("duckdb", "optimx", "ucminf"))}
 models <- list(
   generate_model(2L, 1L, 1L),
   generate_model(1L, 1L, 2L),
@@ -607,7 +607,7 @@ ggplot2::ggplot() +
 ```
 
 #### Misspecified model in periods of decreasing infections
-```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing.", eval = rlang::is_installed("duckdb")}
+```{r misspecified model decreasing, fig.alt = "Using a misspecified model to initialise the SEIR model can match the true data well when infections are decreasing.", eval = rlang::is_installed(c("duckdb", "optimx", "ucminf"))}
 
 models <- list(
   generate_model(2L, 1L, 1L),
