@@ -134,7 +134,7 @@ $$
 \cdot \frac{\tilde{S}_p}{\tilde{N}} - r_I \frac{\tilde{I}_p}{\tilde{N}} \Rightarrow
 $$
 
-Then expanding by $N / N$ and expressing in terms of $c_{p,q} = \frac{t_{ij}}{\tilde{N}_p\tilde{N}_q}$.
+Then expanding by $N / N$ and expressing in terms of $c_{p,q} = \frac{t_{p,q}}{\tilde{N}_p\tilde{N}_q}$.
 $$
 \frac{\dot{\tilde{I}}_p}{\tilde{N}} = P\frac{\tilde{N}}{\tilde{N}}\left(\tilde{I}_1 c_{p,1} + \tilde{I}_2 c_{p,2} + \dots\right) \cdot
 \frac{\tilde{S}_p}{\tilde{N}}
