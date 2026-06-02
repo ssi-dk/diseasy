@@ -107,8 +107,11 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Sets the region adjacency data.
     #' @param adjacency `r rd_adjacency()`
+    #' @param type `r rd_adjacency_type()`
     #' @return `r rd_side_effects`
-    set_adjacency = function(adjacency) {
+    set_adjacency = function(adjacency, type = c("movement", "infection")) {
+
+      type = match.arg(type)
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(adjacency, add = coll)
@@ -118,10 +121,15 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
 
+      checkmate::assert_choice(type, c("movement", "infection"), add = coll)
+
       # Must have codes corresponding to selected regions
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "from")), add = coll)
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "to")),   add = coll)
       checkmate::reportAssertions(coll)
+
+      # Store the type of adjacency matrix
+      attr(adjacency, "type") <- type
 
       # Check configuration works with existing region and demography
       self$validate_configuration(
@@ -240,25 +248,53 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
     #' @description
-    #'   Converts long form adjacency to a normalised and symmetric matrix form.
+    #'   Converts long form adjacency to the "Theta" infection matrix.
     #' @param adjacency `r rd_adjacency()`
-    #' @param tolerance (`numeric(1)`)\cr
-    #'   Numerical tolerance for row and column sums.
-    #' @param max_iterations (`integer(1)`)\cr
-    #'   Maximum number of scaling iterations.
-    adjacency_to_matrix = function(
-      adjacency,
-      tolerance = 1e-10,
-      max_iterations = 1000
-    ) {
-      checkmate::assert_number(tolerance, lower = 0)
-      checkmate::assert_integerish(max_iterations, lower = 1, len = 1)
+    #' @param type `r rd_adjacency_type()`
+    adjacency_to_theta = function(adjacency, type = c("movement", "infection")) {
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_data_frame(adjacency, add = coll)
+      checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
+      checkmate::assert_set_equal(adjacency$from, adjacency$to, add = coll)
+      checkmate::assert_character(adjacency$from, any.missing = FALSE, add = coll)
+      checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
+      checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
 
+      checkmate::assert_choice(type, c("movement", "infection"), add = coll)
+      checkmate::reportAssertions(coll)
 
-      # Allocate empty adjacency matrix
-      regions <- sort(unique(c(adjacency %.% from, adjacency %.% to)))
+      # Determine regions
+      regions <- sort(adjacency %.% from)
 
-      adjacency_matrix <- matrix(
+      # Split computations based on input type
+      if (type == "movement") {
+
+        # Normalise the movement matrix
+        phi_long <- adjacency |>
+          dplyr::mutate(
+            "phi" = .data$adjacency / sum(.data$adjacency),
+            .by = "from"
+          ) |>
+          dplyr::select(!"adjacency")
+
+        # Generate the infection matrix
+        theta_long <- tidyr::expand_grid("x" = regions, "y" = regions, "z" = regions) |>
+          dplyr::left_join(phi_long, by = c("x" = "from", "z" = "to")) |>
+          dplyr::left_join(phi_long, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy")) |>
+          dplyr::summarise(
+            theta = sum(.data$phi_zx * .data$phi_zy),
+            .by = c("x", "y")
+          )
+
+      } else if (type == "infection") {
+
+        theta_long <- adjacency |>
+          dplyr::rename("x" = "from", "y" = "to")
+
+      }
+
+      # Cast to matrix
+      theta_matrix <- matrix(
         NA_real_,
         nrow = length(regions),
         ncol = length(regions),
@@ -266,62 +302,14 @@ DiseasyRegions <- R6::R6Class(                                                  
       )
 
       # Fill with existing values
-      adjacency_matrix[
+      theta_matrix[
         cbind(
-          match(adjacency %.% from, regions),
-          match(adjacency %.% to, regions)
+          match(theta_long %.% x, regions),
+          match(theta_long %.% y, regions)
         )
-      ] <- adjacency[["adjacency"]]
+      ] <- theta_long %.% theta
 
-
-      # Make symmetric
-      symmetric_adjacency_matrix <- purrr::map2_dbl(
-        as.numeric(adjacency_matrix),
-        as.numeric(t(adjacency_matrix)),
-        ~ sum(c(.x, .y), na.rm = TRUE) / (is.finite(.x) + is.finite(.y))
-      ) |>
-        matrix(
-          ncol = nrow(adjacency_matrix),
-          nrow = nrow(adjacency_matrix),
-          dimnames = dimnames(adjacency_matrix)
-        )
-
-
-      # Start normalisation
-      if (any(rowSums(symmetric_adjacency_matrix) == 0)) {
-        pkgcond::pkg_error("Cannot normalise adjacency because at least one row sums to zero.")
-      }
-
-      if (any(colSums(symmetric_adjacency_matrix) == 0)) {
-        pkgcond::pkg_error("Cannot normalise adjacency because at least one column sums to zero.")
-      }
-
-      scaling <- rep(1, nrow(symmetric_adjacency_matrix))
-
-      for (iteration in seq_len(max_iterations)) {
-        normalised_adjacency_matrix <- symmetric_adjacency_matrix |>
-          sweep(MARGIN = 1, STATS = scaling, FUN = "*") |>
-          sweep(MARGIN = 2, STATS = scaling, FUN = "*")
-
-        normalisation_error <- max(
-          abs(rowSums(normalised_adjacency_matrix) - 1),
-          abs(colSums(normalised_adjacency_matrix) - 1)
-        )
-
-        if (normalisation_error <= tolerance) {
-          return(normalised_adjacency_matrix)
-        }
-
-        row_sums <- rowSums(normalised_adjacency_matrix)
-
-        if (any(row_sums == 0)) {
-          pkgcond::pkg_error("Cannot normalise adjacency because at least one row sums to zero.")
-        }
-
-        scaling <- scaling / sqrt(row_sums)
-      }
-
-      pkgcond::pkg_error("Could not normalise adjacency within the configured number of iterations.")
+      return(theta_matrix)
     },
 
 
@@ -364,34 +352,6 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "adjacency",
       expr = {
-        # Unpack the upper triangle of the symmetric and normalised adjacency matrix
-        adjacency_matrix <- self %.% adjacency_matrix
-
-        if (is.null(adjacency_matrix)) {
-          return(NULL)
-        }
-
-        adjacency_index <- which(
-          upper.tri(adjacency_matrix, diag = TRUE),
-          arr.ind = TRUE
-        )
-
-        adjacency <- data.frame(
-          "from" = rownames(adjacency_matrix)[adjacency_index[, "row"]],
-          "to" = colnames(adjacency_matrix)[adjacency_index[, "col"]],
-          "adjacency" = adjacency_matrix[adjacency_index]
-        )
-
-        return(adjacency)
-      }
-    ),
-
-    #' @field adjacency_matrix (`matrix`)\cr
-    #'   The symmetric, normalised matrix form of the adjacency for the given regions.
-    adjacency_matrix = purrr::partial(
-      .f = active_binding,
-      name = "adjacency_matrix",
-      expr = {
         adjacency <- private %.% .adjacency
 
         if (is.null(adjacency)) {
@@ -404,8 +364,23 @@ DiseasyRegions <- R6::R6Class(                                                  
             self$region_filter(values = .data$to)
           )
 
-        # Normalise before returning
-        return(self$adjacency_to_matrix(adjacency = adjacency))
+        return(adjacency)
+      }
+    ),
+
+
+    #' @field theta_matrix (`matrix`)\cr
+    #'  The "Theta" matrix (see `vignette("diseasy-regions")`) that describes flow of infections between regions.
+    theta_matrix = purrr::partial(
+      .f = active_binding,
+      name = "theta_matrix",
+      expr = {
+        adjacency <- self %.% adjacency
+        theta_matrix <- self$adjacency_to_theta(
+          adjacency = adjacency,
+          type = attr(adjacency, "type")
+        )
+        return(theta_matrix)
       }
     ),
 
