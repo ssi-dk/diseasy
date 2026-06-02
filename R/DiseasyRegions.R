@@ -286,14 +286,14 @@ DiseasyRegions <- R6::R6Class(                                                  
           dplyr::left_join(phi_long, by = c("x" = "from", "z" = "to")) |>
           dplyr::left_join(phi_long, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy")) |>
           dplyr::summarise(
-            theta = sum(.data$phi_zx * .data$phi_zy),
+            "theta" = sum(.data$phi_zx * .data$phi_zy),
             .by = c("x", "y")
           )
 
       } else if (type == "infection") {
 
         theta_long <- adjacency |>
-          dplyr::rename("x" = "from", "y" = "to")
+          dplyr::rename("x" = "from", "y" = "to", "theta" = "adjacency")
 
       }
 
