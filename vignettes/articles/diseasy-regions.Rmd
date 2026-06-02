@@ -25,7 +25,7 @@ withr::local_options("tibble.print_min" = 5)
 
 # Overview
 
-The `DiseasyRegions` module defines the regional scope for model models.
+The `DiseasyRegions` module defines the regional scope for the models.
 In addition, it provides a common place to define the demography available for those regions,
 and the adjacency between regions.
 
@@ -83,10 +83,14 @@ adjacency
 `DiseasyRegions` builds on the concept of a degree of "connectedness" between the different regions.
 Here, this "connectedness" is referred to as "adjacency" in alignment with other models.
 
-Different measures for adjacency can be extracted from real-world data which have different interpretations.
+Different measures for adjacency can be extracted from real-world data which have very different interpretations.
+Adjacency is often described from information about "movement" such as mobility data or surveys
+on how people move between regions. Alternatively adjacency can be derived from "infection" data such as genetic
+phylogeny. While these seem very similar, there are substantial differences in hbw these adjacencies should be
+implemented in the models.
 
 In `diseasy`, the adjacency of `DiseasyRegions` are implemented in SEIR-like models and it helps to be clear on
-how this adjacency is used.
+how this adjacency is used to illustrate these differences.
 
 To begin, lets define the "movement matrix" $\Phi$ between $R$ connected regions:
 
@@ -118,6 +122,9 @@ $$
 \underbrace{S_1 \phi_{2,1}}_\textrm{travel}\underbrace{\phi_{2,1} I_1}_\textrm{travel}\right) -
 r_I I_1
 $$
+where we divide the types of contacts into whether individuals stay in their own region or travel[^1] to other regions.
+
+[1^]: Note that they do not immigrate to other regions when they travel as this would change their region index.
 
 In general, we can express the dynamics in matrix form assuming $R$ different regions
 $$
