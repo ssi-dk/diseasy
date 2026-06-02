@@ -152,7 +152,7 @@ $$
 
 That leads to the following expression:
 $$
-S_1 (\phi_{1,1}^2 + \phi_{2,1}^2) I_1 + S_1 (\phi_{1,1}\phi_{1,2} + \phi_{2,1}\phi_{2,2}) I_2 +
+S_1 (\phi_{1,1}^2 + \phi_{2,1}^2) I_1 + S_1 (\phi_{1,1}\phi_{1,2} + \phi_{2,1}\phi_{2,2}) I_2 + \\
 S_2 (\phi_{2,2}^2 + \phi_{1,2}^2) I_2 + S_2 (\phi_{2,2}\phi_{2,1} + \phi_{1,2}\phi_{1,1}) I_1
 $$
 
