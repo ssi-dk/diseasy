@@ -86,7 +86,7 @@ Here, this "connectedness" is referred to as "adjacency" in alignment with other
 Different measures for adjacency can be extracted from real-world data which have very different interpretations.
 Adjacency is often described from information about "movement" such as mobility data or surveys
 on how people move between regions. Alternatively adjacency can be derived from "infection" data such as genetic
-phylogeny. While these seem very similar, there are substantial differences in hbw these adjacencies should be
+phylogeny. While these seem very similar, there are substantial differences in how these adjacencies should be
 implemented in the models.
 
 In `diseasy`, the adjacency of `DiseasyRegions` are implemented in SEIR-like models and it helps to be clear on
