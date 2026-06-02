@@ -144,7 +144,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(demography, add = coll)
       checkmate::assert_subset(c("region", "population"), colnames(demography), add = coll)
-      checkmate::assert_character(demography %.% regions, any.missing = FALSE, add = coll)
+      checkmate::assert_character(demography %.% region, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(demography %.% population, lower = 0, any.missing = FALSE, add = coll)
 
       # Must have codes corresponding to selected regions
@@ -192,7 +192,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (!is.null(regions) && !is.null(demography)) {
         checkmate::assert_subset(
           regions,
-          unique(demography %.% regions),
+          unique(demography %.% region),
           add = coll
         )
       }
@@ -201,7 +201,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (!is.null(adjacency) && !is.null(demography)) {
         overlap <- intersect(
           unique(c(adjacency %.% from, adjacency %.% to)),
-          unique(demography %.% regions)
+          unique(demography %.% region)
         )
 
         checkmate::expect_atomic_vector(overlap, min.len = 1)
