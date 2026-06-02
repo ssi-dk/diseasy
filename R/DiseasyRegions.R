@@ -144,11 +144,11 @@ DiseasyRegions <- R6::R6Class(                                                  
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(demography, add = coll)
       checkmate::assert_subset(c("region", "population"), colnames(demography), add = coll)
-      checkmate::assert_character(demography[["region"]], any.missing = FALSE, add = coll)
-      checkmate::assert_numeric(demography[["population"]], lower = 0, any.missing = FALSE, add = coll)
+      checkmate::assert_character(demography %.% regions, any.missing = FALSE, add = coll)
+      checkmate::assert_numeric(demography %.% population, lower = 0, any.missing = FALSE, add = coll)
 
       # Must have codes corresponding to selected regions
-      checkmate::assert_subset(self %.% regions, unique(dplyr::pull(demography, "region")),   add = coll)
+      checkmate::assert_subset(self %.% regions, unique(demography %.% region), add = coll)
       checkmate::reportAssertions(coll)
 
 
@@ -183,7 +183,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (!is.null(regions) && !is.null(adjacency)) {
         checkmate::assert_subset(
           regions,
-          unique(c(adjacency[["from"]], adjacency[["to"]])),
+          unique(c(adjacency %.% from, adjacency %.% to)),
           add = coll
         )
       }
@@ -192,7 +192,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (!is.null(regions) && !is.null(demography)) {
         checkmate::assert_subset(
           regions,
-          unique(demography[["region"]]),
+          unique(demography %.% regions),
           add = coll
         )
       }
@@ -200,8 +200,8 @@ DiseasyRegions <- R6::R6Class(                                                  
       # Check adjacency is consistent with demography
       if (!is.null(adjacency) && !is.null(demography)) {
         overlap <- intersect(
-          unique(c(adjacency[["from"]], adjacency[["to"]])),
-          unique(demography[["region"]])
+          unique(c(adjacency %.% from, adjacency %.% to)),
+          unique(demography %.% regions)
         )
 
         checkmate::expect_atomic_vector(overlap, min.len = 1)
@@ -256,7 +256,7 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
       # Allocate empty adjacency matrix
-      regions <- sort(unique(c(adjacency[["from"]], adjacency[["to"]])))
+      regions <- sort(unique(c(adjacency %.% from, adjacency %.% to)))
 
       adjacency_matrix <- matrix(
         NA_real_,
@@ -268,8 +268,8 @@ DiseasyRegions <- R6::R6Class(                                                  
       # Fill with existing values
       adjacency_matrix[
         cbind(
-          match(adjacency[["from"]], regions),
-          match(adjacency[["to"]], regions)
+          match(adjacency %.% from, regions),
+          match(adjacency %.% to, regions)
         )
       ] <- adjacency[["adjacency"]]
 
