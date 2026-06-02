@@ -189,37 +189,28 @@ DiseasyRegions <- R6::R6Class(                                                  
       adjacency,
       demography
     ) {
-      coll <- checkmate::makeAssertCollection()
 
       # Check regions are consistent with adjacency
       if (!is.null(regions) && !is.null(adjacency)) {
-        checkmate::assert_subset(
-          regions,
-          unique(c(adjacency %.% from, adjacency %.% to)),
-          add = coll
-        )
+        if (checkmate::test_subset(regions, adjacency %.% from)) {
+          pkgcond::pkg_error("`regions` and `adjacency` must contain at least one common region.")
+        }
       }
 
       # Check regions are consistent with demography
       if (!is.null(regions) && !is.null(demography)) {
-        checkmate::assert_subset(
-          regions,
-          unique(demography %.% region),
-          add = coll
-        )
+        if (checkmate::test_subset(regions, demography %.% from)) {
+          pkgcond::pkg_error("`regions` and `demography` must contain at least one common region.")
+        }
       }
 
       # Check adjacency is consistent with demography
       if (!is.null(adjacency) && !is.null(demography)) {
-        overlap <- intersect(
-          unique(c(adjacency %.% from, adjacency %.% to)),
-          unique(demography %.% region)
-        )
-
-        checkmate::expect_atomic_vector(overlap, min.len = 1)
+        if (length(intersect(adjacency %.% from, demography %.% region)) == 0) {
+          pkgcond::pkg_error("`adjacency` and `demography` must contain at least one common region.")
+        }
       }
 
-      checkmate::reportAssertions(coll)
 
       return(invisible(NULL))
     },
