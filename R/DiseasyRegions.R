@@ -107,7 +107,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Sets the region adjacency data.
     #' @param adjacency `r rd_adjacency()`
-    #' @param type `r rd_adjacency_type()`
+    #' @param type `r rd_adjacency_type`
     #' @return `r rd_side_effects`
     set_adjacency = function(adjacency, type = c("movement", "infection")) {
 
@@ -251,7 +251,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Converts long form adjacency to the "Theta" infection matrix.
     #' @param adjacency `r rd_adjacency()`
-    #' @param type `r rd_adjacency_type()`
+    #' @param type `r rd_adjacency_type`
     adjacency_to_theta = function(adjacency, type = c("movement", "infection")) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(adjacency, add = coll)

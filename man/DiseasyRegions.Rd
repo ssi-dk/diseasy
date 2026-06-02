@@ -143,7 +143,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
-      \item{\code{type}}{\verb{r rd_adjacency_type()}}
+      \item{\code{type}}{(\code{character})\cr The type of adjacency provided ("movement" versus "infection"). See \code{vignette("diseasy-regions")} for details.}
     }
     \if{html}{\out{</div>}}
   }
@@ -241,7 +241,7 @@ regions. If \code{NULL}, all values are matched.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
-      \item{\code{type}}{\verb{r rd_adjacency_type()}}
+      \item{\code{type}}{(\code{character})\cr The type of adjacency provided ("movement" versus "infection"). See \code{vignette("diseasy-regions")} for details.}
     }
     \if{html}{\out{</div>}}
   }

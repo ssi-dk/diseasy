@@ -241,6 +241,12 @@ rd_adjacency <- function(type = "param") {
   )
 }
 
+rd_adjacency_type <- paste(
+  "(`character`)\\cr",
+  'The type of adjacency provided ("movement" versus "infection").',
+  'See `vignette("diseasy-regions")` for details.'
+)
+
 rd_demography <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
 
