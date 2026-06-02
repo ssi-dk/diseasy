@@ -191,7 +191,7 @@ This "movement matrix" $\overline{\overline{\Phi}}$ can be estimated from inform
 on how individuals travel, such as from survey or mobility data.
 
 Alternatively, we can consider the $\overline{\overline{\Theta}}$ matrix which we can
-think of as a "disease flow" matrix. This matrix identifies the flow of infections from
+think of as a "infection flow" matrix. This matrix identifies the flow of infections from
 individuals residing in regions $x$ to individuals residing in regions $y$.
 Such matrix may be estimated from more direct measurements of disease flow such as from
 genetic data or contact tracing.
