@@ -102,7 +102,7 @@ test_that("initialize works", {
       )
     ),
     class = "simpleError",
-    regexp = "Check on 'overlap' failed"
+    regexp = "`adjacency` and `demography` must contain at least one common region."
   )
 })
 

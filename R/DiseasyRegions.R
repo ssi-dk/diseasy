@@ -192,21 +192,21 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Check regions are consistent with adjacency
       if (!is.null(regions) && !is.null(adjacency)) {
-        if (checkmate::test_subset(regions, adjacency %.% from)) {
+        if (length(intersect(regions, adjacency %.% from)) < 1) {
           pkgcond::pkg_error("`regions` and `adjacency` must contain at least one common region.")
         }
       }
 
       # Check regions are consistent with demography
       if (!is.null(regions) && !is.null(demography)) {
-        if (checkmate::test_subset(regions, demography %.% from)) {
+        if (length(intersect(regions, demography %.% region)) < 1) {
           pkgcond::pkg_error("`regions` and `demography` must contain at least one common region.")
         }
       }
 
       # Check adjacency is consistent with demography
       if (!is.null(adjacency) && !is.null(demography)) {
-        if (length(intersect(adjacency %.% from, demography %.% region)) == 0) {
+        if (length(intersect(adjacency %.% from, demography %.% region)) < 1) {
           pkgcond::pkg_error("`adjacency` and `demography` must contain at least one common region.")
         }
       }
