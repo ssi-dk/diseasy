@@ -138,7 +138,8 @@ DiseasyRegions <- R6::R6Class(                                                  
         demography = private %.% .demography
       )
 
-      private$.adjacency <- adjacency
+      # Sort the and save the adjacency
+      private$.adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
 
       return(invisible(NULL))
     },
