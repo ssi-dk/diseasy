@@ -173,6 +173,7 @@ test_that("Setters are commutative", {
   region$set_regions(c("north", "south"))
   region$set_adjacency(test_adjacency)
   region$set_demography(test_demography)
+  hash_1 <- region$hash
   rm(region)
 
 
@@ -181,6 +182,7 @@ test_that("Setters are commutative", {
   region$set_adjacency(test_adjacency)
   region$set_regions(c("north", "south"))
   region$set_demography(test_demography)
+  hash_2 <- region$hash
   rm(region)
 
 
@@ -189,6 +191,7 @@ test_that("Setters are commutative", {
   region$set_adjacency(test_adjacency)
   region$set_demography(test_demography)
   region$set_regions(c("north", "south"))
+  hash_3 <- region$hash
   rm(region)
 
 
@@ -197,7 +200,13 @@ test_that("Setters are commutative", {
   region$set_demography(test_demography)
   region$set_adjacency(test_adjacency)
   region$set_regions(c("north", "south"))
+  hash_4 <- region$hash
   rm(region)
+
+  expect_length(
+    unique(c(hash_1, hash_2, hash_3, hash_4)),
+    1
+  )
 })
 
 
