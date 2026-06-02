@@ -203,7 +203,7 @@ individuals residing in regions $x$ to individuals residing in regions $y$.
 Such matrix may be estimated from more direct measurements of disease flow such as from
 genetic data or contact tracing.
 
-Both matrices are required to be normalised such that their row sums are 1.
+The $\Phi$ matrix will be normalised such that its row sums are 1.
 
 `DiseasyRegions` can take either type of adjacency matrix.
 
