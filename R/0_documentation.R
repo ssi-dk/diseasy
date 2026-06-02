@@ -234,10 +234,17 @@ rd_adjacency <- function(type = "param") {
     "The `data.frame` must include the following columns:\\cr",
     "- `from` (`character`): Region identifier.\\cr",
     "- `to`   (`character`): Region identifier.\\cr",
-    "- `adjacency` (`numeric`): Strength of the connectedness (will be normalised).\\cr",
+    "- `adjacency` (`numeric`): Strength of the connectedness.\\cr",
 
-    switch(type == "param", 'Only "upper" or "lower" triangle of the adjacency needs to be specified'),
-    switch(type == "field", "Read only.")
+    switch(
+      type,
+      "param" = paste(
+        "The `from` and `to` columns must contain the same set of regions.",
+        'For "movement" inputs, rows are normalised before deriving the Theta matrix.',
+        'For "infection" inputs, values are interpreted directly as the Theta matrix.'
+      ),
+      "field" = "Read only."
+    )
   )
 }
 

@@ -56,7 +56,7 @@ See the vignette("diseasy-regions") for examples of use.
   \describe{
     \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest.  Read only.}
 
-    \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr  Read only.}
+    \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr Read only.}
 
     \item{\code{theta_matrix}}{(\code{matrix})\cr
 The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow of infections between regions.}
@@ -99,7 +99,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
     }
@@ -142,7 +142,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{type}}{(\code{character})\cr The type of adjacency provided ("movement" versus "infection"). See \code{vignette("diseasy-regions")} for details.}
     }
     \if{html}{\out{</div>}}
@@ -188,7 +188,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
     }
     \if{html}{\out{</div>}}
@@ -240,7 +240,7 @@ regions. If \code{NULL}, all values are matched.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{type}}{(\code{character})\cr The type of adjacency provided ("movement" versus "infection"). See \code{vignette("diseasy-regions")} for details.}
     }
     \if{html}{\out{</div>}}
