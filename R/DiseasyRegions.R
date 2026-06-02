@@ -348,19 +348,25 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "adjacency",
       expr = {
-        # Unpack the upper triangle of the symmetric and normalised adjacecny matrix
+        # Unpack the upper triangle of the symmetric and normalised adjacency matrix
         adjacency_matrix <- self %.% adjacency_matrix
+
+        if (is.null(adjacency_matrix)) {
+          return(NULL)
+        }
 
         adjacency_index <- which(
           upper.tri(adjacency_matrix, diag = TRUE),
           arr.ind = TRUE
         )
 
-        data.frame(
+        adjacency <- data.frame(
           "from" = rownames(adjacency_matrix)[adjacency_index[, "row"]],
           "to" = colnames(adjacency_matrix)[adjacency_index[, "col"]],
           "adjacency" = adjacency_matrix[adjacency_index]
         )
+
+        return(adjacency)
       }
     ),
 
@@ -370,13 +376,19 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "adjacency_matrix",
       expr = {
-        adjacency <- private %.% .adjacency |>
+        adjacency <- private %.% .adjacency
+
+        if (is.null(adjacency)) {
+          return(NULL)
+        }
+
+        adjacency <- adjacency |>
           dplyr::filter( # Filter adjacency to the given regions
             self$region_filter(values = .data$from),
             self$region_filter(values = .data$to)
           )
 
-        # Normalise and make symmetric
+        # Normalise before returning
         return(self$adjacency_to_matrix(adjacency = adjacency))
       }
     ),
@@ -387,7 +399,13 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "demography",
       expr = {
-        private %.% .demography |>
+        demography <- private %.% .demography
+
+        if (is.null(demography)) {
+          return(NULL)
+        }
+
+        demography <- demography |>
           dplyr::filter( # Filter demography to the given regions
             self$region_filter(values = .data$region)
           ) |>
@@ -396,6 +414,8 @@ DiseasyRegions <- R6::R6Class(                                                  
               c("region", sort(setdiff(dplyr::everything(), c("region", "population"))))
             )
           )
+
+        return(demography)
       }
     )
   ),
