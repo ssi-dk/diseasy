@@ -265,7 +265,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::reportAssertions(coll)
 
       # Determine regions
-      regions <- sort(adjacency %.% from)
+      regions <- sort(unique(adjacency %.% from))
 
       # Split computations based on input type
       if (type == "movement") {
