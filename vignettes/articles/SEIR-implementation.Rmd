@@ -259,7 +259,7 @@ of the state vector.
 
 In this space, we can now account for:
 
-- The state specific infection risks (p.e. the reduced risk from being infected previously / vaccinated)
+- The state specific infection risks (i.e. the reduced risk from being infected previously / vaccinated)
 - The effect of cross-immunity between the variants
 
 That is, we need to construct the matrix that accounts for the waning of immunity ($\gamma_m$) and the cross-immunity

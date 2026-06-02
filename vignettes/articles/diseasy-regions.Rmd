@@ -92,7 +92,7 @@ implemented in the models.
 In `diseasy`, the adjacency of `DiseasyRegions` are implemented in SEIR-like models and it helps to be clear on
 how this adjacency is used to illustrate these differences.
 
-To begin, lets define the "movement matrix" $\Phi$ between $R$ connected regions:
+To begin, let's define the "movement matrix" $\Phi$ between $R$ connected regions:
 
 $$
 \overline{\overline{\Phi}} = \begin{bmatrix}
@@ -124,7 +124,7 @@ r_I I_1
 $$
 where we divide the types of contacts into whether individuals stay in their own region or travel[^1] to other regions.
 
-[1^]: Note that they do not immigrate to other regions when they travel as this would change their region index.
+[^1]: Note that they do not immigrate to other regions when they travel as this would change their region index.
 
 In general, we can express the dynamics in matrix form assuming $R$ different regions
 $$
@@ -198,7 +198,7 @@ This "movement matrix" $\overline{\overline{\Phi}}$ can be estimated from inform
 on how individuals travel, such as from survey or mobility data.
 
 Alternatively, we can consider the $\overline{\overline{\Theta}}$ matrix which we can
-think of as a "infection flow" matrix. This matrix identifies the flow of infections from
+think of as a "infection-flow" matrix. This matrix identifies the flow of infections from
 individuals residing in regions $x$ to individuals residing in regions $y$.
 Such matrix may be estimated from more direct measurements of disease flow such as from
 genetic data or contact tracing.
