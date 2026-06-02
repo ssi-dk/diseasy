@@ -128,6 +128,9 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "to")),   add = coll)
       checkmate::reportAssertions(coll)
 
+      # Sort the adjacency
+      adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
+
       # Store the type of adjacency matrix
       attr(adjacency, "type") <- type
 
@@ -138,7 +141,7 @@ DiseasyRegions <- R6::R6Class(                                                  
         demography = private %.% .demography
       )
 
-      # Sort the and save the adjacency
+      # Store the adjacency
       private$.adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
 
       return(invisible(NULL))
@@ -359,11 +362,15 @@ DiseasyRegions <- R6::R6Class(                                                  
           return(NULL)
         }
 
+        # Filter adjacency to the given regions
         adjacency <- adjacency |>
-          dplyr::filter( # Filter adjacency to the given regions
+          dplyr::filter(
             self$region_filter(values = .data$from),
             self$region_filter(values = .data$to)
           )
+
+        # Copy the type attribute
+        attr(adjacency, "type") <- attr(private %.% .adjacency, "type")
 
         return(adjacency)
       }
