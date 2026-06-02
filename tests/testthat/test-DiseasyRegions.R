@@ -1,21 +1,21 @@
 test_adjacency <- data.frame(
   "from" = c(
     "north", "north", "north", "north",
-    "south", "south", "south",
-    "east", "east",
-    "north_subregion"
+    "south", "south", "south", "south",
+    "east", "east", "east", "east",
+    "north_subregion", "north_subregion", "north_subregion", "north_subregion"
   ),
   "to" = c(
     "north", "south", "east", "north_subregion",
-    "south", "east", "north_subregion",
-    "east", "north_subregion",
-    "north_subregion"
+    "north", "south", "east", "north_subregion",
+    "north", "south", "east", "north_subregion",
+    "north", "south", "east", "north_subregion"
   ),
   "adjacency" = c(
-    0.7,  0.2,  0.05, 0.05,
-    0.7,  0.05, 0.05,
-    0.7,  0.05,
-    0.7
+    0.6,  0.15, 0.0,   0.15,  # Often goes to the south and north subregion
+    0.05, 0.9,  0.025, 0.025, # Stays in the south
+    0.2,  0.2,  0.4,   0.2,   # Globe trotters
+    0.3,  0.0,  0.0,   0.7    # Goes to north only
   )
 )
 
@@ -74,7 +74,7 @@ test_that("initialize works", {
     checkmate_err_msg(
       DiseasyRegions$new(
         regions = "north",
-        adjacency = dplyr::filter(test_adjacency, .data$from != "north"),
+        adjacency = dplyr::filter(test_adjacency, .data$from != "north", .data$to != "north"),
         demography = test_demography
       )
     ),
@@ -132,7 +132,7 @@ test_that("`$set_adjacency()`` works", {
   region_2$set_adjacency(test_adjacency[sample(nrow(test_adjacency)), ])
 
   expect_identical(region_1 %.% adjacency, region_2 %.% adjacency)
-  expect_identical(region_1 %.% adjacency_matrix, region_2 %.% adjacency_matrix)
+  expect_identical(region_1 %.% theta_matrix, region_2 %.% theta_matrix)
   expect_identical(region_1 %.% hash, region_2 %.% hash)
 
   rm(region_1)
@@ -259,20 +259,11 @@ test_that("regions are matched exactly", {
   )
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter
-    region_1$adjacency_matrix,
-    region_2$adjacency_matrix,
+    region_1$theta_matrix,
+    region_2$theta_matrix,
     tolerance = 1e-10
   )
 
-  expect_equal(                                                                                                         # nolint: expect_identical_linter
-    rowSums(region_1$adjacency_matrix),
-    stats::setNames(rep(1, length(region_1 %.% regions)), region_1 %.% regions)
-  )
-
-  expect_equal(                                                                                                         # nolint: expect_identical_linter
-    colSums(region_1$adjacency_matrix),
-    stats::setNames(rep(1, length(region_1 %.% regions)), region_1 %.% regions)
-  )
 
   rm(region_1)
   rm(region_2)
