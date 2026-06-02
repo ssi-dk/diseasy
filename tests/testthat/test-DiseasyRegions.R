@@ -38,6 +38,9 @@ test_demography_stratified <- data.frame(
 
 test_that("initialize works", {
 
+  # Empty module can be initialised
+  expect_no_error(DiseasyRegions$new())
+
   region <- DiseasyRegions$new(
     regions = "north",
     adjacency = test_adjacency,
