@@ -215,6 +215,11 @@ data. Each setter validates the candidate input before storing it.
 
 ```{r create_module}
 region <- DiseasyRegions$new()
+
+region
+```
+
+```{r create_module_setters}
 region$set_regions(regions = c("north", "south", "east"))
 region$set_demography(demography = demography)
 region$set_adjacency(adjacency = adjacency)
