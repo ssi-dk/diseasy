@@ -384,6 +384,18 @@ DiseasyRegions <- R6::R6Class(                                                  
       name = "theta_matrix",
       expr = {
         adjacency <- self %.% adjacency
+
+        if (is.null(adjacency)) {
+          return(
+            matrix(
+              data = 1 / sqrt(length(self %.% regions)),
+              nrow = length(self %.% regions),
+              ncol = length(self %.% regions),
+              dimnames = list(self %.% regions, self %.% regions)
+            )
+          )
+        }
+
         theta_matrix <- self$adjacency_to_theta(
           adjacency = adjacency,
           type = attr(adjacency, "type")
