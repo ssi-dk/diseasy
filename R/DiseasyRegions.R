@@ -328,8 +328,24 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyRegions #############################################")
-      printr(glue::glue("Regions: {toString(self %.% regions)}"))
-      printr(glue::glue("Total population: {sum((self %.% demography)[['population']])}"))
+      if (is.null(self %.% regions)) {
+        printr("No regions have been specified")
+      } else {
+        printr(glue::glue("Regions: {toString(self %.% regions)}"))
+      }
+
+      if (is.null(self %.% demography)) {
+        printr("No population data loaded")
+      } else {
+        printr(glue::glue("Total population: {sum((self %.% demography)[['population']])}"))
+      }
+
+      if (is.null(self %.% adjacency)) {
+        printr("No adjacency data loaded")
+      } else {
+        # TODO
+      }
+
     }
   ),
 
