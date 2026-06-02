@@ -321,21 +321,21 @@ DiseasyRegions <- R6::R6Class(                                                  
     describe = function() {
       printr("# DiseasyRegions #############################################")
       if (is.null(self %.% regions)) {
-        printr("No regions have been specified")
+        printr("Regions: No regions have been specified")
       } else {
         printr(glue::glue("Regions: {toString(self %.% regions)}"))
       }
 
       if (is.null(self %.% demography)) {
-        printr("No population data loaded")
+        printr("Total population: No population data loaded")
       } else {
-        printr(glue::glue("Total population: {sum((self %.% demography)[['population']])}"))
+        printr(glue::glue("Total population: {sum(self %.% demography %.% population)}"))
       }
 
       if (is.null(self %.% adjacency)) {
-        printr("No adjacency data loaded")
+        printr("Theta matrix: No adjacency data loaded")
       } else {
-        # TODO
+        printr(glue::glue("Theta matrix: Max eigenvalue {max(eigen(self %.% theta_matrix)$values)}"))
       }
 
     }
