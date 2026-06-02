@@ -244,7 +244,7 @@ test_that("region filtering works", {
 })
 
 
-test_that("regions are matched exactly", {
+test_that("adjacency matrix normalisation works", {
 
   region_1 <- DiseasyRegions$new(
     regions = c("north", "south", "east", "north_subregion"),
@@ -270,7 +270,7 @@ test_that("regions are matched exactly", {
 })
 
 
-test_that("adjacency matrix normalisation works", {
+test_that("regions are matched exactly", {
 
   region <- DiseasyRegions$new(
     regions = "north",
