@@ -58,8 +58,8 @@ See the vignette("diseasy-regions") for examples of use.
 
     \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr  Read only.}
 
-    \item{\code{adjacency_matrix}}{(\code{matrix})\cr
-The symmetric, normalised matrix form of the adjacency for the given regions.}
+    \item{\code{theta_matrix}}{(\code{matrix})\cr
+The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow of infections between regions.}
 
     \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group. Read only.}
   }
@@ -74,7 +74,7 @@ The symmetric, normalised matrix form of the adjacency for the given regions.}
     \item \href{#method-DiseasyRegions-set_demography}{\code{DiseasyRegions$set_demography()}}
     \item \href{#method-DiseasyRegions-validate_configuration}{\code{DiseasyRegions$validate_configuration()}}
     \item \href{#method-DiseasyRegions-region_filter}{\code{DiseasyRegions$region_filter()}}
-    \item \href{#method-DiseasyRegions-adjacency_to_matrix}{\code{DiseasyRegions$adjacency_to_matrix()}}
+    \item \href{#method-DiseasyRegions-adjacency_to_theta}{\code{DiseasyRegions$adjacency_to_theta()}}
     \item \href{#method-DiseasyRegions-describe}{\code{DiseasyRegions$describe()}}
     \item \href{#method-DiseasyRegions-clone}{\code{DiseasyRegions$clone()}}
   }
@@ -136,13 +136,14 @@ The symmetric, normalised matrix form of the adjacency for the given regions.}
   Sets the region adjacency data.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$set_adjacency(adjacency)}
+    \preformatted{DiseasyRegions$set_adjacency(adjacency, type = c("movement", "infection"))}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
+      \item{\code{type}}{\verb{r rd_adjacency_type()}}
     }
     \if{html}{\out{</div>}}
   }
@@ -227,27 +228,20 @@ regions. If \code{NULL}, all values are matched.}
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyRegions-adjacency_to_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyRegions-adjacency_to_matrix}{}}}
-\subsection{\code{DiseasyRegions$adjacency_to_matrix()}}{
-  Converts long form adjacency to a normalised and symmetric matrix form.
+\if{html}{\out{<a id="method-DiseasyRegions-adjacency_to_theta"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegions-adjacency_to_theta}{}}}
+\subsection{\code{DiseasyRegions$adjacency_to_theta()}}{
+  Converts long form adjacency to the "Theta" infection matrix.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$adjacency_to_matrix(
-  adjacency,
-  tolerance = 1e-10,
-  max_iterations = 1000
-)}
+    \preformatted{DiseasyRegions$adjacency_to_theta(adjacency, type = c("movement", "infection"))}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness (will be normalised).\cr Only "upper" or "lower" triangle of the adjacency needs to be specified}
-      \item{\code{tolerance}}{(\code{numeric(1)})\cr
-Numerical tolerance for row and column sums.}
-      \item{\code{max_iterations}}{(\code{integer(1)})\cr
-Maximum number of scaling iterations.}
+      \item{\code{type}}{\verb{r rd_adjacency_type()}}
     }
     \if{html}{\out{</div>}}
   }
