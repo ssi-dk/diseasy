@@ -60,6 +60,7 @@ The local copy of an DiseasyActivity module. Read-only.}
     \item \href{#method-DiseasyPopulation-initialize}{\code{DiseasyPopulation$new()}}
     \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
     \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
+    \item \href{#method-DiseasyPopulation-map_population}{\code{DiseasyPopulation$map_population()}}
     \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
     \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
   }
@@ -133,6 +134,30 @@ The local copy of an DiseasyActivity module. Read-only.}
     \code{list}(\code{matrix})\cr
 A \code{list} (with names indicating the dates of changes in contacts)
 of contact rates (\code{matrix}).
+Map population between age groups
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-map_population"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-map_population}{}}}
+\subsection{\code{DiseasyPopulation$map_population()}}{
+  The function computes the proportion of population in the new and old age groups.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$map_population(from_age_cuts_lower, to_age_cuts_lower)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{from_age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{to_age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{data.frame} which facilitates mapping the age groups from their reference to the new age groups.
   }
 }
 

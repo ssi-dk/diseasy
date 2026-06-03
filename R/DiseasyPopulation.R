@@ -87,6 +87,43 @@ DiseasyPopulation <- R6::R6Class(                                               
       return(per_capita_contact_matrices)
     },
 
+
+    #' Map population between age groups
+    #'
+    #' @description
+    #'   The function computes the proportion of population in the new and old age groups.
+    #' @param from_age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param to_age_cuts_lower `r rd_age_cuts_lower()`
+    #' @return
+    #'   A `data.frame` which facilitates mapping the age groups from their reference to the new age groups.
+    map_population = function(from_age_cuts_lower, to_age_cuts_lower) {
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_numeric(
+        from_age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
+        lower = 0, unique = TRUE, add = coll
+      )
+      checkmate::assert_numeric(
+        to_age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
+        lower = 0, unique = TRUE, add = coll
+      )
+      checkmate::reportAssertions(coll)
+
+      # Using default population from contact_basis
+      proportion <- # TODO: Get proportion from this module. This needs DiseasyRegions to be implemented
+
+      # Creating mapping for all ages to reference and provided age_groups
+      lower_ref <- as.integer(sapply(strsplit(x = names(proportion), split = "[-+]"), \(x) x[1]))
+      population <- data.frame(age = 0:(length(proportion) - 1), proportion = proportion)
+
+      population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
+      population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
+
+      return(population)
+    },
+
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyPopulation ##########################################")
@@ -183,6 +220,35 @@ DiseasyPopulation <- R6::R6Class(                                               
   private = list(
     .DiseasyActivity = NULL,
 
-    .age_cuts_lower = 0L
+    .age_cuts_lower = 0L,
+
+
+
+    # Compute the population proportion matrix
+    # @description
+    #   The function provides the population proportion matrix `p` used to project age_groups.
+    # @param age_cuts_lower `r rd_age_cuts_lower()`
+    population_transform_matrix = function(age_cuts_lower = NULL) {
+
+      # Early return if no projection is requested
+      if (is.null(age_cuts_lower)) {
+        return(obj)
+      }
+
+      # Compute proportion of population in new and old age_groups
+      population <- self$map_population(age_cuts_lower)
+
+      # Calculating transformation matrix
+      tt <- merge(aggregate(proportion ~ age_group_ref + age_group_out, data = population, FUN = sum),
+                  aggregate(proportion ~ age_group_ref,                 data = population, FUN = sum),
+                  by = "age_group_ref")
+      tt$proportion <- tt$proportion.x / tt$proportion.y
+      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = proportion)))
+
+      # Label the matrix
+      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$proportion))
+
+      return(p)
+    }
   )
 )
