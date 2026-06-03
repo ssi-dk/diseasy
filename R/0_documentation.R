@@ -241,7 +241,7 @@ rd_adjacency <- function(type = "param") {
       "param" = paste(
         "The `from` and `to` columns must contain the same set of regions.",
         'For "movement" inputs, rows are normalised before deriving the Theta matrix.',
-        'For "infection" inputs, values are interpreted directly as the Theta matrix.'
+        'For "infection-flow" inputs, values are interpreted directly as the Theta matrix.'
       ),
       "field" = "Read only."
     )
@@ -250,7 +250,7 @@ rd_adjacency <- function(type = "param") {
 
 rd_adjacency_type <- paste(
   "(`character`)\\cr",
-  'The type of adjacency provided ("movement" versus "infection").',
+  'The type of adjacency provided ("movement" versus "infection-flow").',
   'See `vignette("diseasy-regions")` for details.'
 )
 

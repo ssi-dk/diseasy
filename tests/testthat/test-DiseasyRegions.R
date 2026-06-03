@@ -138,7 +138,7 @@ test_that("`$set_adjacency()`` works", {
   region_2$set_adjacency(test_adjacency[sample(nrow(test_adjacency)), ])
 
   expect_identical(region_1 %.% adjacency, region_2 %.% adjacency)
-  expect_identical(region_1 %.% theta_matrix, region_2 %.% theta_matrix)
+  expect_identical(region_1 %.% infection_flow_matrix, region_2 %.% infection_flow_matrix)
   expect_identical(region_1 %.% hash, region_2 %.% hash)
 
   rm(region_1)
@@ -289,8 +289,8 @@ test_that("adjacency matrix normalisation works", {
   )
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter
-    region_1$theta_matrix,
-    region_2$theta_matrix,
+    region_1$infection_flow_matrix,
+    region_2$infection_flow_matrix,
     tolerance = 1e-10
   )
 

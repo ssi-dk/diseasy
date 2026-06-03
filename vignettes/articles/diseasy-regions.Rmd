@@ -221,7 +221,7 @@ The $\Phi$ matrix will be normalised such that its row sums are 1.
 
 `DiseasyRegions` can take either type of adjacency matrix.
 
-The stored adjacency input is long form, but the module also exposes an `?DiseasyRegions$theta_matrix` field.
+The stored adjacency input is long form, but the module also exposes an `?DiseasyRegions$infection_flow_matrix` field.
 This field returns a matrix representation of adjacency for the currently selected regions.
 
 The matrix is derived in three steps:
@@ -264,7 +264,7 @@ aggregate(
 )
 ```
 
-The active bindings `?DiseasyRegions$adjacency` and `?DiseasyRegions$theta_matrix`
+The active bindings `?DiseasyRegions$adjacency` and `?DiseasyRegions$infection_flow_matrix`
 expose derived views of `adjacency` input after filtering to the selected regions.
 
 ```{r filtered_adjacency}
@@ -272,7 +272,7 @@ region %.% adjacency
 ```
 
 ```{r filtered_theta_matrix}
-region %.% theta_matrix
+region %.% infection_flow_matrix
 ```
 
 
@@ -298,7 +298,7 @@ region %.% adjacency
 ```
 
 ```{r changed_theta_matrix}
-region %.% theta_matrix
+region %.% infection_flow_matrix
 ```
 
 # Exact matching

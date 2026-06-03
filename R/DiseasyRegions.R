@@ -109,7 +109,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param adjacency `r rd_adjacency()`
     #' @param type `r rd_adjacency_type`
     #' @return `r rd_side_effects`
-    set_adjacency = function(adjacency, type = c("movement", "infection")) {
+    set_adjacency = function(adjacency, type = c("movement", "infection-flow")) {
 
       type = match.arg(type)
 
@@ -123,7 +123,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
 
-      checkmate::assert_choice(type, c("movement", "infection"), add = coll)
+      checkmate::assert_choice(type, c("movement", "infection-flow"), add = coll)
 
       # Must have codes corresponding to selected regions
       checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "from")), add = coll)
@@ -248,7 +248,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   Converts long form adjacency to the "Theta" infection matrix.
     #' @param adjacency `r rd_adjacency()`
     #' @param type `r rd_adjacency_type`
-    adjacency_to_theta = function(adjacency, type = c("movement", "infection")) {
+    adjacency_to_theta = function(adjacency, type = c("movement", "infection-flow")) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(adjacency, add = coll)
       checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
@@ -257,7 +257,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
 
-      checkmate::assert_choice(type, c("movement", "infection"), add = coll)
+      checkmate::assert_choice(type, c("movement", "infection-flow"), add = coll)
       checkmate::reportAssertions(coll)
 
       # Determine regions
@@ -283,7 +283,7 @@ DiseasyRegions <- R6::R6Class(                                                  
             .by = c("x", "y")
           )
 
-      } else if (type == "infection") {
+      } else if (type == "infection-flow") {
 
         theta_long <- adjacency |>
           dplyr::rename("x" = "from", "y" = "to", "theta" = "adjacency")
@@ -328,7 +328,11 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (is.null(self %.% adjacency)) {
         printr("Theta matrix: No adjacency data loaded")
       } else {
-        printr(glue::glue("Theta matrix: Max eigenvalue {round(max(eigen(self %.% theta_matrix)$values), digits = 2)}"))
+        printr(
+          glue::glue(
+            "Theta matrix: Max eigenvalue {round(max(eigen(self %.% infection_flow_matrix)$values), digits = 2)}"
+          )
+        )
       }
 
     }
@@ -370,11 +374,11 @@ DiseasyRegions <- R6::R6Class(                                                  
     ),
 
 
-    #' @field theta_matrix (`matrix`)\cr
+    #' @field infection_flow_matrix (`matrix`)\cr
     #'  The "Theta" matrix (see `vignette("diseasy-regions")`) that describes flow of infections between regions.
-    theta_matrix = purrr::partial(
+    infection_flow_matrix = purrr::partial(
       .f = active_binding,
-      name = "theta_matrix",
+      name = "infection_flow_matrix",
       expr = {
         adjacency <- self %.% adjacency
 
@@ -389,11 +393,11 @@ DiseasyRegions <- R6::R6Class(                                                  
           )
         }
 
-        theta_matrix <- self$adjacency_to_theta(
+        infection_flow_matrix <- self$adjacency_to_theta(
           adjacency = adjacency,
           type = attr(adjacency, "type")
         )
-        return(theta_matrix)
+        return(infection_flow_matrix)
       }
     ),
 
