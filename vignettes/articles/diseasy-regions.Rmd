@@ -196,10 +196,17 @@ $$
 (2\phi^2) S I
 $$
 
-Which means that the neutral matrix elements are:
+Which means that the neutral matrix elements for the 2-region system are:
 $$
 \phi = \frac{1}{\sqrt{2}}
 $$
+
+and in general for the n-region system[^2]:
+$$
+\phi = \frac{1}{\sqrt{n}}
+$$
+
+[^2]: Exercise left for the reader.
 
 This "movement matrix" $\overline{\overline{\Phi}}$ can be estimated from information
 on how individuals travel, such as from survey or mobility data.
