@@ -208,6 +208,67 @@ rd_activity_weights <- paste(
   "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
 
+## Templates for DiseasyRegions
+rd_regions <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`character()`)\\cr",
+    "The geographic regions of interest.",
+
+    switch(
+      type == "param",
+      "The specified regions must be available in the `demography` and `adjacency` data."
+    ),
+    switch(type == "field", "Read only.")
+  )
+}
+
+rd_adjacency <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+
+  paste(
+    "(`data.frame(1)`)\\cr",
+    "The adjacency (connectedness) of the regions.",
+    "Effectively, the `adjacency` is a long-form of the adjacency-matrix\\cr",
+
+    "The `data.frame` must include the following columns:\\cr",
+    "- `from` (`character`): Region identifier.\\cr",
+    "- `to`   (`character`): Region identifier.\\cr",
+    "- `adjacency` (`numeric`): Strength of the connectedness.\\cr",
+
+    switch(
+      type,
+      "param" = paste(
+        "The `from` and `to` columns must contain the same set of regions.",
+        'For "movement" inputs, rows are normalised before deriving the Theta matrix.',
+        'For "infection-flow" inputs, values are interpreted directly as the Theta matrix.'
+      ),
+      "field" = "Read only."
+    )
+  )
+}
+
+rd_adjacency_type <- paste(
+  "(`character`)\\cr",
+  'The type of adjacency provided ("movement" versus "infection-flow").',
+  'See `vignette("diseasy-regions")` for details.'
+)
+
+rd_demography <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+
+  paste(
+    "(`data.frame(1)`)\\cr",
+    "The demography of the population per region.\\cr",
+
+    "The `data.frame` must include the following columns:\\cr",
+    "* `region` (`character`) Region identifier.\\cr",
+    "* `...` Optional additional stratification columns (e.g. sex, ethnicity).\\cr",
+    "* `population` (`numeric`) Number of individuals in the group.",
+    switch(type == "field", "Read only.")
+  )
+}
+
 ## Templates for DiseasyModel
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",

@@ -131,7 +131,7 @@ and the target function across all target functions and problem sizes ($M$).
 
 In addition, we only consider problems up to size $M = 5$ for the general results.
 
-```{r helper functions for gt, include = FALSE}
+```{r helper functions for gt, include = FALSE, eval = rlang::is_installed("gt")}
 # Function to apply bold style to the smallest value in each section
 bold_min_value <- function(gt_table) {
   min_value <- gt_table$`_data` |>
@@ -199,7 +199,7 @@ add_footnote <- function(gt_table) {
 ```
 
 
-```{r, echo = FALSE, results = "asis"}
+```{r, echo = FALSE, results = "asis", eval = rlang::is_installed("gt")}
 total_results <- best_optim_results |>
   dplyr::filter(!(.data$target %in% c("Heaviside", "Linear"))) |>
   dplyr::summarise(
@@ -340,7 +340,7 @@ chosen_defaults <- tibble::tibble(
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = rlang::is_installed("gt")}
 total_results <- total_results |>
   dplyr::summarise(
     "min_value" = min(.data$value, na.rm = TRUE),
@@ -422,15 +422,15 @@ visualise_methods <- function(total_results, method) {
 }
 ```
 
-```{r overview free_delta, echo = FALSE, fig.alt = "Total error vs execution time for the free_delta method."}
+```{r overview free_delta, echo = FALSE, fig.alt = "Total error vs execution time for the free_delta method.", eval = rlang::is_installed("gt")}
 visualise_methods(total_results, "free_delta")
 ```
 
-```{r overview free_gamma, echo = FALSE, fig.alt = "Total error vs execution time for the free_gamma method."}
+```{r overview free_gamma, echo = FALSE, fig.alt = "Total error vs execution time for the free_gamma method.", eval = rlang::is_installed("gt")}
 visualise_methods(total_results, "free_gamma")
 ```
 
-```{r overview all_free, echo = FALSE, fig.alt = "Total error vs execution time for the all_free method."}
+```{r overview all_free, echo = FALSE, fig.alt = "Total error vs execution time for the all_free method.", eval = rlang::is_installed("gt")}
 visualise_methods(total_results, "all_free")
 ```
 
@@ -442,7 +442,7 @@ inclusion of penalty.
 
 The following optimiser/strategy combinations acts as defaults for the `?DiseasyImmunity` class:
 
-```{r, echo = FALSE, results = "asis"}
+```{r, echo = FALSE, results = "asis", eval = rlang::is_installed("gt")}
 chosen_defaults |>
   gt::gt() |>
   gt::tab_style(
@@ -468,7 +468,7 @@ As before, we present best performing optimisers for the given targets in an agg
 
 We present the top 3 best optimiser/strategy combination for each method and penalty setting.
 
-```{r, echo = FALSE, results = "asis"}
+```{r, echo = FALSE, results = "asis", eval = rlang::is_installed("gt")}
 # Formatting the results
 per_target_results <- best_optim_results |>
   dplyr::mutate(
