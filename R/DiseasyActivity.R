@@ -180,9 +180,11 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Check structure of contact_basis
       checkmate::assert_list(contact_basis, add = coll)
-      checkmate::assert_set_equal(names(contact_basis),
-                                  c("contacts", "population", "proportion", "demography", "description"),
-                                  add = coll)
+      checkmate::assert_set_equal(
+        names(contact_basis),
+        c("contacts", "age_cuts_lower", "description"),
+        add = coll
+      )
 
       # Checks on contact_basis contacts
       checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
@@ -206,22 +208,25 @@ DiseasyActivity <- R6::R6Class(                                                 
         checkmate::assert_true(n_age_groups == private$n_age_groups, add = coll)
       }
 
-      # Checks on contact_basis population
-      checkmate::assert_numeric(purrr::pluck(contact_basis, "population"), len = n_age_groups, lower = 0, add = coll)
-
-      # Checks on contact_basis proportion
-      checkmate::assert_numeric(purrr::pluck(contact_basis, "proportion"), len = n_age_groups, lower = 0, upper = 1,
-                                add = coll)
-
-      # Checks on contact_basis demography
-      checkmate::assert_data_frame(purrr::pluck(contact_basis, "demography"), add = coll)
-      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "demography")),
-                                  c("age", "population", "proportion"), add = coll)
+      # Checks on contact_basis age_cuts_lower
+      checkmate::assert_integerish(
+        purrr::pluck(contact_basis, "age_cuts_lower"),
+        lower = 0,
+        sorted = TRUE,
+        add = coll
+      )
 
       # Check for dimension mismatch
-      checkmate::assert_number(unique(c(nrow(purrr::pluck(contact_basis, "contacts", 1)),
-                                        ncol(purrr::pluck(contact_basis, "contacts", 1)),
-                                        length(purrr::pluck(contact_basis, "proportion")))), add = coll)
+      checkmate::assert_number(
+        unique(
+          c(
+            nrow(purrr::pluck(contact_basis, "contacts", 1)),
+            ncol(purrr::pluck(contact_basis, "contacts", 1)),
+            length(purrr::pluck(contact_basis, "age_cuts_lower"))
+          )
+        ),
+        add = coll
+      )
 
       # End checks
       checkmate::reportAssertions(coll)
@@ -462,7 +467,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
         age_labels <- age_cuts_lower |>
-          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = self$contact_basis$age_cuts_lower) |>
           purrr::pluck(.default = 0) |>
           diseasystore::age_labels()
 
@@ -535,11 +540,11 @@ DiseasyActivity <- R6::R6Class(                                                 
     get_scenario_contacts = function(age_cuts_lower = NULL, weights = NULL) {
 
       # Input checks
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
-      checkmate::reportAssertions(coll)
+      checkmate::assert_numeric(
+        age_cuts_lower,
+        any.missing = FALSE, null.ok = TRUE,
+        lower = 0, unique = TRUE
+      )
 
       scenario_contacts <- openness <- self$get_scenario_openness()
 
@@ -557,7 +562,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
         age_labels <- age_cuts_lower |>
-          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
+          purrr::pluck(.default = self$contact_basis$age_cuts_lower) |>
           purrr::pluck(.default = 0) |>
           diseasystore::age_labels()
 
