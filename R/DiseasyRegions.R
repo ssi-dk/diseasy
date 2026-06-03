@@ -116,7 +116,9 @@ DiseasyRegions <- R6::R6Class(                                                  
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(adjacency, add = coll)
       checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
-      checkmate::assert_set_equal(adjacency$from, adjacency$to, add = coll)
+      if (!checkmate::test_permutation(adjacency$from, adjacency$to)) {
+        coll$push("`adjacency` incomplete: All two-way connections between regions must be specified!")
+      }
       checkmate::assert_character(adjacency$from, any.missing = FALSE, add = coll)
       checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)

@@ -305,7 +305,8 @@ test_that("adjacency data must be complete", {
   expect_error(
     checkmate_err_msg(
       DiseasyRegions$new(adjacency = test_adjacency_triangle)
-    )
+    ),
+    regexp = "`adjacency` incomplete"
   )
 
 })
