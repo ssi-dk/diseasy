@@ -19,6 +19,12 @@ test_adjacency <- data.frame(
   )
 )
 
+# Incomplete adjacency data
+test_adjacency_triangle <- test_adjacency |>
+  dplyr::group_by(.data$from) |>
+  dplyr::group_split() |>
+  purrr::imap(~ dplyr::filter(.x, dplyr::row_number() >= {{ .y }})) |>
+  purrr::list_rbind()
 
 
 test_demography <- data.frame(
@@ -231,7 +237,6 @@ test_that("$region_filter() works", {
 })
 
 
-
 test_that("region filtering works", {
 
   region <- DiseasyRegions$new(
@@ -248,6 +253,22 @@ test_that("region filtering works", {
   checkmate::expect_subset(region %.% demography %.% region, c("north", "east"))
   checkmate::expect_subset(region %.% adjacency %.% from, c("north", "east"))
   checkmate::expect_subset(region %.% adjacency %.% to, c("north", "east"))
+
+  rm(region)
+})
+
+
+test_that("regions are matched exactly", {
+
+  region <- DiseasyRegions$new(
+    regions = "north",
+    adjacency = test_adjacency,
+    demography = test_demography
+  )
+
+  expect_false("north_subregion" %in% region$demography$region)
+  expect_false("north_subregion" %in% region$adjacency$from)
+  expect_false("north_subregion" %in% region$adjacency$to)
 
   rm(region)
 })
@@ -279,19 +300,14 @@ test_that("adjacency matrix normalisation works", {
 })
 
 
-test_that("regions are matched exactly", {
+test_that("adjacency data must be complete", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
-    adjacency = test_adjacency,
-    demography = test_demography
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(adjacency = test_adjacency_triangle)
+    )
   )
 
-  expect_false("north_subregion" %in% region$demography$region)
-  expect_false("north_subregion" %in% region$adjacency$from)
-  expect_false("north_subregion" %in% region$adjacency$to)
-
-  rm(region)
 })
 
 
