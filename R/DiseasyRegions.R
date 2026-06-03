@@ -328,7 +328,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (is.null(self %.% adjacency)) {
         printr("Theta matrix: No adjacency data loaded")
       } else {
-        printr(glue::glue("Theta matrix: Max eigenvalue {max(eigen(self %.% theta_matrix)$values)}"))
+        printr(glue::glue("Theta matrix: Max eigenvalue {round(max(eigen(self %.% theta_matrix)$values), digits = 2)}"))
       }
 
     }
