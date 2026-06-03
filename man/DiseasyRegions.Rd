@@ -22,9 +22,9 @@ See the vignette("diseasy-regions") for examples of use.
 
   # Adjacency is a long-form representation of connectedness.
   adjacency <- data.frame(
-    from = c("north", "north", "north", "south", "south", "east"),
-    to   = c("north", "south", "east",  "south", "east",  "east"),
-    adjacency = c(1, 0.25, 0.5, 1, 0.25, 1)
+    from = c("north", "north", "north", "south", "south", "south", "east", "east", "east"),
+    to   = c("north", "south", "east", "north", "south", "east", "north", "south", "east"),
+    adjacency = c(0.7, 0.2, 0.1, 0.1, 0.8, 0.1, 0.1, 0.3, 0.6)
   )
 
   # Restrict the model scope to two regions.
