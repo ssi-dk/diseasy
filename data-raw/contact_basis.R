@@ -14,6 +14,8 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
     stats::setNames(countries)
 
   # Export contact matrices where we also have population data
+  data("demography", package = "diseasy")
+
   common_country_codes <- country_codes |>
     purrr::keep(~ . %in% unique(demography$key_country))
 
@@ -21,23 +23,15 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
     purrr::map(\(country_code) {
       tibble::lst(
         "contacts" = NULL, # pre-allocate for below
-        "population" = N,
-        "proportion" = N / sum(N),
-        "demography" = demography |>
-          dplyr::filter(.data$key_country == country_code) |>
-          dplyr::select(!"key_country") |>
-          dplyr::rename("population" = "n_population") |>
-          dplyr::mutate("proportion" = .data$population / sum(.data$population)),
+        "age_cuts_lower" = age_cuts,
         "description" = glue::glue(
           "Contact matrices for ",
           "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
-          "from the `contactdata` package and population data for ",
-          "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
-          "from the US Census Bureau."
+          "from the `contactdata` package"
         )
       )
-    })
-  names(contact_basis) <- common_country_codes
+    }) |>
+    stats::setNames(common_country_codes)
 
 
   # Transform the matrices from the contactdata package
@@ -51,7 +45,8 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       tibble::deframe()
 
     # Retrieve and transform contact matrices for each arena
-    contacts <- purrr::map(c("home", "work", "school", "other"), \(arena) {
+    arenas <- c("home", "work", "school", "other")
+    per_capita_contact_matrices <- purrr::map(arenas, \(arena) {
 
       # The Diseasy SEIR models are configured to use a scale of contact matrices.
       # To make the definition of "contact" matrix more clear, lets start with the
@@ -112,7 +107,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       # NOTE: This is what Klepac (BBC pandemic) calls the C matrix
 
 
-      # Step 3 (optional):
+      # Step 3:
       # Compute the population contact rates
       # By dividing with the M' with population, we can get a symmetric representation of contacts, C, which
       # describes the contact rates:
@@ -158,18 +153,22 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
         rlang::abort("mp is not reciprocal")
       }
 
+      # Convert to per-capita rates
+      proportion <- N / sum(N)
+      cp <- mp / matrix(rep(proportion, length(proportion)), nrow = length(proportion), byrow = TRUE)
+
       # Return the contact matrices directly
-      return(mp)
+      return(cp)
 
     }) |>
       stats::setNames(arenas)
 
-    contact_basis_country$contacts <- contacts
-
-    return(out)
+    return(modifyList(
+      purrr::pluck(contact_basis, country_code),
+      list("contacts" = per_capita_contact_matrices)
+    ))
   }) |>
-    stats::setNames(common_country_codes)
-
+  stats::setNames(common_country_codes)
 
   # Store the data in the package
   attr(contact_basis, "creation_datetime") <- Sys.time()
