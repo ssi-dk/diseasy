@@ -92,7 +92,7 @@ While these seem very similar, there are substantial differences in how these ad
 and how they should be implemented in disease spread models.
 Our framework assumes a reality where disease is transported between regions by people returning to their own region
 (travel or commuting), that is: there is no immigration or emigration.
-If the supplied `adjacency` describes a movement matrix it is furthermore assumed that people traveling _to_ a place
+If the supplied `adjacency` describes a movement matrix it is furthermore assumed that people travelling _to_ a place
 transmits disease equally with people travelling _from_ a place.
 Which in turns means that the resulting infection matrix used in the models will be symmetric.
 
