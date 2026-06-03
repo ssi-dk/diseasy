@@ -86,8 +86,15 @@ Here, this "connectedness" is referred to as "adjacency" in alignment with other
 Different measures for adjacency can be extracted from real-world data which have very different interpretations.
 Adjacency is often described from information about "movement" such as mobility data or surveys
 on how people move between regions. Alternatively adjacency can be derived from "infection" data such as genetic
-phylogeny. While these seem very similar, there are substantial differences in how these adjacencies should be
-implemented in the models.
+phylogeny.
+
+While these seem very similar, there are substantial differences in how these adjacencies are expressed numerically,
+and how they should be implemented in disease spread models.
+Our framework assumes a reality where disease is transported between regions by people returning to their own region
+(travel or commuting), that is: there is no immigration or emigration.
+If the supplied `adjacency` describes a movement matrix it is furthermore assumed that people traveling _to_ a place
+transmits disease equally with people travelling _from_ a place.
+Which in turns means that the resulting infection matrix used in the models will be symmetric.
 
 In `diseasy`, the adjacency of `DiseasyRegions` are implemented in SEIR-like models and it helps to be clear on
 how this adjacency is used to illustrate these differences.
