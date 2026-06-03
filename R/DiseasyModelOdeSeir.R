@@ -711,13 +711,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       estimated_exposed_infected_states <- tidyr::expand_grid(
         "time" = 0,
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        !!!self %.% population %.% groups,
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
           purrr::map_chr(seq_len(L), ~ paste0("I", .))
         ),
         "value" = 0
       ) |>
+        dplyr::cross_join(self %.% population %.% groups) |>
+        dplyr::relocate(
+          dplyr::all_of(names(self %.% population %.% groups)),
+          .after = "variant"
+        ) |>
         dplyr::rows_update(
           estimated_exposed_infected_states,
           by = c("variant", names(self %.% population %.% groups), "state")
@@ -829,9 +833,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           to = self %.% training_period %.% end,
           by = "1 day"
         ),
-        !!!self %.% population %.% groups,
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
       ) |>
+        dplyr::cross_join(self %.% population %.% groups) |>
+        dplyr::relocate(
+          dplyr::all_of(names(self %.% population %.% groups)),
+          .after = "date"
+        ) |>
         dplyr::left_join(
           incidence_data,
           by = c("date", names(self %.% population %.% groups), "variant")
@@ -942,14 +950,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
         "time" = 0,
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        !!!self %.% population %.% groups,
         "state" = paste0("R", seq.int(self %.% parameters %.% compartment_structure %.% R))
       ) |>
         dplyr::add_row(
           "time" = 0,
           "variant" = NA,
-          !!!self %.% population %.% groups,
           "state" = "S"
+        ) |>
+        dplyr::cross_join(self %.% population %.% groups) |>
+        dplyr::relocate(
+          dplyr::all_of(names(self %.% population %.% groups)),
+          .after = "variant"
         ) |>
         dplyr::mutate("value" = sol[nrow(sol), rs_state_indices + 1])
 
@@ -989,9 +1000,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       estimated_I1_history <- dplyr::cross_join(                                                                        # nolint: object_name_linter
         tibble::tibble("time" = times[times <= 0]),
         tidyr::expand_grid(
-          "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-          !!!self %.% population %.% groups
+          "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
         ) |>
+        dplyr::cross_join(self %.% population %.% groups) |>
           dplyr::mutate(
             "state" = "I1",
             "f" = signal_approximations

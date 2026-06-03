@@ -368,7 +368,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         colnames(sol) <- c(
           "time",
           psi |>
-            tidyr::unite("label", "variant", "age_group", "state", sep = "/", na.rm = FALSE) |>
+            tidyr::unite("label", "variant", names(self %.% population %.% groups), "state", sep = "/", na.rm = FALSE) |>
             dplyr::pull("label")
         )
 

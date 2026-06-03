@@ -40,8 +40,8 @@ See vignette("diseasy-population").
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
-    \item{\code{groups}}{(\verb{named character()})\cr
-The names of the demographic groups that have been configured in the module.}
+    \item{\code{groups}}{(\code{data.frame()})\cr
+The demographic groups that have been configured in the module.}
 
     \item{\code{population}}{(\code{tibble})\cr
 The population groups and their sizes configured in the module.}
