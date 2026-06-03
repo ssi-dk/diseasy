@@ -128,28 +128,30 @@ DiseasyPopulation <- R6::R6Class(                                               
 
   active = list(
 
-    #' @field groups (`named character()`)\cr
-    #'   The names of the demographic groups that have been configured in the module.
+    #' @field groups (`data.frame()`)\cr
+    #'   The demographic groups that have been configured in the module.
     groups = function() {
 
-      groups <- list(
-        "age_group" = diseasystore::age_labels(self %.% age_cuts_lower)
-      )
+      groups <- list()
 
-      # Check DiseasyRegions module is loaded
-      if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
+      # Age stratification
+      groups[["age_group"]] <- diseasystore::age_labels(self %.% age_cuts_lower)
 
-        regions <- self %.% regions %.% regions
-
-        if (is.null(regions)) {
-          regions <- unique(self %.% regions %.% demography %.% region)
-        }
-
-        groups[["region"]] <- sort(regions)
+      # Spatial stratification
+      if (is.null(self %.% regional_stratification)) {
+        groups[["region"]] <- "All"
+      } else if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
+        groups[["region"]] <- toString(
+          purrr::pluck(self %.% regions %.% regions, .default = "All")
+        )
       }
 
-      # Sort by name
-      return(groups[order(names(groups))])
+      # Unpack groups and sort by name
+      groups <- tidyr::expand_grid(
+        !!!groups[order(names(groups))]
+      )
+
+      return(groups)
     },
 
 

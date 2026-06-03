@@ -450,7 +450,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_data_frame(incidence_data, add = coll)
       checkmate::assert_names(
         colnames(incidence_data),
-        must.include = c("date", "incidence", names(self %.% population %.% groups)),
+        must.include = c("date", "incidence", colnames(self %.% population %.% groups)),
         add = coll
       )
 
@@ -465,7 +465,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Check demography columns
       # (Input data must include the stratifications in the model)
-      for (group in names(self %.% population %.% groups)) {
+      for (group in colnames(self %.% population %.% groups)) {
         checkmate::assert_set_equal(
           dplyr::pull(incidence_data, group),
           self %.% population %.% groups[[group]],
@@ -504,7 +504,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       incidence_data <- incidence_data |>
         dplyr::left_join(
           self %.% population %.% population,
-          by = names(self %.% population %.% groups)
+          by = colnames(self %.% population %.% groups)
         ) |>
         dplyr::mutate("incidence" = .data$incidence * .data$proportion) |>
         dplyr::select(c(colnames(incidence_data), "incidence"))
@@ -520,7 +520,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       if (nrow(missing_data) > 0) {
         groups_w_missing_data <- missing_data |>
-          dplyr::select(c(names(self %.% population %.% groups), "variant")) |>
+          dplyr::select(c(colnames(self %.% population %.% groups), "variant")) |>
           dplyr::distinct() |>
           dplyr::rowwise() |>
           dplyr::group_map(~ unlist(as.vector(.x[1, ]))) |>
@@ -543,8 +543,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # and extract the subsets.
       # We also need to ensure the variants are ordered as the state vector is
       incidence_subsets <- incidence_data |>
-        dplyr::arrange(dplyr::across(.cols = c("variant", names(self %.% population %.% groups)))) |>
-        dplyr::group_by(dplyr::across(.cols = c("variant", names(self %.% population %.% groups)))) |>
+        dplyr::arrange(dplyr::across(.cols = c("variant", colnames(self %.% population %.% groups)))) |>
+        dplyr::group_by(dplyr::across(.cols = c("variant", colnames(self %.% population %.% groups)))) |>
         dplyr::group_split()
 
 
@@ -653,16 +653,21 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Impute zeros for missing states
       estimated_exposed_infected_states <- tidyr::expand_grid(
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        !!!self %.% population %.% groups,
         "state" = c(
           purrr::map_chr(seq_len(K), ~ paste0("E", .)),
           purrr::map_chr(seq_len(L), ~ paste0("I", .))
         ),
         "initial_condition" = 0
       ) |>
+        dplyr::cross_join(self %.% population %.% groups) |>
         dplyr::rows_update(
           estimated_exposed_infected_states,
-          by = c("variant", names(self %.% population %.% groups), "state")
+          by = c("variant", colnames(self %.% population %.% groups), "state")
+        ) |>
+        dplyr::select(
+          dplyr::all_of(
+            c("variant", colnames(self %.% population %.% groups), "state", "initial_condition")
+          )
         )
 
 
@@ -708,14 +713,19 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           to = self %.% training_period %.% end,
           by = "1 day"
         ),
-        !!!self %.% population %.% groups,
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
       ) |>
+        dplyr::cross_join(self %.% population %.% groups) |>
+        dplyr::select(
+          dplyr::all_of(
+            c("date", colnames(self %.% population %.% groups),  "variant")
+          )
+        ) |>
         dplyr::left_join(
           incidence_data,
-          by = c("date", names(self %.% population %.% groups), "variant")
+          by = c("date", colnames(self %.% population %.% groups), "variant")
         ) |>
-        dplyr::group_by(dplyr::across(c("variant", names(self %.% population %.% groups)))) |>
+        dplyr::group_by(dplyr::across(c("variant", colnames(self %.% population %.% groups)))) |>
         dplyr::group_map(~ {
           stats::approxfun(
             x = as.numeric(.x$date - max(.x$date), unit = "days"),
@@ -800,13 +810,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
         "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-        !!!self %.% population %.% groups,
         "state" = paste0("R", seq.int(self %.% parameters %.% compartment_structure %.% R))
       ) |>
-        dplyr::add_row(
-          "variant" = NA,
-          !!!self %.% population %.% groups,
-          "state" = "S"
+        dplyr::cross_join(self %.% population %.% groups) |>
+        dplyr::select(
+          dplyr::all_of(
+            c("variant", colnames(self %.% population %.% groups),  "state")
+          )
+        )
+        dplyr::union_all(
+          dplyr::mutate(
+            self %.% population %.% groups,
+            "variant" = NA,
+            "state" = "S"
+          )
         ) |>
         dplyr::mutate(
           "initial_condition" = sol[nrow(sol), rs_state_indices + 1]
@@ -825,7 +842,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         estimated_exposed_infected_states,
         estimated_recovered_susceptible_states
       ) |>
-        dplyr::arrange(dplyr::across(c("variant", names(self %.% population %.% groups), "state")))
+        dplyr::arrange(dplyr::across(c("variant", colnames(self %.% population %.% groups), "state")))
 
 
       # Normalise
