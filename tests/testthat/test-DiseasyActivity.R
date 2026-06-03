@@ -262,7 +262,7 @@ test_that("$get_scenario_openness() works with no scenario", {
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- names(contact_basis %.% DK %.% population)
+  age_labels <- diseasystore::age_labels(contact_basis %.% DK %.% age_cuts_lower)
 
   expect_identical(
     act$get_scenario_openness(),
@@ -352,7 +352,7 @@ test_that("$get_scenario_contacts() works no scenario", {
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- names(contact_basis %.% DK %.% population)
+  age_labels <- diseasystore::age_labels(contact_basis %.% DK %.% age_cuts_lower)
 
   expect_identical(
     act$get_scenario_contacts(),
@@ -516,14 +516,6 @@ test_that("$set_contact_basis() works", {
   )
 
   custom_basis <- contact_basis %.% DK
-  custom_basis$proportion <- custom_basis$proportion[-1]
-  expect_error(
-    checkmate_err_msg(act$set_contact_basis(custom_basis)),
-    class = "simpleError",
-    regexp = "Must have length 16, but has length 15"
-  )
-
-  custom_basis <- contact_basis %.% DK
   custom_basis$extra_element <- "some string"
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
@@ -533,7 +525,7 @@ test_that("$set_contact_basis() works", {
 
   custom_basis <- contact_basis %.% DK
   expect_error(
-    checkmate_err_msg(act$set_contact_basis(custom_basis[-5])),
+    checkmate_err_msg(act$set_contact_basis(custom_basis[-3])),
     class = "simpleError",
     regexp = r"{Must be a set equal to .+, but is missing elements \{'description'\}}"
   )
