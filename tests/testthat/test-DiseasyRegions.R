@@ -360,12 +360,16 @@ test_that("active binding: demography works", {
 
 test_that("$describe() works", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
-    adjacency = test_adjacency,
-    demography = test_demography
-  )
+  region <- DiseasyRegions$new()
+  expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
 
+  region$set_regions("north")
+  expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
+
+  region$set_adjacency(test_adjacency)
+  expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
+
+  region$set_demography(test_demography)
   expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
 
   rm(region)
