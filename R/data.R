@@ -102,10 +102,8 @@ NULL
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'   Source: Eurostat dataset `demo_r_pjangrp3`,
-#'   Population on 1 January by age group, sex and NUTS 3 region,
-#'   https://ec.europa.eu/eurostat/databrowser/view/demo_r_pjangrp3/default/table?lang=en,
-#'   accessed `r format(as.Date(attr(demography_nuts3, "creation_datetime")), "%B %d, %Y")`.
+#'   Source: 10.2908/demo_r_pjangrp3, `r format(as.Date(attr(demography_nuts3, "creation_datetime")), "%B %d, %Y")`.
+#'   Population on 1 January by age group, sex and NUTS 3 region
 #' @keywords data
 NULL
 
@@ -124,10 +122,8 @@ NULL
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'   Source: Eurostat dataset `demo_r_pjangrp3`,
-#'   Population on 1 January by age group, sex and NUTS 3 region,
-#'   https://ec.europa.eu/eurostat/databrowser/view/demo_r_pjangrp3/default/table?lang=en,
-#'   accessed `r format(as.Date(attr(demography_nuts, "creation_datetime")), "%B %d, %Y")`.
+#'   Source: 10.2908/demo_r_pjangrp3, `r format(as.Date(attr(demography_nuts3, "creation_datetime")), "%B %d, %Y")`.
+#'   Population on 1 January by age group, sex and NUTS 3 region
 #' @keywords data
 NULL
 

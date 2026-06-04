@@ -5,10 +5,8 @@
 \alias{nuts}
 \title{NUTS region identifiers}
 \source{
-Source: Eurostat dataset \code{demo_r_pjangrp3},
-Population on 1 January by age group, sex and NUTS 3 region,
-https://ec.europa.eu/eurostat/databrowser/view/demo_r_pjangrp3/default/table?lang=en,
-accessed .
+Source: 10.2908/demo_r_pjangrp3, .
+Population on 1 January by age group, sex and NUTS 3 region
 }
 \description{
 This data set contains the unique NUTS region identifiers represented in

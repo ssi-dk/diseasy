@@ -5,10 +5,8 @@
 \alias{demography_nuts3}
 \title{Demography (NUTS)}
 \source{
-Source: Eurostat dataset \code{demo_r_pjangrp3},
-Population on 1 January by age group, sex and NUTS 3 region,
-https://ec.europa.eu/eurostat/databrowser/view/demo_r_pjangrp3/default/table?lang=en,
-accessed .
+Source: 10.2908/demo_r_pjangrp3, .
+Population on 1 January by age group, sex and NUTS 3 region
 }
 \description{
 This data set contains population counts by NUTS region, age group,
