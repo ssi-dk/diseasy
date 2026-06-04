@@ -4,6 +4,10 @@
 #'   The `DiseasyRegions` module is responsible for handling geographic regions
 #'   included in the model.
 #'
+#'   The base class treats regions as generic identifiers. Use
+#'   [`DiseasyRegionsNuts`] for NUTS-specific validation and hierarchical region
+#'   matching.
+#'
 #'   See the vignette("diseasy-regions") for examples of use.
 #' @examples
 #'   # Create simple demography for three generic regions.
@@ -396,5 +400,159 @@ DiseasyRegions <- R6::R6Class(                                                  
     .regions = NULL,
     .adjacency = NULL,
     .demography = NULL
+  )
+)
+
+
+#' @rdname DiseasyRegions
+#' @export
+DiseasyRegionsNuts <- R6::R6Class(                                                                                      # nolint: object_name_linter
+  classname = "DiseasyRegionsNuts",
+  inherit = DiseasyRegions,
+
+  public = list(
+
+    #' @description
+    #'   Check whether regions, adjacency, and demography are mutually consistent
+    #'   and complete under NUTS hierarchy semantics.
+    #' @param regions `r rd_regions()`
+    #' @param adjacency `r rd_adjacency()`
+    #' @param demography `r rd_demography()`
+    #' @return `r rd_side_effects`
+    validate_configuration = function(regions, adjacency, demography) {
+
+      valid_nuts <- nuts$region
+
+      if (!checkmate::test_subset(self %.% regions, valid_nuts)) {
+        pkgcond::pkg_warning(
+          glue::glue(
+            "Some configured regions are not valid NUTS regions: {toString(setdiff(self %.% regions, valid_nuts))}"
+          )
+        )
+      }
+
+      # Helper function to retrieve all NUTS codes for the given regions
+      nuts_at_resolution <- function(nuts_level) {
+        nuts |>
+          dplyr::filter(level <= nuts_level) |>
+          dplyr::slice_max(.data$level, by = "country") |>
+          dplyr::filter(self$region_filter(.data$region, regions)) |>
+          dplyr::pull("region")
+      }
+
+
+      # adjacency must include a complete set of NUTS codes at its resolution
+      if (!is.null(adjacency)) {
+
+        # Infer the resoluition (NUTS level) in adjacency data
+        if (length(unique(nchar(unique(adjacency$from)) - 2)) > 1) {
+          pkgcond::pkg_error("`adjacency` has more data for more than one NUTS level")
+        }
+
+        if (!is.null(regions)) {
+
+          nuts_resolution <- unique(nchar(regions) - 2)
+
+          # Get all nuts code within scope
+          all_nuts_within_scope <- nuts_at_resolution(nuts_resolution) |>
+            purrr::keep(~ any(stringr::str_starts(., regions)))
+
+          missing_regions <- setdiff(all_nuts_within_scope, adjacency$from)
+
+          if (length(missing_regions > 0)) {
+            pkgcond::pkg_error(
+              glue::glue(
+                "`adjacency` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
+              )
+            )
+          }
+
+        }
+
+      }
+
+      # demography must include a complete set of NUTS codes at its resolution
+      if (!is.null(demography)) {
+
+        # Infer the resoluition (NUTS level) in demography data
+        nuts_resolution <- unique(nchar(unique(demography$region)) - 2)
+
+        if (length(nuts_resolution) > 1) {
+          pkgcond::pkg_error("`demography` has more data for more than one NUTS level")
+        }
+
+        if (!is.null(regions)) {
+
+          nuts_resolution <- unique(nchar(regions) - 2)
+
+          # Get all nuts code within scope
+          all_nuts_within_scope <- nuts_at_resolution(nuts_resolution) |>
+            purrr::keep(~ any(stringr::str_starts(., regions)))
+
+          missing_regions <- setdiff(all_nuts_within_scope, demography$region)
+
+          if (length(missing_regions > 0)) {
+            pkgcond::pkg_error(
+              glue::glue(
+                "`demography` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
+              )
+            )
+          }
+
+        }
+      }
+
+
+
+      # Check regions are consistent with adjacency
+      if (!is.null(regions) && !is.null(adjacency)) {
+        if (length(intersect(regions, adjacency %.% from)) < 1) {
+          pkgcond::pkg_error("`regions` and `adjacency` must contain at least one common region.")
+        }
+      }
+
+      # Check regions are consistent with demography
+      if (!is.null(regions) && !is.null(demography)) {
+        if (length(intersect(regions, demography %.% region)) < 1) {
+          pkgcond::pkg_error("`regions` and `demography` must contain at least one common region.")
+        }
+      }
+
+      # Check adjacency is consistent with demography
+      if (!is.null(adjacency) && !is.null(demography)) {
+        if (length(intersect(adjacency %.% from, demography %.% region)) < 1) {
+          pkgcond::pkg_error("`adjacency` and `demography` must contain at least one common region.")
+        }
+      }
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Create a logical filter using NUTS hierarchy prefix matching.
+    #' @param values (`character()`)\cr
+    #'   Values to filter, typically NUTS codes.
+    #' @param regions (`character()` or `NULL`)\cr
+    #'   Region codes to match against. Defaults to the currently selected
+    #'   regions. If `NULL`, all values are matched.
+    #' @return
+    #'   A `logical()` vector with the same length as `values`.
+    region_filter = function(values, regions = self %.% regions) {
+      checkmate::assert_character(values, any.missing = FALSE)
+
+      if (is.null(regions)) {
+        region_filter <- rep(TRUE, length(values))
+        return(region_filter)
+      }
+
+      region_filter <- purrr::reduce(
+        .x = purrr::map(regions, ~ stringr::str_starts(values, .x)),
+        .f = `|`,
+        .init = FALSE
+      )
+
+      return(region_filter)
+    }
   )
 )
