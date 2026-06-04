@@ -15,18 +15,25 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
 
   # Export contact matrices where we also have population data
   common_country_codes <- country_codes |>
-    purrr::keep(~ . %in% unique(demography$key_country))
+    purrr::keep(~ . %in% unique(demography$region))
 
   contact_basis <- common_country_codes |>
     purrr::map(\(country_code) {
+
+      # Store 5-year age group populations
+      N <- demography |>                                                                                                # nolint: object_name_linter
+        dplyr::filter(.data$region == !!country_code) |>
+        dplyr::mutate("age_group" = cut(age, c(age_cuts, Inf), right = FALSE, labels = age_labels)) |>
+        dplyr::summarise("population" = sum(population), .by = "age_group") |>
+        tibble::deframe()
+
       tibble::lst(
         "contacts" = NULL, # pre-allocate for below
         "population" = N,
         "proportion" = N / sum(N),
         "demography" = demography |>
-          dplyr::filter(.data$key_country == country_code) |>
-          dplyr::select(!"key_country") |>
-          dplyr::rename("population" = "n_population") |>
+          dplyr::filter(.data$region == country_code) |>
+          dplyr::select(!"region") |>
           dplyr::mutate("proportion" = .data$population / sum(.data$population)),
         "description" = glue::glue(
           "Contact matrices for ",
@@ -45,13 +52,14 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
 
     # Store 5-year age group populations
     N <- demography |>                                                                                                  # nolint: object_name_linter
-      dplyr::filter(.data$key_country == !!country_code) |>
+      dplyr::filter(.data$region == !!country_code) |>
       dplyr::mutate("age_group" = cut(age, c(age_cuts, Inf), right = FALSE, labels = age_labels)) |>
-      dplyr::summarise("n_population" = sum(n_population), .by = "age_group") |>
+      dplyr::summarise("population" = sum(population), .by = "age_group") |>
       tibble::deframe()
 
     # Retrieve and transform contact matrices for each arena
-    contacts <- purrr::map(c("home", "work", "school", "other"), \(arena) {
+    arenas <- c("home", "work", "school", "other")
+    contacts <- purrr::map(arenas, \(arena) {
 
       # The Diseasy SEIR models are configured to use a scale of contact matrices.
       # To make the definition of "contact" matrix more clear, lets start with the
@@ -164,9 +172,10 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
     }) |>
       stats::setNames(arenas)
 
-    contact_basis_country$contacts <- contacts
-
-    return(out)
+    return(modifyList(
+      purrr::pluck(contact_basis, country_code),
+      list("contacts" = contacts)
+    ))
   }) |>
     stats::setNames(common_country_codes)
 

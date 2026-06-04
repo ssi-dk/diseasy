@@ -29,9 +29,9 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       .data$sex == 0
     ) |>
     dplyr::transmute(
-      .data$key_country,
+      "region" = .data$key_country,
       .data$age,
-      "n_population" = .data$pop
+      "population" = .data$pop
     )
 
   attr(demography, "description") <- "Population data from the US Census Bureau for 2020."
