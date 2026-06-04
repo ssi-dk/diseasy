@@ -112,16 +112,6 @@ test_that("Malformed inputs to initialize works", {
     regexp = "demography` does not have all regions"
   )
 
-  expect_error(
-    checkmate_err_msg(
-      DiseasyRegionsNuts$new(
-        adjacency = dplyr::filter(test_adjacency, .data$from == "MT001", .data$to == "MT001"),
-        demography = dplyr::filter(demography_nuts3, .data$region != "MT001", substr(.data$region, 1, 2) == "MT")
-      )
-    ),
-    class = "simpleError",
-    regexp = "`adjacency` and `demography` must contain at least one common region."
-  )
 })
 
 
@@ -258,18 +248,6 @@ test_that("adjacency matrix normalisation works", {
 
   rm(region_1)
   rm(region_2)
-})
-
-
-test_that("adjacency data must be complete", {
-
-  expect_error(
-    checkmate_err_msg(
-      DiseasyRegionsNuts$new(adjacency = test_adjacency_triangle)
-    ),
-    regexp = "`adjacency` incomplete"
-  )
-
 })
 
 

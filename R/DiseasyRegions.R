@@ -445,16 +445,16 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       if (!is.null(adjacency)) {
 
         # Infer the resoluition (NUTS level) in adjacency data
-        if (length(unique(nchar(unique(adjacency$from)) - 2)) > 1) {
+        adjacency_resolution <- unique(nchar(unique(adjacency$from)) - 2)
+
+        if (length(adjacency_resolution) > 1) {
           pkgcond::pkg_error("`adjacency` has more data for more than one NUTS level")
         }
 
         if (!is.null(regions)) {
 
-          nuts_resolution <- unique(nchar(regions) - 2)
-
           # Get all nuts code within scope
-          all_nuts_within_scope <- nuts_at_resolution(nuts_resolution) |>
+          all_nuts_within_scope <- nuts_at_resolution(adjacency_resolution) |>
             purrr::keep(~ any(stringr::str_starts(., regions)))
 
           missing_regions <- setdiff(all_nuts_within_scope, adjacency$from)
@@ -466,7 +466,6 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
               )
             )
           }
-
         }
 
       }
@@ -475,18 +474,16 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       if (!is.null(demography)) {
 
         # Infer the resoluition (NUTS level) in demography data
-        nuts_resolution <- unique(nchar(unique(demography$region)) - 2)
+        demography_resolution <- unique(nchar(unique(demography$region)) - 2)
 
-        if (length(nuts_resolution) > 1) {
-          pkgcond::pkg_error("`demography` has more data for more than one NUTS level")
+        if (length(demography_resolution) > 1) {
+          pkgcond::pkg_error("`demography` has more data for more than one demography level")
         }
 
         if (!is.null(regions)) {
 
-          nuts_resolution <- unique(nchar(regions) - 2)
-
           # Get all nuts code within scope
-          all_nuts_within_scope <- nuts_at_resolution(nuts_resolution) |>
+          all_nuts_within_scope <- nuts_at_resolution(demography_resolution) |>
             purrr::keep(~ any(stringr::str_starts(., regions)))
 
           missing_regions <- setdiff(all_nuts_within_scope, demography$region)
@@ -499,29 +496,6 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
             )
           }
 
-        }
-      }
-
-
-
-      # Check regions are consistent with adjacency
-      if (!is.null(regions) && !is.null(adjacency)) {
-        if (length(intersect(regions, adjacency %.% from)) < 1) {
-          pkgcond::pkg_error("`regions` and `adjacency` must contain at least one common region.")
-        }
-      }
-
-      # Check regions are consistent with demography
-      if (!is.null(regions) && !is.null(demography)) {
-        if (length(intersect(regions, demography %.% region)) < 1) {
-          pkgcond::pkg_error("`regions` and `demography` must contain at least one common region.")
-        }
-      }
-
-      # Check adjacency is consistent with demography
-      if (!is.null(adjacency) && !is.null(demography)) {
-        if (length(intersect(adjacency %.% from, demography %.% region)) < 1) {
-          pkgcond::pkg_error("`adjacency` and `demography` must contain at least one common region.")
         }
       }
 
