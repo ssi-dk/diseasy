@@ -128,7 +128,7 @@ test_that("Non-empty initialize works", {
   expect_identical(
     sum(region %.% demography %.% population),
     sum(dplyr::pull(dplyr::filter(demography_nuts3, .data$region == "MT001"), "population"))
- )
+  )
 
   expect_identical(nrow(region %.% adjacency), 1L)
   expect_identical(region %.% adjacency %.% from, "MT001")

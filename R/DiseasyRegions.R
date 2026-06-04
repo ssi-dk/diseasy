@@ -183,9 +183,6 @@ DiseasyRegions <- R6::R6Class(                                                  
                                                                                                                         # nolint start: documentation_template_linter, identation_linter
     #' @description
     #'   Create a logical filter for values matching one or more regions.
-    #'
-    #'   The generic implementation uses exact matching. `DiseasyRegionsNuts`
-    #'   overrides this method with hierarchical NUTS prefix matching.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically region identifiers.
     #' @param regions (`character()` or `NULL`)\cr
@@ -459,7 +456,7 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
 
           missing_regions <- setdiff(all_nuts_within_scope, adjacency$from)
 
-          if (length(missing_regions > 0)) {
+          if (length(missing_regions) > 0) {
             pkgcond::pkg_error(
               glue::glue(
                 "`adjacency` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
@@ -488,7 +485,7 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
 
           missing_regions <- setdiff(all_nuts_within_scope, demography$region)
 
-          if (length(missing_regions > 0)) {
+          if (length(missing_regions) > 0) {
             pkgcond::pkg_error(
               glue::glue(
                 "`demography` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
@@ -503,16 +500,17 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
     },
 
 
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' @description
     #'   Create a logical filter using NUTS hierarchy prefix matching.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically NUTS codes.
     #' @param regions (`character()` or `NULL`)\cr
-    #'   Region codes to match against. Defaults to the currently selected
+    #'   Region identifiers to match against. Defaults to the currently selected
     #'   regions. If `NULL`, all values are matched.
     #' @return
     #'   A `logical()` vector with the same length as `values`.
-    region_filter = function(values, regions = self %.% regions) {
+    region_filter = function(values, regions = self %.% regions) {                                                      # nolint end: documentation_template_linter, identation_linter
       checkmate::assert_character(values, any.missing = FALSE)
 
       if (is.null(regions)) {

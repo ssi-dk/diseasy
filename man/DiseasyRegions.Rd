@@ -208,9 +208,6 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
 \if{latex}{\out{\hypertarget{method-DiseasyRegions-region_filter}{}}}
 \subsection{\code{DiseasyRegions$region_filter()}}{
   Create a logical filter for values matching one or more regions.
-
-The generic implementation uses exact matching. \code{DiseasyRegionsNuts}
-overrides this method with hierarchical NUTS prefix matching.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyRegions$region_filter(values, regions = self \%.\% regions)}
@@ -351,7 +348,7 @@ and complete under NUTS hierarchy semantics.
       \item{\code{values}}{(\code{character()})\cr
 Values to filter, typically NUTS codes.}
       \item{\code{regions}}{(\code{character()} or \code{NULL})\cr
-Region codes to match against. Defaults to the currently selected
+Region identifiers to match against. Defaults to the currently selected
 regions. If \code{NULL}, all values are matched.}
     }
     \if{html}{\out{</div>}}
