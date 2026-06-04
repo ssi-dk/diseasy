@@ -136,6 +136,8 @@ checkmate::assert_data_frame(lowest_level_is_not_nuts_3, max.rows = 0)
 demography_nuts3 <- demography_nuts |>
   dplyr::select(!c("level", "country"))
 
+
+# Store in package
 attr(demography_nuts3, "description") <- glue::glue(
   "Population by year, NUTS region, age group, and sex from Eurostat ",
   "dataset `demo_r_pjangrp3`.
@@ -145,10 +147,14 @@ attr(demography_nuts3, "description") <- glue::glue(
   "age groups within region, and sex."
 )
 
+attr(demography_nuts3, "creation_datetime") <- Sys.time()
+usethis::use_data(demography_nuts3, overwrite = TRUE)
+
+
+
 attr(nuts, "description") <- paste0(
   "Latest available NUTS region identifiers represented in `demography_nuts3`"
 )
 
-
-usethis::use_data(demography_nuts3, overwrite = TRUE)
+attr(nuts, "creation_datetime") <- Sys.time()
 usethis::use_data(nuts, overwrite = TRUE)
