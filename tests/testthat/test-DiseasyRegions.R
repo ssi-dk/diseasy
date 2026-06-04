@@ -118,7 +118,7 @@ test_that("Malformed inputs to initialize works", {
       )
     ),
     class = "simpleError",
-    regexp = "Variable 'regions': Must be a subset of"
+    regexp = "`regions` and `adjacency` must contain at least one common region."
   )
 
   expect_error(
@@ -130,7 +130,7 @@ test_that("Malformed inputs to initialize works", {
       )
     ),
     class = "simpleError",
-    regexp = "Variable 'regions': Must be a subset of"
+    regexp = "`regions` and `adjacency` must contain at least one common region."
   )
 
   expect_error(
@@ -142,7 +142,7 @@ test_that("Malformed inputs to initialize works", {
       )
     ),
     class = "simpleError",
-    regexp = "Variable 'regions': Must be a subset of"
+    regexp = "`regions` and `demography` must contain at least one common region."
   )
 
   expect_error(
