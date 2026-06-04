@@ -42,74 +42,8 @@ test_demography_stratified <- data.frame(
 )
 
 
-test_that("initialize works", {
-
-  # Empty module can be initialised
+test_that("Empty initialize works", {
   expect_no_error(DiseasyRegions$new())
-
-  region <- DiseasyRegions$new(
-    regions = "north",
-    adjacency = test_adjacency,
-    demography = test_demography
-  )
-
-  expect_identical(region %.% regions, "north")
-  expect_identical(region %.% demography %.% region, "north")
-  expect_identical(sum(region %.% demography %.% population), 100)
-
-  expect_identical(nrow(region %.% adjacency), 1L)
-  expect_identical(region %.% adjacency %.% from, "north")
-  expect_identical(region %.% adjacency %.% to, "north")
-
-  rm(region)
-
-  # Check if input validation works
-  expect_error(
-    checkmate_err_msg(
-      DiseasyRegions$new(
-        regions = "non-existent-region",
-        adjacency = test_adjacency,
-        demography = test_demography
-      )
-    ),
-    class = "simpleError",
-    regexp = "Variable 'regions': Must be a subset of"
-  )
-
-  expect_error(
-    checkmate_err_msg(
-      DiseasyRegions$new(
-        regions = "north",
-        adjacency = dplyr::filter(test_adjacency, .data$from != "north", .data$to != "north"),
-        demography = test_demography
-      )
-    ),
-    class = "simpleError",
-    regexp = "Variable 'regions': Must be a subset of"
-  )
-
-  expect_error(
-    checkmate_err_msg(
-      DiseasyRegions$new(
-        regions = "north",
-        adjacency = test_adjacency,
-        demography = dplyr::filter(test_demography, .data$region != "north")
-      )
-    ),
-    class = "simpleError",
-    regexp = "Variable 'regions': Must be a subset of"
-  )
-
-  expect_error(
-    checkmate_err_msg(
-      DiseasyRegions$new(
-        adjacency = dplyr::filter(test_adjacency, .data$from == "north", .data$to == "north"),
-        demography = dplyr::filter(test_demography, .data$region != "north")
-      )
-    ),
-    class = "simpleError",
-    regexp = "`adjacency` and `demography` must contain at least one common region."
-  )
 })
 
 
@@ -169,6 +103,78 @@ test_that("`$set_demography()`` works", {
 
   rm(region_1)
   rm(region_2)
+})
+
+
+test_that("Malformed inputs to initialize works", {
+
+  # Check if input validation works
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(
+        regions = "non-existent-region",
+        adjacency = test_adjacency,
+        demography = test_demography
+      )
+    ),
+    class = "simpleError",
+    regexp = "Variable 'regions': Must be a subset of"
+  )
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(
+        regions = "north",
+        adjacency = dplyr::filter(test_adjacency, .data$from != "north", .data$to != "north"),
+        demography = test_demography
+      )
+    ),
+    class = "simpleError",
+    regexp = "Variable 'regions': Must be a subset of"
+  )
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(
+        regions = "north",
+        adjacency = test_adjacency,
+        demography = dplyr::filter(test_demography, .data$region != "north")
+      )
+    ),
+    class = "simpleError",
+    regexp = "Variable 'regions': Must be a subset of"
+  )
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(
+        adjacency = dplyr::filter(test_adjacency, .data$from == "north", .data$to == "north"),
+        demography = dplyr::filter(test_demography, .data$region != "north")
+      )
+    ),
+    class = "simpleError",
+    regexp = "`adjacency` and `demography` must contain at least one common region."
+  )
+})
+
+
+test_that("Non-empty initialize works", {
+
+  region <- DiseasyRegions$new(
+    regions = "north",
+    adjacency = test_adjacency,
+    demography = test_demography
+  )
+
+  expect_identical(region %.% regions, "north")
+  expect_identical(region %.% demography %.% region, "north")
+  expect_identical(sum(region %.% demography %.% population), 100)
+
+  expect_identical(nrow(region %.% adjacency), 1L)
+  expect_identical(region %.% adjacency %.% from, "north")
+  expect_identical(region %.% adjacency %.% to, "north")
+
+  rm(region)
 })
 
 
