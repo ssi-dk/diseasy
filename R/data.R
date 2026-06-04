@@ -226,3 +226,26 @@ NULL
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @keywords data
 NULL
+
+
+#' Meta Social Connectedness Index as adjacency for NUTS 3 regions
+#'
+#' This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index (SCI)
+#' for NUTS 3 regions. The object is formatted for use with `DiseasyRegions`.
+#'
+#' The data set consists of a `data.frame` with three columns:
+#'  - `from`: The origin NUTS 3 region.
+#'  - `to`: The destination NUTS 3 region.
+#'  - `adjacency`: The contacts from `from` allocated to `to`.
+#'
+#' The adjacency values are two-way contact between regions and should be interpreted a type of "infection-flow" matrix.
+#'
+#' @name adjacency_meta_social_connectedness
+#' @docType data
+#' @source
+#'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
+#'   Retrieved `r format(attr(adjacency_meta_social_connectedness, "creation_date"), "%B %d, %Y")`,
+#'   See <https://data.humdata.org/dataset/social-connectedness-index> and
+#'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
+#' @keywords data
+NULL
