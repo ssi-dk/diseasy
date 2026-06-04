@@ -110,6 +110,28 @@ NULL
 NULL
 
 
+#' NUTS region identifiers
+#'
+#' This data set contains the unique NUTS region identifiers represented in
+#' `demography_nuts` after truncating to the latest available year and removing
+#' rows with missing population values.
+#'
+#' This object is derived from `demography_nuts`, which is a modified version
+#' of Eurostat dataset `demo_r_pjangrp3`. Eurostat is not responsible for the
+#' modifications made to the source data.
+#'
+#' @name nuts
+#' @docType data
+#' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
+#' @source
+#'   Source: Eurostat dataset `demo_r_pjangrp3`,
+#'   Population on 1 January by age group, sex and NUTS 3 region,
+#'   https://ec.europa.eu/eurostat/databrowser/view/demo_r_pjangrp3/default/table?lang=en,
+#'   accessed `r format(as.Date(attr(demography_nuts, "creation_datetime")), "%B %d, %Y")`.
+#' @keywords data
+NULL
+
+
 #' Danish activity "units"
 #'
 #' This data set contains the "units" of activity that was developed for the Danish COVID-19 modelling efforts.
