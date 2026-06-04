@@ -11,11 +11,8 @@ missing_packages <- required_packages[
 
 if (length(missing_packages) > 0) {
   stop(
-    paste0(
-      "Install the following packages before running this script: ",
-      paste(missing_packages, collapse = ", "),
-      "."
-    ),
+    "Install the following packages before running this script: ",
+    toString(missing_packages),
     call. = FALSE
   )
 }
