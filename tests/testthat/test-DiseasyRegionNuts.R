@@ -291,3 +291,28 @@ test_that("`demography_nuts3` data set works with `DiseasyRegionsNuts`", {
 
   rm(region)
 })
+
+test_that("Hierarchical regions works", {
+
+  region_0 <- DiseasyRegionsNuts$new(
+    regions = "MT",
+    adjacency = test_adjacency,
+    demography = demography_nuts3
+  )
+
+  region_1 <- DiseasyRegionsNuts$new(
+    regions = "MT0",
+    adjacency = test_adjacency,
+    demography = demography_nuts3
+  )
+
+  region_2 <- DiseasyRegionsNuts$new(
+    regions = "MT00",
+    adjacency = test_adjacency,
+    demography = demography_nuts3
+  )
+
+  rm(region_0)
+  rm(region_1)
+  rm(region_2)
+})
