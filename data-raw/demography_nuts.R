@@ -10,11 +10,8 @@ missing_packages <- required_packages[
 
 if (length(missing_packages) > 0) {
   stop(
-    paste0(
-      "Install the following packages before running this script: ",
-      paste(missing_packages, collapse = ", "),
-      "."
-    ),
+    "Install the following packages before running this script: ",
+    toString(missing_packages),
     call. = FALSE
   )
 }
@@ -38,12 +35,12 @@ eurostat_demography <- eurostat::get_eurostat(
     "sex" = "sex",
     "population" = "values"
   ) |>
-    dplyr::filter(
-      .data$sex %in% c("M", "F"), # Keep stratified population data, not aggregate
-      .data$freq == "A", # freq should always be "A = annual", but just in case
-      .data$unit == "NR" # unit should always be "NR = number", but just in case
-    ) |>
-    dplyr::select(!c("freq", "unit"))
+  dplyr::filter(
+    .data$sex %in% c("M", "F"), # Keep stratified population data, not aggregate
+    .data$freq == "A", # freq should always be "A = annual", but just in case
+    .data$unit == "NR" # unit should always be "NR = number", but just in case
+  ) |>
+  dplyr::select(!c("freq", "unit"))
 
 # Some have unknown age group -> distribute across age groups
 demography_nuts <- dplyr::left_join(
@@ -55,7 +52,7 @@ demography_nuts <- dplyr::left_join(
   by = c("sex", "region", "year")
 ) |>
   dplyr::mutate( # Distribute unknown across other age groups
-    "population" = round(.data$population * (1 + .data$UNK / .data$TOTAL)),
+    "population" = round(.data$population * (1 + .data$UNK / .data$TOTAL))
   ) |>
   dplyr::select(c("year", "region", "age_group", "sex", "population"))
 
@@ -65,12 +62,12 @@ demography_nuts <- demography_nuts |>
   dplyr::mutate(
     "sex" = dplyr::if_else(.data$sex == "F", "Female", "Male"),
     "age_group" = dplyr::case_when(
-      stringr::str_starts(.data$age_group, "Y_LT") ~ paste( # Age group: 00-XX
+      stringr::str_starts(.data$age_group, stringr::fixed("Y_LT")) ~ paste( # Age group: 00-XX
         "00",
         stringr::str_pad(stringr::str_remove(.data$age_group, "^Y_LT"), 2, pad = "0"),
         sep = "-"
       ),
-      stringr::str_starts(.data$age_group, "Y_GE") ~ paste0( # Age group: XX+
+      stringr::str_starts(.data$age_group, stringr::fixed("Y_GE")) ~ paste0( # Age group: XX+
         stringr::str_remove(.data$age_group, "^Y_populationGE"), "+"
       ),
       stringr::str_starts(.data$age_group, r"{Y\d}") ~ paste( # Age group XX-YY
@@ -94,7 +91,7 @@ nuts <- tibble::tibble(
       substr(.data$region, 1, 2),
       origin = "iso2c",
       destination = "country.name",
-      custom_match = c("EL" = "Greece", "EF" = NA, "EU" = NA),
+      custom_match = c("EL" = "Greece", "EF" = NA, "EU" = NA)
     ),
     "level" = nchar(.data$region) - 2
   ) |>
