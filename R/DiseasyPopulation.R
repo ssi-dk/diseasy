@@ -34,17 +34,17 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @description
     #'   Creates a new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
-    #' @param regions `r rd_regions()`
+    #' @param regional_stratification `r rd_regional_stratification()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
-    initialize = function(age_cuts_lower = 0L, regions = NULL, ...) {
+    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, ...) {
 
       # Pass additional arguments to the DiseasyBaseModule initializer
       super$initialize(...)
 
       # Pass arguments to methods
       self$stratify_age(age_cuts_lower)
-      self$stratify_regions(regions)
+      self$stratify_regions(regional_stratification)
 
     },
 
@@ -71,13 +71,13 @@ DiseasyPopulation <- R6::R6Class(                                               
 
     #' @description
     #'   Sets the spatial stratification of the model population.
-    #' @param regions `r rd_regions()`
+    #' @param regional_stratification `r rd_regional_stratification()`
     #' @return `r rd_side_effects`
-    stratify_regions = function(regions) {
+    stratify_regions = function(regional_stratification) {
       checkmate::assert_class(self %.% regions, "DiseasyRegions")
       checkmate::assert_choice(regions, self %.% regions %.% available_stratifications)
 
-      self$regions$set_regions(regions)
+      self$.regional_stratification <- regional_stratification
 
       return(invisible(NULL))
     },
@@ -200,6 +200,13 @@ DiseasyPopulation <- R6::R6Class(                                               
     },
 
 
+    #' @field regional_stratification `r rd_regional_stratification("field")`
+    regional_stratification = purrr::partial(
+      .f = active_binding,
+      name = "regional_stratification",
+      expr = return(private %.% .regional_stratification)
+    ),
+
 
     #' @field age_cuts_lower `r rd_age_cuts_lower("field")`
     age_cuts_lower = purrr::partial(
@@ -237,6 +244,6 @@ DiseasyPopulation <- R6::R6Class(                                               
     .DiseasyRegions = NULL,
 
     .age_cuts_lower = 0L,
-    .regions = NULL
+    .regional_stratification = NULL
   )
 )
