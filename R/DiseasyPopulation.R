@@ -34,15 +34,18 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @description
     #'   Creates a new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param regions `r rd_regions()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
-    initialize = function(age_cuts_lower = 0L, ...) {
+    initialize = function(age_cuts_lower = 0L, regions = NULL, ...) {
+
+      # Pass additional arguments to the DiseasyBaseModule initializer
+      super$initialize(...)
 
       # Pass arguments to methods
       self$stratify_age(age_cuts_lower)
+      self$stratify_regions(regions)
 
-      # Pass further arguments to the DiseasyBaseModule initializer
-      super$initialize(...)
     },
 
 
@@ -61,6 +64,22 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       # Store the age_cuts as integer
       private$.age_cuts_lower <- as.integer(age_cuts_lower)
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Sets the spatial stratification of the model population.
+    #' @param regions `r rd_regions()`
+    #' @return `r rd_side_effects`
+    stratify_regions = function(regions) {
+      checkmate::assert_class(self %.% regions, "DiseasyRegions")
+      checkmate::assert_choice(regions, self %.% regions %.% available_stratifications)
+
+      self$regions$set_regions(regions)
+
+      return(invisible(NULL))
     },
 
 
@@ -108,6 +127,18 @@ DiseasyPopulation <- R6::R6Class(                                               
       groups <- list(
         "age_group" = diseasystore::age_labels(self %.% age_cuts_lower)
       )
+
+      # Check DiseasyRegions module is loaded
+      if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
+
+        regions <- self %.% regions %.% regions
+
+        if (is.null(regions)) {
+          regions <- unique(self %.% regions %.% demography %.% region)
+        }
+
+        groups[["region"]] <- sort(regions)
+      }
 
       # Sort by name
       return(groups[order(names(groups))])
@@ -195,6 +226,7 @@ DiseasyPopulation <- R6::R6Class(                                               
     .DiseasyActivity = NULL,
     .DiseasyRegions = NULL,
 
-    .age_cuts_lower = 0L
+    .age_cuts_lower = 0L,
+    .regions = NULL
   )
 )

@@ -64,6 +64,7 @@ The local copy of an DiseasyRegions module. Read-only.}
   \itemize{
     \item \href{#method-DiseasyPopulation-initialize}{\code{DiseasyPopulation$new()}}
     \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
+    \item \href{#method-DiseasyPopulation-stratify_regions}{\code{DiseasyPopulation$stratify_regions()}}
     \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
     \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
     \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
@@ -82,13 +83,14 @@ The local copy of an DiseasyRegions module. Read-only.}
   Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, ...)}
+    \preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, regions = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}
@@ -109,6 +111,28 @@ The local copy of an DiseasyRegions module. Read-only.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-stratify_regions"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-stratify_regions}{}}}
+\subsection{\code{DiseasyPopulation$stratify_regions()}}{
+  Sets the spatial stratification of the model population.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$stratify_regions(regions)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
     }
     \if{html}{\out{</div>}}
   }
