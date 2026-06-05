@@ -74,10 +74,13 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @param regional_stratification `r rd_regional_stratification()`
     #' @return `r rd_side_effects`
     stratify_regions = function(regional_stratification) {
-      checkmate::assert_class(self %.% regions, "DiseasyRegions")
-      checkmate::assert_choice(regions, self %.% regions %.% available_stratifications)
 
-      self$.regional_stratification <- regional_stratification
+      if (!is.null(regional_stratification)) {
+        checkmate::assert_class(self %.% regions, "DiseasyRegions")
+        checkmate::assert_choice(regions, self %.% regions %.% available_stratifications)
+      }
+
+      private$.regional_stratification <- regional_stratification
 
       return(invisible(NULL))
     },
