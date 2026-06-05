@@ -311,6 +311,15 @@ DiseasyRegions <- R6::R6Class(                                                  
     ),
 
 
+    #' @field available_stratifications (`character()`)\cr
+    #'   The available levels of stratification supported. Read only.
+    available_stratifications = purrr::partial(
+      .f = active_binding,
+      name = "regions",
+      expr = list("region") # For DiseasyRegions, space can either not be startifed or stratified by region
+    ),
+
+
     #' @field adjacency `r rd_adjacency(type = "field")`
     adjacency = purrr::partial(
       .f = active_binding,
