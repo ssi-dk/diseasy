@@ -30,6 +30,8 @@ See vignette("diseasy-population").
 }
 \seealso{
 \link{DiseasyActivity}
+
+\link{DiseasyRegions}
 }
 \keyword{functional-module}
 \section{Super class}{
@@ -51,6 +53,9 @@ The distribution of individuals across the demography groups defined in the modu
 
     \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
 The local copy of an DiseasyActivity module. Read-only.}
+
+    \item{\code{regions}}{(\code{diseasy::DiseasyRegions})\cr
+The local copy of an DiseasyRegions module. Read-only.}
   }
   \if{html}{\out{</div>}}
 }
