@@ -432,9 +432,13 @@ DiseasyModelOde <- R6::R6Class(                                                 
         variant_stratification <- rlang::quos(variant)
       }
 
-      ## Age group
+      ## Age group stratification
       # If age groups are defined in the model, check it is supported by the data
-      if (length(self %.% population %.% age_cuts_lower) > 1) {
+      if (length(self %.% population %.% age_cuts_lower) == 0) {
+
+        age_group_stratification <- rlang::quos(age_group = "0+") # No age groups in the model
+
+      } else { # Age groups in the model
 
         # Can we map from the age groups in the data to the age groups in the model?
         # We use `checkmate::test_choice` because `%in%` randomly does not work in this case.
@@ -494,18 +498,28 @@ DiseasyModelOde <- R6::R6Class(                                                 
             parse(text = paste0(" rlang::quos(age_group = dplyr::case_match(", age_groups_maps, "))"))
           )
         }
-
-      } else {
-        # No age groups in the model
-        age_group_stratification <- rlang::quos(age_group = "0+")
       }
 
+      ## Regional stratification
+      # If regions are defined in the model, check it is supported by the data
+      if (is.null(self %.% population %.% regional_stratification)) {
 
+        # No age groups in the model
+        regional_stratification <- rlang::quos(region = "All")
+
+      } else {
+
+        # Can we map from the regions in the data to the regions in the model?
+        if (checkmate::test_choice("region", self %.% observables %.% available_stratifications)) {
+          # TODO
+        }
+      }
 
       # Set the stratification to the highest level supported by the data / model
       model_stratification <- c(
         variant_stratification,
-        age_group_stratification
+        age_group_stratification,
+        regional_stratification
       )
 
       return(model_stratification)
