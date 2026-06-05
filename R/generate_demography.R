@@ -1,43 +1,71 @@
-if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibble"))) {
+#' Generate country-level demography data
+#'
+#' @description
+#'   Generate the country-level demography data used by `diseasy` from the
+#'   U.S. Census Bureau International Database.
+#' @param regions (`character()`)\cr
+#'   Optional ISO 3166-1 alpha-2 country codes to keep. If `NULL`, all regions
+#'   available in the source data are returned.
+#' @param year (`integer(1)`)\cr
+#'   The year to keep from the source data.
+#' @param idb_zip (`character(1)`)\cr
+#'   URL or file path to the U.S. Census Bureau IDB zip file.
+#' @return
+#'   A `data.frame` with columns `region`, `age`, and `population`.
+#' @examples
+#' \dontrun{
+#' demography <- generate_demography(regions = c("DK", "FI", "IS", "NO", "SE"))
+#' }
+#' @keywords data-generators
+#' @export
+#' @importFrom diseasystore `%.%`
+generate_demography <- function(
+  regions = NULL,
+  year = 2020L,
+  idb_zip = "https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip"
+) {
+  coll <- checkmate::makeAssertCollection()
+  checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, add = coll)
+  checkmate::assert_integerish(year, len = 1, lower = 1950, add = coll)
+  checkmate::assert_string(idb_zip, add = coll)
+  checkmate::reportAssertions(coll)
 
-  # We get age population data like the contactdata package does using this source:
-  # https://www.census.gov/programs-surveys/international-programs/about/idb.html
-  # Terms of the data can be read here:
-  # https://www.census.gov/data/developers/about/terms-of-service.html
+  missing_packages <- purrr::discard(c("curl", "readr"), rlang::is_installed())
 
-  # Alternative data source is here:
-  # https://population.un.org/wpp/Download/Standard/Population/
+  if (length(missing_packages) > 0) {
+    pkgcond::pkg_error(glue::glue(
+      "Install the following packages before generating these data: {toString(missing_packages)}"
+    ))
+  }
 
-  # US Census data uses their "GEO_ID" as geographical identifier. In this case, we only need the
-  # country code (last two characters of GEO_ID)
-  idb_zip <- "https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip"
-  curl::curl_fetch_disk(idb_zip, file.path(tempdir(), "idb.zip"))
+
+  idb_file <- tempfile(fileext = ".zip")
+  curl::curl_fetch_disk(idb_zip, idb_file)
+
   idb_1yr <- readr::read_delim(
-    unz(file.path(tempdir(), "idb.zip"), "idbsingleyear.txt"),
+    unz(idb_file, "idbsingleyear.txt"),
     delim = "|",
     show_col_types = FALSE
-  ) |>
-    dplyr::mutate("key_country" = stringr::str_sub(.data$GEO_ID, -2, -1))
+  )
 
+  if (!is.null(regions)) {
+    idb_1yr <- dplyr::filter(idb_1yr, stringr::str_sub(.data$GEO_ID, -2, -1) %in% regions)
+  }
 
-  # Get 1-year age-group data for all countries in the data set
-  # We use population data from 2020 to match the study year of `contactdata`s contact matrices
   demography <- idb_1yr |>
     dplyr::rename_with(tolower) |>
     dplyr::filter(
-      `#yr` == 2020,
+      .data[["#yr"]] == year,
       .data$sex == 0
     ) |>
     dplyr::transmute(
-      "region" = .data$key_country,
+      "region" = stringr::str_sub(.data$geo_id, -2, -1),
       .data$age,
       "population" = .data$pop
     )
 
-  attr(demography, "description") <- "Population data from the US Census Bureau for 2020."
-
-  # Store the data in the package
+  attr(demography, "description") <- glue::glue("Population data from the US Census Bureau for {year}.")
   attr(demography, "creation_datetime") <- Sys.time()
-  usethis::use_data(demography, overwrite = TRUE)
 
+  return(demography)
 }
