@@ -1,21 +1,54 @@
-if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibble"))) {
+#' Generate contact-basis data
+#'
+#' @description
+#'   Generate the contact-basis object used by `diseasy` from `contactdata`
+#'   contact matrices and country-level demography.
+#' @param regions (`character()`)
+#'   Optional ISO 3166-1 alpha-2 country codes to keep. If `NULL`, all regions
+#'   with both demography and contact data are returned.
+#' @param arenas (`character()`)
+#'   Contact arenas to generate.
+#' @return
+#'   A named list of contact-basis objects, using the current package data
+#'   structure.
+#' @examples
+#' \dontrun{
+#' contact_basis <- generate_contact_basis()
+#' }
+#' @keywords data-generators
+#' @export
+#' @importFrom diseasystore `%.%`
+generate_contact_basis <- function(
+  regions = NULL
+) {
+  checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
 
-  # We express all contact data by default in 16 5-year age groups
-  # (the default age groups of the `contactdata` package)
-  age_cuts <- (0:15) * 5
-  age_labels <- diseasystore::age_labels(age_cuts)
+  missing_packages <- purrr::discard(c("countrycode", "countrycode", "tibble"), rlang::is_installed())
 
-  # Get countries in the contactdata package
+  if (length(missing_packages) > 0) {
+    pkgcond::pkg_error(glue::glue(
+      "Install the following packages before generating these data: {toString(missing_packages)}"
+    ))
+  }
+
+  age_cuts_lower = (0:15) * 5
+  age_labels <- diseasystore::age_labels(age_cuts_lower)
+
+  demography <- generate_demography(regions)
+
   countries <- contactdata::list_countries()
   country_codes <- purrr::map_chr(
     countries,
-    ~ countrycode::countrycode(.,  origin = "country.name", destination = "iso2c")
+    ~ countrycode::countrycode(.x, origin = "country.name", destination = "iso2c")
   ) |>
     stats::setNames(countries)
 
-  # Export contact matrices where we also have population data
   common_country_codes <- country_codes |>
-    purrr::keep(~ . %in% unique(demography$region))
+    purrr::keep(~ .x %in% unique(demography %.% region))
+
+  if (length(common_country_codes) == 0) {
+    rlang::abort("No countries have both demography data and contactdata matrices.")
+  }
 
   contact_basis <- common_country_codes |>
     purrr::map(\(country_code) {
@@ -23,7 +56,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
       # Store 5-year age group populations
       N <- demography |>                                                                                                # nolint: object_name_linter
         dplyr::filter(.data$region == !!country_code) |>
-        dplyr::mutate("age_group" = cut(age, c(age_cuts, Inf), right = FALSE, labels = age_labels)) |>
+        dplyr::mutate("age_group" = cut(age, c(age_cuts_lower, Inf), right = FALSE, labels = age_labels)) |>
         dplyr::summarise("population" = sum(population), .by = "age_group") |>
         tibble::deframe()
 
@@ -53,7 +86,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
     # Store 5-year age group populations
     N <- demography |>                                                                                                  # nolint: object_name_linter
       dplyr::filter(.data$region == !!country_code) |>
-      dplyr::mutate("age_group" = cut(age, c(age_cuts, Inf), right = FALSE, labels = age_labels)) |>
+      dplyr::mutate("age_group" = cut(age, c(age_cuts_lower, Inf), right = FALSE, labels = age_labels)) |>
       dplyr::summarise("population" = sum(population), .by = "age_group") |>
       tibble::deframe()
 
@@ -179,8 +212,7 @@ if (rlang::is_installed(c("contactdata", "countrycode", "curl", "usethis", "tibb
   }) |>
     stats::setNames(common_country_codes)
 
-
-  # Store the data in the package
   attr(contact_basis, "creation_datetime") <- Sys.time()
-  usethis::use_data(contact_basis, overwrite = TRUE)
+
+  return(contact_basis)
 }
