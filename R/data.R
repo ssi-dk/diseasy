@@ -59,20 +59,20 @@
 NULL
 
 
-#' Demography (world)
+#' Demography (Nordics)
 #'
 #' This data set population data for 176 geographical regions in
 #' 1-year age-groups to allow transformation of the contact matrices into other age cuts.
 #'
 #' This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
 #'
-#' @name demography
+#' @name demography_nordic
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
 #'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
 #'  U.S. Department of Commerce. Retrieved
-#'  `r format(attr(demography, "creation_date"), "%B %d, %Y")`,
+#'  `r format(attr(demography_nordic, "creation_date"), "%B %d, %Y")`,
 #'  from https://data.census.gov/
 #' @keywords data
 NULL
