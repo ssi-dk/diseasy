@@ -161,12 +161,22 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @field population (`tibble`)\cr
     #'   The population groups and their sizes configured in the module.
     population = function() {
+      checkmate::assert_class(self %.% regions, "DiseasyRegions")
 
-      demography <- self %.% regions %.% demography
+      # Retrieve either the loaded demography or default to contact_basis
+      demography <- purrr::pluck(
+        self %.% regions %.% demography,
+        .default = self %.% activity %.% contact_basis %.% demography
+      ) |>
+        dplyr::mutate("proportion" = .data$population / sum(.data$population))
 
-      tidyr::expand_grid(!!!self %.% groups) |>
+      self %.% groups |>
         dplyr::left_join(
-          self %.% activity %.% map_population(self %.% age_cuts_lower, demography = demography) |>
+          self %.% activity %.% map_population(
+            age_cuts_lower_out = self %.% age_cuts_lower,
+            age_groups_reference = names(self %.% activity %.% contact_basis %.% proportion),
+            demography = demography
+          ) |>
             dplyr::summarise(
               "proportion" = sum(.data$proportion),
               "age_cuts_lower" = min(.data$age),
