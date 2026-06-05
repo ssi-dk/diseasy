@@ -344,13 +344,24 @@ Map population between age groups
   The function computes the proportion of population in the new and old age groups.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$map_population(age_cuts_lower)}
+    \preformatted{DiseasyActivity$map_population(
+  age_cuts_lower_out,
+  age_groups_reference = names(self$contact_basis$proportion),
+  demography = self$contact_basis$demography
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{age_cuts_lower_out}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{age_groups_reference}}{(\code{character()})\cr
+Age labels (created by \code{diseasystore::age_labels()} of reference data.}
+      \item{\code{demography}}{(\code{data.frame})\cr
+"A \code{data.frame} with the columns\\cr",
+"  * \code{age} (\code{integer()}) 1-year age group\\cr",
+"  * \code{population} (\code{numeric()}) size of population in age group\\cr",
+"  * \code{proportion} (\code{numeric()}) proportion of total population in age group\\cr",}
     }
     \if{html}{\out{</div>}}
   }

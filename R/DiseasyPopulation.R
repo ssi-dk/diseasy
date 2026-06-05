@@ -159,16 +159,18 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   The population groups and their sizes configured in the module.
     population = function() {
 
+      demography <- self %.% regions %.% demography
+
       tidyr::expand_grid(!!!self %.% groups) |>
         dplyr::left_join(
-          self %.% activity %.% map_population(self %.% age_cuts_lower) |>
+          self %.% activity %.% map_population(self %.% age_cuts_lower, demography = demography) |>
             dplyr::summarise(
               "proportion" = sum(.data$proportion),
               "age_cuts_lower" = min(.data$age),
               .by = "age_group_out"
             ) |>
             dplyr::transmute(
-              "population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population),
+              "population" = .data$proportion * sum(demography %.% population),
               .data$proportion,
               "age_group" = diseasystore::age_labels(.data$age_cuts_lower)
             ),
