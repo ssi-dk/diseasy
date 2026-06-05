@@ -3,6 +3,23 @@ test_that("initialize works", {
   # Creating an empty module
   population <- DiseasyPopulation$new()
   expect_identical(population %.% age_cuts_lower, 0L)
+  expect_null(population %.% regional_stratification)
+
+  rm(population)
+
+
+  # Set age stratification during loading
+  population <- DiseasyPopulation$new(age_cuts_lower = c(20, 40, 60))
+  expect_identical(population %.% age_cuts_lower, c(20L, 40L, 60L))
+  expect_null(population %.% regional_stratification)
+
+  rm(population)
+
+
+  # Set spatial stratification during loading
+  population <- DiseasyPopulation$new(regional_stratification = "region")
+  expect_identical(population %.% age_cuts_lower, 0L)
+  expect_identical(population %.% regional_stratification, "region")
 
   rm(population)
 })

@@ -49,6 +49,8 @@ The population groups and their sizes configured in the module.}
     \item{\code{population_proportion}}{(\code{numeric()})\cr
 The distribution of individuals across the demography groups defined in the module.}
 
+    \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population. Read only.}
+
     \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
 
     \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
@@ -83,14 +85,14 @@ The local copy of an DiseasyRegions module. Read-only.}
   Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, regions = NULL, ...)}
+    \preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, regional_stratification = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}
@@ -126,13 +128,13 @@ The local copy of an DiseasyRegions module. Read-only.}
   Sets the spatial stratification of the model population.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyPopulation$stratify_regions(regions)}
+    \preformatted{DiseasyPopulation$stratify_regions(regional_stratification)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
     }
     \if{html}{\out{</div>}}
   }
