@@ -29,14 +29,14 @@
 #'
 #' This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
 #'
-#' @name contact_basis
+#' @name contact_basis_nordic
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @author Lasse Engbo Christiansen \email{lsec@ssi.dk}
 #' @source
 #'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
 #'  U.S. Department of Commerce. Retrieved
-#'  `r format(attr(contact_basis, "creation_date"), "%B %d, %Y")`,
+#'  `r format(attr(contact_basis_nordic, "creation_date"), "%B %d, %Y")`,
 #'  from https://data.census.gov/
 #' @source
 #'  Gruson H (2023). "contactdata: Social Contact Matrices for 152
