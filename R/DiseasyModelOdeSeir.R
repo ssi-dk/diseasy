@@ -76,7 +76,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param observables,population,activity,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,region,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -116,6 +116,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       observables = FALSE,
       population = TRUE,
       activity = TRUE,
+      region = TRUE,
       season = TRUE,
       variant = TRUE,
       immunity = TRUE,
@@ -128,6 +129,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = observables,
         population = population,
         activity = activity,
+        region = region,
         season = season,
         variant = variant,
         immunity = immunity,

@@ -15,10 +15,13 @@ Most notably, the model module facilitates:
 \item Module interfaces:
 The module contains the functional modules via its active bindings:
 \itemize{
-\item \verb{$activity}: \code{DiseasyActivity}
 \item \verb{$observables}: \code{DiseasyObservables}
+\item \verb{$population} : \code{DiseasyPopulation}
+\item \verb{$activity}: \code{DiseasyActivity}
+\item \verb{$region}: \code{DiseasyRegions}
 \item \verb{$season}: \code{DiseasySeason}
 \item \verb{$variant} : \code{DiseasyVariant}
+\item \verb{$immunity} : \code{DiseasyImmunity}
 }
 
 Configured instances of these modules can be provided during initialisation.
@@ -43,11 +46,13 @@ These functions define the "API" of the models and ensure the models can take pa
 
 \link{DiseasyActivity}
 
-\link{DiseasyImmunity}
+\link{DiseasyRegions}
 
 \link{DiseasySeason}
 
 \link{DiseasyVariant}
+
+\link{DiseasyImmunity}
 }
 \keyword{model-template-builder}
 \section{Super class}{
@@ -56,23 +61,26 @@ These functions define the "API" of the models and ensure the models can take pa
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
+    \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
+The local copy of a DiseasyObservables module. Read-only.}
+
     \item{\code{population}}{(\code{diseasy::DiseasyPopulation})\cr
 The local copy of a DiseasyPopulation module. Read-only.}
 
     \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
 The local copy of an DiseasyActivity module. Read-only.}
 
-    \item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
-The local copy of a DiseasyImmunity module. Read-only.}
-
-    \item{\code{observables}}{(\code{diseasy::DiseasyObservables})\cr
-The local copy of a DiseasyObservables module. Read-only.}
+    \item{\code{region}}{(\code{diseasy::DiseasyRegions})\cr
+The local copy of an DiseasyRegions module. Read-only.}
 
     \item{\code{season}}{(\code{diseasy::DiseasySeason})\cr
 The local copy of a DiseasySeason module. Read-only.}
 
     \item{\code{variant}}{(\code{diseasy::.DiseasyVariant})\cr
 The local copy of a DiseasyVariant module. Read-only.}
+
+    \item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
+The local copy of a DiseasyImmunity module. Read-only.}
 
     \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
@@ -115,6 +123,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   observables = FALSE,
   population = FALSE,
   activity = FALSE,
+  region = FALSE,
   season = FALSE,
   variant = FALSE,
   immunity = FALSE,
@@ -127,7 +136,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{observables, population, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{observables, population, activity, region, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
       \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
