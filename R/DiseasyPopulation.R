@@ -106,13 +106,21 @@ DiseasyPopulation <- R6::R6Class(                                               
       return(per_capita_contact_matrices)
     },
 
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyPopulation ##########################################")
+      printr("Stratifications:")
       if (identical(self %.% age_cuts_lower, 0L)) {
-        printr("No age stratification has been configured")
+        printr("Age: No age stratification has been configured")
       } else {
-        printr(glue::glue("Stratified by age: {toString(diseasystore::age_labels(self %.% age_cuts_lower))}"))
+        printr(glue::glue("Age: Stratified by age: {toString(diseasystore::age_labels(self %.% age_cuts_lower))}"))
+      }
+
+      if (is.null(private %.% .regions)) {
+        printr("Space: No spatial stratification has been configured")
+      } else {
+        printr(glue::glue("Space: Stratified by {private %.% .regions}"))
       }
     }
   ),
