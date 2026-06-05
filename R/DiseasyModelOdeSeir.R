@@ -819,7 +819,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           dplyr::all_of(
             c("variant", colnames(self %.% population %.% groups),  "state")
           )
-        )
+        ) |>
         dplyr::union_all(
           dplyr::mutate(
             self %.% population %.% groups,
