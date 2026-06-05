@@ -312,6 +312,15 @@ DiseasyRegions <- R6::R6Class(                                                  
     ),
 
 
+    #' @field available_stratifications (`character()`)\cr
+    #'   The available levels of stratification supported. Read only.
+    available_stratifications = purrr::partial(
+      .f = active_binding,
+      name = "regions",
+      expr = "region" # For DiseasyRegions, space can either not be startifed or stratified by region
+    ),
+
+
     #' @field adjacency `r rd_adjacency(type = "field")`
     adjacency = purrr::partial(
       .f = active_binding,
@@ -526,5 +535,28 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
 
       return(region_filter)
     }
+  ),
+
+  active = list(
+    #' @field available_stratifications (`character()`)\cr
+    #'   The available levels of stratification supported. Read only.
+    available_stratifications = purrr::partial(
+      .f = active_binding,
+      name = "regions",
+      expr = {
+        if (is.null(self %.% demography)) {
+          pkgdown::pkg_error(
+            "`DiseasyRegionsNuts` must be configured with a `demography` to determine available NUTS levels."
+          )
+        }
+
+        max_nuts_level <- self %.% demography %.% region |>
+          nchar() |>
+          unique() - 2
+
+
+        return(paste("NUTS", seq(from = 0, to = max_nuts_level)))
+      }
+    )
   )
 )

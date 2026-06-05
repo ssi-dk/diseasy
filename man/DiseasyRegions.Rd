@@ -61,6 +61,9 @@ See the vignette("diseasy-regions") for examples of use.
   \describe{
     \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. Read only.}
 
+    \item{\code{available_stratifications}}{(\code{character()})\cr
+The available levels of stratification supported. Read only.}
+
     \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr Read only.}
 
     \item{\code{infection_flow_matrix}}{(\code{matrix})\cr
@@ -286,6 +289,14 @@ regions. If \code{NULL}, all values are matched.}
 }
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyRegions]{DiseasyRegions}} -> \code{DiseasyRegionsNuts}
+}
+\section{Active bindings}{
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{available_stratifications}}{(\code{character()})\cr
+The available levels of stratification supported. Read only.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
