@@ -48,7 +48,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 
   # The example data uses a simple activity scenario for Denmark,
   # which we replicate here
-  activity <- DiseasyActivity$new(contact_basis = contact_basis$DK)
+  activity <- DiseasyActivity$new(contact_basis = contact_basis_nordic$DK)
   activity$set_activity_units(dk_activity_units)
   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 

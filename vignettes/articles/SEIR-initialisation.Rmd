@@ -320,7 +320,7 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
 
   # Define the activity for the scenario
   activity <- DiseasyActivity$new()
-  activity$set_contact_basis(contact_basis = contact_basis$DK)
+  activity$set_contact_basis(contact_basis = contact_basis_nordic$DK)
   activity$set_activity_units(dk_activity_units)
   activity$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
 

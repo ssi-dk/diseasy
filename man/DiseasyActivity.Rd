@@ -32,7 +32,7 @@ See vignette("diseasy-activity") for examples of use.
   # Activity module with Danish reference scenario
   act <- DiseasyActivity$new(base_scenario = "dk_reference",
                              activity_units = dk_activity_units,
-                             contact_basis = contact_basis \%.\% DK)
+                             contact_basis = contact_basis_nordic \%.\% DK)
 
   # Get contact matrices
   contact_matrices <- act$get_scenario_activities()

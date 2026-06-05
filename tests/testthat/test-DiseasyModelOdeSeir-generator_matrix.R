@@ -9,7 +9,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   skip_if_not_installed("ucminf")
 
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -75,7 +75,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -216,7 +216,7 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -285,7 +285,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -426,7 +426,7 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1

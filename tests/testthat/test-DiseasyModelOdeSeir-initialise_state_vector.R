@@ -22,7 +22,7 @@ rI <- 1 / 4.5 # Overall disease progression rate from I to R                    
 overall_infection_risk <- 0.025
 
 # Configure the activity module
-activity <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+activity <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
 
 # Configure the immunity module
 immunity <- DiseasyImmunity$new()

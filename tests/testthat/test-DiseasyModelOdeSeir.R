@@ -80,7 +80,7 @@ test_that("$hash works", {
   rm(model)
 
   # Loading a customised activity module should change the hash
-  activity <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  activity <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   model <- DiseasyModelOdeSeir$new(
     observables = observables,
     activity = activity,

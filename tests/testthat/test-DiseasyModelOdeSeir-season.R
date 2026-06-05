@@ -3,7 +3,7 @@ test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`"
   skip_if_not_installed("deSolve")
 
   # Define an activity scenario
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units)
 
   # Fully open from 2020-01-01

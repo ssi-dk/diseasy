@@ -9,7 +9,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   skip_if_not_installed("deSolve")
 
   # Define an activity scenario
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units)
 
   # Fully open from 2020-01-01
@@ -61,7 +61,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   skip_if_not_installed("ucminf")
 
   # Define an activity scenario
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units)
 
   # Fully open from 2020-01-01
@@ -114,7 +114,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -152,7 +152,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   skip_if_not_installed("ucminf")
 
   # Define an activity scenario
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units)
 
   # Fully open from 2020-01-01
@@ -535,7 +535,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   skip_if_not_installed("deSolve")
 
   # Create a activity scenario for the tests
-  basis <- contact_basis %.% DK
+  basis <- contact_basis_nordic %.% DK
   basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
@@ -589,7 +589,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   skip_if_not_installed("deSolve")
 
   # Create a activity scenario for the tests
-  basis <- contact_basis %.% DK
+  basis <- contact_basis_nordic %.% DK
   basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
   basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
   basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
