@@ -176,12 +176,24 @@ DiseasyPopulation <- R6::R6Class(                                               
       .f = active_binding,
       name = "activity",
       expr = return(private %.% .DiseasyActivity)
+    ),
+
+
+    #' @field regions (`diseasy::DiseasyRegions`)\cr
+    #'   The local copy of an DiseasyRegions module. Read-only.
+    #' @seealso [diseasy::DiseasyRegions]
+    #' @importFrom diseasystore `%.%`
+    regions = purrr::partial(
+      .f = active_binding,
+      name = "regions",
+      expr = return(private %.% .DiseasyRegions)
     )
   ),
 
 
   private = list(
     .DiseasyActivity = NULL,
+    .DiseasyRegions = NULL,
 
     .age_cuts_lower = 0L
   )
