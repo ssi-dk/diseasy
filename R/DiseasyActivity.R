@@ -633,6 +633,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     },
 
 
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' Map population between age groups
     #'
     #' @description
@@ -648,10 +649,11 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @return
     #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
     #'   those supplied to the function.
-    map_population = function(
+    map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
       age_cuts_lower_out,
       age_groups_reference = names(self$contact_basis$proportion),
-      demography = self$contact_basis$demography) {
+      demography = self$contact_basis$demography
+    ) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()

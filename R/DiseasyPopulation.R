@@ -241,12 +241,12 @@ DiseasyPopulation <- R6::R6Class(                                               
       expr = return(private %.% .DiseasyActivity)
     ),
 
-
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' @field regions (`diseasy::DiseasyRegions`)\cr
     #'   The local copy of an DiseasyRegions module. Read-only.
     #' @seealso [diseasy::DiseasyRegions]
     #' @importFrom diseasystore `%.%`
-    regions = purrr::partial(
+    regions = purrr::partial(                                                                                           # nolint end: documentation_template_linter, identation_linter
       .f = active_binding,
       name = "regions",
       expr = return(private %.% .DiseasyRegions)
