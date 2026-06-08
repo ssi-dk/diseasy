@@ -51,6 +51,12 @@ See the vignette("diseasy-regions") for examples of use.
   rm(region, demography, adjacency)
 
 }
+\seealso{
+\itemize{
+\item \code{\link[rnaturalearth:ne_countries]{rnaturalearth::ne_countries()}} for country-level shape files.
+\item \code{\link[giscoR:gisco_get_nuts]{giscoR::gisco_get_nuts()}} for NUTS-level shape files in Europe.
+}
+}
 \keyword{functional-module}
 \keyword{internal}
 \section{Super class}{
@@ -84,6 +90,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \item \href{#method-DiseasyRegions-region_filter}{\code{DiseasyRegions$region_filter()}}
     \item \href{#method-DiseasyRegions-regions_at_stratification}{\code{DiseasyRegions$regions_at_stratification()}}
     \item \href{#method-DiseasyRegions-adjacency_to_theta}{\code{DiseasyRegions$adjacency_to_theta()}}
+    \item \href{#method-DiseasyRegions-plot}{\code{DiseasyRegions$plot()}}
     \item \href{#method-DiseasyRegions-describe}{\code{DiseasyRegions$describe()}}
     \item \href{#method-DiseasyRegions-clone}{\code{DiseasyRegions$clone()}}
   }
@@ -279,6 +286,45 @@ regions. If \code{NULL}, all values are matched.}
 }
 
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegions-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegions-plot}{}}}
+\subsection{\code{DiseasyRegions$plot()}}{
+  Plot model outputs or module configuration spatially.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegions$plot(data = NULL, shape_files = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{data}}{(\code{data.frame(1)})\cr
+The data to plot spatially on the configured regions.
+If \code{NULL}, the demography and adjacency of regions are plotted.
+If \code{data.frame}, the first non-structural column is plotted.
+Structural columns are \code{region}, \code{date}, \code{realisation_id}, and \code{weight}.}
+      \item{\code{shape_files}}{(\code{sf} or \code{NULL})\cr
+Shape files used to draw the configured regions.
+If \code{NULL}, \code{rnaturalearth::ne_countries()} is used.
+
+If an \code{sf} object is supplied, region identifiers are guessed from:
+\itemize{
+\item \code{region} for user-provided shape files
+\item \code{adm0_iso} (as in \code{rnaturalearth::ne_countries} - also requires \code{iso_a2} column)
+\item \code{geo} (as in \code{giscoR::gisco_get_nuts()})
+}
+
+If several candidate columns exist, the first candidate with any match
+to the configured regions is used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyRegions-describe"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyRegions-describe}{}}}
 \subsection{\code{DiseasyRegions$describe()}}{
@@ -327,6 +373,7 @@ The available levels of stratification supported. Read only.}
     \item \href{#method-DiseasyRegionsNuts-validate_configuration}{\code{DiseasyRegionsNuts$validate_configuration()}}
     \item \href{#method-DiseasyRegionsNuts-region_filter}{\code{DiseasyRegionsNuts$region_filter()}}
     \item \href{#method-DiseasyRegionsNuts-regions_at_stratification}{\code{DiseasyRegionsNuts$regions_at_stratification()}}
+    \item \href{#method-DiseasyRegionsNuts-plot}{\code{DiseasyRegionsNuts$plot()}}
     \item \href{#method-DiseasyRegionsNuts-clone}{\code{DiseasyRegionsNuts$clone()}}
   }
 }
@@ -412,6 +459,24 @@ regions. If \code{NULL}, all values are matched.}
   }
   \subsection{Returns}{
     The (sorted) list of available regions within the defined scope at the given stratification level.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegionsNuts-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegionsNuts-plot}{}}}
+\subsection{\code{DiseasyRegionsNuts$plot()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegionsNuts$plot(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{Parameters sent to \code{?DiseasyRegions$plot()}.}
+    }
+    \if{html}{\out{</div>}}
   }
 }
 

@@ -295,6 +295,335 @@ DiseasyRegions <- R6::R6Class(                                                  
     },
 
 
+    #' @description
+    #'   Plot model outputs or module configuration spatially.
+    #' @param data (`data.frame(1)`)\cr
+    #'   The data to plot spatially on the configured regions.
+    #'   If `NULL`, the demography and adjacency of regions are plotted.
+    #'   If `data.frame`, the first non-structural column is plotted.
+    #'   Structural columns are `region`, `date`, `realisation_id`, and `weight`.
+    #' @param shape_files (`sf` or `NULL`)\cr
+    #'   Shape files used to draw the configured regions.
+    #'   If `NULL`, `rnaturalearth::ne_countries()` is used.
+    #'
+    #'   If an `sf` object is supplied, region identifiers are guessed from:
+    #'   * `region` for user-provided shape files
+    #'   * `adm0_iso` (as in `rnaturalearth::ne_countries` - also requires `iso_a2` column)
+    #'   * `geo` (as in `giscoR::gisco_get_nuts()`)
+    #'
+    #'   If several candidate columns exist, the first candidate with any match
+    #'   to the configured regions is used.
+    #' @return `r rd_side_effects`
+    #' @seealso
+    #' - [rnaturalearth::ne_countries()] for country-level shape files.
+    #' - [giscoR::gisco_get_nuts()] for NUTS-level shape files in Europe.
+    plot = function(data = NULL, shape_files = NULL) {
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_data_frame(data, null.ok = TRUE, add = coll)
+      checkmate::assert_class(shape_files, "sf", null.ok = TRUE, add = coll)
+
+      if (!is.null(data)) {
+        checkmate::assert_subset("region", colnames(data), add = coll)
+      }
+
+      checkmate::reportAssertions(coll)
+
+      if (!rlang::is_installed("sf")) {
+        pkgcond::pkg_error("Package `sf` must be installed to plot regions.")
+      }
+
+      if (!rlang::is_installed("ggplot2")) {
+        pkgcond::pkg_error("Package `ggplot2` must be installed to plot regions.")
+      }
+
+      if (is.null(shape_files) && !rlang::is_installed("rnaturalearth")) {
+        pkgcond::pkg_error(
+          "Package `rnaturalearth` must be installed if no shape files are provided."
+        )
+      }
+
+      if (is.null(data) && is.null(self %.% demography)) {
+        pkgcond::pkg_error(
+          "If no `data` is provided to `plot()`, then the `demography` must be configured."
+        )
+      }
+
+      # Resolve shape files
+      if (is.null(shape_files)) {
+        shape_files <- rnaturalearth::ne_countries(returnclass = "sf", scale = "medium")
+      }
+
+      # Infer region column
+      region_columns <- c(
+        "region",
+        "adm0_iso",
+        "geo"
+      )
+      region_column <- region_columns[region_columns %in% colnames(shape_files)] |>
+        purrr::pluck(1)
+
+      if (is.null(region_column)) {
+        pkgcond::pkg_error(
+          "`shape_files` must contain a usable region identifier column."
+        )
+      }
+
+      # Standardise shape file
+      shape_files <- shape_files |>
+        dplyr::mutate("region" = as.character(.data[[region_column]]))
+
+      # Convert region in rnaturalearth::ne_countries() data to iso2c
+      if (region_column == "adm0_iso") {
+        shape_files <- shape_files |>
+          dplyr::mutate(
+            "region" =
+            dplyr::coalesce(
+              countrycode::countrycode(
+                .data$adm0_iso,
+                origin = "iso3c",
+                destination = "iso2c",
+                warn = FALSE
+              ),
+              .data$iso_a2,
+            )
+          )
+      }
+
+      sf::st_agr(shape_files) <- "constant"
+
+
+      # Compare with configured regions
+      if (!is.null(self %.% regions)) {
+        missing_regions <- setdiff(self %.% demography %.% region, unique(shape_files %.% region))
+
+        if (length(missing_regions) > 0) {
+          pkgcond::pkg_error(
+            glue::glue(
+              "`shape_files` is missing configured regions: {toString(missing_regions)}."
+            )
+          )
+        }
+
+        shape_files <- dplyr::filter(shape_files, self$region_filter(.data$region))
+
+      }
+
+
+      # Resolve plot data
+      if (is.null(data)) {
+        value_column <- "population"
+
+        if (is.null(self %.% demography)) {
+          plot_data <- data.frame(
+            "region" = self %.% regions,
+            "value" = NA_real_
+          )
+        } else {
+          plot_data <- self %.% demography |>
+            dplyr::summarise(
+              "value" = sum(.data$population),
+              .by = "region"
+            )
+
+        }
+
+        # Plot adjacency if configured
+        plot_adjacency <- !is.null(self %.% adjacency)
+
+      } else {
+
+        if (!"region" %in% colnames(data)) {
+          pkgcond::pkg_error("`data` must contain a `region` column.")
+        }
+
+        # Infer value column
+        value_column <- setdiff(colnames(data), c("region", "date", "realisation_id", "weight")) |>
+          purrr::pluck(1)
+
+        if (is.null(value_column)) {
+          pkgcond::pkg_error("`data` must contain at least one non-structural column to plot.")
+        }
+
+        if (!checkmate::test_numeric(data[[value_column]])) {
+          pkgcond::pkg_error(
+            glue::glue("The inferred plot column `{value_column}` must be numeric.")
+          )
+        }
+
+        plot_data <- data |>
+          dplyr::filter(self$region_filter(values = .data$region))
+
+        if (nrow(plot_data) < 1) {
+          pkgcond::pkg_error(
+            "`data` does not contain rows matching the configured regions."
+          )
+        }
+
+        group_columns <- intersect(c("region", "date"), colnames(plot_data))
+
+        if ("weight" %in% colnames(plot_data)) {
+          plot_data <- plot_data |>
+            dplyr::summarise(
+              "value" = stats::weighted.mean(
+                x = .data[[value_column]],
+                w = .data$weight,
+                na.rm = TRUE
+              ),
+              .by = dplyr::all_of(group_columns)
+            )
+        } else {
+          plot_data <- plot_data |>
+            dplyr::summarise(
+              "value" = sum(.data[[value_column]], na.rm = TRUE),
+              .by = dplyr::all_of(group_columns)
+            )
+        }
+
+        plot_adjacency <- FALSE
+
+      }
+
+      # Restrict time-dependent data to five snapshots across the available range.
+      if ("date" %in% colnames(plot_data)) {
+        plot_dates <- sort(unique(plot_data %.% date))
+
+        if (length(plot_dates) > 5L) {
+          plot_dates <- plot_dates[
+            unique(round(seq(1, length(plot_dates), length.out = 5L)))
+          ]
+        }
+
+        plot_data <- plot_data |>
+          dplyr::filter(.data$date %in% plot_dates)
+
+        plot_data <- tidyr::expand_grid(
+          "region" = self %.% regions,
+          "date" = plot_dates
+        ) |>
+          dplyr::left_join(plot_data, by = c("region", "date"))
+      }
+
+      plot_shapes <- shape_files |>
+        dplyr::left_join(plot_data, by = "region")
+
+      # Create figure
+      out <- ggplot2::ggplot(plot_shapes) +
+        ggplot2::geom_sf(
+          ggplot2::aes(fill = .data$value),
+          colour = "grey70",
+          linewidth = 0.2
+        ) +
+        ggplot2::scale_fill_gradient2(
+          high = "#3d3d3d",
+          mid = "#4bbd4b",
+          low = "#4bbd4b",
+          midpoint = 0,
+          labels = scales::label_log(base = 10)
+        ) +
+        ggplot2::labs(fill = stringr::str_to_sentence(value_column)) +
+        ggplot2::theme_void() +
+        ggplot2::theme(
+          plot.background = ggplot2::element_rect(fill = "#96ceff", colour = NA)
+        )
+
+      # Add adjacency overlay for module-configuration plots.
+      if (plot_adjacency) {
+
+        # Build nodes from the largest polygon belonging to each region.
+        # This avoids placing nodes on small islands or remote multipolygon parts.
+        node_shapes <- suppressWarnings(
+          sf::st_cast(shape_files, "POLYGON")
+        )
+
+        node_shapes[[".area"]] <- as.numeric(
+          sf::st_area(sf::st_geometry(node_shapes))
+        )
+
+        node_shapes <- node_shapes |>
+          dplyr::arrange(.data$region, dplyr::desc(.data$.area)) |>
+          dplyr::distinct(.data$region, .keep_all = TRUE) |>
+          dplyr::select("region")
+
+        node_geometry <- suppressWarnings(
+          sf::st_point_on_surface(sf::st_geometry(node_shapes))
+        )
+
+        node_coordinates <- sf::st_coordinates(node_geometry)
+
+        nodes <- data.frame(
+          "region" = node_shapes %.% region,
+          "x" = node_coordinates[, "X"],
+          "y" = node_coordinates[, "Y"]
+        )
+
+        # Build graph edges from infection flow matrix
+        infection_flow_matrix <- self %.% infection_flow_matrix
+
+        nodes <- nodes |>
+          dplyr::mutate(
+            "self_adjacency" = diag(infection_flow_matrix)[.data$region]
+          )
+
+        edges <- data.frame(
+          "from" = rep(
+            rownames(infection_flow_matrix),
+            times = ncol(infection_flow_matrix)
+          ),
+          "to" = rep(
+            colnames(infection_flow_matrix),
+            each = nrow(infection_flow_matrix)
+          ),
+          "adjacency" = as.vector(infection_flow_matrix)
+        ) |>
+          dplyr::filter(.data$from != .data$to, .data$adjacency > 0) |>
+          dplyr::left_join(nodes, by = c("from" = "region")) |>
+          dplyr::left_join(
+            nodes,
+            by = c("to" = "region"),
+            suffix = c("", "_end")
+          )
+
+        out <- out +
+          ggplot2::geom_segment(
+            data = edges,
+            mapping = ggplot2::aes(
+              x = .data$x,
+              y = .data$y,
+              xend = .data$x_end,
+              yend = .data$y_end,
+              linewidth = .data$adjacency,
+              alpha = .data$adjacency
+            ),
+            inherit.aes = FALSE
+          ) +
+          ggplot2::geom_point(
+            data = nodes,
+            mapping = ggplot2::aes(
+              x = .data$x,
+              y = .data$y,
+              size = .data$self_adjacency
+            ),
+            inherit.aes = FALSE
+          ) +
+          ggplot2::scale_linewidth_continuous(range = c(0.1, 1), limits = c(0, NA)) +
+          ggplot2::scale_alpha_continuous(range = c(0.01, 0.5), limits = c(0, NA)) +
+          ggplot2::scale_size_continuous(range = c(0, 5), limits = c(0, NA)) +
+          ggplot2::labs(
+            linewidth = "Inter-region flows",
+            alpha = "Inter-region flows",
+            size = "Intra-region flows"
+          )
+      }
+
+      if ("date" %in% colnames(plot_shapes)) {
+        out <- out +
+          ggplot2::facet_wrap(stats::as.formula("~ date"))
+      }
+
+      return(out)
+    },
+
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyRegions #############################################")
@@ -475,7 +804,7 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       # adjacency must include a complete set of NUTS codes at its resolution
       if (!is.null(adjacency)) {
 
-        # Infer the resoluition (NUTS level) in adjacency data
+        # Infer the resolution (NUTS level) in adjacency data
         adjacency_resolution <- unique(nchar(unique(adjacency$from)) - 2)
 
         if (length(adjacency_resolution) > 1) {
@@ -504,7 +833,7 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       # demography must include a complete set of NUTS codes at its resolution
       if (!is.null(demography)) {
 
-        # Infer the resoluition (NUTS level) in demography data
+        # Infer the resolution (NUTS level) in demography data
         demography_resolution <- unique(nchar(unique(demography$region)) - 2)
 
         if (length(demography_resolution) > 1) {
@@ -587,6 +916,23 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       return(sort(unique(substr(regions, 1, nuts_stratification + 2))))
     }
 
+
+    #' @param ...
+    #'   Parameters sent to `?DiseasyRegions$plot()`.
+    plot = function(...) {
+
+      if (!rlang::is_installed("giscoR")) {
+        pkgcond::pkg_error("Install the following packages to plot this module: giscoR")
+      }
+
+      super$plot(
+        ...,
+        shape_files = giscoR::gisco_get_nuts(
+          resolution = "03",
+          nuts_level = stringr::str_extract(max(self %.% available_stratifications), r"{\d$}")
+        )
+      )
+    }
   ),
 
   active = list(
