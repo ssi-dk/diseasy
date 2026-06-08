@@ -45,37 +45,14 @@ The demography data must include the columns `region` and `population`. Any addi
 stratification variables.
 
 ```{r demography_data}
-all_regions <- c("north", "south", "east", "north_subregion")
-
-demography <- data.frame(
-  region = rep(all_regions, each = 2),
-  age_group = rep(c("0-17", "18+"), times = length(all_regions)),
-  population = c(
-    100000, 250000,
-    80000, 180000,
-    60000, 140000,
-    20000, 50000
-  )
-)
-
-demography
+demography_nordic
 ```
 
 The adjacency data must include exactly the columns `from`, `to`, and `adjacency`.
 The `from` and `to` columns should contain the same set of region identifiers.
 
 ```{r adjacency_data}
-adjacency <- tidyr::expand_grid(
-  from = all_regions,
-  to = all_regions
-)
-
-adjacency[["adjacency"]] <- 0.1
-adjacency[adjacency$from == adjacency$to, "adjacency"] <- 1
-adjacency[adjacency$from == "north" & adjacency$to == "south", "adjacency"] <- 0.5
-adjacency[adjacency$from == "south" & adjacency$to == "north", "adjacency"] <- 0.5
-
-adjacency
+adjacency_meta_nordic
 ```
 
 # Regional adjacency
@@ -240,10 +217,10 @@ region <- DiseasyRegions$new()
 region
 ```
 
-```{r create_module_setters}
-region$set_regions(regions = c("north", "south", "east"))
-region$set_demography(demography = demography)
-region$set_adjacency(adjacency = adjacency)
+```{r module_setters}
+region$set_regions(regions = c("DK", "SE", "NO", "FI"))
+region$set_demography(demography = demography_nordic)
+region$set_adjacency(adjacency = adjacency_meta_nordic)
 
 region
 ```
@@ -275,6 +252,33 @@ region %.% adjacency
 region %.% infection_flow_matrix
 ```
 
+The module configuration can also be visualised via the `$plot()` method with or `plot()`.
+```{r plot}
+plot(region)
+```
+
+## Regional module with hierarchical structure (NUTS)
+
+If you have demography and adjacency data for strucutred regions (such as NUTS), then `DiseasyRegionsNuts` can handle
+the nested data.
+```{r create_module_nuts}
+region_nuts <- DiseasyRegionsNuts$new()
+
+region_nuts
+```
+
+```{r nuts_module_setters}
+region_nuts$set_regions(regions = c("DK"))#, "SE"))
+region_nuts$set_demography(demography = demography_nordic_nuts3)
+region_nuts$set_adjacency(adjacency = adjacency_meta_nordic_nuts)
+
+region_nuts
+```
+
+And again the module configuration can also be visualised with `plot()`.
+```{r plot_nuts}
+plot(region_nuts)
+```
 
 # Changing the selected regions
 
@@ -282,7 +286,7 @@ The selected regional scope can be changed with `$set_regions()`. The new region
 adjacency and demography data.
 
 ```{r change_regions}
-region$set_regions(regions = c("north", "south"))
+region$set_regions(regions = c("DK", "SE"))
 
 region %.% regions
 ```
@@ -301,52 +305,6 @@ region %.% adjacency
 region %.% infection_flow_matrix
 ```
 
-# Exact matching
-
-The generic module does not use hierarchical matching. In the example data, `"north"` and `"north_subregion"` are two
-different region identifiers.
-
-```{r exact_matching}
-region$set_regions(regions = "north")
-
-region %.% demography
-```
-
-The result includes rows for `"north"`, but not for `"north_subregion"`.
-
-# Updating demography and adjacency
-
-The demography and adjacency can also be updated after the module has been created. Candidate data are validated before
-they are stored, so an invalid update leaves the existing object state unchanged.
-
-```{r update_demography}
-demography_new <- demography
-demography_new[
-  demography_new[["region"]] == "north" & demography_new[["age_group"]] == "18+",
-  "population"
-] <- 260000
-
-region$set_demography(demography = demography_new)
-
-region %.% demography
-```
-
-```{r update_adjacency}
-adjacency_new <- adjacency
-adjacency_new[
-  adjacency_new[["from"]] == "north" & adjacency_new[["to"]] == "south",
-  "adjacency"
-] <- 0.75
-adjacency_new[
-  adjacency_new[["from"]] == "south" & adjacency_new[["to"]] == "north",
-  "adjacency"
-] <- 0.75
-
-region$set_regions(regions = c("north", "south"))
-region$set_adjacency(adjacency = adjacency_new)
-
-region %.% adjacency
-```
 
 # Validation
 
@@ -354,15 +312,15 @@ The module checks that selected regions are available in the stored demography a
 select a region that is not present in the data will fail.
 
 ```{r invalid_region}
-try(region$set_regions(regions = "west"))
+try(region$set_regions(regions = "DE"))
 ```
 
 The adjacency data must also contain the same region identifiers in the `from` and `to` columns.
 
 ```{r invalid_adjacency}
 bad_adjacency <- data.frame(
-  from = c("north", "south"),
-  to = c("south", "east"),
+  from = c("DE", "BE"),
+  to = c("DE", "BE"),
   adjacency = c(1, 1)
 )
 
