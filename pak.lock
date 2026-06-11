@@ -101,7 +101,7 @@
     },
     {
       "package": "callr",
-      "version": "3.7.6",
+      "version": "3.8.0",
       "binary": true
     },
     {
@@ -556,7 +556,7 @@
     },
     {
       "package": "mvtnorm",
-      "version": "1.4-0",
+      "version": "1.4-1",
       "binary": true
     },
     {
@@ -581,7 +581,7 @@
     },
     {
       "package": "openssl",
-      "version": "2.4.1",
+      "version": "2.4.2",
       "binary": true
     },
     {
@@ -596,7 +596,7 @@
     },
     {
       "package": "pak",
-      "version": "0.9.5",
+      "version": "0.10.0",
       "binary": true
     },
     {
@@ -846,7 +846,7 @@
     },
     {
       "package": "sessioninfo",
-      "version": "1.2.3",
+      "version": "1.2.4",
       "binary": true
     },
     {
@@ -1026,7 +1026,7 @@
     },
     {
       "package": "zip",
-      "version": "2.3.3",
+      "version": "3.0.0",
       "binary": true
     }
   ],
