@@ -99,8 +99,8 @@ demography_nuts <- dplyr::left_join(
   suffix = c("", "_max")
 ) |>
   dplyr::filter(
-    (stringr::str_ends(.data$age_group, r"{\+}") & .data$age_group == .data$age_group_max)
-      | !stringr::str_ends(.data$age_group, r"{\+}")
+    (stringr::str_ends(.data$age_group, stringr::fixed("+")) & .data$age_group == .data$age_group_max)
+    | !stringr::str_ends(.data$age_group, stringr::fixed("+"))
   ) |>
   dplyr::select(!dplyr::ends_with("_max"))
 
