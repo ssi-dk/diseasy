@@ -10,7 +10,7 @@ Authors@R:
              comment = c(ORCID = "0000-0002-6258-8212")),
       person("Sofia Myrup", "Otero", , "smot@ssi.dk", role = c("aut"),
              comment = c(ORCID = "0009-0006-4953-614X")),
-      person("Marcus Munch", "Gr\u00FCnewald", , "mmgr@ssi.dk", role = c("aut"),
+      person("Marcus Munch", "Gr\u00FCnewald", , "mmgr@ssi.dk", role = c("rev"),
              comment = c(ORCID = "0009-0006-8090-406X")),
       person("Statens Serum Institut, SSI", role = c("cph", "fnd")))
 Description: This package facilitates creation of an ensemble of models through modular construction and combinatorics.
