@@ -130,18 +130,12 @@ demography_nuts <- demography_nuts |>
   dplyr::inner_join(dplyr::select(nuts, "region"), by = "region")
 
 
-# Verify lowest NUTS level has complete data
-# i.e. as we aggregate population data within each NUTS level, we should
-# obtain the same total population
+# Verify NUTS level 3 has complete data
 lowest_nuts_lack_data <- demography_nuts |>
-  dplyr::left_join(nuts, by = "region") |>
-  dplyr::summarise(
-    "population" = sum(.data$population),
-    .by = c("country", "level")
-  ) |>
-  dplyr::distinct(.data$country, .data$population) |>
-  dplyr::count(.data$country, .data$population) |>
-  dplyr::filter(.data$n > 1)
+  dplyr::right_join(nuts, by = "region") |>
+  dplyr::slice_max(.data$year, by = "country") |>
+  dplyr::slice_max(.data$level, by = "country") |>
+  dplyr::filter(is.na(.data$population))
 
 checkmate::assert_data_frame(lowest_nuts_lack_data, max.rows = 0)
 
