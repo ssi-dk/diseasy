@@ -23,7 +23,7 @@ generate_contact_basis <- function(
 ) {
   checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
 
-  missing_packages <- purrr::discard(c("countrycode", "countrycode", "tibble"), rlang::is_installed())
+  missing_packages <- purrr::discard(c("countrycode", "countrycode", "tibble"), rlang::is_installed)
 
   if (length(missing_packages) > 0) {
     pkgcond::pkg_error(glue::glue(

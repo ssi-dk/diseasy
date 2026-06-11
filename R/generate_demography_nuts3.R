@@ -23,7 +23,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
   checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
   checkmate::assert_flag(cache)
 
-  missing_packages <- purrr::discard(c("countrycode", "eurostat", "tibble"), rlang::is_installed())
+  missing_packages <- purrr::discard(c("countrycode", "eurostat", "tibble"), rlang::is_installed)
 
   if (length(missing_packages) > 0) {
     pkgcond::pkg_error(glue::glue(

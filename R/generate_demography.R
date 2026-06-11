@@ -30,7 +30,7 @@ generate_demography <- function(
   checkmate::assert_string(idb_zip, add = coll)
   checkmate::reportAssertions(coll)
 
-  missing_packages <- purrr::discard(c("curl", "readr"), rlang::is_installed())
+  missing_packages <- purrr::discard(c("curl", "readr"), rlang::is_installed)
 
   if (length(missing_packages) > 0) {
     pkgcond::pkg_error(glue::glue(
