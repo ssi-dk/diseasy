@@ -852,11 +852,11 @@ demographic groups and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min     lq      mean median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 21.402 22.313 25.654062 22.694 23.2250 2390.814  1000</span></span>
-<span><span class="co">#&gt;              sapply 11.477 11.958 12.578085 12.229 12.5485   40.691  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 11.427 11.948 12.491763 12.198 12.5690   43.826  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.537  4.767  5.102405  4.928  5.1170   30.245  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min      lq      mean  median      uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 24.616 26.9755 31.475501 28.0120 29.3300 2465.774  1000</span></span>
+<span><span class="co">#&gt;              sapply 12.554 13.1945 14.335654 13.6605 14.4515   69.359  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES 12.623 13.1450 14.324147 13.5355 14.3515   44.403  1000</span></span>
+<span><span class="co">#&gt;              vapply  4.779  5.1800  5.586275  5.4000  5.6510   33.152  1000</span></span></code></pre></div>
 <p>Note, that the best performing function in this case is
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>.</p>
 </div>
@@ -868,7 +868,7 @@ demographic groups and one variant.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Rasmus Skytte Randløv, Lasse Engbo Christiansen, Kaare Græsbøll, Sofia Myrup Otero, Marcus Munch Grünewald, <a href="https://www.ssi.dk/" class="external-link"><img src="https://www.ssi.dk/assets/images/ssi-logo-optimeret.svg" alt="SSI" height="64" style="margin-bottom: 0.5em; margin-top: 1.5em;"></a>.</p>
+  <p>Developed by Rasmus Skytte Randløv, Lasse Engbo Christiansen, Kaare Græsbøll, Sofia Myrup Otero, <a href="https://www.ssi.dk/" class="external-link"><img src="https://www.ssi.dk/assets/images/ssi-logo-optimeret.svg" alt="SSI" height="64" style="margin-bottom: 0.5em; margin-top: 1.5em;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
