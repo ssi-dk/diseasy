@@ -68,7 +68,7 @@ demography_nuts <- demography_nuts |>
         sep = "-"
       ),
       stringr::str_starts(.data$age_group, stringr::fixed("Y_GE")) ~ paste0( # Age group: XX+
-        stringr::str_remove(.data$age_group, "^Y_populationGE"), "+"
+        stringr::str_remove(.data$age_group, "^Y_GE"), "+"
       ),
       stringr::str_starts(.data$age_group, r"{Y\d}") ~ paste( # Age group XX-YY
         stringr::str_pad(stringr::str_extract(.data$age_group, r"{(?<=^Y)\d+}"), 2, pad = "0"),
@@ -81,6 +81,29 @@ demography_nuts <- demography_nuts |>
 # Truncate to latest year
 demography_nuts <- demography_nuts |>
   dplyr::slice_max(.data$year)
+
+
+# Remove doubly counted groups
+max_age_group <- demography_nuts |>
+  dplyr::slice_max(
+    .data$age_group,
+    by = c("region", "sex")
+  )
+
+# Some regions have both "XX+", "XX-YY" and "YY+" columns.
+# For these regions, we remove "XX+" entry.
+demography_nuts <- dplyr::left_join(
+  demography_nuts,
+  max_age_group,
+  by = c("region", "sex"),
+  suffix = c("", "_max")
+) |>
+  dplyr::filter(
+    (stringr::str_ends(.data$age_group, r"{\+}") & .data$age_group == .data$age_group_max)
+      | !stringr::str_ends(.data$age_group, r"{\+}")
+  ) |>
+  dplyr::select(!dplyr::ends_with("_max"))
+
 
 # Extract the corresponding list of NUTS identifiers
 nuts <- tibble::tibble(

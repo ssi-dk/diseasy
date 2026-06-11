@@ -5,7 +5,7 @@
 \alias{demography_nuts3}
 \title{Demography (NUTS)}
 \source{
-Source: 10.2908/demo_r_pjangrp3, June 04, 2026.
+Source: 10.2908/demo_r_pjangrp3, June 11, 2026.
 Population on 1 January by age group, sex and NUTS 3 region
 }
 \description{
