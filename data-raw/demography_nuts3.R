@@ -51,8 +51,8 @@ demography_nuts <- dplyr::left_join(
     tidyr::pivot_wider(names_from = "age_group", values_from = "population"),
   by = c("sex", "region", "year")
 ) |>
-  dplyr::mutate( # Distribute unknown across other age groups
-    "population" = round(.data$population * (1 + .data$UNK / .data$TOTAL))
+  dplyr::mutate( # Distribute unknown across other age groups (with special care for sparse populations)
+    "population" =  round(.data$population * (1 + dplyr::coalesce(.data$UNK, 0) / pmax(.data$TOTAL, 1, na.rm = TRUE)))
   ) |>
   dplyr::select(c("year", "region", "age_group", "sex", "population"))
 
