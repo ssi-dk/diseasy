@@ -28,8 +28,8 @@ DiseasyModelDummy2 <- R6::R6Class(                                              
 # Create a set of activity modules to load
 activity_modules <- list(
   DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
-  DiseasyActivity$new(contact_basis = contact_basis %.% SE),
-  DiseasyActivity$new(contact_basis = contact_basis %.% NO)
+  DiseasyActivity$new(contact_basis = contact_basis_nordic %.% SE),
+  DiseasyActivity$new(contact_basis = contact_basis_nordic %.% NO)
 )
 
 

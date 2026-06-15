@@ -321,7 +321,7 @@ test_that("adjacency data must be complete", {
 test_that("`demography` data set works with `DiseasyRegions`", {
 
   region <- DiseasyRegions$new()
-  expect_no_error(region$set_demography(demography))
+  expect_no_error(region$set_demography(demography_nordic))
   expect_no_error(region$set_regions(c("DK", "SE")))
 
   rm(region)
@@ -331,7 +331,7 @@ test_that("`demography` data set works with `DiseasyRegions`", {
 test_that("`demography_nuts3` data set works with `DiseasyRegions`", {
 
   region <- DiseasyRegions$new()
-  expect_no_error(region$set_demography(demography_nuts3))
+  expect_no_error(region$set_demography(demography_nordic_nuts3))
   expect_no_error(region$set_regions(c("DK011", "DK012")))
 
   rm(region)
