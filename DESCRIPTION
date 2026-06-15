@@ -12,7 +12,9 @@ Authors@R:
              comment = c(ORCID = "0009-0006-4953-614X")),
       person("Marcus Munch", "Gr\u00FCnewald", , "mmgr@ssi.dk", role = c("rev"),
              comment = c(ORCID = "0009-0006-8090-406X")),
-      person("Statens Serum Institut, SSI", role = c("cph", "fnd")))
+      person("Statens Serum Institut", role = c("cph", "fnd"), comment = "https://www.ssi.dk"),
+      person("EU", role = c("fnd"))
+    )
 Description: This package facilitates creation of an ensemble of models through modular construction and combinatorics.
 License: GPL-3
 Encoding: UTF-8
