@@ -5,8 +5,8 @@
 \alias{demography_nordic_nuts3}
 \title{Demography (NUTS)}
 \source{
-Source: 10.2908/demo_r_pjangrp3,
-June 15, 2026.
+Source: 10.2908/demo_r_pjangrp3.
+Retrieved June 15, 2026.
 Population on 1 January by age group, sex and NUTS 3 region
 }
 \description{

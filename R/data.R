@@ -34,14 +34,14 @@
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @author Lasse Engbo Christiansen \email{lsec@ssi.dk}
 #' @source
-#'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
-#'  U.S. Department of Commerce. Retrieved
-#'  `r format(attr(contact_basis_nordic, "creation_date"), "%B %d, %Y")`,
-#'  from https://data.census.gov/
+#'   U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
+#'   U.S. Department of Commerce.
+#'   Retrieved `r format(attr(contact_basis_nordic, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
+#'   from https://data.census.gov/
 #' @source
-#'  Gruson H (2023). "contactdata: Social Contact Matrices for 152
-#'  Countries." R package version 1.0.0,
-#'  <https://CRAN.R-project.org/package=contactdata>.
+#'   Gruson H (2023). "contactdata: Social Contact Matrices for 152
+#'   Countries." R package version 1.0.0,
+#'   <https://CRAN.R-project.org/package=contactdata>.
 #' @source
 #'   Prem K, Cook AR, Jit M (2017). "Projecting social contact
 #'   matrices in 152 countries using contact surveys and demographic
@@ -70,9 +70,9 @@ NULL
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
-#'  U.S. Department of Commerce. Retrieved
-#'  `r format(attr(demography_nordic, "creation_date"), "%B %d, %Y")`,
+#'   U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
+#'   U.S. Department of Commerce.
+#'   Retrieved `r format(attr(demography_nordic, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'  from https://data.census.gov/
 #' @keywords data
 NULL
@@ -102,8 +102,8 @@ NULL
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'   Source: 10.2908/demo_r_pjangrp3,
-#'   `r format(as.Date(attr(demography_nordic_nuts3, "creation_date")), "%B %d, %Y")`.
+#'   Source: 10.2908/demo_r_pjangrp3.
+#'   Retrieved `r format(attr(demography_nordic_nuts3, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   Population on 1 January by age group, sex and NUTS 3 region
 #' @keywords data
 NULL
@@ -123,7 +123,8 @@ NULL
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'   Source: 10.2908/demo_r_pjangrp3, `r format(as.Date(attr(nuts, "creation_date")), "%B %d, %Y")`.
+#'   Source: 10.2908/demo_r_pjangrp3.
+#'   Retrieved `r format(attr(nuts, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   Population on 1 January by age group, sex and NUTS 3 region
 #' @keywords data
 NULL
@@ -246,7 +247,7 @@ NULL
 #' @docType data
 #' @source
 #'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
-#'   Retrieved `r format(attr(adjacency_meta_nordic_nuts, "creation_date"), "%B %d, %Y")`,
+#'   Retrieved `r format(attr(adjacency_meta_nordic_nuts, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   See <https://data.humdata.org/dataset/social-connectedness-index> and
 #'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
 #' @keywords data
@@ -268,7 +269,7 @@ NULL
 #' @docType data
 #' @source
 #'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
-#'   Retrieved `r format(attr(adjacency_meta_nordic, "creation_date"), "%B %d, %Y")`,
+#'   Retrieved `r format(attr(adjacency_meta_nordic, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   See <https://data.humdata.org/dataset/social-connectedness-index> and
 #'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
 #' @keywords data
