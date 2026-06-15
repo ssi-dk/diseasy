@@ -633,12 +633,11 @@ DiseasyActivity <- R6::R6Class(                                                 
     },
 
 
-                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' Map population between age groups
     #'
     #' @description
     #'   The function computes the proportion of population in the new and old age groups.
-    #' @param age_cuts_lower_out `r rd_age_cuts_lower()`
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param age_groups_reference (`character()`)\cr
     #'   Age labels (created by `diseasystore::age_labels()` of reference data.
     #' @param demography (`data.frame`)\cr
@@ -650,14 +649,14 @@ DiseasyActivity <- R6::R6Class(                                                 
     #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
     #'   those supplied to the function.
     map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
-      age_cuts_lower_out,
+      age_cuts_lower,
       age_groups_reference = names(self$contact_basis$proportion),
       demography = self$contact_basis$demography
     ) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower_out, any.missing = FALSE, null.ok = TRUE,
+      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
                                 lower = 0, unique = TRUE, add = coll)
       checkmate::assert_character(age_groups_reference, add = coll)
       checkmate::reportAssertions(coll)
@@ -670,7 +669,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       population <- data.frame(age = 0:(length(proportion) - 1), proportion = proportion)
 
       population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
-      population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower_out))
+      population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
 
       return(population)
     },

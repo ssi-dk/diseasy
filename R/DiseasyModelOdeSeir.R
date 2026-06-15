@@ -168,6 +168,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_class(self %.% observables, "DiseasyObservables")
       checkmate::assert_date(self %.% observables %.% last_queryable_date, add = coll)
       checkmate::assert_class(self %.% activity, "DiseasyActivity", add = coll)
+      checkmate::assert_class(self %.% region, "DiseasyRegions", add = coll)
       checkmate::assert_class(self %.% season, "DiseasySeason", add = coll)
       checkmate::assert_class(self %.% variant, "DiseasyVariant", add = coll)
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)

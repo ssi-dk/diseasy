@@ -173,7 +173,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       self %.% groups |>
         dplyr::left_join(
           self %.% activity %.% map_population(
-            age_cuts_lower_out = self %.% age_cuts_lower,
+            age_cuts_lower = self %.% age_cuts_lower,
             age_groups_reference = names(self %.% activity %.% contact_basis %.% proportion),
             demography = demography
           ) |>
@@ -241,12 +241,12 @@ DiseasyPopulation <- R6::R6Class(                                               
       expr = return(private %.% .DiseasyActivity)
     ),
 
-                                                                                                                        # nolint start: documentation_template_linter, identation_linter
+
     #' @field regions (`diseasy::DiseasyRegions`)\cr
     #'   The local copy of an DiseasyRegions module. Read-only.
     #' @seealso [diseasy::DiseasyRegions]
     #' @importFrom diseasystore `%.%`
-    regions = purrr::partial(                                                                                           # nolint end: documentation_template_linter, identation_linter
+    regions = purrr::partial(
       .f = active_binding,
       name = "regions",
       expr = return(private %.% .DiseasyRegions)
