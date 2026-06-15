@@ -59,8 +59,8 @@ generate_adjacency_meta <- function(
 
     # Keep regions in our NUTS list
     adjacency_meta <- adjacency_meta |>
-      dplyr::inner_join(dplyr::select(nuts, "region"), by = c("from" = "region")) |>
-      dplyr::inner_join(dplyr::select(nuts, "region"), by = c("to" = "region"))
+      dplyr::inner_join(dplyr::select(diseasy::nuts, "region"), by = c("from" = "region")) |>
+      dplyr::inner_join(dplyr::select(diseasy::nuts, "region"), by = c("to" = "region"))
 
   } else {
 
