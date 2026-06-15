@@ -31,10 +31,32 @@ test_that("$stratify_age() works", {
   population <- DiseasyPopulation$new()
   expect_identical(population %.% age_cuts_lower, 0L)
   hash_new_instance <- population$hash # Store the current hash
-  expect_identical(population$hash, hash_new_instance)
 
   # Change stratification (low resolution)
   population$stratify_age(age_cuts_lower = c(0, 30))
+  expect_identical(population %.% age_cuts_lower, c(0L, 30L))
+  hash_2_age_groups <- population$hash
+  expect_identical(population$hash, hash_2_age_groups)
+  expect_false(identical(hash_2_age_groups, hash_new_instance))
+
+  # Change stratification (high resolution)
+  population$stratify_age(age_cuts_lower = seq(0, 100, by = 20))
+  expect_identical(population %.% age_cuts_lower, c(0L, 20L, 40L, 60L, 80L, 100L))
+  expect_false(identical(population$hash, hash_new_instance))
+  expect_false(identical(population$hash, hash_2_age_groups))
+
+})
+
+
+test_that("$stratify_regions() works", {
+
+  # Creating an empty module
+  population <- DiseasyPopulation$new()
+  expect_null(population %.% regional_stratification)
+  hash_new_instance <- population$hash # Store the current hash
+
+  # Change stratification (low resolution)
+  population$stratify_regions(regional_stratification = "NUTS0")
   expect_identical(population %.% age_cuts_lower, c(0L, 30L))
   hash_2_age_groups <- population$hash
   expect_identical(population$hash, hash_2_age_groups)
