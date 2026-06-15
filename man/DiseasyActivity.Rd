@@ -46,7 +46,7 @@ See vignette("diseasy-activity") for examples of use.
     dplyr::add_row(date = as.Date("2020-03-12"), opening = NA,              closing = "baseline") |>
     dplyr::add_row(date = as.Date("2020-03-12"), opening = "lockdown_2020", closing = NA)
 
-  act$set_contact_basis(contact_basis \%.\% GB) # Use the "Great Britain" contact_basis
+  act$set_contact_basis(contact_basis_nordic \%.\% SE) # Use the "Sweden" contact_basis
   act$set_activity_units(dk_activity_units)
   act$change_activity(scenario)
 
