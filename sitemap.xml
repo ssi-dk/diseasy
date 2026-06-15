@@ -39,6 +39,7 @@
 <url><loc>https://ssi-dk.github.io/diseasy/reference/combineasy.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/contact_basis.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/demography.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasy/reference/demography_nuts3.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/diseasy-package.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/diseasy_immunity_optimiser_results.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/diseasyoption.html</loc></url>
@@ -47,6 +48,7 @@
 <url><loc>https://ssi-dk.github.io/diseasy/reference/hash_environment.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/hypoexponential.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/index.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasy/reference/nuts.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/plot.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/print.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasy/reference/seir_example_data.html</loc></url>
