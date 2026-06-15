@@ -3,9 +3,7 @@
 #' @description
 #'   Generate NUTS3 demography data and the corresponding NUTS region lookup
 #'   from Eurostat dataset `demo_r_pjangrp3`.
-#' @param regions (`character()`)\cr
-#'   Optional NUTS 3 codes to keep.
-#'   If `NULL`, all NUTS 3 available in the source data are returned.
+#' @param regions `r rd_regions("generators")`
 #' @param cache (`logical(1)`)\cr
 #'   Passed to [eurostat::get_eurostat()].
 #' @param output_nuts (`logical(1)`)\cr
@@ -149,7 +147,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
 
   # Remove regions with no DATA
   demography_nuts <- demography_nuts |>
-    dplyr::filter(!is.na(population))
+    dplyr::filter(!is.na(.data$population))
 
   # Verify NUTS level 3 has complete data
   lowest_nuts_lack_data <- demography_nuts |>
@@ -172,11 +170,11 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
     demography_nuts <- demography_nuts |>
       dplyr::filter(
         purrr::reduce(
-        .x = purrr::map(regions, ~ stringr::str_starts(.data$region, .x)),
-        .f = `|`,
-        .init = FALSE
+          .x = purrr::map(regions, ~ stringr::str_starts(.data$region, .x)),
+          .f = `|`,
+          .init = FALSE
+        )
       )
-    )
 
   }
 
@@ -184,7 +182,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
   # Keep only lowest NUTS level
   demography_nuts <- demography_nuts |>
     dplyr::left_join(nuts, by = "region") |>
-    dplyr::slice_max(level, by = "country")
+    dplyr::slice_max(.data$level, by = "country")
 
   # Verify lowest level is NUTS 3
   lowest_level_is_not_nuts_3 <- demography_nuts |>

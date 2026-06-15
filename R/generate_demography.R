@@ -3,9 +3,7 @@
 #' @description
 #'   Generate the country-level demography data used by `diseasy` from the
 #'   U.S. Census Bureau International Database.
-#' @param regions (`character()`)\cr
-#'   Optional ISO 3166-1 alpha-2 country codes to keep. If `NULL`, all regions
-#'   available in the source data are returned.
+#' @param regions `r rd_regions("generators")`
 #' @param year (`integer(1)`)\cr
 #'   The year to keep from the source data.
 #' @param idb_zip (`character(1)`)\cr

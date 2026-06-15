@@ -11,9 +11,7 @@ generate_demography(
 )
 }
 \arguments{
-\item{regions}{(\code{character()})\cr
-Optional ISO 3166-1 alpha-2 country codes to keep. If \code{NULL}, all regions
-available in the source data are returned.}
+\item{regions}{(\code{character()})\cr The geographic regions of interest. If \code{NULL}, all regions are returned.}
 
 \item{year}{(\code{integer(1)})\cr
 The year to keep from the source data.}

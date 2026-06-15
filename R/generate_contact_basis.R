@@ -3,11 +3,7 @@
 #' @description
 #'   Generate the contact-basis object used by `diseasy` from `contactdata`
 #'   contact matrices and country-level demography.
-#' @param regions (`character()`)
-#'   Optional ISO 3166-1 alpha-2 country codes to keep. If `NULL`, all regions
-#'   with both demography and contact data are returned.
-#' @param arenas (`character()`)
-#'   Contact arenas to generate.
+#' @param regions `r rd_regions("generators")`
 #' @return
 #'   A named list of contact-basis objects, using the current package data
 #'   structure.
@@ -31,7 +27,7 @@ generate_contact_basis <- function(
     ))
   }
 
-  age_cuts_lower = (0:15) * 5
+  age_cuts_lower <- (0:15) * 5
   age_labels <- diseasystore::age_labels(age_cuts_lower)
 
   demography <- generate_demography(regions)
@@ -56,8 +52,8 @@ generate_contact_basis <- function(
       # Store 5-year age group populations
       N <- demography |>                                                                                                # nolint: object_name_linter
         dplyr::filter(.data$region == !!country_code) |>
-        dplyr::mutate("age_group" = cut(age, c(age_cuts_lower, Inf), right = FALSE, labels = age_labels)) |>
-        dplyr::summarise("population" = sum(population), .by = "age_group") |>
+        dplyr::mutate("age_group" = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE, labels = age_labels)) |>
+        dplyr::summarise("population" = sum(.data$population), .by = "age_group") |>
         tibble::deframe()
 
       tibble::lst(
@@ -86,8 +82,8 @@ generate_contact_basis <- function(
     # Store 5-year age group populations
     N <- demography |>                                                                                                  # nolint: object_name_linter
       dplyr::filter(.data$region == !!country_code) |>
-      dplyr::mutate("age_group" = cut(age, c(age_cuts_lower, Inf), right = FALSE, labels = age_labels)) |>
-      dplyr::summarise("population" = sum(population), .by = "age_group") |>
+      dplyr::mutate("age_group" = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE, labels = age_labels)) |>
+      dplyr::summarise("population" = sum(.data$population), .by = "age_group") |>
       tibble::deframe()
 
     # Retrieve and transform contact matrices for each arena

@@ -7,12 +7,7 @@
 generate_contact_basis(regions = NULL)
 }
 \arguments{
-\item{regions}{(\code{character()})
-Optional ISO 3166-1 alpha-2 country codes to keep. If \code{NULL}, all regions
-with both demography and contact data are returned.}
-
-\item{arenas}{(\code{character()})
-Contact arenas to generate.}
+\item{regions}{(\code{character()})\cr The geographic regions of interest. If \code{NULL}, all regions are returned.}
 }
 \value{
 A named list of contact-basis objects, using the current package data

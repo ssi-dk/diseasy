@@ -7,9 +7,7 @@
 generate_demography_nuts3(regions = NULL, cache = FALSE, output_nuts = FALSE)
 }
 \arguments{
-\item{regions}{(\code{character()})\cr
-Optional NUTS 3 codes to keep.
-If \code{NULL}, all NUTS 3 available in the source data are returned.}
+\item{regions}{(\code{character()})\cr The geographic regions of interest. If \code{NULL}, all regions are returned.}
 
 \item{cache}{(\code{logical(1)})\cr
 Passed to \code{\link[eurostat:get_eurostat]{eurostat::get_eurostat()}}.}
