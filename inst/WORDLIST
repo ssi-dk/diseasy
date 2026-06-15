@@ -29,7 +29,6 @@ catalog
 cetera
 cdot
 cdots
-circ
 classname
 cloneable
 CMD
@@ -60,7 +59,6 @@ dfoptim
 dI
 Diekmann
 diseasy
-Diseasy's
 diseasystore
 DiseasystoreBase
 DiseasystoreGoogleCovid
@@ -74,7 +72,6 @@ DiseasyModelOde
 DiseasyModelRegression
 DiseasyObservables
 DiseasyPopulation
-DiseasyRegions
 DiseasySeason
 DiseasyVariant
 dk
@@ -186,7 +183,6 @@ PascalCase
 pcbi
 pgpass
 pid
-pjangrp
 Plesner
 PLoS
 pnr
@@ -225,7 +221,6 @@ sigmoidal
 sim
 simulist
 Skytte
-ssi
 SSI
 Statens
 subplex
