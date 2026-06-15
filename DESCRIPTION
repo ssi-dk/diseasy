@@ -44,6 +44,7 @@ Suggests:
     contactdata,
     countrycode,
     curl,
+    eurostat,
     DBI,
     deSolve,
     devtools,
