@@ -225,7 +225,7 @@ rd_regions <- function(type = "param") {
 }
 
 rd_adjacency <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
+  checkmate::assert_choice(type, c("param", "field", "return"))
 
   paste(
     "(`data.frame(1)`)\\cr",
