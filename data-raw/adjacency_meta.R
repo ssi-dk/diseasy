@@ -32,6 +32,6 @@ attr(adjacency_meta_nordic, "type") <- "infection-flow"
 attr(adjacency_meta_nordic, "description") <- paste(
   "Meta Social-Connectedness-Index as inter-regional contacts across countries."
 )
-attr(adjacency_meta_nordic, "creation_datetime") <- Sys.time()
+attr(adjacency_meta_nordic, "creation_date") <- Sys.time()
 
 usethis::use_data(adjacency_meta_nordic, overwrite = TRUE)

@@ -203,7 +203,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
     "Unknown-age population counts are redistributed proportionally across known ",
     "age groups within region, and sex."
   )
-  attr(demography_nuts3, "creation_datetime") <- Sys.time()
+  attr(demography_nuts3, "creation_date") <- Sys.time()
 
 
   if (output_nuts) {
@@ -211,7 +211,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
     attr(nuts, "description") <- paste0(
       "Latest available NUTS region identifiers represented in `demography_nuts3`"
     )
-    attr(nuts, "creation_datetime") <- Sys.time()
+    attr(nuts, "creation_date") <- Sys.time()
 
     out <- list(
       "demography_nuts3" = demography_nuts3,

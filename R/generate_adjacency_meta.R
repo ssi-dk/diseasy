@@ -88,7 +88,7 @@ generate_adjacency_meta <- function(
     "Meta Social-Connectedness-Index as inter-regional contacts across NUTS 3 regions."
   )
 
-  attr(adjacency_meta, "creation_datetime") <- Sys.time()
+  attr(adjacency_meta, "creation_date") <- Sys.time()
 
   return(adjacency_meta)
 }

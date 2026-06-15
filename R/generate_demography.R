@@ -63,7 +63,7 @@ generate_demography <- function(
     )
 
   attr(demography, "description") <- glue::glue("Population data from the US Census Bureau for {year}.")
-  attr(demography, "creation_datetime") <- Sys.time()
+  attr(demography, "creation_date") <- Sys.time()
 
   return(demography)
 }

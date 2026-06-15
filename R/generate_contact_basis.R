@@ -208,7 +208,7 @@ generate_contact_basis <- function(
   }) |>
     stats::setNames(common_country_codes)
 
-  attr(contact_basis, "creation_datetime") <- Sys.time()
+  attr(contact_basis, "creation_date") <- Sys.time()
 
   return(contact_basis)
 }
