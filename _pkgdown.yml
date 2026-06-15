@@ -3,12 +3,21 @@ template:
   bootstrap: 5
 
 authors:
-  Statens Serum Institut, SSI:
+  Statens Serum Institut:
     href: https://www.ssi.dk/
-    html: >-
-      <img src="https://www.ssi.dk/assets/images/ssi-logo-optimeret.svg" alt="SSI" height="64" style="margin-bottom: 0.5em; margin-top: 1.5em;" />
+  EU: {}
 
 llm-docs: false
+
+navbar:
+  structure:
+    left: [intro, reference, articles, funding, news]
+    right: [search, github]
+
+  components:
+    funding:
+      text: Funding
+      href: articles/funding.html
 
 reference:
   - title: Functional modules
@@ -77,3 +86,8 @@ articles:
   navbar: Additional information
   contents:
   - articles/diseasy-immunity-optimisation
+
+- title: Funding
+  navbar: Funding
+  contents:
+  - articles/funding

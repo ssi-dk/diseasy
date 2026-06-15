@@ -33,7 +33,8 @@ Authors:
 Other contributors:
 \itemize{
   \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID}) [reviewer]
-  \item Statens Serum Institut, SSI [copyright holder, funder]
+  \item Statens Serum Institut (https://www.ssi.dk) [copyright holder, funder]
+  \item EU [funder]
 }
 
 }

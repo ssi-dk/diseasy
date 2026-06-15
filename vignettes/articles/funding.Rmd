@@ -1,0 +1,33 @@
+---
+title: "Funding"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Funding}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r SSI, echo = FALSE, fig.align = "left", out.width = "60%"}
+knitr::include_graphics(
+  devtools::package_file(
+    "vignettes/articles/article_data/funding-SSI.svg"
+  )
+)
+```
+
+This project is in general funded by [Statens Serum Institut]("https://www.ssi.dk").
+
+
+```{r EU, echo = FALSE, fig.align = "left", out.width = "75%"}
+knitr::include_graphics(
+  devtools::package_file(
+    "vignettes/articles/article_data/funding-EU-co-founded.png"
+  )
+)
+```
+
+Specific parts of this project co-funded by the European Union
+
+* The modelling of spatially structured populations is funded via the [PAIR project](https://doi.org/10.3030/101133191)
+
+* The modelling of waning immunity is funded via the [DURABLE project](https://durableproject.org)
