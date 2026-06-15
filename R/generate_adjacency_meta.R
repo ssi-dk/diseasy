@@ -10,9 +10,7 @@
 #' @description
 #'   Generate adjacency data between NUTS 3 regions from Meta Social Connectedness
 #'   Index.
-#' @param regions (`character()`)\cr
-#'   Optional NUTS 3 codes to keep.
-#'   If `NULL`, all NUTS 3 available in the source data are returned.
+#' @param regions `r rd_regions("generators")`
 #' @return
 #'   `r rd_adjacency("return")`
 #' @examples
@@ -57,29 +55,33 @@ generate_adjacency_meta <- function(
     )
 
 
-   if (is.null(regions)) {
-      # Keep regions in our NUTS list
-      adjacency_meta <- adjacency_meta |>
-        dplyr::inner_join(dplyr::select(nuts, "region"), by = c("from" = "region")) |>
-        dplyr::inner_join(dplyr::select(nuts, "region"), by = c("to" = "region"))
-    } else {
-      # Keep user defined regions
-      adjacency_meta <- adjacency_meta |>
-        dplyr::filter(
-          purrr::reduce(
-            .x = purrr::map(regions, ~ stringr::str_starts(.data$from, .x)),
-            .f = `|`,
-            .init = FALSE
-          )
-        ) |>
-        dplyr::filter(
-            purrr::reduce(
-            .x = purrr::map(regions, ~ stringr::str_starts(.data$to, .x)),
-            .f = `|`,
-            .init = FALSE
-          )
+  if (is.null(regions)) {
+
+    # Keep regions in our NUTS list
+    adjacency_meta <- adjacency_meta |>
+      dplyr::inner_join(dplyr::select(nuts, "region"), by = c("from" = "region")) |>
+      dplyr::inner_join(dplyr::select(nuts, "region"), by = c("to" = "region"))
+
+  } else {
+
+    # Keep user defined regions
+    adjacency_meta <- adjacency_meta |>
+      dplyr::filter(
+        purrr::reduce(
+          .x = purrr::map(regions, ~ stringr::str_starts(.data$from, .x)),
+          .f = `|`,
+          .init = FALSE
         )
-    }
+      ) |>
+      dplyr::filter(
+        purrr::reduce(
+          .x = purrr::map(regions, ~ stringr::str_starts(.data$to, .x)),
+          .f = `|`,
+          .init = FALSE
+        )
+      )
+
+  }
 
 
   attr(adjacency_meta, "type") <- "infection-flow"

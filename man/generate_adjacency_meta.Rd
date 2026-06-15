@@ -7,9 +7,7 @@
 generate_adjacency_meta(regions = NULL)
 }
 \arguments{
-\item{regions}{(\code{character()})\cr
-Optional NUTS 3 codes to keep.
-If \code{NULL}, all NUTS 3 available in the source data are returned.}
+\item{regions}{(\code{character()})\cr The geographic regions of interest. If \code{NULL}, all regions are returned.}
 }
 \value{
 (\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr
