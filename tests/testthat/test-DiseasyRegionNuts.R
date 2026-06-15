@@ -290,6 +290,17 @@ test_that("Hierarchical regions works", {
     demography = demography_nuts3
   )
 
+  # For Malta, NUTS "0", NUTS 1 and NUTS 2 are the same
+  expect_identical(
+    region_0$demography,
+    region_1$demography
+  )
+
+  expect_identical(
+    region_0$demography,
+    region_2$demography
+  )
+
   rm(region_0)
   rm(region_1)
   rm(region_2)
