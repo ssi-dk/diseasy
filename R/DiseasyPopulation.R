@@ -37,10 +37,15 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @param regional_stratification `r rd_regional_stratification()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
-    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, ...) {
+    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, region = NULL, ...) {
+      checkmate::assert_class(observables, "DiseasyObservables", null.ok = TRUE)
 
       # Pass additional arguments to the DiseasyBaseModule initializer
       super$initialize(...)
+
+      if (!is.null(region)) {
+        self$load_module(region)
+      }
 
       # Pass arguments to methods
       self$stratify_age(age_cuts_lower)
