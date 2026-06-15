@@ -201,7 +201,7 @@ generate_contact_basis <- function(
     }) |>
       stats::setNames(arenas)
 
-    return(modifyList(
+    return(utils::modifyList(
       purrr::pluck(contact_basis, country_code),
       list("contacts" = contacts)
     ))
