@@ -281,7 +281,11 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (is.null(self %.% demography)) {
         printr("Total population: No population data loaded")
       } else {
-        printr(glue::glue("Total population: {sum(self %.% demography %.% population)}"))
+        printr(
+          glue::glue(
+            "Total population: {prettyNum(sum(self %.% demography %.% population), big.mark = ',', scientific = FALSE)}"
+          )
+        )
       }
 
       if (is.null(self %.% adjacency)) {
