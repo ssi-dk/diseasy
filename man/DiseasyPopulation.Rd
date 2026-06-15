@@ -85,7 +85,12 @@ The local copy of an DiseasyRegions module. Read-only.}
   Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, regional_stratification = NULL, ...)}
+    \preformatted{DiseasyPopulation$new(
+  age_cuts_lower = 0L,
+  regional_stratification = NULL,
+  region = NULL,
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
