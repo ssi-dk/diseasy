@@ -151,7 +151,14 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
   demography_nuts <- demography_nuts |>
     dplyr::filter(!is.na(population))
 
+  # Verify NUTS level 3 has complete data
+  lowest_nuts_lack_data <- demography_nuts |>
+    dplyr::right_join(nuts, by = "region") |>
+    dplyr::slice_max(.data$year, by = "country") |>
+    dplyr::slice_max(.data$level, by = "country") |>
+    dplyr::filter(is.na(.data$population))
 
+  checkmate::assert_data_frame(lowest_nuts_lack_data, max.rows = 0)
 
   if (is.null(regions)) {
 
@@ -160,6 +167,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
       dplyr::inner_join(dplyr::select(nuts, "region"), by = "region")
 
   } else {
+
     # Keep user defined regions
     demography_nuts <- demography_nuts |>
       dplyr::filter(
@@ -169,16 +177,9 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
         .init = FALSE
       )
     )
+
   }
 
-  # Verify NUTS level 3 has complete data
-  lowest_nuts_lack_data <- demography_nuts |>
-    dplyr::right_join(nuts, by = "region") |>
-    dplyr::slice_max(.data$year, by = "country") |>
-    dplyr::slice_max(.data$level, by = "country") |>
-    dplyr::filter(is.na(.data$population))
-
-  checkmate::assert_data_frame(lowest_nuts_lack_data, max.rows = 0)
 
   # Keep only lowest NUTS level
   demography_nuts <- demography_nuts |>
