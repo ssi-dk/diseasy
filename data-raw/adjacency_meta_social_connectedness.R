@@ -1,5 +1,5 @@
 # This script creates an adjacency object from the Meta Social Connectedness
-# Index (SCI) for NUTS 3 regions.
+# Index for NUTS 3 regions.
 #
 # The resulting object is a long-form adjacency data frame with columns
 # `from`, `to`, and `adjacency`. The values represent the per-capita contact

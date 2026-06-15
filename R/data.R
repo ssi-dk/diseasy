@@ -230,7 +230,7 @@ NULL
 
 #' Meta Social Connectedness Index as adjacency for NUTS 3 regions
 #'
-#' This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index (SCI)
+#' This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index
 #' for NUTS 3 regions. The object is formatted for use with `DiseasyRegions`.
 #'
 #' The data set consists of a `data.frame` with three columns:

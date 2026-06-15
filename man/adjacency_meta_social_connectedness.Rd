@@ -11,7 +11,7 @@ See \url{https://data.humdata.org/dataset/social-connectedness-index} and
 \url{https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/}.
 }
 \description{
-This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index (SCI)
+This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index
 for NUTS 3 regions. The object is formatted for use with \code{DiseasyRegions}.
 }
 \details{
