@@ -72,24 +72,6 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param regions `r rd_regions()`
     #' @return `r rd_side_effects`
     set_regions = function(regions) {
-      coll <- checkmate::makeAssertCollection()
-
-      checkmate::assert_character(regions, min.len = 1, any.missing = FALSE, unique = TRUE, add = coll)
-
-      available_regions <- NULL
-      if (!is.null(private %.% .adjacency)) {
-        available_regions <- unique(dplyr::pull(private %.% .adjacency, "from"))
-      }
-
-      if (!is.null(private %.% .demography)) {
-        available_regions <- intersect(available_regions, unique(dplyr::pull(private %.% .demography, "region")))
-      }
-
-      if (!is.null(available_regions)) {
-        checkmate::assert_subset(regions, available_regions, add = coll)
-      }
-
-      checkmate::reportAssertions(coll)
 
       # Check configuration works with existing adjacency and demography
       self$validate_configuration(
@@ -113,22 +95,9 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       type = match.arg(type)
 
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_data_frame(adjacency, add = coll)
-      checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
       if (!checkmate::test_permutation(adjacency$from, adjacency$to)) {
-        coll$push("`adjacency` incomplete: All two-way connections between regions must be specified!")
+        pkgcond::pkg_error("`adjacency` incomplete: All two-way connections between regions must be specified!")
       }
-      checkmate::assert_character(adjacency$from, any.missing = FALSE, add = coll)
-      checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
-      checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
-
-      checkmate::assert_choice(type, c("movement", "infection-flow"), add = coll)
-
-      # Must have codes corresponding to selected regions
-      checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "from")), add = coll)
-      checkmate::assert_subset(self %.% regions, unique(dplyr::pull(adjacency, "to")),   add = coll)
-      checkmate::reportAssertions(coll)
 
       # Sort the adjacency
       adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
@@ -155,16 +124,6 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param demography `r rd_demography()`
     #' @return `r rd_side_effects`
     set_demography = function(demography) {
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_data_frame(demography, add = coll)
-      checkmate::assert_subset(c("region", "population"), colnames(demography), add = coll)
-      checkmate::assert_character(demography %.% region, any.missing = FALSE, add = coll)
-      checkmate::assert_numeric(demography %.% population, lower = 0, any.missing = FALSE, add = coll)
-
-      # Must have codes corresponding to selected regions
-      checkmate::assert_subset(self %.% regions, unique(demography %.% region), add = coll)
-      checkmate::reportAssertions(coll)
-
 
       # Check configuration works with existing regions and adjacency
       self$validate_configuration(
