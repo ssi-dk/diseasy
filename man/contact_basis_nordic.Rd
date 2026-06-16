@@ -3,7 +3,7 @@
 \docType{data}
 \name{contact_basis_nordic}
 \alias{contact_basis_nordic}
-\title{Contact basis}
+\title{Contact basis (Nordics)}
 \source{
 U.S. Census Bureau. (n.d.). \emph{International Database: World Population Estimates and Projections}.
 U.S. Department of Commerce.

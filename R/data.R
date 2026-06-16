@@ -1,4 +1,4 @@
-#' Contact basis
+#' Contact basis (Nordics)
 #'
 #' This data set contains contact matrices and population data for 176 geographical regions.
 #' The contact matrices uses data provided by the `contactdata` package while the population
@@ -78,13 +78,13 @@ NULL
 NULL
 
 
-#' Demography (NUTS)
+#' Demography (Nordics - NUTS 3)
 #'
-#' This data set contains population counts by NUTS region, age group,
+#' This data set contains population counts by NUTS 3 region, age group,
 #' and sex from Eurostat dataset `demo_r_pjangrp3`.
 #'
 #' The source dataset contains population on 1 January by age group, sex, and
-#' NUTS3 region. This object is a modified version of the Eurostat dataset:
+#' NUTS 3 region. This object is a modified version of the Eurostat dataset:
 #' unknown-age population counts are redistributed proportionally
 #' across known age groups within each year, region, and sex, rows with missing
 #' population values are removed, and the object is truncated to the latest
@@ -93,7 +93,7 @@ NULL
 #'
 #' The data set consists of a `tibble` with the following columns:
 #'  - `year`: The calendar year of the population count.
-#'  - `region`: The NUTS region identifier.
+#'  - `region`: The NUTS 3 region identifier.
 #'  - `age_group`: The age group.
 #'  - `sex`: The sex.
 #'  - `population`: The population count.
