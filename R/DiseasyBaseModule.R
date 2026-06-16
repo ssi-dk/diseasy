@@ -95,6 +95,9 @@ DiseasyBaseModule <- R6::R6Class(                                               
       # This way, a copy (reference) of the module being loaded is propagated to the nested modules. Any changes to the
       # parent module is then reflected in the nested instances.
 
+      if (!inherits(module, "DiseasyBaseModule")) {
+        pkgcond::pkg_error("Only `diseasy` modules can be loaded (must inherit `DiseasyBaseModule`).")
+      }
 
       # Check the instance has a slot for the module to be loaded
       base_class <- class(module)[which(class(module) == "DiseasyBaseModule") - 1]
