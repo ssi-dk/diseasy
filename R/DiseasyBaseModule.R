@@ -97,8 +97,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
 
       # Check the instance has a slot for the module to be loaded
-      if (!paste0(".", class(module)[1]) %in% names(private)) {
-        stop(glue::glue("Module {class(module)[1]} not found in {class(self)[1]}"), call. = FALSE)
+      base_class <- class(module)[which(class(module) == "DiseasyBaseModule") - 1]
+
+      if (!paste0(".", base_class) %in% names(private)) {
+        stop(glue::glue("Module {base_class} has no slot in {class(self)[1]}"), call. = FALSE)
       }
 
       # Check if the module should be cloned (i.e. a new instance is created, or if the module is used by reference)
@@ -130,10 +132,10 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
 
       # Finally, store the module
-      private[[glue::glue(".{class(module)[1]}")]] <- module
+      private[[glue::glue(".{base_class}")]] <- module
 
       # ... and track if module was cloned
-      attr(private[[glue::glue(".{class(module)[1]}")]], "clone") <- clone
+      attr(private[[glue::glue(".{base_class}")]], "clone") <- clone
 
     }
   ),
