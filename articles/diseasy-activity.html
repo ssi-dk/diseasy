@@ -147,15 +147,15 @@ population information).</p>
 <p>NOTE: the given contact basis uses counts of contacts between
 individuals rather than rates. Having contacts as counts is important if
 you want to project the contact matrices into different age groups. (see
-<code><a href="../reference/contact_basis.html">?contact_basis</a></code> for more details on how the
+<code>?contact_basis</code> for more details on how the
 <code>contact_basis</code> is constructed)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span><span class="va">dk_activity_units</span><span class="op">)</span></span>
-<span><span class="va">act</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span><span class="va">contact_basis</span> <span class="op"><a href="https://ssi-dk.github.io/diseasystore/reference/grapes-.-grapes.html">%.%</a></span> <span class="va">DK</span><span class="op">)</span></span>
+<span><span class="va">act</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span><span class="va">contact_basis_nordic</span> <span class="op"><a href="https://ssi-dk.github.io/diseasystore/reference/grapes-.-grapes.html">%.%</a></span> <span class="va">DK</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># This configuration can also be done as part of the constructor</span></span>
 <span><span class="co"># act &lt;- DiseasyActivity$new(activity_units = dk_activity_units</span></span>
-<span><span class="co">#                            contact_basis = contact_basis %.% DK)</span></span></code></pre></div>
+<span><span class="co">#                            contact_basis = contact_basis_nordic %.% DK)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="defining-an-activity-scenario">Defining an activity scenario<a class="anchor" aria-label="anchor" href="#defining-an-activity-scenario"></a>

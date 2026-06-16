@@ -274,7 +274,7 @@ in the model.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Configure an activity module using Danish population and contact information.</span></span>
 <span><span class="va">activity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">activity</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span>contact_basis <span class="op">=</span> <span class="va">contact_basis</span><span class="op">$</span><span class="va">DK</span><span class="op">)</span></span>
+<span><span class="va">activity</span><span class="op">$</span><span class="fu">set_contact_basis</span><span class="op">(</span>contact_basis <span class="op">=</span> <span class="va">contact_basis_nordic</span><span class="op">$</span><span class="va">DK</span><span class="op">)</span></span>
 <span><span class="va">activity</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span><span class="va">dk_activity_units</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The level of activity is fixed to the "baseline" level throughout the simulation.</span></span>
@@ -292,7 +292,7 @@ immunity:</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-t/time_scale)</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x558dbef9ac98&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55d8b15881a8&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "exponential_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
