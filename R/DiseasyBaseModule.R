@@ -100,7 +100,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
       }
 
       # Check the instance has a slot for the module to be loaded
-      base_class <- class(module)[which(class(module) == "DiseasyBaseModule") - 1]
+      base_class <- class(module)[which(class(module) == "DiseasyBaseModule") - 1]                                      # nolint: class_equals_linter
 
       if (!paste0(".", base_class) %in% names(private)) {
         stop(glue::glue("Module {base_class} has no slot in {class(self)[1]}"), call. = FALSE)
