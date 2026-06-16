@@ -187,4 +187,14 @@ test_that("Module loading works", {
   )
 
   expect_no_error(t$load_module(sub_module$new()))
+
+  # And non-diseasy modules should not be loadable
+  non_diseasy_module <- R6::R6Class(
+    classname = "non_diseasy_module"
+  )
+
+  expect_error(
+    t$load_module(non_diseasy_module$new()),
+    regexp = r"{Only `diseasy` modules can be loaded \(must inherit `DiseasyBaseModule`\).}"
+  )
 })
