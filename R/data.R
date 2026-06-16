@@ -1,4 +1,4 @@
-#' Contact basis
+#' Contact basis (Nordics)
 #'
 #' This data set contains contact matrices and population data for 176 geographical regions.
 #' The contact matrices uses data provided by the `contactdata` package while the population
@@ -29,19 +29,19 @@
 #'
 #' This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
 #'
-#' @name contact_basis
+#' @name contact_basis_nordic
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @author Lasse Engbo Christiansen \email{lsec@ssi.dk}
 #' @source
-#'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
-#'  U.S. Department of Commerce. Retrieved
-#'  `r format(attr(contact_basis, "creation_date"), "%B %d, %Y")`,
-#'  from https://data.census.gov/
+#'   U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
+#'   U.S. Department of Commerce.
+#'   Retrieved `r format(attr(contact_basis_nordic, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
+#'   from https://data.census.gov/
 #' @source
-#'  Gruson H (2023). "contactdata: Social Contact Matrices for 152
-#'  Countries." R package version 1.0.0,
-#'  <https://CRAN.R-project.org/package=contactdata>.
+#'   Gruson H (2023). "contactdata: Social Contact Matrices for 152
+#'   Countries." R package version 1.0.0,
+#'   <https://CRAN.R-project.org/package=contactdata>.
 #' @source
 #'   Prem K, Cook AR, Jit M (2017). "Projecting social contact
 #'   matrices in 152 countries using contact surveys and demographic
@@ -59,32 +59,32 @@
 NULL
 
 
-#' Demography (world)
+#' Demography (Nordics)
 #'
 #' This data set population data for 176 geographical regions in
 #' 1-year age-groups to allow transformation of the contact matrices into other age cuts.
 #'
 #' This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
 #'
-#' @name demography
+#' @name demography_nordic
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'  U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
-#'  U.S. Department of Commerce. Retrieved
-#'  `r format(attr(demography, "creation_date"), "%B %d, %Y")`,
+#'   U.S. Census Bureau. (n.d.). _International Database: World Population Estimates and Projections_.
+#'   U.S. Department of Commerce.
+#'   Retrieved `r format(attr(demography_nordic, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'  from https://data.census.gov/
 #' @keywords data
 NULL
 
 
-#' Demography (NUTS)
+#' Demography (Nordics - NUTS 3)
 #'
-#' This data set contains population counts by NUTS region, age group,
+#' This data set contains population counts by NUTS 3 region, age group,
 #' and sex from Eurostat dataset `demo_r_pjangrp3`.
 #'
 #' The source dataset contains population on 1 January by age group, sex, and
-#' NUTS3 region. This object is a modified version of the Eurostat dataset:
+#' NUTS 3 region. This object is a modified version of the Eurostat dataset:
 #' unknown-age population counts are redistributed proportionally
 #' across known age groups within each year, region, and sex, rows with missing
 #' population values are removed, and the object is truncated to the latest
@@ -93,16 +93,17 @@ NULL
 #'
 #' The data set consists of a `tibble` with the following columns:
 #'  - `year`: The calendar year of the population count.
-#'  - `region`: The NUTS region identifier.
+#'  - `region`: The NUTS 3 region identifier.
 #'  - `age_group`: The age group.
 #'  - `sex`: The sex.
 #'  - `population`: The population count.
 #'
-#' @name demography_nuts3
+#' @name demography_nordic_nuts3
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'   Source: 10.2908/demo_r_pjangrp3, `r format(as.Date(attr(demography_nuts3, "creation_datetime")), "%B %d, %Y")`.
+#'   Source: 10.2908/demo_r_pjangrp3.
+#'   Retrieved `r format(attr(demography_nordic_nuts3, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   Population on 1 January by age group, sex and NUTS 3 region
 #' @keywords data
 NULL
@@ -122,7 +123,8 @@ NULL
 #' @docType data
 #' @author Rasmus Skytte Randl&oslash;v \email{rske@ssi.dk}
 #' @source
-#'   Source: 10.2908/demo_r_pjangrp3, `r format(as.Date(attr(demography_nuts3, "creation_datetime")), "%B %d, %Y")`.
+#'   Source: 10.2908/demo_r_pjangrp3.
+#'   Retrieved `r format(attr(nuts, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   Population on 1 January by age group, sex and NUTS 3 region
 #' @keywords data
 NULL
@@ -228,10 +230,11 @@ NULL
 NULL
 
 
-#' Meta Social Connectedness Index as adjacency for NUTS 3 regions
+#' Meta Social Connectedness Index as adjacency for NUTS 3 regions (Nordics)
 #'
 #' This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index
-#' for NUTS 3 regions. The object is formatted for use with `DiseasyRegions`.
+#' for NUTS 3 regions in then Nordic countries. The object is formatted for use with `DiseasyRegions` and
+#' `DiseasyRegionsNuts`.
 #'
 #' The data set consists of a `data.frame` with three columns:
 #'  - `from`: The origin NUTS 3 region.
@@ -240,11 +243,33 @@ NULL
 #'
 #' The adjacency values are two-way contact between regions and should be interpreted a type of "infection-flow" matrix.
 #'
-#' @name adjacency_meta_social_connectedness
+#' @name adjacency_meta_nordic_nuts
 #' @docType data
 #' @source
 #'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
-#'   Retrieved `r format(attr(adjacency_meta_social_connectedness, "creation_date"), "%B %d, %Y")`,
+#'   Retrieved `r format(attr(adjacency_meta_nordic_nuts, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
+#'   See <https://data.humdata.org/dataset/social-connectedness-index> and
+#'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
+#' @keywords data
+NULL
+
+#' Meta Social Connectedness Index as adjacency for countries (Nordics)
+#'
+#' This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index
+#' for the Nordic countries. The object is formatted for use with `DiseasyRegions`.
+#'
+#' The data set consists of a `data.frame` with three columns:
+#'  - `from`: The origin country.
+#'  - `to`: The destination country.
+#'  - `adjacency`: The contacts from `from` allocated to `to`.
+#'
+#' The adjacency values are two-way contact between regions and should be interpreted a type of "infection-flow" matrix.
+#'
+#' @name adjacency_meta_nordic
+#' @docType data
+#' @source
+#'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
+#'   Retrieved `r format(attr(adjacency_meta_nordic, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   See <https://data.humdata.org/dataset/social-connectedness-index> and
 #'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
 #' @keywords data

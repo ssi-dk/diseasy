@@ -210,21 +210,22 @@ rd_activity_weights <- paste(
 
 ## Templates for DiseasyRegions
 rd_regions <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
+  checkmate::assert_choice(type, c("param", "field", "generators"))
   paste(
     "(`character()`)\\cr",
     "The geographic regions of interest.",
 
     switch(
-      type == "param",
-      "The specified regions must be available in the `demography` and `adjacency` data."
-    ),
-    switch(type == "field", "Read only.")
+      type,
+      "param" = "The specified regions must be available in the `demography` and `adjacency` data.",
+      "field" = "Read only.",
+      "generators" = "If `NULL`, all regions are returned."
+    )
   )
 }
 
 rd_adjacency <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
+  checkmate::assert_choice(type, c("param", "field", "return"))
 
   paste(
     "(`data.frame(1)`)\\cr",

@@ -256,13 +256,13 @@ test_that("$get_scenario_openness() works with default parameters", {
 test_that("$get_scenario_openness() works with no scenario", {
 
   # Test openness with given contact basis
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
 
   # With no scenario, we should get a default openness of 1
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- names(contact_basis %.% DK %.% population)
+  age_labels <- names(contact_basis_nordic %.% DK %.% population)
 
   expect_identical(
     act$get_scenario_openness(),
@@ -292,7 +292,7 @@ test_that("$get_scenario_openness() works with no scenario", {
 test_that("$get_scenario_openness() works with given scenario", {
 
   # Create a new instance of the activity module
-  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
   # Now we load a scenario
@@ -346,13 +346,13 @@ test_that("$get_scenario_contacts() works with default parameters", {
 test_that("$get_scenario_contacts() works no scenario", {
 
   # Test openness with given contact basis
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
 
   # With no scenario, we should get a default openness of 1
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- names(contact_basis %.% DK %.% population)
+  age_labels <- names(contact_basis_nordic %.% DK %.% population)
 
   expect_identical(
     act$get_scenario_contacts(),
@@ -398,7 +398,7 @@ test_that("$get_scenario_contacts() works no scenario", {
 test_that("$get_scenario_contacts() works with given scenario", {
 
   # Create a new instance of the activity module
-  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
   # Now we load a scenario
@@ -426,7 +426,7 @@ test_that("Check warnings are thrown for misconfigured scenarios", {
   expect_no_error(act$get_scenario_contacts())
   rm(act)
 
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   expect_no_error(act$get_scenario_openness())
   expect_no_error(act$get_scenario_contacts())
   rm(act)
@@ -438,7 +438,7 @@ test_that("Check warnings are thrown for misconfigured scenarios", {
   expect_warning(act$get_scenario_contacts(), "Activity scenario configuration started but not completed.")
   rm(act)
 
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units)
   expect_warning(act$get_scenario_openness(), "Activity scenario configuration started but not completed.")
   expect_warning(act$get_scenario_contacts(), "Activity scenario configuration started but not completed.")
@@ -449,7 +449,7 @@ test_that("Check warnings are thrown for misconfigured scenarios", {
 test_that("contactdata: contact_basis works", {
 
   # Test contactdata contacts
-  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
@@ -473,7 +473,7 @@ test_that("contactdata: contact_basis works", {
 test_that("dk_reference scenario works", {
 
   ## Test dk_reference scenario
-  act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis_nordic %.% DK)
   checkmate::expect_class(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), "list")
   # More tests could be made ... but tested above. The length may change over time so maybe some particular dates.
 
@@ -493,21 +493,21 @@ test_that("$set_contact_basis() works", {
   hash_new_instance <- act$hash # Store new hash
 
   # Setting basis should change the hash
-  act$set_contact_basis(contact_basis %.% DK)
+  act$set_contact_basis(contact_basis_nordic %.% DK)
 
   hash_contact_basis_loaded <- act$hash # Store new hash
   expect_false(hash_new_instance == hash_contact_basis_loaded) # With contact_basis loaded, hash should change
 
 
   # Changing basis should give new hash
-  custom_basis <- contact_basis %.% DK
+  custom_basis <- contact_basis_nordic %.% DK
   custom_basis$description <- "foo"
   act$set_contact_basis(custom_basis)
 
   expect_false(act$hash == hash_contact_basis_loaded)
 
   # Check malformed inputs
-  custom_basis <- contact_basis %.% DK
+  custom_basis <- contact_basis_nordic %.% DK
   custom_basis$contacts <- custom_basis$contacts[-1]
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
@@ -515,7 +515,7 @@ test_that("$set_contact_basis() works", {
     regexp = r"{Must be a set equal to \{'home','work','school','other'\}, but is missing elements \{'home'\}}"
   )
 
-  custom_basis <- contact_basis %.% DK
+  custom_basis <- contact_basis_nordic %.% DK
   custom_basis$proportion <- custom_basis$proportion[-1]
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
@@ -523,7 +523,7 @@ test_that("$set_contact_basis() works", {
     regexp = "Must have length 16, but has length 15"
   )
 
-  custom_basis <- contact_basis %.% DK
+  custom_basis <- contact_basis_nordic %.% DK
   custom_basis$extra_element <- "some string"
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
@@ -531,7 +531,7 @@ test_that("$set_contact_basis() works", {
     regexp = r"{Must be a permutation of set .+, but has extra elements \{'extra_element'\}}"
   )
 
-  custom_basis <- contact_basis %.% DK
+  custom_basis <- contact_basis_nordic %.% DK
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis[-5])),
     class = "simpleError",
@@ -546,7 +546,7 @@ test_that("$describe() works", {
   act <- DiseasyActivity$new()
   expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
 
-  act$set_contact_basis(contact_basis %.% DK)
+  act$set_contact_basis(contact_basis_nordic %.% DK)
   expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
 
   act$set_activity_units(dk_activity_units)

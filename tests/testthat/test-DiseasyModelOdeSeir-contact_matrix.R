@@ -5,7 +5,7 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -51,7 +51,7 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -97,7 +97,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40, 80)),
-    activity = DiseasyActivity$new(contact_basis = contact_basis %.% DK),
+    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -141,7 +141,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   skip_if_not_installed("ucminf")
 
   # Define an activity scenario
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units)
 
   # Fully open from 2020-01-01
@@ -182,7 +182,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       act$rescale_contacts_to_rates(proportion) |>
       (\(m) m * outer(proportion, proportion, "*"))() |>
       sum() |>
@@ -192,7 +192,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       act$rescale_contacts_to_rates(proportion) |>
       (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
       sum() |>
@@ -201,7 +201,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(0),
-    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       act$rescale_contacts_to_rates(proportion) |>
       (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
       sum() |>
@@ -211,7 +211,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   # The contact matrix should be valid forever
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(Inf),
-    purrr::reduce(contact_basis %.% DK %.% contacts, `+`) |>
+    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       act$rescale_contacts_to_rates(proportion) |>
       (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
       sum() |>
@@ -227,7 +227,7 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
   skip_if_not_installed("ucminf")
 
   # Define an activity scenario
-  act <- DiseasyActivity$new(contact_basis = contact_basis %.% DK)
+  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units)
 
   # Fully open from 2020-01-01
@@ -243,7 +243,7 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(
-      age_cuts_lower = as.numeric(stringr::str_extract(names(contact_basis %.% DK %.% population), r"{^\d+}"))
+      age_cuts_lower = as.numeric(stringr::str_extract(names(contact_basis_nordic %.% DK %.% population), r"{^\d+}"))
     ),
     activity = act,
     observables = DiseasyObservables$new(
@@ -268,8 +268,8 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
     act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% contacts, `+`),
-      contact_basis %.% DK %.% proportion
+      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`),
+      contact_basis_nordic %.% DK %.% proportion
     )
   )
 
@@ -277,16 +277,16 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
     act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% contacts, `+`) * 0.5,
-      contact_basis %.% DK %.% proportion
+      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) * 0.5,
+      contact_basis_nordic %.% DK %.% proportion
     )
   )
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(0),
     act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% contacts, `+`) * 0.5,
-      contact_basis %.% DK %.% proportion
+      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) * 0.5,
+      contact_basis_nordic %.% DK %.% proportion
     )
   )
 
@@ -294,8 +294,8 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(Inf),
     act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis %.% DK %.% contacts, `+`) * 0.5,
-      contact_basis %.% DK %.% proportion
+      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) * 0.5,
+      contact_basis_nordic %.% DK %.% proportion
     )
   )
 

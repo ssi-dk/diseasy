@@ -25,7 +25,7 @@ age_cuts_lower <- c(0, 30, 60)
 
 # Configure an activity module using Danish population and contact information
 activity <- DiseasyActivity$new()
-activity$set_contact_basis(contact_basis = contact_basis %.% DK)
+activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
 activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 

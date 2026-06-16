@@ -410,7 +410,7 @@ plot.DiseasyBaseModule <- function(x, ...) {
 #' # Create an activity module with Danish reference scenario
 #' activity <- DiseasyActivity$new(
 #'   base_scenario = "dk_reference",
-#'   contact_basis = contact_basis$DK
+#'   contact_basis = contact_basis_nordic$DK
 #' )
 #' print(activity)
 #' @export

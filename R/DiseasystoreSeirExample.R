@@ -54,7 +54,7 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
         # we use the same data here to compute the population
         age_cuts <- c(0, 30, 60)
 
-        out <- contact_basis %.% DK %.% demography |>
+        out <- contact_basis_nordic %.% DK %.% demography |>
           dplyr::group_by(
             "key_age_group" = cut(
               .data$age,

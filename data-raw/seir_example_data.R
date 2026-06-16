@@ -27,7 +27,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # Define the activity scenario
   activity <- DiseasyActivity$new()
-  activity$set_contact_basis(contact_basis = contact_basis %.% DK)
+  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
   activity$set_activity_units(dk_activity_units)
   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
@@ -95,7 +95,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
 
   # Extract the maximal test positive signal from the I1 states
-  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI * sum(contact_basis %.% DK %.% population)
+  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI * sum(contact_basis_nordic %.% DK %.% population)
   colnames(true_infected) <- diseasystore::age_labels(age_cuts_lower)
 
   # Convert to long format

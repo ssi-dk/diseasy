@@ -212,9 +212,9 @@ To do so, we will create a few different instances of the functional modules, `D
 ```{r, eval = FALSE}
 # Create three different contact bases for the ensemble
 # All uses the Danish populations but with different contact matrices
-contact_basis_1 <- contact_basis_2 <- contact_basis_3 <- contact_basis$DK
-contact_basis_2$contacts <- contact_basis$SE$contact
-contact_basis_3$contacts <- contact_basis$NO$contact
+contact_basis_1 <- contact_basis_2 <- contact_basis_3 <- contact_basis_nordic$DK
+contact_basis_2$contacts <- contact_basis_nordic$SE$contact
+contact_basis_3$contacts <- contact_basis_nordic$NO$contact
 
 # Create an activity instance with the Danish changes in restrictions
 activity <- DiseasyActivity$new()
