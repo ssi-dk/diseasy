@@ -2,6 +2,7 @@
 % Please edit documentation in R/DiseasyRegions.R
 \name{DiseasyRegions}
 \alias{DiseasyRegions}
+\alias{DiseasyRegionsNuts}
 \title{Diseasy's region (spatial) handler}
 \value{
 A new instance of the \code{DiseasyRegions} \link[R6:R6Class]{R6} class.
@@ -9,6 +10,10 @@ A new instance of the \code{DiseasyRegions} \link[R6:R6Class]{R6} class.
 \description{
 The \code{DiseasyRegions} module is responsible for handling geographic regions
 included in the model.
+
+The base class treats regions as generic identifiers. Use
+\code{\link{DiseasyRegionsNuts}} for NUTS-specific validation and hierarchical region
+matching.
 
 See the vignette("diseasy-regions") for examples of use.
 }
@@ -203,9 +208,6 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
 \if{latex}{\out{\hypertarget{method-DiseasyRegions-region_filter}{}}}
 \subsection{\code{DiseasyRegions$region_filter()}}{
   Create a logical filter for values matching one or more regions.
-
-The generic implementation uses exact matching. \code{DiseasyRegionsNuts}
-overrides this method with hierarchical NUTS prefix matching.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyRegions$region_filter(values, regions = self \%.\% regions)}
@@ -270,6 +272,100 @@ regions. If \code{NULL}, all values are matched.}
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyRegions$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
+
+}
+\section{Super classes}{
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyRegions]{DiseasyRegions}} -> \code{DiseasyRegionsNuts}
+}
+\section{Methods}{
+\subsection{Public methods}{
+  \itemize{
+    \item \href{#method-DiseasyRegionsNuts-validate_configuration}{\code{DiseasyRegionsNuts$validate_configuration()}}
+    \item \href{#method-DiseasyRegionsNuts-region_filter}{\code{DiseasyRegionsNuts$region_filter()}}
+    \item \href{#method-DiseasyRegionsNuts-clone}{\code{DiseasyRegionsNuts$clone()}}
+  }
+}
+\if{html}{\out{<details><summary>Inherited methods</summary>
+<ul>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="adjacency_to_theta"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-adjacency_to_theta'><code>DiseasyRegions$adjacency_to_theta()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="describe"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-describe'><code>DiseasyRegions$describe()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="initialize"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-initialize'><code>DiseasyRegions$initialize()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_adjacency"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_adjacency'><code>DiseasyRegions$set_adjacency()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_demography"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_demography'><code>DiseasyRegions$set_demography()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_regions"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_regions'><code>DiseasyRegions$set_regions()</code></a></span></li>
+</ul>
+</details>}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegionsNuts-validate_configuration"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegionsNuts-validate_configuration}{}}}
+\subsection{\code{DiseasyRegionsNuts$validate_configuration()}}{
+  Check whether regions, adjacency, and demography are mutually consistent
+and complete under NUTS hierarchy semantics.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegionsNuts$validate_configuration(regions, adjacency, demography)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
+      \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegionsNuts-region_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegionsNuts-region_filter}{}}}
+\subsection{\code{DiseasyRegionsNuts$region_filter()}}{
+  Create a logical filter using NUTS hierarchy prefix matching.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegionsNuts$region_filter(values, regions = self \%.\% regions)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{values}}{(\code{character()})\cr
+Values to filter, typically NUTS codes.}
+      \item{\code{regions}}{(\code{character()} or \code{NULL})\cr
+Region identifiers to match against. Defaults to the currently selected
+regions. If \code{NULL}, all values are matched.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{logical()} vector with the same length as \code{values}.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegionsNuts-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegionsNuts-clone}{}}}
+\subsection{\code{DiseasyRegionsNuts$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegionsNuts$clone(deep = FALSE)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
