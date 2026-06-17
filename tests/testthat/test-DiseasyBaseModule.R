@@ -145,3 +145,56 @@ test_that("$stratification_to_string() works", {
 
   rm(m)
 })
+
+test_that("Module loading works", {
+
+  # Create a module with a slot to load modules of class "sub_module"
+  parent_module <-  R6::R6Class(
+    classname = "parent_module",
+    inherit = DiseasyBaseModule,
+    private = list(".sub_module" = NULL)
+  )
+
+  t <- parent_module$new()
+
+
+  # sub_module should be loadable
+  sub_module <- R6::R6Class(
+    classname = "sub_module",
+    inherit = DiseasyBaseModule
+  )
+
+  expect_no_error(t$load_module(sub_module$new()))
+
+
+
+  # A differently named module should not be loadable
+  alt_module <- R6::R6Class(
+    classname = "alt_module",
+    inherit = DiseasyBaseModule
+  )
+
+  expect_error(
+    t$load_module(alt_module$new()),
+    regexp = "Module alt_module has no slot in parent_module"
+  )
+
+
+  # But a child of the original loadable module should also be loadable
+  sub_sub_module <- R6::R6Class(
+    classname = "sub_sub_module",
+    inherit = sub_module
+  )
+
+  expect_no_error(t$load_module(sub_module$new()))
+
+  # And non-diseasy modules should not be loadable
+  non_diseasy_module <- R6::R6Class(
+    classname = "non_diseasy_module"
+  )
+
+  expect_error(
+    t$load_module(non_diseasy_module$new()),
+    regexp = r"{Only `diseasy` modules can be loaded \(must inherit `DiseasyBaseModule`\).}"
+  )
+})
