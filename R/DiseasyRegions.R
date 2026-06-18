@@ -575,7 +575,7 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       name = "regions",
       expr = {
         if (is.null(self %.% demography)) {
-          pkgdown::pkg_error(
+          pkgcond::pkg_error(
             "`DiseasyRegionsNuts` must be configured with a `demography` to determine available NUTS levels."
           )
         }
