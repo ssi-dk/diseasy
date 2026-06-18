@@ -205,6 +205,17 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
     #' @description
+    #'   Get the regions available at the given stratification level
+    #' @param regional_stratification `r rd_regional_stratification()`
+    #' @return
+    #'   The (sorted) list of available regions within the defined scope at the given stratification level.
+    regions_at_stratification = function(regional_stratification) {
+      checkmate::assert_choice(regional_stratification, self %.% available_stratifications)
+      return(self %.% regions) # For `DiseasyRegions`, there is only the 1 level of stratification
+    },
+
+
+    #' @description
     #'   Converts long form adjacency to the "Theta" infection matrix.
     #' @param adjacency `r rd_adjacency()`
     #' @param type `r rd_adjacency_type`
@@ -534,7 +545,26 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       )
 
       return(region_filter)
+    },
+
+
+    #' @description
+    #'   Get the regions available at the given stratification level
+    #' @param regional_stratification `r rd_regional_stratification()`
+    #' @return
+    #'   The (sorted) list of available regions within the defined scope at the given stratification level.
+    regions_at_stratification = function(regional_stratification) {
+      checkmate::assert_choice(regional_stratification, self %.% available_stratifications)
+
+      # What regions are available
+      regions_in_demography <- self %.% demography %.% region
+
+      # What NUTS level is requested?
+      nuts_stratification <- as.integer(stringr::str_extract(regional_stratification, r"{\d$}"))
+
+      return(sort(unique(substr(regions_in_demography, 1, nuts_stratification + 2))))
     }
+
   ),
 
   active = list(
