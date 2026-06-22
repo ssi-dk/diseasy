@@ -10,7 +10,7 @@ overall_infection_risk <- 0.02
 
 # Configure the activity module
 activity <- DiseasyActivity$new()
-activity$set_contact_basis(contact_basis = contact_basis$DK)
+activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
 activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
 
