@@ -117,7 +117,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
       # If we are loading an observables module, make sure the connection is marked as not needing clean up
       if (inherits(module, "DiseasyObservables")) {
-        attr(module$.__enclos_env__$private$.conn, "needs_cleanup") <- FALSE
+        module$.__enclos_env__$private$conn_needs_cleanup <- FALSE
       }
 
 
