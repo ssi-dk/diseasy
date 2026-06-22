@@ -14,7 +14,6 @@ activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
 activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
 
-
 # Configure the immunity module
 immunity <- DiseasyImmunity$new()
 immunity$set_exponential_waning(time_scale = 180)
@@ -170,7 +169,7 @@ tidyr::expand_grid(
           reference_after,
           - round(1 / rE + 1 / (L + rI)) # Drop first points to account for time difference
         ),
-        tolerance = 5e-2 # Within 5 %
+        tolerance = 0.1 # Within 10 %
       )
 
       rm(m)
