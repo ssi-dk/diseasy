@@ -260,5 +260,15 @@ test_that("active binding: age_cuts_lower works", {
 test_that("$describe() works", {
   population <- DiseasyPopulation$new()
   expect_no_error(withr::with_output_sink(nullfile(), population$describe()))
+
+  region = DiseasyRegions$new(regions = c("DK", "SE", "NO"), demography = demography_nordic)
+  population$load_module(region)
+  population$stratify_regions("region")
+  expect_no_error(withr::with_output_sink(nullfile(), population$describe()))
+
+  population$stratify_age(c(0, 20, 40))
+  expect_no_error(withr::with_output_sink(nullfile(), population$describe()))
+
+  rm(region)
   rm(population)
 })
