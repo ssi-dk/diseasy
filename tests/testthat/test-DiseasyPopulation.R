@@ -198,6 +198,7 @@ test_that("$groups works", {
   population$load_module(region_nuts)
 
   # This should break the configuration, so we should get an error when trying to get groups
+  # (since stratification is still "region" but we now have a NUTS regions module loaded)
   expect_error(
     checkmate_err_msg(population$groups),
     regexp = "Assertion on 'regional_stratification' failed: Must be element of set"
