@@ -76,13 +76,13 @@ tidyr::expand_grid(
       skip_if_not_installed("RSQLite")
 
       m <- DiseasyModelOdeSeir$new(
+        population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
         activity = activity,
         immunity = immunity,
         season = season,
         observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-          "age_cuts_lower" = age_cuts_lower,
           "overall_infection_risk" = overall_infection_risk,
           "disease_progression_rates" = c("E" = rE, "I" = rI)
         )
