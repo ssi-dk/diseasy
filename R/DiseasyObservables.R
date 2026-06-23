@@ -454,15 +454,7 @@ DiseasyObservables <- R6::R6Class(                                              
     conn = purrr::partial(
       .f = active_binding,
       name = "conn",
-      expr = {
-        conn <- private %.% .conn
-
-        # Remove the "needs_cleanup" attribute as it is only used during clean up
-        # and not meaningful in other contexts
-        attr(conn, "needs_cleanup") <- NULL
-
-        return(conn)
-      }
+      expr = private %.% .conn
     )
   ),
 
