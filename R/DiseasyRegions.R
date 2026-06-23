@@ -327,7 +327,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   The available levels of stratification supported. Read only.
     available_stratifications = purrr::partial(
       .f = active_binding,
-      name = "regions",
+      name = "available_stratifications",
       expr = "region" # For DiseasyRegions, space can either not be startifed or stratified by region
     ),
 
@@ -572,7 +572,7 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
     #'   The available levels of stratification supported. Read only.
     available_stratifications = purrr::partial(
       .f = active_binding,
-      name = "regions",
+      name = "available_stratifications",
       expr = {
         if (is.null(self %.% demography)) {
           pkgcond::pkg_error(
