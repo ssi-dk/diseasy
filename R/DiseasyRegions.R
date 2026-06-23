@@ -424,8 +424,11 @@ DiseasyRegions <- R6::R6Class(                                                  
               "value" = sum(.data$population),
               .by = "region"
             )
-
         }
+
+        # Set colours
+        colour_high <- "#3d3d3d"
+        colour_low <- "#4bbd4b"
 
         # Plot adjacency if configured
         plot_adjacency <- !is.null(self %.% adjacency)
@@ -479,6 +482,10 @@ DiseasyRegions <- R6::R6Class(                                                  
             )
         }
 
+        # Set colours
+        colour_high <- "#ff0000"
+        colour_low <- "#ffffff"
+
         plot_adjacency <- FALSE
 
       }
@@ -514,9 +521,9 @@ DiseasyRegions <- R6::R6Class(                                                  
           linewidth = 0.2
         ) +
         ggplot2::scale_fill_gradient2(
-          high = "#3d3d3d",
-          mid = "#4bbd4b",
-          low = "#4bbd4b",
+          high = colour_high,
+          mid = colour_low,
+          low = colour_low,
           midpoint = 0,
           labels = scales::label_log(base = 10)
         ) +
