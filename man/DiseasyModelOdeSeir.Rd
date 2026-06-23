@@ -73,7 +73,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   # Plot the results
   plot(m, observable = "incidence", prediction_length = 30)
 
-  rm(m, act, obs)
+  rm(m, activity, observables, population)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
