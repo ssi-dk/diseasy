@@ -74,7 +74,7 @@ test_that("$finalize works - internal connections", {
 
   # Finalize the observables module
   rm(observables)
-  gc()
+  invisible(gc())
 
   # Connection should be closed
   expect_false(DBI::dbIsValid(conn))
@@ -98,7 +98,7 @@ test_that("$finalize works - external connections", {
 
     # Finalize the observables module
     rm(observables)
-    gc()
+    invisible(gc())
 
     # Connection should be closed
     expect_true(DBI::dbIsValid(conn))

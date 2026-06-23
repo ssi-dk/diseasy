@@ -51,6 +51,8 @@ test_that("initialize works with functional modules", {
 
   rm(m, m_population_instance, m_act_instance, m_s_instance, m_immunity_instance, m_obs_instance)
   rm(m_population_boolean, m_act_boolean, m_s_boolean, m_immunity_boolean, m_obs_boolean, m_var_boolean, m_label)
+  rm(obs, population, act, s, immunity, var)
+  invisible(gc())
 })
 
 
@@ -147,8 +149,8 @@ test_that("$load_module() works", {
   expect_false(identical(m %.% observables, obs))
   expect_false(identical(m %.% observables %.% hash, obs %.% hash))
 
-  rm(m)
-
+  rm(m, obs)
+  invisible(gc())
 
   #.. and the other way around
   m <- DiseasyModel$new(observables = TRUE)
@@ -161,7 +163,8 @@ test_that("$load_module() works", {
   checkmate::expect_class(m %.% season %.% observables, "DiseasyObservables")
   expect_identical(m %.% season %.% observables, m %.% observables)
 
-  rm(m)
+  rm(m, s)
+  invisible(gc())
 })
 
 
@@ -277,6 +280,7 @@ test_that("$hash works", {
   m$load_module(immunity) # Reset to original
 
   rm(m, s, act, obs, var, immunity, s_alt, act_alt, obs_alt, var_alt, immunity_alt)
+  invisible(gc())
 
 
   # Create a simple model that takes parameters
@@ -400,6 +404,7 @@ test_that("cloning works", {
   expect_false(obs$hash == m_c$observables$hash) # module hashes should also be different
 
   rm(m, m_c, s, act, obs, s_alt, act_alt, obs_alt)
+  invisible(gc())
 })
 
 
@@ -727,5 +732,6 @@ test_that("active binding: training_period, testing_period and validation_period
   expect_identical(tryCatch(m$validation_period <- c("start" = Sys.Date()), error = \(e) e),                            # nolint: implicit_assignment_linter
                    simpleError("`$validation_period` is read only"))
 
-  rm(m)
+  rm(m, obs)
+  invisible(gc())
 })
