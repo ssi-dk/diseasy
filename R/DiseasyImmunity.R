@@ -884,7 +884,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Run the optimisation
-          missing_packages <- c("dfoptim", "nloptr", "subplex", "ucminf") |>
+          missing_packages <- c("nloptr", "ucminf") |>
             purrr::discard(rlang::is_installed) |>
             toString()
 
