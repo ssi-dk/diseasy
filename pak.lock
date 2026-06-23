@@ -1,7 +1,7 @@
 {
   "lockfile_version": 1,
-  "os": "Ubuntu 24.04.3 LTS",
-  "r_version": "R version 4.5.2 (2025-10-31)",
+  "os": "Ubuntu 24.04.4 LTS",
+  "r_version": "R version 4.6.0 (2026-04-24)",
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
@@ -21,12 +21,12 @@
     },
     {
       "package": "backports",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "binary": true
     },
     {
       "package": "base64enc",
-      "version": "0.1-3",
+      "version": "0.1-6",
       "binary": true
     },
     {
@@ -46,7 +46,7 @@
     },
     {
       "package": "bit64",
-      "version": "4.6.0-1",
+      "version": "4.8.2",
       "binary": true
     },
     {
@@ -86,7 +86,7 @@
     },
     {
       "package": "bslib",
-      "version": "0.9.0",
+      "version": "0.11.0",
       "binary": true
     },
     {
@@ -96,22 +96,22 @@
     },
     {
       "package": "callr",
-      "version": "3.7.6",
+      "version": "3.8.0",
       "binary": true
     },
     {
       "package": "checkmate",
-      "version": "2.3.3",
+      "version": "2.3.4",
       "binary": true
     },
     {
       "package": "cli",
-      "version": "3.6.5",
+      "version": "3.6.6",
       "binary": true
     },
     {
       "package": "clipr",
-      "version": "0.8.0",
+      "version": "0.8.1",
       "binary": true
     },
     {
@@ -136,7 +136,7 @@
     },
     {
       "package": "countrycode",
-      "version": "1.6.1",
+      "version": "1.8.0",
       "binary": true
     },
     {
@@ -151,17 +151,17 @@
     },
     {
       "package": "curl",
-      "version": "7.0.0",
+      "version": "7.1.0",
       "binary": true
     },
     {
       "package": "DBI",
-      "version": "1.2.3",
+      "version": "1.3.0",
       "binary": true
     },
     {
       "package": "dbplyr",
-      "version": "2.5.1",
+      "version": "2.6.0",
       "binary": true
     },
     {
@@ -171,12 +171,12 @@
     },
     {
       "package": "deSolve",
-      "version": "1.40",
+      "version": "1.42",
       "binary": true
     },
     {
       "package": "devtools",
-      "version": "2.4.6",
+      "version": "2.5.2",
       "binary": true
     },
     {
@@ -201,12 +201,12 @@
     },
     {
       "package": "diseasystore",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "binary": true
     },
     {
       "package": "distributional",
-      "version": "0.6.0",
+      "version": "0.7.1",
       "binary": true
     },
     {
@@ -216,17 +216,17 @@
     },
     {
       "package": "dplyr",
-      "version": "1.1.4",
+      "version": "1.2.1",
       "binary": true
     },
     {
       "package": "duckdb",
-      "version": "1.4.3",
+      "version": "1.5.4",
       "binary": true
     },
     {
       "package": "ellipsis",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "binary": true
     },
     {
@@ -261,17 +261,17 @@
     },
     {
       "package": "fs",
-      "version": "1.6.6",
+      "version": "2.1.0",
       "binary": true
     },
     {
       "package": "future",
-      "version": "1.69.0",
+      "version": "1.70.0",
       "binary": true
     },
     {
       "package": "future.apply",
-      "version": "1.20.1",
+      "version": "1.20.2",
       "binary": true
     },
     {
@@ -286,7 +286,7 @@
     },
     {
       "package": "ggplot2",
-      "version": "4.0.1",
+      "version": "4.0.3",
       "binary": true
     },
     {
@@ -296,7 +296,7 @@
     },
     {
       "package": "gh",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "binary": true
     },
     {
@@ -306,12 +306,12 @@
     },
     {
       "package": "globals",
-      "version": "0.18.0",
+      "version": "0.19.1",
       "binary": true
     },
     {
       "package": "glue",
-      "version": "1.8.0",
+      "version": "1.8.1",
       "binary": true
     },
     {
@@ -331,7 +331,7 @@
     },
     {
       "package": "highr",
-      "version": "0.11",
+      "version": "0.12",
       "binary": true
     },
     {
@@ -351,7 +351,7 @@
     },
     {
       "package": "httpuv",
-      "version": "1.6.16",
+      "version": "1.6.17",
       "binary": true
     },
     {
@@ -411,22 +411,17 @@
     },
     {
       "package": "later",
-      "version": "1.4.5",
+      "version": "1.4.8",
       "binary": true
     },
     {
       "package": "lattice",
-      "version": "0.22-7",
-      "binary": true
-    },
-    {
-      "package": "lazyeval",
-      "version": "0.2.2",
+      "version": "0.22-9",
       "binary": true
     },
     {
       "package": "lgr",
-      "version": "0.5.0",
+      "version": "0.5.2",
       "binary": true
     },
     {
@@ -441,7 +436,7 @@
     },
     {
       "package": "listenv",
-      "version": "0.10.0",
+      "version": "1.0.0",
       "binary": true
     },
     {
@@ -456,12 +451,12 @@
     },
     {
       "package": "lubridate",
-      "version": "1.9.4",
+      "version": "1.9.5",
       "binary": true
     },
     {
       "package": "magrittr",
-      "version": "2.0.4",
+      "version": "2.0.5",
       "binary": true
     },
     {
@@ -471,7 +466,7 @@
     },
     {
       "package": "Matrix",
-      "version": "1.7-4",
+      "version": "1.7-5",
       "binary": true
     },
     {
@@ -486,7 +481,7 @@
     },
     {
       "package": "mgcv",
-      "version": "1.9-3",
+      "version": "1.9-4",
       "binary": true
     },
     {
@@ -506,17 +501,17 @@
     },
     {
       "package": "mvtnorm",
-      "version": "1.3-3",
+      "version": "1.4-1",
       "binary": true
     },
     {
       "package": "nleqslv",
-      "version": "3.3.5",
+      "version": "3.3.7",
       "binary": true
     },
     {
       "package": "nlme",
-      "version": "3.1-168",
+      "version": "3.1-169",
       "binary": true
     },
     {
@@ -531,7 +526,7 @@
     },
     {
       "package": "openssl",
-      "version": "2.3.4",
+      "version": "2.4.2",
       "binary": true
     },
     {
@@ -545,8 +540,13 @@
       "binary": true
     },
     {
+      "package": "pak",
+      "version": "0.10.0",
+      "binary": true
+    },
+    {
       "package": "parallelly",
-      "version": "1.46.1",
+      "version": "1.47.0",
       "binary": true
     },
     {
@@ -576,7 +576,7 @@
     },
     {
       "package": "pkgload",
-      "version": "1.4.1",
+      "version": "1.5.3",
       "binary": true
     },
     {
@@ -586,7 +586,7 @@
     },
     {
       "package": "posterior",
-      "version": "1.6.1",
+      "version": "1.7.0",
       "binary": true
     },
     {
@@ -606,7 +606,7 @@
     },
     {
       "package": "processx",
-      "version": "3.8.6",
+      "version": "3.9.0",
       "binary": true
     },
     {
@@ -616,7 +616,7 @@
     },
     {
       "package": "progressr",
-      "version": "0.18.0",
+      "version": "0.19.0",
       "binary": true
     },
     {
@@ -626,17 +626,17 @@
     },
     {
       "package": "ps",
-      "version": "1.9.1",
+      "version": "1.9.3",
       "binary": true
     },
     {
       "package": "purrr",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "binary": true
     },
     {
       "package": "QuickJSR",
-      "version": "1.8.1",
+      "version": "1.10.0",
       "binary": true
     },
     {
@@ -646,7 +646,7 @@
     },
     {
       "package": "ragg",
-      "version": "1.5.0",
+      "version": "1.5.2",
       "binary": true
     },
     {
@@ -666,12 +666,12 @@
     },
     {
       "package": "Rcpp",
-      "version": "1.1.1",
+      "version": "1.1.1-1.1",
       "binary": true
     },
     {
       "package": "RcppParallel",
-      "version": "5.1.11-1",
+      "version": "5.1.11-2",
       "binary": true
     },
     {
@@ -686,12 +686,7 @@
     },
     {
       "package": "readr",
-      "version": "2.1.6",
-      "binary": true
-    },
-    {
-      "package": "remotes",
-      "version": "2.5.0",
+      "version": "2.2.0",
       "binary": true
     },
     {
@@ -701,22 +696,22 @@
     },
     {
       "package": "rex",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "binary": true
     },
     {
       "package": "rlang",
-      "version": "1.1.7",
+      "version": "1.2.0",
       "binary": true
     },
     {
       "package": "rmarkdown",
-      "version": "2.30",
+      "version": "2.31",
       "binary": true
     },
     {
       "package": "roxygen2",
-      "version": "7.3.3",
+      "version": "8.0.0",
       "binary": true
     },
     {
@@ -726,7 +721,7 @@
     },
     {
       "package": "RSQLite",
-      "version": "2.4.5",
+      "version": "3.53.2",
       "binary": true
     },
     {
@@ -741,7 +736,7 @@
     },
     {
       "package": "rstudioapi",
-      "version": "0.18.0",
+      "version": "0.19.0",
       "binary": true
     },
     {
@@ -751,7 +746,7 @@
     },
     {
       "package": "S7",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "binary": true
     },
     {
@@ -766,22 +761,22 @@
     },
     {
       "package": "SCDB",
-      "version": "0.5.2",
+      "version": "0.6.2",
       "binary": true
     },
     {
       "package": "sessioninfo",
-      "version": "1.2.3",
+      "version": "1.2.4",
       "binary": true
     },
     {
       "package": "shiny",
-      "version": "1.12.1",
+      "version": "1.14.0",
       "binary": true
     },
     {
       "package": "sourcetools",
-      "version": "0.1.7-1",
+      "version": "0.1.7-2",
       "binary": true
     },
     {
@@ -816,7 +811,7 @@
     },
     {
       "package": "systemfonts",
-      "version": "1.3.1",
+      "version": "1.3.2",
       "binary": true
     },
     {
@@ -831,7 +826,7 @@
     },
     {
       "package": "textshaping",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "binary": true
     },
     {
@@ -851,12 +846,12 @@
     },
     {
       "package": "timechange",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "binary": true
     },
     {
       "package": "tinytex",
-      "version": "0.58",
+      "version": "0.60",
       "binary": true
     },
     {
@@ -866,7 +861,7 @@
     },
     {
       "package": "ucminf",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "binary": true
     },
     {
@@ -886,22 +881,22 @@
     },
     {
       "package": "V8",
-      "version": "8.0.1",
+      "version": "8.2.0",
       "binary": true
     },
     {
       "package": "vctrs",
-      "version": "0.7.0",
+      "version": "0.7.3",
       "binary": true
     },
     {
       "package": "viridisLite",
-      "version": "0.4.2",
+      "version": "0.4.3",
       "binary": true
     },
     {
       "package": "vroom",
-      "version": "1.6.7",
+      "version": "1.7.1",
       "binary": true
     },
     {
@@ -916,17 +911,17 @@
     },
     {
       "package": "withr",
-      "version": "3.0.2",
+      "version": "3.0.3",
       "binary": true
     },
     {
       "package": "xfun",
-      "version": "0.56",
+      "version": "0.59",
       "binary": true
     },
     {
       "package": "xml2",
-      "version": "1.5.2",
+      "version": "1.6.0",
       "binary": true
     },
     {
@@ -941,7 +936,7 @@
     },
     {
       "package": "xtable",
-      "version": "1.8-4",
+      "version": "1.8-8",
       "binary": true
     },
     {
@@ -951,7 +946,7 @@
     },
     {
       "package": "zip",
-      "version": "2.3.3",
+      "version": "3.0.0",
       "binary": true
     }
   ],
@@ -961,8 +956,8 @@
     "version": "24.04",
     "url": {},
     "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install pandoc libx11-dev git libcurl4-openssl-dev libssl-dev xz-utils make libgit2-dev zlib1g-dev cmake libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libnode-dev libxml2-dev",
+    "install_scripts": "apt-get -y install pandoc libx11-dev git libcurl4-openssl-dev libssl-dev xz-utils cmake make libuv1-dev libgit2-dev zlib1g-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libnode-dev libxml2-dev",
     "post_install": {},
-    "packages": ["pandoc", "libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "xz-utils", "make", "libgit2-dev", "zlib1g-dev", "cmake", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libwebp-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libnode-dev", "libxml2-dev"]
+    "packages": ["pandoc", "libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "xz-utils", "cmake", "make", "libuv1-dev", "libgit2-dev", "zlib1g-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libwebp-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libnode-dev", "libxml2-dev"]
   }
 }
