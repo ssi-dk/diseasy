@@ -39,7 +39,7 @@ The workflow for creating a specific `?DiseasyModelOdeSeir` model would roughly 
   The model template may have some configurability that you control. In the case of `?DiseasyModelOdeSeir` for example,
   you must choose the number of consecutive $E$, $I$ and $R$ states in the model.
 3) **Mapping to observables.**
-  The ODE family of models is in some ways bespoke in the sense that the user needs provide a mapping from the
+  The ODE family of models is in some ways bespoke in the sense that the user needs to provide a mapping from the
   observables to the "true" incidence of infections. The model is then initialised from this estimated incidence.
   If the model should provide predictions for observables other than the "true" incidence, the user needs to provide
   mapping between the model incidence and the observables in question.
@@ -132,7 +132,7 @@ observables$get_observation(
 ```
 
 # Defining the scenario
-The first step to creating a `?DiseasyModelOdeSeir` model is to define the scenario.
+The first step to creating a `?DiseasyModelOdeSeir` model is to define the model scenario.
 In this case, as we stated above, we can exactly match the scenario to the data since
 the data was created using this class of models.
 
@@ -142,7 +142,7 @@ module, and then we define the activity scenario via the `?DiseasyActivity` modu
 before finally defining the seasonality scenario via the `?DiseasySeason` module.
 
 ## Model population
-We here use a simple three age-group stratification of the population in the model.
+In this example scenario we use a simple three age-group stratification of the population in the model.
 
 ```{r diseasy_population}
 # Split the model population into three age groups
@@ -165,7 +165,7 @@ activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 ```
 
 ## Seasonality scenario
-This particular scenario also include simple seasonality and waning immunity:
+This particular scenario also includes simple seasonality and waning immunity:
 ```{r diseasy_season}
 # Waning immunity scenario
 immunity <- DiseasyImmunity$new()
@@ -189,9 +189,8 @@ The hyperparameters are:
 The parameters are:
 
 - *disease_progression_rates*: A named vector specifying the progression rates
-  from $E$ to $I$ and from $I$ to $R$ (i.e. waiting times).
-- *overall_infection_risk*: The overall risk of infection in the population
-  (the overall scaling of infectivity).
+  from $E$ to $I$ and from $I$ to $R$ (i.e. waiting times). The rates determine the expected time spent in each state).
+- *overall_infection_risk*: A population-level scaling factor for transmission, controlling the overall risk of infection in the population.
 
 ```{r model configuration, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # Hyper parameters
@@ -334,7 +333,7 @@ model_output_to_observable <- list(
 The `diseasy` ODE model templates uses a generic system for generating observables
 from the state_vector, $\overline{\psi}$.
 
-A observable can be configured to either derive from either the full state vector
+A observable can be configured to either derive from the full state vector
 $\overline{\psi}$ or the infection matrix $f$ (see the article `SEIR-implementation`
 in the online documentation).
 
