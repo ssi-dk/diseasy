@@ -343,9 +343,8 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
   # No information
   region <- DiseasyRegions$new()
 
-  expect_identical(
-    region$regions_at_stratification(regional_stratification = "region"),
-    NULL
+  expect_null(
+    region$regions_at_stratification(regional_stratification = "region")
   )
 
 

@@ -331,7 +331,7 @@ test_that("$regions_at_stratification() returns all NUTS regions when no regions
     unique() |>
     sort()
 
-  expect_identical(region %.% regions, NULL)
+  expect_null(region %.% regions)
 
   expect_identical(
     region$regions_at_stratification(regional_stratification = "NUTS 0"),
@@ -376,7 +376,7 @@ test_that("$regions_at_stratification() returns all NUTS regions when no regions
   )
 
   expected_nuts3 <- demography_nordic_nuts3 %.% region |>
-    dplyr::filter(substr(.data$region, 1, 2) %in% "DK")
+    dplyr::filter(startsWith(.data$region, "DK"))
 
   expect_identical(
     region$regions_at_stratification(regional_stratification = "NUTS 3"),
