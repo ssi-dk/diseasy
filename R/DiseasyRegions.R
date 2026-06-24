@@ -215,12 +215,13 @@ DiseasyRegions <- R6::R6Class(                                                  
       # What regions are available
       regions_in_demography <- self$demography$region
       regions_in_adjacency <- self$adjacency$from
+      regions_in_both <- intersect(regions_in_demography, regions_in_adjacency)
+      if (length(regions_in_both) == 0) regions_in_both <- NULL
 
       # "Coalesce" the regions from the possible sources
-      regions <- self %.% regions |>
-        purrr::pluck(.default = intersect(regions_in_demography, regions_in_adjacency)) |>
+      regions <- regions_in_both |>
         purrr::pluck(.default = regions_in_demography) |>
-        purrr::pluck(.default = regions_in_adjacency)  |>
+        purrr::pluck(.default = regions_in_adjacency) |>
         unique() |>
         sort()
 
@@ -572,10 +573,11 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       # What regions are available
       regions_in_demography <- self$demography$region
       regions_in_adjacency <- self$adjacency$from
+      regions_in_both <- intersect(regions_in_demography, regions_in_adjacency)
+      if (length(regions_in_both) == 0) regions_in_both <- NULL
 
       # "Coalesce" the regions from the possible sources
-      regions <- self %.% regions |>
-        purrr::pluck(.default = intersect(regions_in_demography, regions_in_adjacency)) |>
+      regions <- regions_in_both |>
         purrr::pluck(.default = regions_in_demography) |>
         purrr::pluck(.default = regions_in_adjacency)
 
