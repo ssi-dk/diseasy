@@ -338,6 +338,47 @@ test_that("`demography_nuts3` data set works with `DiseasyRegions`", {
 })
 
 
+test_that("$regions_at_stratification() tries to guess regions even if `regions` are not configured", {
+
+  # No information
+  region <- DiseasyRegions$new()
+
+  expect_identical(
+    region$regions_at_stratification(regional_stratification = "region"),
+    NULL
+  )
+
+
+  # Only demography
+  region$set_demography(demography_nordic)
+
+  expect_identical(
+    region$regions_at_stratification(regional_stratification = "region"),
+    sort(unique(demography_nordic$region))
+  )
+
+
+  # Intersection of demography and adjacency
+  region$set_adjacency(dplyr::filter(adjacency_meta_nordic, .data$from %in% c("DK", "SE"), .data$to %in% c("DK", "SE")))
+
+  expect_identical(
+    region$regions_at_stratification(regional_stratification = "region"),
+    c("DK", "SE")
+  )
+
+
+  # With regions defined
+  region$set_regions("DK")
+
+  expect_identical(
+    region$regions_at_stratification(regional_stratification = "region"),
+    "DK"
+  )
+
+  rm(region)
+})
+
+
 test_that("active binding: regions works", {
 
   region <- DiseasyRegions$new(
