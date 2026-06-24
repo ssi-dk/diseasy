@@ -259,7 +259,7 @@ plot(region)
 
 ## Regional module with hierarchical structure (NUTS)
 
-If you have demography and adjacency data for strucutred regions (such as NUTS), then `DiseasyRegionsNuts` can handle
+If you have demography and adjacency data for structured regions (such as NUTS), then `DiseasyRegionsNuts` can handle
 the nested data.
 ```{r create_module_nuts}
 region_nuts <- DiseasyRegionsNuts$new()
