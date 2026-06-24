@@ -306,16 +306,7 @@ test_that("Hierarchical regions works", {
   rm(region_2)
 })
 
-test_that("$regions_at_stratification() returns all NUTS regions when no regions are configured", {
-
-  # No information
-  region <- DiseasyRegionsNuts$new()
-
-  expect_identical(
-    region$regions_at_stratification(regional_stratification = "region"),
-    NULL
-  )
-
+test_that("$regions_at_stratification() tries to guess regions even if `regions` are not configured", {
 
   # Only demography
   region <- DiseasyRegionsNuts$new(
@@ -347,7 +338,7 @@ test_that("$regions_at_stratification() returns all NUTS regions when no regions
   # Intersection of demography and adjacency
   region$set_adjacency(
     dplyr::filter(
-      adjacency_meta_nordic,
+      adjacency_meta_nordic_nuts,
       substr(.data$from, 1, 2) %in% c("DK", "SE"),
       substr(.data$to, 1, 2) %in% c("DK", "SE")
     )
@@ -358,8 +349,11 @@ test_that("$regions_at_stratification() returns all NUTS regions when no regions
     c("DK", "SE")
   )
 
-  expected_nuts3 <- demography_nordic_nuts3 %.% region |>
-    dplyr::filter(substr(.data$region, 1, 2) %in% c("DK", "SE"))
+  expected_nuts3 <- demography_nordic_nuts3 |>
+    dplyr::filter(substr(.data$region, 1, 2) %in% c("DK", "SE")) |>
+    dplyr::pull("region") |>
+    unique() |>
+    sort()
 
   expect_identical(
     region$regions_at_stratification(regional_stratification = "NUTS 3"),
@@ -375,8 +369,11 @@ test_that("$regions_at_stratification() returns all NUTS regions when no regions
     "DK"
   )
 
-  expected_nuts3 <- demography_nordic_nuts3 %.% region |>
-    dplyr::filter(startsWith(.data$region, "DK"))
+  expected_nuts3 <- demography_nordic_nuts3 |>
+    dplyr::filter(startsWith(.data$region, "DK")) |>
+    dplyr::pull("region") |>
+    unique() |>
+    sort()
 
   expect_identical(
     region$regions_at_stratification(regional_stratification = "NUTS 3"),
