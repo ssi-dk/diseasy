@@ -326,19 +326,17 @@ DiseasyRegions <- R6::R6Class(                                                  
         checkmate::assert_subset("region", colnames(data), add = coll)
       }
 
-      checkmate::reportAssertions(coll)
-
       if (!rlang::is_installed("sf")) {
-        pkgcond::pkg_error("Package `sf` must be installed to plot regions.")
+        coll$push("Package `sf` must be installed to plot regions.")
       }
 
       if (!rlang::is_installed("ggplot2")) {
-        pkgcond::pkg_error("Package `ggplot2` must be installed to plot regions.")
+        coll$push("Package `ggplot2` must be installed to plot regions.")
       }
 
       if (is.null(shape_files) && !rlang::is_installed(c("rnaturalearth", "rnaturalearthdata"))) {
         missing_packages <- purrr::discard(c("rnaturalearth", "rnaturalearthdata"), rlang::is_installed)
-        pkgcond::pkg_error(
+        coll$push(
           glue::glue(
             "Package{ifelse(length(missing_packages) > 1, 's', '')} {toString(missing_packages)} ",
             "must be installed if no shape files are provided."
@@ -347,10 +345,12 @@ DiseasyRegions <- R6::R6Class(                                                  
       }
 
       if (is.null(data) && is.null(self %.% demography)) {
-        pkgcond::pkg_error(
+        coll$push(
           "If no `data` is provided to `plot()`, then the `demography` must be configured."
         )
       }
+
+      checkmate::reportAssertions(coll)
 
       # Resolve shape files
       if (is.null(shape_files)) {
