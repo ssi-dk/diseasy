@@ -39,10 +39,17 @@ The workflow for creating a specific `?DiseasyModelOdeSeir` model would roughly 
   The model template may have some configurability that you control. In the case of `?DiseasyModelOdeSeir` for example,
   you must choose the number of consecutive $E$, $I$ and $R$ states in the model.
 3) **Mapping to observables.**
-  The ODE family of models is in some ways bespoke in the sense that the user needs to provide a mapping from the
-  observables to the "true" incidence of infections. The model is then initialised from this estimated incidence.
-  If the model should provide predictions for observables other than the "true" incidence, the user needs to provide
-  mapping between the model incidence and the observables in question.
+  The ODE family of models is in some ways bespoke in the sense that the user needs to provide a mapping from and to
+  real-world observables.
+
+  We distinguish between two mappings:
+  First, observed real-world data, such as positive tests or hospitalisations, is used to estimate the "true" incidence
+  of infections.
+  Secondly, the modelled incidence is then mapped back to the observable quantities of interest.
+
+  The model _must_ have an estimate of the disease incidence to be initialised.
+  If no reverse mappings are given, the model can only provide predictions for the true incidence and true number of
+  infected.
 
 These steps are outlined in individual sections below where we work through defining a model in a specific example.
 Note that this example is contrived in the sense that the data we use in this example have been generated with this
@@ -208,7 +215,7 @@ observables$set_last_queryable_date(last_queryable_date)
 # Mapping observables to model and back
 Being a SEIR model, the `?DiseasyModelOdeSeir` model template runs the dynamics of the
 infections in the population. These dynamics are inferred from the incidence of the
-disease in the population.
+infections in the population. These dynamics are not usually observed directly. Instead, they must be inferred from one or more observed data sources, such as positive tests or hospital admissions.
 
 Mathematically, we map from the set of real-world observables $\vec{O}(t)$ to the
 incidence $Inc(t)$ via the map $f$:
