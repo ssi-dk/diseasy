@@ -381,7 +381,7 @@ For example, when the model includes a `?DiseasyImmunity` module, observables ar
 configured to track outcomes related to immunity.
 
 Here, waning target named "hospitalisation" or "death" in the immunity scenario are
-assigned their own observables which is derived from the infection matrix
+assigned their own observables which are derived from the infection matrix
 (Note that there is no difference in waning between variants included in the model).
 
 In the SEIR3 case ($N = L = 1, M = 3$) with two age-groups, the weights take the following form:

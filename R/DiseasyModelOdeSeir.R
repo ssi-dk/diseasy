@@ -325,7 +325,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Above, we have the progression rate for each "track" in the model
-      # We now repeat for each track the model to construct the full vector
+      # We now repeat for each track in the model to construct the full vector
       # and add rates for the S states at the end.
       private$progression_flow_rates <- c(
         rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
