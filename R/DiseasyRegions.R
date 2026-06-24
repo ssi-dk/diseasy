@@ -336,9 +336,13 @@ DiseasyRegions <- R6::R6Class(                                                  
         pkgcond::pkg_error("Package `ggplot2` must be installed to plot regions.")
       }
 
-      if (is.null(shape_files) && !rlang::is_installed("rnaturalearth")) {
+      if (is.null(shape_files) && !rlang::is_installed(c("rnaturalearth", "rnaturalearthdata"))) {
+        missing_packages <- purrr::discard(c("rnaturalearth", "rnaturalearthdata"), rlang::is_installed)
         pkgcond::pkg_error(
-          "Package `rnaturalearth` must be installed if no shape files are provided."
+          glue::glue(
+            "Package{ifelse(length(missing_packages) > 1, 's', '')} {toString(missing_packages)} ",
+            "must be installed if no shape files are provided."
+          )
         )
       }
 
@@ -504,7 +508,7 @@ DiseasyRegions <- R6::R6Class(                                                  
           dplyr::filter(.data$date %in% plot_dates)
 
         plot_data <- tidyr::expand_grid(
-          "region" = self %.% regions,
+          "region" = self$regions_at_stratification(max(self$available_stratifications)),
           "date" = plot_dates
         ) |>
           dplyr::left_join(plot_data, by = c("region", "date"))
@@ -520,17 +524,50 @@ DiseasyRegions <- R6::R6Class(                                                  
           colour = "grey70",
           linewidth = 0.2
         ) +
-        ggplot2::scale_fill_gradient2(
-          high = colour_high,
-          mid = colour_low,
+        ggplot2::scale_fill_gradient(
           low = colour_low,
-          midpoint = 0,
-          labels = scales::label_log(base = 10)
+          high = colour_high,
+          limits = c(0, NA),
+          na.value = "grey90",
+          labels = scales::label_log(),
+          guide = ggplot2::guide_colourbar(order = 1)
         ) +
         ggplot2::labs(fill = stringr::str_to_sentence(value_column)) +
         ggplot2::theme_void() +
         ggplot2::theme(
-          plot.background = ggplot2::element_rect(fill = "#96ceff", colour = NA)
+          panel.background = ggplot2::element_rect(
+            fill = "#96ceff",
+            colour = "#2F4F4F",
+            linewidth = 0.4
+          ),
+          panel.border = ggplot2::element_rect(
+            fill = NA,
+            colour = "#2F4F4F",
+            linewidth = 0.5
+          ),
+          panel.spacing = grid::unit(1, "lines"),
+          strip.background = ggplot2::element_rect(
+            fill = "#E6E6E6",
+            colour = "#2F4F4F",
+            linewidth = 0.4
+          ),
+          strip.text = ggplot2::element_text(
+            face = "bold",
+            margin = ggplot2::margin(4, 4, 4, 4)
+          ),
+          plot.background = ggplot2::element_rect(
+            fill = "white",
+            colour = NA
+          ),
+          legend.background = ggplot2::element_rect(
+            fill = "white",
+            colour = NA
+          ),
+          legend.key = ggplot2::element_rect(
+            fill = NA,
+            colour = NA
+          ),
+          legend.box.background = ggplot2::element_blank()
         )
 
       # Add adjacency overlay for module-configuration plots.
@@ -612,9 +649,21 @@ DiseasyRegions <- R6::R6Class(                                                  
             ),
             inherit.aes = FALSE
           ) +
-          ggplot2::scale_linewidth_continuous(range = c(0.1, 1), limits = c(0, NA)) +
-          ggplot2::scale_alpha_continuous(range = c(0.01, 0.5), limits = c(0, NA)) +
-          ggplot2::scale_size_continuous(range = c(0, 5), limits = c(0, NA)) +
+          ggplot2::scale_linewidth_continuous(
+            range = c(0.1, 1),
+            limits = c(0, NA),
+            guide = ggplot2::guide_legend(order = 3)
+          ) +
+          ggplot2::scale_alpha_continuous(
+            range = c(0.01, 0.5),
+            limits = c(0, NA),
+            guide = ggplot2::guide_legend(order = 3)
+          ) +
+          ggplot2::scale_size_continuous(
+            range = c(0, 5),
+            limits = c(0, NA),
+            guide = ggplot2::guide_legend(order = 2)
+          ) +
           ggplot2::labs(
             linewidth = "Inter-region flows",
             alpha = "Inter-region flows",
