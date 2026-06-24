@@ -31,7 +31,7 @@ This template allows for any number of $E$, $I$ or $R$ states in the model and i
 
 The workflow for creating a specific `?DiseasyModelOdeSeir` model would roughly follow these steps:
 
-1) **Defining the scenario.**
+1) **Defining the model scenario.**
   The first step to using most models in `diseasy` is to define the scenario. That is, to configure the functional
   modules that the model templates takes as argument (e.g. `?DiseasyActivity`).
   These steps provide the model template with information about the population, the activity, variants to include etc.
@@ -133,8 +133,8 @@ observables$get_observation(
 
 # Defining the scenario
 The first step to creating a `?DiseasyModelOdeSeir` model is to define the model scenario.
-In this case, as we stated above, we can exactly match the scenario to the data since
-the data was created using this class of models.
+In this case, as we stated above, we can exactly match the model scenario to the data since
+the data was created using the same class of models.
 
 
 First we define the population to include in the model via the `?DiseasyPopulation`
@@ -142,7 +142,7 @@ module, and then we define the activity scenario via the `?DiseasyActivity` modu
 before finally defining the seasonality scenario via the `?DiseasySeason` module.
 
 ## Model population
-In this example scenario we use a simple three age-group stratification of the population in the model.
+In this example scenario, we use a simple three age-group stratification of the population in the model.
 
 ```{r diseasy_population}
 # Split the model population into three age groups
@@ -211,11 +211,11 @@ infections in the population. These dynamics are inferred from the incidence of 
 disease in the population.
 
 Mathematically, we map from the set of real-world observables $\vec{O}(t)$ to the
-incidence $I(t)$ via the map $f$:
-$$\vec{O}(t) \overset{f}{\rightarrow} I(t)$$
+incidence $Inc(t)$ via the map $f$:
+$$\vec{O}(t) \overset{f}{\rightarrow} Inc(t)$$
 The model then produces a number of observations under the given configuration.
 
-By default, the model will predict the evolution of the incidence[^1], $\tilde{I}(t)$,
+By default, the model will predict the evolution of the incidence[^1], $\tilde{Inc}(t)$,
 but other outputs can be configured (see further below).
 
 [^1]: Measured as the rate of individuals exiting the first `I` state.
@@ -223,12 +223,12 @@ but other outputs can be configured (see further below).
 To get predictions for other real-world observables, we must map from the incidence
 (or other output) to the observable of interest.
 
-From the model incidence $\tilde{I}(t)$, we then map to the observable estimates
+From the model incidence $\tilde{Inc}(t)$, we then map to the observable estimates
 $\tilde{O}_i(t)$ via the maps $g_i$:
-$$\tilde{I}(t) \overset{g_1}{\rightarrow} \tilde{O}_1(t)$$
-$$\tilde{I}(t) \overset{g_2}{\rightarrow} \tilde{O}_2(t)$$
+$$\tilde{Inc}(t) \overset{g_1}{\rightarrow} \tilde{O}_1(t)$$
+$$\tilde{Inc}(t) \overset{g_2}{\rightarrow} \tilde{O}_2(t)$$
 $$\vdots$$
-$$\tilde{I}(t) \overset{g_n}{\rightarrow} \tilde{O}_n(t)$$
+$$\tilde{Inc}(t) \overset{g_n}{\rightarrow} \tilde{O}_n(t)$$
 
 ## Mapping from observables to incidence
 For the model to be initialised, it needs an estimate of the incidence in the population.
@@ -255,7 +255,7 @@ observables$define_synthetic_observable(
 
 
 ## Mapping from model incidence to observables
-By default, the model can only return predictions for the true number of infected
+By default, the model can only return predictions for the "true" number of infected
 (`n_infected`) and the incidence (`incidence`) since these are the only observables
 "known" to the model.
 
