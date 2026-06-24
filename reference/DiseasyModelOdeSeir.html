@@ -121,6 +121,11 @@ A scaling factor to apply to the contact matrices to account for structural diff
 in the model. Read only.</p></dd>
 
 
+    <dt><code>model_outputs</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
+Names of the user-configured model outputs. Read only.</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -136,6 +141,7 @@ in the model. Read only.</p></dd>
 <li><p><a href="#method-DiseasyModelOdeSeir-malthusian_growth_rate"><code>DiseasyModelOdeSeir$malthusian_growth_rate()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-initialise_state_vector"><code>DiseasyModelOdeSeir$initialise_state_vector()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-rhs"><code>DiseasyModelOdeSeir$rhs()</code></a></p></li>
+<li><p><a href="#method-DiseasyModelOdeSeir-configure_observable"><code>DiseasyModelOdeSeir$configure_observable()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-clone"><code>DiseasyModelOdeSeir$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>DiseasyModel$get_data()</code></a></span></li>
@@ -198,10 +204,13 @@ Arguments passed to <code><a href=".{2}/reference/DiseasyImmunity.html#method-Di
 <h3 id="diseasymodelodeseir-load-module-"><code>DiseasyModelOdeSeir$load_module()</code><a class="anchor" aria-label="anchor" href="#diseasymodelodeseir-load-module-"></a></h3>
 <p>Overload the <code>$load_module()</code> to re-initialise the helpers after loading</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">load_module</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">load_module</span><span class="op">(</span><span class="va">module</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<p></p><div class="arguments"><dl><dt><code>module</code></dt>
+<dd><p>(<code>R6::R6Class instance</code>)<br> This instance is cloned to the field with the same name as the class of the module</p></dd>
+
+      <dt><code>...</code></dt>
 <dd><p>Arguments sent to parent method.</p></dd>
 
 
@@ -391,13 +400,53 @@ The rate of change for the differential equations.</p>
 
 </div>
 
+<p></p><hr><a id="method-DiseasyModelOdeSeir-configure_observable"></a><div class="section">
+<h3 id="diseasymodelodeseir-configure-observable-"><code>DiseasyModelOdeSeir$configure_observable()</code><a class="anchor" aria-label="anchor" href="#diseasymodelodeseir-configure-observable-"></a></h3>
+<p>Define new observables via a set of weights.</p>
+<p>Currently, only countable observables are supported.
+That is, observables must be summarisable by the "sum()" function.</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">configure_observable</span><span class="op">(</span></span>
+<span>  <span class="va">weights</span>,</span>
+<span>  <span class="va">name</span>,</span>
+<span>  derived_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state_vector"</span>, <span class="st">"infection_matrix"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>weights</code></dt>
+<dd><p>(<code>matrix</code>)<br>
+A matrix of weights to multiply by the signal source to form the flow into surveillance states.</p></dd>
+
+      <dt><code>name</code></dt>
+<dd><p>(<code>character(1)</code>)<br>
+A name for the observable (retrievable by <code>$get_results()</code>)</p></dd>
+
+      <dt><code>derived_from</code></dt>
+<dd><p>(<code>character(1)</code>)<br>
+Which signal source should the observable be derived from?</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="details-2">Details<a class="anchor" aria-label="anchor" href="#details-2"></a></h4>
+<p>If the signal source is "state_vector" the dot-product of the weights matrix and the state vector
+forms the flow into a number of surveillance states (defined by the dimensions of the weights matrix).</p>
+<p>If the signal source is "infection_matrix" the dot-product of the weights matrix and the row-sums
+of the infection matrix defines the flow (row-sums correspond to new infections).</p>
+</div><p></p><div class="section">
+<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
+<p><code>NULL</code> (called for side effects)</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-DiseasyModelOdeSeir-clone"></a><div class="section">
 <h3 id="diseasymodelodeseir-clone-"><code>DiseasyModelOdeSeir$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodelodeseir-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

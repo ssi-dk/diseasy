@@ -132,12 +132,12 @@ SEIR model overview with multiple E and I states
 &lt;code&gt;?DiseasyModelOdeSeir$initialise_state_vector()&lt;/code&gt; is computed
 from the incidence rate. There is a small but important difference
 between the incidence rate and the signal need for initialisation,
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msup&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mo stretchy="false" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="false" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;I^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;msup&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mo stretchy="false" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="false" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;Inc^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.
 Specifically,
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msup&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mo stretchy="false" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="false" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;I^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;msup&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;mo&gt;*&lt;/mo&gt;&lt;/msup&gt;&lt;mo stretchy="false" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo stretchy="false" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;Inc^*(t)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
 should be the number of true infections in the group divided by the
-total population not the group population.&lt;/p&gt;'><sup>1</sup></a>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>,
+total population not the grouped population.&lt;/p&gt;'><sup>1</sup></a>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Inc^*(t)</annotation></semantics></math>,
 which we would like our model to match.</p>
 <p>The general approach is to consider the derivatives of the incidence
 and link these to the states of the model.</p>
@@ -153,7 +153,7 @@ the incidence.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>
 in the model.</p>
 <p>That is, we assume
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">I^* = r_i I_1</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">Inc^* = r_i I_1</annotation></semantics></math>.</p>
 <p>If we take the equation for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>
 and multiply by
@@ -161,28 +161,28 @@ and multiply by
 we obtain.</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mn>1</mn></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>−</mo><msubsup><mi>r</mi><mi>i</mi><mn>2</mn></msubsup><msub><mi>I</mi><mn>1</mn></msub><mo>⇒</mo></mrow><annotation encoding="application/x-tex">
 r_i\frac{d I_1}{d t} = r_i r_e E_K - r_i^2 I_1 \Rightarrow
-</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><msup><mi>I</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">
-\frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
+</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">
+\frac{d Inc^*}{d t} = r_i r_e E_K - r_i Inc^*
 </annotation></semantics></math></p>
 <p>If we take the second derivative, we find:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>E</mi><mi>K</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mi>l</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t} - r_i \frac{d I_l}{d t}
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>E</mi><mi>K</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mi>l</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+\frac{d^2Inc^*}{d t^2} = r_i r_e \frac{d E_K}{d t} - r_i \frac{d I_l}{d t}
 </annotation></semantics></math> From here, we can inject
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mrow><mi>d</mi><msub><mi>E</mi><mi>K</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><annotation encoding="application/x-tex">\frac{d E_K}{d t}</annotation></semantics></math>
 from the SEIR equations which in turn relates to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><annotation encoding="application/x-tex">E_{k-1}</annotation></semantics></math>.
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mi>l</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I_l}{d t}
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mi>l</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+\frac{d^2Inc^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I_l}{d t}
 </annotation></semantics></math></p>
 <p>This process can be iterated through the derivatives until all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>K</mi></msub><annotation encoding="application/x-tex">E_K</annotation></semantics></math>
 states are expressed in terms of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Inc^*(t)</annotation></semantics></math>
 and its derivatives.</p>
 <p>In this case, we can relate the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>k</mi></msub><annotation encoding="application/x-tex">E_k</annotation></semantics></math>
 states to the rates and derivatives of the signal in a simple form:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>r</mi><mi>e</mi><mn>2</mn></msubsup><msub><mi>E</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>r</mi><mi>e</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>E</mi><mn>2</mn></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>r</mi><mi>e</mi><mi>K</mi></msubsup><msub><mi>E</mi><mn>1</mn></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><msub><mover><mover><mi>M</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mi>K</mi></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msup><mi>I</mi><mo>*</mo></msup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mfrac><mrow><msup><mi>d</mi><mi>K</mi></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mi>K</mi></msup></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mfrac><mrow><msup><mi>d</mi><mrow><mi>K</mi><mo>+</mo><mn>1</mn></mrow></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mrow><mi>K</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow></mfrac></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>r</mi><mi>e</mi><mn>2</mn></msubsup><msub><mi>E</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>r</mi><mi>e</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>E</mi><mn>2</mn></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>r</mi><mi>e</mi><mi>K</mi></msubsup><msub><mi>E</mi><mn>1</mn></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><msub><mover><mover><mi>M</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mi>K</mi></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>…</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mfrac><mrow><msup><mi>d</mi><mi>K</mi></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mi>K</mi></msup></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mfrac><mrow><msup><mi>d</mi><mrow><mi>K</mi><mo>+</mo><mn>1</mn></mrow></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mrow><mi>K</mi><mo>+</mo><mn>1</mn></mrow></msup></mrow></mfrac></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
 r_i
 \begin{bmatrix}
 r_e E_K \\
@@ -194,46 +194,46 @@ r_e^K E_1 \\
 =
 \overline{\overline{M}}_K \cdot
 \begin{bmatrix}
-I^* \\
-\frac{d I^*}{d t} \\
+Inc^* \\
+\frac{d Inc^*}{d t} \\
 \dots \\
-\frac{d^K I^*}{d t^K} \\
-\frac{d^{K+1}I^*}{d t^{K+1}}
+\frac{d^K Inc^*}{d t^K} \\
+\frac{d^{K+1}Inc^*}{d t^{K+1}}
 \end{bmatrix}
 </annotation></semantics></math></p>
 <p>The matrix
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><msub><mi>M</mi><mi>K</mi></msub><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{M_K}}</annotation></semantics></math>
 can be computed via a simple recursion.</p>
 <p>To see why, start the equation for the derivative of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t)</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><msup><mi>I</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">
-\frac{d I^*}{d t} = r_i r_e E_K - r_i I^*
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Inc^*(t)</annotation></semantics></math>:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">
+\frac{d Inc^*}{d t} = r_i r_e E_K - r_i Inc^*
 </annotation></semantics></math></p>
 <p>And separating the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>k</mi></msub><annotation encoding="application/x-tex">E_k</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>*</mo></mrow><annotation encoding="application/x-tex">I*</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">Inc^*</annotation></semantics></math>
 terms:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msup><mi>I</mi><mo>*</mo></msup><mo>+</mo><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-r_i r_e E_K = r_i I^* + \frac{d I^*}{d t}
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo>+</mo><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+r_i r_e E_K = r_i Inc^* + \frac{d Inc^*}{d t}
 </annotation></semantics></math></p>
 <p>In the above formulation, this corresponds to the matrix
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mover><mi>M</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mn>1</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>r</mi><mi>i</mi></msub></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\overline{\overline{M}}_1 = \begin{bmatrix}r_i &amp; 1\end{bmatrix}</annotation></semantics></math>.</p>
 <p>When taking the second derivative, we obtain:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>E</mi><mi>K</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>⇒</mo></mrow><annotation encoding="application/x-tex">
-\frac{d^2I^*}{d t^2} = r_i r_e \frac{d E_K}{d t}- r_i \frac{d I^*}{d t} \Rightarrow
-</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>⇒</mo></mrow><annotation encoding="application/x-tex">
-\frac{d^2I^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d I^*}{d t} \Rightarrow
-</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msubsup><mi>r</mi><mi>e</mi><mn>2</mn></msubsup><msub><mi>E</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-\frac{d^2I^*}{d t^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{d I^*}{d t} + I^*\right)- r_i \frac{d I^*}{d t}
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mfrac><mrow><mi>d</mi><msub><mi>E</mi><mi>K</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>⇒</mo></mrow><annotation encoding="application/x-tex">
+\frac{d^2Inc^*}{d t^2} = r_i r_e \frac{d E_K}{d t}- r_i \frac{d Inc^*}{d t} \Rightarrow
+</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>r</mi><mi>e</mi></msub><msub><mi>E</mi><mi>K</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>⇒</mo></mrow><annotation encoding="application/x-tex">
+\frac{d^2Inc^*}{d t^2} = r_i r_e \left(r_e E_{K-1} - r_e E_K\right) - r_i \frac{d Inc^*}{d t} \Rightarrow
+</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msubsup><mi>r</mi><mi>e</mi><mn>2</mn></msubsup><msub><mi>E</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+\frac{d^2Inc^*}{d t^2} = r_i r_e^2 E_{k-1} - r_e\left(r_i \frac{d Inc^*}{d t} + Inc^*\right)- r_i \frac{d Inc^*}{d t}
 </annotation></semantics></math></p>
 <p>And separating the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>k</mi></msub><annotation encoding="application/x-tex">E_k</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>*</mo></mrow><annotation encoding="application/x-tex">I*</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">Inc^*</annotation></semantics></math>
 terms:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><msubsup><mi>r</mi><mi>e</mi><mn>2</mn></msubsup><msub><mi>E</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><msup><mi>I</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-r_i r_e^2 E_{k-1} = r_e\left(r_i \frac{d I^*}{d t} + I^*\right) + r_i \frac{d I^*}{d t} + \frac{d^2I^*}{d t^2}
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><msubsup><mi>r</mi><mi>e</mi><mn>2</mn></msubsup><msub><mi>E</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>r</mi><mi>e</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>r</mi><mi>i</mi></msub><mfrac><mrow><mi>d</mi><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+r_i r_e^2 E_{k-1} = r_e\left(r_i \frac{d Inc^*}{d t} + Inc^*\right) + r_i \frac{d Inc^*}{d t} + \frac{d^2Inc^*}{d t^2}
 </annotation></semantics></math></p>
 <p>Which, in the matrix formulation corresponds to the sum of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>e</mi></msub><msub><mover><mi>m</mi><mo accent="true">¯</mo></mover><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">r_e \overline{m}_1</annotation></semantics></math>
@@ -291,13 +291,13 @@ yields the two level system:</p>
 <span><span class="co">#&gt; [3,] 0.5760 2.08 2.50  1.0    0</span></span>
 <span><span class="co">#&gt; [4,] 0.4608 2.24 4.08  3.3    1</span></span></code></pre></div>
 <p>Since we assume that the signal
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>I</mi><mo>*</mo></msup><annotation encoding="application/x-tex">I^*</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">Inc^*</annotation></semantics></math>
 only relates to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>,
 then we can determine the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mrow><mi>l</mi><mo>&gt;</mo><mn>1</mn></mrow></msub><annotation encoding="application/x-tex">I_{l&gt;1}</annotation></semantics></math>
 states by evaluating the signal at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>l</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">I^*(t - (l - 1) / r_i)</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>l</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Inc^*(t - (l - 1) / r_i)</annotation></semantics></math>.</p>
 </div>
 <div class="section level2">
 <h2 id="initialising-sr-states">Initialising SR states<a class="anchor" aria-label="anchor" href="#initialising-sr-states"></a>
@@ -311,7 +311,7 @@ the population to be in the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
 states.</p>
 <p>We again assume
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>I</mi><mo>*</mo></msup><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">I^* = r_i I_1</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">Inc^* = r_i I_1</annotation></semantics></math>.</p>
 <p>We can modify the SEIR equation to take this signal as a forcing
 function with no
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>E</mi><annotation encoding="application/x-tex">E</annotation></semantics></math>
@@ -321,11 +321,11 @@ state (no
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>
 state).</p>
 <p>The equations are as normal expect for the following changes:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>=</mo><mfrac><msup><mi>I</mi><mo>*</mo></msup><msub><mi>r</mi><mi>i</mi></msub></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>l</mi><mo>=</mo><mn>2</mn></mrow><mi>L</mi></munderover><msub><mi>I</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">
-I = \frac{I^*}{r_i} + \sum_{l=2}^L I_l
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>=</mo><mfrac><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><msub><mi>r</mi><mi>i</mi></msub></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>l</mi><mo>=</mo><mn>2</mn></mrow><mi>L</mi></munderover><msub><mi>I</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">
+I = \frac{Inc^*}{r_i} + \sum_{l=2}^L I_l
 </annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mn>2</mn></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msup><mi>I</mi><mo>*</mo></msup><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">
-\frac{d I_2}{d t} = I^* - r_i I_2
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mn>2</mn></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">
+\frac{d I_2}{d t} = Inc^* - r_i I_2
 </annotation></semantics></math> If we start this system at a time where
 there are no new infections, we can initialize
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>I</mi><mi>l</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">I_l = 0</annotation></semantics></math>,
@@ -387,16 +387,16 @@ a reduced probability of testing during weekends.</li>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,500 × 6</span></span></span>
 <span><span class="co">#&gt;    date       age_group variant n_infected n_positive_simple n_positive</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            17.2                 7          7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            36.8                26         23</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            49.1                26         19</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            57.4                34         39</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            64.4                47         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            71.6                44         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT            79.2                55         59</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT            87.3                61         64</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT            96.0                59         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           105.                 83         67</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 30-59     WT            64.2                37         41</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 30-59     WT           136.                 85         64</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 30-59     WT           179.                107         79</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 30-59     WT           203.                136        138</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 30-59     WT           221.                137        144</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 30-59     WT           239.                159        169</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 30-59     WT           257.                170        181</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 30-59     WT           278.                188        196</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 30-59     WT           301.                203        159</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 30-59     WT           325.                198        142</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,490 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualise the example data</span></span>
@@ -597,108 +597,34 @@ infer the initial state vector.</p>
 <p>And we now test the initial conditions by solving the model using
 these starting conditions.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">get_prediction</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>  <span class="va">model</span>,</span>
-<span>  <span class="va">psi</span>,</span>
-<span>  <span class="va">signal</span> <span class="op">=</span> <span class="st">"incidence"</span></span>
-<span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>  <span class="co"># Integrate the ODE system with deSolve</span></span>
-<span>  <span class="va">sol</span> <span class="op">&lt;-</span> <span class="fu">deSolve</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">ode</a></span><span class="op">(</span></span>
-<span>    y <span class="op">=</span> <span class="va">psi</span><span class="op">$</span><span class="va">initial_condition</span>,</span>
-<span>    times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span>,</span>
-<span>    func <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">rhs</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># Improve the names of the output</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">sol</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"time"</span>,</span>
-<span>    <span class="va">psi</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unite.html" class="external-link">unite</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"variant"</span>, <span class="st">"age_group"</span>, <span class="st">"state"</span>, sep <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="st">"label"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># Convert to long format</span></span>
-<span>  <span class="va">sol_long</span> <span class="op">&lt;-</span> <span class="va">sol</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span></span>
-<span>      <span class="op">!</span><span class="st">"time"</span>,</span>
-<span>      names_sep <span class="op">=</span> <span class="st">"/"</span>,</span>
-<span>      names_to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"variant"</span>, <span class="st">"age_group"</span>, <span class="st">"state"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="va">m</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
+<span>  <span class="st">"incidence"</span>,</span>
+<span>  stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">variant</span>, <span class="va">age_group</span><span class="op">)</span>,</span>
+<span>  prediction_length <span class="op">=</span> <span class="fl">100</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    model_configuration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span><span class="op">)</span>,</span>
+<span>      <span class="va">m</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span>,</span>
+<span>      collapse <span class="op">=</span> <span class="st">""</span></span>
 <span>    <span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># Extract the solution</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">signal</span> <span class="op">==</span> <span class="st">"incidence"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="va">sol_long</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">state</span> <span class="op">==</span> <span class="st">"I1"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="st">"state"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>        <span class="st">"date"</span> <span class="op">=</span> <span class="va">.data</span><span class="op">$</span><span class="va">time</span> <span class="op">+</span> <span class="va">model</span><span class="op">$</span><span class="va">observables</span><span class="op">$</span><span class="va">last_queryable_date</span>,</span>
-<span>        <span class="st">"incidence_model"</span> <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">disease_progression_rates</span><span class="op">[[</span><span class="st">"I"</span><span class="op">]</span><span class="op">]</span> <span class="op">*</span></span>
-<span>            <span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span><span class="op">[[</span><span class="st">"I"</span><span class="op">]</span><span class="op">]</span> <span class="op">*</span></span>
-<span>            <span class="va">.data</span><span class="op">$</span><span class="va">value</span></span>
-<span>      <span class="op">)</span></span>
-<span></span>
-<span>    <span class="co"># Convert to incidence</span></span>
-<span>    <span class="va">proportion</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="va">activity</span><span class="op">$</span><span class="fu">map_population</span><span class="op">(</span></span>
-<span>      <span class="va">model</span><span class="op">$</span><span class="va">population</span><span class="op">$</span><span class="va">age_cuts_lower</span></span>
-<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>        <span class="st">"age_group"</span> <span class="op">=</span> <span class="fu">diseasystore</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/diseasystore/reference/age_labels.html">age_labels</a></span><span class="op">(</span></span>
-<span>          <span class="va">model</span><span class="op">$</span><span class="va">population</span><span class="op">$</span><span class="va">age_cuts_lower</span></span>
-<span>        <span class="op">)</span><span class="op">[</span><span class="va">.data</span><span class="op">$</span><span class="va">age_group_out</span><span class="op">]</span></span>
-<span>      <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>        <span class="st">"proportion"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">proportion</span><span class="op">)</span>,</span>
-<span>        .by <span class="op">=</span> <span class="st">"age_group"</span></span>
-<span>      <span class="op">)</span></span>
-<span></span>
-<span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="va">out</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">proportion</span>, by <span class="op">=</span> <span class="st">"age_group"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="st">"incidence_model"</span> <span class="op">=</span> <span class="va">.data</span><span class="op">$</span><span class="va">incidence_model</span> <span class="op">/</span> <span class="va">.data</span><span class="op">$</span><span class="va">proportion</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="st">"proportion"</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">signal</span> <span class="op">==</span> <span class="st">"prevalence"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="va">sol_long</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">state</span>, <span class="st">"I1"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="st">"state"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>        <span class="st">"date"</span> <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span> <span class="op">+</span> <span class="va">model</span><span class="op">$</span><span class="va">observables</span><span class="op">$</span><span class="va">last_queryable_date</span>,</span>
-<span>        <span class="st">"incidence_model"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">value</span><span class="op">)</span>,</span>
-<span>        .by <span class="op">=</span> <span class="st">"time"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span></span>
-<span>  <span class="co"># Add the model configuration</span></span>
-<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="va">out</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      <span class="st">"model_configuration"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span><span class="op">)</span>,</span>
-<span>        <span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span>,</span>
-<span>        collapse <span class="op">=</span> <span class="st">""</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu">get_prediction</span><span class="op">(</span>model <span class="op">=</span> <span class="va">m</span>, psi <span class="op">=</span> <span class="va">psi</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">prediction</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 303 × 7</span></span></span>
-<span><span class="co">#&gt;     time variant age_group   value date       incidence_model</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0 All     00-29     0.005<span style="text-decoration: underline;">28</span> 2020-02-22         0.003<span style="text-decoration: underline;">32</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     0 All     30-59     0.004<span style="text-decoration: underline;">57</span> 2020-02-22         0.002<span style="text-decoration: underline;">63</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0 All     60+       0.001<span style="text-decoration: underline;">61</span> 2020-02-22         0.001<span style="text-decoration: underline;">38</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1 All     00-29     0.005<span style="text-decoration: underline;">46</span> 2020-02-23         0.003<span style="text-decoration: underline;">43</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1 All     30-59     0.004<span style="text-decoration: underline;">72</span> 2020-02-23         0.002<span style="text-decoration: underline;">71</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1 All     60+       0.001<span style="text-decoration: underline;">68</span> 2020-02-23         0.001<span style="text-decoration: underline;">44</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     2 All     00-29     0.005<span style="text-decoration: underline;">73</span> 2020-02-24         0.003<span style="text-decoration: underline;">60</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     2 All     30-59     0.004<span style="text-decoration: underline;">96</span> 2020-02-24         0.002<span style="text-decoration: underline;">85</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     2 All     60+       0.001<span style="text-decoration: underline;">77</span> 2020-02-24         0.001<span style="text-decoration: underline;">51</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     3 All     00-29     0.006<span style="text-decoration: underline;">07</span> 2020-02-25         0.003<span style="text-decoration: underline;">81</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 293 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 7</span></span></span>
+<span><span class="co">#&gt;    date       variant age_group incidence realisation_id weight</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-02-23 All     00-29       0.003<span style="text-decoration: underline;">32</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-02-24 All     00-29       0.003<span style="text-decoration: underline;">43</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-02-25 All     00-29       0.003<span style="text-decoration: underline;">60</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-02-26 All     00-29       0.003<span style="text-decoration: underline;">81</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-02-27 All     00-29       0.004<span style="text-decoration: underline;">05</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-02-28 All     00-29       0.004<span style="text-decoration: underline;">29</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-02-29 All     00-29       0.004<span style="text-decoration: underline;">55</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-03-01 All     00-29       0.004<span style="text-decoration: underline;">82</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-03-02 All     00-29       0.005<span style="text-decoration: underline;">09</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-03-03 All     00-29       0.005<span style="text-decoration: underline;">37</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 290 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: model_configuration &lt;chr&gt;</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -714,7 +640,7 @@ these starting conditions.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">prediction</span>,</span>
-<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">incidence_model</span>, color <span class="op">=</span> <span class="va">model_configuration</span><span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">incidence</span>, color <span class="op">=</span> <span class="va">model_configuration</span><span class="op">)</span>,</span>
 <span>    linewidth <span class="op">=</span> <span class="fl">1.5</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span></span>
@@ -750,7 +676,18 @@ model predictions may diminish.</p>
 <span></span>
 <span><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="va">models</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>\<span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu">get_prediction</span><span class="op">(</span>model <span class="op">=</span> <span class="va">m</span>, psi <span class="op">=</span> <span class="va">m</span><span class="op">$</span><span class="fu">initialise_state_vector</span><span class="op">(</span><span class="va">incidence_data</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">m</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
+<span>      <span class="st">"incidence"</span>,</span>
+<span>      stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">variant</span>, <span class="va">age_group</span><span class="op">)</span>,</span>
+<span>      prediction_length <span class="op">=</span> <span class="fl">100</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        model_configuration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span><span class="op">)</span>,</span>
+<span>          <span class="va">m</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span>,</span>
+<span>          collapse <span class="op">=</span> <span class="st">""</span></span>
+<span>        <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/reduce.html" class="external-link">reduce</a></span><span class="op">(</span><span class="va">rbind</span><span class="op">)</span></span>
 <span></span>
@@ -768,7 +705,7 @@ model predictions may diminish.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">predictions</span>,</span>
-<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">incidence_model</span>, color <span class="op">=</span> <span class="va">model_configuration</span><span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">incidence</span>, color <span class="op">=</span> <span class="va">model_configuration</span><span class="op">)</span>,</span>
 <span>    linewidth <span class="op">=</span> <span class="fl">1.5</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span></span>
@@ -801,7 +738,18 @@ model predictions may diminish.</p>
 <span></span>
 <span><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="va">models</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>\<span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu">get_prediction</span><span class="op">(</span>model <span class="op">=</span> <span class="va">m</span>, psi <span class="op">=</span> <span class="va">m</span><span class="op">$</span><span class="fu">initialise_state_vector</span><span class="op">(</span><span class="va">incidence_data</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">m</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
+<span>      <span class="st">"incidence"</span>,</span>
+<span>      stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">variant</span>, <span class="va">age_group</span><span class="op">)</span>,</span>
+<span>      prediction_length <span class="op">=</span> <span class="fl">100</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        model_configuration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>          <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span><span class="op">)</span>,</span>
+<span>          <span class="va">m</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">compartment_structure</span>,</span>
+<span>          collapse <span class="op">=</span> <span class="st">""</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/reduce.html" class="external-link">reduce</a></span><span class="op">(</span><span class="va">rbind</span><span class="op">)</span></span>
 <span></span>
@@ -819,7 +767,7 @@ model predictions may diminish.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">predictions</span>,</span>
-<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">incidence_model</span>, color <span class="op">=</span> <span class="va">model_configuration</span><span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">incidence</span>, color <span class="op">=</span> <span class="va">model_configuration</span><span class="op">)</span>,</span>
 <span>    linewidth <span class="op">=</span> <span class="fl">1.5</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span></span>
