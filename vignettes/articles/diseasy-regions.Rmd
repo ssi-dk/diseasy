@@ -268,7 +268,7 @@ region_nuts
 ```
 
 ```{r nuts_module_setters}
-region_nuts$set_regions(regions = c("DK"))#, "SE"))
+region_nuts$set_regions(regions = "DK")
 region_nuts$set_demography(demography = demography_nordic_nuts3)
 region_nuts$set_adjacency(adjacency = adjacency_meta_nordic_nuts)
 

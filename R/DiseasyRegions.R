@@ -380,15 +380,14 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (region_column == "adm0_iso") {
         shape_files <- shape_files |>
           dplyr::mutate(
-            "region" =
-            dplyr::coalesce(
+            "region" = dplyr::coalesce(
               countrycode::countrycode(
                 .data$adm0_iso,
                 origin = "iso3c",
                 destination = "iso2c",
                 warn = FALSE
               ),
-              .data$iso_a2,
+              .data$iso_a2
             )
           )
       }
