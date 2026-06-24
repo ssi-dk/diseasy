@@ -119,8 +119,7 @@ The name of the moduleowner.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{module}}{(\verb{R6::R6Class instance})\cr
-This instance is cloned to the field with the same name as the class of the module}
+      \item{\code{module}}{(\verb{R6::R6Class instance})\cr This instance is cloned to the field with the same name as the class of the module}
       \item{\code{clone}}{(\code{boolean})\cr
 Toggle whether or not the module should be cloned when loading. Default TRUE.}
     }
