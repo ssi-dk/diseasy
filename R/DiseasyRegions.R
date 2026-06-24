@@ -211,7 +211,20 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   The (sorted) list of available regions within the defined scope at the given stratification level.
     regions_at_stratification = function(regional_stratification) {
       checkmate::assert_choice(regional_stratification, self %.% available_stratifications)
-      return(self %.% regions) # For `DiseasyRegions`, there is only the 1 level of stratification
+
+      # What regions are available
+      regions_in_demography <- self$demography$region
+      regions_in_adjacency <- self$adjacency$from
+
+      # "Coalesce" the regions from the possible sources
+      regions <- self %.% regions |>
+        purrr::pluck(.default = intersect(regions_in_demography, regions_in_adjacency)) |>
+        purrr::pluck(.default = regions_in_demography) |>
+        purrr::pluck(.default = regions_in_adjacency)  |>
+        unique() |>
+        sort()
+
+      return(regions) # For `DiseasyRegions`, there is only the 1 level of stratification
     },
 
 
@@ -557,12 +570,19 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       checkmate::assert_choice(regional_stratification, self %.% available_stratifications)
 
       # What regions are available
-      regions_in_demography <- self %.% demography %.% region
+      regions_in_demography <- self$demography$region
+      regions_in_adjacency <- self$adjacency$from
+
+      # "Coalesce" the regions from the possible sources
+      regions <- self %.% regions |>
+        purrr::pluck(.default = intersect(regions_in_demography, regions_in_adjacency)) |>
+        purrr::pluck(.default = regions_in_demography) |>
+        purrr::pluck(.default = regions_in_adjacency)
 
       # What NUTS level is requested?
       nuts_stratification <- as.integer(stringr::str_extract(regional_stratification, r"{\d$}"))
 
-      return(sort(unique(substr(regions_in_demography, 1, nuts_stratification + 2))))
+      return(sort(unique(substr(regions, 1, nuts_stratification + 2))))
     }
 
   ),
