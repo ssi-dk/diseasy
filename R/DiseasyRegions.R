@@ -330,8 +330,16 @@ DiseasyRegions <- R6::R6Class(                                                  
         coll$push("Package `sf` must be installed to plot regions.")
       }
 
-      if (!rlang::is_installed("ggplot2")) {
-        coll$push("Package `ggplot2` must be installed to plot regions.")
+      if (!rlang::is_installed("plotly")) {
+        coll$push("Package `plotly` must be installed to plot regions.")
+      }
+
+      if (!rlang::is_installed("geojsonsf")) {
+        coll$push("Package `geojsonsf` must be installed to plot regions.")
+      }
+
+      if (!rlang::is_installed("jsonlite")) {
+        coll$push("Package `jsonlite` must be installed to plot regions.")
       }
 
       if (is.null(shape_files) && !rlang::is_installed(c("rnaturalearth", "rnaturalearthdata"))) {
@@ -354,7 +362,10 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Resolve shape files
       if (is.null(shape_files)) {
-        shape_files <- rnaturalearth::ne_countries(returnclass = "sf", scale = "medium")
+        shape_files <- rnaturalearth::ne_countries(
+          returnclass = "sf",
+          scale = "medium"
+        )
       }
 
       # Infer region column
@@ -363,6 +374,7 @@ DiseasyRegions <- R6::R6Class(                                                  
         "adm0_iso",
         "geo"
       )
+
       region_column <- region_columns[region_columns %in% colnames(shape_files)] |>
         purrr::pluck(1)
 
@@ -395,20 +407,29 @@ DiseasyRegions <- R6::R6Class(                                                  
       sf::st_agr(shape_files) <- "constant"
 
 
-      # Compare with configured regions
-      if (!is.null(self %.% regions)) {
-        missing_regions <- setdiff(self %.% demography %.% region, unique(shape_files %.% region))
+      if (is.na(sf::st_crs(shape_files))) {
+        pkgcond::pkg_error(
+          "`shape_files` must have a coordinate reference system for plotly maps."
+        )
+      }
 
-        if (length(missing_regions) > 0) {
-          pkgcond::pkg_error(
-            glue::glue(
-              "`shape_files` is missing configured regions: {toString(missing_regions)}."
-            )
-          )
-        }
+      shape_files <- shape_files |>
+        sf::st_transform(crs = 4326) |>
+        dplyr::select("region") |>
+        sf::st_make_valid()
 
-        shape_files <- dplyr::filter(shape_files, self$region_filter(.data$region))
+      if (any(sf::st_geometry_type(shape_files) == "GEOMETRYCOLLECTION")) {
+        shape_files <- sf::st_collection_extract(shape_files, "POLYGON")
+      }
 
+      shape_files <- shape_files[!sf::st_is_empty(sf::st_geometry(shape_files)), ]
+
+      shape_files <- shape_files |>
+        dplyr::select("region")
+
+      if (rlang::is_installed("lwgeom")) {
+        shape_files <- shape_files |>
+          lwgeom::st_force_polygon_cw()
       }
 
 
@@ -416,18 +437,11 @@ DiseasyRegions <- R6::R6Class(                                                  
       if (is.null(data)) {
         value_column <- "population"
 
-        if (is.null(self %.% demography)) {
-          plot_data <- data.frame(
-            "region" = self %.% regions,
-            "value" = NA_real_
+        plot_data <- self %.% demography |>
+          dplyr::summarise(
+            "value" = sum(.data$population),
+            .by = "region"
           )
-        } else {
-          plot_data <- self %.% demography |>
-            dplyr::summarise(
-              "value" = sum(.data$population),
-              .by = "region"
-            )
-        }
 
         # Set colours
         colour_high <- "#3d3d3d"
@@ -437,17 +451,17 @@ DiseasyRegions <- R6::R6Class(                                                  
         plot_adjacency <- !is.null(self %.% adjacency)
 
       } else {
-
-        if (!"region" %in% colnames(data)) {
-          pkgcond::pkg_error("`data` must contain a `region` column.")
-        }
-
         # Infer value column
-        value_column <- setdiff(colnames(data), c("region", "date", "realisation_id", "weight")) |>
+        value_column <- setdiff(
+          colnames(data),
+          c("region", "date", "realisation_id", "weight")
+        ) |>
           purrr::pluck(1)
 
         if (is.null(value_column)) {
-          pkgcond::pkg_error("`data` must contain at least one non-structural column to plot.")
+          pkgcond::pkg_error(
+            "`data` must contain at least one non-structural column to plot."
+          )
         }
 
         if (!checkmate::test_numeric(data[[value_column]])) {
@@ -490,84 +504,150 @@ DiseasyRegions <- R6::R6Class(                                                  
         colour_low <- "#ffffff"
 
         plot_adjacency <- FALSE
-
       }
 
-      # Restrict time-dependent data to five snapshots across the available range.
-      if ("date" %in% colnames(plot_data)) {
+      # Compare with configured regions
+      plot_regions <- sort(unique(plot_data %.% region))
+      missing_regions <- setdiff(plot_regions, unique(shape_files %.% region))
+
+      if (length(missing_regions) > 0) {
+        pkgcond::pkg_error(
+          glue::glue(
+            "`shape_files` is missing configured regions: {toString(missing_regions)}."
+          )
+        )
+      }
+
+      shape_files <- dplyr::filter(shape_files, .data$region %in% plot_regions)
+
+
+      # Use all available dates as animation frames.
+      animate_plot <- "date" %in% colnames(plot_data)
+
+      if (animate_plot) {
         plot_dates <- sort(unique(plot_data %.% date))
 
-        if (length(plot_dates) > 5L) {
-          plot_dates <- plot_dates[
-            unique(round(seq(1, length(plot_dates), length.out = 5L)))
-          ]
-        }
-
-        plot_data <- plot_data |>
-          dplyr::filter(.data$date %in% plot_dates)
-
         plot_data <- tidyr::expand_grid(
-          "region" = self$regions_at_stratification(max(self$available_stratifications)),
+          "region" = plot_regions,
           "date" = plot_dates
         ) |>
-          dplyr::left_join(plot_data, by = c("region", "date"))
+          dplyr::left_join(plot_data, by = c("region", "date")) |>
+          dplyr::mutate(
+            "date" = factor(
+              as.character(.data$date),
+              levels = as.character(plot_dates)
+            )
+          )
       }
 
-      plot_shapes <- shape_files |>
-        dplyr::left_join(plot_data, by = "region")
+      if (plot_adjacency) {
+        plot_data <- plot_data |>
+          dplyr::left_join(
+            data.frame(
+              "region" = names(diag(self %.% infection_flow_matrix)),
+              "intra_region_flow" = as.numeric(diag(self %.% infection_flow_matrix))
+            ),
+            by = "region"
+          )
+      } else {
+        plot_data <- plot_data |>
+          dplyr::mutate("intra_region_flow" = NA)
+      }
 
-      # Create figure
-      out <- ggplot2::ggplot(plot_shapes) +
-        ggplot2::geom_sf(
-          ggplot2::aes(fill = .data$value),
-          colour = "grey70",
-          linewidth = 0.2
-        ) +
-        ggplot2::scale_fill_gradient(
-          low = colour_low,
-          high = colour_high,
-          limits = c(0, NA),
-          na.value = "grey90",
-          labels = scales::label_log(),
-          guide = ggplot2::guide_colourbar(order = 1)
-        ) +
-        ggplot2::labs(fill = stringr::str_to_sentence(value_column)) +
-        ggplot2::theme_void() +
-        ggplot2::theme(
-          panel.background = ggplot2::element_rect(
-            fill = "#96ceff",
-            colour = "#2F4F4F",
-            linewidth = 0.4
-          ),
-          panel.border = ggplot2::element_rect(
-            fill = NA,
-            colour = "#2F4F4F",
-            linewidth = 0.5
-          ),
-          panel.spacing = grid::unit(1, "lines"),
-          strip.background = ggplot2::element_rect(
-            fill = "#E6E6E6",
-            colour = "#2F4F4F",
-            linewidth = 0.4
-          ),
-          strip.text = ggplot2::element_text(
-            face = "bold",
-            margin = ggplot2::margin(4, 4, 4, 4)
-          ),
-          plot.background = ggplot2::element_rect(
-            fill = "white",
-            colour = NA
-          ),
-          legend.background = ggplot2::element_rect(
-            fill = "white",
-            colour = NA
-          ),
-          legend.key = ggplot2::element_rect(
-            fill = NA,
-            colour = NA
-          ),
-          legend.box.background = ggplot2::element_blank()
+      if (any(plot_data %.% value < 0, na.rm = TRUE)) {
+        pkgcond::pkg_error(
+          "`plot()` requires non-negative values when using log1p colour mapping."
         )
+      }
+
+      value_max <- max(plot_data %.% value, na.rm = TRUE)
+      if (!is.finite(value_max) || value_max <= 0) value_max <- 1
+
+
+      plot_data <- plot_data |>
+        dplyr::mutate(
+          "plot_value" = .data$value,
+          "value_label" = format(.data$value, big.mark = ",", scientific = FALSE, digits = 3, trim = TRUE),
+          "hover_text" = paste0(
+            "Region: ", .data$region,
+            if (animate_plot) paste0("<br>Date: ", as.character(.data$date)) else "",
+            "<br>", stringr::str_to_sentence(value_column), ": ", .data$value_label,
+            dplyr::if_else(
+              is.na(.data$intra_region_flow),
+              "",
+              paste0(
+                "<br>Intra-region flow: ",
+                format(.data$intra_region_flow, digits = 2, scientific = FALSE, trim = TRUE)
+              )
+            )
+          )
+        )
+
+      shape_geojson <- shape_files |>
+        dplyr::select("region") |>
+        geojsonsf::sf_geojson() |>
+        jsonlite::fromJSON(simplifyVector = FALSE)
+
+      shape_geojson$features <- purrr::map(
+        shape_geojson$features,
+        \(feature) {
+          feature$id <- as.character(feature$properties$region)
+          return(feature)
+        }
+      )
+
+      geojson_regions <- vapply(
+        X = shape_geojson$features,
+        FUN = \(feature) feature$id,
+        FUN.VALUE = character(1)
+      )
+
+      if (!setequal(plot_regions, geojson_regions)) {
+        pkgcond::pkg_error(
+          glue::glue(
+            "Plot data and GeoJSON regions do not match. ",
+            "Missing from GeoJSON: {toString(setdiff(plot_regions, geojson_regions))}. ",
+            "Missing from data: {toString(setdiff(geojson_regions, plot_regions))}."
+          )
+        )
+      }
+
+      # Create region choropleth.
+      out <- plotly::plot_geo()
+
+      choropleth_args <- list(
+        p = out,
+        data = plot_data,
+        type = "choropleth",
+        geojson = shape_geojson,
+        featureidkey = "id",
+        locationmode = "geojson-id",
+        locations = stats::as.formula("~ region"),
+        z = stats::as.formula("~ plot_value"),
+        ids = stats::as.formula("~ region"),
+        text = stats::as.formula("~ hover_text"),
+        hovertemplate = "%{text}<extra></extra>",
+        colorscale = list(c(0, colour_low), c(1, colour_high)),
+        zmin = 0,
+        zmax = value_max,
+        marker = list(
+          line = list(
+            color = "grey70",
+            width = 0.3
+          )
+        ),
+        colorbar = list(
+          title = list(text = stringr::str_to_sentence(value_column))
+        ),
+        name = stringr::str_to_sentence(value_column),
+        showlegend = FALSE
+      )
+
+      if (animate_plot) {
+        choropleth_args[["frame"]] <- stats::as.formula("~ date")
+      }
+
+      out <- do.call(plotly::add_trace, choropleth_args)
 
       # Add adjacency overlay for module-configuration plots.
       if (plot_adjacency) {
@@ -602,9 +682,19 @@ DiseasyRegions <- R6::R6Class(                                                  
         # Build graph edges from infection flow matrix
         infection_flow_matrix <- self %.% infection_flow_matrix
 
+        nodes[["self_adjacency"]] <- as.numeric(
+          diag(infection_flow_matrix)[nodes %.% region]
+        )
+
+        node_max <- max(nodes %.% self_adjacency, na.rm = TRUE)
+
+        if (!is.finite(node_max) || node_max <= 0) {
+          node_max <- 1
+        }
+
         nodes <- nodes |>
           dplyr::mutate(
-            "self_adjacency" = diag(infection_flow_matrix)[.data$region]
+            "node_size" = 8 + 10 * .data$self_adjacency / node_max
           )
 
         edges <- data.frame(
@@ -624,55 +714,127 @@ DiseasyRegions <- R6::R6Class(                                                  
             nodes,
             by = c("to" = "region"),
             suffix = c("", "_end")
+          ) |>
+          dplyr::filter(
+            is.finite(.data$x),
+            is.finite(.data$y),
+            is.finite(.data$x_end),
+            is.finite(.data$y_end)
           )
 
-        out <- out +
-          ggplot2::geom_segment(
-            data = edges,
-            mapping = ggplot2::aes(
-              x = .data$x,
-              y = .data$y,
-              xend = .data$x_end,
-              yend = .data$y_end,
-              linewidth = .data$adjacency,
-              alpha = .data$adjacency
-            ),
-            inherit.aes = FALSE
-          ) +
-          ggplot2::geom_point(
+        # Plotly line width and opacity are trace-level for scattergeo lines.
+        # Bin edges to keep the plot interactive without creating one trace per edge.
+        if (nrow(edges) > 0) {
+          n_edge_groups <- min(5L, nrow(edges))
+
+          edges <- edges |>
+            dplyr::mutate(
+              "edge_group" = dplyr::ntile(.data$adjacency, n_edge_groups)
+            )
+
+          edge_groups <- sort(unique(edges %.% edge_group))
+          max_edge_group <- max(edge_groups)
+
+          for (edge_group in edge_groups) {
+            edge_data <- edges |>
+              dplyr::filter(.data$edge_group == !!edge_group)
+
+            edge_longitude <- as.vector(
+              rbind(edge_data %.% x, edge_data %.% x_end, NA_real_)
+            )
+
+            edge_latitude <- as.vector(
+              rbind(edge_data %.% y, edge_data %.% y_end, NA_real_)
+            )
+
+            edge_alpha <- 0.1 + 0.9 * mean(edge_data$adjacency) / max(edges$adjacency)
+            edge_width <- 3 * mean(edge_data$adjacency) / max(edges$adjacency)
+
+            out <- out |>
+              plotly::add_trace(
+                type = "scattergeo",
+                mode = "lines",
+                lon = edge_longitude,
+                lat = edge_latitude,
+                line = list(
+                  color = glue::glue("rgba(0, 0, 0, {edge_alpha})"),
+                  width = edge_width
+                ),
+                opacity = edge_alpha,
+                hoverinfo = "skip",
+                showlegend = edge_group == max_edge_group,
+                name = "Inter-region flows",
+                legendgroup = "Inter-region flows",
+                legendrank = 3,
+                inherit = FALSE
+              )
+          }
+        }
+
+        out <- out |>
+          plotly::add_trace(
             data = nodes,
-            mapping = ggplot2::aes(
-              x = .data$x,
-              y = .data$y,
-              size = .data$self_adjacency
+            type = "scattergeo",
+            mode = "markers",
+            lon = stats::as.formula("~ x"),
+            lat = stats::as.formula("~ y"),
+            hoverinfo = "skip",
+            marker = list(
+              size = nodes %.% node_size,
+              color = "black",
+              line = list(
+                color = "white",
+                width = 0.5
+              )
             ),
-            inherit.aes = FALSE
-          ) +
-          ggplot2::scale_linewidth_continuous(
-            range = c(0.1, 1),
-            limits = c(0, NA),
-            guide = ggplot2::guide_legend(order = 3)
-          ) +
-          ggplot2::scale_alpha_continuous(
-            range = c(0.01, 0.5),
-            limits = c(0, NA),
-            guide = ggplot2::guide_legend(order = 3)
-          ) +
-          ggplot2::scale_size_continuous(
-            range = c(0, 5),
-            limits = c(0, NA),
-            guide = ggplot2::guide_legend(order = 2)
-          ) +
-          ggplot2::labs(
-            linewidth = "Inter-region flows",
-            alpha = "Inter-region flows",
-            size = "Intra-region flows"
+            showlegend = TRUE,
+            name = "Intra-region flows",
+            legendrank = 2,
+            inherit = FALSE
           )
       }
 
-      if ("date" %in% colnames(plot_shapes)) {
-        out <- out +
-          ggplot2::facet_wrap(stats::as.formula("~ date"))
+      out <- out |>
+        plotly::layout(
+          geo = list(
+            scope = "world",
+            fitbounds = "geojson",
+            projection = list(
+              type = "orthographic"
+            ),
+            showframe = FALSE,
+            showcoastlines = FALSE,
+            showcountries = FALSE,
+            showland = FALSE,
+            showocean = TRUE,
+            oceancolor = "#96ceff",
+            showlakes = TRUE,
+            lakecolor = "#96ceff",
+            bgcolor = "#96ceff"
+          ),
+          paper_bgcolor = "#96ceff",
+          plot_bgcolor = "#96ceff",
+          margin = list(l = 0, r = 0, b = 0, t = 0),
+          legend = list(
+            bgcolor = "rgba(255, 255, 255, 0.8)",
+            bordercolor = "rgba(0, 0, 0, 0)",
+            traceorder = "normal"
+          )
+        )
+
+      if (animate_plot) {
+        out <- out |>
+          plotly::animation_opts(
+            frame = 750,
+            transition = 0,
+            redraw = TRUE
+          ) |>
+          plotly::animation_slider(
+            currentvalue = list(
+              prefix = "Date: ",
+              font = list(color = "black")
+            )
+          )
       }
 
       return(out)
@@ -969,21 +1131,28 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       nuts_stratification <- as.integer(stringr::str_extract(regional_stratification, r"{\d$}"))
 
       return(sort(unique(substr(regions, 1, nuts_stratification + 2))))
-    }
+    },
 
 
     #' @param ...
     #'   Parameters sent to `?DiseasyRegions$plot()`.
     plot = function(...) {
 
+      coll <- checkmate::makeAssertCollection()
       if (!rlang::is_installed("giscoR")) {
-        pkgcond::pkg_error("Install the following packages to plot this module: giscoR")
+        coll$push("Package `giscoR` must be installed to plot NUTS regions.")
       }
+
+      if (!rlang::is_installed("lwgeom")) {
+        coll$push("Package `lwgeom` must be installed to plot NUTS regions.")
+      }
+      checkmate::reportAssertions(coll)
 
       super$plot(
         ...,
         shape_files = giscoR::gisco_get_nuts(
           resolution = "03",
+          epsg = "3857",
           nuts_level = stringr::str_extract(max(self %.% available_stratifications), r"{\d$}")
         )
       )
