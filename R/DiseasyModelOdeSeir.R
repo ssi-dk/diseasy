@@ -988,7 +988,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         tibble::tibble("time" = times[times <= 0]),
         tidyr::expand_grid(
           "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
-          "age_group" = diseasystore::age_labels(self %.% parameters %.% age_cuts_lower)
+          !!!self %.% population %.% groups
         ) |>
           dplyr::mutate(
             "state" = "I1",
@@ -1044,7 +1044,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         groups <- groups |>
           purrr::map2(self %.% model_outputs, ~ dplyr::mutate(.x, "state" = .y)) |>
           purrr::list_rbind() |>
-          dplyr::select(!"time")
+          dplyr::select(!c("time", "state"))
 
         # Pull the full solution from the initialisation submodel for the surveillance_states
         # (These are located at the end of the state_vector)
@@ -1063,9 +1063,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             "values_to" = "value"
           )
 
-        estimated_surveillance_states <- estimated_surveillance_states |>
-          dplyr::left_join(groups, by = c("state")) |>
-          dplyr::select(c("time", "variant", "age_group", "state", "value"))
+        # Add group information
+        estimated_surveillance_states <- cbind(
+          groups,
+          estimated_surveillance_states
+        ) |>
+          tibble::as_tibble() |>
+          dplyr::select(c("time", names(self %.% population %.% groups), "variant", "state", "value"))
 
         initial_state_vector <- rbind(initial_state_vector, estimated_surveillance_states)
       }
