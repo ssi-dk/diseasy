@@ -906,8 +906,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
           # If the user has configured custom outputs, we need to add the forcing to these states as well
-          dy_dt[c_state_vector_indicies] <- dy_dt[c_state_vector_indicies] +
-            private$observable_mapping$state_vector[, private$i1_state_indices] * s / ri
+          if (!is.null(private$observable_mapping$state_vector))  {
+            dy_dt[c_state_vector_indicies] <- dy_dt[c_state_vector_indicies] +
+              rowSums(private$observable_mapping$state_vector[, private$i1_state_indices, drop = FALSE] * s) / ri
+          }
 
           return(dy_dt)
         }
