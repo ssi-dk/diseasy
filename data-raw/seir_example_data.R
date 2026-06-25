@@ -46,17 +46,21 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     last_queryable_date = as.Date("2020-01-20")
   )
 
+  # Store parameters seperately
+  parameters <- list(
+    "compartment_structure" = c("E" = K, "I" = L, "R" = M),
+    "overall_infection_risk" = overall_infection_risk,
+    "disease_progression_rates" = c("E" = rE, "I" = rI)
+  )
+
+  # Build model
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
     immunity = immunity,
     season = season,
     observables = observables,
     population = population,
-    parameters = list(
-      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "overall_infection_risk" = overall_infection_risk,
-      "disease_progression_rates" = c("E" = rE, "I" = rI)
-    )
+    parameters = parameters
   )
 
   # Get a reference to the private environment
@@ -80,11 +84,11 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     dplyr::summarise("activity" = sum(.data$activity), .by = "age_group_out") |>
     dplyr::pull("activity")
 
-  activity <- population_proportion * activity_proportion
-  activity <- activity / sum(activity)
+  activity_per_age_group <- population_proportion * activity_proportion
+  activity_per_age_group <- activity_per_age_group / sum(activity_per_age_group)
 
   # 0.05% are newly infected
-  y0[private$e1_state_indices] <- activity * 0.0005
+  y0[private$e1_state_indices] <- activity_per_age_group * 0.0005
 
   # 99.95% are susceptible
   y0[private$s_state_indices] <- population_proportion - y0[private$e1_state_indices]
@@ -168,7 +172,18 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
                  "Test positive (realistic)" = "red", "Admissions * 10" = "darkgreen")
     )
 
-  # Store data set
+  # Store data set and meta data
+  seir_example_data <- list(
+    "data" = seir_example_data,
+    "modules" = list(
+      "activity" = activity,
+      "immunity" = immunity,
+      "season" = season,
+      "population" = population
+    ),
+    "parameters" = parameters
+  )
+
   usethis::use_data(seir_example_data, overwrite = TRUE)
 
 }

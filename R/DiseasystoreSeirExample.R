@@ -27,8 +27,8 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
     #' @return
     #'   A new instance of the `DiseasystoreSeirExample` [R6][R6::R6Class] class.
     initialize = function(...) {
-      private$.min_start_date <- min(seir_example_data$date)
-      private$.max_end_date   <- max(seir_example_data$date)
+      private$.min_start_date <- min(seir_example_data$data$date)
+      private$.max_end_date   <- max(seir_example_data$data$date)
 
       super$initialize(...)
     }
@@ -81,7 +81,7 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
       compute = function(start_date, end_date, slice_ts, source_conn, ...) {
 
         # Load and parse
-        out <- seir_example_data |>
+        out <- seir_example_data$data |>
           dplyr::transmute(
             "key_age_group" = .data$age_group,
             "n_infected" = .data$n_infected,

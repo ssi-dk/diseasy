@@ -5,7 +5,8 @@
 \alias{seir_example_data}
 \title{Synthetic epidemiological data}
 \description{
-This data set contains a the simulation output from a SEIR model to use when testing and developing models.
+This data set contains a the simulation output from a SEIR model (along with the metadata to reconstruct the model)
+to use when testing and developing models.
 }
 \details{
 The underlying model is a SEIR model (\code{?DiseasyModelOdeSeir}) with 2 exposed compartments, 1 infected compartment
@@ -14,7 +15,7 @@ The model uses Denmark for its population and activity scenario with the "baseli
 activity. The overall infection risk is set to be 0.025 and initially, 0.2 \% of the population is newly exposed
 (i.e. placed in the E1 compartments).
 
-The model outputs included in the dataset is in the form of a tibble with the following columns:
+The model outputs included in the dataset is in the form of a data tibble with the following columns:
 \itemize{
 \item \code{date}: The time for the output.
 \item \code{age_group}: The age group for the output.
@@ -25,6 +26,8 @@ a reduced test-probability in the weekend.
 \item \code{n_admission}: A realisation of the number of admissions to hospital delayed relative to incidence and
 accounting for a age dependent risk of admission.
 }
+
+As metadata, the modules used in the \code{DiseasyModelOdeSeir} along with the parameters of the model are included.
 }
 \author{
 Rasmus Skytte Randløv \email{rske@ssi.dk}

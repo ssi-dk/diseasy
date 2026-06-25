@@ -205,7 +205,8 @@ NULL
 
 #' Synthetic epidemiological data
 #'
-#' This data set contains a the simulation output from a SEIR model to use when testing and developing models.
+#' This data set contains a the simulation output from a SEIR model (along with the metadata to reconstruct the model)
+#' to use when testing and developing models.
 #'
 #' The underlying model is a SEIR model (`?DiseasyModelOdeSeir`) with 2 exposed compartments, 1 infected compartment
 #' and 1 recovered compartment. The model uses an exposed period of 2.1 days and a infectious period of 4.5 days.
@@ -213,7 +214,7 @@ NULL
 #' activity. The overall infection risk is set to be 0.025 and initially, 0.2 % of the population is newly exposed
 #' (i.e. placed in the E1 compartments).
 #'
-#' The model outputs included in the dataset is in the form of a tibble with the following columns:
+#' The model outputs included in the dataset is in the form of a data tibble with the following columns:
 #'   - `date`: The time for the output.
 #'   - `age_group`: The age group for the output.
 #'   - `n_infected`: The direct output of the SEIR model ( = (I1 * L) / 4.5 days).
@@ -222,6 +223,8 @@ NULL
 #'     a reduced test-probability in the weekend.
 #'   - `n_admission`: A realisation of the number of admissions to hospital delayed relative to incidence and
 #'     accounting for a age dependent risk of admission.
+#'
+#' As metadata, the modules used in the `DiseasyModelOdeSeir` along with the parameters of the model are included.
 #'
 #' @name seir_example_data
 #' @docType data
