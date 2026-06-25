@@ -731,7 +731,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # (we take the max with 1 to ensure non-inf values which triggers an error. If the reduced model
       # has no I states, the disease_progression_rates$I value is not)
       disease_progression_rates <- self %.% parameters %.% disease_progression_rates |>
-        purrr::map_at("I", ~ . * self %.% parameters %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)) |>
+        purrr::map_at(
+          "I",
+          ~ . * self %.% parameters %.% compartment_structure %.% I /  max(compartment_structure %.% I, 1)
+        ) |>
         unlist()
 
       # Define a modified list of model parameters
@@ -752,14 +755,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Remove the outputs generated from `$configure_model_output()`
       # I would do this with utils::modifyList(), this does not work for nested lists.
       # compare:
-      # modifyList(list("A" = 2), list("A" = 1)) # Works!
+      # modifyList(list("A" = 2), list("A" = 1)) # Works!                                                               # nolint start: commented_code_linter
       # modifyList(list("A" = list(2)), list("A" = list(1))) # Does not work???
 
       # Also we need special care to overwrite the value in the list for reasons^tm.
       # Example:
       # t <- list("A" = list(1, 2, 3))
       # t["A"] <- list(1, 2) # Produces warning???
-      # t[["A"]] <- list(1, 2) # Works without warning.
+      # t[["A"]] <- list(1, 2) # Works without warning.                                                                 # nolint end: commented_code_linter
       parameters[["model_output_to_observable"]] <- purrr::pluck(
         private %.% default_parameters(),
         "model_output_to_observable"
@@ -977,7 +980,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_numeric(initial_state_vector$value, lower = 0, any.missing = FALSE)
 
       # Impute the solution for I1 for (t < 0)
-      estimated_I1_history <- dplyr::cross_join(
+      estimated_I1_history <- dplyr::cross_join(                                                                        # nolint: object_name_linter
         tibble::tibble("time" = times[times <= 0]),
         tidyr::expand_grid(
           "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All"),
@@ -988,7 +991,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             "f" = signal_approximations
           )
       ) |>
-        dplyr::mutate("value" = purrr::map2_dbl(.data$f, .data$time, ~ .x(.y)) / ri) |>
+        dplyr::mutate("value" = purrr::map2_dbl(.data$f, .data$time, \(f, t) f(t)) / ri) |>
         dplyr::select(!"f")
 
       initial_state_vector <- rbind(initial_state_vector, dplyr::filter(estimated_I1_history, .data$time < 0))

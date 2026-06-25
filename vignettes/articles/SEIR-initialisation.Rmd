@@ -204,7 +204,7 @@ exported by the model.
 Each model output is derived either from the $I_1$ state or any of the $C$ states
 added when the user defines a custom model output (see the "DiseasyModelOde" article).
 
-To eliminate the transient behavior of the model output when delays are included,
+To eliminate the transient behaviour of the model output when delays are included,
 we can determine the values of the $I_1$ state and the $C$ states for `time < 0`.
 
 This process is two-fold,
