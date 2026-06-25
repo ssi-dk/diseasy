@@ -150,7 +150,7 @@ tidyr::expand_grid(
         respect_last_queryable_date = FALSE
       )
 
-      # Check accuracy within treshold
+      # Check accuracy within threshold
       comparison <- rbind(
         dplyr::mutate(results, "source" = "model"),
         dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
@@ -175,9 +175,6 @@ rm(model)
 
 # We should also be able to run the model with a no age groups
 test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: NULL)", {
-  skip_if_not_installed("RSQLite")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("ucminf")
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
@@ -213,7 +210,7 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
     respect_last_queryable_date = FALSE
   )
 
-  # Check accuracy within 15%
+  # Check accuracy within threshold
   comparison <- rbind(
     dplyr::mutate(results, "source" = "model"),
     dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
@@ -237,9 +234,6 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
 
 # We should also be able to run the model with sub sets of the data age groups groups
 test_that("$get_results() (SEEIR, subset age groups - n_infected - stratification: NULL)", {
-  skip_if_not_installed("RSQLite")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("ucminf")
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
@@ -276,7 +270,7 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
     respect_last_queryable_date = FALSE
   )
 
-  # Check accuracy within 15%
+  # Check accuracy within threshold
   comparison <- rbind(
     dplyr::mutate(results, "source" = "model"),
     dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
