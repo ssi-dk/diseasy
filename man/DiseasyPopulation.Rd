@@ -85,7 +85,12 @@ The local copy of an DiseasyRegions module. Read-only.}
   Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, regional_stratification = NULL, ...)}
+    \preformatted{DiseasyPopulation$new(
+  age_cuts_lower = 0L,
+  regional_stratification = NULL,
+  region = NULL,
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -93,6 +98,8 @@ The local copy of an DiseasyRegions module. Read-only.}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+      \item{\code{region}}{(\code{DiseasyRegions})\cr
+An instance of a regional module which should provide the demography of the population.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}
