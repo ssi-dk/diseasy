@@ -925,9 +925,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       times <- seq(
-        from = - length(
-          seq.Date(from = self %.% training_period %.% start, to = self %.% training_period %.% end, by = "1 day")
-        ) + 1,
+        from = as.numeric(
+          difftime(self %.% training_period %.% start, self %.% training_period %.% end), units = "days"
+        ),
         to = 0,
         by = 1
       )
@@ -935,8 +935,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       sol <- deSolve::ode(
         y = y0,
         times = times,
-        func = initialisation_submodel %.% rhs,
-        parms = list("overall_infection_risk" = overall_infection_risk)
+        func = initialisation_submodel %.% rhs
       )
 
       # Get R and S states from the last row
