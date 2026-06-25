@@ -812,8 +812,8 @@ DiseasyRegions <- R6::R6Class(                                                  
             lakecolor = "#96ceff",
             bgcolor = "#96ceff"
           ),
-          paper_bgcolor = "#96ceff",
-          plot_bgcolor = "#96ceff",
+          paper_bgcolor = "white",
+          plot_bgcolor = "white",
           margin = list(l = 0, r = 0, b = 0, t = 0),
           legend = list(
             bgcolor = "rgba(255, 255, 255, 0.8)",
