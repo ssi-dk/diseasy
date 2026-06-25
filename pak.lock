@@ -1,7 +1,7 @@
 {
   "lockfile_version": 1,
   "os": "Ubuntu 24.04.4 LTS",
-  "r_version": "R version 4.6.1 (2026-06-24)",
+  "r_version": "R version 4.6.0 (2026-04-24)",
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
@@ -170,6 +170,11 @@
       "binary": true
     },
     {
+      "package": "crosstalk",
+      "version": "1.2.2",
+      "binary": true
+    },
+    {
       "package": "curl",
       "version": "7.1.0",
       "binary": true
@@ -186,7 +191,7 @@
     },
     {
       "package": "dbplyr",
-      "version": "2.5.2",
+      "version": "2.6.0",
       "binary": true
     },
     {
@@ -312,6 +317,11 @@
     {
       "package": "generics",
       "version": "0.1.4",
+      "binary": true
+    },
+    {
+      "package": "geojsonsf",
+      "version": "2.0.5",
       "binary": true
     },
     {
@@ -475,6 +485,11 @@
       "binary": true
     },
     {
+      "package": "lazyeval",
+      "version": "0.2.3",
+      "binary": true
+    },
+    {
       "package": "lgr",
       "version": "0.5.2",
       "binary": true
@@ -507,6 +522,11 @@
     {
       "package": "lubridate",
       "version": "1.9.5",
+      "binary": true
+    },
+    {
+      "package": "lwgeom",
+      "version": "0.2-16",
       "binary": true
     },
     {
@@ -637,6 +657,11 @@
     {
       "package": "pkgload",
       "version": "1.5.2",
+      "binary": true
+    },
+    {
+      "package": "plotly",
+      "version": "4.12.0",
       "binary": true
     },
     {
@@ -1071,8 +1096,8 @@
     "version": "24.04",
     "url": {},
     "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install pandoc libx11-dev git libcurl4-openssl-dev libssl-dev xz-utils cmake make libuv1-dev libgit2-dev zlib1g-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libabsl-dev libgdal-dev gdal-bin libgeos-dev libproj-dev libsqlite3-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libudunits2-dev libnode-dev libxml2-dev",
+    "install_scripts": "apt-get -y install pandoc libx11-dev git libcurl4-openssl-dev libssl-dev xz-utils cmake make libuv1-dev libgit2-dev zlib1g-dev libgeos-dev libproj-dev libsqlite3-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libabsl-dev libgdal-dev gdal-bin libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libudunits2-dev libnode-dev libxml2-dev",
     "post_install": {},
-    "packages": ["pandoc", "libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "xz-utils", "cmake", "make", "libuv1-dev", "libgit2-dev", "zlib1g-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libwebp-dev", "libabsl-dev", "libgdal-dev", "gdal-bin", "libgeos-dev", "libproj-dev", "libsqlite3-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libudunits2-dev", "libnode-dev", "libxml2-dev"]
+    "packages": ["pandoc", "libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "xz-utils", "cmake", "make", "libuv1-dev", "libgit2-dev", "zlib1g-dev", "libgeos-dev", "libproj-dev", "libsqlite3-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libwebp-dev", "libabsl-dev", "libgdal-dev", "gdal-bin", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libudunits2-dev", "libnode-dev", "libxml2-dev"]
   }
 }
