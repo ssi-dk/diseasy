@@ -465,7 +465,11 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) / cumsum(x[[observable]]), ~ . < 1 / 2)
+    purrr::every(
+      abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
+        cumsum(x[[observable]]),
+      ~ . < 1 / 2
+    )
   }
 )
 ```
@@ -518,7 +522,11 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) / cumsum(x[[observable]]), ~ . < 1 / 2)
+    purrr::every(
+      abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
+        cumsum(x[[observable]]),
+      ~ . < 1 / 2
+    )
   }
 )
 ```
@@ -569,7 +577,11 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) / cumsum(x[[observable]]), ~ . < 1 / 2)
+    purrr::every(
+      abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
+        cumsum(x[[observable]]),
+      ~ . < 1 / 2
+    )
   }
 )
 ```
@@ -618,7 +630,11 @@ y <- model$get_data(
   dplyr::filter(.data$t > 0)
 stopifnot(
   "Model prediction varies more than expected from example data" = {
-    purrr::every(abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) / cumsum(x[[observable]]), ~ . < 1 / 2)
+    purrr::every(
+      abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
+        cumsum(x[[observable]]),
+      ~ . < 1 / 2
+    )
   }
 )
 ```
