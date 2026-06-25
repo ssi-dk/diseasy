@@ -825,6 +825,11 @@
       "binary": true
     },
     {
+      "package": "rnaturalearthdata",
+      "version": "1.0.0",
+      "binary": true
+    },
+    {
       "package": "roxygen2",
       "version": "8.0.0",
       "binary": true
