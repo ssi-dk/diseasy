@@ -231,7 +231,7 @@
     },
     {
       "package": "distributional",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "binary": true
     },
     {
@@ -246,7 +246,7 @@
     },
     {
       "package": "duckdb",
-      "version": "1.5.2",
+      "version": "1.5.4",
       "binary": true
     },
     {
@@ -466,7 +466,7 @@
     },
     {
       "package": "lattice",
-      "version": "0.22-9",
+      "version": "0.22-7",
       "binary": true
     },
     {
@@ -486,7 +486,7 @@
     },
     {
       "package": "listenv",
-      "version": "0.10.1",
+      "version": "1.0.0",
       "binary": true
     },
     {
@@ -521,7 +521,7 @@
     },
     {
       "package": "Matrix",
-      "version": "1.7-5",
+      "version": "1.7-4",
       "binary": true
     },
     {
@@ -536,7 +536,7 @@
     },
     {
       "package": "mgcv",
-      "version": "1.9-4",
+      "version": "1.9-3",
       "binary": true
     },
     {
@@ -566,7 +566,7 @@
     },
     {
       "package": "nlme",
-      "version": "3.1-169",
+      "version": "3.1-168",
       "binary": true
     },
     {
@@ -631,7 +631,7 @@
     },
     {
       "package": "pkgload",
-      "version": "1.5.2",
+      "version": "1.5.3",
       "binary": true
     },
     {
@@ -751,7 +751,7 @@
     },
     {
       "package": "readxl",
-      "version": "1.4.5",
+      "version": "1.5.0",
       "binary": true
     },
     {
@@ -801,7 +801,7 @@
     },
     {
       "package": "RSQLite",
-      "version": "3.53.1",
+      "version": "3.53.2",
       "binary": true
     },
     {
@@ -816,7 +816,7 @@
     },
     {
       "package": "rstudioapi",
-      "version": "0.18.0",
+      "version": "0.19.0",
       "binary": true
     },
     {
@@ -851,7 +851,7 @@
     },
     {
       "package": "shiny",
-      "version": "1.13.0",
+      "version": "1.14.0",
       "binary": true
     },
     {
@@ -931,7 +931,7 @@
     },
     {
       "package": "tinytex",
-      "version": "0.59",
+      "version": "0.60",
       "binary": true
     },
     {
@@ -991,17 +991,17 @@
     },
     {
       "package": "withr",
-      "version": "3.0.2",
+      "version": "3.0.3",
       "binary": true
     },
     {
       "package": "xfun",
-      "version": "0.58",
+      "version": "0.59",
       "binary": true
     },
     {
       "package": "xml2",
-      "version": "1.5.2",
+      "version": "1.6.0",
       "binary": true
     },
     {
