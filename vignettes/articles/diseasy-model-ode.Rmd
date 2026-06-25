@@ -80,7 +80,7 @@ It contains three observables of interest for our example:
 When running the models, we should also define at what point in time they should provide predictions for.
 This is done by setting the `last_queryable_date` in the observables module:
 ```{r last_queryable_date, eval = rlang::is_installed("RSQLite")}
-last_queryable_date <- observables$ds$min_start_date + 42
+last_queryable_date <- observables$ds$min_start_date + 45
 ```
 
 Lets first look at the data we have available:
