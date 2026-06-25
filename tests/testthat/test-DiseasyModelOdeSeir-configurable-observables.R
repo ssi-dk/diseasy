@@ -1,5 +1,13 @@
-if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
-  return() # Skip these tests if RSQLite is not installed
+if (!rlang::is_installed(c("RSQLite", "deSolve", "optimx", "ucminf"))) {
+  # Skip these tests if dependencies are not installed
+  test_that("missing dependencies", {
+    skip_if_not_installed("RSQLite")
+    skip_if_not_installed("deSolve")
+    skip_if_not_installed("optimx")
+    skip_if_not_installed("ucminf")
+  })
+
+  return(NULL)
 }
 
 # We here use the parameters of the generating model
@@ -72,7 +80,6 @@ tidyr::expand_grid(
     age_group_string <- ifelse(length(age_cuts_lower) == 0, "single", "multiple")
 
     test_that(glue::glue("$configure_model_output() ({model_string} single variant / {age_group_string} age group)"), {
-      skip_if_not_installed("RSQLite")
 
       m <- DiseasyModelOdeSeir$new(
         population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
