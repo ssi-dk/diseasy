@@ -61,6 +61,9 @@ See the vignette("diseasy-regions") for examples of use.
   \describe{
     \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. Read only.}
 
+    \item{\code{available_stratifications}}{(\code{character()})\cr
+The available levels of stratification supported. Read only.}
+
     \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr Read only.}
 
     \item{\code{infection_flow_matrix}}{(\code{matrix})\cr
@@ -79,6 +82,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \item \href{#method-DiseasyRegions-set_demography}{\code{DiseasyRegions$set_demography()}}
     \item \href{#method-DiseasyRegions-validate_configuration}{\code{DiseasyRegions$validate_configuration()}}
     \item \href{#method-DiseasyRegions-region_filter}{\code{DiseasyRegions$region_filter()}}
+    \item \href{#method-DiseasyRegions-regions_at_stratification}{\code{DiseasyRegions$regions_at_stratification()}}
     \item \href{#method-DiseasyRegions-adjacency_to_theta}{\code{DiseasyRegions$adjacency_to_theta()}}
     \item \href{#method-DiseasyRegions-describe}{\code{DiseasyRegions$describe()}}
     \item \href{#method-DiseasyRegions-clone}{\code{DiseasyRegions$clone()}}
@@ -230,6 +234,28 @@ regions. If \code{NULL}, all values are matched.}
 }
 
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegions-regions_at_stratification"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegions-regions_at_stratification}{}}}
+\subsection{\code{DiseasyRegions$regions_at_stratification()}}{
+  Get the regions available at the given stratification level
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegions$regions_at_stratification(regional_stratification)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The (sorted) list of available regions within the defined scope at the given stratification level.
+  }
+}
+
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyRegions-adjacency_to_theta"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyRegions-adjacency_to_theta}{}}}
 \subsection{\code{DiseasyRegions$adjacency_to_theta()}}{
@@ -287,11 +313,20 @@ regions. If \code{NULL}, all values are matched.}
 \section{Super classes}{
 \code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyRegions]{DiseasyRegions}} -> \code{DiseasyRegionsNuts}
 }
+\section{Active bindings}{
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{available_stratifications}}{(\code{character()})\cr
+The available levels of stratification supported. Read only.}
+  }
+  \if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
   \itemize{
     \item \href{#method-DiseasyRegionsNuts-validate_configuration}{\code{DiseasyRegionsNuts$validate_configuration()}}
     \item \href{#method-DiseasyRegionsNuts-region_filter}{\code{DiseasyRegionsNuts$region_filter()}}
+    \item \href{#method-DiseasyRegionsNuts-regions_at_stratification}{\code{DiseasyRegionsNuts$regions_at_stratification()}}
     \item \href{#method-DiseasyRegionsNuts-clone}{\code{DiseasyRegionsNuts$clone()}}
   }
 }
@@ -355,6 +390,28 @@ regions. If \code{NULL}, all values are matched.}
   }
   \subsection{Returns}{
     A \code{logical()} vector with the same length as \code{values}.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegionsNuts-regions_at_stratification"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegionsNuts-regions_at_stratification}{}}}
+\subsection{\code{DiseasyRegionsNuts$regions_at_stratification()}}{
+  Get the regions available at the given stratification level
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegionsNuts$regions_at_stratification(regional_stratification)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The (sorted) list of available regions within the defined scope at the given stratification level.
   }
 }
 

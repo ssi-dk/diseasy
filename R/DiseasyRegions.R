@@ -205,6 +205,31 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
     #' @description
+    #'   Get the regions available at the given stratification level
+    #' @param regional_stratification `r rd_regional_stratification()`
+    #' @return
+    #'   The (sorted) list of available regions within the defined scope at the given stratification level.
+    regions_at_stratification = function(regional_stratification) {
+      checkmate::assert_choice(regional_stratification, self %.% available_stratifications)
+
+      # What regions are available
+      regions_in_demography <- self$demography$region
+      regions_in_adjacency <- self$adjacency$from
+      regions_in_both <- intersect(regions_in_demography, regions_in_adjacency)
+      if (length(regions_in_both) == 0) regions_in_both <- NULL
+
+      # "Coalesce" the regions from the possible sources
+      regions <- regions_in_both |>
+        purrr::pluck(.default = regions_in_demography) |>
+        purrr::pluck(.default = regions_in_adjacency) |>
+        unique() |>
+        sort()
+
+      return(regions) # For `DiseasyRegions`, there is only the 1 level of stratification
+    },
+
+
+    #' @description
     #'   Converts long form adjacency to the "Theta" infection matrix.
     #' @param adjacency `r rd_adjacency()`
     #' @param type `r rd_adjacency_type`
@@ -309,6 +334,15 @@ DiseasyRegions <- R6::R6Class(                                                  
       .f = active_binding,
       name = "regions",
       expr = return(private %.% .regions)
+    ),
+
+
+    #' @field available_stratifications (`character()`)\cr
+    #'   The available levels of stratification supported. Read only.
+    available_stratifications = purrr::partial(
+      .f = active_binding,
+      name = "available_stratifications",
+      expr = "region" # For DiseasyRegions, space can either not be startifed or stratified by region
     ),
 
 
@@ -525,6 +559,56 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
       )
 
       return(region_filter)
+    },
+
+
+    #' @description
+    #'   Get the regions available at the given stratification level
+    #' @param regional_stratification `r rd_regional_stratification()`
+    #' @return
+    #'   The (sorted) list of available regions within the defined scope at the given stratification level.
+    regions_at_stratification = function(regional_stratification) {
+      checkmate::assert_choice(regional_stratification, self %.% available_stratifications)
+
+      # What regions are available
+      regions_in_demography <- self$demography$region
+      regions_in_adjacency <- self$adjacency$from
+      regions_in_both <- intersect(regions_in_demography, regions_in_adjacency)
+      if (length(regions_in_both) == 0) regions_in_both <- NULL
+
+      # "Coalesce" the regions from the possible sources
+      regions <- regions_in_both |>
+        purrr::pluck(.default = regions_in_demography) |>
+        purrr::pluck(.default = regions_in_adjacency)
+
+      # What NUTS level is requested?
+      nuts_stratification <- as.integer(stringr::str_extract(regional_stratification, r"{\d$}"))
+
+      return(sort(unique(substr(regions, 1, nuts_stratification + 2))))
     }
+
+  ),
+
+  active = list(
+    #' @field available_stratifications (`character()`)\cr
+    #'   The available levels of stratification supported. Read only.
+    available_stratifications = purrr::partial(
+      .f = active_binding,
+      name = "available_stratifications",
+      expr = {
+        if (is.null(self %.% demography)) {
+          pkgcond::pkg_error(
+            "`DiseasyRegionsNuts` must be configured with a `demography` to determine available NUTS levels."
+          )
+        }
+
+        max_nuts_level <- self %.% demography %.% region |>
+          nchar() |>
+          unique() - 2
+
+
+        return(paste("NUTS", seq(from = 0, to = max_nuts_level)))
+      }
+    )
   )
 )
