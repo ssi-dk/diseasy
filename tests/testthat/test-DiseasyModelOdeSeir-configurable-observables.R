@@ -32,30 +32,30 @@ season$set_reference_date(as.Date("2020-01-01"))
 season$use_cosine_season()
 
 # Configure a observables module for use in the tests
-obs <- DiseasyObservables$new(
+observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
   conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
-obs$set_study_period(
-  start_date = obs %.% ds %.% min_start_date,
-  end_date = obs %.% ds %.% max_end_date
+observables$set_study_period(
+  start_date = observables %.% ds %.% min_start_date,
+  end_date = observables %.% ds %.% max_end_date
 )
 
 
 # Get incidence data to infer initial state vector from
-obs$define_synthetic_observable(
+observables$define_synthetic_observable(
   name = "incidence",
   mapping = \(n_infected, n_population) n_infected / n_population
 )
 
-incidence_data <- obs$get_observation(
+incidence_data <- observables$get_observation(
   observable = "incidence"
 )
 
 
 # Lock the observation data to a simulation start date
-obs$set_last_queryable_date(obs %.% start_date + lubridate::days(45))
+observables$set_last_queryable_date(observables %.% start_date + lubridate::days(45))
 
 
 
@@ -82,11 +82,11 @@ tidyr::expand_grid(
     test_that(glue::glue("$configure_model_output() ({model_string} single variant / {age_group_string} age group)"), {
 
       m <- DiseasyModelOdeSeir$new(
+        observables = observables,
         population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
         activity = activity,
         immunity = immunity,
         season = season,
-        observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
           "overall_infection_risk" = overall_infection_risk,
@@ -182,7 +182,7 @@ tidyr::expand_grid(
 test_that("Loading modules resets user configured observables", {
 
   m <- DiseasyModelOdeSeir$new(
-    observables = obs
+    observables = observables
   )
 
   m$configure_model_output(
