@@ -593,7 +593,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             !!self %.% training_period %.% end,
             as.Date(.data$date)
           ) / lubridate::days(1)
-        )
+        ) |>
+        dplyr::filter(.data$t <= 0)
 
       # Now we need to fit the polynomials to each demography-group / variant in the model, so we group by these
       # and extract the subsets.
