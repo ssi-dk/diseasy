@@ -241,9 +241,9 @@ DiseasyModel <- R6::R6Class(                                                    
         respect_last_queryable_date = (period != "plotting")
       ) |>
         dplyr::mutate(
-          t = lubridate::interval(
+          "t" = lubridate::interval(
             !!self %.% training_period %.% end,
-            as.Date(date)
+            as.Date(.data$date)
           ) / lubridate::days(1)
         )
 
