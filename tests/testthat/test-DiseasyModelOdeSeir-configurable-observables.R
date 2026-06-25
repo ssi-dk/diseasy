@@ -152,7 +152,7 @@ tidyr::expand_grid(
       reference_after <- m$get_results("n_infected", prediction_length = 10)$n_infected
 
       # These should be very close to identical
-      expect_equal(reference_before, reference_after, tolerance = 5e-3) # within 5 per mille
+      expect_equal(reference_before, reference_after, tolerance = 1e-3) # within 1 per mille
 
       # For our other observables, we expect some difference:
       # 1) For the state_vector observable, we should have little difference since we
