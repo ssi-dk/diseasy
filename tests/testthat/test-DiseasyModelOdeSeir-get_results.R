@@ -126,9 +126,6 @@ tidyr::expand_grid(
     )
 
     test_that(test_label, {
-      skip_if_not_installed("RSQLite")
-      skip_if_not_installed("optimx")
-      skip_if_not_installed("ucminf")
 
       # Estimate the initial state vector but suppress messages about negative states being set to zero
       prediction_length <- 30
@@ -153,7 +150,7 @@ tidyr::expand_grid(
         respect_last_queryable_date = FALSE
       )
 
-      # Check accuracy within 15%
+      # Check accuracy within treshold
       comparison <- rbind(
         dplyr::mutate(results, "source" = "model"),
         dplyr::mutate(observations, "realisation_id" = 1, "weight" = 1, "source" = "observations")
