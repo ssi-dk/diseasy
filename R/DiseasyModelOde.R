@@ -360,7 +360,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         # we need to solve for 1 additional day
         sol <- deSolve::ode(
           y = psi$value,
-          times = seq(from = 1, to = prediction_length + 1, by = 1),
+          times = seq(from = 0, to = prediction_length + 1, by = 1),
           func = self$rhs
         )
 
