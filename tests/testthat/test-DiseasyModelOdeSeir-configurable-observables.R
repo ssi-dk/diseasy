@@ -28,7 +28,7 @@ immunity$set_exponential_waning(time_scale = 180)
 
 # Configure the season module
 season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-01"))
+season$set_reference_date(as.Date("2020-01-20"))
 season$use_cosine_season()
 
 # Configure a observables module for use in the tests
