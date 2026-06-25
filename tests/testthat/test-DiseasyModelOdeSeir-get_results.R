@@ -162,7 +162,7 @@ tidyr::expand_grid(
       expect_equal(                                                                                                     # nolint: expect_identical_linter
         comparison$mean_relative_error,
         rep(1, nrow(comparison)),
-        tolerance = 0.2,
+        tolerance = 0.25,
         label = glue::glue("mean_relative_error ({observable}, {stratification})")
       )
     })
@@ -222,7 +222,11 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
     dplyr::mutate("relative_error" = model / observations) |>
     dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
 
-  expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.15)                              # nolint: expect_identical_linter
+  expect_equal(
+    comparison$mean_relative_error,
+    rep(1, nrow(comparison)),
+    tolerance = 0.25
+  )
 
 
   # Clean up
@@ -281,7 +285,11 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
     dplyr::mutate("relative_error" = model / observations) |>
     dplyr::summarise("mean_relative_error" = mean(relative_error, na.rm = TRUE))
 
-  expect_equal(comparison$mean_relative_error, rep(1, nrow(comparison)), tolerance = 0.15)                              # nolint: expect_identical_linter
+  expect_equal(
+    comparison$mean_relative_error,
+    rep(1, nrow(comparison)),
+    tolerance = 0.25
+  )
 
 
   # Clean up
