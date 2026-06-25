@@ -1218,7 +1218,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ),
         add = coll
       )
-      checkmate::assert_numeric(delay, lower = 0, add = coll)
+      checkmate::assert_number(delay, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
 
       # Mark RHS as un-ready
