@@ -82,7 +82,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'
     #'   Parameters controlling the structure of the model:
     #'   * `compartment_structure` `r rd_compartment_structure()`
-    #'   * `age_cuts_lower` (`numeric()`)\cr
     #'     Determines the age groups in the model.
     #'   * `malthusian_matching` (`logical(1)`)\cr
     #'     Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?

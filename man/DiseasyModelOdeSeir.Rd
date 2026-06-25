@@ -146,7 +146,6 @@ List of parameters to set for the model during initialization.
 Parameters controlling the structure of the model:
 \itemize{
 \item \code{compartment_structure} (\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.
-\item \code{age_cuts_lower} (\code{numeric()})\cr
 Determines the age groups in the model.
 \item \code{malthusian_matching} (\code{logical(1)})\cr
 Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?
