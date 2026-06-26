@@ -136,7 +136,7 @@ tidyr::expand_grid(
       # 2) For the infection_matrix we expect bigger differences since we measure in different
       # ways (as for 1)), but in addition, there is a time-delay since we measure inflow to E1
       # instead of outflow of I1.
-      # The time difference is roughly: 1/ rE + 1 / (L + rI) days
+      # The time difference is roughly: 1/ rE + 1 / (L * rI) days
 
       expect_equal(
         m$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
@@ -144,16 +144,20 @@ tidyr::expand_grid(
         tolerance = 5e-2 # Within 5 %
       )
 
+      # Get rates from SEIR example
+      rE <- seir_example_data %.% parameters %.% disease_progression_rates[["E"]]
+      rI <- seir_example_data %.% parameters %.% disease_progression_rates[["I"]]
+
       expect_equal(
         utils::head(
           m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
-          - round(1 / rE + 1 / (L + rI)) # Drop last points to account for time difference
+          - round(1 / rE + 1 / (L * rI)) # Drop last points to account for time difference
         ),
         utils::tail(
           reference_after,
-          - round(1 / rE + 1 / (L + rI)) # Drop first points to account for time difference
+          - round(1 / rE + 1 / (L * rI)) # Drop first points to account for time difference
         ),
-        tolerance = 0.1 # Within 10 %
+        tolerance = 0.1 / K + 0.1 / L # Within treshold (More states mean more tighter tolerances)
       )
 
       rm(m)
