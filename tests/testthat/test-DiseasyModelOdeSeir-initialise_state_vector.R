@@ -15,38 +15,21 @@ if (!all(rlang::is_installed(c("RSQLite", "optimx", "ucminf")))) {
   return(NULL)
 }
 
-# We here use the parameters of the generating model
-# - see data-raw/seir_example_data.R
-rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
-rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
-
-# Configure the activity module
-activity <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
-
-# Configure the immunity module
-immunity <- DiseasyImmunity$new()
-immunity$set_exponential_waning(time_scale = 180)
-
-# Configure the season module
-season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-20"))
-season$use_cosine_season()
 
 # Configure a observables module for use in the tests
-obs <- DiseasyObservables$new(
+observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
   conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
 # Get incidence data to infer initial state vector from
-obs$define_synthetic_observable(
+observables$define_synthetic_observable(
   name = "incidence",
   mapping = \(n_infected, n_population) n_infected / n_population
 )
 
 # Lock the observation data to a simulation start date
-obs$set_last_queryable_date(obs %.% ds %.% min_start_date + 30)
+observables$set_last_queryable_date(observables %.% ds %.% min_start_date + 30)
 
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
@@ -66,31 +49,26 @@ tidyr::expand_grid(
       paste(collapse = "")
 
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
-      skip_if_not_installed("RSQLite")
-      skip_if_not_installed("optimx")
-      skip_if_not_installed("ucminf")
 
-      m <- DiseasyModelOdeSeir$new(
-        activity = activity,
-        immunity = immunity,
-        season = season,
-        observables = obs,
-        parameters = list(
-          "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-          "disease_progression_rates" = c("E" = rE, "I" = rI),
-          "overall_infection_risk" = overall_infection_risk
-        )
-      )
+      # Modify example scenario
+      modules <- c(seir_example_data %.% modules, observables)
+      modules %.% population$stratify_age(0)
+      parameters <- seir_example_data %.% parameters |>
+        utils::modifyList(list("compartment_structure" = c("E" = K, "I" = L, "R" = M)))
+
+      # Generate model
+      m <- DiseasyModelOdeSeir$new(parameters = parameters)
+      purrr::walk(modules, m$load_module)
 
       # Get a reference to the private environment
       private <- m$.__enclos_env__$private
 
       # Retrieve incidence data
-      incidence_data <- obs$get_observation(
+      incidence_data <- observables$get_observation(
         observable = "incidence",
         stratification = private$model_stratification(),
-        start_date = obs %.% ds %.% min_start_date,
-        end_date = obs %.% last_queryable_date
+        start_date = observables %.% ds %.% min_start_date,
+        end_date = observables %.% last_queryable_date
       )
 
       # Estimate the initial state vector but suppress messages about negative states being set to zero
@@ -111,11 +89,11 @@ tidyr::expand_grid(
       model_incidence <- rI * rowSums(sol[, private$i1_state_indices + 1, drop = FALSE])
 
       # Check that the initialisation works "well" - always within 10% of the true incidence
-      true_incidence <- obs$get_observation(
+      true_incidence <- observables$get_observation(
         observable = "incidence",
         stratification = private$model_stratification(),
-        start_date = obs %.% last_queryable_date,
-        end_date = obs %.% last_queryable_date + 60,
+        start_date = observables %.% last_queryable_date,
+        end_date = observables %.% last_queryable_date + 60,
         respect_last_queryable_date = FALSE
       ) |>
         dplyr::pull("incidence")
