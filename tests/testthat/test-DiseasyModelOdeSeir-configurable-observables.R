@@ -102,6 +102,9 @@ tidyr::expand_grid(
         derived_from = "infection_matrix"
       )
 
+      # Get rates from SEIR example
+      rE <- seir_example_data %.% parameters %.% disease_progression_rates[["E"]]
+      rI <- seir_example_data %.% parameters %.% disease_progression_rates[["I"]]
 
       weights_state_vector <- (seq_along(age_cuts_lower) - 1) |>
         purrr::map(
@@ -143,10 +146,6 @@ tidyr::expand_grid(
         reference_after,
         tolerance = 5e-2 # Within 5 %
       )
-
-      # Get rates from SEIR example
-      rE <- seir_example_data %.% parameters %.% disease_progression_rates[["E"]]
-      rI <- seir_example_data %.% parameters %.% disease_progression_rates[["I"]]
 
       expect_equal(
         utils::head(
