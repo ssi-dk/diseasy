@@ -63,7 +63,7 @@ tidyr::expand_grid(
 
       # Modify example scenario
       modules <- c(seir_example_data %.% modules, observables)
-      modules %.% population$stratify_age(age_cuts_lower)
+      modules[["population"]] <- modules %.% population$clone() $stratify_age(age_cuts_lower)
       parameters <- seir_example_data %.% parameters |>
         utils::modifyList(list("compartment_structure" = c("E" = K, "I" = L, "R" = M)))
 
