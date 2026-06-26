@@ -82,9 +82,6 @@ tidyr::expand_grid(
     )
 
     test_that(test_label, {
-      skip_if_not_installed("RSQLite")
-      skip_if_not_installed("optimx")
-      skip_if_not_installed("ucminf")
 
       # Estimate the initial state vector but suppress messages about negative states being set to zero
       prediction_length <- 30
@@ -134,9 +131,6 @@ rm(model)
 
 # We should also be able to run the model with a no age groups
 test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: NULL)", {
-  skip_if_not_installed("RSQLite")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("ucminf")
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
@@ -192,9 +186,6 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
 
 # We should also be able to run the model with sub sets of the data age groups groups
 test_that("$get_results() (SEEIR, subset age groups - n_infected - stratification: NULL)", {
-  skip_if_not_installed("RSQLite")
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("ucminf")
 
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
