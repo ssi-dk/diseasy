@@ -5,10 +5,11 @@
 # We can therefore test that the initialisation works "well" and thereby guard ourselves against future,
 # unintended drops in performance.
 
-if (!all(rlang::is_installed(c("RSQLite", "optimx", "ucminf")))) {
+if (!all(rlang::is_installed(c("RSQLite", "deSolve", "optimx", "ucminf")))) {
   # Skip these tests if dependencies are not installed
   test_that("missing dependencies", {
     skip_if_not_installed("RSQLite")
+    skip_if_not_installed("deSolve")
     skip_if_not_installed("optimx")
     skip_if_not_installed("ucminf")
   })
