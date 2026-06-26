@@ -58,11 +58,11 @@ tidyr::expand_grid(
         utils::modifyList(list("compartment_structure" = c("E" = K, "I" = L, "R" = M)))
 
       # Generate model
-      m <- DiseasyModelOdeSeir$new(parameters = parameters)
-      purrr::walk(modules, m$load_module)
+      model <- DiseasyModelOdeSeir$new(parameters = parameters)
+      purrr::walk(modules, model$load_module)
 
       # Get a reference to the private environment
-      private <- m$.__enclos_env__$private
+      private <- model$.__enclos_env__$private
 
       # Retrieve incidence data
       incidence_data <- observables$get_observation(
@@ -76,7 +76,7 @@ tidyr::expand_grid(
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
         expr = {
-          y0 <- m$initialise_state_vector(incidence_data)                                                               # nolint: implicit_assignment_linter
+          y0 <- model$initialise_state_vector(incidence_data)                                                           # nolint: implicit_assignment_linter
         }
       )
 
@@ -84,7 +84,7 @@ tidyr::expand_grid(
       sol <- deSolve::ode(
         y = y0 %.% initial_condition,
         times = seq_len(60) - 1,
-        func = m %.% rhs
+        func = model %.% rhs
       )
 
       model_incidence <- rI * rowSums(sol[, private$i1_state_indices + 1, drop = FALSE])
@@ -106,13 +106,13 @@ tidyr::expand_grid(
       # This will not generally be true, but should be true if the model we fit match the model
       # used to generate the data. If there is a misspecification of the model, the initial
       # behaviour of the model output may be "noisy" and not have the same number of turning points
-      if (identical(c(K, L, M), c(2L, 1L, 2L))) {
+      if (identical(c("E" = K, "I" = L, "R" = M), seir_example_data %.% parameters %.% compartment_structure)) {
         expect_identical(
           sum(diff(sign(diff(model_incidence))) != 0),
           sum(diff(sign(diff(true_incidence))) != 0)
         )
       }
 
-      rm(m)
+      rm(model)
     })
   })
