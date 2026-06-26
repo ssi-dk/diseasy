@@ -29,7 +29,7 @@ The `DiseasyPopulation` module is responsible for defining the model population 
 
 Presently, `DiseasyPopulation` combines `DiseasyRegions` and `DiseasyActivity` to configure a model population
 stratified by age and geographical region. Where `DiseasyRegions` defines the _scope_ and possible stratifications of
-the model population, `DiseasyPopulation` manages the stratification itself. Similarily, `DiseasyActivity` defines the
+the model population, `DiseasyPopulation` manages the stratification itself. Similarly, `DiseasyActivity` defines the
 age-specific interactions between age groups as well as age-specific societal restrictions over time,
 while `DiseasyPopulation` aggregates these effects into user stratified age groups.
 Combined, this forms a model population stratified both spatially and by age groups.
