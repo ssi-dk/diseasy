@@ -48,7 +48,7 @@ tidyr::expand_grid(
     ) |>
       paste(collapse = "")
 
-    age_group_string <- ifelse(length(age_cuts_lower) == 0, "single", "multiple")
+    age_group_string <- ifelse(length(age_cuts_lower) == 1, "single", "multiple")
 
     test_that(glue::glue("$configure_observable() ({model_string} single variant / {age_group_string} age group)"), {
       skip_if_not_installed("RSQLite")
