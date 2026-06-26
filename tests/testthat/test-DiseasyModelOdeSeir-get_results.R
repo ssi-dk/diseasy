@@ -16,28 +16,6 @@ if (!all(rlang::is_installed(c("RSQLite", "optimx", "ucminf")))) {
   return(NULL)
 }
 
-# We here use the parameters of the generating model
-# - see data-raw/seir_example_data.R
-rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
-rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
-age_cuts_lower <- c(0, 30, 60)
-
-# Configure an activity module using Danish population and contact information
-activity <- DiseasyActivity$new()
-activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
-activity$set_activity_units(dk_activity_units)
-activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
-
-# Configure the immunity module
-immunity <- DiseasyImmunity$new()
-immunity$set_exponential_waning(time_scale = 180)
-
-# Configure the season module
-season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-20"))
-season$use_cosine_season()
-
 
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
@@ -84,36 +62,14 @@ model_output_to_observable <- list(
 )
 
 
+# Create model instance matching the generating model
+# but wiht out output mappings attached
+parameters <- seir_example_data %.% parameters
+parameters[["model_output_to_observable"]] <- model_output_to_observable
 
-# Test the get_results method of the configuration used in the example data
-K <- 2L                                                                                                                 # nolint start: object_name_linter
-L <- 1L
-M <- 2L                                                                                                                 # nolint end: object_name_linter
+m <- DiseasyModelOdeSeir$new(parameters = parameters)
+purrr::walk(c(seir_example_data %.% modules, observables), m$load_module)
 
-# Create the model instance
-model <- DiseasyModelOdeSeir$new(
-  population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
-  activity = activity,
-  immunity = immunity,
-  season = season,
-  observables = observables,
-  parameters = list(
-    "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-    "overall_infection_risk" = overall_infection_risk,
-    "disease_progression_rates" = c("E" = rE, "I" = rI),
-    "model_output_to_observable" = model_output_to_observable
-  )
-)
-
-# Generate label for the model being tested
-model_string <- c(
-  "S",
-  rep("E", K),
-  rep("I", L),
-  rep("R", M),
-  " (age_cuts = ", toString(age_cuts_lower), ")"
-) |>
-  paste(collapse = "")
 
 # Check the method for different stratifications and observables
 tidyr::expand_grid(
@@ -122,7 +78,7 @@ tidyr::expand_grid(
 ) |>
   purrr::pwalk(\(observable, stratification) {
     test_label <- glue::glue(
-      "$get_results() ({model_string} - {observable} - stratification: {rlang::as_label(stratification[[1]])})"
+      "$get_results() ({observable} - stratification: {rlang::as_label(stratification[[1]])})"
     )
 
     test_that(test_label, {
@@ -293,4 +249,4 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
 
 
 # Clean up
-rm(observables, activity)
+rm(observables)
