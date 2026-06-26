@@ -160,14 +160,14 @@ tidyr::expand_grid(
         tolerance = 0.1 / K + 0.1 / L # Within treshold (More states mean more tighter tolerances)
       )
 
-      rm(m)
+      rm(model)
     })
   })
 
 
 test_that("Loading modules resets user configured observables", {
 
-  m <- DiseasyModelOdeSeir$new(
+  model <- DiseasyModelOdeSeir$new(
     observables = observables
   )
 
@@ -180,7 +180,7 @@ test_that("Loading modules resets user configured observables", {
   # Configured observable should be in the set of observables
   checkmate::expect_subset(
     "test_observable",
-    names(m %.% parameters %.% model_output_to_observable)
+    names(model %.% parameters %.% model_output_to_observable)
   )
 
   # Loading activity module should produce no warning
@@ -192,7 +192,7 @@ test_that("Loading modules resets user configured observables", {
   # Configured observable should be in the set of observables
   checkmate::expect_subset(
     "test_observable",
-    names(m %.% parameters %.% model_output_to_observable)
+    names(model %.% parameters %.% model_output_to_observable)
   )
 
   # Loading variant module should produce warning
@@ -205,7 +205,7 @@ test_that("Loading modules resets user configured observables", {
   # Configured observable should now be removed from set of observables
   checkmate::expect_disjunct(
     "test_observable",
-    names(m %.% parameters %.% model_output_to_observable)
+    names(model %.% parameters %.% model_output_to_observable)
   )
 
   # And we should now be able to reconfigure the observable again
@@ -218,9 +218,9 @@ test_that("Loading modules resets user configured observables", {
   # Configured observable should again be in the set of observables
   checkmate::expect_subset(
     "test_observable",
-    names(m %.% parameters %.% model_output_to_observable)
+    names(model %.% parameters %.% model_output_to_observable)
   )
 
 
-  rm(m)
+  rm(model)
 })
