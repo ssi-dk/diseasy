@@ -64,12 +64,14 @@ model_output_to_observable <- list(
 
 
 # Create model instance matching the generating model
-# but wiht out output mappings attached
+# .. but with our output mappings attached
 parameters <- seir_example_data %.% parameters
 parameters[["model_output_to_observable"]] <- model_output_to_observable
 
-m <- DiseasyModelOdeSeir$new(parameters = parameters)
-purrr::walk(c(seir_example_data %.% modules, observables), m$load_module)
+modules <- c(seir_example_data %.% modules, observables)
+
+model <- DiseasyModelOdeSeir$new(parameters = parameters)
+purrr::walk(modules, model$load_module)
 
 
 # Check the method for different stratifications and observables
@@ -133,18 +135,14 @@ rm(model)
 # We should also be able to run the model with a no age groups
 test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: NULL)", {
 
-  # Create the model instance
-  model <- DiseasyModelOdeSeir$new(
-    activity = activity,
-    immunity = immunity,
-    season = season,
-    observables = observables,
-    parameters = list(
-      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "overall_infection_risk" = overall_infection_risk,
-      "disease_progression_rates" = c("E" = rE, "I" = rI)
-    )
-  )
+  # Create model instance matching the generating model
+  # .. but without age groups
+  parameters <- seir_example_data %.% parameters
+  modules <- c(seir_example_data %.% modules, observables)
+  modules[["population"]]$stratify_age(0)
+
+  model <- DiseasyModelOdeSeir$new(parameters = parameters)
+  purrr::walk(modules, model$load_module)
 
   # Estimate the initial state vector but suppress messages about negative states being set to zero
   prediction_length <- 30
@@ -188,19 +186,14 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
 # We should also be able to run the model with sub sets of the data age groups groups
 test_that("$get_results() (SEEIR, subset age groups - n_infected - stratification: NULL)", {
 
-  # Create the model instance
-  model <- DiseasyModelOdeSeir$new(
-    population = DiseasyPopulation$new(age_cuts_lower = c(0, 30)),
-    activity = activity,
-    immunity = immunity,
-    season = season,
-    observables = observables,
-    parameters = list(
-      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "overall_infection_risk" = overall_infection_risk,
-      "disease_progression_rates" = c("E" = rE, "I" = rI)
-    )
-  )
+  # Create model instance matching the generating model
+  # .. but with altered age groups
+  parameters <- seir_example_data %.% parameters
+  modules <- c(seir_example_data %.% modules, observables)
+  modules[["population"]]$stratify_age(c(0, 30))
+
+  model <- DiseasyModelOdeSeir$new(parameters = parameters)
+  purrr::walk(modules, model$load_module)
 
   # Estimate the initial state vector but suppress messages about negative states being set to zero
   prediction_length <- 30
