@@ -352,6 +352,10 @@ DiseasyModelOde <- R6::R6Class(                                                 
     #   The number of days to predict for.
     solve_ode = function(prediction_length) {
 
+      if (!rlang::is_installed("deSolve")) {
+        pkgcond::pkg_error("Package `deSolve` must be installed to solve ODEs")
+      }
+
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
