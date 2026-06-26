@@ -68,11 +68,11 @@ tidyr::expand_grid(
         utils::modifyList(list("compartment_structure" = c("E" = K, "I" = L, "R" = M)))
 
       # Generate model
-      m <- DiseasyModelOdeSeir$new(parameters = parameters)
-      purrr::walk(modules, m$load_module)
+      model <- DiseasyModelOdeSeir$new(parameters = parameters)
+      purrr::walk(modules, model$load_module)
 
       # Compute n_infected observable before configuring observables
-      reference_before <- m$get_results("n_infected", prediction_length = 10)$n_infected
+      reference_before <- model$get_results("n_infected", prediction_length = 10)$n_infected
 
 
       ## Configure two different methods for measuring "n_infected"
@@ -96,7 +96,7 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_observable(
+      model$configure_observable(
         weights = weights_infection_matrix,
         name = "n_infected_infection_matrix",
         derived_from = "infection_matrix"
@@ -118,14 +118,14 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_observable(
+      model$configure_observable(
         weights = weights_state_vector,
         name = "n_infected_state_vector",
         derived_from = "state_vector"
       )
 
       # Compute n_infected observable after configuring observables
-      reference_after <- m$get_results("n_infected", prediction_length = 10)$n_infected
+      reference_after <- model$get_results("n_infected", prediction_length = 10)$n_infected
 
       # These should be very close to identical
       expect_equal(reference_before, reference_after, tolerance = 1e-4) # within 0.1 per mille
@@ -139,7 +139,7 @@ tidyr::expand_grid(
       # The time difference is roughly: 1/ rE + 1 / (L * rI) days
 
       expect_equal(
-        m$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
+        model$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
         reference_after,
         tolerance = 5e-2 # Within 5 %
       )
@@ -150,7 +150,7 @@ tidyr::expand_grid(
 
       expect_equal(
         utils::head(
-          m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
+          model$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
           - round(1 / rE + 1 / (L * rI)) # Drop last points to account for time difference
         ),
         utils::tail(
@@ -171,7 +171,7 @@ test_that("Loading modules resets user configured observables", {
     observables = observables
   )
 
-  m$configure_observable(
+  model$configure_observable(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"
@@ -185,7 +185,7 @@ test_that("Loading modules resets user configured observables", {
 
   # Loading activity module should produce no warning
   expect_no_warning(
-    m$load_module(seir_example_data %.% modules %.% activity),
+    model$load_module(seir_example_data %.% modules %.% activity),
     message = "DiseasyActivity loaded - user-specified observable configurations deleted!"
   )
 
@@ -198,7 +198,7 @@ test_that("Loading modules resets user configured observables", {
   # Loading variant module should produce warning
   variant <- DiseasyVariant$new()
   expect_warning(
-    m$load_module(variant),
+    model$load_module(variant),
     regexp = "DiseasyVariant loaded - user-specified observable configurations deleted!"
   )
 
@@ -209,7 +209,7 @@ test_that("Loading modules resets user configured observables", {
   )
 
   # And we should now be able to reconfigure the observable again
-  m$configure_observable(
+  model$configure_observable(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"
