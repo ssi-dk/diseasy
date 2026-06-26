@@ -82,7 +82,7 @@ tidyr::expand_grid(
       # Solve model, and get the incidence data to compare with the data
       sol <- deSolve::ode(
         y = y0 %.% initial_condition,
-        times = seq_along(seq(from = obs$last_queryable_date, obs$last_queryable_date + 60, by = "1 day")) - 1,
+        times = seq_len(60) - 1,
         func = m %.% rhs
       )
 
