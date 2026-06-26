@@ -73,7 +73,7 @@ if needed for the model -- but this is not done for this example.
 
 ```{r activity}
 activity <- Diseasyactivity(
-  contact_basis = contact_basis_nordic # Use contact matrices from `contactdata` package
+  contact_basis = contact_basis_nordic # Contact matrices from `contactdata` package
 )
 
 activity
