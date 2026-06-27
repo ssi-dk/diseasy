@@ -169,6 +169,7 @@ Throw error if misconfigured.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
     }
     \if{html}{\out{</div>}}
   }

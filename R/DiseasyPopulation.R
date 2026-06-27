@@ -104,6 +104,7 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   Validate the stratifications are supported by demography data.
     #'   Throw error if misconfigured.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param regional_stratification `r rd_regional_stratification()`
     #' @return `r rd_side_effects`
     validate_configuration = function(
       age_cuts_lower = self %.% age_cuts_lower,
