@@ -260,6 +260,7 @@ DiseasyPopulation <- R6::R6Class(                                               
           by = "age_group"
         )
 
+      return(population)
     },
 
 
