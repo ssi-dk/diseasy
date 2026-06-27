@@ -67,15 +67,21 @@ test_that("age stratification must be subset of `demography` age groups", {
   population_nuts <- DiseasyPopulation$new(region = region_nuts)
 
   # Error should only occur when age stratifications are requested
-  expect_no_error(population$stratify_age(c(0, 30)))      # No issue since inconsistency is for 50+
-  expect_no_error(population_nuts$stratify_age(c(0, 30))) # No issue since inconsistency is for 50+
+  population$stratify_age(c(0, 30)) # No issue since inconsistency is for 50+
+  expect_no_error(population$groups)
 
+  population_nuts$stratify_age(c(0, 30)) # No issue since inconsistency is for 50+
+  expect_no_error(population_nuts$groups)
+
+  population$stratify_age(c(0, 30, 60))
   expect_error(
-    checkmate_err_msg(population$stratify_age(c(0, 30, 60))),
+    checkmate_err_msg(population$groups),
     regexp = "The age groups in the demography"
   )
+
+  population_nuts$stratify_age(c(0, 30, 60))
   expect_error(
-    checkmate_err_msg(population_nuts$stratify_age(c(0, 30, 60))),
+    checkmate_err_msg(population_nuts$groups),
     regexp = "The age groups in the demography"
   )
 

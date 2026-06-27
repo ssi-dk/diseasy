@@ -69,8 +69,6 @@ DiseasyPopulation <- R6::R6Class(                                               
         lower = 0, unique = TRUE, sorted = TRUE
       )
 
-      self %.% validate_configuration(age_cuts_lower)
-
       # Store the age_cuts as integer
       private$.age_cuts_lower <- as.integer(age_cuts_lower)
 
@@ -208,7 +206,7 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   The demographic groups that have been configured in the module.
     groups = function() {
 
-      # For good measure, we check the configuration is valid
+      # We check the configuration is valid
       self %.% validate_configuration()
 
       groups <- list()
