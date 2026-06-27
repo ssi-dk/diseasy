@@ -67,6 +67,7 @@ The local copy of an DiseasyRegions module. Read-only.}
     \item \href{#method-DiseasyPopulation-initialize}{\code{DiseasyPopulation$new()}}
     \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
     \item \href{#method-DiseasyPopulation-stratify_regions}{\code{DiseasyPopulation$stratify_regions()}}
+    \item \href{#method-DiseasyPopulation-validate_configuration}{\code{DiseasyPopulation$validate_configuration()}}
     \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
     \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
     \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
@@ -142,6 +143,32 @@ An instance of a regional module which should provide the demography of the popu
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-validate_configuration"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-validate_configuration}{}}}
+\subsection{\code{DiseasyPopulation$validate_configuration()}}{
+  Validate the stratifications are supported by demography data.
+Throw error if misconfigured.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$validate_configuration(
+  age_cuts_lower = self \%.\% age_cuts_lower,
+  regional_stratification = self \%.\% regional_stratification
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
     }
     \if{html}{\out{</div>}}
   }

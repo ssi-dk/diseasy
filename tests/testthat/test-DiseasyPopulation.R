@@ -8,16 +8,17 @@ test_that("initialize works", {
   rm(population)
 
 
-  # Set age stratification during loading
-  population <- DiseasyPopulation$new(age_cuts_lower = c(20, 40, 60))
+  # Set age stratification during loading (requires region module)
+  region <- DiseasyRegions$new(demography = demography_nordic)
+  population <- DiseasyPopulation$new(age_cuts_lower = c(20, 40, 60), region = region)
   expect_identical(population %.% age_cuts_lower, c(20L, 40L, 60L))
   expect_null(population %.% regional_stratification)
 
   rm(population)
 
 
-  # Set spatial stratification during loading
-  population <- DiseasyPopulation$new(regional_stratification = "region")
+  # Set spatial stratification during loading (requires region module)
+  population <- DiseasyPopulation$new(regional_stratification = "region", region = region)
   expect_identical(population %.% age_cuts_lower, 0L)
   expect_identical(population %.% regional_stratification, "region")
 
@@ -28,10 +29,10 @@ test_that("initialize works", {
 test_that("$stratify_age() works", {
 
   # Creating an empty module
-  population <- DiseasyPopulation$new()
+  region <- DiseasyRegions$new(demography = demography_nordic)
+  population <- DiseasyPopulation$new(region = region)
   expect_identical(population %.% age_cuts_lower, 0L)
   hash_new_instance <- population$hash # Store the current hash
-  expect_identical(population$hash, hash_new_instance)
 
   # Change stratification (low resolution)
   population$stratify_age(age_cuts_lower = c(0, 30))
