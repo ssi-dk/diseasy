@@ -675,10 +675,9 @@ DiseasyActivity <- R6::R6Class(                                                 
       }
 
       if (identical(demography_age_column, "age_group")) {
-        checkmate::assert_integerish(
+        checkmate::assert_character(
           demography$age_group,
-          any.missing = FALSE, lower = 1, upper = length(age_groups_reference),
-          unique = TRUE, add = coll
+          any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", add = coll
         )
       }
 
@@ -732,11 +731,11 @@ DiseasyActivity <- R6::R6Class(                                                 
           "proportion" = .data$population / sum(.data$population)
         ) |>
         dplyr::mutate(
-          "age_group_id"           = age_cuts_lower_demography,
+          "age_group_id"           = dplyr::row_number(),
           "age_group"              = diseasystore::age_labels(age_cuts_lower_demography),
-          "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower)),
+          "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. > age_cuts_lower)) + 1,
           "age_group_out"          = age_labels_out[.data$age_group_id_out],
-          "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
+          "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. > age_cuts_lower_reference)),
           "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
         )
 
