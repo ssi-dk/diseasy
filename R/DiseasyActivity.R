@@ -693,6 +693,9 @@ DiseasyActivity <- R6::R6Class(                                                 
         purrr::map_if(is.character, ~ stringr::str_extract(., r"{^\d+}")) |>
         as.integer()
 
+      # Ensure age_cuts_lower is fully formed
+      age_cuts_lower <- unique(c(0, age_cuts_lower))
+
       # Verify that the demography has the age information needed to perform the map
       missing_age_cuts_reference <- setdiff(age_cuts_lower_reference, age_cuts_lower_demography)
       missing_age_cuts_out       <- setdiff(age_cuts_lower,           age_cuts_lower_demography)
