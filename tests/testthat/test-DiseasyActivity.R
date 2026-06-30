@@ -591,14 +591,14 @@ test_that("`map_population` works with 1-year age groups in demography", {
   expect_no_error(
     activity$map_population(
       age_cuts_lower = 5,
-      age_groups_reference = demography_5yr$age_group,
+      age_groups_reference = demography_1yr$age_group,
       demography = demography_1yr
     )
   )
   expect_no_error(
     activity$map_population(
       age_cuts_lower = c(2, 4, 6),
-      age_groups_reference = demography_5yr$age_group,
+      age_groups_reference = demography_1yr$age_group,
       demography = demography_1yr
     )
   )
@@ -615,7 +615,7 @@ test_that("`map_population` works with 1-year age groups in demography", {
     checkmate_err_msg(
       activity$map_population(
         age_cuts_lower = 200,
-        age_groups_reference = demography_5yr$age_group,
+        age_groups_reference = demography_1yr$age_group,
         demography = demography_1yr
       )
     ),
