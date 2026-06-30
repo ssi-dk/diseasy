@@ -606,7 +606,7 @@
     },
     {
       "package": "openssl",
-      "version": "2.4.1",
+      "version": "2.4.2",
       "binary": true
     },
     {
@@ -951,7 +951,7 @@
     },
     {
       "package": "terra",
-      "version": "1.9-27",
+      "version": "1.9-34",
       "binary": true
     },
     {
@@ -1091,7 +1091,7 @@
     },
     {
       "package": "zip",
-      "version": "2.3.3",
+      "version": "3.0.0",
       "binary": true
     }
   ],
@@ -1101,8 +1101,8 @@
     "version": "24.04",
     "url": {},
     "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install pandoc libx11-dev git libcurl4-openssl-dev libssl-dev xz-utils cmake make libuv1-dev libgit2-dev zlib1g-dev libgeos-dev libproj-dev libsqlite3-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libabsl-dev libgdal-dev gdal-bin libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libudunits2-dev libnode-dev libxml2-dev",
+    "install_scripts": "apt-get -y install libgeos-dev libproj-dev libsqlite3-dev libabsl-dev cmake libssl-dev libgdal-dev gdal-bin libudunits2-dev pandoc libx11-dev git libcurl4-openssl-dev xz-utils make libuv1-dev libgit2-dev zlib1g-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libnode-dev libxml2-dev",
     "post_install": {},
-    "packages": ["pandoc", "libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "xz-utils", "cmake", "make", "libuv1-dev", "libgit2-dev", "zlib1g-dev", "libgeos-dev", "libproj-dev", "libsqlite3-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libwebp-dev", "libabsl-dev", "libgdal-dev", "gdal-bin", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libudunits2-dev", "libnode-dev", "libxml2-dev"]
+    "packages": ["libgeos-dev", "libproj-dev", "libsqlite3-dev", "libabsl-dev", "cmake", "libssl-dev", "libgdal-dev", "gdal-bin", "libudunits2-dev", "pandoc", "libx11-dev", "git", "libcurl4-openssl-dev", "xz-utils", "make", "libuv1-dev", "libgit2-dev", "zlib1g-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libwebp-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libnode-dev", "libxml2-dev"]
   }
 }
