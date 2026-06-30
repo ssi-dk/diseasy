@@ -569,9 +569,6 @@ test_that("`map_population` works with 1-year age groups in demography", {
   # We should be able to map the population as long as demography has
   # all the age cuts requested by age_cuts_lower and included in age_groups_reference
 
-  self <- activity
-  private <- self$.__enclos_env__$private
-
   # So for 1-year age group demography, we should almost never fail
   expect_no_error(
     activity$map_population(
@@ -591,14 +588,14 @@ test_that("`map_population` works with 1-year age groups in demography", {
   expect_no_error(
     activity$map_population(
       age_cuts_lower = 5,
-      age_groups_reference = demography_1yr$age_group,
+      age_groups_reference = demography_1yr$age,
       demography = demography_1yr
     )
   )
   expect_no_error(
     activity$map_population(
       age_cuts_lower = c(2, 4, 6),
-      age_groups_reference = demography_1yr$age_group,
+      age_groups_reference = demography_1yr$age,
       demography = demography_1yr
     )
   )
@@ -615,7 +612,7 @@ test_that("`map_population` works with 1-year age groups in demography", {
     checkmate_err_msg(
       activity$map_population(
         age_cuts_lower = 200,
-        age_groups_reference = demography_1yr$age_group,
+        age_groups_reference = demography_1yr$age,
         demography = demography_1yr
       )
     ),
