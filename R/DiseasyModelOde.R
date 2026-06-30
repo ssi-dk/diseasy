@@ -527,8 +527,27 @@ DiseasyModelOde <- R6::R6Class(                                                 
       } else {
 
         # Can we map from the regions in the data to the regions in the model?
-        if (checkmate::test_choice("region", self %.% observables %.% available_stratifications)) {
-          # TODO
+        region_column <- self %.% population %.% regional_stratification |>
+          stringr::str_to_lower() |>
+          stringr::str_replace(stringr::fixed(""), "_")
+
+
+        # Is the stratification in the observables?
+        if (checkmate::test_choice(
+          region_column,
+          self %.% observables %.% available_stratifications
+        )) {
+
+          # If yes, stratify by region
+          regional_stratification <- rlang::quos(region)
+
+        } else {
+          pkgcond::pkg_error(
+            glue::glue(
+              "`regional_stratification` (: {self %.% population %.% regional_stratification}) ",
+              "not supported by the configured `diseasystore`."
+            )
+          )
         }
       }
 
