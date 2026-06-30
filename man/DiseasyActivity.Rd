@@ -359,9 +359,8 @@ Map population between age groups
 Age labels (created by \code{diseasystore::age_labels()} of reference data.}
       \item{\code{demography}}{(\code{data.frame})\cr
 "A \code{data.frame} with the columns\\cr",
-"  * \code{age} (\code{integer()}) 1-year age group\\cr",
-"  * \code{population} (\code{numeric()}) size of population in age group\\cr",
-"  * \code{proportion} (\code{numeric()}) proportion of total population in age group\\cr",}
+"  * \code{age} (\code{integer()}) 1-year age groups or \code{age_group} (\code{integer()}) dynamic age groups\\cr",
+"  * \code{population} (\code{numeric()}) size of population in age group\\cr"}
     }
     \if{html}{\out{</div>}}
   }

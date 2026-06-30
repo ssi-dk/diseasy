@@ -643,8 +643,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param demography (`data.frame`)\cr
     #'   "A `data.frame` with the columns\\cr",
     #'   "  * `age` (`integer()`) 1-year age groups or `age_group` (`integer()`) dynamic age groups\\cr",
-    #'   "  * `population` (`numeric()`) size of population in age group\\cr",
-    #'   "  * `proportion` (`numeric()`) proportion of total population in age group\\cr",
+    #'   "  * `population` (`numeric()`) size of population in age group\\cr"
     #' @return
     #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
     #'   those supplied to the function.
@@ -664,7 +663,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       )
 
       checkmate::assert_data_frame(demography, min.rows = 1, add = coll)
-      checkmate::assert_names(names(demography), must.include = c("population", "proportion"), add = coll)
+      checkmate::assert_names(names(demography), must.include = "population", add = coll)
 
       demography_age_column <- intersect(c("age", "age_group"), names(demography))
       if (length(demography_age_column) != 1) {
@@ -686,13 +685,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
       checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
 
-      checkmate::assert_numeric(demography$proportion, any.missing = FALSE, lower = 0, upper = 1, add = coll)
-
       checkmate::reportAssertions(coll)
 
-
-      # Using default population from contact_basis
-      proportion <- demography$proportion
 
       # Determine the age cuts of the reference and the demography data
       age_cuts_lower_reference <- as.integer(stringr::str_extract(age_groups_reference, r"{^\d+}"))
