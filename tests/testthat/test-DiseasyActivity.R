@@ -618,6 +618,8 @@ test_that("`map_population` works with 1-year age groups in demography", {
     ),
     regexp = "`demography` is missing age group splits to facilitate splits at"
   )
+
+  rm(activity)
 })
 
 
@@ -700,4 +702,5 @@ test_that("`map_population` works with 5-year age groups in demography", {
     regexp = "`demography` is missing age group splits to facilitate splits at"
   )
 
+  rm(activity)
 })
