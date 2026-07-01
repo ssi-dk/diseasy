@@ -728,10 +728,10 @@ DiseasyActivity <- R6::R6Class(                                                 
       population <- demography |>
         dplyr::mutate(
           "population" = .data$population,
-          "proportion" = .data$proportion, 
           .by = dplyr::all_of(demography_age_column)
         ) |>
         dplyr::mutate(
+          "proportion" = .data$population / sum(.data$population),
           "age_group_id"           = age_cuts_lower_demography,
           "age_group"              = diseasystore::age_labels(age_cuts_lower_demography),
           "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower)),
