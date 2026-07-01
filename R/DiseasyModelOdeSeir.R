@@ -147,22 +147,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     load_module = function(module, ...) {
       super$load_module(module, ...)
 
-      # DiseasyVariant can change the structure of the model which would
-      # require reconfiguration of the RHS function
-      if (inherits(module, "DiseasyVariant")) {
+      # Delete observable configurations and warn user
+      if (!purrr::every(private %.% output_mapping, is.null)) {
+        pkgcond::pkg_warning("New module loaded - user-specified output configurations deleted!")
 
-        # Delete observable configurations and warn user
-        if (!purrr::every(private %.% output_mapping, is.null)) {
-          pkgcond::pkg_warning("DiseasyVariant loaded - user-specified observable configurations deleted!")
-
-          # Remove user-configured observables
-          private$.parameters$model_output_to_observable[[self %.% model_outputs]] <- NULL
-          private$output_mapping <- list("state_vector" = NULL, "infection_matrix" = NULL)
-        }
-
-        # Attempt to re-initialise helpers with the current inputs
-        tryCatch(self$prepare_rhs(), error = function(e) {})
+        # Remove user-configured observables
+        private$.parameters$model_output_to_observable[[self %.% model_outputs]] <- NULL
+        private$output_mapping <- list("state_vector" = NULL, "infection_matrix" = NULL)
       }
+
     },
 
 
