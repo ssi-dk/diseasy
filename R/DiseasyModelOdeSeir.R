@@ -291,6 +291,37 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       immunity_rates <- immunity_approx %.% delta
 
 
+      # Re-configure outputs for immunity targets
+      immunity_approx %.% gamma |>
+        purrr::keep_at(c("hospitalisation", "death")) |>
+        purrr::iwalk(\(gammas, observable) {
+
+          # Compute the weights for the observable
+          weights_infection_matrix <- seq(from = 0, to = private %.% n_age_groups - 1) |>
+            purrr::map(
+              \(offset) {
+                c(
+                  rep(0, compartment_structure %.% R * offset),
+                  rep(1, compartment_structure %.% R),
+                  rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
+                ) * gammas
+              }
+            ) |>
+            purrr::map(~ rep(., private$n_variants)) |>
+            purrr::map2(
+              .y = seq(from = 0, to = private %.% n_age_groups - 1),
+              ~ c(.x, .y == seq(from = 0, to = private %.% n_age_groups - 1))
+            ) |>
+            purrr::reduce(rbind)
+
+          # Configure the observable
+          self$configure_output(
+            weights = weights_infection_matrix,
+            name = glue::glue("n_{observable}"),
+            derived_from = "infection_matrix"
+          )
+        })
+
 
       # Configure the passive inflow/outflow to/from the compartments
       # That is, the flows that are arise from the disease's natural progression within an individual
@@ -351,38 +382,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (length(immunity_matrix) == 1) immunity_matrix <- immunity_matrix[[1]]
 
       private$immunity_matrix <- immunity_matrix
-
-
-      # Configure observables for hospitalisation immunity target
-      immunity_approx %.% gamma |>
-        purrr::keep_at(c("hospitalisation", "death")) |>
-        purrr::iwalk(\(gammas, observable) {
-
-          # Compute the weights for the observable
-          weights_infection_matrix <- seq(from = 0, to = private %.% n_age_groups - 1) |>
-            purrr::map(
-              \(offset) {
-                c(
-                  rep(0, compartment_structure %.% R * offset),
-                  rep(1, compartment_structure %.% R),
-                  rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
-                ) * gammas
-              }
-            ) |>
-            purrr::map(~ rep(., private$n_variants)) |>
-            purrr::map2(
-              .y = seq(from = 0, to = private %.% n_age_groups - 1),
-              ~ c(.x, .y == seq(from = 0, to = private %.% n_age_groups - 1))
-            ) |>
-            purrr::reduce(rbind)
-
-          # Configure the observable
-          self$configure_output(
-            weights = weights_infection_matrix,
-            name = glue::glue("n_{observable}"),
-            derived_from = "infection_matrix"
-          )
-        })
 
 
       # Set the default forcing functions (no forcing)
