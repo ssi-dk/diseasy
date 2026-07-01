@@ -179,7 +179,7 @@ We again assume $Inc^* = r_i I_1$.
 We can modify the SEIR equation to take this signal as a forcing function with one less $I$ state
 (no $I_1$ state).
 
-The equations are as normal expect for the following changes:
+The equations are as normal except for the following changes:
 $$
 I = \frac{Inc^*}{r_i} + \sum_{l=2}^L I_l
 $$
@@ -196,7 +196,7 @@ at the point of interest.
 When the model is asked to deliver a prediction for an observable, these observables
 may be shifted in time (i.e. delayed) relative to the point of infection.
 
-For example, hospitalisation might occur an average of 7 days after infection.
+For example, hospitalisation might occur on average 7 days after infection.
 If the models starts at `time = 0`, then any model output for hospitalisation
 will therefore have a transient period of 7 days before that signal begins being
 exported by the model.
@@ -208,7 +208,7 @@ To eliminate the transient behaviour of the model output when delays are include
 we can determine the values of the $I_1$ state and the $C$ states for `time < 0`.
 
 This process is two-fold,
-1) To determine $I_1$ for `time < 0` we can simply use the input signal given the
+1) To determine $I_1$ for `time < 0` we can simply use the input signal given to
 the initialisation method by re-using the assumption $I^* = r_i I_1$.
 
 2) To determine $C_\cdot$ for `time < 0` we use the same submodel used to infer the R
