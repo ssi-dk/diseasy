@@ -833,8 +833,22 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
+
+        # Detect user configured infection matrix outputs
+        # (DiseasyImmunity automatically configures infection matrix outputs and
+        # we need to copy over user configured outputs)
+        infection_matrix_outputs <- rownames(private %.% observable_mapping %.% infection_matrix)
+        user_configured_infection_matrix_outputs <- which(
+          !(infection_matrix_outputs %in% c("n_hospitalisation", "n_death"))
+        )
+        missing_infection_matrix_outputs <- private %.% observable_mapping %.% infection_matrix[
+          user_configured_infection_matrix_outputs,
+          ,
+          drop = FALSE
+        ]
+
         purrr::iwalk(
-          .x = private %.% observable_mapping %.% infection_matrix |>
+          .x = missing_infection_matrix_outputs |>
             t() |>
             as.data.frame() |>
             as.list(),
@@ -949,7 +963,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       y0 <- c(
         rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
         self %.% population %.% population_proportion, # S states
-        rep(0, length(self %.% model_outputs)) # Surveillance states
+        rep(0, length(initialisation_submodel %.% model_outputs)) # Surveillance states
       )
 
       times <- seq(
