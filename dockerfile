@@ -14,17 +14,20 @@ WORKDIR /app
 
 # tex packages are installed in /root/bin so we have to make sure those
 # packages accessible by adding that directory to the PATH variable.
-ENV PATH="/snap/bin:/home/runner/.local/bin:/opt/pipx_bin:/home/runner/.cargo/bin:/home/runner/.config/composer/vendor/bin:/usr/local/.ghcup/bin:/home/runner/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/root/bin"
+ENV PATH="${PATH}:/root/bin"
 
 RUN R -e 'install.packages("pak")'
 
 RUN R -e 'getwd(); dir()'
 
+# Remove dev package from pak.lock
 RUN R -e 'pak::pak("jsonlite"); d <- jsonlite::read_json("pak.lock"); d$packages <- Filter(\(x) x$package != "diseasy", d$packages); print(unlist(Map(\(x) x$package, d$packages))); jsonlite::write_json(d, "pak.lock", auto_unbox = TRUE)'
 
+# Install package dependencies
 RUN R -e 'pkgs <- jsonlite::fromJSON("pak.lock")$packages; pak::pak(paste0(pkgs$package, "@" ,pkgs$version))'
 
+# Install workflow dependencies
 RUN R -e 'pak::pak(c("jsonlite", "rcmdcheck", "devtools", "lintr", "covr", "roxygen2", "pkgdown", "rmarkdown", "styler"))'
 
+# Install the dev package
 RUN R -e 'devtools::install()'
-

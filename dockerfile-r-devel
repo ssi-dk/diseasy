@@ -1,0 +1,8 @@
+FROM ghcr.io/r-hub/containers/ubuntu-gcc16:latest
+ENV TZ=Australia/Sydney
+
+COPY . /app/
+WORKDIR /app
+
+# Install check-time dependencies once when the image is rebuilt.
+RUN R -e 'pak::pkg_install(c("deps::.", "any::rcmdcheck", "any::devtools", "any::testthat", "any::knitr", "any::rmarkdown"), dependencies = TRUE)'
