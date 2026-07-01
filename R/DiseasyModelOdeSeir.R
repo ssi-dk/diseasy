@@ -63,7 +63,7 @@
 #'   # Plot the results
 #'   plot(m, observable = "incidence", prediction_length = 30)
 #'
-#'   rm(m, act, obs)
+#'   rm(m, activity, observables, population)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
