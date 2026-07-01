@@ -823,7 +823,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             t() |>
             as.data.frame() |>
             as.list(),
-          .y = attr(private %.% observable_mapping %.% state_vector, "name"),
+          .y = rownames(private %.% observable_mapping %.% state_vector),
           .f = ~ initialisation_submodel %.% configure_output(
             weights = .x,
             name = .y,
@@ -833,12 +833,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       if (!is.null(private %.% observable_mapping %.% infection_matrix)) {
-        purrr::walk2(
+        purrr::iwalk(
           .x = private %.% observable_mapping %.% infection_matrix |>
             t() |>
             as.data.frame() |>
             as.list(),
-          .y = attr(private %.% observable_mapping %.% infection_matrix, "name"),
           .f = ~ initialisation_submodel %.% configure_output(
             weights = .x,
             name = .y,
@@ -1262,7 +1261,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (derived_from == "infection_matrix") {
 
         # Current labels
-        existing_outputs <- attr(private$observable_mapping$infection_matrix, "name")
+        existing_outputs <- rownames(private$observable_mapping$infection_matrix)
 
         # Add weights
         private$observable_mapping$infection_matrix <- rbind(
@@ -1271,7 +1270,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
 
         # Update output names
-        attr(private$observable_mapping$infection_matrix, "name") <- c(
+        rownames(private$observable_mapping$infection_matrix) <- c(
           existing_outputs,
           rep(name, nrow(weights))
         )
@@ -1282,7 +1281,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (derived_from == "state_vector") {
 
         # Current labels
-        existing_outputs <- attr(private$observable_mapping$state_vector, "name")
+        existing_outputs <- rownames(private$observable_mapping$state_vector)
 
         # Add weights (ignoring potential existing zero-padding)
         private$observable_mapping$state_vector <- rbind(
@@ -1291,7 +1290,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
 
         # Update output names
-        attr(private$observable_mapping$state_vector, "name") <- c(
+        rownames(private$observable_mapping$state_vector) <- c(
           existing_outputs,
           rep(name, nrow(weights))
         )
@@ -1302,7 +1301,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (!is.null(private$observable_mapping$state_vector)) {
 
         # Current labels
-        existing_outputs <- attr(private$observable_mapping$state_vector, "name")
+        existing_outputs <- rownames(private$observable_mapping$state_vector)
 
         private$observable_mapping$state_vector <- cbind(
           private %.% observable_mapping %.% state_vector[, seq_len(private %.% n_states), drop = FALSE],
@@ -1315,7 +1314,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
 
         # Update output names
-        attr(private$observable_mapping$state_vector, "name") <- existing_outputs
+        rownames(private$observable_mapping$state_vector) <- existing_outputs
       }
 
       # Update surveillance indices
@@ -1386,7 +1385,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #' @field model_outputs (`character()`)\cr
     #'   Names of the user-configured model outputs. Read only.
     model_outputs = function() {
-      purrr::reduce(purrr::map(private %.% observable_mapping, ~ attr(., "name")), c)
+      purrr::reduce(purrr::map(private %.% observable_mapping, rownames), c)
     }
   ),
 
