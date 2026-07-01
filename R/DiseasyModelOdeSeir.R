@@ -291,6 +291,30 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       immunity_rates <- immunity_approx %.% delta
 
 
+      # Clear existing outputs for immunity targets
+      infection_matrix_outputs <- rownames(private %.% output_mapping %.% infection_matrix)
+      existing_immunity_outputs <- purrr::keep_at(infection_matrix_outputs, c("n_hospitalisation", "n_death"))
+      idx_to_delete <- purrr::map_lgl(infection_matrix_outputs, ~ . %in% existing_immunity_outputs)
+
+      # Clearing immunity outputs reduces the length of the state vector, so state_vector mappings must also be adjusted
+      if (!is.null(private$output_mapping$state_vector) && sum(idx_to_delete) > 0) {
+        private$output_mapping$state_vector <- private %.% output_mapping %.% state_vector[
+          ,
+          seq_len(ncol(private %.% output_mapping %.% state_vector) - sum(idx_to_delete)),
+          drop = FALSE
+        ]
+      }
+
+      # .. and now we can clear the immunity outpouts from the immunity_matrix mappings
+      if (sum(idx_to_delete) > 0) {
+        private$output_mapping$infection_matrix <- private %.% output_mapping %.% infection_matrix[
+          !purrr::map_lgl(infection_matrix_outputs, ~ . %in% existing_immunity_outputs),
+          ,
+          drop = FALSE
+        ]
+      }
+
+
       # Re-configure outputs for immunity targets
       immunity_approx %.% gamma |>
         purrr::keep_at(c("hospitalisation", "death")) |>
