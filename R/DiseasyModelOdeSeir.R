@@ -190,6 +190,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'  Allocate the helpers for the rhs method
     prepare_rhs = function() {
 
+      if (identical(private %.% ready, self %.% hash)) {
+        return(invisible(NULL))
+      }
+
       compartment_structure <- self %.% parameters %.% compartment_structure
       disease_progression_rates <- self %.% parameters %.% disease_progression_rates
 
