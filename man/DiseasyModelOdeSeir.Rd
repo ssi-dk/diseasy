@@ -106,7 +106,7 @@ Names of the user-configured model outputs. Read only.}
     \item \href{#method-DiseasyModelOdeSeir-malthusian_growth_rate}{\code{DiseasyModelOdeSeir$malthusian_growth_rate()}}
     \item \href{#method-DiseasyModelOdeSeir-initialise_state_vector}{\code{DiseasyModelOdeSeir$initialise_state_vector()}}
     \item \href{#method-DiseasyModelOdeSeir-rhs}{\code{DiseasyModelOdeSeir$rhs()}}
-    \item \href{#method-DiseasyModelOdeSeir-configure_observable}{\code{DiseasyModelOdeSeir$configure_observable()}}
+    \item \href{#method-DiseasyModelOdeSeir-configure_model_output}{\code{DiseasyModelOdeSeir$configure_model_output()}}
     \item \href{#method-DiseasyModelOdeSeir-clone}{\code{DiseasyModelOdeSeir$clone()}}
   }
 }
@@ -146,7 +146,6 @@ List of parameters to set for the model during initialization.
 Parameters controlling the structure of the model:
 \itemize{
 \item \code{compartment_structure} (\verb{named integer()})\cr The structure of the compartments in the model. The names should be \code{E}, \code{I}, and \code{R} for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.
-\item \code{age_cuts_lower} (\code{numeric()})\cr
 Determines the age groups in the model.
 \item \code{malthusian_matching} (\code{logical(1)})\cr
 Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?
@@ -354,8 +353,10 @@ If \code{ei_rs_balance = 1}, the estimate for EI states are prioritised, and onl
 If \code{ei_rs_balance = 0}, the estimate for RS states are prioritised.
   }
   \subsection{Returns}{
-    (\code{numeric()})\cr
-The initial state vector for the model (invisibly).
+    (\code{data.frame()})\cr
+The initialised state vector for the model.
+NOTE: the output includes the complete state for \code{time = 0} and additional
+history (\code{time < 0}) for some states (to allow observables with time-delays).
   }
 }
 
@@ -394,19 +395,20 @@ The rate of change for the differential equations.
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_observable"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_observable}{}}}
-\subsection{\code{DiseasyModelOdeSeir$configure_observable()}}{
+\if{html}{\out{<a id="method-DiseasyModelOdeSeir-configure_model_output"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOdeSeir-configure_model_output}{}}}
+\subsection{\code{DiseasyModelOdeSeir$configure_model_output()}}{
   Define new observables via a set of weights.
 
 Currently, only countable observables are supported.
 That is, observables must be summarisable by the "sum()" function.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOdeSeir$configure_observable(
+    \preformatted{DiseasyModelOdeSeir$configure_model_output(
   weights,
   name,
-  derived_from = c("state_vector", "infection_matrix")
+  derived_from = c("state_vector", "infection_matrix"),
+  delay = 0
 )}
     \if{html}{\out{</div>}}
   }
@@ -419,6 +421,8 @@ A matrix of weights to multiply by the signal source to form the flow into surve
 A name for the observable (retrievable by \verb{$get_results()})}
       \item{\code{derived_from}}{(\code{character(1)})\cr
 Which signal source should the observable be derived from?}
+      \item{\code{delay}}{(\code{numeric(1)})\cr
+The delay (in days) between infection and the occurrence of the given observable.}
     }
     \if{html}{\out{</div>}}
   }

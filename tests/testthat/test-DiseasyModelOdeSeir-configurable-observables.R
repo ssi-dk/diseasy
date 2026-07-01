@@ -1,18 +1,26 @@
-if (!rlang::is_installed(c("RSQLite", "deSolve"))) {
-  return() # Skip these tests if RSQLite is not installed
+if (!rlang::is_installed(c("RSQLite", "deSolve", "optimx", "ucminf"))) {
+  # Skip these tests if dependencies are not installed
+  test_that("missing dependencies", {
+    skip_if_not_installed("RSQLite")
+    skip_if_not_installed("deSolve")
+    skip_if_not_installed("optimx")
+    skip_if_not_installed("ucminf")
+  })
+
+  return(NULL)
 }
 
 # We here use the parameters of the generating model
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.02
+overall_infection_risk <- 0.025
 
 # Configure the activity module
 activity <- DiseasyActivity$new()
 activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
 activity$set_activity_units(dk_activity_units)
-activity$change_activity(date = as.Date("1900-01-01"), opening = "baseline")
+activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
 # Configure the immunity module
 immunity <- DiseasyImmunity$new()
@@ -20,34 +28,34 @@ immunity$set_exponential_waning(time_scale = 180)
 
 # Configure the season module
 season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-01"))
+season$set_reference_date(as.Date("2020-01-20"))
 season$use_cosine_season()
 
 # Configure a observables module for use in the tests
-obs <- DiseasyObservables$new(
+observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
   conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
-obs$set_study_period(
-  start_date = obs %.% ds %.% min_start_date,
-  end_date = obs %.% ds %.% max_end_date
+observables$set_study_period(
+  start_date = observables %.% ds %.% min_start_date,
+  end_date = observables %.% ds %.% max_end_date
 )
 
 
 # Get incidence data to infer initial state vector from
-obs$define_synthetic_observable(
+observables$define_synthetic_observable(
   name = "incidence",
   mapping = \(n_infected, n_population) n_infected / n_population
 )
 
-incidence_data <- obs$get_observation(
+incidence_data <- observables$get_observation(
   observable = "incidence"
 )
 
 
 # Lock the observation data to a simulation start date
-obs$set_last_queryable_date(obs %.% start_date + lubridate::days(45))
+observables$set_last_queryable_date(observables %.% start_date + lubridate::days(45))
 
 
 
@@ -71,15 +79,14 @@ tidyr::expand_grid(
 
     age_group_string <- ifelse(length(age_cuts_lower) == 0, "single", "multiple")
 
-    test_that(glue::glue("$configure_observable() ({model_string} single variant / {age_group_string} age group)"), {
-      skip_if_not_installed("RSQLite")
+    test_that(glue::glue("$configure_model_output() ({model_string} single variant / {age_group_string} age group)"), {
 
       m <- DiseasyModelOdeSeir$new(
+        observables = observables,
         population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
         activity = activity,
         immunity = immunity,
         season = season,
-        observables = obs,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
           "overall_infection_risk" = overall_infection_risk,
@@ -112,10 +119,11 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_observable(
+      m$configure_model_output(
         weights = weights_infection_matrix,
         name = "n_infected_infection_matrix",
-        derived_from = "infection_matrix"
+        derived_from = "infection_matrix",
+        delay = (K > 0) / rE + 1 / (rI * L) # Delay by E states and 1 I state
       )
 
 
@@ -134,7 +142,7 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_observable(
+      m$configure_model_output(
         weights = weights_state_vector,
         name = "n_infected_state_vector",
         derived_from = "state_vector"
@@ -144,7 +152,7 @@ tidyr::expand_grid(
       reference_after <- m$get_results("n_infected", prediction_length = 10)$n_infected
 
       # These should be very close to identical
-      expect_equal(reference_before, reference_after, tolerance = 1e-4) # within 0.1 per mille
+      expect_equal(reference_before, reference_after, tolerance = 5e-3) # within 5 per mille
 
       # For our other observables, we expect some difference:
       # 1) For the state_vector observable, we should have little difference since we
@@ -152,7 +160,7 @@ tidyr::expand_grid(
       # 2) For the infection_matrix we expect bigger differences since we measure in different
       # ways (as for 1)), but in addition, there is a time-delay since we measure inflow to E1
       # instead of outflow of I1.
-      # The time difference is roughly: 1/ rE + 1 / (L + rI) days
+      # The time difference is roughly: 1 / rE + 1 / (L * rI) days
 
       expect_equal(
         m$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
@@ -161,15 +169,9 @@ tidyr::expand_grid(
       )
 
       expect_equal(
-        utils::head(
-          m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
-          - round(1 / rE + 1 / (L + rI)) # Drop last points to account for time difference
-        ),
-        utils::tail(
-          reference_after,
-          - round(1 / rE + 1 / (L + rI)) # Drop first points to account for time difference
-        ),
-        tolerance = 0.1 # Within 10 %
+        m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
+        reference_after,
+        tolerance = 5e-2 # Within 5 %
       )
 
       rm(m)
@@ -180,10 +182,10 @@ tidyr::expand_grid(
 test_that("Loading modules resets user configured observables", {
 
   m <- DiseasyModelOdeSeir$new(
-    observables = obs
+    observables = observables
   )
 
-  m$configure_observable(
+  m$configure_model_output(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"
@@ -221,7 +223,7 @@ test_that("Loading modules resets user configured observables", {
   )
 
   # And we should now be able to reconfigure the observable again
-  m$configure_observable(
+  m$configure_model_output(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"

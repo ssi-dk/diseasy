@@ -34,19 +34,19 @@ season$set_reference_date(as.Date("2020-01-20"))
 season$use_cosine_season()
 
 # Configure a observables module for use in the tests
-obs <- DiseasyObservables$new(
+observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
   conn = DBI::dbConnect(RSQLite::SQLite())
 )
 
 # Get incidence data to infer initial state vector from
-obs$define_synthetic_observable(
+observables$define_synthetic_observable(
   name = "incidence",
   mapping = \(n_infected, n_population) n_infected / n_population
 )
 
 # Lock the observation data to a simulation start date
-obs$set_last_queryable_date(obs %.% ds %.% min_start_date + 30)
+observables$set_last_queryable_date(observables %.% ds %.% min_start_date + 30)
 
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
@@ -66,15 +66,12 @@ tidyr::expand_grid(
       paste(collapse = "")
 
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
-      skip_if_not_installed("RSQLite")
-      skip_if_not_installed("optimx")
-      skip_if_not_installed("ucminf")
 
       m <- DiseasyModelOdeSeir$new(
         activity = activity,
         immunity = immunity,
         season = season,
-        observables = obs,
+        observables = observables,
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M),
           "disease_progression_rates" = c("E" = rE, "I" = rI),
@@ -86,38 +83,39 @@ tidyr::expand_grid(
       private <- m$.__enclos_env__$private
 
       # Retrieve incidence data
-      incidence_data <- obs$get_observation(
+      incidence_data <- m$get_data(
         observable = "incidence",
         stratification = private$model_stratification(),
-        start_date = obs %.% ds %.% min_start_date,
-        end_date = obs %.% last_queryable_date
-      )
+        period = "training"
+      ) |>
+        dplyr::rename("incidence" = m %.% parameters %.% incidence_feature_name)
 
       # Estimate the initial state vector but suppress messages about negative states being set to zero
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
         expr = {
-          y0 <- m$initialise_state_vector(incidence_data)                                                               # nolint: implicit_assignment_linter
+          psi <- m$initialise_state_vector(incidence_data) |>                                                           # nolint: implicit_assignment_linter
+            dplyr::filter(.data$time == 0)
         }
       )
 
       # Solve model, and get the incidence data to compare with the data
       sol <- deSolve::ode(
-        y = y0 %.% initial_condition,
-        times = seq_along(seq(from = obs$last_queryable_date, obs$last_queryable_date + 60, by = "1 day")) - 1,
+        y = psi %.% value,
+        times = seq_len(60) - 1,
         func = m %.% rhs
       )
 
       model_incidence <- rI * rowSums(sol[, private$i1_state_indices + 1, drop = FALSE])
 
       # Check that the initialisation works "well" - always within 10% of the true incidence
-      true_incidence <- obs$get_observation(
+      true_incidence <- m$get_data(
         observable = "incidence",
         stratification = private$model_stratification(),
-        start_date = obs %.% last_queryable_date,
-        end_date = obs %.% last_queryable_date + 60,
-        respect_last_queryable_date = FALSE
+        period = "plotting",
+        prediction_length = 60
       ) |>
+        dplyr::filter(.data$t > 0) |>
         dplyr::pull("incidence")
 
       expect_equal(model_incidence, true_incidence, tolerance = 1e-1)                                                   # nolint: expect_identical_linter

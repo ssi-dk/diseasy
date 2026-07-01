@@ -2,3 +2,8 @@
 if (Sys.getenv("CI") == "true" && .Platform$OS.type == "unix" && Sys.info()['sysname'] != "Darwin") {
   options(repos = c("CRAN" = "https://p3m.dev/cran/__linux__/noble/latest"))
 }
+
+user_profile <- path.expand("~/.Rprofile")
+if (file.exists(user_profile)) {
+  source(user_profile)
+}
