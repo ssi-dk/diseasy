@@ -200,7 +200,10 @@ vector,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>ψ</mi><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\psi}</annotation></semantics></math>,
 and increments first in demographic groups then in variants.</p>
 <p>Finally, the susceptible states are placed at the end of the state
-vector.</p>
+vector<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;If the user has configured custom model outputs (see the
+“DiseasyModelOde” article) each such output needs a state (here called
+&lt;code&gt;C_\cdot&lt;/code&gt; state) which is placed after the susceptible states
+in the state vector.&lt;/p&gt;"><sup>1</sup></a>.</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>ψ</mi><mo accent="true">¯</mo></mover><mo>=</mo><mo stretchy="false" form="prefix">[</mo><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Demographic group 1, Variant 1</mtext></munder></mrow><annotation encoding="application/x-tex">
 \overline{\psi} = [\underbrace{\begin{matrix} E_{1,1}^1\, \cdots \, E_{1,1}^K \;\;\; I_{1,1}^1 \, \cdots \, I_{1,1}^L \;\;\; R_{1,1}^1 \, \cdots \, R_{1,1}^M \end{matrix}}_{\text{Demographic group 1, Variant 1}}
 </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><munder><mtable><mtr><mtd columnalign="center" style="text-align: center"><msubsup><mi>E</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>E</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>K</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>I</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>I</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>L</mi></msubsup><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>R</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mn>1</mn></msubsup><mspace width="0.167em"></mspace><mi>⋯</mi><mspace width="0.167em"></mspace><msubsup><mi>R</mi><mrow><mn>2</mn><mo>,</mo><mn>1</mn></mrow><mi>M</mi></msubsup></mtd></mtr></mtable><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">Demographic group 2, Variant 1</mtext></munder><mspace width="0.278em"></mspace><mi>⋯</mi></mrow><annotation encoding="application/x-tex">
@@ -856,15 +859,16 @@ demographic groups and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min      lq      mean  median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 24.576 27.0105 31.484847 28.1780 29.3850 2463.426  1000</span></span>
-<span><span class="co">#&gt;              sapply 12.814 13.3540 14.452164 13.8160 14.6375   42.749  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 12.763 13.3350 14.409679 13.7905 14.5780   38.532  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.719  5.2700  5.681142  5.5110  5.7510   24.285  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min      lq      mean  median     uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 17.406 18.3370 19.538150 18.7730 19.474  186.528  1000</span></span>
+<span><span class="co">#&gt;              sapply  9.243  9.8145 12.910928 10.0650 10.431 2603.306  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES  9.124  9.8445 10.501967 10.1505 10.596   54.672  1000</span></span>
+<span><span class="co">#&gt;              vapply  3.565  3.8805  4.179099  4.0560  4.266   13.660  1000</span></span></code></pre></div>
 <p>Note, that the best performing function in this case is
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>.</p>
 </div>
 </div>
+
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

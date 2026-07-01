@@ -141,7 +141,7 @@ Names of the user-configured model outputs. Read only.</p></dd>
 <li><p><a href="#method-DiseasyModelOdeSeir-malthusian_growth_rate"><code>DiseasyModelOdeSeir$malthusian_growth_rate()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-initialise_state_vector"><code>DiseasyModelOdeSeir$initialise_state_vector()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-rhs"><code>DiseasyModelOdeSeir$rhs()</code></a></p></li>
-<li><p><a href="#method-DiseasyModelOdeSeir-configure_observable"><code>DiseasyModelOdeSeir$configure_observable()</code></a></p></li>
+<li><p><a href="#method-DiseasyModelOdeSeir-configure_model_output"><code>DiseasyModelOdeSeir$configure_model_output()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-clone"><code>DiseasyModelOdeSeir$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>DiseasyModel$get_data()</code></a></span></li>
@@ -168,8 +168,7 @@ Names of the user-configured model outputs. Read only.</p></dd>
       <dt><code>parameters</code></dt>
 <dd><p>(<code>named list()</code>)<br>
 List of parameters to set for the model during initialization.</p>
-<p>Parameters controlling the structure of the model:</p><ul><li><p><code>compartment_structure</code> (<code>named integer()</code>)<br> The structure of the compartments in the model. The names should be <code>E</code>, <code>I</code>, and <code>R</code> for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.</p></li>
-<li><p><code>age_cuts_lower</code> (<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)<br>
+<p>Parameters controlling the structure of the model:</p><ul><li><p><code>compartment_structure</code> (<code>named integer()</code>)<br> The structure of the compartments in the model. The names should be <code>E</code>, <code>I</code>, and <code>R</code> for the exposed, infectious, and recovered compartments, respectively. The exposed compartments can optionally be omitted.
 Determines the age groups in the model.</p></li>
 <li><p><code>malthusian_matching</code> (<code>logical(1)</code>)<br>
 Should the model be scaled such the Malthusian growth rate matches the corresponding SIR model?</p></li>
@@ -357,8 +356,10 @@ If <code>ei_rs_balance = 1</code>, the estimate for EI states are prioritised, a
 If <code>ei_rs_balance = 0</code>, the estimate for RS states are prioritised.</p>
 </div><p></p><div class="section">
 <h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
-<p>(<code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric()</a></code>)<br>
-The initial state vector for the model (invisibly).</p>
+<p>(<code><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame()</a></code>)<br>
+The initialised state vector for the model.
+NOTE: the output includes the complete state for <code>time = 0</code> and additional
+history (<code>time &lt; 0</code>) for some states (to allow observables with time-delays).</p>
 </div>
 
 </div>
@@ -400,16 +401,17 @@ The rate of change for the differential equations.</p>
 
 </div>
 
-<p></p><hr><a id="method-DiseasyModelOdeSeir-configure_observable"></a><div class="section">
-<h3 id="diseasymodelodeseir-configure-observable-"><code>DiseasyModelOdeSeir$configure_observable()</code><a class="anchor" aria-label="anchor" href="#diseasymodelodeseir-configure-observable-"></a></h3>
+<p></p><hr><a id="method-DiseasyModelOdeSeir-configure_model_output"></a><div class="section">
+<h3 id="diseasymodelodeseir-configure-model-output-"><code>DiseasyModelOdeSeir$configure_model_output()</code><a class="anchor" aria-label="anchor" href="#diseasymodelodeseir-configure-model-output-"></a></h3>
 <p>Define new observables via a set of weights.</p>
 <p>Currently, only countable observables are supported.
 That is, observables must be summarisable by the "sum()" function.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">configure_observable</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">configure_model_output</span><span class="op">(</span></span>
 <span>  <span class="va">weights</span>,</span>
 <span>  <span class="va">name</span>,</span>
-<span>  derived_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state_vector"</span>, <span class="st">"infection_matrix"</span><span class="op">)</span></span>
+<span>  derived_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state_vector"</span>, <span class="st">"infection_matrix"</span><span class="op">)</span>,</span>
+<span>  delay <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
@@ -424,6 +426,10 @@ A name for the observable (retrievable by <code>$get_results()</code>)</p></dd>
       <dt><code>derived_from</code></dt>
 <dd><p>(<code>character(1)</code>)<br>
 Which signal source should the observable be derived from?</p></dd>
+
+      <dt><code>delay</code></dt>
+<dd><p>(<code>numeric(1)</code>)<br>
+The delay (in days) between infection and the occurrence of the given observable.</p></dd>
 
 
 </dl><p></p></div>
@@ -508,11 +514,11 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   date       incidence realisation_id weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 2020-03-01   0.003<span style="text-decoration: underline;">63</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2020-03-02   0.003<span style="text-decoration: underline;">73</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 2020-03-03   0.003<span style="text-decoration: underline;">85</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 2020-03-04   0.003<span style="text-decoration: underline;">99</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 2020-03-05   0.004<span style="text-decoration: underline;">13</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 2020-03-01   0.003<span style="text-decoration: underline;">74</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2020-03-02   0.003<span style="text-decoration: underline;">90</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 2020-03-03   0.004<span style="text-decoration: underline;">07</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 2020-03-04   0.004<span style="text-decoration: underline;">26</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 2020-03-05   0.004<span style="text-decoration: underline;">45</span>              1      1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Plot the results</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m</span>, observable <span class="op">=</span> <span class="st">"incidence"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>

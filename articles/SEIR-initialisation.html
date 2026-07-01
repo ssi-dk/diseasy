@@ -313,20 +313,19 @@ states.</p>
 <p>We again assume
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">Inc^* = r_i I_1</annotation></semantics></math>.</p>
 <p>We can modify the SEIR equation to take this signal as a forcing
-function with no
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>E</mi><annotation encoding="application/x-tex">E</annotation></semantics></math>
-states and one less
+function with one less
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
 state (no
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>
 state).</p>
-<p>The equations are as normal expect for the following changes:
+<p>The equations are as normal except for the following changes:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>=</mo><mfrac><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup></mrow><msub><mi>r</mi><mi>i</mi></msub></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>l</mi><mo>=</mo><mn>2</mn></mrow><mi>L</mi></munderover><msub><mi>I</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">
 I = \frac{Inc^*}{r_i} + \sum_{l=2}^L I_l
 </annotation></semantics></math></p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><msub><mi>I</mi><mn>2</mn></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo>−</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">
 \frac{d I_2}{d t} = Inc^* - r_i I_2
-</annotation></semantics></math> If we start this system at a time where
+</annotation></semantics></math></p>
+<p>If we create such a submodel and start this system at a time where
 there are no new infections, we can initialize
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>I</mi><mi>l</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">I_l = 0</annotation></semantics></math>,
 and run the simulation forward to estimate the
@@ -334,6 +333,43 @@ and run the simulation forward to estimate the
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
 populations at the point of interest.</p>
+</div>
+<div class="section level2">
+<h2 id="initialising-custom-model-output-states">Initialising custom model output states<a class="anchor" aria-label="anchor" href="#initialising-custom-model-output-states"></a>
+</h2>
+<p>When the model is asked to deliver a prediction for an observable,
+these observables may be shifted in time (i.e. delayed) relative to the
+point of infection.</p>
+<p>For example, hospitalisation might occur on average 7 days after
+infection. If the models starts at <code>time = 0</code>, then any model
+output for hospitalisation will therefore have a transient period of 7
+days before that signal begins being exported by the model.</p>
+<p>Each model output is derived either from the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>
+state or any of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
+states added when the user defines a custom model output (see the
+“DiseasyModelOde” article).</p>
+<p>To eliminate the transient behaviour of the model output when delays
+are included, we can determine the values of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>
+state and the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
+states for <code>time &lt; 0</code>.</p>
+<p>This process is two-fold, 1) To determine
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mn>1</mn></msub><annotation encoding="application/x-tex">I_1</annotation></semantics></math>
+for <code>time &lt; 0</code> we can simply use the input signal given to
+the initialisation method by re-using the assumption
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><msup><mi>c</mi><mo>*</mo></msup><mo>=</mo><msub><mi>r</mi><mi>i</mi></msub><msub><mi>I</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">Inc^* = r_i I_1</annotation></semantics></math>.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>To determine
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mo>⋅</mo></msub><annotation encoding="application/x-tex">C_\cdot</annotation></semantics></math>
+for <code>time &lt; 0</code> we use the same submodel used to infer the
+R and S states and configure the custom model outputs here. The forcing
+function in the submodel thus generates the time evolution of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mo>⋅</mo></msub><annotation encoding="application/x-tex">C_\cdot</annotation></semantics></math>
+states for <code>time &lt; 0</code>.</li>
+</ol>
 </div>
 <div class="section level2">
 <h2 id="testing-the-methods">Testing the methods<a class="anchor" aria-label="anchor" href="#testing-the-methods"></a>
@@ -387,16 +423,16 @@ a reduced probability of testing during weekends.</li>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,500 × 6</span></span></span>
 <span><span class="co">#&gt;    date       age_group variant n_infected n_positive_simple n_positive</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            17.2                 7          7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            36.8                26         23</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            49.1                26         19</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            57.4                34         39</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            64.4                47         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            71.6                44         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT            79.2                55         59</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT            87.3                61         64</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT            96.0                59         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           105.                 83         67</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 00-29     WT            68.0                42         42</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 00-29     WT           145.                 94         69</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 00-29     WT           191.                122         93</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 00-29     WT           220.                142        149</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 00-29     WT           242.                152        163</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 00-29     WT           265.                169        180</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 00-29     WT           289.                189        203</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 00-29     WT           315.                191        207</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 00-29     WT           343.                231        176</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 00-29     WT           374.                236        174</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,490 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualise the example data</span></span>
@@ -573,27 +609,20 @@ infer the initial state vector.</p>
 <code class="sourceCode R"><span><span class="va">psi</span> <span class="op">&lt;-</span> <span class="va">m</span><span class="op">$</span><span class="fu">initialise_state_vector</span><span class="op">(</span><span class="va">incidence_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">psi</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 18 × 4</span></span></span>
-<span><span class="co">#&gt;    variant age_group state initial_condition</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> All     00-29     E1             0.001<span style="text-decoration: underline;">41</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> All     00-29     E2             0.001<span style="text-decoration: underline;">39</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> All     00-29     I1             0.005<span style="text-decoration: underline;">28</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> All     00-29     R1             0.016<span style="text-decoration: underline;">4</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> All     00-29     R2             0.001<span style="text-decoration: underline;">10</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> All     30-59     E1             0.001<span style="text-decoration: underline;">21</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> All     30-59     E2             0.001<span style="text-decoration: underline;">20</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> All     30-59     I1             0.004<span style="text-decoration: underline;">57</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> All     30-59     R1             0.014<span style="text-decoration: underline;">1</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> All     30-59     R2             0.000<span style="text-decoration: underline;">945</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> All     60+       E1             0.000<span style="text-decoration: underline;">456</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> All     60+       E2             0.000<span style="text-decoration: underline;">443</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> All     60+       I1             0.001<span style="text-decoration: underline;">61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> All     60+       R1             0.004<span style="text-decoration: underline;">79</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> All     60+       R2             0.000<span style="text-decoration: underline;">321</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> <span style="color: #BB0000;">NA</span>      00-29     S              0.330   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> <span style="color: #BB0000;">NA</span>      30-59     S              0.365   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> <span style="color: #BB0000;">NA</span>      60+       S              0.250</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 168 × 5</span></span></span>
+<span><span class="co">#&gt;     time variant age_group state   value</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0 All     00-29     E1    0.001<span style="text-decoration: underline;">41</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     0 All     00-29     E2    0.001<span style="text-decoration: underline;">39</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0 All     00-29     I1    0.005<span style="text-decoration: underline;">28</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     0 All     00-29     R1    0.001<span style="text-decoration: underline;">31</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     0 All     00-29     R2    0.001<span style="text-decoration: underline;">23</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     0 All     30-59     E1    0.001<span style="text-decoration: underline;">21</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0 All     30-59     E2    0.001<span style="text-decoration: underline;">20</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     0 All     30-59     I1    0.004<span style="text-decoration: underline;">57</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     0 All     30-59     R1    0.001<span style="text-decoration: underline;">14</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     0 All     30-59     R2    0.001<span style="text-decoration: underline;">07</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 158 more rows</span></span></span></code></pre></div>
 <p>And we now test the initial conditions by solving the model using
 these starting conditions.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -614,16 +643,16 @@ these starting conditions.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 7</span></span></span>
 <span><span class="co">#&gt;    date       variant age_group incidence realisation_id weight</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-02-23 All     00-29       0.003<span style="text-decoration: underline;">32</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-02-24 All     00-29       0.003<span style="text-decoration: underline;">43</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-02-25 All     00-29       0.003<span style="text-decoration: underline;">60</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-02-26 All     00-29       0.003<span style="text-decoration: underline;">81</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-02-27 All     00-29       0.004<span style="text-decoration: underline;">05</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-02-28 All     00-29       0.004<span style="text-decoration: underline;">29</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-02-29 All     00-29       0.004<span style="text-decoration: underline;">55</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-03-01 All     00-29       0.004<span style="text-decoration: underline;">82</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-03-02 All     00-29       0.005<span style="text-decoration: underline;">09</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-03-03 All     00-29       0.005<span style="text-decoration: underline;">37</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-02-23 All     00-29       0.003<span style="text-decoration: underline;">43</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-02-24 All     00-29       0.003<span style="text-decoration: underline;">62</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-02-25 All     00-29       0.003<span style="text-decoration: underline;">85</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-02-26 All     00-29       0.004<span style="text-decoration: underline;">12</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-02-27 All     00-29       0.004<span style="text-decoration: underline;">40</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-02-28 All     00-29       0.004<span style="text-decoration: underline;">69</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-02-29 All     00-29       0.005<span style="text-decoration: underline;">00</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-03-01 All     00-29       0.005<span style="text-decoration: underline;">32</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-03-02 All     00-29       0.005<span style="text-decoration: underline;">64</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-03-03 All     00-29       0.005<span style="text-decoration: underline;">97</span>              1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 290 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: model_configuration &lt;chr&gt;</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
