@@ -209,7 +209,7 @@ we can determine the values of the $I_1$ state and the $C$ states for `time < 0`
 
 This process is two-fold,
 1) To determine $I_1$ for `time < 0` we can simply use the input signal given to
-the initialisation method by re-using the assumption $I^* = r_i I_1$.
+the initialisation method by re-using the assumption $Inc^* = r_i I_1$.
 
 2) To determine $C_\cdot$ for `time < 0` we use the same submodel used to infer the R
 and S states and configure the custom model outputs here.
