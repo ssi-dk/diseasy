@@ -291,12 +291,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       immunity_rates <- immunity_approx %.% delta
 
 
-      # Clear existing outputs for immunity targets
+      # Outcomes from DiseasyImmunity can configure outputs for the model
+      # When we prepare the RHS for the ODE, we first need to clear any existing
+      # configured outputs for immunity targets but leave user configured outputs as is
+
+      # Which outputs are presently configured derived from the infection_matrix?
       infection_matrix_outputs <- rownames(private %.% output_mapping %.% infection_matrix)
+
+      # Which are a configured automatically from DiseasyImmunity (i.e. which should we delete)
       existing_immunity_outputs <- purrr::keep_at(infection_matrix_outputs, c("n_hospitalisation", "n_death"))
       idx_to_delete <- purrr::map_lgl(infection_matrix_outputs, ~ . %in% existing_immunity_outputs)
 
-      # Clearing immunity outputs reduces the length of the state vector, so state_vector mappings must also be adjusted
+      # Clearing immunity outputs reduces the length of the state vector, so state_vector mappings must also be adjuted
+      # (e.g. if we remove two outputs, the length of the state_vector will be reduced by two, and we should therefore
+      # reduce the state_vector output mapping matrix by two in the corresponding direction)
       if (!is.null(private$output_mapping$state_vector) && sum(idx_to_delete) > 0) {
         private$output_mapping$state_vector <- private %.% output_mapping %.% state_vector[
           ,
@@ -315,13 +323,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
 
-      # Re-configure outputs for immunity targets
+      # Now that we are sure we have removed existing outputs from the configuration,
+      # we can re-configure outputs for immunity targets using the (potentially) new parameters.
       immunity_approx %.% gamma |>
         purrr::keep_at(c("hospitalisation", "death")) |>
         purrr::iwalk(\(gammas, observable) {
 
-          # Compute the weights for the observable
-          weights_infection_matrix <- seq(from = 0, to = private %.% n_age_groups - 1) |>
+          # Compute the weights for the output
+          # For each age_group in the model, we need the gammas from
+          # DiseasyImmunity to line up with the corresponding part of the state_vector
+          weights_infection_matrix <- seq(from = 0, to = (private %.% n_age_groups) - 1) |>
             purrr::map(
               \(offset) {
                 c(
