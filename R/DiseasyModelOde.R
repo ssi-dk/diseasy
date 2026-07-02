@@ -77,9 +77,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
         # .. get population data
         population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-          dplyr::mutate(
-            "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower)[.data$age_group_out]
-          ) |>
+          dplyr::mutate("age_group" = .data$age_group_out) |>
           dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
           dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
 
@@ -179,9 +177,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
       # .. get population data
       population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-        dplyr::mutate(
-          "age_group" = diseasystore::age_labels(self %.% population %.% age_cuts_lower)[.data$age_group_out]
-        ) |>
+        dplyr::mutate("age_group" = .data$age_group_out) |>
         dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
         dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
 
