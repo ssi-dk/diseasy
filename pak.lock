@@ -481,7 +481,7 @@
     },
     {
       "package": "lattice",
-      "version": "0.22-7",
+      "version": "0.22-9",
       "binary": true
     },
     {
@@ -546,7 +546,7 @@
     },
     {
       "package": "Matrix",
-      "version": "1.7-4",
+      "version": "1.7-5",
       "binary": true
     },
     {
@@ -561,7 +561,7 @@
     },
     {
       "package": "mgcv",
-      "version": "1.9-3",
+      "version": "1.9-4",
       "binary": true
     },
     {
@@ -591,7 +591,7 @@
     },
     {
       "package": "nlme",
-      "version": "3.1-168",
+      "version": "3.1-169",
       "binary": true
     },
     {
