@@ -627,8 +627,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   )
 
   # Get a reference to the private environment
-  self <- m
-  private <- self$.__enclos_env__$private
+  private <- m$.__enclos_env__$private
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
@@ -636,9 +635,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
   y0[private$s_state_indices] <- ss <- 0.4 # The rest are susceptible
-
-  t <- 1
-  state_vector <- y0
   expect_equal(                                                                                                         # nolint: expect_identical_linter
     unname(m %.% rhs(1, y0)[[1]]),
     c(
