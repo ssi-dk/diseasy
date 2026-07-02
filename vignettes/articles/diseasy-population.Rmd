@@ -57,7 +57,7 @@ Once the scope of the population has been defined in `DiseasyRegions`, this can 
 `DiseasyPopulation` to handle the remaining configuration of the model population.
 
 ```{r load-regions}
-population <- DiseasyPopulation$new(regions = regions)
+population <- DiseasyPopulation$new(region = regions)
 
 population
 ```
