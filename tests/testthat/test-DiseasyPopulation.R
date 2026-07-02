@@ -254,7 +254,19 @@ test_that("$per_capita_contact_matrices() works", {
     demography = demography_nordic_nuts3,
     adjacency = adjacency_meta_nordic_nuts
   )
-  population <- DiseasyPopulation$new(region = regions)
+
+  # And a simple activity scenario
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
+  activity$set_activity_units(dk_activity_units)
+  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+
+  # Combine into a populaiton module
+  population <- DiseasyPopulation$new(
+    region = regions,
+    activity = activity
+  )
 
   # Get the non-stratified contact matrices
   contact_matrices_non_stratified <- population$per_capita_contact_matrices()
@@ -262,6 +274,8 @@ test_that("$per_capita_contact_matrices() works", {
   # Stratify and then re-compute contact matrices in the new groups
   population$stratify_age(c(0, 30, 60))
   population$stratify_regions("NUTS 2")
+
+  contact_matrices_stratified <- population$per_capita_contact_matrices()
 
 
   rm(population)
