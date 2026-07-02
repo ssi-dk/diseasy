@@ -57,7 +57,7 @@ Once the scope of the population has been defined in `DiseasyRegions`, this can 
 `DiseasyPopulation` to handle the remaining configuration of the model population.
 
 ```{r load-regions}
-population <- DiseasyPopulation(regions = regions)
+population <- DiseasyPopulation$new(regions = regions)
 
 population
 ```
@@ -72,7 +72,7 @@ In `diseasy`, this is done via the `DiseasyActivity`[^2].
 if needed for the model -- but this is not done for this example.
 
 ```{r activity}
-activity <- Diseasyactivity(
+activity <- Diseasyactivity$new(
   contact_basis = contact_basis_nordic # Contact matrices from `contactdata` package
 )
 
