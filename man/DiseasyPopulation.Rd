@@ -30,6 +30,8 @@ See vignette("diseasy-population").
 }
 \seealso{
 \link{DiseasyActivity}
+
+\link{DiseasyRegions}
 }
 \keyword{functional-module}
 \section{Super class}{
@@ -38,8 +40,8 @@ See vignette("diseasy-population").
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
-    \item{\code{groups}}{(\verb{named character()})\cr
-The names of the demographic groups that have been configured in the module.}
+    \item{\code{groups}}{(\code{data.frame()})\cr
+The demographic groups that have been configured in the module.}
 
     \item{\code{population}}{(\code{tibble})\cr
 The population groups and their sizes configured in the module.}
@@ -47,10 +49,15 @@ The population groups and their sizes configured in the module.}
     \item{\code{population_proportion}}{(\code{numeric()})\cr
 The distribution of individuals across the demography groups defined in the module.}
 
+    \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population. Read only.}
+
     \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
 
     \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
 The local copy of an DiseasyActivity module. Read-only.}
+
+    \item{\code{regions}}{(\code{diseasy::DiseasyRegions})\cr
+The local copy of an DiseasyRegions module. Read-only.}
   }
   \if{html}{\out{</div>}}
 }
@@ -59,6 +66,8 @@ The local copy of an DiseasyActivity module. Read-only.}
   \itemize{
     \item \href{#method-DiseasyPopulation-initialize}{\code{DiseasyPopulation$new()}}
     \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
+    \item \href{#method-DiseasyPopulation-stratify_regions}{\code{DiseasyPopulation$stratify_regions()}}
+    \item \href{#method-DiseasyPopulation-validate_configuration}{\code{DiseasyPopulation$validate_configuration()}}
     \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
     \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
     \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
@@ -77,13 +86,21 @@ The local copy of an DiseasyActivity module. Read-only.}
   Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyPopulation$new(age_cuts_lower = 0L, ...)}
+    \preformatted{DiseasyPopulation$new(
+  age_cuts_lower = 0L,
+  regional_stratification = NULL,
+  region = NULL,
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+      \item{\code{region}}{(\code{DiseasyRegions})\cr
+An instance of a regional module which should provide the demography of the population.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}
@@ -104,6 +121,55 @@ The local copy of an DiseasyActivity module. Read-only.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-stratify_regions"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-stratify_regions}{}}}
+\subsection{\code{DiseasyPopulation$stratify_regions()}}{
+  Sets the spatial stratification of the model population.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$stratify_regions(regional_stratification)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-validate_configuration"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-validate_configuration}{}}}
+\subsection{\code{DiseasyPopulation$validate_configuration()}}{
+  Validate the stratifications are supported by demography data.
+Throw error if misconfigured.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$validate_configuration(
+  age_cuts_lower = self \%.\% age_cuts_lower,
+  regional_stratification = self \%.\% regional_stratification
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
     }
     \if{html}{\out{</div>}}
   }
