@@ -93,6 +93,7 @@ M <- 2L                                                                         
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
   population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
+  region = DiseasyRegions$new(regions = "DK", demography = demography_nordic),
   activity = activity,
   immunity = immunity,
   season = season,
@@ -238,6 +239,7 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 30)),
+    region = DiseasyRegions$new(regions = "DK", demography = demography_nordic),
     activity = activity,
     immunity = immunity,
     season = season,

@@ -84,6 +84,7 @@ tidyr::expand_grid(
       m <- DiseasyModelOdeSeir$new(
         observables = observables,
         population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
+        region = DiseasyRegions$new(regions = "DK", demography = demography_nordic),
         activity = activity,
         immunity = immunity,
         season = season,

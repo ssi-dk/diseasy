@@ -51,6 +51,7 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    region = DiseasyRegions$new(regions = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -97,6 +98,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40, 80)),
+    region = DiseasyRegions$new(regions = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -245,6 +247,7 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
     population = DiseasyPopulation$new(
       age_cuts_lower = as.numeric(stringr::str_extract(names(contact_basis_nordic %.% DK %.% population), r"{^\d+}"))
     ),
+    region = DiseasyRegions$new(regions = "DK", demography = demography_nordic),
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
