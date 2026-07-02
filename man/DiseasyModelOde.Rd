@@ -22,133 +22,131 @@ This implementation requires the subclass to implement the \verb{$rhs()} and \ve
 }
 \keyword{model-template-builder}
 \section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{DiseasyModel}} -> \code{DiseasyModelOde}
+\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{diseasy::DiseasyModel}} -> \code{DiseasyModelOde}
 }
 \section{Methods}{
 \subsection{Public methods}{
-  \itemize{
-    \item \href{#method-DiseasyModelOde-initialize}{\code{DiseasyModelOde$new()}}
-    \item \href{#method-DiseasyModelOde-get_results}{\code{DiseasyModelOde$get_results()}}
-    \item \href{#method-DiseasyModelOde-initialise_state_vector}{\code{DiseasyModelOde$initialise_state_vector()}}
-    \item \href{#method-DiseasyModelOde-plot}{\code{DiseasyModelOde$plot()}}
-    \item \href{#method-DiseasyModelOde-clone}{\code{DiseasyModelOde$clone()}}
-  }
+\itemize{
+\item \href{#method-DiseasyModelOde-new}{\code{DiseasyModelOde$new()}}
+\item \href{#method-DiseasyModelOde-get_results}{\code{DiseasyModelOde$get_results()}}
+\item \href{#method-DiseasyModelOde-initialise_state_vector}{\code{DiseasyModelOde$initialise_state_vector()}}
+\item \href{#method-DiseasyModelOde-plot}{\code{DiseasyModelOde$plot()}}
+\item \href{#method-DiseasyModelOde-clone}{\code{DiseasyModelOde$clone()}}
 }
-\if{html}{\out{<details open><summary>Inherited methods</summary>
+}
+\if{html}{\out{
+<details open><summary>Inherited methods</summary>
 <ul>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>diseasy::DiseasyModel$get_data()</code></a></span></li>
 </ul>
-</details>}}
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyModelOde-initialize"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyModelOde-initialize}{}}}
-\subsection{\code{DiseasyModelOde$new()}}{
-  Merge the user provided mappings with the default mappings during initialisation.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOde$new(parameters = NULL, ...)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{parameters}}{(\code{list()})\cr
-List of parameters given to the model.}
-      \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\if{html}{\out{<a id="method-DiseasyModelOde-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModelOde-new}{}}}
+\subsection{Method \code{new()}}{
+Merge the user provided mappings with the default mappings during initialisation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$new(parameters = NULL, ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{parameters}}{(\code{list()})\cr
+List of parameters given to the model.}
+
+\item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOde-get_results"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOde-get_results}{}}}
-\subsection{\code{DiseasyModelOde$get_results()}}{
-  The primary method used to request model results of a given observable at a given stratification
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOde$get_results(
+\subsection{Method \code{get_results()}}{
+The primary method used to request model results of a given observable at a given stratification
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$get_results(
   observable,
   prediction_length,
   quantiles = NULL,
   stratification = NULL
-)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
-      \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
-      \item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
-      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-    }
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Returns}{
-    A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
-  }
+)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+
+\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+
+\item{\code{quantiles}}{(\code{list}(\code{numeric}))\cr If given, results are returned at the quantiles given.}
+
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{tibble} \link[tibble:tibble]{tibble::tibble} with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:\cr\cr  - date (\code{Date}) specifying the date of the prediction.\cr  - realisation_id (\code{character}) giving a unique id for each realization in the ensemble.\cr  - weight (\code{numeric}) giving the weight of the realization in the ensemble.
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOde-initialise_state_vector"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOde-initialise_state_vector}{}}}
-\subsection{\code{DiseasyModelOde$initialise_state_vector()}}{
-  Infer the state_vector from incidence data
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOde$initialise_state_vector(incidence_data)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{incidence_data}}{(\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{...}: Columns corresponding to the demographic groups configured in the scenario (see \verb{$population$groups}). - \code{variant}: The variant of the incidence observation (if configured in the scenario). - \code{incidence}: The incidence in the age group at the given date}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{initialise_state_vector()}}{
+Infer the state_vector from incidence data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$initialise_state_vector(incidence_data)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{incidence_data}}{(\code{data.frame})\cr Incidence observations as a \code{data.frame} with columns - \code{date}: The date of the observations - \code{...}: Columns corresponding to the demographic groups configured in the scenario (see \verb{$population$groups}). - \code{variant}: The variant of the incidence observation (if configured in the scenario). - \code{incidence}: The incidence in the age group at the given date}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOde-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOde-plot}{}}}
-\subsection{\code{DiseasyModelOde$plot()}}{
-  Plot the predictions from the current model.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOde$plot(observable, prediction_length, stratification = NULL)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
-      \item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
-      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{plot()}}{
+Plot the predictions from the current model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$plot(observable, prediction_length, stratification = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+
+\item{\code{prediction_length}}{(\code{numeric})\cr The number of days to predict. The prediction start is defined by \code{last_queryable_date} of the \code{?DiseasyObservables} \link[R6:R6Class]{R6} class.}
+
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyModelOde-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyModelOde-clone}{}}}
-\subsection{\code{DiseasyModelOde$clone()}}{
-  The objects of this class are cloneable with this method.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOde$clone(deep = FALSE)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{deep}}{Whether to make a deep clone.}
-    }
-    \if{html}{\out{</div>}}
-  }
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasyModelOde$clone(deep = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
 }

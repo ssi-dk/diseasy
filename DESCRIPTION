@@ -86,3 +86,4 @@ URL: https://github.com/ssi-dk/diseasy, https://ssi-dk.github.io/diseasy/
 BugReports: https://github.com/ssi-dk/diseasy/issues
 Config/roxygen2/version: 8.0.0
 LazyDataCompression: xz
+RoxygenNote: 7.3.3
