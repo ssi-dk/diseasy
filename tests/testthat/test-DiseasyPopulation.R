@@ -246,6 +246,29 @@ test_that("$groups works", {
 })
 
 
+test_that("$per_capita_contact_matrices() works", {
+
+  # Creating a module with the Danish population
+  regions <- DiseasyRegionsNuts$new(
+    regions = "DK",
+    demography = demography_nordic_nuts3,
+    adjacency = adjacency_meta_nordic_nuts
+  )
+  population <- DiseasyPopulation$new(region = regions)
+
+  # Get the non-stratified contact matrices
+  contact_matrices_non_stratified <- population$per_capita_contact_matrices()
+
+  # Stratify and then re-compute contact matrices in the new groups
+  population$stratify_age(c(0, 30, 60))
+  population$stratify_regions("NUTS 2")
+
+
+  rm(population)
+  rm(regions)
+})
+
+
 test_that("active binding: age_cuts_lower works", {
   population <- DiseasyPopulation$new()
 
@@ -259,6 +282,24 @@ test_that("active binding: age_cuts_lower works", {
     simpleError("`$age_cuts_lower` is read only")
   )
   expect_identical(population %.% age_cuts_lower, 0L)
+
+  rm(population)
+})
+
+
+test_that("active binding: regional_stratification works", {
+  population <- DiseasyPopulation$new()
+
+  # Retrieve the age cuts
+  expect_null(population %.% regional_stratification)
+
+  # Try to set the variants
+  # test_that cannot capture this error, so we have to hack it
+  expect_identical(
+    tryCatch(population$regional_stratification <- "NUTS 2", error = \(e) e),                                           # nolint: implicit_assignment_linter
+    simpleError("`$regional_stratification` is read only")
+  )
+  expect_null(population %.% regional_stratification)
 
   rm(population)
 })
