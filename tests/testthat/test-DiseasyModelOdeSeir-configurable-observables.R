@@ -201,7 +201,7 @@ test_that("Loading modules resets user configured observables", {
   variant <- DiseasyVariant$new()
   expect_warning(
     m$load_module(variant),
-    regexp = "DiseasyVariant loaded - user-specified outputs configurations deleted!"
+    regexp = "New module loaded - user-specified output configurations deleted!"
   )
 
   # Configured observable should now be removed from set of observables
