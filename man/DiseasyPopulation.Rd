@@ -35,194 +35,202 @@ See vignette("diseasy-population").
 }
 \keyword{functional-module}
 \section{Super class}{
-\code{\link[diseasy:DiseasyBaseModule]{diseasy::DiseasyBaseModule}} -> \code{DiseasyPopulation}
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyPopulation}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{groups}}{(\code{data.frame()})\cr
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{groups}}{(\code{data.frame()})\cr
 The demographic groups that have been configured in the module.}
 
-\item{\code{population}}{(\code{tibble})\cr
+    \item{\code{population}}{(\code{tibble})\cr
 The population groups and their sizes configured in the module.}
 
-\item{\code{population_proportion}}{(\code{numeric()})\cr
+    \item{\code{population_proportion}}{(\code{numeric()})\cr
 The distribution of individuals across the demography groups defined in the module.}
 
-\item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population. Read only.}
+    \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population. Read only.}
 
-\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
+    \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
 
-\item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
+    \item{\code{activity}}{(\code{diseasy::DiseasyActivity})\cr
 The local copy of an DiseasyActivity module. Read-only.}
 
-\item{\code{regions}}{(\code{diseasy::DiseasyRegions})\cr
+    \item{\code{regions}}{(\code{diseasy::DiseasyRegions})\cr
 The local copy of an DiseasyRegions module. Read-only.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasyPopulation-new}{\code{DiseasyPopulation$new()}}
-\item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
-\item \href{#method-DiseasyPopulation-stratify_regions}{\code{DiseasyPopulation$stratify_regions()}}
-\item \href{#method-DiseasyPopulation-validate_configuration}{\code{DiseasyPopulation$validate_configuration()}}
-\item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
-\item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
-\item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
+  \itemize{
+    \item \href{#method-DiseasyPopulation-initialize}{\code{DiseasyPopulation$new()}}
+    \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
+    \item \href{#method-DiseasyPopulation-stratify_regions}{\code{DiseasyPopulation$stratify_regions()}}
+    \item \href{#method-DiseasyPopulation-validate_configuration}{\code{DiseasyPopulation$validate_configuration()}}
+    \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
+    \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
+    \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>diseasy::DiseasyBaseModule$load_module()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>diseasy::DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyPopulation-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyPopulation-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$new(
+\if{html}{\out{<a id="method-DiseasyPopulation-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-initialize}{}}}
+\subsection{\code{DiseasyPopulation$new()}}{
+  Creates a new instance of the \code{DiseasyPopulation} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$new(
   age_cuts_lower = 0L,
   regional_stratification = NULL,
   region = NULL,
   ...
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-
-\item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
-
-\item{\code{region}}{(\code{DiseasyRegions})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+      \item{\code{region}}{(\code{DiseasyRegions})\cr
 An instance of a regional module which should provide the demography of the population.}
+      \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyPopulation-stratify_age"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-stratify_age}{}}}
-\subsection{Method \code{stratify_age()}}{
-Sets the age stratification of the model population.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$stratify_age(age_cuts_lower)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyPopulation$stratify_age()}}{
+  Sets the age stratification of the model population.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$stratify_age(age_cuts_lower)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyPopulation-stratify_regions"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-stratify_regions}{}}}
-\subsection{Method \code{stratify_regions()}}{
-Sets the spatial stratification of the model population.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$stratify_regions(regional_stratification)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyPopulation$stratify_regions()}}{
+  Sets the spatial stratification of the model population.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$stratify_regions(regional_stratification)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyPopulation-validate_configuration"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-validate_configuration}{}}}
-\subsection{Method \code{validate_configuration()}}{
-Validate the stratifications are supported by demography data.
+\subsection{\code{DiseasyPopulation$validate_configuration()}}{
+  Validate the stratifications are supported by demography data.
 Throw error if misconfigured.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$validate_configuration(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$validate_configuration(
   age_cuts_lower = self \%.\% age_cuts_lower,
   regional_stratification = self \%.\% regional_stratification
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-
-\item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{NULL} (called for side effects)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyPopulation-per_capita_contact_matrices"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-per_capita_contact_matrices}{}}}
-\subsection{Method \code{per_capita_contact_matrices()}}{
-Compute the per-capita contact matrices. See vignette("diseasy-activity") for details.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$per_capita_contact_matrices(weights = rep(1, 4))}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{list}(\code{matrix})\cr
+\subsection{\code{DiseasyPopulation$per_capita_contact_matrices()}}{
+  Compute the per-capita contact matrices. See vignette("diseasy-activity") for details.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$per_capita_contact_matrices(weights = rep(1, 4))}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{list}(\code{matrix})\cr
 A \code{list} (with names indicating the dates of changes in contacts)
 of contact rates (\code{matrix}).
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyPopulation-describe"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-describe}{}}}
-\subsection{Method \code{describe()}}{
-Prints a human readable report of the internal state of the module.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$describe()}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyPopulation$describe()}}{
+  Prints a human readable report of the internal state of the module.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$describe()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyPopulation-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyPopulation-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasyPopulation$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasyPopulation$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
