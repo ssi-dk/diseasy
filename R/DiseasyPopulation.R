@@ -178,6 +178,19 @@ DiseasyPopulation <- R6::R6Class(                                               
       per_capita_contact_matrices <- contact_matrices |>
         purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
 
+      # We need to check the math on this ...
+      target_regions <- regions$regions_at_stratification(self %.% regional_stratification)
+
+      regions$adjacency |>
+        dplyr::mutate(
+          "from" = purrr::map_chr(.data$from, \(from) purrr::keep(target_regions, ~ stringr::str_starts(from, .))),
+          "to"   = purrr::map_chr(.data$to,   \(to)   purrr::keep(target_regions, ~ stringr::str_starts(to, .)))
+        ) |>
+        dplyr::summarise(
+          "adjacency" = sum(.data$adjacency), # Or weighted average, or some other operation..
+          .by = c("from", "to")
+        )
+
       return(per_capita_contact_matrices)
     },
 
