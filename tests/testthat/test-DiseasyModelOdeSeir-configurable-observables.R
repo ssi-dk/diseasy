@@ -22,6 +22,8 @@ activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
 activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
+regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+
 # Configure the immunity module
 immunity <- DiseasyImmunity$new()
 immunity$set_exponential_waning(time_scale = 180)
@@ -84,6 +86,7 @@ tidyr::expand_grid(
       m <- DiseasyModelOdeSeir$new(
         observables = observables,
         population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
+        regions = regions,
         activity = activity,
         immunity = immunity,
         season = season,
@@ -251,6 +254,7 @@ test_that("waning immunity targets other than 'infection' configures outputs", {
 
   m <- DiseasyModelOdeSeir$new(
     activity = activity,
+    regions = regions,
     immunity = immunity,
     observables = observables
   )
