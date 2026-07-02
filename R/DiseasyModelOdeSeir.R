@@ -1002,7 +1002,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         tidyr::expand_grid(
           "variant" = purrr::pluck(self %.% variant %.% variants, names, .default = "All")
         ) |>
-        dplyr::cross_join(self %.% population %.% groups) |>
+          dplyr::cross_join(self %.% population %.% groups) |>
           dplyr::mutate(
             "state" = "I1",
             "f" = signal_approximations
