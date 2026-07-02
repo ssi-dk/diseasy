@@ -175,21 +175,58 @@ DiseasyPopulation <- R6::R6Class(                                               
       )
 
       # We then construct the normalised matrices
-      per_capita_contact_matrices <- contact_matrices |>
+      per_capita_age_contacts <- contact_matrices |>
         purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
+
+      per_capita_age_contacts_long <- per_capita_age_contact_matrices |>
+        purrr::map(
+          \(per_capita_contact_matrix) {
+            data.frame(per_capita_contact_matrix, age_group_from = rownames(per_capita_contact_matrix), check.names = FALSE) |>
+              tidyr::pivot_longer(!"age_group_from", names_to = "age_group_to", values_to = "per_capita_contacts")
+          }
+        )
 
       # We need to check the math on this ...
       target_regions <- regions$regions_at_stratification(self %.% regional_stratification)
 
-      regions$adjacency |>
+      infection_flow_matrix <- regions$infection_flow_matrix
+
+      # Normalize (maybe)
+      infection_flow_matrix <- infection_flow_matrix / max(eigen(infection_flow_matrix)$values)
+
+
+      infection_flow_long <- data.frame(infection_flow_matrix, region_from = rownames(infection_flow_matrix)) |>
+        tidyr::pivot_longer(!"region_from", names_to = "region_to", values_to = "infection_flow") |>
         dplyr::mutate(
-          "from" = purrr::map_chr(.data$from, \(from) purrr::keep(target_regions, ~ stringr::str_starts(from, .))),
-          "to"   = purrr::map_chr(.data$to,   \(to)   purrr::keep(target_regions, ~ stringr::str_starts(to, .)))
+          "region_from" = purrr::map_chr(
+            .data$region_from, \(from) purrr::keep(target_regions, ~ stringr::str_starts(from, .))
+          ),
+          "region_to"   = purrr::map_chr(
+            .data$region_to,   \(to)   purrr::keep(target_regions, ~ stringr::str_starts(to, .))
+          )
         ) |>
         dplyr::summarise(
-          "adjacency" = sum(.data$adjacency), # Or weighted average, or some other operation..
-          .by = c("from", "to")
+          "infection_flow" = sum(.data$infection_flow), # Or weighted average, or some other operation..
+          .by = c("region_from", "region_to")
         )
+
+
+      per_capita_contact <- per_capita_age_contacts_long |>
+        purrr::map(
+          \(per_capita_age_contacts)
+          contacts <- dplyr::cross_join(
+            population$groups,
+            population$groups,
+            suffix = c("_from", "_to")
+          ) |>
+            dplyr::left_join(infection_flow_long, by = c("region_from", "region_to")) |>
+            dplyr::left_join(per_capita_age_contacts, by = c("age_group_from", "age_group_to")) |>
+            dplyr::summarise(
+              .cols = dplyr::across(!c(dplyr::ends_with("_from"), dplyr::ends_with("_to"))),
+              .fns = prod
+            )
+        )
+
 
       return(per_capita_contact_matrices)
     },
