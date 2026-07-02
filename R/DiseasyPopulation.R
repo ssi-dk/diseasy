@@ -185,7 +185,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       per_capita_age_contacts <- contact_matrices |>
         purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
 
-      per_capita_age_contacts_long <- per_capita_age_contact_matrices |>
+      per_capita_age_contacts_long <- per_capita_age_contacts |>
         purrr::map(
           \(per_capita_contact_matrix) {
             data.frame(per_capita_contact_matrix, age_group_from = rownames(per_capita_contact_matrix), check.names = FALSE) |>
