@@ -366,7 +366,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           psi |>
             tidyr::unite(
               "label",
-              "variant", names(self %.% population %.% groups), "state",
+              dplyr::all_of(c("variant", colnames(self %.% population %.% groups), "state")),
               sep = "/",
               na.rm = FALSE
             ) |>
