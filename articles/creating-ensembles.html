@@ -47,6 +47,7 @@
     <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-immunity.html">DiseasyImmunity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-observables.html">DiseasyObservables</a></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-population.html">DiseasyPopulation</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-regions.html">DiseasyRegions</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-season.html">DiseasySeason</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
@@ -193,7 +194,7 @@ instances which we give the class <code>DiseasyEnsemble</code>.</p>
 functions to get a quick overview of the ensemble.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 792a7), DiseasyModelG1 (hash: 70307), DiseasyModelG1 (hash: 50da8)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG1 (hash: 84525), DiseasyModelG1 (hash: 66f53), DiseasyModelG1 (hash: 962db)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>
@@ -212,12 +213,12 @@ least specify the following:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
 <span><span class="co">#&gt;   date       n_positive realisation_id weight model                           </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2021-03-28      <span style="text-decoration: underline;">2</span>132. 1                   1 792a718e7e4a6697cd77c85a71679557</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2021-03-29      <span style="text-decoration: underline;">1</span>719. 1                   1 792a718e7e4a6697cd77c85a71679557</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2021-03-30      <span style="text-decoration: underline;">2</span>432. 1                   1 792a718e7e4a6697cd77c85a71679557</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2021-03-31      <span style="text-decoration: underline;">2</span>555. 1                   1 792a718e7e4a6697cd77c85a71679557</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2021-04-01      <span style="text-decoration: underline;">2</span>163. 1                   1 792a718e7e4a6697cd77c85a71679557</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2021-04-02      <span style="text-decoration: underline;">1</span>253. 1                   1 792a718e7e4a6697cd77c85a71679557</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2021-03-28      <span style="text-decoration: underline;">2</span>132. 1                   1 845255d2f6d1811c1a22e2964695fdb2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2021-03-29      <span style="text-decoration: underline;">1</span>719. 1                   1 845255d2f6d1811c1a22e2964695fdb2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2021-03-30      <span style="text-decoration: underline;">2</span>432. 1                   1 845255d2f6d1811c1a22e2964695fdb2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2021-03-31      <span style="text-decoration: underline;">2</span>555. 1                   1 845255d2f6d1811c1a22e2964695fdb2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2021-04-01      <span style="text-decoration: underline;">2</span>163. 1                   1 845255d2f6d1811c1a22e2964695fdb2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2021-04-02      <span style="text-decoration: underline;">1</span>253. 1                   1 845255d2f6d1811c1a22e2964695fdb2</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">ensemble</span>, observable <span class="op">=</span> <span class="st">"n_positive"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <p><img src="creating-ensembles_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="Plot of the ensemble predictions. Shaded area is ensemble quantiles with observations as points." width="700"></p>
@@ -296,7 +297,7 @@ parameter settings from before.</p>
 models:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: 5601c), DiseasyModelG0 (hash: 09f7b), DiseasyModelG0 (hash: 4892d), DiseasyModelG1 (hash: 792a7), DiseasyModelG1 (hash: 70307)</span></span></code></pre></div>
+<span><span class="co">#&gt; DiseasyEnsemble: DiseasyModelG0 (hash: 34d9b), DiseasyModelG0 (hash: 35797), DiseasyModelG0 (hash: 50f16), DiseasyModelG1 (hash: 84525), DiseasyModelG1 (hash: 66f53)</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">)</span></span>
 <span><span class="co">#&gt; DiseasyEnsemble consisting of:</span></span>

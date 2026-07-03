@@ -49,6 +49,7 @@ See vignette(diseasy-model-ode-seir) for a detailed examples of how to use this 
     <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-immunity.html">DiseasyImmunity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-observables.html">DiseasyObservables</a></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-population.html">DiseasyPopulation</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-regions.html">DiseasyRegions</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-season.html">DiseasySeason</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
@@ -141,7 +142,7 @@ Names of the user-configured model outputs. Read only.</p></dd>
 <li><p><a href="#method-DiseasyModelOdeSeir-malthusian_growth_rate"><code>DiseasyModelOdeSeir$malthusian_growth_rate()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-initialise_state_vector"><code>DiseasyModelOdeSeir$initialise_state_vector()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-rhs"><code>DiseasyModelOdeSeir$rhs()</code></a></p></li>
-<li><p><a href="#method-DiseasyModelOdeSeir-configure_model_output"><code>DiseasyModelOdeSeir$configure_model_output()</code></a></p></li>
+<li><p><a href="#method-DiseasyModelOdeSeir-configure_output"><code>DiseasyModelOdeSeir$configure_output()</code></a></p></li>
 <li><p><a href="#method-DiseasyModelOdeSeir-clone"><code>DiseasyModelOdeSeir$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href="DiseasyModel.html#method-get_data"><code>DiseasyModel$get_data()</code></a></span></li>
@@ -401,13 +402,13 @@ The rate of change for the differential equations.</p>
 
 </div>
 
-<p></p><hr><a id="method-DiseasyModelOdeSeir-configure_model_output"></a><div class="section">
-<h3 id="diseasymodelodeseir-configure-model-output-"><code>DiseasyModelOdeSeir$configure_model_output()</code><a class="anchor" aria-label="anchor" href="#diseasymodelodeseir-configure-model-output-"></a></h3>
+<p></p><hr><a id="method-DiseasyModelOdeSeir-configure_output"></a><div class="section">
+<h3 id="diseasymodelodeseir-configure-output-"><code>DiseasyModelOdeSeir$configure_output()</code><a class="anchor" aria-label="anchor" href="#diseasymodelodeseir-configure-output-"></a></h3>
 <p>Define new observables via a set of weights.</p>
 <p>Currently, only countable observables are supported.
 That is, observables must be summarisable by the "sum()" function.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">configure_model_output</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModelOdeSeir</span><span class="op">$</span><span class="fu">configure_output</span><span class="op">(</span></span>
 <span>  <span class="va">weights</span>,</span>
 <span>  <span class="va">name</span>,</span>
 <span>  derived_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state_vector"</span>, <span class="st">"infection_matrix"</span><span class="op">)</span>,</span>

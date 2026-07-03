@@ -29,6 +29,7 @@ See vignette("diseasy-population").'><meta property="og:image" content="https://
     <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-immunity.html">DiseasyImmunity</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-observables.html">DiseasyObservables</a></li>
+    <li><a class="dropdown-item" href="../articles/diseasy-population.html">DiseasyPopulation</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-regions.html">DiseasyRegions</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-season.html">DiseasySeason</a></li>
     <li><a class="dropdown-item" href="../articles/diseasy-variant.html">DiseasyVariant</a></li>
@@ -80,7 +81,8 @@ See vignette("diseasy-population").'><meta property="og:image" content="https://
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><a href="DiseasyActivity.html">DiseasyActivity</a></p></div>
+    <div class="dont-index"><p><a href="DiseasyActivity.html">DiseasyActivity</a></p>
+<p><a href="DiseasyRegions.html">DiseasyRegions</a></p></div>
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
@@ -89,8 +91,8 @@ See vignette("diseasy-population").'><meta property="og:image" content="https://
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
     <p></p><div class="r6-active-bindings"><dl><dt><code>groups</code></dt>
-<dd><p>(<code>named character()</code>)<br>
-The names of the demographic groups that have been configured in the module.</p></dd>
+<dd><p>(<code><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame()</a></code>)<br>
+The demographic groups that have been configured in the module.</p></dd>
 
 
     <dt><code>population</code></dt>
@@ -103,6 +105,10 @@ The population groups and their sizes configured in the module.</p></dd>
 The distribution of individuals across the demography groups defined in the module.</p></dd>
 
 
+    <dt><code>regional_stratification</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The level of spatial stratification of the population. Read only.</p></dd>
+
+
     <dt><code>age_cuts_lower</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer()</a></code>)<br> vector of ages defining the lower bound for each age group. If <code>NULL</code>, age groups of contact_basis is used. Read only.</p></dd>
 
@@ -110,6 +116,11 @@ The distribution of individuals across the demography groups defined in the modu
     <dt><code>activity</code></dt>
 <dd><p>(<code><a href="DiseasyActivity.html">diseasy::DiseasyActivity</a></code>)<br>
 The local copy of an DiseasyActivity module. Read-only.</p></dd>
+
+
+    <dt><code>regions</code></dt>
+<dd><p>(<code><a href="DiseasyRegions.html">diseasy::DiseasyRegions</a></code>)<br>
+The local copy of an DiseasyRegions module. Read-only.</p></dd>
 
 
 </dl><p></p></div>
@@ -121,6 +132,8 @@ The local copy of an DiseasyActivity module. Read-only.</p></dd>
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 <p></p><ul><li><p><a href="#method-DiseasyPopulation-initialize"><code>DiseasyPopulation$new()</code></a></p></li>
 <li><p><a href="#method-DiseasyPopulation-stratify_age"><code>DiseasyPopulation$stratify_age()</code></a></p></li>
+<li><p><a href="#method-DiseasyPopulation-stratify_regions"><code>DiseasyPopulation$stratify_regions()</code></a></p></li>
+<li><p><a href="#method-DiseasyPopulation-validate_configuration"><code>DiseasyPopulation$validate_configuration()</code></a></p></li>
 <li><p><a href="#method-DiseasyPopulation-per_capita_contact_matrices"><code>DiseasyPopulation$per_capita_contact_matrices()</code></a></p></li>
 <li><p><a href="#method-DiseasyPopulation-describe"><code>DiseasyPopulation$describe()</code></a></p></li>
 <li><p><a href="#method-DiseasyPopulation-clone"><code>DiseasyPopulation$clone()</code></a></p></li>
@@ -130,11 +143,23 @@ The local copy of an DiseasyActivity module. Read-only.</p></dd>
 <h3 id="diseasypopulation-new-"><code>DiseasyPopulation$new()</code><a class="anchor" aria-label="anchor" href="#diseasypopulation-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyPopulation</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>age_cuts_lower <span class="op">=</span> <span class="fl">0L</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  age_cuts_lower <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  regional_stratification <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  region <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>age_cuts_lower</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer()</a></code>)<br> vector of ages defining the lower bound for each age group. If <code>NULL</code>, age groups of contact_basis is used.</p></dd>
+
+      <dt><code>regional_stratification</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The level of spatial stratification of the population.</p></dd>
+
+      <dt><code>region</code></dt>
+<dd><p>(<code>DiseasyRegions</code>)<br>
+An instance of a regional module which should provide the demography of the population.</p></dd>
 
       <dt><code>...</code></dt>
 <dd><p>Parameters sent to <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor</p></dd>
@@ -164,20 +189,65 @@ The local copy of an DiseasyActivity module. Read-only.</p></dd>
 
 </div>
 
+<p></p><hr><a id="method-DiseasyPopulation-stratify_regions"></a><div class="section">
+<h3 id="diseasypopulation-stratify-regions-"><code>DiseasyPopulation$stratify_regions()</code><a class="anchor" aria-label="anchor" href="#diseasypopulation-stratify-regions-"></a></h3>
+<p>Sets the spatial stratification of the model population.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyPopulation</span><span class="op">$</span><span class="fu">stratify_regions</span><span class="op">(</span><span class="va">regional_stratification</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>regional_stratification</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The level of spatial stratification of the population.</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p><code>NULL</code> (called for side effects)</p>
+</div>
+
+</div>
+
+<p></p><hr><a id="method-DiseasyPopulation-validate_configuration"></a><div class="section">
+<h3 id="diseasypopulation-validate-configuration-"><code>DiseasyPopulation$validate_configuration()</code><a class="anchor" aria-label="anchor" href="#diseasypopulation-validate-configuration-"></a></h3>
+<p>Validate the stratifications are supported by demography data.
+Throw error if misconfigured.</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyPopulation</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span></span>
+<span>  age_cuts_lower <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">age_cuts_lower</span>,</span>
+<span>  regional_stratification <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">regional_stratification</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>age_cuts_lower</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer()</a></code>)<br> vector of ages defining the lower bound for each age group. If <code>NULL</code>, age groups of contact_basis is used.</p></dd>
+
+      <dt><code>regional_stratification</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The level of spatial stratification of the population.</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<p><code>NULL</code> (called for side effects)</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-DiseasyPopulation-per_capita_contact_matrices"></a><div class="section">
 <h3 id="diseasypopulation-per-capita-contact-matrices-"><code>DiseasyPopulation$per_capita_contact_matrices()</code><a class="anchor" aria-label="anchor" href="#diseasypopulation-per-capita-contact-matrices-"></a></h3>
 <p>Compute the per-capita contact matrices. See vignette("diseasy-activity") for details.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyPopulation</span><span class="op">$</span><span class="fu">per_capita_contact_matrices</span><span class="op">(</span>weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>weights</code></dt>
 <dd><p>(<code>numeric(4)</code>)<br> vector of weights for the four types of contacts. If <code>NULL</code>, no weighting is done.</p></dd>
 
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p><code>list</code>(<code>matrix</code>)<br>
 A <code>list</code> (with names indicating the dates of changes in contacts)
 of contact rates (<code>matrix</code>).</p>
@@ -188,7 +258,7 @@ of contact rates (<code>matrix</code>).</p>
 <p></p><hr><a id="method-DiseasyPopulation-describe"></a><div class="section">
 <h3 id="diseasypopulation-describe-"><code>DiseasyPopulation$describe()</code><a class="anchor" aria-label="anchor" href="#diseasypopulation-describe-"></a></h3>
 <p>Prints a human readable report of the internal state of the module.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyPopulation</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -197,10 +267,10 @@ of contact rates (<code>matrix</code>).</p>
 <p></p><hr><a id="method-DiseasyPopulation-clone"></a><div class="section">
 <h3 id="diseasypopulation-clone-"><code>DiseasyPopulation$clone()</code><a class="anchor" aria-label="anchor" href="#diseasypopulation-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyPopulation</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -221,7 +291,9 @@ of contact rates (<code>matrix</code>).</p>
 <span class="r-in"><span>  <span class="co"># By default a single, non-stratified population is used in the models.</span></span></span>
 <span class="r-in"><span>  <span class="va">population</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # DiseasyPopulation ##########################################</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> No age stratification has been configured</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stratifications:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Age: No age stratification has been configured</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Space: No spatial stratification has been configured</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Stratification can be added via methods</span></span></span>
 <span class="r-in"><span></span></span>
@@ -231,7 +303,9 @@ of contact rates (<code>matrix</code>).</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">population</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # DiseasyPopulation ##########################################</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Stratified by age: 00-59, 60+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stratifications:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Age: Stratified by age: 00-59, 60+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Space: No spatial stratification has been configured</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">population</span><span class="op">)</span></span></span>
 </code></pre></div>
