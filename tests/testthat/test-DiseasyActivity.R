@@ -227,12 +227,22 @@ test_that("$get_scenario_openness() works with default parameters", {
   # Test openness with default parameters
   act <- DiseasyActivity$new()
 
-  # With no scenario, we should get a default openness of 1 and no age-groups
+  # With no scenario, we should get a default openness of 1 across default age-groups
+  default_age_groups <- diseasystore::age_labels(seq(from = 0, to = 75, by = 5))
+
   expect_identical(
     act$get_scenario_openness(),
     list(
       stats::setNames(
-        rep(list(c("0+" = 1)), 4),
+        rep(
+          list(
+            stats::setNames(
+              rep(1, length(default_age_groups)),
+              default_age_groups
+            )
+          ),
+          4
+        ),
         act$.__enclos_env__$private$activity_types
       )
     ) |>
@@ -241,12 +251,12 @@ test_that("$get_scenario_openness() works with default parameters", {
 
   expect_identical(
     act$get_scenario_openness(weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = c("0+" = 1))
-  )
-
-  expect_identical(
-    act$get_scenario_openness(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = c("00-59" = 1, "60+" = 1))
+    list(
+      "1970-01-01" = stats::setNames(
+        rep(1, length(default_age_groups)),
+        default_age_groups
+      )
+    )
   )
 
   rm(act)
@@ -262,7 +272,7 @@ test_that("$get_scenario_openness() works with no scenario", {
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- names(contact_basis_nordic %.% DK %.% population)
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% contacts, 1, colnames)
 
   expect_identical(
     act$get_scenario_openness(),
@@ -280,11 +290,6 @@ test_that("$get_scenario_openness() works with no scenario", {
     list("1970-01-01" = stats::setNames(rep(1, length(age_labels)), age_labels))
   )
 
-  expect_identical(
-    act$get_scenario_openness(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = c("00-59" = 1, "60+" = 1))
-  )
-
   rm(act)
 })
 
@@ -295,6 +300,9 @@ test_that("$get_scenario_openness() works with given scenario", {
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% contacts, 1, colnames)
+
+
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
                       opening      = c("baseline",   "lockdown_2020", "secondary_education_phase_1_2020"),
@@ -303,10 +311,8 @@ test_that("$get_scenario_openness() works with given scenario", {
   expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
   expect_length(act$get_scenario_openness()[[1]], 4L) # 4 arenas
   expect_true(all(unlist(lapply(act$get_scenario_openness(), lengths)) == 16))
-
-  # Test with different age cuts
-  expect_length(purrr::pluck(act$get_scenario_openness(age_cuts_lower = c(0, 60)), 1, 1), n = 2) # 2 age groups
-  expect_length(purrr::pluck(act$get_scenario_openness(age_cuts_lower = 0), 1, 1),        n = 1) # 1 (no) age groups
+9
+  expect_length(purrr::pluck(act$get_scenario_openness(), 1, 1), n = length(age_labels))
   rm(act)
 })
 
@@ -317,81 +323,13 @@ test_that("$get_scenario_contacts() works with default parameters", {
   act <- DiseasyActivity$new()
 
   # With no scenario and no contact_basis, all contact matrices are assumed to be 1
-  expect_identical(
-    act$get_scenario_contacts(),
-    list(
-      stats::setNames(
-        rep(list(matrix(0.25, dimnames = list("0+", "0+"))), 4),
-        act$.__enclos_env__$private$activity_types
-      )
-    ) |>
-      stats::setNames("1970-01-01")
-  )
+  expect_null(act$get_scenario_contacts())
 
-  expect_identical(
-    act$get_scenario_contacts(weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = matrix(1, dimnames = list("0+", "0+")))
-  )
-
-  expect_identical(
-    act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
-  )
+  expect_null(act$get_scenario_contacts(weights = c(1, 1, 1, 1)))
 
   rm(act)
 })
 
-
-test_that("$get_scenario_contacts() works no scenario", {
-
-  # Test openness with given contact basis
-  act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
-
-  # With no scenario, we should get a default openness of 1
-  # but since we have the contact_basis loaded, we should get the age information by default
-  # (inferred from the contact_basis)
-
-  age_labels <- names(contact_basis_nordic %.% DK %.% population)
-
-  expect_identical(
-    act$get_scenario_contacts(),
-    list(
-      stats::setNames(
-        rep(
-          list(
-            matrix(
-              rep(0.25 / length(age_labels), length(age_labels) * length(age_labels)),
-              ncol = length(age_labels),
-              dimnames = list(age_labels, age_labels)
-            )
-          ),
-          4
-        ),
-        act$.__enclos_env__$private$activity_types
-      )
-    ) |>
-      stats::setNames("1970-01-01")
-  )
-
-  expect_identical(
-    act$get_scenario_contacts(weights = c(1, 1, 1, 1)),
-    list(
-      matrix(
-        rep(1 / length(age_labels), length(age_labels) * length(age_labels)),
-        ncol = length(age_labels),
-        dimnames = list(age_labels, age_labels)
-      )
-    ) |>
-      stats::setNames("1970-01-01")
-  )
-
-  expect_identical(
-    act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
-  )
-
-  rm(act)
-})
 
 
 test_that("$get_scenario_contacts() works with given scenario", {
@@ -408,10 +346,6 @@ test_that("$get_scenario_contacts() works with given scenario", {
   expect_length(act$get_scenario_contacts(), 3L) # 3 dates in scenario
   expect_length(act$get_scenario_contacts()[[1]], 4L) # 4 arenas
   expect_true(all(unlist(lapply(act$get_scenario_contacts(), lengths)) == 16 * 16))
-
-  # Test with different age cuts
-  expect_identical(purrr::pluck(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), 1, 1, length), 2L * 2L)
-  expect_identical(purrr::pluck(act$get_scenario_contacts(age_cuts_lower = 0), 1, 1, length), 1L) # 1 (no) age groups
 
   rm(act)
 })
@@ -461,10 +395,6 @@ test_that("contactdata: contact_basis works", {
   # Checking dimension
   expect_identical(dim(act$get_scenario_contacts()[[1]][[1]]), c(16L, 16L))
 
-  # Check dimensions with other age groups
-  expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = c(0, 60))[[1]][[1]]), c(2L, 2L))
-  expect_identical(dim(act$get_scenario_contacts(age_cuts_lower = 0)[[1]][[1]]), c(1L, 1L))
-
   rm(act)
 })
 
@@ -473,12 +403,12 @@ test_that("dk_reference scenario works", {
 
   ## Test dk_reference scenario
   act <- DiseasyActivity$new(base_scenario = "dk_reference", contact_basis = contact_basis_nordic %.% DK)
-  checkmate::expect_class(act$get_scenario_contacts(age_cuts_lower = c(0, 60)), "list")
+  checkmate::expect_class(act$get_scenario_contacts(), "list")
   # More tests could be made ... but tested above. The length may change over time so maybe some particular dates.
 
   ## Test weighted contact types. Most meaningful for contact matrices
-  tmp_list          <- act$get_scenario_contacts(age_cuts_lower = c(0, 60))
-  tmp_list_weighted <- act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1))
+  tmp_list          <- act$get_scenario_contacts()
+  tmp_list_weighted <- act$get_scenario_contacts(weights = c(1, 1, 1, 1))
   expect_length(tmp_list, length(tmp_list_weighted))
 
   rm(act)
@@ -515,26 +445,11 @@ test_that("$set_contact_basis() works", {
   )
 
   custom_basis <- contact_basis_nordic %.% DK
-  custom_basis$proportion <- custom_basis$proportion[-1]
-  expect_error(
-    checkmate_err_msg(act$set_contact_basis(custom_basis)),
-    class = "simpleError",
-    regexp = "Must have length 16, but has length 15"
-  )
-
-  custom_basis <- contact_basis_nordic %.% DK
   custom_basis$extra_element <- "some string"
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
     class = "simpleError",
     regexp = r"{Must be a permutation of set .+, but has extra elements \{'extra_element'\}}"
-  )
-
-  custom_basis <- contact_basis_nordic %.% DK
-  expect_error(
-    checkmate_err_msg(act$set_contact_basis(custom_basis[-5])),
-    class = "simpleError",
-    regexp = r"{Must be a set equal to .+, but is missing elements \{'description'\}}"
   )
 
   rm(act)
@@ -553,154 +468,4 @@ test_that("$describe() works", {
   expect_no_error(withr::with_output_sink(nullfile(), act$describe()))
 
   rm(act)
-})
-
-
-test_that("`map_population` works with 1-year age groups in demography", {
-
-  # Generate test demography
-  demography_1yr <- data.frame(
-    age = seq(from = 0, to = 100),
-    population = seq(from = 100, to = 0, by = -1)
-  )
-
-  activity <- DiseasyActivity$new()
-
-  # We should be able to map the population as long as demography has
-  # all the age cuts requested by age_cuts_lower and included in age_groups_reference
-
-  # So for 1-year age group demography, we should almost never fail
-  expect_no_error(
-    activity$map_population(
-      age_cuts_lower = 5,
-      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
-      demography = demography_1yr
-    )
-  )
-  expect_no_error(
-    activity$map_population(
-      age_cuts_lower = c(2, 4, 6),
-      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
-      demography = demography_1yr
-    )
-  )
-
-  expect_no_error(
-    activity$map_population(
-      age_cuts_lower = 5,
-      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
-      demography = demography_1yr
-    )
-  )
-  expect_no_error(
-    activity$map_population(
-      age_cuts_lower = c(2, 4, 6),
-      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
-      demography = demography_1yr
-    )
-  )
-  expect_no_error(
-    activity$map_population(
-      age_cuts_lower = 5,
-      age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
-      demography = demography_1yr
-    )
-  )
-
-  # .. but if we go outside the range of demography, we should get errors
-  expect_error(
-    checkmate_err_msg(
-      activity$map_population(
-        age_cuts_lower = 200,
-        age_groups_reference = diseasystore::age_labels(demography_1yr$age),
-        demography = demography_1yr
-      )
-    ),
-    regexp = "`demography` is missing age group splits to facilitate splits at"
-  )
-
-  rm(activity)
-})
-
-
-test_that("`map_population` works with 5-year age groups in demography", {
-
-  # Generate test demography
-  demography_5yr <- data.frame(
-    age_group = diseasystore::age_labels(seq(from = 0, to = 100, by = 5)),
-    population = seq(from = 100, to = 0, by = -5)
-  )
-
-  activity <- DiseasyActivity$new()
-
-  # For stratified demographies we are more restricted since the age cuts must be a subset of the demography groups
-  expect_no_error(
-    activity$map_population(
-      age_cuts_lower = 5,
-      age_groups_reference = demography_5yr$age_group,
-      demography = demography_5yr
-    )
-  )
-  expect_error(
-    checkmate_err_msg(
-      activity$map_population(
-        age_cuts_lower = c(2, 4, 6),
-        age_groups_reference = demography_5yr$age_group,
-        demography = demography_5yr
-      )
-    ),
-    regexp = "`demography` is missing age group splits to facilitate splits at"
-  )
-  expect_error(
-    checkmate_err_msg(
-      activity$map_population(
-        age_cuts_lower = 5,
-        age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
-        demography = demography_5yr
-      )
-    ),
-    regexp = "`demography` is missing age group splits to facilitate splits at"
-  )
-
-  expect_no_error(
-    activity$map_population(
-      age_cuts_lower = 5,
-      age_groups_reference = demography_5yr$age_group,
-      demography = demography_5yr
-    )
-  )
-  expect_error(
-    checkmate_err_msg(
-      activity$map_population(
-        age_cuts_lower = c(2, 4, 6),
-        age_groups_reference = demography_5yr$age_group,
-        demography = demography_5yr
-      )
-    ),
-    regexp = "`demography` is missing age group splits to facilitate splits at"
-  )
-  expect_error(
-    checkmate_err_msg(
-      activity$map_population(
-        age_cuts_lower = 5,
-        age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
-        demography = demography_5yr
-      )
-    ),
-    regexp = "`demography` is missing age group splits to facilitate splits at"
-  )
-
-  # .. and if we go outside the range of demography, we should still errors
-  expect_error(
-    checkmate_err_msg(
-      activity$map_population(
-        age_cuts_lower = 200,
-        age_groups_reference = demography_5yr$age_group,
-        demography = demography_5yr
-      )
-    ),
-    regexp = "`demography` is missing age group splits to facilitate splits at"
-  )
-
-  rm(activity)
 })
