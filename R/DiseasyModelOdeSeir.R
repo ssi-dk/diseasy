@@ -326,7 +326,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Now that we are sure we have removed existing outputs from the configuration,
       # we can re-configure outputs for immunity targets using the (potentially) new parameters.
       immunity_approx %.% gamma |>
-        purrr::discard_at(c("infection")) |> # "infection" outcome is treated specially
+        purrr::discard_at("infection") |> # "infection" outcome is treated specially
         purrr::iwalk(\(gammas, observable) {
 
           # Compute the weights for the output
