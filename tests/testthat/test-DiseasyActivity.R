@@ -507,7 +507,7 @@ test_that("$set_contact_basis() works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis_nordic %.% DK
-  custom_basis$contacts <- custom_basis$contacts[-1]
+  custom_basis$per_capita_contacts <- custom_basis$per_capita_contacts[-1]
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
     class = "simpleError",
