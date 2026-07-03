@@ -247,7 +247,7 @@ test_that("Consecutive `$prepare_rhs()` calls works without error", {
 })
 
 
-test_that("waning immunity targets 'hospitalisation' and 'death' configures outputs", {
+test_that("waning immunity targets other than 'infection' configures outputs", {
 
   m <- DiseasyModelOdeSeir$new(
     activity = activity,

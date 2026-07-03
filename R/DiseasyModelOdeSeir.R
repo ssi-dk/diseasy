@@ -299,10 +299,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       infection_matrix_outputs <- rownames(private %.% output_mapping %.% infection_matrix)
 
       # Which are a configured automatically from DiseasyImmunity (i.e. which should we delete)
-      existing_immunity_outputs <- purrr::keep_at(infection_matrix_outputs, c("n_hospitalisation", "n_death"))
-      idx_to_delete <- purrr::map_lgl(infection_matrix_outputs, ~ . %in% existing_immunity_outputs)
+      immunity_outputs <- purrr::discard_at(names(immunity_approx %.% gamma), "infection")
+      idx_to_delete <- purrr::map_lgl(infection_matrix_outputs, ~ . %in% immunity_outputs)
 
-      # Clearing immunity outputs reduces the length of the state vector, so state_vector mappings must also be adjuted
+      # Clearing immunity outputs reduces the length of the state vector, so state_vector mappings must also be adjusted
       # (e.g. if we remove two outputs, the length of the state_vector will be reduced by two, and we should therefore
       # reduce the state_vector output mapping matrix by two in the corresponding direction)
       if (!is.null(private$output_mapping$state_vector) && sum(idx_to_delete) > 0) {
@@ -313,10 +313,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ]
       }
 
-      # .. and now we can clear the immunity outpouts from the immunity_matrix mappings
+      # .. and now we can clear the immunity outputs from the immunity_matrix mappings
       if (sum(idx_to_delete) > 0) {
         private$output_mapping$infection_matrix <- private %.% output_mapping %.% infection_matrix[
-          !purrr::map_lgl(infection_matrix_outputs, ~ . %in% existing_immunity_outputs),
+          !purrr::map_lgl(infection_matrix_outputs, ~ . %in% immunity_outputs),
           ,
           drop = FALSE
         ]
@@ -326,7 +326,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Now that we are sure we have removed existing outputs from the configuration,
       # we can re-configure outputs for immunity targets using the (potentially) new parameters.
       immunity_approx %.% gamma |>
-        purrr::keep_at(c("hospitalisation", "death")) |>
+        purrr::discard_at(c("infection")) |> # "infection" outcome is treated specially
         purrr::iwalk(\(gammas, observable) {
 
           # Compute the weights for the output
