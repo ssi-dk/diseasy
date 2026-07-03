@@ -34,15 +34,25 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @description
     #'   Creates a new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param regional_stratification `r rd_regional_stratification()`
+    #' @param region  (`DiseasyRegions`)\cr
+    #'   An instance of a regional module which should provide the demography of the population.
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
-    initialize = function(age_cuts_lower = 0L, ...) {
+    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, region = NULL, ...) {
+      checkmate::assert_class(region, "DiseasyRegions", null.ok = TRUE)
+
+      # Pass additional arguments to the DiseasyBaseModule initializer
+      super$initialize(...)
+
+      if (!is.null(region)) {
+        self$load_module(region)
+      }
 
       # Pass arguments to methods
       self$stratify_age(age_cuts_lower)
+      self$stratify_regions(regional_stratification)
 
-      # Pass further arguments to the DiseasyBaseModule initializer
-      super$initialize(...)
     },
 
 
@@ -61,6 +71,90 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       # Store the age_cuts as integer
       private$.age_cuts_lower <- as.integer(age_cuts_lower)
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Sets the spatial stratification of the model population.
+    #' @param regional_stratification `r rd_regional_stratification()`
+    #' @return `r rd_side_effects`
+    stratify_regions = function(regional_stratification) {
+
+      if (!is.null(regional_stratification)) { # Checks when user tries to set regional stratification
+
+        if (!checkmate::test_class(self %.% regions, "DiseasyRegions")) {
+          pkgcond::pkg_error(
+            "To specify regional stratification, `DiseasyPopulation` must be loaded with a `DiseasyRegions` module."
+          )
+        }
+
+        # Verify stratification is supported
+        checkmate::assert_choice(regional_stratification, self %.% regions %.% available_stratifications)
+      }
+
+      private$.regional_stratification <- regional_stratification
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Validate the stratifications are supported by demography data.
+    #'   Throw error if misconfigured.
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param regional_stratification `r rd_regional_stratification()`
+    #' @return `r rd_side_effects`
+    validate_configuration = function(
+      age_cuts_lower = self %.% age_cuts_lower,
+      regional_stratification = self %.% regional_stratification
+    ) {
+
+      # If `DiseasyRegions` is configured, age and regional splits must be consistent with demography data
+      if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
+
+        if (!identical(age_cuts_lower, 0L)) {
+
+          if (is.null(self %.% regions %.% demography)) {
+            pkgcond::pkg_error(
+              "When stratifying by age, `DiseasyRegions` must be loaded with a `demography`."
+            )
+          }
+
+          # Check the given age groups can be mapped to the demography data
+          coll <- checkmate::makeAssertCollection()
+          self %.% regions %.% demography |>
+            dplyr::group_by(.data$region) |>
+            dplyr::group_walk(
+              \(demography_subset, group) {
+                age_groups_in_demography <- demography_subset |>
+                  dplyr::distinct(dplyr::across(dplyr::any_of(c("age", "age_group")))) |>
+                  dplyr::pull(1)
+
+                age_cuts_lower_demography <- age_groups_in_demography |>
+                  stringr::str_extract_all(r"{^\d+}") |>
+                  as.numeric()
+
+                if (!checkmate::test_subset(age_cuts_lower, age_cuts_lower_demography)) {
+                  coll$push(
+                    glue::glue(
+                      "The age groups in the demography for region {group$region} ",
+                      "can't be mapped to the requested age groups: ",
+                      "{toString(diseasystore::age_labels(age_cuts_lower))}."
+                    )
+                  )
+                }
+              }
+            )
+
+          checkmate::reportAssertions(coll)
+        }
+
+        if (!is.null(regional_stratification)) {
+          checkmate::assert_choice(regional_stratification, self %.% regions %.% available_stratifications)
+        }
+      }
     },
 
 
@@ -87,13 +181,21 @@ DiseasyPopulation <- R6::R6Class(                                               
       return(per_capita_contact_matrices)
     },
 
+
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyPopulation ##########################################")
+      printr("Stratifications:")
       if (identical(self %.% age_cuts_lower, 0L)) {
-        printr("No age stratification has been configured")
+        printr("Age: No age stratification has been configured")
       } else {
-        printr(glue::glue("Stratified by age: {toString(diseasystore::age_labels(self %.% age_cuts_lower))}"))
+        printr(glue::glue("Age: Stratified by age: {toString(diseasystore::age_labels(self %.% age_cuts_lower))}"))
+      }
+
+      if (is.null(self %.% regional_stratification)) {
+        printr("Space: No spatial stratification has been configured")
+      } else {
+        printr(glue::glue("Space: Stratified by {self %.% regional_stratification}"))
       }
     }
   ),
@@ -101,16 +203,40 @@ DiseasyPopulation <- R6::R6Class(                                               
 
   active = list(
 
-    #' @field groups (`named character()`)\cr
-    #'   The names of the demographic groups that have been configured in the module.
+    #' @field groups (`data.frame()`)\cr
+    #'   The demographic groups that have been configured in the module.
     groups = function() {
 
-      groups <- list(
-        "age_group" = diseasystore::age_labels(self %.% age_cuts_lower)
+      # We check the configuration is valid
+      self %.% validate_configuration()
+
+      groups <- list()
+
+      # Age stratification
+      groups[["age_group"]] <- diseasystore::age_labels(self %.% age_cuts_lower)
+
+      # Spatial stratification
+      if (is.null(self %.% regional_stratification)) {
+        groups[["region"]] <- "All"
+      } else {
+
+        if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
+          groups[["region"]] <- self %.% regions %.% regions_at_stratification(self %.% regional_stratification)
+        } else {
+
+          pkgcond::pkg_error(
+            "regional stratification has been set, but no `DiseasyRegions` has been provided."
+          )
+
+        }
+      }
+
+      # Unpack groups and sort by name
+      groups <- tidyr::expand_grid(
+        !!!groups[order(names(groups))]
       )
 
-      # Sort by name
-      return(groups[order(names(groups))])
+      return(groups)
     },
 
 
@@ -118,7 +244,7 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   The population groups and their sizes configured in the module.
     population = function() {
 
-      tidyr::expand_grid(!!!self %.% groups) |>
+      population <- self %.% groups |>
         dplyr::left_join(
           self %.% activity %.% map_population(
             age_cuts_lower = self %.% age_cuts_lower,
@@ -138,6 +264,7 @@ DiseasyPopulation <- R6::R6Class(                                               
           by = "age_group"
         )
 
+      return(population)
     },
 
 
@@ -163,6 +290,13 @@ DiseasyPopulation <- R6::R6Class(                                               
     },
 
 
+    #' @field regional_stratification `r rd_regional_stratification("field")`
+    regional_stratification = purrr::partial(
+      .f = active_binding,
+      name = "regional_stratification",
+      expr = return(private %.% .regional_stratification)
+    ),
+
 
     #' @field age_cuts_lower `r rd_age_cuts_lower("field")`
     age_cuts_lower = purrr::partial(
@@ -180,13 +314,26 @@ DiseasyPopulation <- R6::R6Class(                                               
       .f = active_binding,
       name = "activity",
       expr = return(private %.% .DiseasyActivity)
+    ),
+
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
+    #' @field regions (`diseasy::DiseasyRegions`)\cr
+    #'   The local copy of an DiseasyRegions module. Read-only.
+    #' @seealso [diseasy::DiseasyRegions]
+    #' @importFrom diseasystore `%.%`
+    regions = purrr::partial(                                                                                           # nolint end: documentation_template_linter, identation_linter
+      .f = active_binding,
+      name = "regions",
+      expr = return(private %.% .DiseasyRegions)
     )
   ),
 
 
   private = list(
     .DiseasyActivity = NULL,
+    .DiseasyRegions = NULL,
 
-    .age_cuts_lower = 0L
+    .age_cuts_lower = 0L,
+    .regional_stratification = NULL
   )
 )

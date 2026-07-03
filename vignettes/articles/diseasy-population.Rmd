@@ -1,0 +1,128 @@
+---
+title: "DiseasyPopulation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyPopulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r hidden_options, include = FALSE}
+withr::local_options("diseasystore.verbose" = FALSE)
+withr::local_options("tibble.print_min" = 5)
+```
+
+# Overview
+
+The `DiseasyPopulation` module is responsible for defining the model population and interfacing with the models.
+
+Presently, `DiseasyPopulation` combines `DiseasyRegions` and `DiseasyActivity` to configure a model population
+stratified by age and geographical region. Where `DiseasyRegions` defines the _scope_ and possible stratifications of
+the model population, `DiseasyPopulation` manages the stratification itself. Similarly, `DiseasyActivity` defines the
+age-specific interactions between age groups as well as age-specific societal restrictions over time,
+while `DiseasyPopulation` aggregates these effects into user stratified age groups.
+Combined, this forms a model population stratified both spatially and by age groups.
+
+# Defining the population of interest
+
+The first step of defining the model population is to define a population of interest.
+
+For `DiseasyPopulation`, this is done via `DiseasyRegions`[^1] which handles demography data
+(see `vignette(diseasy-regions)` for more details).
+
+[^1] Or, as in this case, `DiseasyRegionsNuts` which is a generalisation of `DiseasyRegions`.
+
+```{r regions}
+regions <- DiseasyRegionsNuts$new(
+  demography = demography_nordic_nuts3, # Use demography data from EUROSTAT
+  adjacency = adjacency_meta_nordic_nuts, # Use adjacency data from Meta
+  regions = "DK" # Restrict population of interest to Danish population
+)
+
+regions
+```
+
+Once the scope of the population has been defined in `DiseasyRegions`, this can be passed to
+`DiseasyPopulation` to handle the remaining configuration of the model population.
+
+```{r load-regions}
+population <- DiseasyPopulation$new(region = regions)
+
+population
+```
+
+# Defining the age-specific interactions
+
+If the model population should be stratified by age, the next step is to
+configure the age-specific interactions between age groups (contact matrices).
+In `diseasy`, this is done via the `DiseasyActivity`[^2].
+
+[^2]: `DiseasyActivity` also defines (age-specific) changes in societal restrictions
+if needed for the model -- but this is not done for this example.
+
+```{r activity}
+activity <- DiseasyActivity$new(
+  contact_basis = contact_basis_nordic %.% DK
+)
+
+activity
+```
+
+... and, once a basis of contact matrices has defined, the `DiseasyActivity`
+can be passed to `DiseasyPopulation`.
+
+```{r load-activity}
+population$load_module(activity)
+
+population
+```
+
+# Stratifying to form the model population
+
+With the population basis defined via `DiseasyRegions` and `DiseasyActivity`,
+the model population can now be stratified at various resolutions to before
+being passed to the models.
+
+To stratify by age, we use the `?DiseasyPopulation$stratify_age()` method:
+```{r stratify-age}
+population$stratify_age(age_cuts_lower = c(0, 20, 40, 60, 80))
+
+# and we can inspect the defined demographic groups
+population$group
+```
+
+To stratify by region, we use the `?DiseasyPopulation$stratify_regions()` method:
+```{r stratify-regions}
+population$stratify_regions(regional_stratification = "NUTS 2")
+
+# .. and we can inspect the updated demographic groups
+population$group
+```
+
+# Populations outside the Nordics
+
+To keep the installation size of `diseasy` light, we only bundle population data
+for the Nordic countries.
+
+To generate data for other regions, see the data generating functions:
+`generate_demography()`, `generate_contact_basis()`, etc.
+
+```{r cleanup, include = FALSE}
+rm(
+  regions,
+  activity,
+  population
+)
+gc()
+```

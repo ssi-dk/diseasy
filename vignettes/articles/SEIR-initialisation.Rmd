@@ -324,7 +324,7 @@ obs$define_synthetic_observable("incidence", mapping)
 
 incidence_data <- obs$get_observation(
   observable = "incidence",
-  stratification = rlang::quos(age_group)
+  stratification = rlang::quos(age_group, region = "All")
 ) |>
   dplyr::mutate("source" = !!source)
 ```
