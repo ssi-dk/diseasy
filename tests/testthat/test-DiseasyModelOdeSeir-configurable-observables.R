@@ -79,7 +79,7 @@ tidyr::expand_grid(
 
     age_group_string <- ifelse(length(age_cuts_lower) == 0, "single", "multiple")
 
-    test_that(glue::glue("$configure_model_output() ({model_string} single variant / {age_group_string} age group)"), {
+    test_that(glue::glue("$configure_output() ({model_string} single variant / {age_group_string} age group)"), {
 
       m <- DiseasyModelOdeSeir$new(
         observables = observables,
@@ -119,7 +119,7 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_model_output(
+      m$configure_output(
         weights = weights_infection_matrix,
         name = "n_infected_infection_matrix",
         derived_from = "infection_matrix",
@@ -142,7 +142,7 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_model_output(
+      m$configure_output(
         weights = weights_state_vector,
         name = "n_infected_state_vector",
         derived_from = "state_vector"
@@ -185,7 +185,7 @@ test_that("Loading modules resets user configured observables", {
     observables = observables
   )
 
-  m$configure_model_output(
+  m$configure_output(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"
@@ -197,23 +197,11 @@ test_that("Loading modules resets user configured observables", {
     names(m %.% parameters %.% model_output_to_observable)
   )
 
-  # Loading activity module should produce no warning
-  expect_no_warning(
-    m$load_module(activity),
-    message = "DiseasyActivity loaded - user-specified observable configurations deleted!"
-  )
-
-  # Configured observable should be in the set of observables
-  checkmate::expect_subset(
-    "test_observable",
-    names(m %.% parameters %.% model_output_to_observable)
-  )
-
-  # Loading variant module should produce warning
+  # Loading a module should produce warning
   variant <- DiseasyVariant$new()
   expect_warning(
     m$load_module(variant),
-    regexp = "DiseasyVariant loaded - user-specified observable configurations deleted!"
+    regexp = "New module loaded - user-specified output configurations deleted!"
   )
 
   # Configured observable should now be removed from set of observables
@@ -223,7 +211,7 @@ test_that("Loading modules resets user configured observables", {
   )
 
   # And we should now be able to reconfigure the observable again
-  m$configure_model_output(
+  m$configure_output(
     weights = rep(1, 4),
     name = "test_observable",
     derived_from = "state_vector"
@@ -235,6 +223,54 @@ test_that("Loading modules resets user configured observables", {
     names(m %.% parameters %.% model_output_to_observable)
   )
 
+
+  rm(m)
+})
+
+
+# Add additional waning immunity targets
+immunity$set_no_waning(target = "hospitalisation")
+immunity$set_no_waning(target = "death")
+
+
+test_that("Consecutive `$prepare_rhs()` calls works without error", {
+
+  m <- DiseasyModelOdeSeir$new(
+    immunity = immunity,
+    observables = observables
+  )
+
+  expect_no_condition(m$prepare_rhs())
+  expect_no_condition(m$prepare_rhs())
+
+  rm(m)
+})
+
+
+test_that("waning immunity targets other than 'infection' configures outputs", {
+
+  m <- DiseasyModelOdeSeir$new(
+    activity = activity,
+    immunity = immunity,
+    observables = observables
+  )
+
+  # Configured observable should be in the set of observables
+  checkmate::expect_subset(
+    "n_hospitalisation",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+  checkmate::expect_subset(
+    "n_death",
+    names(m %.% parameters %.% model_output_to_observable)
+  )
+
+
+  # We should be able to get outputs for the outcomes
+  expect_no_error(m$get_results("n_hospitalisation", prediction_length = 1))
+
+  expect_no_error(m$get_results("n_death", prediction_length = 1))
 
   rm(m)
 })

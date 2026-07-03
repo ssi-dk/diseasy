@@ -172,16 +172,20 @@ activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 ```
 
 ## Seasonality scenario
-This particular scenario also includes simple seasonality and waning immunity:
+This particular scenario also includes simple seasonality relationship:
 ```{r diseasy_season}
-# Waning immunity scenario
-immunity <- DiseasyImmunity$new()
-immunity$set_exponential_waning(time_scale = 180)
-
 # Season scenario
 season <- DiseasySeason$new()
 season$set_reference_date(as.Date("2020-01-20"))
 season$use_cosine_season()
+```
+
+## Immunity scenario
+This scenario includes an exponentially waning immunity against infection:
+```{r diseasy_immunity}
+# Waning immunity scenario
+immunity <- DiseasyImmunity$new()
+immunity$set_exponential_waning(time_scale = 180)
 ```
 
 # Choosing the model configuration
@@ -382,14 +386,14 @@ $$
 where $r_i$is the rate of transition out of $I$ (i.e. the reciprocal of the time spent
 in $I$ state).
 
-As stated above, the model always provides a prediction for the "n_infected" observable
-but there are cases where other observables are automatically configured by `diseasy`.
+As stated above, the model always provides a prediction for the "n_infected" output
+but there are cases where other outputs are automatically configured by `diseasy`.
 
-For example, when the model includes a `?DiseasyImmunity` module, observables are
+For example, when the model includes a `?DiseasyImmunity` module, outputs are
 configured to track outcomes related to immunity.
 
-Here, waning target named "hospitalisation" or "death" in the immunity scenario are
-assigned their own observables which are derived from the infection matrix
+Here, waning targets named "hospitalisation" or "death" in the immunity scenario are
+assigned their own output which are derived from the infection matrix
 (Note that there is no difference in waning between variants included in the model).
 
 In the SEIR3 case ($N = L = 1, M = 3$) with two age-groups, the weights take the following form:
