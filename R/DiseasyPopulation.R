@@ -246,7 +246,11 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       population <- self %.% groups |>
         dplyr::left_join(
-          self %.% activity %.% map_population(self %.% age_cuts_lower) |>
+          self %.% activity %.% map_population(
+            age_cuts_lower = self %.% age_cuts_lower,
+            age_groups_reference = names(self %.% activity %.% contact_basis %.% proportion),
+            demography = self %.% activity %.% contact_basis %.% demography
+          ) |>
             dplyr::summarise(
               "proportion" = sum(.data$proportion),
               "age_cuts_lower" = min(.data$age),

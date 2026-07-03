@@ -498,7 +498,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
           # Get the population proportion in the new age groups
           population <- self$map_population(age_cuts_lower)
-          proportion <- aggregate(proportion ~ age_group_ref, data = population, FUN = sum)$proportion
+          proportion <- aggregate(proportion ~ age_group_reference, data = population, FUN = sum)$proportion
 
           # Weight the population transformation matrix by the population proportion
           p <- p * proportion
@@ -632,33 +632,113 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(scenario_contacts)
     },
 
-
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' Map population between age groups
     #'
     #' @description
     #'   The function computes the proportion of population in the new and old age groups.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param age_groups_reference (`character()`)\cr
+    #'   Age labels (created by `diseasystore::age_labels()` of reference data.
+    #' @param demography (`data.frame`)\cr
+    #'   "A `data.frame` with the columns\\cr",
+    #'   "  * `age` (`integer()`) 1-year age groups or `age_group` (`integer()`) dynamic age groups\\cr",
+    #'   "  * `population` (`numeric()`) size of population in age group\\cr"
     #' @return
     #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
     #'   those supplied to the function.
-    map_population = function(age_cuts_lower) {
+    map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
+      age_cuts_lower,
+      age_groups_reference = names(self$contact_basis$proportion),
+      demography = self$contact_basis$demography
+    ) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, unique = TRUE, add = coll)
-      checkmate::assert_character(names(self$contact_basis$proportion), add = coll)
+      checkmate::assert_integerish(
+        age_cuts_lower, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE, add = coll
+      )
+      checkmate::assert_character(
+        age_groups_reference, any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", add = coll
+      )
+
+      checkmate::assert_data_frame(demography, min.rows = 1, add = coll)
+      checkmate::assert_names(names(demography), must.include = "population", add = coll)
+
+      demography_age_column <- intersect(c("age", "age_group"), names(demography))
+      if (length(demography_age_column) != 1) {
+        coll$push("`demography` must contain exactly one of `age` and `age_group`.")
+      }
+
+      if (identical(demography_age_column, "age")) {
+        checkmate::assert_integerish(demography$age, any.missing = FALSE, lower = 0, unique = TRUE, add = coll)
+      }
+
+      if (identical(demography_age_column, "age_group")) {
+        checkmate::assert_character(
+          demography$age_group,
+          any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", add = coll
+        )
+      }
+
+      checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
+      checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
+
       checkmate::reportAssertions(coll)
 
-      # Using default population from contact_basis
-      proportion <- self$contact_basis$demography$proportion
 
-      # Creating mapping for all ages to reference and provided age_groups
-      lower_ref <- as.integer(sapply(strsplit(x = names(self$contact_basis$proportion), split = "[-+]"), \(x) x[1]))
-      population <- data.frame(age = 0:(length(proportion) - 1), proportion = proportion)
+      # Determine the age cuts of the reference and the demography data
+      age_cuts_lower_reference <- as.integer(stringr::str_extract(age_groups_reference, r"{^\d+}"))
+      age_cuts_lower_demography <- purrr::pluck(demography, demography_age_column) |>
+        purrr::map_if(is.character, ~ stringr::str_extract(., r"{^\d+}")) |>
+        as.integer()
 
-      population$age_group_ref <- sapply(population$age, \(x) sum(x >= lower_ref))
-      population$age_group_out <- sapply(population$age, \(x) sum(x >= age_cuts_lower))
+      # Ensure age_cuts_lower is fully formed
+      age_cuts_lower <- unique(c(0, age_cuts_lower))
+
+      # Verify that the demography has the age information needed to perform the map
+      missing_age_cuts_reference <- setdiff(age_cuts_lower_reference, age_cuts_lower_demography)
+      missing_age_cuts_out       <- setdiff(age_cuts_lower,           age_cuts_lower_demography)
+
+      coll <- checkmate::makeAssertCollection()
+      if (length(missing_age_cuts_out) > 0) {
+        coll$push(
+          glue::glue(
+            "`demography` is missing age group splits to facilitate splits at ",
+            'age{ifelse(length(missing_age_cuts_out) > 1, "s", "")} = {missing_age_cuts_out}'
+          )
+        )
+      }
+      if (length(missing_age_cuts_reference) > 0) {
+        coll$push(
+          glue::glue(
+            "`demography` is missing age group splits to facilitate splits at ",
+            'age{ifelse(length(missing_age_cuts_reference) > 1, "s", "")} = {missing_age_cuts_reference}'
+          )
+        )
+      }
+      checkmate::reportAssertions(coll)
+
+
+      # Generate age labels for the output
+      age_labels_out       <- diseasystore::age_labels(age_cuts_lower)
+      age_labels_reference <- diseasystore::age_labels(age_cuts_lower_reference)
+
+      #  Map reference and return age groups to the demography age groups
+      population <- demography |>
+        dplyr::mutate(
+          "population" = .data$population,
+          .by = dplyr::all_of(demography_age_column)
+        ) |>
+        dplyr::mutate(
+          "proportion" = .data$population / sum(.data$population),
+          "age_group_id"           = age_cuts_lower_demography,
+          "age_group"              = diseasystore::age_labels(age_cuts_lower_demography),
+          "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower)),
+          "age_group_out"          = age_labels_out[.data$age_group_id_out],
+          "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
+          "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
+        )
 
       return(population)
     },
@@ -1096,14 +1176,16 @@ DiseasyActivity <- R6::R6Class(                                                 
       population <- self$map_population(age_cuts_lower)
 
       # Calculating transformation matrix
-      tt <- merge(aggregate(proportion ~ age_group_ref + age_group_out, data = population, FUN = sum),
-                  aggregate(proportion ~ age_group_ref,                 data = population, FUN = sum),
-                  by = "age_group_ref")
+      tt <- merge(
+        aggregate(proportion ~ age_group_id_reference + age_group_id_out, data = population, FUN = sum),
+        aggregate(proportion ~ age_group_id_reference,                    data = population, FUN = sum),
+        by = "age_group_id_reference"
+      )
       tt$proportion <- tt$proportion.x / tt$proportion.y
-      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_out, j = age_group_ref, x = proportion)))
+      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_id_out, j = age_group_id_reference, x = proportion)))
 
       # Label the matrix
-      dimnames(p) <- list(diseasystore::age_labels(age_cuts_lower), names(self$contact_basis$proportion))
+      dimnames(p) <- list(unique(population$age_group_out), unique(population$age_group_reference))
 
       return(p)
     },
