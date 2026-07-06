@@ -446,7 +446,8 @@ results <- list.files(path) |>
           !!file,
           r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
         ),
-        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}") + 0.5 * stringr::str_detect(!!file, r"{-1-0-[0-9]+.rds}")
+        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}") +
+          0.5 * stringr::str_detect(!!file, r"{-1-0-[0-9]+.rds}")
       )
   }) |>
   purrr::list_rbind() |>
