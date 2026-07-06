@@ -255,10 +255,10 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 # collects the existing results from the round
 existing_results <- function(M, monotonous, individual_level) {                                                         # nolint: object_name_linter
 
-  exisitng_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
+  existing_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
 
   # Early return if no files exist
-  if (length(exisitng_files) == 0) {
+  if (length(existing_files) == 0) {
     return(
       data.frame(
         "optim_method" = character(0),
@@ -271,7 +271,7 @@ existing_results <- function(M, monotonous, individual_level) {                 
 
 
   # Parse existing files
-  list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds")) |>
+  existing_files |>
     purrr::map(
       .progress = TRUE,
       \(file) {
