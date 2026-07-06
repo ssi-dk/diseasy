@@ -494,7 +494,8 @@ should_have_been_eliminated <- results |>
 
 if (nrow(should_have_been_eliminated) > 0) {
   cat("should_have_been_eliminated")
-  print(should_have_been_eliminated)
+  print(dplyr::select(should_have_been_eliminated, !c("target", "variation", "target_label")))
+  print(dplyr::count(should_have_been_eliminated, method, strategy, penalty))
 }
 
 results <- dplyr::anti_join(
@@ -514,7 +515,8 @@ should_not_have_been_eliminated <- results |>
 
 if (nrow(should_not_have_been_eliminated) > 0) {
   cat("should_not_have_been_eliminated")
-  print(should_not_have_been_eliminated)
+  print(dplyr::select(should_not_have_been_eliminated, !c("target", "variation", "target_label")))
+  print(dplyr::count(should_not_have_been_eliminated, method, strategy, penalty))
 }
 
 # Re-arrange the columns
@@ -531,6 +533,9 @@ results <- results |>
     .data$method,
     .data$strategy
   )
+
+# Restore the (potentially) upper-case names for the configuration
+results <- dplyr::left_join(results, optim_configs, by = "optim_method")
 
 # Store results
 diseasy_immunity_optimiser_results <- results
