@@ -221,9 +221,9 @@ existing_results <- function(M, monotonous, individual_level) {                 
 path <- devtools::package_file("data-raw/diseasy_immunity_optimiser_results/")
 cache <- cachem::cache_disk(dir = path, max_size = Inf)
 
-for (penalty in c(0, 1)) {
-  monotonous <- penalty
-  individual_level <- penalty
+for (penalty in c(0, 0.5, 1)) {
+  monotonous <- ceiling(penalty)
+  individual_level <- floor(penalty)
 
   closeAllConnections()
 
@@ -446,7 +446,7 @@ results <- list.files(path) |>
           !!file,
           r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
         ),
-        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}")
+        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}") + 0.5 * stringr::str_detect(!!file, r"{-1-0-[0-9]+.rds}")
       )
   }) |>
   purrr::list_rbind() |>
