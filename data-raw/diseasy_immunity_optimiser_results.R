@@ -271,7 +271,7 @@ existing_results <- function(M, monotonous, individual_level) {                 
 
 
   # Parse existing files
-  list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{2}.rds")) |>
+  list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds")) |>
     purrr::map(
       .progress = TRUE,
       \(file) {
@@ -334,7 +334,7 @@ for (penalty in c(0, 1)) {
     message(glue::glue("M = {M}"))
 
     # Remove existing computations
-    candidates <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
+    candidates_needing_compute <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
 
     # Compute new/missing runs
     combinations <- tidyr::expand_grid(
@@ -352,7 +352,7 @@ for (penalty in c(0, 1)) {
         delim = "-",
         names = c("method", "strategy")
       ) |>
-      dplyr::inner_join(candidates, by = c("optim_method", "target_label", "method", "strategy")) |>
+      dplyr::inner_join(candidates_needing_compute, by = c("optim_method", "target_label", "method", "strategy")) |>
       dplyr::left_join(optim_configs, by = "optim_method")
 
     # Run the approximations for the round
