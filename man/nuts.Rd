@@ -6,7 +6,7 @@
 \title{NUTS region identifiers}
 \source{
 Source: 10.2908/demo_r_pjangrp3.
-Retrieved July 07, 2026.
+Retrieved June 15, 2026.
 Population on 1 January by age group, sex and NUTS 3 region
 }
 \description{

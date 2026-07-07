@@ -7,7 +7,7 @@
 \source{
 U.S. Census Bureau. (n.d.). \emph{International Database: World Population Estimates and Projections}.
 U.S. Department of Commerce.
-Retrieved July 07, 2026.
+Retrieved June 15, 2026.
 from https://data.census.gov/
 }
 \description{
