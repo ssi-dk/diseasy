@@ -33,22 +33,22 @@ See the vignette("diseasy-regions") for examples of use.
   )
 
   # Restrict the model scope to two regions.
-  region <- DiseasyRegions$new(
-    regions = c("north", "south"),
+  regions <- DiseasyRegions$new(
+    area = c("north", "south"),
     adjacency = adjacency,
     demography = demography
   )
 
   # Active bindings return data for configured regions.
-  region \%.\% regions
-  region \%.\% demography
-  region \%.\% adjacency
+  regions \%.\% area
+  regions \%.\% demography
+  regions \%.\% adjacency
 
   # Update the configured regional scope.
-  region$set_regions(regions = c("north", "south", "east"))
-  region$describe()
+  regions$set_area(area = c("north", "south", "east"))
+  regions$describe()
 
-  rm(region, demography, adjacency)
+  rm(regions, demography, adjacency)
 
 }
 \seealso{
@@ -65,7 +65,7 @@ See the vignette("diseasy-regions") for examples of use.
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
-    \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. Read only.}
+    \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. Read only.}
 
     \item{\code{available_stratifications}}{(\code{character()})\cr
 The available levels of stratification supported. Read only.}
@@ -83,7 +83,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
 \subsection{Public methods}{
   \itemize{
     \item \href{#method-DiseasyRegions-initialize}{\code{DiseasyRegions$new()}}
-    \item \href{#method-DiseasyRegions-set_regions}{\code{DiseasyRegions$set_regions()}}
+    \item \href{#method-DiseasyRegions-set_area}{\code{DiseasyRegions$set_area()}}
     \item \href{#method-DiseasyRegions-set_adjacency}{\code{DiseasyRegions$set_adjacency()}}
     \item \href{#method-DiseasyRegions-set_demography}{\code{DiseasyRegions$set_demography()}}
     \item \href{#method-DiseasyRegions-validate_configuration}{\code{DiseasyRegions$validate_configuration()}}
@@ -108,13 +108,13 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
   Creates a new instance of the \code{DiseasyRegions} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$new(regions = NULL, adjacency = NULL, demography = NULL, ...)}
+    \preformatted{DiseasyRegions$new(area = NULL, adjacency = NULL, demography = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
@@ -124,19 +124,19 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyRegions-set_regions"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyRegions-set_regions}{}}}
-\subsection{\code{DiseasyRegions$set_regions()}}{
+\if{html}{\out{<a id="method-DiseasyRegions-set_area"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegions-set_area}{}}}
+\subsection{\code{DiseasyRegions$set_area()}}{
   Sets the geographic regions of interest.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$set_regions(regions)}
+    \preformatted{DiseasyRegions$set_area(area)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
     }
     \if{html}{\out{</div>}}
   }
@@ -149,7 +149,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
 \if{html}{\out{<a id="method-DiseasyRegions-set_adjacency"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyRegions-set_adjacency}{}}}
 \subsection{\code{DiseasyRegions$set_adjacency()}}{
-  Sets the region adjacency data.
+  Sets the regional adjacency data.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyRegions$set_adjacency(adjacency, type = c("movement", "infection-flow"))}
@@ -194,16 +194,16 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
 \if{html}{\out{<a id="method-DiseasyRegions-validate_configuration"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyRegions-validate_configuration}{}}}
 \subsection{\code{DiseasyRegions$validate_configuration()}}{
-  Check whether \code{regions}, \code{adjacency}, and \code{demography} are mutually consistent.
+  Check whether \code{area}, \code{adjacency}, and \code{demography} are mutually consistent.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$validate_configuration(regions, adjacency, demography)}
+    \preformatted{DiseasyRegions$validate_configuration(area, adjacency, demography)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
     }
@@ -221,7 +221,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
   Create a logical filter for values matching one or more regions.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$region_filter(values, regions = self \%.\% regions)}
+    \preformatted{DiseasyRegions$region_filter(values, area = self \%.\% area)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -229,9 +229,9 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \describe{
       \item{\code{values}}{(\code{character()})\cr
 Values to filter, typically region identifiers.}
-      \item{\code{regions}}{(\code{character()} or \code{NULL})\cr
+      \item{\code{area}}{(\code{character()} or \code{NULL})\cr
 Region identifiers to match against. Defaults to the currently selected
-regions. If \code{NULL}, all values are matched.}
+area. If \code{NULL}, all values are matched.}
     }
     \if{html}{\out{</div>}}
   }
@@ -299,12 +299,12 @@ regions. If \code{NULL}, all values are matched.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{data}}{(\code{data.frame(1)})\cr
-The data to plot spatially on the configured regions.
+The data to plot spatially on the configured area.
 If \code{NULL}, the demography and adjacency of regions are plotted.
 If \code{data.frame}, the first non-structural column is plotted.
 Structural columns are \code{region}, \code{date}, \code{realisation_id}, and \code{weight}.}
       \item{\code{shape_files}}{(\code{sf} or \code{NULL})\cr
-Shape files used to draw the configured regions.
+Shape files used to draw the configured area.
 If \code{NULL}, \code{rnaturalearth::ne_countries()} is used.
 
 If an \code{sf} object is supplied, region identifiers are guessed from:
@@ -315,7 +315,7 @@ If an \code{sf} object is supplied, region identifiers are guessed from:
 }
 
 If several candidate columns exist, the first candidate with any match
-to the configured regions is used.}
+to the configured area is used.}
     }
     \if{html}{\out{</div>}}
   }
@@ -385,25 +385,25 @@ The available levels of stratification supported. Read only.}
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="describe"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-describe'><code>DiseasyRegions$describe()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="initialize"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-initialize'><code>DiseasyRegions$initialize()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_adjacency"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_adjacency'><code>DiseasyRegions$set_adjacency()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_area"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_area'><code>DiseasyRegions$set_area()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_demography"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_demography'><code>DiseasyRegions$set_demography()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_regions"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_regions'><code>DiseasyRegions$set_regions()</code></a></span></li>
 </ul>
 </details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyRegionsNuts-validate_configuration"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyRegionsNuts-validate_configuration}{}}}
 \subsection{\code{DiseasyRegionsNuts$validate_configuration()}}{
-  Check whether regions, adjacency, and demography are mutually consistent
+  Check whether area, adjacency, and demography are mutually consistent
 and complete under NUTS hierarchy semantics.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegionsNuts$validate_configuration(regions, adjacency, demography)}
+    \preformatted{DiseasyRegionsNuts$validate_configuration(area, adjacency, demography)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regions}}{(\code{character()})\cr The geographic regions of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
     }
@@ -421,7 +421,7 @@ and complete under NUTS hierarchy semantics.
   Create a logical filter using NUTS hierarchy prefix matching.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegionsNuts$region_filter(values, regions = self \%.\% regions)}
+    \preformatted{DiseasyRegionsNuts$region_filter(values, area = self \%.\% area)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -429,9 +429,9 @@ and complete under NUTS hierarchy semantics.
     \describe{
       \item{\code{values}}{(\code{character()})\cr
 Values to filter, typically NUTS codes.}
-      \item{\code{regions}}{(\code{character()} or \code{NULL})\cr
+      \item{\code{area}}{(\code{character()} or \code{NULL})\cr
 Region identifiers to match against. Defaults to the currently selected
-regions. If \code{NULL}, all values are matched.}
+area. If \code{NULL}, all values are matched.}
     }
     \if{html}{\out{</div>}}
   }

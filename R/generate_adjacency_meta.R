@@ -10,20 +10,18 @@
 #' @description
 #'   Generate adjacency data between NUTS 3 regions from Meta Social Connectedness
 #'   Index.
-#' @param regions `r rd_regions("generators")`
+#' @param area `r rd_area("generators")`
 #' @return
 #'   `r rd_adjacency("return")`
 #' @examples
 #' \dontrun{
-#' adjacency_meta_nordic <- generate_adjacency_meta(regions = c("DK", "FI", "IS", "NO", "SE"))
+#' adjacency_meta_nordic <- generate_adjacency_meta(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
 #' @keywords data-generators
 #' @export
 #' @importFrom diseasystore `%.%`
-generate_adjacency_meta <- function(
-  regions = NULL
-) {
-  checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
+generate_adjacency_meta <- function(area = NULL) {
+  checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
 
   missing_packages <- purrr::discard(c("countrycode", "countrycode", "tibble"), rlang::is_installed)
 
@@ -55,7 +53,7 @@ generate_adjacency_meta <- function(
     )
 
 
-  if (is.null(regions)) {
+  if (is.null(area)) {
 
     # Keep regions in our NUTS list
     adjacency_meta <- adjacency_meta |>
@@ -68,14 +66,14 @@ generate_adjacency_meta <- function(
     adjacency_meta <- adjacency_meta |>
       dplyr::filter(
         purrr::reduce(
-          .x = purrr::map(regions, ~ stringr::str_starts(.data$from, .x)),
+          .x = purrr::map(area, ~ stringr::str_starts(.data$from, .x)),
           .f = `|`,
           .init = FALSE
         )
       ) |>
       dplyr::filter(
         purrr::reduce(
-          .x = purrr::map(regions, ~ stringr::str_starts(.data$to, .x)),
+          .x = purrr::map(area, ~ stringr::str_starts(.data$to, .x)),
           .f = `|`,
           .init = FALSE
         )
