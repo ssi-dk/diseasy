@@ -180,7 +180,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Check structure of contact_basis
       checkmate::assert_list(contact_basis, add = coll)
-      checkmate::assert_set_equal(names(contact_basis), c("contacts", "age_groups", "description"), add = coll)
+      checkmate::assert_set_equal(names(contact_basis), c("contacts", "description"), add = coll)
 
       # Checks on contact_basis contacts
       checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
@@ -214,9 +214,6 @@ DiseasyActivity <- R6::R6Class(                                                 
         ),
         add = coll
       )
-
-      # Checks on contact_basis proportion
-      checkmate::assert_character(contact_basis$age_groups, pattern = r"{\d+(-\d+|\+)}", add = coll)
 
       # End checks
       checkmate::reportAssertions(coll)
