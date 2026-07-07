@@ -35,6 +35,11 @@
       "binary": true
     },
     {
+      "package": "BB",
+      "version": "2026.1.0",
+      "binary": true
+    },
+    {
       "package": "bibtex",
       "version": "0.5.2",
       "binary": true
@@ -236,7 +241,12 @@
     },
     {
       "package": "distributional",
-      "version": "0.7.0",
+      "version": "0.8.1",
+      "binary": true
+    },
+    {
+      "package": "doParallel",
+      "version": "1.0.17",
       "binary": true
     },
     {
@@ -251,7 +261,7 @@
     },
     {
       "package": "duckdb",
-      "version": "1.5.2",
+      "version": "1.5.4.2",
       "binary": true
     },
     {
@@ -297,6 +307,11 @@
     {
       "package": "fontawesome",
       "version": "0.5.3",
+      "binary": true
+    },
+    {
+      "package": "foreach",
+      "version": "1.5.2",
       "binary": true
     },
     {
@@ -366,7 +381,7 @@
     },
     {
       "package": "gridExtra",
-      "version": "2.3",
+      "version": "2.3.1",
       "binary": true
     },
     {
@@ -416,7 +431,7 @@
     },
     {
       "package": "httr2",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "binary": true
     },
     {
@@ -442,6 +457,11 @@
     {
       "package": "ISOweek",
       "version": "0.6-2",
+      "binary": true
+    },
+    {
+      "package": "iterators",
+      "version": "1.0.14",
       "binary": true
     },
     {
@@ -490,6 +510,11 @@
       "binary": true
     },
     {
+      "package": "lbfgsb3c",
+      "version": "2024-3.5",
+      "binary": true
+    },
+    {
       "package": "lgr",
       "version": "0.5.2",
       "binary": true
@@ -506,7 +531,7 @@
     },
     {
       "package": "listenv",
-      "version": "0.10.1",
+      "version": "1.0.0",
       "binary": true
     },
     {
@@ -516,7 +541,7 @@
     },
     {
       "package": "loo",
-      "version": "2.9.0",
+      "version": "2.10.0",
       "binary": true
     },
     {
@@ -537,6 +562,11 @@
     {
       "package": "markdown",
       "version": "2.0",
+      "binary": true
+    },
+    {
+      "package": "marqLevAlg",
+      "version": "2.0.8",
       "binary": true
     },
     {
@@ -577,6 +607,11 @@
     {
       "package": "miniUI",
       "version": "0.1.2",
+      "binary": true
+    },
+    {
+      "package": "minqa",
+      "version": "1.2.8",
       "binary": true
     },
     {
@@ -626,7 +661,7 @@
     },
     {
       "package": "parallelly",
-      "version": "1.47.0",
+      "version": "1.48.0",
       "binary": true
     },
     {
@@ -656,7 +691,7 @@
     },
     {
       "package": "pkgload",
-      "version": "1.5.2",
+      "version": "1.5.3",
       "binary": true
     },
     {
@@ -701,7 +736,7 @@
     },
     {
       "package": "progressr",
-      "version": "0.19.0",
+      "version": "1.0.0",
       "binary": true
     },
     {
@@ -722,6 +757,11 @@
     {
       "package": "purrr",
       "version": "1.2.2",
+      "binary": true
+    },
+    {
+      "package": "quadprog",
+      "version": "1.5-8",
       "binary": true
     },
     {
@@ -756,7 +796,7 @@
     },
     {
       "package": "Rcpp",
-      "version": "1.1.1-1.1",
+      "version": "1.1.2",
       "binary": true
     },
     {
@@ -781,7 +821,7 @@
     },
     {
       "package": "readxl",
-      "version": "1.4.5",
+      "version": "1.5.0",
       "binary": true
     },
     {
@@ -841,7 +881,7 @@
     },
     {
       "package": "RSQLite",
-      "version": "3.53.1",
+      "version": "3.53.3",
       "binary": true
     },
     {
@@ -856,7 +896,7 @@
     },
     {
       "package": "rstudioapi",
-      "version": "0.18.0",
+      "version": "0.19.0",
       "binary": true
     },
     {
@@ -901,7 +941,7 @@
     },
     {
       "package": "shiny",
-      "version": "1.13.0",
+      "version": "1.14.0",
       "binary": true
     },
     {
@@ -986,7 +1026,7 @@
     },
     {
       "package": "tinytex",
-      "version": "0.59",
+      "version": "0.60",
       "binary": true
     },
     {
@@ -1051,7 +1091,7 @@
     },
     {
       "package": "withr",
-      "version": "3.0.2",
+      "version": "3.0.3",
       "binary": true
     },
     {
@@ -1061,12 +1101,12 @@
     },
     {
       "package": "xfun",
-      "version": "0.58",
+      "version": "0.59",
       "binary": true
     },
     {
       "package": "xml2",
-      "version": "1.5.2",
+      "version": "1.6.0",
       "binary": true
     },
     {
