@@ -6,7 +6,7 @@
 \title{Demography (Nordics - NUTS 3)}
 \source{
 Source: 10.2908/demo_r_pjangrp3.
-Retrieved June 15, 2026.
+Retrieved July 07, 2026.
 Population on 1 January by age group, sex and NUTS 3 region
 }
 \description{

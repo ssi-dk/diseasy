@@ -208,10 +208,25 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_number(
         unique(
           c(
-            nrow(purrr::pluck(contact_basis, "contacts", 1)),
-            ncol(purrr::pluck(contact_basis, "contacts", 1))
+            purrr::pluck(contact_basis, "contacts", 1, nrow),
+            purrr::pluck(contact_basis, "contacts", 1, ncol)
           )
         ),
+        add = coll
+      )
+
+      checkmate::assert_true(
+        identical(
+          purrr::pluck(contact_basis, "contacts", 1, rownames),
+          purrr::pluck(contact_basis, "contacts", 1, colnames)
+        ),
+        add = coll
+      )
+
+      # Checks on contact_basis labels
+      checkmate::assert_character(
+        purrr::pluck(contact_basis, "contacts", 1, colnames),
+        pattern = r"{\d+(-\d+|\+)}",
         add = coll
       )
 

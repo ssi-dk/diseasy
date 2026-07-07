@@ -6,7 +6,7 @@
 \title{Meta Social Connectedness Index as adjacency for countries (Nordics)}
 \source{
 Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
-Retrieved June 15, 2026.
+Retrieved July 07, 2026.
 See \url{https://data.humdata.org/dataset/social-connectedness-index} and
 \url{https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/}.
 }

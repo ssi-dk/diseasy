@@ -245,7 +245,6 @@ DiseasyPopulation <- R6::R6Class(                                               
         dplyr::left_join(
           private %.% map_population(
             age_cuts_lower = self %.% age_cuts_lower,
-            age_groups_reference = names(self %.% activity %.% contact_basis %.% proportion),
             demography = self %.% regions %.% demography
           ) |>
             dplyr::summarise(
@@ -275,7 +274,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       } else {
 
-        population_proportion <- private %.% map_population(self %.% age_cuts_lower) |>
+        population_proportion <- private %.% map_population(age_cuts_lower = self %.% age_cuts_lower) |>
           dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
           dplyr::pull("proportion")
 
@@ -348,8 +347,8 @@ DiseasyPopulation <- R6::R6Class(                                               
     #   those supplied to the function.
     map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
       age_cuts_lower,
-      age_groups_reference = self$contact_basis$age_groups,
-      demography = self$contact_basis$demography
+      age_groups_reference = NULL,
+      demography = self$regions$demography
     ) {
 
       # Input checks
@@ -358,7 +357,9 @@ DiseasyPopulation <- R6::R6Class(                                               
         age_cuts_lower, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE, add = coll
       )
       checkmate::assert_character(
-        age_groups_reference, any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", add = coll
+        age_groups_reference,
+        any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", null.ok = TRUE,
+        add = coll
       )
 
       checkmate::assert_data_frame(demography, min.rows = 1, add = coll)
@@ -380,7 +381,6 @@ DiseasyPopulation <- R6::R6Class(                                               
         )
       }
 
-      checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
       checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
 
       checkmate::reportAssertions(coll)
@@ -434,10 +434,17 @@ DiseasyPopulation <- R6::R6Class(                                               
           "age_group_id"           = age_cuts_lower_demography,
           "age_group"              = diseasystore::age_labels(age_cuts_lower_demography),
           "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower)),
-          "age_group_out"          = age_labels_out[.data$age_group_id_out],
-          "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
-          "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
+          "age_group_out"          = age_labels_out[.data$age_group_id_out]
         )
+
+        # Add maps to reference if given
+        if (!is.null(age_groups_reference)) {
+        population <- population |>
+          dplyr::mutate(
+            "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
+            "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
+          )
+        }
 
       return(population)
     },
@@ -455,7 +462,11 @@ DiseasyPopulation <- R6::R6Class(                                               
       }
 
       # Compute proportion of population in new and old age_groups
-      population <- self$map_population(age_cuts_lower)
+      population <- private %.% map_population(
+        age_cuts_lower = age_cuts_lower,
+        age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "contacts", 1, colnames),
+        demography = self %.% regions %.% demography
+      )
 
       # Calculating transformation matrix
       tt <- merge(

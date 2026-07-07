@@ -272,7 +272,7 @@ test_that("$get_scenario_openness() works with no scenario", {
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- contact_basis_nordic %.% DK %.% age_groups
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% contacts, 1, colnames)
 
   expect_identical(
     act$get_scenario_openness(),
@@ -300,7 +300,7 @@ test_that("$get_scenario_openness() works with given scenario", {
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
-  age_labels <- contact_basis_nordic %.% DK %.% age_groups
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% contacts, 1, colnames)
 
 
   # Now we load a scenario
