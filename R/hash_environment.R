@@ -14,10 +14,44 @@ hash_environment <- function(environment) {
 
   if (checkmate::test_environment(environment)) environment <- as.list(environment)
 
-  # Create helper function to recursively dive into a list and hash function elements
+  # Helper function to handle calls (e.g. from errors)
+  deparse_call <- function(call) {
+    if (is.null(call)) {
+      return(NULL)
+    }
 
+    out <- paste(
+      stringr::str_squish(deparse(call, width.cutoff = 500L)),
+      collapse = ""
+    )
+
+    return(out)
+  }
+
+  # Helper to hash conditions
+  hash_condition <- function(obj) {
+    out <- list(
+      "condition_class" = class(obj),
+      "condition_message" = conditionMessage(obj),
+      "condition_call" = deparse_call(conditionCall(obj)),
+      "condition_fields" = hash_nested_list(purrr::discard_at(unclass(obj), c("message", "call", "trace", "parent")))
+    )
+
+    if (inherits(unclass(obj)$parent, "condition")) {
+      out[["condition_parent"]] <- hash_condition(unclass(obj)$parent)
+    }
+  }
+
+
+  # Create helper function to recursively dive into a list and hash function elements
   hash_nested_list <- function(obj) {
-    if (checkmate::test_list(obj)) {
+    if (inherits(obj, "condition")) {
+
+      # Conditions are list-like, but their call, trace and parent can carry
+      # unstable state. Hash a normalized representation instead.
+      out <- hash_condition(obj)
+
+    } else if (checkmate::test_list(obj)) {
 
       # If it's a list, recursively hash
       out <- purrr::map(obj, hash_nested_list)
