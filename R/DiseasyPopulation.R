@@ -244,6 +244,9 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   The population groups and their sizes configured in the module.
     population = function() {
       checkmate::assert_class(self %.% regions, "DiseasyRegions")
+      if (is.null(self %.% regions %.% demography)) {
+        pkgcond::pkg_error("`demography` must be set in `DiseasyRegions` to compute `population`")
+      }
 
       population <- self %.% groups |>
         dplyr::left_join(
