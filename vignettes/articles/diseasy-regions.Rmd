@@ -26,18 +26,15 @@ withr::local_options("tibble.print_min" = 5)
 # Overview
 
 The `DiseasyRegions` module defines the regional scope for the models.
-In addition, it provides a common place to define the demography available for those regions,
-and the adjacency between regions.
-
-The module is intentionally generic. Region identifiers are treated as ordinary character values and are matched
-exactly. This means that, e.g., the region `"north"` is not interpreted as a parent of `"north_subregion"`.
+In addition, it provides a common place to define the demography available for those areas,
+and the adjacency between regions within the areas.
 
 # Data structure
 
 `DiseasyRegions` uses three inputs:
 
-- `regions`: a `character` vector defining the selected region scope.
-- `demography`: a `data.frame` with one region column, optional stratification columns, and one population column.
+- `area`: a `character` vector defining the selected regional scope.
+- `demography`: a `data.frame` with one "region" column, optional stratification columns, and one population column.
 - `adjacency`: a `data.frame` describing connectedness between pairs of regions
   (see the [Regional adjacency](#regional-adjacency) section for further details).
 
@@ -208,27 +205,27 @@ The matrix is derived in three steps:
 
 # Creating a regional module
 
-A `DiseasyRegions` object can be created and then configured with the selected regions, demography, and adjacency
+A `DiseasyRegions` object can be created and then configured with the selected area, demography, and adjacency
 data. Each setter validates the candidate input before storing it.
 
 ```{r create_module}
-region <- DiseasyRegions$new()
+regions <- DiseasyRegions$new()
 
-region
+regions
 ```
 
 ```{r module_setters}
-region$set_regions(regions = c("DK", "SE", "NO", "FI"))
-region$set_demography(demography = demography_nordic)
-region$set_adjacency(adjacency = adjacency_meta_nordic)
+regions$set_area(area = c("DK", "SE", "NO", "FI"))
+regions$set_demography(demography = demography_nordic)
+regions$set_adjacency(adjacency = adjacency_meta_nordic)
 
-region
+regions
 ```
 
 The `?DiseasyRegions$demography` field returns demography filtered to the currently selected regions.
 
 ```{r filtered_demography}
-region %.% demography
+regions %.% demography
 ```
 
 Population totals can be computed directly from the filtered demography.
@@ -236,7 +233,7 @@ Population totals can be computed directly from the filtered demography.
 ```{r population_totals}
 aggregate(
   population ~ region,
-  data = region %.% demography,
+  data = regions %.% demography,
   FUN = sum
 )
 ```
@@ -245,16 +242,16 @@ The active bindings `?DiseasyRegions$adjacency` and `?DiseasyRegions$infection_f
 expose derived views of `adjacency` input after filtering to the selected regions.
 
 ```{r filtered_adjacency}
-region %.% adjacency
+regions %.% adjacency
 ```
 
 ```{r filtered_theta_matrix}
-region %.% infection_flow_matrix
+regions %.% infection_flow_matrix
 ```
 
 The module configuration can also be visualised via the `$plot()` method with or `plot()`.
 ```{r plot}
-plot(region)
+plot(regions)
 ```
 
 ## Regional module with hierarchical structure (NUTS)
@@ -262,47 +259,47 @@ plot(region)
 If you have demography and adjacency data for structured regions (such as NUTS), then `DiseasyRegionsNuts` can handle
 the nested data.
 ```{r create_module_nuts}
-region_nuts <- DiseasyRegionsNuts$new()
+regions_nuts <- DiseasyRegionsNuts$new()
 
-region_nuts
+regions_nuts
 ```
 
 ```{r nuts_module_setters}
-region_nuts$set_regions(regions = "DK")
-region_nuts$set_demography(demography = demography_nordic_nuts3)
-region_nuts$set_adjacency(adjacency = adjacency_meta_nordic_nuts)
+regions_nuts$set_area(area = "DK")
+regions_nuts$set_demography(demography = demography_nordic_nuts3)
+regions_nuts$set_adjacency(adjacency = adjacency_meta_nordic_nuts)
 
-region_nuts
+regions_nuts
 ```
 
 And again the module configuration can also be visualised with `plot()`.
 ```{r plot_nuts}
-plot(region_nuts)
+plot(regions_nuts)
 ```
 
 # Changing the selected regions
 
-The selected regional scope can be changed with `$set_regions()`. The new regions must be available in the stored
+The selected regional scope can be changed with `$set_area()`. The new regions must be available in the stored
 adjacency and demography data.
 
 ```{r change_regions}
-region$set_regions(regions = c("DK", "SE"))
+regions$set_area(area = c("DK", "SE"))
 
-region %.% regions
+regions %.% regions
 ```
 
 The active fields now reflect the updated scope.
 
 ```{r changed_demography}
-region %.% demography
+regions %.% demography
 ```
 
 ```{r changed_adjacency}
-region %.% adjacency
+regions %.% adjacency
 ```
 
 ```{r changed_theta_matrix}
-region %.% infection_flow_matrix
+regions %.% infection_flow_matrix
 ```
 
 
@@ -312,7 +309,7 @@ The module checks that selected regions are available in the stored demography a
 select a region that is not present in the data will fail.
 
 ```{r invalid_region}
-try(region$set_regions(regions = "DE"))
+try(DiseasyRegionsNuts$set_area(regions = "DE"))
 ```
 
 The adjacency data must also contain the same region identifiers in the `from` and `to` columns.
@@ -324,7 +321,7 @@ bad_adjacency <- data.frame(
   adjacency = c(1, 1)
 )
 
-try(region$set_adjacency(adjacency = bad_adjacency))
+try(regions$set_adjacency(adjacency = bad_adjacency))
 ```
 
 
