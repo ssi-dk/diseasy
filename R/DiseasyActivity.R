@@ -837,12 +837,12 @@ DiseasyActivity <- R6::R6Class(                                                 
         \(type) {
           activity_unit_subset |>
             purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
-            purrr::reduce(`+`, .init = rep(0, private$n_age_groups)) |> # each age_group starts with 0 activity
-            stats::setNames(names(self$contact_basis$proportion))
+            purrr::reduce(`+`, .init = rep(0, private %.% n_age_groups)) |> # each age_group starts with 0 activity
+            stats::setNames(purrr::pluck(self %.% contact_basis %.% contacts, 1, colnames))
         }
       )
 
-      names(risk_weighted_activity) <- private$activity_types
+      names(risk_weighted_activity) <- private %.% activity_types
       return(risk_weighted_activity)
     },
 

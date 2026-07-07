@@ -169,14 +169,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       checkmate::assert_numeric(weights, lower = 0, len = 4)
 
       # Retrieve the time-varying contact matrices projected onto target age-groups
-      contact_matrices <- self %.% activity %.% get_scenario_contacts(
-        age_cuts_lower = self %.% age_cuts_lower,
-        weights = weights
-      )
-
-      # We then construct the normalised matrices
-      per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
+      per_capita_contact_matrices <- self %.% activity %.% get_scenario_contacts(weights = weights)
 
       return(per_capita_contact_matrices)
     },
