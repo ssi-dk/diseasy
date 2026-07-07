@@ -176,6 +176,7 @@ generate_contact_basis <- function(area = NULL) {
     return(
       list(
         "contacts" = contacts,
+        "age_groups" = age_labels,
         "description" = glue::glue(
           "Contact matrices for ",
           "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",

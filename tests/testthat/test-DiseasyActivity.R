@@ -272,7 +272,7 @@ test_that("$get_scenario_openness() works with no scenario", {
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% contacts, 1, colnames)
+  age_labels <- contact_basis_nordic %.% DK %.% age_groups
 
   expect_identical(
     act$get_scenario_openness(),
@@ -300,7 +300,7 @@ test_that("$get_scenario_openness() works with given scenario", {
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
-  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% contacts, 1, colnames)
+  age_labels <- contact_basis_nordic %.% DK %.% age_groups
 
 
   # Now we load a scenario
@@ -311,7 +311,7 @@ test_that("$get_scenario_openness() works with given scenario", {
   expect_length(act$get_scenario_openness(), 3L) # 3 dates in scenario
   expect_length(act$get_scenario_openness()[[1]], 4L) # 4 arenas
   expect_true(all(unlist(lapply(act$get_scenario_openness(), lengths)) == 16))
-9
+
   expect_length(purrr::pluck(act$get_scenario_openness(), 1, 1), n = length(age_labels))
   rm(act)
 })
@@ -450,6 +450,14 @@ test_that("$set_contact_basis() works", {
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
     class = "simpleError",
     regexp = r"{Must be a permutation of set .+, but has extra elements \{'extra_element'\}}"
+  )
+
+  custom_basis <- contact_basis_nordic %.% DK
+  custom_basis$age_groups <- NULL
+  expect_error(
+    checkmate_err_msg(act$set_contact_basis(custom_basis)),
+    class = "simpleError",
+    regexp = r"{Must be a set equal to .+, but is missing elements \{'age_groups'\}}"
   )
 
   rm(act)

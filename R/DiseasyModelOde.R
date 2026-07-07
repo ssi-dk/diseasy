@@ -76,10 +76,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         model_rates <- private %.% solve_ode(prediction_length = prediction_length)
 
         # .. get population data
-        population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-          dplyr::mutate("age_group" = .data$age_group_out) |>
-          dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
-          dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+        population_data <- self %.% population %.% population
 
         # Combine and convert raw rates to number of infected
         model_output <- model_rates |>
@@ -176,10 +173,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
       )
 
       # .. get population data
-      population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-        dplyr::mutate("age_group" = .data$age_group_out) |>
-        dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
-        dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+      population_data <- self %.% population %.% population
 
       # .. add to the observations
       observations <- observations |>

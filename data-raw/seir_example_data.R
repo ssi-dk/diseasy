@@ -69,9 +69,6 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Generate a initial state_vector
   y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
 
-  population_proportion <- activity$map_population(age_cuts_lower) |>
-    dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
-    dplyr::pull("proportion")
 
   activity_proportion <- cbind(
     activity$map_population(age_cuts_lower) |>
@@ -84,7 +81,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     dplyr::summarise("activity" = sum(.data$activity), .by = "age_group_out") |>
     dplyr::pull("activity")
 
-  activity <- population_proportion * activity_proportion
+  activity <- population$population_proportion * activity_proportion
   activity <- activity / sum(activity)
 
   # 0.05% are newly infected
