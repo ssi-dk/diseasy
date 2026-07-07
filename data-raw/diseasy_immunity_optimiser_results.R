@@ -300,7 +300,12 @@ existing_results <- function(M, monotonous, individual_level) {                 
 
 
 # Run the optimisation
-path <- devtools::package_file("data-raw/diseasy_immunity_optimiser_results/")
+path <- tryCatch(
+  devtools::package_file("data-raw/diseasy_immunity_optimiser_results/"),
+  error = function(e) {
+    "diseasy_immunity_optimiser_results/"
+  }
+)
 cache <- cachem::cache_disk(dir = path, max_size = Inf)
 
 for (penalty in c(0, 0.5, 1)) {
