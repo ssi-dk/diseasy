@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   articles/creating-a-model: creating-a-model.html
@@ -19,7 +19,7 @@ articles:
   articles/SEIR-implementation: SEIR-implementation.html
   articles/SEIR-initialisation: SEIR-initialisation.html
   articles/SEIR-malthusian-matching: SEIR-malthusian-matching.html
-last_built: 2026-07-07T12:26Z
+last_built: 2026-07-08T13:18Z
 urls:
   reference: https://ssi-dk.github.io/diseasy/reference
   article: https://ssi-dk.github.io/diseasy/articles
