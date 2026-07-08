@@ -652,7 +652,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           self %.% population %.% population,
           by = names(self %.% population %.% groups)
         ) |>
-        dplyr::mutate("incidence" = .data$incidence * .data$population / sum(.data$population)) |>
+        dplyr::mutate(
+          "incidence" = .data$incidence * .data$proportion,
+          .by = colnames(self %.% population %.% groups)
+        ) |>
         dplyr::select(c(colnames(incidence_data), "incidence"))
 
       # Ensure we have complete information
