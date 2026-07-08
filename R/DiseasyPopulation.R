@@ -261,6 +261,9 @@ DiseasyPopulation <- R6::R6Class(                                               
             ) |>
             dplyr::rename("age_group" = "age_group_out"),
           by = "age_group"
+        ) |>
+        dplyr::mutate(
+          "proportion" = .data$population / sum(.data$population)
         )
 
       return(population)
