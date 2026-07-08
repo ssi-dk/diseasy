@@ -547,7 +547,7 @@ test_that("$hash works", {
   # Create a observables instance using example data
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
-    conn = DBI::dbConnect(RSQLite::SQLite())
+    conn = \() DBI::dbConnect(RSQLite::SQLite())
   )
 
   # Get the hash for the observables module

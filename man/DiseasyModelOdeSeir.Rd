@@ -30,9 +30,11 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 
   # First, we add a observables modules with example data bundled
   # with the package.
+  conn <- DBI::dbConnect(duckdb::duckdb())
+
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
-    conn = DBI::dbConnect(duckdb::duckdb())
+    conn = conn
   )
 
   # The observables module also defines the time if interest via
@@ -74,6 +76,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   plot(m, observable = "incidence", prediction_length = 30)
 
   rm(m, activity, observables, population)
+  DBI::dbDisconnect(conn)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

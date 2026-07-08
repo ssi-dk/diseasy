@@ -9,9 +9,11 @@
 #'   See vignette("diseasy-observables")
 #' @examplesIf rlang::is_installed("duckdb")
 #'   # Create observables module using the Simulist data
+#'   conn <- DBI::dbConnect(duckdb::duckdb())
+#'
 #'   obs <- DiseasyObservables$new(
 #'     diseasystore = "Simulist",
-#'     conn = DBI::dbConnect(duckdb::duckdb())
+#'     conn = conn
 #'   )
 #'
 #'   # See available observables
@@ -26,6 +28,7 @@
 #'   )
 #'
 #'   rm(obs)
+#'   DBI::dbDisconnect(conn)
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @keywords functional-module

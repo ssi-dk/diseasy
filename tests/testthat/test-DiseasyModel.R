@@ -641,7 +641,7 @@ test_that("active binding: training_period, testing_period and validation_period
   rm(m)
 
   # Creating a module with an observables module without a `last_queryable_date`
-  obs <- DiseasyObservables$new("Google COVID-19", conn = DBI::dbConnect(RSQLite::SQLite()))
+  obs <- DiseasyObservables$new("Google COVID-19", conn = \() DBI::dbConnect(RSQLite::SQLite()))
   m <- DiseasyModel$new(observables = obs)
   expect_error(m %.% training_period,   r"{`\$last_queryable_date` not configured in observables module!}")
   expect_error(m %.% testing_period,    r"{`\$last_queryable_date` not configured in observables module!}")

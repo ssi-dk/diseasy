@@ -17,9 +17,11 @@ See vignette("diseasy-observables")
 \examples{
 \dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
   # Create observables module using the Simulist data
+  conn <- DBI::dbConnect(duckdb::duckdb())
+
   obs <- DiseasyObservables$new(
     diseasystore = "Simulist",
-    conn = DBI::dbConnect(duckdb::duckdb())
+    conn = conn
   )
 
   # See available observables
@@ -34,6 +36,7 @@ See vignette("diseasy-observables")
   )
 
   rm(obs)
+  DBI::dbDisconnect(conn)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

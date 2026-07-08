@@ -11,9 +11,11 @@
 #' @param width (`integer(1)`)\cr
 #'   The maximum number of characters to print.
 #' @examplesIf rlang::is_installed("duckdb")
+#'   conn <- DBI::dbConnect(duckdb::duckdb())
+#'
 #'   observables <- DiseasyObservables$new(
 #'     diseasystore = DiseasystoreSeirExample,
-#'     conn = DBI::dbConnect(duckdb::duckdb())
+#'     conn = conn
 #'   )
 #'
 #'   # Set the reference date in the observables module
@@ -36,6 +38,7 @@
 #'   plot(ensemble, "n_positive", prediction_length = 30)
 #'
 #'   rm(ensemble, observables)
+#'   DBI::dbDisconnect(conn)
 #' @return `r rd_side_effects`
 #' @export
 print.DiseasyEnsemble <- function(x, n = 5, width = 200, ...) {

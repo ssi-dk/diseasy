@@ -47,9 +47,11 @@ To configure this module we must:
   after this date is kept from the ensemble.
 
 ```{r, eval = rlang::is_installed("RSQLite")}
+conn <- DBI::dbConnect(RSQLite::SQLite())
+
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = conn
 )
 
 observables$set_last_queryable_date(
@@ -317,4 +319,9 @@ summary(seir_ensemble)
 
 ```{r, fig.alt = "Plot of predictions from SEIR ensemble. Shaded area is ensemble quantiles with observations as points.", eval = FALSE}
 plot(seir_ensemble, observable = "incidence", prediction_length = 30)
+```
+
+```{r cleanup, include = FALSE}
+if (DBI::dbIsValid(conn)) DBI::dbDisconnect(conn)
+gc()
 ```

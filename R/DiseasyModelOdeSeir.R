@@ -20,9 +20,11 @@
 #'
 #'   # First, we add a observables modules with example data bundled
 #'   # with the package.
+#'   conn <- DBI::dbConnect(duckdb::duckdb())
+#'
 #'   observables <- DiseasyObservables$new(
 #'     diseasystore = DiseasystoreSeirExample,
-#'     conn = DBI::dbConnect(duckdb::duckdb())
+#'     conn = conn
 #'   )
 #'
 #'   # The observables module also defines the time if interest via
@@ -64,6 +66,7 @@
 #'   plot(m, observable = "incidence", prediction_length = 30)
 #'
 #'   rm(m, activity, observables, population)
+#'   DBI::dbDisconnect(conn)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
