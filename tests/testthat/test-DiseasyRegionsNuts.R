@@ -192,11 +192,11 @@ test_that("$region_filter() works", {
   )
 
   expect_identical(
-    regions_nuts$region_filter(values = c("IS001", "IS002"), area = "IS001"),
+    regions_nuts$region_filter(values = c("IS001", "IS002"), target_area = "IS001"),
     c(TRUE, FALSE)
   )
   expect_identical(
-    regions_nuts$region_filter(values = c("IS001", "IS002"), area = NULL),
+    regions_nuts$region_filter(values = c("IS001", "IS002"), target_area = NULL),
     c(TRUE, TRUE)
   )
 
