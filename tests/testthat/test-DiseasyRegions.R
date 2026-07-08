@@ -231,11 +231,11 @@ test_that("$region_filter() works", {
   )
 
   expect_identical(
-    regions$region_filter(values = c("north", "south"), area = "north"),
+    regions$region_filter(values = c("north", "south"), target_area = "north"),
     c(TRUE, FALSE)
   )
   expect_identical(
-    regions$region_filter(values = c("north", "south"), area = NULL),
+    regions$region_filter(values = c("north", "south"), target_area = NULL),
     c(TRUE, TRUE)
   )
 
