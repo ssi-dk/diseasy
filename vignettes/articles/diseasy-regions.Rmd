@@ -285,7 +285,7 @@ adjacency and demography data.
 ```{r change_regions}
 regions$set_area(area = c("DK", "SE"))
 
-regions %.% regions
+regions %.% area
 ```
 
 The active fields now reflect the updated scope.
