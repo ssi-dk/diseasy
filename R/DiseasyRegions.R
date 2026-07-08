@@ -185,20 +185,20 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   Create a logical filter for values matching one or more regions.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically region identifiers.
-    #' @param area (`character()` or `NULL`)\cr
+    #' @param target_area (`character()` or `NULL`)\cr
     #'   Region identifiers to match against. Defaults to the currently selected
     #'   area. If `NULL`, all values are matched.
     #' @return
     #'   A `logical()` vector with the same length as `values`.
-    region_filter = function(values, area = self %.% area) {
+    region_filter = function(values, target_area = self %.% area) {
       checkmate::assert_character(values, any.missing = FALSE)
 
-      if (is.null(area)) {
+      if (is.null(target_area)) {
         region_filter <- rep(TRUE, length(values))
         return(region_filter)
       }
 
-      region_filter <- values %in% area
+      region_filter <- values %in% target_area
 
       return(region_filter)
     },
@@ -1084,21 +1084,21 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
     #'   Create a logical filter using NUTS hierarchy prefix matching.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically NUTS codes.
-    #' @param area (`character()` or `NULL`)\cr
+    #' @param target_area (`character()` or `NULL`)\cr
     #'   Region identifiers to match against. Defaults to the currently selected
     #'   area. If `NULL`, all values are matched.
     #' @return
     #'   A `logical()` vector with the same length as `values`.
-    region_filter = function(values, area = self %.% area) {
+    region_filter = function(values, target_area = self %.% area) {
       checkmate::assert_character(values, any.missing = FALSE)
 
-      if (is.null(area)) {
+      if (is.null(target_area)) {
         region_filter <- rep(TRUE, length(values))
         return(region_filter)
       }
 
       region_filter <- purrr::reduce(
-        .x = purrr::map(area, ~ stringr::str_starts(values, .x)),
+        .x = purrr::map(target_area, ~ stringr::str_starts(values, .x)),
         .f = `|`,
         .init = FALSE
       )

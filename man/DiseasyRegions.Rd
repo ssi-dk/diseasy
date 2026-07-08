@@ -221,7 +221,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
   Create a logical filter for values matching one or more regions.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$region_filter(values, area = self \%.\% area)}
+    \preformatted{DiseasyRegions$region_filter(values, target_area = self \%.\% area)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -229,7 +229,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \describe{
       \item{\code{values}}{(\code{character()})\cr
 Values to filter, typically region identifiers.}
-      \item{\code{area}}{(\code{character()} or \code{NULL})\cr
+      \item{\code{target_area}}{(\code{character()} or \code{NULL})\cr
 Region identifiers to match against. Defaults to the currently selected
 area. If \code{NULL}, all values are matched.}
     }
@@ -421,7 +421,7 @@ and complete under NUTS hierarchy semantics.
   Create a logical filter using NUTS hierarchy prefix matching.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegionsNuts$region_filter(values, area = self \%.\% area)}
+    \preformatted{DiseasyRegionsNuts$region_filter(values, target_area = self \%.\% area)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -429,7 +429,7 @@ and complete under NUTS hierarchy semantics.
     \describe{
       \item{\code{values}}{(\code{character()})\cr
 Values to filter, typically NUTS codes.}
-      \item{\code{area}}{(\code{character()} or \code{NULL})\cr
+      \item{\code{target_area}}{(\code{character()} or \code{NULL})\cr
 Region identifiers to match against. Defaults to the currently selected
 area. If \code{NULL}, all values are matched.}
     }
