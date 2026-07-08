@@ -42,6 +42,7 @@ Imports:
     tidyr,
     withr
 Suggests:
+    BB,
     brms,
     contactdata,
     countrycode,
@@ -60,10 +61,13 @@ Suggests:
     gt,
     jsonlite,
     knitr,
+    lbfgsb3c,
     lintr,
     lwgeom,
     nloptr,
+    marqLevAlg,
     microbenchmark,
+    minqa,
     optimx,
     plotly,
     progressr,
