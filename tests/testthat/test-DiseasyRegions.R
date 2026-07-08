@@ -358,7 +358,13 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
 
 
   # Intersection of demography and adjacency
-  regions$set_adjacency(dplyr::filter(adjacency_meta_nordic, .data$from %in% c("DK", "SE"), .data$to %in% c("DK", "SE")))
+  regions$set_adjacency(
+    dplyr::filter(
+      adjacency_meta_nordic,
+      .data$from %in% c("DK", "SE"),
+      .data$to %in% c("DK", "SE")
+    )
+  )
 
   expect_identical(
     regions$regions_at_stratification(regional_stratification = "region"),
@@ -389,7 +395,7 @@ test_that("active binding: area works", {
   expect_identical(regions %.% area, "north")
 
   regions_error <- tryCatch(
-    regions$area <- "south",                                                                                          # nolint: implicit_assignment_linter
+    regions$area <- "south",                                                                                            # nolint: implicit_assignment_linter
     error = \(e) e
   )
   expect_identical(regions_error, simpleError("`$area` is read only"))
@@ -410,7 +416,7 @@ test_that("active binding: adjacency works", {
   expect_identical(nrow(regions %.% adjacency), 1L)
 
   adjacency_error <- tryCatch(
-    regions$adjacency <- test_adjacency,                                                                                 # nolint: implicit_assignment_linter
+    regions$adjacency <- test_adjacency,                                                                                # nolint: implicit_assignment_linter
     error = \(e) e
   )
   expect_identical(adjacency_error, simpleError("`$adjacency` is read only"))
@@ -431,7 +437,7 @@ test_that("active binding: demography works", {
   expect_identical(regions %.% demography %.% region, "north")
 
   demography_error <- tryCatch(
-    regions$demography <- test_demography,                                                                               # nolint: implicit_assignment_linter
+    regions$demography <- test_demography,                                                                              # nolint: implicit_assignment_linter
     error = \(e) e
   )
   expect_identical(demography_error, simpleError("`$demography` is read only"))
