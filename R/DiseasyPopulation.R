@@ -218,16 +218,16 @@ DiseasyPopulation <- R6::R6Class(                                               
         # Create a square matrix in the original population repeated as columns
         N_original <- outer(population_reference, rep(1, length(population_reference)))                                 # nolint: object_name_linter
 
-        # For each contact matrix, m, in the scenario, we perform the transformation
-        # (p %*% (m * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))                                        # nolint: commented_code_linter
-        # As m is the number of contacts from each individual m * N_original scales to all contacts between
-        # age groups ("t" domain).
+        # For each contact matrix, c, in the scenario, we perform the transformation
+        # (p %*% (c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))                                        # nolint: commented_code_linter
+        # As c is the per capita contacts from each individual c * N_original * t(N_original) scales to all contacts
+        # between age groups ("t" domain).
         # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-        # Finally, the division by N_new transforms back to contacts per individual in the new age groups
-        # ("m" domain).
+        # Finally, the division by N_new * t(N_new) transforms back to per-capita contacts in the new age groups
+        # ("c" domain).
         per_capita_contact_matrices <- lapply(
-          per_capita_contact_matrices,
-          \(c) (p %*% ( c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))
+          X = per_capita_contact_matrices,
+          FUN = \(c) (p %*% ( c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))
         )
       }
 
