@@ -213,13 +213,13 @@ DiseasyPopulation <- R6::R6Class(                                               
           dplyr::pull("population")
 
         # Create square matrix with the new population repeated as columns
-        N_new <- outer(population_per_group, rep(1, length(population_per_group)))                                                        # nolint: object_name_linter
+        N_new <- outer(population_per_group, rep(1, length(population_per_group)))                                      # nolint: object_name_linter
 
         # Create a square matrix in the original population repeated as columns
-        N_original <- outer(population_reference, rep(1, length(population_reference)))                                                   # nolint: object_name_linter
+        N_original <- outer(population_reference, rep(1, length(population_reference)))                                 # nolint: object_name_linter
 
         # For each contact matrix, m, in the scenario, we perform the transformation
-        # (p %*% (m * N_original) %*% t(p)) / N_new                                                                     # nolint: commented_code_linter
+        # (p %*% (m * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))                                        # nolint: commented_code_linter
         # As m is the number of contacts from each individual m * N_original scales to all contacts between
         # age groups ("t" domain).
         # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
@@ -227,7 +227,7 @@ DiseasyPopulation <- R6::R6Class(                                               
         # ("m" domain).
         per_capita_contact_matrices <- lapply(
           per_capita_contact_matrices,
-          \(m) (p %*% m %*% t(p))
+          \(c) (p %*% ( c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))
         )
       }
 
