@@ -213,7 +213,7 @@ test_that("`$set_waning_model()` works for all available models", {
   # Attempt to set with time scale for no_waning model
   expect_error(
     im_indirect$set_waning_model("no_waning", time_scale = 10),
-    "unused argument (time_scale = 10)",
+    "unused argument: (time_scale = 10)",
     fixed = TRUE
   )
 

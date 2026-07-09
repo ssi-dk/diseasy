@@ -64,7 +64,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # Update the time_scale for the model
         rlang::fn_env(private$.model[[.y]])$time_scale <- .x
-        attr(private$.model[[.y]], "dots") <- list(time_scale = .x)
+        attr(private$.model[[.y]], "dots") <- modifyList(dots, list("time_scale" = .x))
 
       })
 
@@ -116,6 +116,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Store additional arguments
       dots <- list(...)
+      private$verify_dots(dots)
       if (!is.null(dots)) attr(model, "dots") <- dots
 
       # Set the model
@@ -147,7 +148,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "exponential_waning"
-      attr(model, "dots") <- list(time_scale = time_scale, ...)
+      private$verify_dots(list(...))
+      attr(model, "dots") <- list("time_scale" = time_scale, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -182,7 +184,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "sigmoidal_waning"
-      attr(model, "dots") <- list(time_scale = time_scale, shape = shape, ...)
+      private$verify_dots(list(...))
+      attr(model, "dots") <- list("time_scale" = time_scale, "shape" = shape, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -213,7 +216,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "linear_waning"
-      attr(model, "dots") <- list(time_scale = time_scale, ...)
+      private$verify_dots(list(...))
+      attr(model, "dots") <- list("time_scale" = time_scale, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -244,7 +248,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Set the attributes
       attr(model, "name") <- "heaviside_waning"
-      attr(model, "dots") <- list(time_scale = time_scale, ...)
+      private$verify_dots(list(...))
+      attr(model, "dots") <- list("time_scale" = time_scale, ...)
 
       # Set the model
       private$.model[[target]] <- model
@@ -306,10 +311,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
         )
 
         # Set the attributes
-        attr(model, "dots") <- list(time_scale = time_scale, ...)
+        private$verify_dots(list(...))
+        attr(model, "dots") <- list("time_scale" = time_scale, ...)
       } else {
         # Store additional arguments
         dots <- list(...)
+        private$verify_dots(dots)
         if (!is.null(dots)) attr(model, "dots") <- dots
       }
 
@@ -1210,7 +1217,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
       return(\(t) do.call(cbind, private$occupancy_probability(delta, M, t)) %*% gamma)
     },
 
+    # Check that dots contain only allowed parameters
+    verify_dots = function(dots) {
+      unmatched_dots <- purrr::discard_at(dots, "delay")
 
+      if (length(unmatched_dots) > 0) {
+        pkgcond::pkg_error(
+          glue::glue(
+            'unused argument{ifelse(length(unmatched_dots) > 1, "s", "")}: ',
+            '({paste(names(unmatched_dots), unmatched_dots, collapse = ", ", sep = " = ")})'
+          )
+        )
+      }
+    },
 
     # Compute the probability of occupying each of M sequential compartments
     # @param rate (`numeric(1)` or `numeric(M - 1)`)\cr
