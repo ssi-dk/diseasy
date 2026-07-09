@@ -97,6 +97,14 @@ tidyr::expand_grid(
         )
       )
 
+      m$regions
+      m$population$regions
+      self <- m
+      private <- self$.__enclos_env__$private
+      observable <- "n_infected"
+      prediction_length <- 10L
+
+
       # Compute n_infected observable before configuring observables
       reference_before <- m$get_results("n_infected", prediction_length = 10)$n_infected
 
