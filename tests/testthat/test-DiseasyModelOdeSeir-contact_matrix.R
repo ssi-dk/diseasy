@@ -22,13 +22,13 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
   # With no scenario, we expect only a single contact matrix
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(1, dimnames = list("0+", "0+"))
+    matrix(1, dimnames = list("0+/All", "0+/All"))
   )
 
   # The default contact matrix starts on 1970-01-01
   expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(1, dimnames = list("0+", "0+"))
+    matrix(1, dimnames = list("0+/All", "0+/All"))
   )
 
   # (.. So it should not be there before)
@@ -37,7 +37,7 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(1, dimnames = list("0+", "0+"))
+    matrix(1, dimnames = list("0+/All", "0+/All"))
   )
 
   rm(m)
@@ -73,18 +73,33 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
   # Then from 1970-01-01, it should always be the same
   expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4),
+    ncol = 2,
+    dimnames = list(
+      c("00-59/All", "60+/All"),
+      c("00-59/All", "60+/All"))
+    )
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4),
+    ncol = 2,
+    dimnames = list(
+      c("00-59/All", "60+/All"),
+      c("00-59/All", "60+/All"))
+    )
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4),
+    ncol = 2,
+    dimnames = list(
+      c("00-59/All", "60+/All"),
+      c("00-59/All", "60+/All"))
+    )
   )
 
   rm(m)
@@ -120,18 +135,33 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
   # Then from 1970-01-01, it should always be the same
   expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9),
+    ncol = 3,
+    dimnames = list(
+      c("00-39/All", "40-79/All", "80+/All"),
+      c("00-39/All", "40-79/All", "80+/All"))
+    )
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9),
+    ncol = 3,
+    dimnames = list(
+      c("00-39/All", "40-79/All", "80+/All"),
+      c("00-39/All", "40-79/All", "80+/All"))
+    )
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9),
+    ncol = 3,
+    dimnames = list(
+      c("00-39/All", "40-79/All", "80+/All"),
+      c("00-39/All", "40-79/All", "80+/All"))
+    )
   )
 
   rm(m)
@@ -184,7 +214,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
     purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       (\(m) m * outer(proportion, proportion, "*"))() |>
       sum() |>
-      matrix(dimnames = list("0+", "0+"))
+      matrix(dimnames = list("0+/All", "0+/All"))
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
@@ -193,7 +223,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
     purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
       sum() |>
-      matrix(dimnames = list("0+", "0+"))
+      matrix(dimnames = list("0+/All", "0+/All"))
   )
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
@@ -201,7 +231,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
     purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
       sum() |>
-      matrix(dimnames = list("0+", "0+"))
+      matrix(dimnames = list("0+/All", "0+/All"))
   )
 
   # The contact matrix should be valid forever
@@ -210,7 +240,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
     purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
       (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
       sum() |>
-      matrix(dimnames = list("0+", "0+"))
+      matrix(dimnames = list("0+/All", "0+/All"))
   )
 
   rm(m, act)

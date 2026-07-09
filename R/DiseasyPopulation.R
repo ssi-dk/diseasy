@@ -175,11 +175,12 @@ DiseasyPopulation <- R6::R6Class(                                               
       if (is.null(per_capita_contact_matrices)) {
 
         # If no scenario is defined, return unit contact matrices
-        labels <- tidyr::unite(self %.% groups, "label", dplyr::everything(), sep = "/")
+        labels <- tidyr::unite(self %.% groups, "label", dplyr::everything(), sep = "/") |>
+          dplyr::pull("label")
 
         per_capita_contact_matrices <- matrix(
           rep(
-            1 / length(labels), # Contacts are uniform across all age groups
+            1, # Contacts are uniform across all age groups
             length(labels) * length(labels)
           ),
           ncol = length(labels),
@@ -201,7 +202,7 @@ DiseasyPopulation <- R6::R6Class(                                               
         population_per_group <- population_map |>
           dplyr::summarise(
             "population" = sum(.data$population),
-            .by = "age_group"
+            .by = "age_group_out"
           ) |>
           dplyr::pull("population")
 
