@@ -879,6 +879,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = self %.% observables,
         population = self %.% population,
         activity = self %.% activity,
+        regions = self %.% regions,
         variant = self %.% variant,
         season = self %.% season,
         immunity = self %.% immunity,

@@ -171,9 +171,10 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Retrieve the time-varying contact matrices projected onto target age-groups
       per_capita_contact_matrices <- self %.% activity %.% get_scenario_contacts(weights = weights)
 
-      # If no scenario is defined, return unit contact matrices
+
       if (is.null(per_capita_contact_matrices)) {
 
+        # If no scenario is defined, return unit contact matrices
         labels <- tidyr::unite(self %.% groups, "label", dplyr::everything(), sep = "/")
 
         per_capita_contact_matrices <- matrix(
@@ -186,6 +187,48 @@ DiseasyPopulation <- R6::R6Class(                                               
         ) |>
           list() |>
           stats::setNames(as.Date("1970-01-01"))
+
+      } else {
+        # Else, project contact matrices into the corresponding age groups
+        p <- private$population_transform_matrix()
+
+        # To perform the projection, we need the number of persons in the new and original age groups
+        # Determine the population in the new age groups
+        population_map <- private %.% map_population(
+          age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "contacts", 1, colnames),
+        )
+
+        population_per_group <- population_map |>
+          dplyr::summarise(
+            "population" = sum(.data$population),
+            .by = "age_group"
+          ) |>
+          dplyr::pull("population")
+
+        population_reference <- population_map |>
+          dplyr::summarise(
+            "population" = sum(.data$population),
+            .by = "age_group_reference"
+          ) |>
+          dplyr::pull("population")
+
+        # Create square matrix with the new population repeated as columns
+        N_new <- outer(population_per_group, rep(1, length(population_per_group)))                                                        # nolint: object_name_linter
+
+        # Create a square matrix in the original population repeated as columns
+        N_original <- outer(population_reference, rep(1, length(population_reference)))                                                   # nolint: object_name_linter
+
+        # For each contact matrix, m, in the scenario, we perform the transformation
+        # (p %*% (m * N_original) %*% t(p)) / N_new                                                                     # nolint: commented_code_linter
+        # As m is the number of contacts from each individual m * N_original scales to all contacts between
+        # age groups ("t" domain).
+        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
+        # Finally, the division by N_new transforms back to contacts per individual in the new age groups
+        # ("m" domain).
+        per_capita_contact_matrices <- lapply(
+          per_capita_contact_matrices,
+          \(m) (p %*% m %*% t(p))
+        )
       }
 
       return(per_capita_contact_matrices)
@@ -260,10 +303,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       population <- self %.% groups |>
         dplyr::left_join(
-          private %.% map_population(
-            age_cuts_lower = self %.% age_cuts_lower,
-            demography = self %.% regions %.% demography
-          ) |>
+          private %.% map_population() |>
             dplyr::summarise(
               "population" = sum(.data$population),
               .by = "age_group_out"
@@ -291,7 +331,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       } else {
 
-        population_proportion <- private %.% map_population(age_cuts_lower = self %.% age_cuts_lower) |>
+        population_proportion <- private %.% map_population() |>
           dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
           dplyr::pull("proportion")
 
@@ -363,10 +403,14 @@ DiseasyPopulation <- R6::R6Class(                                               
     #   A `data.frame` which maps the age groups from their reference in `contact_basis` to
     #   those supplied to the function.
     map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
-      age_cuts_lower,
+      age_cuts_lower = self %.% age_cuts_lower,
       age_groups_reference = NULL,
-      demography = self$regions$demography
+      demography = self %.% regions %.%demography
     ) {
+
+      if (is.null(demography)) {
+        pkgcond::pkg_error("`demography` must be set to use `map_population`")
+      }
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -470,32 +514,24 @@ DiseasyPopulation <- R6::R6Class(                                               
     # Compute the population proportion matrix
     # @description
     #   The function provides the population proportion matrix `p` used to project age_groups.
-    # @param age_cuts_lower `r rd_age_cuts_lower()`
-    population_transform_matrix = function(age_cuts_lower = NULL) {
-
-      # Early return if no projection is requested
-      if (is.null(age_cuts_lower)) {
-        return(obj)
-      }
+    population_transform_matrix = function() {
 
       # Compute proportion of population in new and old age_groups
-      population <- private %.% map_population(
-        age_cuts_lower = age_cuts_lower,
-        age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "contacts", 1, colnames),
-        demography = self %.% regions %.% demography
+      population_map <- private %.% map_population(
+        age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "contacts", 1, colnames)
       )
 
       # Calculating transformation matrix
       tt <- merge(
-        aggregate(proportion ~ age_group_id_reference + age_group_id_out, data = population, FUN = sum),
-        aggregate(proportion ~ age_group_id_reference,                    data = population, FUN = sum),
+        aggregate(proportion ~ age_group_id_reference + age_group_id_out, data = population_map, FUN = sum),
+        aggregate(proportion ~ age_group_id_reference,                    data = population_map, FUN = sum),
         by = "age_group_id_reference"
       )
       tt$proportion <- tt$proportion.x / tt$proportion.y
       p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_id_out, j = age_group_id_reference, x = proportion)))
 
       # Label the matrix
-      dimnames(p) <- list(unique(population$age_group_out), unique(population$age_group_reference))
+      dimnames(p) <- list(unique(population_map$age_group_out), unique(population_map$age_group_reference))
 
       return(p)
     }
