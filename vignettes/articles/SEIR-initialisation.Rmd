@@ -341,6 +341,7 @@ obs$set_last_queryable_date(obs$start_date + lubridate::days(50))
 generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
 
   # Define the population for the model
+  regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
   population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
 
   # Define the activity for the scenario
@@ -363,6 +364,7 @@ generate_model <- function(K, L, M, rE = 1 / 2.1, rI = 1 / 4.5) {
   m <- DiseasyModelOdeSeir$new(
     population = population,
     activity = activity,
+    regions = regions,
     immunity = immunity,
     season = season,
     observables = obs,
