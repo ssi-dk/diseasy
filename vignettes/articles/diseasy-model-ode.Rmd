@@ -389,7 +389,8 @@ We will configure such an output by adding a non-waning target called "admission
 ```{r diseasy_immunity_output}
 immunity$set_no_waning(
   target = "admission",
-  delay = 3.6 # Average delay in the scenario
+  delay = 3.6, # Average delay in the scenario
+  risks = c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1)
 )
 ```
 
