@@ -1172,7 +1172,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           printr("  ", attr(func, "name"))
           printr("  ", attr(func, "srcref"))
           if (!is.null(attr(func, "dots"))) {
-            printr("  arguments: ", toString(purrr::imap(attr(func, "dots"), ~ paste(.y, "=", .x))))
+            printr("  arguments: ", toString(purrr::imap(attr(func, "dots"), ~ paste(.y, "=", list(.x)))))
           }
           printr("")
         }
@@ -1219,7 +1219,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     # Check that dots contain only allowed parameters
     verify_dots = function(dots) {
-      unmatched_dots <- purrr::discard_at(dots, "delay")
+      unmatched_dots <- purrr::discard_at(dots, c("delay", "risks"))
 
       if (length(unmatched_dots) > 0) {
         pkgcond::pkg_error(
