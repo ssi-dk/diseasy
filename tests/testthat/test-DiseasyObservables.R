@@ -44,7 +44,9 @@ test_that("initialize works", {
   rm(obs)
 
   # Test that conn can be given externally
-  expect_no_error(DiseasyObservables$new(conn = (options() %.% diseasy.conn)()))
+  conn <- (options() %.% diseasy.conn)()
+  expect_no_error(DiseasyObservables$new(conn = conn))
+  DBI::dbDisconnect(conn)
 
   # Full initialization
   obs <- DiseasyObservables$new(diseasystore = "Google COVID-19",
