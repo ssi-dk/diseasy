@@ -1644,11 +1644,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         return(NA)
       }
 
+      # Retrieve the active contact matrix
+      contact_matrix <- private %.% contact_matrix(t)
+
       # Input checks
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_number(t, add = coll)
       checkmate::assert_numeric(RS_states, lower = 0, upper = 1, add = coll)
       checkmate::assert_number(overall_infection_risk, lower = 0, add = coll)
+      checkmate::assert_matrix(contact_matrix, add = coll)
       checkmate::reportAssertions(coll)
 
       ## Compute the transition rate component
@@ -1686,10 +1690,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Compute the transmissions component
-
-      # Retrieve the active contact matrix
-      contact_matrix <- private %.% contact_matrix(t)
-
       # If the contact matrix is 1 x 1, convert to scalar since R wont multiply otherwise
       if (length(contact_matrix) == 1) contact_matrix <- as.numeric(contact_matrix)
 
@@ -1766,10 +1766,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
       reference_model <- DiseasyModelOdeSeir$new(
-        activity = self %.% activity,
         observables = self %.% observables,
+        population = self %.% population,
+        activity = self %.% activity,
+        regions = self %.%  regions,
         season = self %.% season,
         variant = self %.% variant,
+        immunity = self %.% immunity,
         parameters = modifyList(
           self %.% parameters,
           list(

@@ -22,6 +22,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
+  self <- m
 
   # Check the case where everyone is in S
   expect_identical(

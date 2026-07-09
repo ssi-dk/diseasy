@@ -121,6 +121,10 @@ test_that("$hash works", {
   expect_identical(model$hash, hash)
 
 
+  self <- model
+  private <- self$.__enclos_env__$private
+  observable = "incidence"
+  prediction_length = 5L
 
   ## Request results from the model
   model$get_results(

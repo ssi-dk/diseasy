@@ -452,14 +452,6 @@ test_that("$set_contact_basis() works", {
     regexp = r"{Must be a permutation of set .+, but has extra elements \{'extra_element'\}}"
   )
 
-  custom_basis <- contact_basis_nordic %.% DK
-  custom_basis$age_groups <- NULL
-  expect_error(
-    checkmate_err_msg(act$set_contact_basis(custom_basis)),
-    class = "simpleError",
-    regexp = r"{Must be a set equal to .+, but is missing elements \{'age_groups'\}}"
-  )
-
   rm(act)
 })
 

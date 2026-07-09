@@ -171,6 +171,23 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Retrieve the time-varying contact matrices projected onto target age-groups
       per_capita_contact_matrices <- self %.% activity %.% get_scenario_contacts(weights = weights)
 
+      # If no scenario is defined, return unit contact matrices
+      if (is.null(per_capita_contact_matrices)) {
+
+        labels <- tidyr::unite(self %.% groups, "label", dplyr::everything(), sep = "/")
+
+        per_capita_contact_matrices <- matrix(
+          rep(
+            1 / length(labels), # Contacts are uniform across all age groups
+            length(labels) * length(labels)
+          ),
+          ncol = length(labels),
+          dimnames = list(labels, labels)
+        ) |>
+          list() |>
+          stats::setNames(as.Date("1970-01-01"))
+      }
+
       return(per_capita_contact_matrices)
     },
 
