@@ -135,9 +135,11 @@ the following code.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 1</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55c007ba2438&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558ad0b5f978&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
-<span><span class="co">#&gt; [1] "no_waning"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "no_waning"</span></span>
+<span><span class="co">#&gt; attr(,"dots")</span></span>
+<span><span class="co">#&gt; list()</span></span></code></pre></div>
 <p>This returns a <code>named list()</code> where the named target are
 modelled by the corresponding function.</p>
 <p>To see the available waning models within the module, query the
@@ -173,7 +175,7 @@ given &lt;code&gt;&lt;a href="../reference/DiseasyImmunity.html"&gt;?DiseasyImmu
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55c0092b11f0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558ad2273b98&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -206,6 +208,12 @@ waning, such as e.g. infection, hospitalisation, or death.</li>
 <li>
 <code>name</code>: A name for the custom function, used for
 identification. Default is “custom_waning”.</li>
+<li>
+<code>delay</code> (optional): The delay of the outcome relative to
+infection (in days) (used in some models).</li>
+<li>
+<code>risks</code> (optional): The (age-stratified) risk of the
+outcome following infection (used in some models).</li>
 </ul>
 <p>Here is an example of setting a custom waning function:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -213,17 +221,26 @@ identification. Default is “custom_waning”.</li>
 <span>  custom_function <span class="op">=</span> \<span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span> <span class="op">(</span><span class="va">t</span> <span class="op">/</span> <span class="va">time_scale</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.2</span>,</span>
 <span>  time_scale <span class="op">=</span> <span class="fl">12</span>,</span>
 <span>  target <span class="op">=</span> <span class="st">"hospitalisation"</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"gaussian_waning"</span></span>
+<span>  name <span class="op">=</span> <span class="st">"gaussian_waning"</span>,</span>
+<span>  delay <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  risks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"00-29"</span> <span class="op">=</span> <span class="fl">0.001</span>, <span class="st">"30-59"</span> <span class="op">=</span> <span class="fl">0.01</span>, <span class="st">"60+"</span> <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55c00a07e860&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558ad3046d98&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
 <span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 12</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 12</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"dots")$delay</span></span>
+<span><span class="co">#&gt; [1] 7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"dots")$risks</span></span>
+<span><span class="co">#&gt; 00-29 30-59   60+ </span></span>
+<span><span class="co">#&gt; 0.001 0.010 0.100</span></span></code></pre></div>
 <p>To visualize all the functions in the model, use the same plot
 function as above:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -256,8 +273,8 @@ additional arguments.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55c00b47afd0&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55c00af7f800&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x558ad4467af0&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558ad3f54320&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -270,17 +287,21 @@ additional arguments.</p>
 <span>  model <span class="op">=</span> \<span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span> <span class="op">(</span><span class="va">t</span> <span class="op">/</span> <span class="va">time_scale</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.2</span>,</span>
 <span>  time_scale <span class="op">=</span> <span class="fl">18</span>,</span>
 <span>  target <span class="op">=</span> <span class="st">"hospitalisation"</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"gaussian_waning"</span></span>
+<span>  name <span class="op">=</span> <span class="st">"gaussian_waning"</span>,</span>
+<span>  delay <span class="op">=</span> <span class="fl">7</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55c00bc1f868&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558ad4d9daa0&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
 <span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 18</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 18</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"dots")$delay</span></span>
+<span><span class="co">#&gt; [1] 7</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -299,23 +320,29 @@ targets in the current models.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55c00af7f800&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558ad3f54320&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
 <span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
 <span><span class="co">#&gt; [1] 6</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"dots")$shape</span></span>
+<span><span class="co">#&gt; [1] 6</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $hospitalisation</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55c00bc1f868&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x558ad4d9daa0&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
 <span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 18</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 18</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"dots")$delay</span></span>
+<span><span class="co">#&gt; [1] 7</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="approximating-to-a-compartmental-model">Approximating to a compartmental model<a class="anchor" aria-label="anchor" href="#approximating-to-a-compartmental-model"></a>
@@ -518,7 +545,7 @@ hospitalisation targets defined earlier, which will be approximated.</p>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $execution_time</span></span>
-<span><span class="co">#&gt; [1] "1M 30.012948513031S"</span></span>
+<span><span class="co">#&gt; [1] "1M 12.8349192142487S"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attr(,"class")</span></span>
 <span><span class="co">#&gt; [1] "ucminf"</span></span>
