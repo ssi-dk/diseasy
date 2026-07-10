@@ -736,7 +736,7 @@
     },
     {
       "package": "progressr",
-      "version": "0.19.0",
+      "version": "1.0.0",
       "binary": true
     },
     {
@@ -796,7 +796,7 @@
     },
     {
       "package": "Rcpp",
-      "version": "1.1.1-1.1",
+      "version": "1.1.2",
       "binary": true
     },
     {
