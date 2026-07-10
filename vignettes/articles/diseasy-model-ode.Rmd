@@ -437,7 +437,7 @@ plot(
 )
 ```
 
-```{r configuration test - incidence, include = FALSE, eval = F && rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
+```{r configuration test - incidence, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -494,7 +494,7 @@ plot(
 )
 ```
 
-```{r configuration test - n_infected, include = FALSE, eval = F && rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
+```{r configuration test - n_infected, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -549,7 +549,7 @@ plot(
 )
 ```
 
-```{r configuration test - n_positive, include = FALSE, eval = F && rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
+```{r configuration test - n_positive, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
@@ -602,7 +602,7 @@ plot(
 )
 ```
 
-```{r configuration test - n_admission, include = FALSE, eval = F && rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
+```{r configuration test - n_admission, include = FALSE, eval = rlang::is_installed(c("RSQLite", "optimx", "ucminf"))}
 # This code block is used as a sanity check that the models work as expected
 # When the model works, we should be able to closely match model with data
 # - when not, we get informed by an error
