@@ -1,5 +1,5 @@
 adjacency_meta_nordic_nuts <- generate_adjacency_meta(
-  regions = c("DK", "FI", "IS", "NO", "SE")
+  area = c("DK", "FI", "IS", "NO", "SE")
 ) |>
   dplyr::inner_join(dplyr::select(nuts, "region"), by = c("from" = "region")) |>
   dplyr::inner_join(dplyr::select(nuts, "region"), by = c("to" = "region"))
