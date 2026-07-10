@@ -154,16 +154,17 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 \if{html}{\out{<a id="method-DiseasyImmunity-set_no_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_no_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_no_waning()}}{
-  Retrieves the waning model with a constant value (1).
+  Use a waning model without waning for a given target (i.e. constant value (1)).
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyImmunity$set_no_waning(target = "infection")}
+    \preformatted{DiseasyImmunity$set_no_waning(target = "infection", ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
+      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
     }
     \if{html}{\out{</div>}}
   }
@@ -176,10 +177,14 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 \if{html}{\out{<a id="method-DiseasyImmunity-set_exponential_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_exponential_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_exponential_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set an exponential model for waning.
+  Use a exponential waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyImmunity$set_exponential_waning(time_scale = 20, target = "infection")}
+    \preformatted{DiseasyImmunity$set_exponential_waning(
+  time_scale = 20,
+  target = "infection",
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -187,6 +192,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
     \describe{
       \item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
+      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
     }
     \if{html}{\out{</div>}}
   }
@@ -199,13 +205,14 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 \if{html}{\out{<a id="method-DiseasyImmunity-set_sigmoidal_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_sigmoidal_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_sigmoidal_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a sigmoidal model for waning.
+  Use a sigmoidal waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_sigmoidal_waning(
   time_scale = 20,
   shape = 6,
-  target = "infection"
+  target = "infection",
+  ...
 )}
     \if{html}{\out{</div>}}
   }
@@ -217,6 +224,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 Determines the steepness of the waning curve in the sigmoidal waning model.
 Higher values of \code{shape} result in a steeper curve, leading to a more rapid decline in immunity.}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
+      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
     }
     \if{html}{\out{</div>}}
   }
@@ -229,10 +237,10 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
 \if{html}{\out{<a id="method-DiseasyImmunity-set_linear_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_linear_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_linear_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a linear model for waning.
+  Use a linear waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyImmunity$set_linear_waning(time_scale = 20, target = "infection")}
+    \preformatted{DiseasyImmunity$set_linear_waning(time_scale = 20, target = "infection", ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -240,6 +248,7 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
     \describe{
       \item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
+      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
     }
     \if{html}{\out{</div>}}
   }
@@ -252,10 +261,14 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
 \if{html}{\out{<a id="method-DiseasyImmunity-set_heaviside_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_heaviside_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_heaviside_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a Heaviside model for waning.
+  Use a Heaviside waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyImmunity$set_heaviside_waning(time_scale = 20, target = "infection")}
+    \preformatted{DiseasyImmunity$set_heaviside_waning(
+  time_scale = 20,
+  target = "infection",
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -263,6 +276,7 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
     \describe{
       \item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
+      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
     }
     \if{html}{\out{</div>}}
   }
@@ -275,14 +289,15 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
 \if{html}{\out{<a id="method-DiseasyImmunity-set_custom_waning"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyImmunity-set_custom_waning}{}}}
 \subsection{\code{DiseasyImmunity$set_custom_waning()}}{
-  Sets the \code{DiseasyImmunity} module to set a custom waning function.
+  Use a custom waning model for a given target.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$set_custom_waning(
   custom_function = NULL,
   time_scale = 20,
   target = "infection",
-  name = "custom_waning"
+  name = "custom_waning",
+  ...
 )}
     \if{html}{\out{</div>}}
   }
@@ -296,6 +311,7 @@ If the function has a time scale, it should be included in the function as \code
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
       \item{\code{name}}{(\code{character(1)})\cr
 Set the name of the custom waning function.}
+      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
     }
     \if{html}{\out{</div>}}
   }

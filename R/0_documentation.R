@@ -81,6 +81,11 @@ rd_target <- function(type = "param") {
         ifelse(type == "field", " Read only.", ""))
 }
 
+rd_diseasy_immunity_dots <- paste(
+  "Optional attributes supplied to the waning function.",
+  "Must be one or both of `delay` and `risk`."
+)
+
 rd_time_scale <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`numeric(1)`)\\cr",

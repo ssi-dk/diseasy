@@ -736,7 +736,7 @@
     },
     {
       "package": "progressr",
-      "version": "1.0.0",
+      "version": "0.19.0",
       "binary": true
     },
     {
@@ -796,7 +796,7 @@
     },
     {
       "package": "Rcpp",
-      "version": "1.1.2",
+      "version": "1.1.1-1.1",
       "binary": true
     },
     {
@@ -1134,15 +1134,5 @@
       "version": "3.0.0",
       "binary": true
     }
-  ],
-  "sysreqs": {
-    "os": "linux",
-    "distribution": "ubuntu",
-    "version": "24.04",
-    "url": {},
-    "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install pandoc libx11-dev git libcurl4-openssl-dev libssl-dev xz-utils cmake make libuv1-dev libgit2-dev zlib1g-dev libgeos-dev libproj-dev libsqlite3-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libabsl-dev libgdal-dev gdal-bin libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libudunits2-dev libnode-dev libxml2-dev",
-    "post_install": {},
-    "packages": ["pandoc", "libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "xz-utils", "cmake", "make", "libuv1-dev", "libgit2-dev", "zlib1g-dev", "libgeos-dev", "libproj-dev", "libsqlite3-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libwebp-dev", "libabsl-dev", "libgdal-dev", "gdal-bin", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libudunits2-dev", "libnode-dev", "libxml2-dev"]
-  }
+  ]
 }

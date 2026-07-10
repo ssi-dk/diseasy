@@ -114,6 +114,8 @@ The input for the custom waning function includes:
 - `time_scale`: A characteristic time scale, which defines the period until when the immunity is significantly waning.
 - `target`: The specific aspect towards which immunity is waning, such as e.g. infection, hospitalisation, or death.
 - `name`: A name for the custom function, used for identification. Default is "custom_waning".
+- `delay` (optional): The delay of the outcome relative to infection (in days) (used in some models).
+- `risks` (optional): The (age-stratified) risk of the outcome following infection (used in some models).
 
 Here is an example of setting a custom waning function:
 ```{r custom waning function}
@@ -121,7 +123,9 @@ im$set_custom_waning(
   custom_function = \(t) 0.8 * exp(- (t / time_scale)^2) + 0.2,
   time_scale = 12,
   target = "hospitalisation",
-  name = "gaussian_waning"
+  name = "gaussian_waning",
+  delay = 7,
+  risks = c("00-29" = 0.001, "30-59" = 0.01, "60+" = 0.1)
 )
 ```
 
@@ -151,7 +155,8 @@ im$set_waning_model(
   model = \(t) 0.8 * exp(- (t / time_scale)^2) + 0.2,
   time_scale = 18,
   target = "hospitalisation",
-  name = "gaussian_waning"
+  name = "gaussian_waning",
+  delay = 7
 )
 ```
 

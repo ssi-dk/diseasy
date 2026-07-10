@@ -327,33 +327,57 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # we can re-configure outputs for immunity targets using the (potentially) new parameters.
       immunity_approx %.% gamma |>
         purrr::discard_at("infection") |> # "infection" outcome is treated specially
-        purrr::iwalk(\(gammas, observable) {
+        purrr::iwalk(\(gammas, output) {
 
           # Compute the weights for the output
+          # Here, we need to combine the temporal evolution described by the gammas
+          # with the age-specific risks
+          risks <- purrr::pluck(
+            self %.% immunity, "model", output, attributes, "dots", "risks",
+            .default = stats::setNames(
+              rep(1, private %.% n_age_groups),
+              diseasystore::age_labels(self %.% population %.% age_cuts_lower)
+            )
+          )
+
+          risks <- risks[order(names(risks))]
+
+          # Ensure the model age groups are represented in the risks vector
+          checkmate::assert_set_equal(
+            names(risks),
+            diseasystore::age_labels(self %.% population %.% age_cuts_lower)
+          )
+
           # For each age_group in the model, we need the gammas from
           # DiseasyImmunity to line up with the corresponding part of the state_vector
-          weights_infection_matrix <- seq(from = 0, to = (private %.% n_age_groups) - 1) |>
-            purrr::map(
-              \(offset) {
-                c(
-                  rep(0, compartment_structure %.% R * offset),
-                  rep(1, compartment_structure %.% R),
-                  rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
-                ) * gammas
-              }
-            ) |>
+          # and modify the gammas with the age-group-specific risks
+          weights_infection_matrix <- purrr::map2(
+            .x = seq(from = 0, to = (private %.% n_age_groups) - 1),
+            .y = risks,
+            .f = \(offset, risk) {
+              c(
+                rep(0, compartment_structure %.% R * offset),
+                rep(1, compartment_structure %.% R),
+                rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
+              ) * gammas * risk
+            }
+          ) |>
             purrr::map(~ rep(., private$n_variants)) |>
             purrr::map2(
               .y = seq(from = 0, to = private %.% n_age_groups - 1),
-              ~ c(.x, .y == seq(from = 0, to = private %.% n_age_groups - 1))
+              ~ c(.x, risks * (.y == seq(from = 0, to = private %.% n_age_groups - 1)))
             ) |>
             purrr::reduce(rbind)
 
-          # Configure the observable
+          # Configure the output
           self$configure_output(
             weights = weights_infection_matrix,
-            name = glue::glue("n_{observable}"),
-            derived_from = "infection_matrix"
+            name = glue::glue("n_{output}"),
+            derived_from = "infection_matrix",
+            delay = purrr::pluck(
+              self %.% immunity, "model", output, attributes, "dots", "delay",
+              .default = 0
+            )
           )
         })
 
@@ -417,7 +441,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (length(immunity_matrix) == 1) immunity_matrix <- immunity_matrix[[1]]
 
       private$immunity_matrix <- immunity_matrix
-
 
       # Set the default forcing functions (no forcing)
       self %.% set_forcing_functions(
@@ -1310,7 +1333,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         weights <- matrix(weights, nrow = 1)
       }
 
-      # Add observables internal mappings
+      # Add internal mappings for the output
       # (used in $rhs() to map to the surveillance states)
 
       # Update surveillance of infection matrix
