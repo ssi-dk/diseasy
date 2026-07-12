@@ -7,7 +7,7 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -53,7 +53,7 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -99,7 +99,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40, 80)),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -158,7 +158,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = act,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -247,7 +247,7 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
     ),
     activity = act,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(

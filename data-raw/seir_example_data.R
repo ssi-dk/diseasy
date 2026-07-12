@@ -42,7 +42,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # We need a dummy observables module
   observables <- DiseasyObservables$new(
-    conn = DBI::dbConnect(RSQLite::SQLite()),
+    conn = \() DBI::dbConnect(RSQLite::SQLite()),
     last_queryable_date = as.Date("2020-01-20")
   )
 

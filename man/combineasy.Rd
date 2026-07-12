@@ -25,9 +25,10 @@ Easily combine modules and parameters to form a model ensemble
 \examples{
 \dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
   # Create a small ensemble with the `DiseasyModelG1` model template
+  conn <- DBI::dbConnect(duckdb::duckdb())
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
-    conn = DBI::dbConnect(duckdb::duckdb())
+    conn = conn
   )
 
   ensemble <- combineasy(
@@ -42,6 +43,7 @@ Easily combine modules and parameters to form a model ensemble
   summary(ensemble)
 
   rm(observables)
+  DBI::dbDisconnect(conn)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

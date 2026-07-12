@@ -19,7 +19,7 @@ test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`"
     activity = act,
     season = s,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = as.Date("2020-01-01")
     )
   )
@@ -28,7 +28,7 @@ test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`"
     activity = act,
     season = s,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = as.Date("2020-01-01") + lubridate::days(180)
     )
   )
