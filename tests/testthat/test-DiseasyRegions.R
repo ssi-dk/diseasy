@@ -47,15 +47,15 @@ test_that("Empty initialize works", {
 })
 
 
-test_that("`$set_regions()`` works", {
+test_that("`$set_area()`` works", {
 
   region_1 <- DiseasyRegions$new()
-  region_1$set_regions(c("north", "south"))
+  region_1$set_area(c("north", "south"))
 
   region_2 <- DiseasyRegions$new()
-  region_2$set_regions(c("south", "north"))
+  region_2$set_area(c("south", "north"))
 
-  expect_identical(region_1 %.% regions, region_2 %.% regions)
+  expect_identical(region_1 %.% area, region_2 %.% area)
   expect_identical(region_1 %.% hash, region_2 %.% hash)
 
   rm(region_1)
@@ -112,37 +112,37 @@ test_that("Malformed inputs to initialize works", {
   expect_error(
     checkmate_err_msg(
       DiseasyRegions$new(
-        regions = "non-existent-region",
+        area = "non-existent-region",
         adjacency = test_adjacency,
         demography = test_demography
       )
     ),
     class = "simpleError",
-    regexp = "`regions` and `adjacency` must contain at least one common region."
+    regexp = "`area` and `adjacency` must contain at least one common region."
   )
 
   expect_error(
     checkmate_err_msg(
       DiseasyRegions$new(
-        regions = "north",
+        area = "north",
         adjacency = dplyr::filter(test_adjacency, .data$from != "north", .data$to != "north"),
         demography = test_demography
       )
     ),
     class = "simpleError",
-    regexp = "`regions` and `adjacency` must contain at least one common region."
+    regexp = "`area` and `adjacency` must contain at least one common region."
   )
 
   expect_error(
     checkmate_err_msg(
       DiseasyRegions$new(
-        regions = "north",
+        area = "north",
         adjacency = test_adjacency,
         demography = dplyr::filter(test_demography, .data$region != "north")
       )
     ),
     class = "simpleError",
-    regexp = "`regions` and `demography` must contain at least one common region."
+    regexp = "`area` and `demography` must contain at least one common region."
   )
 
   expect_error(
@@ -160,60 +160,60 @@ test_that("Malformed inputs to initialize works", {
 
 test_that("Non-empty initialize works", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
+  regions <- DiseasyRegions$new(
+    area = "north",
     adjacency = test_adjacency,
     demography = test_demography
   )
 
-  expect_identical(region %.% regions, "north")
-  expect_identical(region %.% demography %.% region, "north")
-  expect_identical(sum(region %.% demography %.% population), 100)
+  expect_identical(regions %.% area, "north")
+  expect_identical(regions %.% demography %.% region, "north")
+  expect_identical(sum(regions %.% demography %.% population), 100)
 
-  expect_identical(nrow(region %.% adjacency), 1L)
-  expect_identical(region %.% adjacency %.% from, "north")
-  expect_identical(region %.% adjacency %.% to, "north")
+  expect_identical(nrow(regions %.% adjacency), 1L)
+  expect_identical(regions %.% adjacency %.% from, "north")
+  expect_identical(regions %.% adjacency %.% to, "north")
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("Setters are commutative", {
 
   # Permutaiton 1
-  region <- DiseasyRegions$new()
-  region$set_regions(c("north", "south"))
-  region$set_adjacency(test_adjacency)
-  region$set_demography(test_demography)
-  hash_1 <- region$hash
-  rm(region)
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("north", "south"))
+  regions$set_adjacency(test_adjacency)
+  regions$set_demography(test_demography)
+  hash_1 <- regions$hash
+  rm(regions)
 
 
   # Permutation 2
-  region <- DiseasyRegions$new()
-  region$set_adjacency(test_adjacency)
-  region$set_regions(c("north", "south"))
-  region$set_demography(test_demography)
-  hash_2 <- region$hash
-  rm(region)
+  regions <- DiseasyRegions$new()
+  regions$set_adjacency(test_adjacency)
+  regions$set_area(c("north", "south"))
+  regions$set_demography(test_demography)
+  hash_2 <- regions$hash
+  rm(regions)
 
 
   # Permutation 3
-  region <- DiseasyRegions$new()
-  region$set_adjacency(test_adjacency)
-  region$set_demography(test_demography)
-  region$set_regions(c("north", "south"))
-  hash_3 <- region$hash
-  rm(region)
+  regions <- DiseasyRegions$new()
+  regions$set_adjacency(test_adjacency)
+  regions$set_demography(test_demography)
+  regions$set_area(c("north", "south"))
+  hash_3 <- regions$hash
+  rm(regions)
 
 
   # Permutation 4
-  region <- DiseasyRegions$new()
-  region$set_demography(test_demography)
-  region$set_adjacency(test_adjacency)
-  region$set_regions(c("north", "south"))
-  hash_4 <- region$hash
-  rm(region)
+  regions <- DiseasyRegions$new()
+  regions$set_demography(test_demography)
+  regions$set_adjacency(test_adjacency)
+  regions$set_area(c("north", "south"))
+  hash_4 <- regions$hash
+  rm(regions)
 
   expect_length(
     unique(c(hash_1, hash_2, hash_3, hash_4)),
@@ -224,72 +224,72 @@ test_that("Setters are commutative", {
 
 test_that("$region_filter() works", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
+  regions <- DiseasyRegions$new(
+    area = "north",
     adjacency = test_adjacency,
     demography = test_demography
   )
 
   expect_identical(
-    region$region_filter(values = c("north", "south"), regions = "north"),
+    regions$region_filter(values = c("north", "south"), target_area = "north"),
     c(TRUE, FALSE)
   )
   expect_identical(
-    region$region_filter(values = c("north", "south"), regions = NULL),
+    regions$region_filter(values = c("north", "south"), target_area = NULL),
     c(TRUE, TRUE)
   )
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("region filtering works", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
+  regions <- DiseasyRegions$new(
+    area = "north",
     adjacency = test_adjacency,
     demography = test_demography
   )
 
-  checkmate::expect_subset(region %.% demography %.% region, "north")
-  checkmate::expect_subset(region %.% adjacency %.% from, "north")
-  checkmate::expect_subset(region %.% adjacency %.% to, "north")
+  checkmate::expect_subset(regions %.% demography %.% region, "north")
+  checkmate::expect_subset(regions %.% adjacency %.% from, "north")
+  checkmate::expect_subset(regions %.% adjacency %.% to, "north")
 
-  region$set_regions(c("north", "east"))
-  checkmate::expect_subset(region %.% demography %.% region, c("north", "east"))
-  checkmate::expect_subset(region %.% adjacency %.% from, c("north", "east"))
-  checkmate::expect_subset(region %.% adjacency %.% to, c("north", "east"))
+  regions$set_area(c("north", "east"))
+  checkmate::expect_subset(regions %.% demography %.% region, c("north", "east"))
+  checkmate::expect_subset(regions %.% adjacency %.% from, c("north", "east"))
+  checkmate::expect_subset(regions %.% adjacency %.% to, c("north", "east"))
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("regions are matched exactly", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
+  regions <- DiseasyRegions$new(
+    area = "north",
     adjacency = test_adjacency,
     demography = test_demography
   )
 
-  expect_false("north_subregion" %in% region$demography$region)
-  expect_false("north_subregion" %in% region$adjacency$from)
-  expect_false("north_subregion" %in% region$adjacency$to)
+  expect_false("north_subregion" %in% regions$demography$region)
+  expect_false("north_subregion" %in% regions$adjacency$from)
+  expect_false("north_subregion" %in% regions$adjacency$to)
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("adjacency matrix normalisation works", {
 
   region_1 <- DiseasyRegions$new(
-    regions = c("north", "south", "east", "north_subregion"),
+    area = c("north", "south", "east", "north_subregion"),
     adjacency = test_adjacency,
     demography = test_demography
   )
 
   region_2 <- DiseasyRegions$new(
-    regions = c("north", "south", "east", "north_subregion"),
+    area = c("north", "south", "east", "north_subregion"),
     adjacency = dplyr::mutate(test_adjacency, "adjacency" = 2 * .data$adjacency),
     demography = test_demography
   )
@@ -320,140 +320,146 @@ test_that("adjacency data must be complete", {
 
 test_that("`demography` data set works with `DiseasyRegions`", {
 
-  region <- DiseasyRegions$new()
-  expect_no_error(region$set_demography(demography_nordic))
-  expect_no_error(region$set_regions(c("DK", "SE")))
+  regions <- DiseasyRegions$new()
+  expect_no_error(regions$set_demography(demography_nordic))
+  expect_no_error(regions$set_area(c("DK", "SE")))
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("`demography_nuts3` data set works with `DiseasyRegions`", {
 
-  region <- DiseasyRegions$new()
-  expect_no_error(region$set_demography(demography_nordic_nuts3))
-  expect_no_error(region$set_regions(c("DK011", "DK012")))
+  regions <- DiseasyRegions$new()
+  expect_no_error(regions$set_demography(demography_nordic_nuts3))
+  expect_no_error(regions$set_area(c("DK011", "DK012")))
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("$regions_at_stratification() tries to guess regions even if `regions` are not configured", {
 
   # No information
-  region <- DiseasyRegions$new()
+  regions <- DiseasyRegions$new()
 
   expect_null(
-    region$regions_at_stratification(regional_stratification = "region")
+    regions$regions_at_stratification(regional_stratification = "region")
   )
 
 
   # Only demography
-  region$set_demography(demography_nordic)
+  regions$set_demography(demography_nordic)
 
   expect_identical(
-    region$regions_at_stratification(regional_stratification = "region"),
+    regions$regions_at_stratification(regional_stratification = "region"),
     sort(unique(demography_nordic$region))
   )
 
 
   # Intersection of demography and adjacency
-  region$set_adjacency(dplyr::filter(adjacency_meta_nordic, .data$from %in% c("DK", "SE"), .data$to %in% c("DK", "SE")))
+  regions$set_adjacency(
+    dplyr::filter(
+      adjacency_meta_nordic,
+      .data$from %in% c("DK", "SE"),
+      .data$to %in% c("DK", "SE")
+    )
+  )
 
   expect_identical(
-    region$regions_at_stratification(regional_stratification = "region"),
+    regions$regions_at_stratification(regional_stratification = "region"),
     c("DK", "SE")
   )
 
 
   # With regions defined
-  region$set_regions("DK")
+  regions$set_area("DK")
 
   expect_identical(
-    region$regions_at_stratification(regional_stratification = "region"),
+    regions$regions_at_stratification(regional_stratification = "region"),
     "DK"
   )
 
-  rm(region)
+  rm(regions)
 })
 
 
-test_that("active binding: regions works", {
+test_that("active binding: area works", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
+  regions <- DiseasyRegions$new(
+    area = "north",
     adjacency = test_adjacency,
     demography = test_demography
   )
 
-  expect_identical(region %.% regions, "north")
+  expect_identical(regions %.% area, "north")
 
   regions_error <- tryCatch(
-    region$regions <- "south",                                                                                          # nolint: implicit_assignment_linter
+    regions$area <- "south",                                                                                            # nolint: implicit_assignment_linter
     error = \(e) e
   )
-  expect_identical(regions_error, simpleError("`$regions` is read only"))
-  expect_identical(region %.% regions, "north")
+  expect_identical(regions_error, simpleError("`$area` is read only"))
+  expect_identical(regions %.% area, "north")
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("active binding: adjacency works", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
+  regions <- DiseasyRegions$new(
+    area = "north",
     adjacency = test_adjacency,
     demography = test_demography
   )
 
-  expect_identical(nrow(region %.% adjacency), 1L)
+  expect_identical(nrow(regions %.% adjacency), 1L)
 
   adjacency_error <- tryCatch(
-    region$adjacency <- test_adjacency,                                                                                 # nolint: implicit_assignment_linter
+    regions$adjacency <- test_adjacency,                                                                                # nolint: implicit_assignment_linter
     error = \(e) e
   )
   expect_identical(adjacency_error, simpleError("`$adjacency` is read only"))
-  expect_identical(nrow(region %.% adjacency), 1L)
+  expect_identical(nrow(regions %.% adjacency), 1L)
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("active binding: demography works", {
 
-  region <- DiseasyRegions$new(
-    regions = "north",
+  regions <- DiseasyRegions$new(
+    area = "north",
     adjacency = test_adjacency,
     demography = test_demography
   )
 
-  expect_identical(region %.% demography %.% region, "north")
+  expect_identical(regions %.% demography %.% region, "north")
 
   demography_error <- tryCatch(
-    region$demography <- test_demography,                                                                               # nolint: implicit_assignment_linter
+    regions$demography <- test_demography,                                                                              # nolint: implicit_assignment_linter
     error = \(e) e
   )
   expect_identical(demography_error, simpleError("`$demography` is read only"))
-  expect_identical(region %.% demography %.% region, "north")
+  expect_identical(regions %.% demography %.% region, "north")
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("$describe() works", {
 
-  region <- DiseasyRegions$new()
-  expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
+  regions <- DiseasyRegions$new()
+  expect_no_error(withr::with_output_sink(nullfile(), regions$describe()))
 
-  region$set_regions("north")
-  expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
+  regions$set_area("north")
+  expect_no_error(withr::with_output_sink(nullfile(), regions$describe()))
 
-  region$set_adjacency(test_adjacency)
-  expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
+  regions$set_adjacency(test_adjacency)
+  expect_no_error(withr::with_output_sink(nullfile(), regions$describe()))
 
-  region$set_demography(test_demography)
-  expect_no_error(withr::with_output_sink(nullfile(), region$describe()))
+  regions$set_demography(test_demography)
+  expect_no_error(withr::with_output_sink(nullfile(), regions$describe()))
 
-  rm(region)
+  rm(regions)
 })

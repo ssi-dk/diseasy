@@ -35,18 +35,18 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   Creates a new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param regional_stratification `r rd_regional_stratification()`
-    #' @param region  (`DiseasyRegions`)\cr
+    #' @param regions (`DiseasyRegions`)\cr
     #'   An instance of a regional module which should provide the demography of the population.
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
-    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, region = NULL, ...) {
-      checkmate::assert_class(region, "DiseasyRegions", null.ok = TRUE)
+    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, regions = NULL, ...) {
+      checkmate::assert_class(regions, "DiseasyRegions", null.ok = TRUE)
 
       # Pass additional arguments to the DiseasyBaseModule initializer
       super$initialize(...)
 
-      if (!is.null(region)) {
-        self$load_module(region)
+      if (!is.null(regions)) {
+        self$load_module(regions)
       }
 
       # Pass arguments to methods
@@ -243,25 +243,27 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @field population (`tibble`)\cr
     #'   The population groups and their sizes configured in the module.
     population = function() {
+      checkmate::assert_class(self %.% regions, "DiseasyRegions")
+      if (is.null(self %.% regions %.% demography)) {
+        pkgcond::pkg_error("`demography` must be set in `DiseasyRegions` to compute `population`")
+      }
 
       population <- self %.% groups |>
         dplyr::left_join(
           self %.% activity %.% map_population(
             age_cuts_lower = self %.% age_cuts_lower,
             age_groups_reference = names(self %.% activity %.% contact_basis %.% proportion),
-            demography = self %.% activity %.% contact_basis %.% demography
+            demography = self %.% regions %.% demography
           ) |>
             dplyr::summarise(
-              "proportion" = sum(.data$proportion),
-              "age_cuts_lower" = min(.data$age),
+              "population" = sum(.data$population),
               .by = "age_group_out"
             ) |>
-            dplyr::transmute(
-              "population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population),
-              .data$proportion,
-              "age_group" = diseasystore::age_labels(.data$age_cuts_lower)
-            ),
+            dplyr::rename("age_group" = "age_group_out"),
           by = "age_group"
+        ) |>
+        dplyr::mutate(
+          "proportion" = .data$population / sum(.data$population)
         )
 
       return(population)

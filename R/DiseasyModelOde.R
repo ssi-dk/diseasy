@@ -527,10 +527,10 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
       } else {
 
-        # Can we map from the regions in the data to the regions in the model?
+        # What stratification column does the model stratification expect?
         region_column <- self %.% population %.% regional_stratification |>
-          stringr::str_to_lower() |>
-          stringr::str_replace(stringr::fixed(""), "_")
+          stringr::str_to_lower() |> # "NUTS 2" becomes "nuts 2"
+          stringr::str_replace(stringr::fixed(" "), "_") # "nuts 2" becomes "nuts_2"
 
 
         # Is the stratification in the observables?

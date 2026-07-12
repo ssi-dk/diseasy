@@ -25,22 +25,22 @@
 #'   )
 #'
 #'   # Restrict the model scope to two regions.
-#'   region <- DiseasyRegions$new(
-#'     regions = c("north", "south"),
+#'   regions <- DiseasyRegions$new(
+#'     area = c("north", "south"),
 #'     adjacency = adjacency,
 #'     demography = demography
 #'   )
 #'
 #'   # Active bindings return data for configured regions.
-#'   region %.% regions
-#'   region %.% demography
-#'   region %.% adjacency
+#'   regions %.% area
+#'   regions %.% demography
+#'   regions %.% adjacency
 #'
 #'   # Update the configured regional scope.
-#'   region$set_regions(regions = c("north", "south", "east"))
-#'   region$describe()
+#'   regions$set_area(area = c("north", "south", "east"))
+#'   regions$describe()
 #'
-#'   rm(region, demography, adjacency)
+#'   rm(regions, demography, adjacency)
 #'
 #' @return
 #'   A new instance of the `DiseasyRegions` [R6][R6::R6Class] class.
@@ -54,17 +54,17 @@ DiseasyRegions <- R6::R6Class(                                                  
 
     #' @description
     #'   Creates a new instance of the `DiseasyRegions` [R6][R6::R6Class] class.
-    #' @param regions `r rd_regions()`
+    #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    initialize = function(regions = NULL, adjacency = NULL, demography = NULL, ...) {
+    initialize = function(area = NULL, adjacency = NULL, demography = NULL, ...) {
 
       # Load objects
       if (!is.null(demography)) self$set_demography(demography)
       if (!is.null(adjacency))  self$set_adjacency(adjacency)
-      if (!is.null(regions))    self$set_regions(regions)
+      if (!is.null(area))       self$set_area(area)
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
@@ -73,25 +73,25 @@ DiseasyRegions <- R6::R6Class(                                                  
 
     #' @description
     #'   Sets the geographic regions of interest.
-    #' @param regions `r rd_regions()`
+    #' @param area `r rd_area()`
     #' @return `r rd_side_effects`
-    set_regions = function(regions) {
+    set_area = function(area) {
 
       # Check configuration works with existing adjacency and demography
       self$validate_configuration(
-        regions = sort(regions),
+        area = sort(area),
         adjacency = private %.% .adjacency,
         demography = private %.% .demography
       )
 
-      private$.regions <- sort(regions)
+      private$.area <- sort(area)
 
       return(invisible(NULL))
     },
 
 
     #' @description
-    #'   Sets the region adjacency data.
+    #'   Sets the regional adjacency data.
     #' @param adjacency `r rd_adjacency()`
     #' @param type `r rd_adjacency_type`
     #' @return `r rd_side_effects`
@@ -109,9 +109,9 @@ DiseasyRegions <- R6::R6Class(                                                  
       # Store the type of adjacency matrix
       attr(adjacency, "type") <- type
 
-      # Check configuration works with existing region and demography
+      # Check configuration works with existing area and demography
       self$validate_configuration(
-        regions = self %.% regions,
+        area = self %.% area,
         adjacency = adjacency,
         demography = private %.% .demography
       )
@@ -131,7 +131,7 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Check configuration works with existing regions and adjacency
       self$validate_configuration(
-        regions = self %.% regions,
+        area = self %.% area,
         adjacency = private %.% .adjacency,
         demography = demography
       )
@@ -143,29 +143,29 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
     #' @description
-    #'   Check whether `regions`, `adjacency`, and `demography` are mutually consistent.
-    #' @param regions `r rd_regions()`
+    #'   Check whether `area`, `adjacency`, and `demography` are mutually consistent.
+    #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
     #' @return `r rd_side_effects`
     #' @keywords internal
     validate_configuration = function(
-      regions,
+      area,
       adjacency,
       demography
     ) {
 
-      # Check regions are consistent with adjacency
-      if (!is.null(regions) && !is.null(adjacency)) {
-        if (length(intersect(regions, adjacency %.% from)) < 1) {
-          pkgcond::pkg_error("`regions` and `adjacency` must contain at least one common region.")
+      # Check area are consistent with adjacency
+      if (!is.null(area) && !is.null(adjacency)) {
+        if (length(intersect(area, adjacency %.% from)) < 1) {
+          pkgcond::pkg_error("`area` and `adjacency` must contain at least one common region.")
         }
       }
 
-      # Check regions are consistent with demography
-      if (!is.null(regions) && !is.null(demography)) {
-        if (length(intersect(regions, demography %.% region)) < 1) {
-          pkgcond::pkg_error("`regions` and `demography` must contain at least one common region.")
+      # Check area are consistent with demography
+      if (!is.null(area) && !is.null(demography)) {
+        if (length(intersect(area, demography %.% region)) < 1) {
+          pkgcond::pkg_error("`area` and `demography` must contain at least one common region.")
         }
       }
 
@@ -180,25 +180,25 @@ DiseasyRegions <- R6::R6Class(                                                  
       return(invisible(NULL))
     },
 
-                                                                                                                        # nolint start: documentation_template_linter, identation_linter
+
     #' @description
     #'   Create a logical filter for values matching one or more regions.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically region identifiers.
-    #' @param regions (`character()` or `NULL`)\cr
+    #' @param target_area (`character()` or `NULL`)\cr
     #'   Region identifiers to match against. Defaults to the currently selected
-    #'   regions. If `NULL`, all values are matched.
+    #'   area. If `NULL`, all values are matched.
     #' @return
     #'   A `logical()` vector with the same length as `values`.
-    region_filter = function(values, regions = self %.% regions) {                                                      # nolint end: documentation_template_linter, identation_linter
+    region_filter = function(values, target_area = self %.% area) {
       checkmate::assert_character(values, any.missing = FALSE)
 
-      if (is.null(regions)) {
+      if (is.null(target_area)) {
         region_filter <- rep(TRUE, length(values))
         return(region_filter)
       }
 
-      region_filter <- values %in% regions
+      region_filter <- values %in% target_area
 
       return(region_filter)
     },
@@ -298,12 +298,12 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Plot model outputs or module configuration spatially.
     #' @param data (`data.frame(1)`)\cr
-    #'   The data to plot spatially on the configured regions.
+    #'   The data to plot spatially on the configured area.
     #'   If `NULL`, the demography and adjacency of regions are plotted.
     #'   If `data.frame`, the first non-structural column is plotted.
     #'   Structural columns are `region`, `date`, `realisation_id`, and `weight`.
     #' @param shape_files (`sf` or `NULL`)\cr
-    #'   Shape files used to draw the configured regions.
+    #'   Shape files used to draw the configured area.
     #'   If `NULL`, `rnaturalearth::ne_countries()` is used.
     #'
     #'   If an `sf` object is supplied, region identifiers are guessed from:
@@ -312,7 +312,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   * `geo` (as in `giscoR::gisco_get_nuts()`)
     #'
     #'   If several candidate columns exist, the first candidate with any match
-    #'   to the configured regions is used.
+    #'   to the configured area is used.
     #' @return `r rd_side_effects`
     #' @seealso
     #' - [rnaturalearth::ne_countries()] for country-level shape files.
@@ -844,10 +844,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyRegions #############################################")
-      if (is.null(self %.% regions)) {
-        printr("Regions: No regions have been specified")
+      if (is.null(self %.% area)) {
+        printr("Area: No area has been specified")
       } else {
-        printr(glue::glue("Regions: {toString(self %.% regions)}"))
+        printr(glue::glue("Area: {toString(self %.% area)}"))
       }
 
       if (is.null(self %.% demography)) {
@@ -875,11 +875,11 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
   active  = list(
-    #' @field regions `r rd_regions(type = "field")`
-    regions = purrr::partial(
+    #' @field area `r rd_area(type = "field")`
+    area = purrr::partial(
       .f = active_binding,
-      name = "regions",
-      expr = return(private %.% .regions)
+      name = "area",
+      expr = return(private %.% .area)
     ),
 
 
@@ -929,10 +929,10 @@ DiseasyRegions <- R6::R6Class(                                                  
         if (is.null(adjacency)) {
           return(
             matrix(
-              data = 1 / sqrt(length(self %.% regions)),
-              nrow = length(self %.% regions),
-              ncol = length(self %.% regions),
-              dimnames = list(self %.% regions, self %.% regions)
+              data = 1 / sqrt(length(self %.% area)),
+              nrow = length(self %.% area),
+              ncol = length(self %.% area),
+              dimnames = list(self %.% area, self %.% area)
             )
           )
         }
@@ -958,7 +958,7 @@ DiseasyRegions <- R6::R6Class(                                                  
         }
 
         demography <- demography |>
-          dplyr::filter( # Filter demography to the given regions
+          dplyr::filter( # Filter demography to the given area
             self$region_filter(values = .data$region)
           ) |>
           dplyr::arrange(
@@ -974,7 +974,7 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
   private = list(
-    .regions = NULL,
+    .area = NULL,
     .adjacency = NULL,
     .demography = NULL
   )
@@ -990,30 +990,30 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
   public = list(
 
     #' @description
-    #'   Check whether regions, adjacency, and demography are mutually consistent
+    #'   Check whether area, adjacency, and demography are mutually consistent
     #'   and complete under NUTS hierarchy semantics.
-    #' @param regions `r rd_regions()`
+    #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
     #' @return `r rd_side_effects`
-    validate_configuration = function(regions, adjacency, demography) {
+    validate_configuration = function(area, adjacency, demography) {
 
       valid_nuts <- nuts$region
 
-      if (!checkmate::test_subset(self %.% regions, valid_nuts)) {
+      if (!checkmate::test_subset(self %.% area, valid_nuts)) {
         pkgcond::pkg_warning(
           glue::glue(
-            "Some configured regions are not valid NUTS regions: {toString(setdiff(self %.% regions, valid_nuts))}"
+            "Some of the configured area are not valid NUTS regions: {toString(setdiff(self %.% area, valid_nuts))}"
           )
         )
       }
 
-      # Helper function to retrieve all NUTS codes for the given regions
+      # Helper function to retrieve all NUTS codes for the given area
       nuts_at_resolution <- function(nuts_level) {
         nuts |>
           dplyr::filter(level <= nuts_level) |>
           dplyr::slice_max(.data$level, by = "country") |>
-          dplyr::filter(self$region_filter(.data$region, regions)) |>
+          dplyr::filter(self$region_filter(.data$region, area)) |>
           dplyr::pull("region")
       }
 
@@ -1028,11 +1028,11 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
           pkgcond::pkg_error("`adjacency` has more data for more than one NUTS level")
         }
 
-        if (!is.null(regions)) {
+        if (!is.null(area)) {
 
           # Get all nuts code within scope
           all_nuts_within_scope <- nuts_at_resolution(adjacency_resolution) |>
-            purrr::keep(~ any(stringr::str_starts(., regions)))
+            purrr::keep(~ any(stringr::str_starts(., area)))
 
           missing_regions <- setdiff(all_nuts_within_scope, adjacency$from)
 
@@ -1057,11 +1057,11 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
           pkgcond::pkg_error("`demography` has more data for more than one demography level")
         }
 
-        if (!is.null(regions)) {
+        if (!is.null(area)) {
 
           # Get all nuts code within scope
           all_nuts_within_scope <- nuts_at_resolution(demography_resolution) |>
-            purrr::keep(~ any(stringr::str_starts(., regions)))
+            purrr::keep(~ any(stringr::str_starts(., area)))
 
           missing_regions <- setdiff(all_nuts_within_scope, demography$region)
 
@@ -1080,26 +1080,25 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
     },
 
 
-                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' @description
     #'   Create a logical filter using NUTS hierarchy prefix matching.
     #' @param values (`character()`)\cr
     #'   Values to filter, typically NUTS codes.
-    #' @param regions (`character()` or `NULL`)\cr
+    #' @param target_area (`character()` or `NULL`)\cr
     #'   Region identifiers to match against. Defaults to the currently selected
-    #'   regions. If `NULL`, all values are matched.
+    #'   area. If `NULL`, all values are matched.
     #' @return
     #'   A `logical()` vector with the same length as `values`.
-    region_filter = function(values, regions = self %.% regions) {                                                      # nolint end: documentation_template_linter, identation_linter
+    region_filter = function(values, target_area = self %.% area) {
       checkmate::assert_character(values, any.missing = FALSE)
 
-      if (is.null(regions)) {
+      if (is.null(target_area)) {
         region_filter <- rep(TRUE, length(values))
         return(region_filter)
       }
 
       region_filter <- purrr::reduce(
-        .x = purrr::map(regions, ~ stringr::str_starts(values, .x)),
+        .x = purrr::map(target_area, ~ stringr::str_starts(values, .x)),
         .f = `|`,
         .init = FALSE
       )

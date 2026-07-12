@@ -59,6 +59,7 @@ combinations |>
           last_queryable_date = Sys.Date() - 1
         ),
         population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
+        regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
         parameters = list(
           "compartment_structure" = c("E" = K, "I" = L, "R" = 1L),
           "overall_infection_risk" = 0.6,

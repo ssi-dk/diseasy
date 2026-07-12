@@ -42,13 +42,22 @@
 #'   activity$set_activity_units(dk_activity_units)
 #'   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 #'
+#'
+#'   # .. and it uses the Danish population
+#'   regions <- DiseasyRegions$new(
+#'     area = "DK",
+#'     demography = demography_nordic,
+#'   )
+#'
 #'   # The example stratifies the population into three age groups
 #'   population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
+#'
 #'
 #'   # We create a simple model instance
 #'   m <- DiseasyModelOdeSeir$new(
 #'     observables = observables,
 #'     population = population,
+#'     regions = regions,
 #'     activity = activity,
 #'     parameters = list(
 #'       "overall_infection_risk" = 0.025,
@@ -63,7 +72,7 @@
 #'   # Plot the results
 #'   plot(m, observable = "incidence", prediction_length = 30)
 #'
-#'   rm(m, act, obs)
+#'   rm(m, activity, observables, population)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
@@ -76,7 +85,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param observables,population,activity,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,regions,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -115,6 +124,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       observables = FALSE,
       population = TRUE,
       activity = TRUE,
+      regions = TRUE,
       season = TRUE,
       variant = TRUE,
       immunity = TRUE,
@@ -127,6 +137,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = observables,
         population = population,
         activity = activity,
+        regions = regions,
         season = season,
         variant = variant,
         immunity = immunity,
@@ -641,7 +652,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           self %.% population %.% population,
           by = names(self %.% population %.% groups)
         ) |>
-        dplyr::mutate("incidence" = .data$incidence * .data$proportion) |>
+        dplyr::mutate(
+          "incidence" = .data$incidence * .data$proportion,
+          .by = colnames(self %.% population %.% groups)
+        ) |>
         dplyr::select(c(colnames(incidence_data), "incidence"))
 
       # Ensure we have complete information

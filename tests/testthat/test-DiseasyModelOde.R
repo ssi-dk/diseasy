@@ -103,6 +103,7 @@ test_that("$hash works", {
   # Create a DiseasyModelOdeSeir instance (we need a child class with `$initialise_state_vector()` implemented)
   model <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     observables = observables
   )
 

@@ -123,6 +123,7 @@ test_that("helpers works (SIR double variant / double age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -395,6 +396,7 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),

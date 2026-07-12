@@ -166,6 +166,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = act,
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -240,6 +241,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rI, "I" = rI)
@@ -316,6 +318,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
@@ -401,6 +404,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
@@ -493,6 +497,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
@@ -612,6 +617,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
@@ -621,8 +627,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   )
 
   # Get a reference to the private environment
-  self <- m
-  private <- self$.__enclos_env__$private
+  private <- m$.__enclos_env__$private
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
@@ -630,9 +635,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   y0 <- rep(0, private$n_states)
   y0[purrr::reduce(private$i_state_indices, c)] <- si <- 0.05 # Infections with both variants
   y0[private$s_state_indices] <- ss <- 0.4 # The rest are susceptible
-
-  t <- 1
-  state_vector <- y0
   expect_equal(                                                                                                         # nolint: expect_identical_linter
     unname(m %.% rhs(1, y0)[[1]]),
     c(
@@ -727,6 +729,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),

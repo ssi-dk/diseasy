@@ -52,13 +52,22 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   activity$set_activity_units(dk_activity_units)
   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
+
+  # .. and it uses the Danish population
+  regions <- DiseasyRegions$new(
+    area = "DK",
+    demography = demography_nordic,
+  )
+
   # The example stratifies the population into three age groups
   population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
+
 
   # We create a simple model instance
   m <- DiseasyModelOdeSeir$new(
     observables = observables,
     population = population,
+    regions = regions,
     activity = activity,
     parameters = list(
       "overall_infection_risk" = 0.025,
@@ -73,7 +82,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
   # Plot the results
   plot(m, observable = "incidence", prediction_length = 30)
 
-  rm(m, act, obs)
+  rm(m, activity, observables, population)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
@@ -128,6 +137,7 @@ Names of the user-configured model outputs. Read only.}
   observables = FALSE,
   population = TRUE,
   activity = TRUE,
+  regions = TRUE,
   season = TRUE,
   variant = TRUE,
   immunity = TRUE,
@@ -139,7 +149,7 @@ Names of the user-configured model outputs. Read only.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{observables, population, activity, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{observables, population, activity, regions, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
       \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
