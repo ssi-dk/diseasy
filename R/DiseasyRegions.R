@@ -954,7 +954,13 @@ DiseasyRegions <- R6::R6Class(                                                  
         demography <- private %.% .demography
 
         if (is.null(demography)) {
-          return(NULL)
+          return(
+            data.frame(
+              "region" = "All",
+              "age" = seq(from = 0, to = 99),
+              "population" = 1 / 100
+            )
+          )
         }
 
         demography <- demography |>

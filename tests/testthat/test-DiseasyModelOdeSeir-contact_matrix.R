@@ -16,6 +16,8 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -51,7 +53,6 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
-    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -62,6 +63,8 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -113,7 +116,6 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40, 80)),
-    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -124,6 +126,8 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -189,6 +193,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     activity = act,
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -198,6 +203,8 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -286,6 +293,8 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
