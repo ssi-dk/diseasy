@@ -7,7 +7,7 @@
 \source{
 U.S. Census Bureau. (n.d.). \emph{International Database: World Population Estimates and Projections}.
 U.S. Department of Commerce.
-Retrieved July 07, 2026.
+Retrieved July 13, 2026.
 from https://data.census.gov/
 
 Gruson H (2023). "contactdata: Social Contact Matrices for 152
