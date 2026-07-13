@@ -37,6 +37,14 @@ See vignette("diseasy-population").
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyPopulation}
 }
+\section{Public fields}{
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{population}}{(\code{tibble})\cr
+The population groups and their sizes configured in the module.}
+  }
+  \if{html}{\out{</div>}}
+}
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
