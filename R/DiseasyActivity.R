@@ -180,11 +180,11 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Check structure of contact_basis
       checkmate::assert_list(contact_basis, add = coll)
-      checkmate::assert_set_equal(names(contact_basis), c("contacts", "description"), add = coll)
+      checkmate::assert_set_equal(names(contact_basis), c("per_capita_contacts", "description"), add = coll)
 
       # Checks on contact_basis contacts
-      checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
-      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "contacts")), private$activity_types, add = coll)
+      checkmate::assert_list(purrr::pluck(contact_basis, "per_capita_contacts"), min.len = 1, add = coll)
+      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "per_capita_contacts")), private$activity_types, add = coll)
       purrr::walk(
         contact_basis$contacts,
         \(contacts) checkmate::assert_matrix(contacts, min.rows = 1, min.cols = 1, any.missing = FALSE, add = coll)
@@ -192,9 +192,9 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # - Check for consistency of the number of age groups in the contact matrices
       # All matrices should be square matrices with of the same dimensions
-      n_age_groups <- purrr::pluck(contact_basis, "contacts", 1, dim, 1) # Get first dimensions of the first matrix
+      n_age_groups <- purrr::pluck(contact_basis, "per_capita_contacts", 1, dim, 1) # Get first dimensions of the first matrix
       purrr::walk(
-        purrr::pluck(contact_basis, "contacts"),
+        purrr::pluck(contact_basis, "per_capita_contacts"),
         ~ checkmate::assert_matrix(., ncols = n_age_groups, nrows = n_age_groups, add = coll)
       )
 
@@ -208,8 +208,8 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_number(
         unique(
           c(
-            purrr::pluck(contact_basis, "contacts", 1, nrow),
-            purrr::pluck(contact_basis, "contacts", 1, ncol)
+            purrr::pluck(contact_basis, "per_capita_contacts", 1, nrow),
+            purrr::pluck(contact_basis, "per_capita_contacts", 1, ncol)
           )
         ),
         add = coll
@@ -217,15 +217,15 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       checkmate::assert_true(
         identical(
-          purrr::pluck(contact_basis, "contacts", 1, rownames),
-          purrr::pluck(contact_basis, "contacts", 1, colnames)
+          purrr::pluck(contact_basis, "per_capita_contacts", 1, rownames),
+          purrr::pluck(contact_basis, "per_capita_contacts", 1, colnames)
         ),
         add = coll
       )
 
       # Checks on contact_basis labels
       checkmate::assert_character(
-        purrr::pluck(contact_basis, "contacts", 1, colnames),
+        purrr::pluck(contact_basis, "per_capita_contacts", 1, colnames),
         pattern = r"{\d+(-\d+|\+)}",
         add = coll
       )
@@ -607,7 +607,7 @@ DiseasyActivity <- R6::R6Class(                                                 
               "from" = rownames(.x),
               "arena" = .y
             ) |>
-              dplyr::mutate("contacts" = as.vector(.x))
+              dplyr::mutate("per_capita_contacts" = as.vector(.x))
           }
         ) |>
           purrr::list_rbind()
@@ -616,7 +616,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           "to" = colnames(contact_matrix_to_plot),
           "from" = rownames(contact_matrix_to_plot)
         ) |>
-          dplyr::mutate("contacts" = as.vector(contact_matrix_to_plot))
+          dplyr::mutate("per_capita_contacts" = as.vector(contact_matrix_to_plot))
       }
 
       # Plot contacts
@@ -628,7 +628,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           x = "Contacts from",
           y = "Contacts to",
           title = "Mean number of daily contacts ",
-          fill = "Contacts",
+          fill = "per_capita_contacts",
           caption = glue::glue("Contact matrix as of {contacts_date}")
         ) +
         ggplot2::theme(
@@ -850,7 +850,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           activity_unit_subset |>
             purrr::map(~ purrr::pluck(., type) * purrr::pluck(., "risk")) |>
             purrr::reduce(`+`, .init = rep(0, private %.% n_age_groups)) |> # each age_group starts with 0 activity
-            stats::setNames(purrr::pluck(self %.% contact_basis %.% contacts, 1, colnames))
+            stats::setNames(purrr::pluck(self %.% contact_basis %.% per_capita_contacts, 1, colnames))
         }
       )
 

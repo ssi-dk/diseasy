@@ -197,7 +197,7 @@ DiseasyPopulation <- R6::R6Class(                                               
         # To perform the projection, we need the number of persons in the new and original age groups
         # Determine the population in the new age groups
         population_map <- private %.% map_population(
-          age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "contacts", 1, colnames),
+          age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "per_capita_contacts", 1, colnames),
         )
 
         population_per_group <- population_map |>
