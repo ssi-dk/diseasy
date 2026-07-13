@@ -545,7 +545,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             # be reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
             # non-commutative.
             scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
-              self$contact_basis$contacts[[tt]]
+              self %.% contact_basis %.% per_capita_contacts[[tt]]
           }
         }
       }

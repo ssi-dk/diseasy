@@ -193,6 +193,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     activity = act,
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     observables = DiseasyObservables$new(
       conn = DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -203,6 +204,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
     )
   )
 
+  self <- m
   expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
@@ -214,34 +216,59 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
 
   # Then from 2020-01-01, it should be "baseline" with risk 1, which is just the contact_basis matrices
   # However, the model uses per capita-ish rates, so we need to convert.
+  age_cuts_reference <- as.numeric(
+    stringr::str_extract(
+      purrr::pluck(m %.% activity %.% contact_basis, "per_capita_contacts", 1, colnames),
+      r"{^\d+}"
+    )
+  )
+
+  population <- m %.% regions %.% demography |>
+    dplyr::mutate(
+      "age_group" = cut(
+        age,
+        breaks = !!c(age_cuts_reference, Inf),
+        right = FALSE,
+        labels = diseasystore::age_labels(age_cuts_reference)
+      )
+    ) |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "age_group"
+    )
+
+  N_squared <- outer(
+    X = dplyr::pull(population, "population"),
+    Y = dplyr::pull(population, "population")
+  )
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) |>
-      sum() |>
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(dplyr::pull(m %.% regions %.% demography, "population")) |>
       matrix(dimnames = list("0+", "0+"))
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) |>
-      sum() * 0.5 |>
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(dplyr::pull(m %.% regions %.% demography, "population")) * 0.5 |>
       matrix(dimnames = list("0+", "0+"))
   )
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(0),
-    purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) |>
-      sum() * 0.5 |>
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(dplyr::pull(m %.% regions %.% demography, "population")) * 0.5 |>
       matrix(dimnames = list("0+", "0+"))
   )
 
   # The contact matrix should be valid forever
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(Inf),
-    purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) |>
-      sum() * 0.5 |>
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(dplyr::pull(m %.% regions %.% demography, "population")) * 0.5 |>
       matrix(dimnames = list("0+", "0+"))
   )
 

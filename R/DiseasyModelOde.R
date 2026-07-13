@@ -76,7 +76,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         model_rates <- private %.% solve_ode(prediction_length = prediction_length)
 
         # .. get population data
-        population_data <- self %.% population %.% population
+        population_data <- self %.% population %.% model_population
 
         # Combine and convert raw rates to number of infected
         model_output <- model_rates |>
@@ -173,7 +173,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
       )
 
       # .. get population data
-      population_data <- self %.% population %.% population
+      population_data <- self %.% population %.% model_population
 
       # .. add to the observations
       observations <- observations |>

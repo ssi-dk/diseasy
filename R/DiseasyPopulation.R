@@ -312,13 +312,13 @@ DiseasyPopulation <- R6::R6Class(                                               
 
     #' @field population (`tibble`)\cr
     #'   The population groups and their sizes configured in the module.
-    population = function() {
+    model_population = function() {
       checkmate::assert_class(self %.% regions, "DiseasyRegions")
       if (is.null(self %.% regions %.% demography)) {
-        pkgcond::pkg_error("`demography` must be set in `DiseasyRegions` to compute `population`")
+        pkgcond::pkg_error("`demography` must be set in `DiseasyRegions` to compute `model_population`")
       }
 
-      population <- self %.% groups |>
+      model_population <- self %.% groups |>
         dplyr::left_join(
           private %.% map_population() |>
             dplyr::summarise(
@@ -332,7 +332,7 @@ DiseasyPopulation <- R6::R6Class(                                               
           "proportion" = .data$population / sum(.data$population)
         )
 
-      return(population)
+      return(model_population)
     },
 
 
