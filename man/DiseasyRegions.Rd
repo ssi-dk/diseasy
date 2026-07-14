@@ -108,7 +108,12 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
   Creates a new instance of the \code{DiseasyRegions} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$new(area = NULL, adjacency = NULL, demography = NULL, ...)}
+    \preformatted{DiseasyRegions$new(
+  area = NULL,
+  adjacency = NULL,
+  demography = demography_unit,
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
