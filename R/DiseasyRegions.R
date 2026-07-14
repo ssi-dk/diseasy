@@ -59,7 +59,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param demography `r rd_demography()`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    initialize = function(area = NULL, adjacency = NULL, demography = NULL, ...) {
+    initialize = function(area = NULL, adjacency = NULL, demography = demography_unit, ...) {
 
       # Load objects
       if (!is.null(demography)) self$set_demography(demography)
@@ -952,16 +952,6 @@ DiseasyRegions <- R6::R6Class(                                                  
       name = "demography",
       expr = {
         demography <- private %.% .demography
-
-        if (is.null(demography)) {
-          return(
-            data.frame(
-              "region" = "All",
-              "age" = seq(from = 0, to = 79),
-              "population" = 1 / 80
-            )
-          )
-        }
 
         demography <- demography |>
           dplyr::filter( # Filter demography to the given area
