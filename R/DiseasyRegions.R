@@ -957,8 +957,8 @@ DiseasyRegions <- R6::R6Class(                                                  
           return(
             data.frame(
               "region" = "All",
-              "age" = seq(from = 0, to = 99),
-              "population" = 1 / 100
+              "age" = seq(from = 0, to = 79),
+              "population" = 1 / 80
             )
           )
         }
