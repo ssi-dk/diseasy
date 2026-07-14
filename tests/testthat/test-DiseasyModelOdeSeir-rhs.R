@@ -404,7 +404,6 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
