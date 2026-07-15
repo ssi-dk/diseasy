@@ -152,9 +152,11 @@ before finally defining the seasonality scenario via the `?DiseasySeason` module
 In this example scenario, we use a simple three age-group stratification of the population in the model.
 
 ```{r diseasy_population}
+# To stratify the population, we need to define the population
+regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+
 # Split the model population into three age groups
-population <- DiseasyPopulation$new()
-population$stratify_age(age_cuts_lower = c(0, 30, 60))
+population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
 ```
 
 ## Activity scenario
@@ -402,6 +404,7 @@ With all the configuration done above, we can now create our model instance.
 model <- DiseasyModelOdeSeir$new(
   # Scenario configuration
   population = population,
+  regions = regions,
   activity = activity,
   immunity = immunity,
   season = season,

@@ -37,6 +37,14 @@ See vignette("diseasy-population").
 \section{Super class}{
 \code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{DiseasyPopulation}
 }
+\section{Public fields}{
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{population}}{(\code{tibble})\cr
+The population groups and their sizes configured in the module.}
+  }
+  \if{html}{\out{</div>}}
+}
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
@@ -89,7 +97,7 @@ The local copy of an DiseasyRegions module. Read-only.}
     \preformatted{DiseasyPopulation$new(
   age_cuts_lower = 0L,
   regional_stratification = NULL,
-  region = NULL,
+  regions = NULL,
   ...
 )}
     \if{html}{\out{</div>}}
@@ -99,7 +107,7 @@ The local copy of an DiseasyRegions module. Read-only.}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
-      \item{\code{region}}{(\code{DiseasyRegions})\cr
+      \item{\code{regions}}{(\code{DiseasyRegions})\cr
 An instance of a regional module which should provide the demography of the population.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
     }

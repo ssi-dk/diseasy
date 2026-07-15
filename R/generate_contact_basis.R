@@ -3,7 +3,7 @@
 #' @description
 #'   Generate the contact-basis object used by `diseasy` from `contactdata`
 #'   contact matrices and country-level demography.
-#' @param regions `r rd_regions("generators")`
+#' @param area `r rd_area("generators")`
 #' @return
 #'   A named list of contact-basis objects, using the current package data
 #'   structure.
@@ -14,10 +14,8 @@
 #' @keywords data-generators
 #' @export
 #' @importFrom diseasystore `%.%`
-generate_contact_basis <- function(
-  regions = NULL
-) {
-  checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
+generate_contact_basis <- function(area = NULL) {
+  checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
 
   missing_packages <- purrr::discard(c("countrycode", "countrycode", "tibble"), rlang::is_installed)
 
@@ -27,10 +25,10 @@ generate_contact_basis <- function(
     ))
   }
 
-  age_cuts_lower <- (0:15) * 5
+  age_cuts_lower <- seq(from = 0, to = 75, by = 5)
   age_labels <- diseasystore::age_labels(age_cuts_lower)
 
-  demography <- generate_demography(regions)
+  demography <- generate_demography(area)
 
   countries <- contactdata::list_countries()
   country_codes <- purrr::map_chr(
@@ -45,36 +43,6 @@ generate_contact_basis <- function(
   if (length(common_country_codes) == 0) {
     rlang::abort("No countries have both demography data and contactdata matrices.")
   }
-
-  contact_basis <- common_country_codes |>
-    purrr::map(\(country_code) {
-
-      # Store 5-year age group populations
-      N <- demography |>                                                                                                # nolint: object_name_linter
-        dplyr::filter(.data$region == !!country_code) |>
-        dplyr::mutate("age_group" = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE, labels = age_labels)) |>
-        dplyr::summarise("population" = sum(.data$population), .by = "age_group") |>
-        tibble::deframe()
-
-      tibble::lst(
-        "contacts" = NULL, # pre-allocate for below
-        "population" = N,
-        "proportion" = N / sum(N),
-        "demography" = demography |>
-          dplyr::filter(.data$region == country_code) |>
-          dplyr::select(!"region") |>
-          dplyr::mutate("proportion" = .data$population / sum(.data$population)),
-        "description" = glue::glue(
-          "Contact matrices for ",
-          "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
-          "from the `contactdata` package and population data for ",
-          "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
-          "from the US Census Bureau."
-        )
-      )
-    })
-  names(contact_basis) <- common_country_codes
-
 
   # Transform the matrices from the contactdata package
   contact_basis <- purrr::imap(common_country_codes, \(country_code, country) {
@@ -195,16 +163,28 @@ generate_contact_basis <- function(
         rlang::abort("mp is not reciprocal")
       }
 
-      # Return the contact matrices directly
-      return(mp)
+      # Convert to per-capita rates
+      N_j <- t(N_i)                                                                                                     # nolint: object_name_linter
+      cp <- mp / N_j
+
+      # Return the per-capita contact rates
+      return(cp)
 
     }) |>
       stats::setNames(arenas)
 
-    return(utils::modifyList(
-      purrr::pluck(contact_basis, country_code),
-      list("contacts" = contacts)
-    ))
+    return(
+      list(
+        "per_capita_contacts" = contacts,
+        "description" = glue::glue(
+          "Contact matrices for ",
+          "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
+          "from the `contactdata` package and population data for ",
+          "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
+          "from the US Census Bureau."
+        )
+      )
+    )
   }) |>
     stats::setNames(common_country_codes)
 

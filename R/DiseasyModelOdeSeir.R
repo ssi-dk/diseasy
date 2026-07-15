@@ -42,13 +42,22 @@
 #'   activity$set_activity_units(dk_activity_units)
 #'   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 #'
+#'
+#'   # .. and it uses the Danish population
+#'   regions <- DiseasyRegions$new(
+#'     area = "DK",
+#'     demography = demography_nordic,
+#'   )
+#'
 #'   # The example stratifies the population into three age groups
 #'   population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
+#'
 #'
 #'   # We create a simple model instance
 #'   m <- DiseasyModelOdeSeir$new(
 #'     observables = observables,
 #'     population = population,
+#'     regions = regions,
 #'     activity = activity,
 #'     parameters = list(
 #'       "overall_infection_risk" = 0.025,
@@ -63,7 +72,7 @@
 #'   # Plot the results
 #'   plot(m, observable = "incidence", prediction_length = 30)
 #'
-#'   rm(m, act, obs)
+#'   rm(m, activity, observables, population)
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
@@ -76,7 +85,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param observables,population,activity,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,regions,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -115,6 +124,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       observables = FALSE,
       population = TRUE,
       activity = TRUE,
+      regions = TRUE,
       season = TRUE,
       variant = TRUE,
       immunity = TRUE,
@@ -127,6 +137,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = observables,
         population = population,
         activity = activity,
+        regions = regions,
         season = season,
         variant = variant,
         immunity = immunity,
@@ -638,10 +649,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Rescale to the number of infections relative to the full population
       incidence_data <- incidence_data |>
         dplyr::left_join(
-          self %.% population %.% population,
+          self %.% population %.% model_population,
           by = names(self %.% population %.% groups)
         ) |>
-        dplyr::mutate("incidence" = .data$incidence * .data$proportion) |>
+        dplyr::mutate(
+          "incidence" = .data$incidence * .data$proportion,
+          .by = colnames(self %.% population %.% groups)
+        ) |>
         dplyr::select(c(colnames(incidence_data), "incidence"))
 
       # Ensure we have complete information
@@ -865,6 +879,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = self %.% observables,
         population = self %.% population,
         activity = self %.% activity,
+        regions = self %.% regions,
         variant = self %.% variant,
         season = self %.% season,
         immunity = self %.% immunity,
@@ -1024,7 +1039,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Run the simulation forward to estimate the R and S states
       y0 <- c(
         rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
-        self %.% population %.% population_proportion, # S states
+        self %.% population %.% model_population_proportion, # S states
         rep(0, length(initialisation_submodel %.% model_outputs)) # Surveillance states
       )
 
@@ -1586,8 +1601,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # @return `r rd_side_effects()`
     set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
 
-      # Apply the scaling factor to the contact matrices
-      scaled_per_capita_contact_matrices <- purrr::map(per_capita_contact_matrices, ~ .x * scaling_factor)
+      # Apply the scaling factors to the contact matrices
+      scaled_per_capita_contact_matrices <- purrr::map(
+        per_capita_contact_matrices,
+        ~ .x * scaling_factor * purrr::pluck(self %.% population %.% model_population, "population", sum)
+      )
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: the end of the training period)
@@ -1618,7 +1636,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(                                                                                                    # nolint: object_name_linter
         rep(0, private %.% n_age_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R),
-        self %.% population %.% population_proportion
+        self %.% population %.% model_population_proportion
       )
     ) {
 
@@ -1630,11 +1648,15 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         return(NA)
       }
 
+      # Retrieve the active contact matrix
+      contact_matrix <- private %.% contact_matrix(t)
+
       # Input checks
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_number(t, add = coll)
       checkmate::assert_numeric(RS_states, lower = 0, upper = 1, add = coll)
       checkmate::assert_number(overall_infection_risk, lower = 0, add = coll)
+      checkmate::assert_matrix(contact_matrix, add = coll)
       checkmate::reportAssertions(coll)
 
       ## Compute the transition rate component
@@ -1672,10 +1694,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       ## Compute the transmissions component
-
-      # Retrieve the active contact matrix
-      contact_matrix <- private %.% contact_matrix(t)
-
       # If the contact matrix is 1 x 1, convert to scalar since R wont multiply otherwise
       if (length(contact_matrix) == 1) contact_matrix <- as.numeric(contact_matrix)
 
@@ -1752,10 +1770,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
       reference_model <- DiseasyModelOdeSeir$new(
-        activity = self %.% activity,
         observables = self %.% observables,
+        population = self %.% population,
+        activity = self %.% activity,
+        regions = self %.%  regions,
         season = self %.% season,
         variant = self %.% variant,
+        immunity = self %.% immunity,
         parameters = modifyList(
           self %.% parameters,
           list(

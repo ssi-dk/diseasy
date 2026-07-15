@@ -227,11 +227,11 @@ rd_regional_stratification <- function(type = "param") {
 
 
 ## Templates for DiseasyRegions
-rd_regions <- function(type = "param") {
+rd_area <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field", "generators"))
   paste(
     "(`character()`)\\cr",
-    "The geographic regions of interest.",
+    "The geographic area (list of regions) of interest.",
 
     switch(
       type,

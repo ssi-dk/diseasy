@@ -76,10 +76,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         model_rates <- private %.% solve_ode(prediction_length = prediction_length)
 
         # .. get population data
-        population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-          dplyr::mutate("age_group" = .data$age_group_out) |>
-          dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
-          dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+        population_data <- self %.% population %.% model_population
 
         # Combine and convert raw rates to number of infected
         model_output <- model_rates |>
@@ -176,10 +173,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
       )
 
       # .. get population data
-      population_data <- self %.% activity %.% map_population(self %.% population %.% age_cuts_lower) |>
-        dplyr::mutate("age_group" = .data$age_group_out) |>
-        dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group") |>
-        dplyr::mutate("population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population))
+      population_data <- self %.% population %.% model_population
 
       # .. add to the observations
       observations <- observations |>
@@ -527,10 +521,10 @@ DiseasyModelOde <- R6::R6Class(                                                 
 
       } else {
 
-        # Can we map from the regions in the data to the regions in the model?
+        # What stratification column does the model stratification expect?
         region_column <- self %.% population %.% regional_stratification |>
-          stringr::str_to_lower() |>
-          stringr::str_replace(stringr::fixed(""), "_")
+          stringr::str_to_lower() |> # "NUTS 2" becomes "nuts 2"
+          stringr::str_replace(stringr::fixed(" "), "_") # "nuts 2" becomes "nuts_2"
 
 
         # Is the stratification in the observables?
