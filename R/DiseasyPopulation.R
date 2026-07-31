@@ -176,7 +176,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       # We then construct the normalised matrices
       per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
+        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% model_population %.% proportion))
 
       return(per_capita_contact_matrices)
     },
@@ -240,21 +240,12 @@ DiseasyPopulation <- R6::R6Class(                                               
     },
 
 
-    #' @field population (`tibble`)\cr
+    #' @field model_population (`tibble`)\cr
     #'   The population groups and their sizes configured in the module.
-    population = function() {
-      checkmate::assert_class(self %.% regions, "DiseasyRegions")
-      if (is.null(self %.% regions %.% demography)) {
-        pkgcond::pkg_error("`demography` must be set in `DiseasyRegions` to compute `population`")
-      }
-
-      population <- self %.% groups |>
+    model_population = function() {
+      model_population <- self %.% groups |>
         dplyr::left_join(
-          self %.% activity %.% map_population(
-            age_cuts_lower = self %.% age_cuts_lower,
-            age_groups_reference = names(self %.% activity %.% contact_basis %.% proportion),
-            demography = self %.% regions %.% demography
-          ) |>
+          self %.% activity %.% map_population(age_cuts_lower = self %.% age_cuts_lower) |>
             dplyr::summarise(
               "population" = sum(.data$population),
               .by = "age_group_out"
@@ -266,29 +257,7 @@ DiseasyPopulation <- R6::R6Class(                                               
           "proportion" = .data$population / sum(.data$population)
         )
 
-      return(population)
-    },
-
-
-    #' @field population_proportion (`numeric()`)\cr
-    #'   The distribution of individuals across the demography groups defined in the module.
-    population_proportion = function() {
-
-      if (length(self %.% activity %.% get_scenario_activities()) == 0) {
-
-        # If no scenario is defined then no contact matrix between age groups is provided and we
-        # assume an even distribution of contacts
-        population_proportion <- rep(1 / length(self %.% age_cuts_lower), length(self %.% age_cuts_lower))
-
-      } else {
-
-        population_proportion <- self %.% activity %.% map_population(self %.% age_cuts_lower) |>
-          dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
-          dplyr::pull("proportion")
-
-      }
-
-      return(population_proportion)
+      return(model_population)
     },
 
 

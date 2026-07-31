@@ -69,9 +69,6 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Generate a initial state_vector
   y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
 
-  population_proportion <- activity$map_population(age_cuts_lower) |>
-    dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
-    dplyr::pull("proportion")
 
   activity_proportion <- cbind(
     activity$map_population(age_cuts_lower) |>
@@ -84,14 +81,14 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     dplyr::summarise("activity" = sum(.data$activity), .by = "age_group_out") |>
     dplyr::pull("activity")
 
-  activity <- population_proportion * activity_proportion
+  activity <- population$model_population_proportion * activity_proportion
   activity <- activity / sum(activity)
 
   # 0.05% are newly infected
   y0[private$e1_state_indices] <- activity * 0.0005
 
   # 99.95% are susceptible
-  y0[private$s_state_indices] <- population_proportion - y0[private$e1_state_indices]
+  y0[private$s_state_indices] <- model %.% population %.% model_population %.% proportion - y0[private$e1_state_indices]
 
 
   # Run solver across scenario change to check for long-term leakage
@@ -99,7 +96,8 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
 
   # Extract the maximal test positive signal from the I1 states
-  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI * sum(contact_basis_nordic %.% DK %.% population)
+  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI *
+    sum(model %.% population %.% model_population %.% population)
   colnames(true_infected) <- diseasystore::age_labels(age_cuts_lower)
 
   # Convert to long format
