@@ -104,8 +104,8 @@ matching.</p>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
-    <p></p><div class="r6-active-bindings"><dl><dt><code>regions</code></dt>
-<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic regions of interest. Read only.</p></dd>
+    <p></p><div class="r6-active-bindings"><dl><dt><code>area</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. Read only.</p></dd>
 
 
     <dt><code>available_stratifications</code></dt>
@@ -134,7 +134,7 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 <p></p><ul><li><p><a href="#method-DiseasyRegions-initialize"><code>DiseasyRegions$new()</code></a></p></li>
-<li><p><a href="#method-DiseasyRegions-set_regions"><code>DiseasyRegions$set_regions()</code></a></p></li>
+<li><p><a href="#method-DiseasyRegions-set_area"><code>DiseasyRegions$set_area()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-set_adjacency"><code>DiseasyRegions$set_adjacency()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-set_demography"><code>DiseasyRegions$set_demography()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-validate_configuration"><code>DiseasyRegions$validate_configuration()</code></a></p></li>
@@ -150,11 +150,11 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <h3 id="diseasyregions-new-"><code>DiseasyRegions$new()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyRegions</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyRegions.html">DiseasyRegions</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>regions <span class="op">=</span> <span class="cn">NULL</span>, adjacency <span class="op">=</span> <span class="cn">NULL</span>, demography <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyRegions.html">DiseasyRegions</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>area <span class="op">=</span> <span class="cn">NULL</span>, adjacency <span class="op">=</span> <span class="cn">NULL</span>, demography <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>regions</code></dt>
-<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic regions of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
+<p></p><div class="arguments"><dl><dt><code>area</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
 
       <dt><code>adjacency</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The adjacency (connectedness) of the regions. Effectively, the <code>adjacency</code> is a long-form of the adjacency-matrix<br> The <code>data.frame</code> must include the following columns:<br> - <code>from</code> (<code>character</code>): Region identifier.<br> - <code>to</code>   (<code>character</code>): Region identifier.<br> - <code>adjacency</code> (<code>numeric</code>): Strength of the connectedness.<br> The <code>from</code> and <code>to</code> columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.</p></dd>
@@ -171,15 +171,15 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 
 </div>
 
-<p></p><hr><a id="method-DiseasyRegions-set_regions"></a><div class="section">
-<h3 id="diseasyregions-set-regions-"><code>DiseasyRegions$set_regions()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-set-regions-"></a></h3>
+<p></p><hr><a id="method-DiseasyRegions-set_area"></a><div class="section">
+<h3 id="diseasyregions-set-area-"><code>DiseasyRegions$set_area()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-set-area-"></a></h3>
 <p>Sets the geographic regions of interest.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">set_regions</span><span class="op">(</span><span class="va">regions</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">set_area</span><span class="op">(</span><span class="va">area</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>regions</code></dt>
-<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic regions of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
+<p></p><div class="arguments"><dl><dt><code>area</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
 
 
 </dl><p></p></div>
@@ -192,7 +192,7 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 
 <p></p><hr><a id="method-DiseasyRegions-set_adjacency"></a><div class="section">
 <h3 id="diseasyregions-set-adjacency-"><code>DiseasyRegions$set_adjacency()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-set-adjacency-"></a></h3>
-<p>Sets the region adjacency data.</p><div class="section">
+<p>Sets the regional adjacency data.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">set_adjacency</span><span class="op">(</span><span class="va">adjacency</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"movement"</span>, <span class="st">"infection-flow"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
@@ -233,13 +233,13 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 
 <p></p><hr><a id="method-DiseasyRegions-validate_configuration"></a><div class="section">
 <h3 id="diseasyregions-validate-configuration-"><code>DiseasyRegions$validate_configuration()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-validate-configuration-"></a></h3>
-<p>Check whether <code>regions</code>, <code>adjacency</code>, and <code>demography</code> are mutually consistent.</p><div class="section">
+<p>Check whether <code>area</code>, <code>adjacency</code>, and <code>demography</code> are mutually consistent.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span><span class="va">regions</span>, <span class="va">adjacency</span>, <span class="va">demography</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span><span class="va">area</span>, <span class="va">adjacency</span>, <span class="va">demography</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>regions</code></dt>
-<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic regions of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
+<p></p><div class="arguments"><dl><dt><code>area</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
 
       <dt><code>adjacency</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The adjacency (connectedness) of the regions. Effectively, the <code>adjacency</code> is a long-form of the adjacency-matrix<br> The <code>data.frame</code> must include the following columns:<br> - <code>from</code> (<code>character</code>): Region identifier.<br> - <code>to</code>   (<code>character</code>): Region identifier.<br> - <code>adjacency</code> (<code>numeric</code>): Strength of the connectedness.<br> The <code>from</code> and <code>to</code> columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.</p></dd>
@@ -260,17 +260,17 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <h3 id="diseasyregions-region-filter-"><code>DiseasyRegions$region_filter()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-region-filter-"></a></h3>
 <p>Create a logical filter for values matching one or more regions.</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">region_filter</span><span class="op">(</span><span class="va">values</span>, regions <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">regions</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">region_filter</span><span class="op">(</span><span class="va">values</span>, target_area <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">area</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>values</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 Values to filter, typically region identifiers.</p></dd>
 
-      <dt><code>regions</code></dt>
+      <dt><code>target_area</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> or <code>NULL</code>)<br>
 Region identifiers to match against. Defaults to the currently selected
-regions. If <code>NULL</code>, all values are matched.</p></dd>
+area. If <code>NULL</code>, all values are matched.</p></dd>
 
 
 </dl><p></p></div>
@@ -331,20 +331,20 @@ regions. If <code>NULL</code>, all values are matched.</p></dd>
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>data</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br>
-The data to plot spatially on the configured regions.
+The data to plot spatially on the configured area.
 If <code>NULL</code>, the demography and adjacency of regions are plotted.
 If <code>data.frame</code>, the first non-structural column is plotted.
 Structural columns are <code>region</code>, <code>date</code>, <code>realisation_id</code>, and <code>weight</code>.</p></dd>
 
       <dt><code>shape_files</code></dt>
 <dd><p>(<code>sf</code> or <code>NULL</code>)<br>
-Shape files used to draw the configured regions.
+Shape files used to draw the configured area.
 If <code>NULL</code>, <code><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html" class="external-link">rnaturalearth::ne_countries()</a></code> is used.</p>
 <p>If an <code>sf</code> object is supplied, region identifiers are guessed from:</p><ul><li><p><code>region</code> for user-provided shape files</p></li>
 <li><p><code>adm0_iso</code> (as in <code><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html" class="external-link">rnaturalearth::ne_countries</a></code> - also requires <code>iso_a2</code> column)</p></li>
 <li><p><code>geo</code> (as in <code><a href="https://ropengov.github.io/giscoR/reference/gisco_get_nuts.html" class="external-link">giscoR::gisco_get_nuts()</a></code>)</p></li>
 </ul><p>If several candidate columns exist, the first candidate with any match
-to the configured regions is used.</p></dd>
+to the configured area is used.</p></dd>
 
 
 </dl><p></p></div>
@@ -411,18 +411,18 @@ The available levels of stratification supported. Read only.</p></dd>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="describe"><a href="DiseasyRegions.html#method-describe"><code>DiseasyRegions$describe()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="initialize"><a href="DiseasyRegions.html#method-initialize"><code>DiseasyRegions$initialize()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_adjacency"><a href="DiseasyRegions.html#method-set_adjacency"><code>DiseasyRegions$set_adjacency()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_area"><a href="DiseasyRegions.html#method-set_area"><code>DiseasyRegions$set_area()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_demography"><a href="DiseasyRegions.html#method-set_demography"><code>DiseasyRegions$set_demography()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_regions"><a href="DiseasyRegions.html#method-set_regions"><code>DiseasyRegions$set_regions()</code></a></span></li>
 </ul></details></p><hr><a id="method-DiseasyRegionsNuts-validate_configuration"></a><div class="section">
 <h3 id="diseasyregionsnuts-validate-configuration-"><code>DiseasyRegionsNuts$validate_configuration()</code><a class="anchor" aria-label="anchor" href="#diseasyregionsnuts-validate-configuration-"></a></h3>
-<p>Check whether regions, adjacency, and demography are mutually consistent
+<p>Check whether area, adjacency, and demography are mutually consistent
 and complete under NUTS hierarchy semantics.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span><span class="va">regions</span>, <span class="va">adjacency</span>, <span class="va">demography</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span><span class="va">area</span>, <span class="va">adjacency</span>, <span class="va">demography</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>regions</code></dt>
-<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic regions of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
+<p></p><div class="arguments"><dl><dt><code>area</code></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
 
       <dt><code>adjacency</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The adjacency (connectedness) of the regions. Effectively, the <code>adjacency</code> is a long-form of the adjacency-matrix<br> The <code>data.frame</code> must include the following columns:<br> - <code>from</code> (<code>character</code>): Region identifier.<br> - <code>to</code>   (<code>character</code>): Region identifier.<br> - <code>adjacency</code> (<code>numeric</code>): Strength of the connectedness.<br> The <code>from</code> and <code>to</code> columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.</p></dd>
@@ -443,17 +443,17 @@ and complete under NUTS hierarchy semantics.</p><div class="section">
 <h3 id="diseasyregionsnuts-region-filter-"><code>DiseasyRegionsNuts$region_filter()</code><a class="anchor" aria-label="anchor" href="#diseasyregionsnuts-region-filter-"></a></h3>
 <p>Create a logical filter using NUTS hierarchy prefix matching.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">region_filter</span><span class="op">(</span><span class="va">values</span>, regions <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">regions</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">region_filter</span><span class="op">(</span><span class="va">values</span>, target_area <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">area</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>values</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 Values to filter, typically NUTS codes.</p></dd>
 
-      <dt><code>regions</code></dt>
+      <dt><code>target_area</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> or <code>NULL</code>)<br>
 Region identifiers to match against. Defaults to the currently selected
-regions. If <code>NULL</code>, all values are matched.</p></dd>
+area. If <code>NULL</code>, all values are matched.</p></dd>
 
 
 </dl><p></p></div>
@@ -535,22 +535,22 @@ regions. If <code>NULL</code>, all values are matched.</p></dd>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Restrict the model scope to two regions.</span></span></span>
-<span class="r-in"><span>  <span class="va">region</span> <span class="op">&lt;-</span> <span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    regions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"north"</span>, <span class="st">"south"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">regions</span> <span class="op">&lt;-</span> <span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"north"</span>, <span class="st">"south"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    adjacency <span class="op">=</span> <span class="va">adjacency</span>,</span></span>
 <span class="r-in"><span>    demography <span class="op">=</span> <span class="va">demography</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Active bindings return data for configured regions.</span></span></span>
-<span class="r-in"><span>  <span class="va">region</span> <span class="op">%.%</span> <span class="va">regions</span></span></span>
+<span class="r-in"><span>  <span class="va">regions</span> <span class="op">%.%</span> <span class="va">area</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "north" "south"</span>
-<span class="r-in"><span>  <span class="va">region</span> <span class="op">%.%</span> <span class="va">demography</span></span></span>
+<span class="r-in"><span>  <span class="va">regions</span> <span class="op">%.%</span> <span class="va">demography</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   region age_group population</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  north      0-17        100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  north       18+        300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3  south      0-17         80</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4  south       18+        220</span>
-<span class="r-in"><span>  <span class="va">region</span> <span class="op">%.%</span> <span class="va">adjacency</span></span></span>
+<span class="r-in"><span>  <span class="va">regions</span> <span class="op">%.%</span> <span class="va">adjacency</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    from    to adjacency</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 north north       0.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 north south       0.2</span>
@@ -558,14 +558,14 @@ regions. If <code>NULL</code>, all values are matched.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 south south       0.8</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Update the configured regional scope.</span></span></span>
-<span class="r-in"><span>  <span class="va">region</span><span class="op">$</span><span class="fu">set_regions</span><span class="op">(</span>regions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"north"</span>, <span class="st">"south"</span>, <span class="st">"east"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">region</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">regions</span><span class="op">$</span><span class="fu">set_area</span><span class="op">(</span>area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"north"</span>, <span class="st">"south"</span>, <span class="st">"east"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">regions</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # DiseasyRegions #############################################</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Regions: east, north, south</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Area: east, north, south</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Total population: 900</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Theta matrix: Max eigenvalue 1.06</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">region</span>, <span class="va">demography</span>, <span class="va">adjacency</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">regions</span>, <span class="va">demography</span>, <span class="va">adjacency</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

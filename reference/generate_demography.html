@@ -77,7 +77,7 @@ U.S. Census Bureau International Database.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_demography</span><span class="op">(</span></span>
-<span>  regions <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  area <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  year <span class="op">=</span> <span class="fl">2020L</span>,</span>
 <span>  idb_zip <span class="op">=</span> <span class="st">"https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -87,8 +87,8 @@ U.S. Census Bureau International Database.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-regions">regions<a class="anchor" aria-label="anchor" href="#arg-regions"></a></dt>
-<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic regions of interest. If <code>NULL</code>, all regions are returned.</p></dd>
+<dl><dt id="arg-area">area<a class="anchor" aria-label="anchor" href="#arg-area"></a></dt>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. If <code>NULL</code>, all regions are returned.</p></dd>
 
 
 <dt id="arg-year">year<a class="anchor" aria-label="anchor" href="#arg-year"></a></dt>
@@ -109,7 +109,7 @@ URL or file path to the U.S. Census Bureau IDB zip file.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">demography</span> <span class="op">&lt;-</span> <span class="fu">generate_demography</span><span class="op">(</span>regions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DK"</span>, <span class="st">"FI"</span>, <span class="st">"IS"</span>, <span class="st">"NO"</span>, <span class="st">"SE"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">demography</span> <span class="op">&lt;-</span> <span class="fu">generate_demography</span><span class="op">(</span>area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DK"</span>, <span class="st">"FI"</span>, <span class="st">"IS"</span>, <span class="st">"NO"</span>, <span class="st">"SE"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
