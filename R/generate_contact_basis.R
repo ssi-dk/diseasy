@@ -3,7 +3,7 @@
 #' @description
 #'   Generate the contact-basis object used by `diseasy` from `contactdata`
 #'   contact matrices and country-level demography.
-#' @param regions `r rd_regions("generators")`
+#' @param area `r rd_area("generators")`
 #' @return
 #'   A named list of contact-basis objects, using the current package data
 #'   structure.
@@ -14,10 +14,8 @@
 #' @keywords data-generators
 #' @export
 #' @importFrom diseasystore `%.%`
-generate_contact_basis <- function(
-  regions = NULL
-) {
-  checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
+generate_contact_basis <- function(area = NULL) {
+  checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
 
   missing_packages <- purrr::discard(c("countrycode", "countrycode", "tibble"), rlang::is_installed)
 
@@ -30,7 +28,7 @@ generate_contact_basis <- function(
   age_cuts_lower <- (0:15) * 5
   age_labels <- diseasystore::age_labels(age_cuts_lower)
 
-  demography <- generate_demography(regions)
+  demography <- generate_demography(area)
 
   countries <- contactdata::list_countries()
   country_codes <- purrr::map_chr(

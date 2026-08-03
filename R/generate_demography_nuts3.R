@@ -3,7 +3,7 @@
 #' @description
 #'   Generate NUTS3 demography data and the corresponding NUTS region lookup
 #'   from Eurostat dataset `demo_r_pjangrp3`.
-#' @param regions `r rd_regions("generators")`
+#' @param area `r rd_area("generators")`
 #' @param cache (`logical(1)`)\cr
 #'   Passed to [eurostat::get_eurostat()].
 #' @param output_nuts (`logical(1)`)\cr
@@ -12,13 +12,13 @@
 #'   A named list with elements `demography_nuts3` and `nuts`.
 #' @examples
 #' \dontrun{
-#' nuts_data <- generate_demography_nuts3(regions = c("DK", "FI", "IS", "NO", "SE"))
+#' nuts_data <- generate_demography_nuts3(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
 #' @keywords data-generators
 #' @export
 #' @importFrom diseasystore `%.%`
-generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts = FALSE) {
-  checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
+generate_demography_nuts3 <- function(area = NULL, cache = FALSE, output_nuts = FALSE) {
+  checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
   checkmate::assert_flag(cache)
 
   missing_packages <- purrr::discard(c("countrycode", "eurostat", "tibble"), rlang::is_installed)
@@ -158,7 +158,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
 
   checkmate::assert_data_frame(lowest_nuts_lack_data, max.rows = 0)
 
-  if (is.null(regions)) {
+  if (is.null(area)) {
 
     # Keep regions in our NUTS list
     demography_nuts <- demography_nuts |>
@@ -170,7 +170,7 @@ generate_demography_nuts3 <- function(regions = NULL, cache = FALSE, output_nuts
     demography_nuts <- demography_nuts |>
       dplyr::filter(
         purrr::reduce(
-          .x = purrr::map(regions, ~ stringr::str_starts(.data$region, .x)),
+          .x = purrr::map(area, ~ stringr::str_starts(.data$region, .x)),
           .f = `|`,
           .init = FALSE
         )

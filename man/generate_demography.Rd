@@ -5,13 +5,13 @@
 \title{Generate country-level demography data}
 \usage{
 generate_demography(
-  regions = NULL,
+  area = NULL,
   year = 2020L,
   idb_zip = "https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip"
 )
 }
 \arguments{
-\item{regions}{(\code{character()})\cr The geographic regions of interest. If \code{NULL}, all regions are returned.}
+\item{area}{(\code{character()})\cr The geographic area (list of regions) of interest. If \code{NULL}, all regions are returned.}
 
 \item{year}{(\code{integer(1)})\cr
 The year to keep from the source data.}
@@ -28,7 +28,7 @@ U.S. Census Bureau International Database.
 }
 \examples{
 \dontrun{
-demography <- generate_demography(regions = c("DK", "FI", "IS", "NO", "SE"))
+demography <- generate_demography(area = c("DK", "FI", "IS", "NO", "SE"))
 }
 }
 \keyword{data-generators}

@@ -47,7 +47,7 @@ For `DiseasyPopulation`, this is done via `DiseasyRegions`[^1] which handles dem
 regions <- DiseasyRegionsNuts$new(
   demography = demography_nordic_nuts3, # Use demography data from EUROSTAT
   adjacency = adjacency_meta_nordic_nuts, # Use adjacency data from Meta
-  regions = "DK" # Restrict population of interest to Danish population
+  area = "DK" # Restrict population of interest to Danish population
 )
 
 regions
@@ -57,7 +57,7 @@ Once the scope of the population has been defined in `DiseasyRegions`, this can 
 `DiseasyPopulation` to handle the remaining configuration of the model population.
 
 ```{r load-regions}
-population <- DiseasyPopulation$new(region = regions)
+population <- DiseasyPopulation$new(regions = regions)
 
 population
 ```

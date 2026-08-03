@@ -35,18 +35,18 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   Creates a new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param regional_stratification `r rd_regional_stratification()`
-    #' @param region  (`DiseasyRegions`)\cr
+    #' @param regions (`DiseasyRegions`)\cr
     #'   An instance of a regional module which should provide the demography of the population.
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
-    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, region = NULL, ...) {
-      checkmate::assert_class(region, "DiseasyRegions", null.ok = TRUE)
+    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, regions = NULL, ...) {
+      checkmate::assert_class(regions, "DiseasyRegions", null.ok = TRUE)
 
       # Pass additional arguments to the DiseasyBaseModule initializer
       super$initialize(...)
 
-      if (!is.null(region)) {
-        self$load_module(region)
+      if (!is.null(regions)) {
+        self$load_module(regions)
       }
 
       # Pass arguments to methods
@@ -316,12 +316,12 @@ DiseasyPopulation <- R6::R6Class(                                               
       expr = return(private %.% .DiseasyActivity)
     ),
 
-                                                                                                                        # nolint start: documentation_template_linter, identation_linter
+
     #' @field regions (`diseasy::DiseasyRegions`)\cr
     #'   The local copy of an DiseasyRegions module. Read-only.
     #' @seealso [diseasy::DiseasyRegions]
     #' @importFrom diseasystore `%.%`
-    regions = purrr::partial(                                                                                           # nolint end: documentation_template_linter, identation_linter
+    regions = purrr::partial(
       .f = active_binding,
       name = "regions",
       expr = return(private %.% .DiseasyRegions)

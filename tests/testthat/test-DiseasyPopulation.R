@@ -9,8 +9,8 @@ test_that("initialize works", {
 
 
   # Set age stratification during loading (requires region module)
-  region <- DiseasyRegions$new(demography = demography_nordic)
-  population <- DiseasyPopulation$new(age_cuts_lower = c(20, 40, 60), region = region)
+  regions <- DiseasyRegions$new(demography = demography_nordic)
+  population <- DiseasyPopulation$new(age_cuts_lower = c(20, 40, 60), regions = regions)
   expect_identical(population %.% age_cuts_lower, c(20L, 40L, 60L))
   expect_null(population %.% regional_stratification)
 
@@ -18,7 +18,7 @@ test_that("initialize works", {
 
 
   # Set spatial stratification during loading (requires region module)
-  population <- DiseasyPopulation$new(regional_stratification = "region", region = region)
+  population <- DiseasyPopulation$new(regional_stratification = "region", regions = regions)
   expect_identical(population %.% age_cuts_lower, 0L)
   expect_identical(population %.% regional_stratification, "region")
 
@@ -29,8 +29,8 @@ test_that("initialize works", {
 test_that("$stratify_age() works", {
 
   # Creating an empty module
-  region <- DiseasyRegions$new(demography = demography_nordic)
-  population <- DiseasyPopulation$new(region = region)
+  regions <- DiseasyRegions$new(demography = demography_nordic)
+  population <- DiseasyPopulation$new(regions = regions)
   expect_identical(population %.% age_cuts_lower, 0L)
   hash_new_instance <- population$hash # Store the current hash
 
@@ -53,18 +53,18 @@ test_that("$stratify_age() works", {
 test_that("age stratification must be subset of `demography` age groups", {
 
   # Create region modules with inconsistent age groups
-  region <- DiseasyRegions$new(
+  regions <- DiseasyRegions$new(
     demography = demography_nordic |>
       dplyr::filter(.data$region == "DK" | (.data$region == "SE" & .data$age < 50))
   )
 
-  region_nuts <- DiseasyRegionsNuts$new(
+  regions_nuts <- DiseasyRegionsNuts$new(
     demography = demography_nordic_nuts3 |>
       dplyr::filter(startsWith(.data$region, "DK") | (startsWith(.data$region, "SE") & .data$age_group < "50"))
   )
 
-  population      <- DiseasyPopulation$new(region = region)
-  population_nuts <- DiseasyPopulation$new(region = region_nuts)
+  population      <- DiseasyPopulation$new(regions = regions)
+  population_nuts <- DiseasyPopulation$new(regions = regions_nuts)
 
   # Error should only occur when age stratifications are requested
   population$stratify_age(c(0, 30)) # No issue since inconsistency is for 50+
@@ -85,15 +85,15 @@ test_that("age stratification must be subset of `demography` age groups", {
     regexp = "The age groups in the demography"
   )
 
-  rm(region)
+  rm(regions)
 })
 
 
 test_that("$stratify_regions() works", {
 
   # Creating an empty module
-  region <- DiseasyRegions$new()
-  population <- DiseasyPopulation$new(region = region)
+  regions <- DiseasyRegions$new()
+  population <- DiseasyPopulation$new(regions = regions)
   expect_null(population %.% regional_stratification)
   hash_new_instance <- population$hash # Store the current hash
 
@@ -112,13 +112,13 @@ test_that("$stratify_regions() works", {
   )
 
   rm(population)
-  rm(region)
+  rm(regions)
 
 
 
   # `DiseasyRegionsNuts` supports "null" or NUTS levels depending on loaded demography
-  region_nuts <- DiseasyRegionsNuts$new(demography = demography_nordic_nuts3)
-  population <- DiseasyPopulation$new(region = region_nuts)
+  regions_nuts <- DiseasyRegionsNuts$new(demography = demography_nordic_nuts3)
+  population <- DiseasyPopulation$new(regions = regions_nuts)
   hash_new_instance <- population$hash # Store the current hash
 
 
@@ -144,7 +144,7 @@ test_that("$stratify_regions() works", {
 
 
   rm(population)
-  rm(region_nuts)
+  rm(regions_nuts)
 })
 
 
@@ -179,11 +179,11 @@ test_that("$groups works", {
   )
 
   # Load region module
-  region = DiseasyRegions$new(
-    regions = c("DK", "SE", "NO"),
+  regions = DiseasyRegions$new(
+    area = c("DK", "SE", "NO"),
     demography = demography_nordic
   )
-  population$load_module(region)
+  population$load_module(regions)
 
   expect_no_error(population$stratify_regions(regional_stratification = "region"))
   expect_identical(
@@ -196,12 +196,12 @@ test_that("$groups works", {
 
 
   # We now test with the NUTS region module
-  region_nuts <- DiseasyRegionsNuts$new(
-    regions = c("DK", "SE", "NO"),
+  regions_nuts <- DiseasyRegionsNuts$new(
+    area = c("DK", "SE", "NO"),
     demography = demography_nordic_nuts3
   )
 
-  population$load_module(region_nuts)
+  population$load_module(regions_nuts)
 
   # This should break the configuration, so we should get an error when trying to get groups
   # (since stratification is still "region" but we now have a NUTS regions module loaded)
@@ -222,7 +222,7 @@ test_that("$groups works", {
 
 
   # To test lower nuts level, we restrict the scope to DK
-  population$regions$set_regions("DK")
+  population$regions$set_area("DK")
   expect_identical(
     population$groups,
     tidyr::expand_grid(
@@ -241,8 +241,8 @@ test_that("$groups works", {
   )
 
   rm(population)
-  rm(region)
-  rm(region_nuts)
+  rm(regions)
+  rm(regions_nuts)
 })
 
 
@@ -268,14 +268,14 @@ test_that("$describe() works", {
   population <- DiseasyPopulation$new()
   expect_no_error(withr::with_output_sink(nullfile(), population$describe()))
 
-  region = DiseasyRegions$new(regions = c("DK", "SE", "NO"), demography = demography_nordic)
-  population$load_module(region)
+  regions = DiseasyRegions$new(area = c("DK", "SE", "NO"), demography = demography_nordic)
+  population$load_module(regions)
   population$stratify_regions("region")
   expect_no_error(withr::with_output_sink(nullfile(), population$describe()))
 
   population$stratify_age(c(0, 20, 40))
   expect_no_error(withr::with_output_sink(nullfile(), population$describe()))
 
-  rm(region)
+  rm(regions)
   rm(population)
 })

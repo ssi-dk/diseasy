@@ -4,10 +4,10 @@
 \alias{generate_demography_nuts3}
 \title{Generate NUTS3 demography data}
 \usage{
-generate_demography_nuts3(regions = NULL, cache = FALSE, output_nuts = FALSE)
+generate_demography_nuts3(area = NULL, cache = FALSE, output_nuts = FALSE)
 }
 \arguments{
-\item{regions}{(\code{character()})\cr The geographic regions of interest. If \code{NULL}, all regions are returned.}
+\item{area}{(\code{character()})\cr The geographic area (list of regions) of interest. If \code{NULL}, all regions are returned.}
 
 \item{cache}{(\code{logical(1)})\cr
 Passed to \code{\link[eurostat:get_eurostat]{eurostat::get_eurostat()}}.}
@@ -24,7 +24,7 @@ from Eurostat dataset \code{demo_r_pjangrp3}.
 }
 \examples{
 \dontrun{
-nuts_data <- generate_demography_nuts3(regions = c("DK", "FI", "IS", "NO", "SE"))
+nuts_data <- generate_demography_nuts3(area = c("DK", "FI", "IS", "NO", "SE"))
 }
 }
 \keyword{data-generators}

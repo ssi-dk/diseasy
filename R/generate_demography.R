@@ -3,7 +3,7 @@
 #' @description
 #'   Generate the country-level demography data used by `diseasy` from the
 #'   U.S. Census Bureau International Database.
-#' @param regions `r rd_regions("generators")`
+#' @param area `r rd_area("generators")`
 #' @param year (`integer(1)`)\cr
 #'   The year to keep from the source data.
 #' @param idb_zip (`character(1)`)\cr
@@ -12,18 +12,18 @@
 #'   A `data.frame` with columns `region`, `age`, and `population`.
 #' @examples
 #' \dontrun{
-#' demography <- generate_demography(regions = c("DK", "FI", "IS", "NO", "SE"))
+#' demography <- generate_demography(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
 #' @keywords data-generators
 #' @export
 #' @importFrom diseasystore `%.%`
 generate_demography <- function(
-  regions = NULL,
+  area = NULL,
   year = 2020L,
   idb_zip = "https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip"
 ) {
   coll <- checkmate::makeAssertCollection()
-  checkmate::assert_character(regions, any.missing = FALSE, unique = TRUE, null.ok = TRUE, add = coll)
+  checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, add = coll)
   checkmate::assert_integerish(year, len = 1, lower = 1950, add = coll)
   checkmate::assert_string(idb_zip, add = coll)
   checkmate::reportAssertions(coll)
@@ -46,8 +46,8 @@ generate_demography <- function(
     show_col_types = FALSE
   )
 
-  if (!is.null(regions)) {
-    idb_1yr <- dplyr::filter(idb_1yr, stringr::str_sub(.data$GEO_ID, -2, -1) %in% regions)
+  if (!is.null(area)) {
+    idb_1yr <- dplyr::filter(idb_1yr, stringr::str_sub(.data$GEO_ID, -2, -1) %in% area)
   }
 
   demography <- idb_1yr |>

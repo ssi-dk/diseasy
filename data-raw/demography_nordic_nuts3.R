@@ -1,5 +1,5 @@
 output <- generate_demography_nuts3(
-  regions = c("DK", "FI", "IS", "NO", "SE"),
+  area = c("DK", "FI", "IS", "NO", "SE"),
   output_nuts = TRUE
 )
 
