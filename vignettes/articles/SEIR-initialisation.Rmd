@@ -13,6 +13,41 @@ knitr::opts_chunk$set(
 library(diseasy)
 ```
 
+```{r options, include = FALSE}
+# Create a cache for this vignette since the examples take a long time to generate
+# We will destroy the cache if the source code for `DiseasyImmunity`,
+# `DiseasyObservables` or `DiseasyModelOdeSeir` changes
+cache <- cachem::cache_disk(dir = "article_data/cache/SEIR-initialisation")
+
+r6_hash <- \(r6_generator) {
+  c(
+    "public_methods",
+    "public_fields",
+    "private_methods",
+    "private_fields",
+    "active"
+  ) |>
+    purrr::map(~ purrr::pluck(r6_generator, .x)) |>
+    purrr::reduce(c) |>
+    hash_environment()
+}
+
+source_code_hash <- c(
+  DiseasyBaseModule, DiseasyImmunity, DiseasyObservables, DiseasyModelOdeSeir
+) |>
+  purrr::map(r6_hash) |>
+  rlang::hash()
+
+if (!identical(source_code_hash, cache$get("source-code-hash"))) {
+  cache$reset()
+  cache$set("source-code-hash", source_code_hash)
+}
+
+withr::local_options(
+  "diseasy.cache" = cache
+)
+```
+
 # Introduction
 Let us begin by considering a general SEIR model with $K$ and $L$ consecutive $E$ and $I$ states respectively,
 which are governed by the rates $r_e$ and $r_i$ respectively.
