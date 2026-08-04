@@ -210,9 +210,15 @@ in behaviour) or a modifier relating to the physical location itself
 
 If the modifier $\Gamma_x$ is related to the location, the elements of the
 infection-flow matrix is modified to
-$\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}$, where as if the modifier
-is related to behavioural differences, the elements are modified to:
-$\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}$.
+$$
+\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}
+$$
+
+Whereas if the modifier is related to behavioural differences, the elements
+are modified to:
+$$
+\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}
+$$
 
 Notice that if the infection-matrix is directly specified, these modifies are
 already (implicitly) included.
