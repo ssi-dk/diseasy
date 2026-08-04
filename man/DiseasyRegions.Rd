@@ -215,20 +215,37 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
       \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
       \item{\code{regional_risks_type}}{(\code{character(1)})\cr
 The interpretation of the risk modifiers (see details).
-Must be either "location" or "behaviour".}
+Must be either \code{"location"} or \code{"behaviour"}.}
     }
     \if{html}{\out{</div>}}
   }
   \subsection{Details}{
-    If the relative risk modifier, $\Gamma_x$, is related to the location,
-the elements of the infection-flow matrix, $\Theta_{x,y}$, is derived
-from the elements of the movement matrix, \verb{\\phi_\{x,y\}} via the relation:
-$\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}$, where as if the
-modifiers are related to behavioural differences, the relation is:
-$\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}$.
+    If the relative risk modifier, \eqn{\Gamma_x}{Gamma[x]}, is related
+to the location, the elements of the infection-flow matrix,
+\eqn{\Theta_{x,y}}{Theta[x,y]}, are derived from the elements of the
+movement matrix, \eqn{\phi_{x,y}}{phi[x,y]}, via the relation:
+
+\deqn{
+    \Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}
+  }{
+    Theta[x,y] = sum_z Gamma[z] phi[z,x] phi[z,y]
+  }
+
+If the modifiers instead represent behavioural differences, the
+relation is:
+
+\deqn{
+    \Theta_{x,y}
+      = \sqrt{\Gamma_x \Gamma_y}
+        \sum_z \phi_{z,x} \phi_{z,y}
+  }{
+    Theta[x,y]
+      = sqrt(Gamma[x] Gamma[y])
+        sum_z phi[z,x] phi[z,y]
+  }
 
 If the infection-flow matrix is specified directly, the location
-interpretation cannot be computed and will result in an error.
+interpretation cannot be computed and results in an error.
   }
   \subsection{Returns}{
     \code{NULL} (called for side effects)
