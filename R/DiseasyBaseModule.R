@@ -306,17 +306,23 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #   Function that parses the given environment to a unique hash.
     # @param function_environment (`environment`)\cr
     #   The environment of the function to hash.
+    # @param pure (`logical`)\cr
+    #   Is the function a pure function or does it rely on information in the module?
     # @return (`character`)\cr
     #   The values in the function environment is hashed and combined with the classname and hash of the parent
     #   environment.
-    get_hash = function(function_environment = rlang::caller_env()) {
+    get_hash = function(function_environment = rlang::caller_env(), pure = FALSE) {
 
       # Find all relevant hashes
-      hash_list <- c(
-        module_hash = self$hash, # Hash of the module (state of public fields)
-        hash_environment(function_environment), # hash everything in the function environment
-        class = class(self)[1] # And add the module name to the hash
-      )
+      hash_list <- hash_environment(function_environment) # hash everything in the function environment
+
+      if (!pure) {
+        hash_list <- c(
+          hash_list,
+          "module_hash" = self$hash, # Hash of the module (state of public fields)
+          class = class(self)[1] # And add the module name to the hash
+        )
+      }
 
       # Reduce to single hash and return
       hash <- withr::with_locale(
