@@ -198,10 +198,28 @@ The $\Phi$ matrix will be normalised such that its row sums are 1.
 The stored adjacency input is long form, but the module also exposes an `?DiseasyRegions$infection_flow_matrix` field.
 This field returns a matrix representation of adjacency for the currently selected regions.
 
-The matrix is derived in three steps:
+# Regional differences in infection risk
 
-- the stored adjacency data are filtered to the selected regions;
-- the matrix is normalised so that row sums are 1.
+In `DiseasyRegions` we implement a regional modifier for the infection risk as a
+named vector of relative risks for each region in the model.
+
+This modifier can conceptually be thought of as either a modifier on the human
+behavior of individual residing in the region (e.g. socio-economic differences
+in behavior) or a modifier relating to the physical location itself
+(e.g. related to infrastructure of the region).
+
+If the modifier $\Gamma_x$ is related to the location, the elements of the
+infection-flow matrix is modified to
+$\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}$, where as if the modifier
+is related to behavioral differences, the elements are modified to:
+$\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}$.
+
+Notice that if the infection-matrix is directly specified, these modifies are
+already (implicitly) included.
+
+The region-specific modifiers can be set via the `set_regional_risks()` method,
+and the interpretation of the modifer can be toggled via the `risk_type`
+argument.
 
 # Creating a regional module
 
@@ -246,6 +264,27 @@ regions %.% adjacency
 ```
 
 ```{r filtered_theta_matrix}
+regions %.% infection_flow_matrix
+```
+
+Regional modifiers of infection risk can be set via the `$set_regional_risks()` method
+... tied to location:
+```{r location_based_risks}
+regions$set_regional_risks(
+  relative_risks = c("DK" = 1.1, "SE" = 0.9, "NO" = 0.8, "FI" = 0.5),
+  risk_type = "location"
+)
+
+regions %.% infection_flow_matrix
+```
+
+... or tied to population:
+```{r behavior_based_risks}
+regions$set_regional_risks(
+  relative_risks = c("DK" = 1.1, "SE" = 0.9, "NO" = 0.8, "FI" = 0.5),
+  risk_type = "behavior"
+)
+
 regions %.% infection_flow_matrix
 ```
 
