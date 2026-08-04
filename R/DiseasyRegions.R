@@ -81,7 +81,8 @@ DiseasyRegions <- R6::R6Class(                                                  
       self$validate_configuration(
         area = sort(area),
         adjacency = private %.% .adjacency,
-        demography = private %.% .demography
+        demography = private %.% .demography,
+        regional_risks = private %.% .regional_risks
       )
 
       private$.area <- sort(area)
@@ -93,11 +94,14 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Sets the regional adjacency data.
     #' @param adjacency `r rd_adjacency()`
-    #' @param type `r rd_adjacency_type`
+    #' @param adjacency_type `r rd_adjacency_type`
     #' @return `r rd_side_effects`
-    set_adjacency = function(adjacency, type = c("movement", "infection-flow")) {
+    set_adjacency = function(
+      adjacency,
+      adjacency_type = c("movement", "infection-flow")
+    ) {
 
-      type = match.arg(type)
+      adjacency_type = match.arg(adjacency_type)
 
       if (!checkmate::test_permutation(adjacency$from, adjacency$to)) {
         pkgcond::pkg_error("`adjacency` incomplete: All two-way connections between regions must be specified!")
@@ -107,13 +111,14 @@ DiseasyRegions <- R6::R6Class(                                                  
       adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
 
       # Store the type of adjacency matrix
-      attr(adjacency, "type") <- type
+      attr(adjacency, "type") <- adjacency_type
 
       # Check configuration works with existing area and demography
       self$validate_configuration(
         area = self %.% area,
         adjacency = adjacency,
-        demography = private %.% .demography
+        demography = private %.% .demography,
+        regional_risks = private %.% .regional_risks
       )
 
       # Store the adjacency
@@ -133,10 +138,48 @@ DiseasyRegions <- R6::R6Class(                                                  
       self$validate_configuration(
         area = self %.% area,
         adjacency = private %.% .adjacency,
-        demography = demography
+        demography = demography,
+        regional_risks = private %.% .regional_risks
       )
 
       private$.demography <- demography
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Set modifiers to regional risks for all regions.
+    #' @param regional_risks `r rd_regional_risks()`
+    #' @param regional_risks_type (`character(1)`)\cr
+    #'   The interpretation of the risk modifiers (see details).
+    #'   Must be either "location" or "behavior".
+    #' @details
+    #'   If the relative risk modifier, $\Gamma_x$, is related to the location,
+    #'   the elements of the infection-flow matrix, $\Theta_{x,y}$, is derived
+    #'   from the elements of the movement matrix, `\phi_{x,y}` via the relation:
+    #'   $\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}$, where as if the
+    #'   modifiers are related to behavioral differences, the relation is:
+    #'   $\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}$.
+    #'
+    #'   If the infection-flow matrix is specified directly, the location
+    #'   interpretation cannot be computed and will result in an error.
+    #' @return `r rd_side_effects`
+    set_regional_risks = function(
+      regional_risks,
+      regional_risks_type = c("location", "behavior")
+    ) {
+      regional_risks_type = match.arg(regional_risks_type)
+
+      self$validate_configuration(
+        area = sort(area),
+        adjacency = private %.% .adjacency,
+        demography = private %.% .demography,
+        regional_risks = regional_risks
+      )
+
+      attr(regional_risks, "type") <- regional_risks_type
+      private$.regional_risks <- regional_risks[self %.% area]
 
       return(invisible(NULL))
     },
@@ -147,13 +190,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
+    #' @param regional_risks `r rd_regional_risks()`
     #' @return `r rd_side_effects`
     #' @keywords internal
-    validate_configuration = function(
-      area,
-      adjacency,
-      demography
-    ) {
+    validate_configuration = function(area, adjacency, demography, regional_risks) {
 
       # Check area are consistent with adjacency
       if (!is.null(area) && !is.null(adjacency)) {
@@ -169,6 +209,13 @@ DiseasyRegions <- R6::R6Class(                                                  
         }
       }
 
+      # Check area are consistent with regional_risks
+      if (!is.null(area) && !is.null(regional_risks)) {
+        if (length(intersect(area, names(regional_risks))) < 1) {
+          pkgcond::pkg_error("`area` and `regional_risks` must contain at least one common region.")
+        }
+      }
+
       # Check adjacency is consistent with demography
       if (!is.null(adjacency) && !is.null(demography)) {
         if (length(intersect(adjacency %.% from, demography %.% region)) < 1) {
@@ -176,6 +223,19 @@ DiseasyRegions <- R6::R6Class(                                                  
         }
       }
 
+      # Check adjacency is consistent with regional_risks
+      if (!is.null(adjacency) && !is.null(regional_risks)) {
+        if (length(intersect(adjacency %.% from, names(regional_risks))) < 1) {
+          pkgcond::pkg_error("`adjacency` and `regional_risks` must contain at least one common region.")
+        }
+      }
+
+      # Check demography is consistent with regional_risks
+      if (!is.null(demography) && !is.null(regional_risks)) {
+        if (length(intersect(demography %.% region %.% from, names(regional_risks))) < 1) {
+          pkgcond::pkg_error("`demography` and `regional_risks` must contain at least one common region.")
+        }
+      }
 
       return(invisible(NULL))
     },
@@ -232,8 +292,15 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Converts long form adjacency to the "Theta" infection matrix.
     #' @param adjacency `r rd_adjacency()`
-    #' @param type `r rd_adjacency_type`
-    adjacency_to_theta = function(adjacency, type = c("movement", "infection-flow")) {
+    #' @param adjacency_type `r rd_adjacency_type`
+    #' @param regional_risks `r rd_regional_risks()`
+    #' @param regional_risks_type (`character(1)`)\cr
+    #'   The interpretation of the risk modifiers.
+    #'   Must be either "location" or "behavior".
+    adjacency_to_theta = function(
+      adjacency, adjacency_type,
+      regional_risks, regional_risks_type
+    ) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(adjacency, add = coll)
       checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
@@ -242,14 +309,21 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
 
-      checkmate::assert_choice(type, c("movement", "infection-flow"), add = coll)
+      checkmate::assert_choice(adjacency_type, c("movement", "infection-flow"), add = coll)
+
+      checkmate::assert_numeric(regional_risks, lower = 0, any.missing = FALSE, null.ok = TRUE, add = coll)
+      if (!is.null(regional_risks)) {
+        checkmate::assert_set_equal(names(regional_risks), adjacency$from, add = coll)
+      }
+
+      checkmate::assert_choice(regional_risks_type, c("location", "behavior"), null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       # Determine regions
       regions <- sort(unique(adjacency %.% from))
 
       # Split computations based on input type
-      if (type == "movement") {
+      if (adjacency_type == "movement") {
 
         # Normalise the movement matrix
         phi_long <- adjacency |>
@@ -259,20 +333,37 @@ DiseasyRegions <- R6::R6Class(                                                  
           ) |>
           dplyr::select(!"adjacency")
 
-        # Generate the infection matrix
+        # Generate the interactions
         theta_long <- tidyr::expand_grid("x" = regions, "y" = regions, "z" = regions) |>
           dplyr::left_join(phi_long, by = c("x" = "from", "z" = "to")) |>
-          dplyr::left_join(phi_long, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy")) |>
+          dplyr::left_join(phi_long, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy"))
+
+        # ... add regional modifiers
+        if (identical(regional_risks_type, "location")) {
+          theta_long <- dplyr::left_join(
+            theta_long,
+            tibble::tibble("z" = regions, "modifier" = regional_risks[sort(names(regional_risks))]),
+            by = "z"
+          )
+        } else {
+          theta_long <- dplyr::mutate(theta_long, "modifier" = 1)
+        }
+
+        # Generate the infection matrix
+        theta_long <- theta_long |>
           dplyr::summarise(
-            "theta" = sum(.data$phi_zx * .data$phi_zy),
+            "theta" = sum(.data$modifier * .data$phi_zx * .data$phi_zy),
             .by = c("x", "y")
           )
 
-      } else if (type == "infection-flow") {
+      } else if (adjacency_type == "infection-flow") {
 
         theta_long <- adjacency |>
           dplyr::rename("x" = "from", "y" = "to", "theta" = "adjacency")
 
+        if (identical(regional_risks_type, "location")) {
+          pkgcond::pkg_error('`regional_risks_type` can only be "location" if `adjacency_type = "movement"`')
+        }
       }
 
       # Cast to matrix
@@ -290,6 +381,18 @@ DiseasyRegions <- R6::R6Class(                                                  
           match(theta_long %.% y, regions)
         )
       ] <- theta_long %.% theta
+
+
+      # Apply the regional modifiers (if tied to behavior)
+      if (identical(regional_risks_type, "behavior")) {
+        theta_matrix <- theta_matrix *
+          sqrt(
+            outer(
+              X = self %.% regional_risks,
+              Y = self %.% regional_risks
+            )
+          )
+      }
 
       return(theta_matrix)
     },
@@ -925,22 +1028,45 @@ DiseasyRegions <- R6::R6Class(                                                  
       name = "infection_flow_matrix",
       expr = {
         adjacency <- self %.% adjacency
+        regional_risks <- self %.% regional_risks
 
         if (is.null(adjacency)) {
-          return(
-            matrix(
-              data = 1 / sqrt(length(self %.% area)),
-              nrow = length(self %.% area),
-              ncol = length(self %.% area),
-              dimnames = list(self %.% area, self %.% area)
-            )
+
+          infection_flow_matrix <- matrix(
+            data = 1 / sqrt(length(self %.% area)),
+            nrow = length(self %.% area),
+            ncol = length(self %.% area),
+            dimnames = list(self %.% area, self %.% area)
           )
+
+          if (attr(regional_risks, "type") == "behavior") {
+            infection_flow_matrix <- infection_flow_matrix *
+              sqrt(
+                outer(
+                  X = self %.% regional_risks,
+                  Y = self %.% regional_risks
+                )
+              )
+          } else {
+            pkgcond::pkg_error(
+              paste(
+                "The interpretation of regional modifiers (`regional_risks_type`) must be",
+                '"behavior" if no adjacency data is provided.'
+              )
+            )
+          }
+
+        } else {
+
+          infection_flow_matrix <- self$adjacency_to_theta(
+            adjacency = adjacency,
+            adjacency_type = attr(adjacency, "type"),
+            regional_risks = regional_risks,
+            regional_risks_type = attr(regional_risks, "type")
+          )
+
         }
 
-        infection_flow_matrix <- self$adjacency_to_theta(
-          adjacency = adjacency,
-          type = attr(adjacency, "type")
-        )
         return(infection_flow_matrix)
       }
     ),
@@ -969,6 +1095,24 @@ DiseasyRegions <- R6::R6Class(                                                  
 
         return(demography)
       }
+    ),
+
+
+    #' @field regional_risks `r rd_regional_risks(type = "field")`
+    regional_risks = purrr::partial(
+      .f = active_binding,
+      name = "regional_risks",
+      expr = {
+        if (is.null(private %.% .regional_risks)) {
+          return(NULL)
+        }
+
+        return(
+          private %.% .regional_risks[
+            self %.% region_filter(names(private %.% .regional_risks))
+          ]
+        )
+      }
     )
   ),
 
@@ -976,7 +1120,8 @@ DiseasyRegions <- R6::R6Class(                                                  
   private = list(
     .area = NULL,
     .adjacency = NULL,
-    .demography = NULL
+    .demography = NULL,
+    .regional_risks = NULL
   )
 )
 
@@ -995,8 +1140,9 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
     #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
+    #' @param regional_risks `r rd_regional_risks()`
     #' @return `r rd_side_effects`
-    validate_configuration = function(area, adjacency, demography) {
+    validate_configuration = function(area, adjacency, demography, regional_risks) {
 
       valid_nuts <- nuts$region
 
@@ -1008,7 +1154,9 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
         )
       }
 
-      # Helper function to retrieve all NUTS codes for the given area
+      # Helper functions
+
+      # ... to retrieve all NUTS codes for the given area
       nuts_at_resolution <- function(nuts_level) {
         nuts |>
           dplyr::filter(level <= nuts_level) |>
@@ -1017,15 +1165,18 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
           dplyr::pull("region")
       }
 
-
-      # adjacency must include a complete set of NUTS codes at its resolution
-      if (!is.null(adjacency)) {
+      # ... to validate completeness
+      check_completeness <- function(regions, variable_name) {
 
         # Infer the resolution (NUTS level) in adjacency data
-        adjacency_resolution <- unique(nchar(unique(adjacency$from)) - 2)
+        adjacency_resolution <- unique(nchar(unique(regions)) - 2)
 
         if (length(adjacency_resolution) > 1) {
-          pkgcond::pkg_error("`adjacency` has more data for more than one NUTS level")
+          pkgcond::pkg_error(
+            glue::glue(
+              "`{variable_name}` has data for more than one NUTS level"
+            )
+          )
         }
 
         if (!is.null(area)) {
@@ -1034,12 +1185,12 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
           all_nuts_within_scope <- nuts_at_resolution(adjacency_resolution) |>
             purrr::keep(~ any(stringr::str_starts(., area)))
 
-          missing_regions <- setdiff(all_nuts_within_scope, adjacency$from)
+          missing_regions <- setdiff(all_nuts_within_scope, regions)
 
           if (length(missing_regions) > 0) {
             pkgcond::pkg_error(
               glue::glue(
-                "`adjacency` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
+                "`{variable_name}` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
               )
             )
           }
@@ -1047,34 +1198,11 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
 
       }
 
-      # demography must include a complete set of NUTS codes at its resolution
-      if (!is.null(demography)) {
 
-        # Infer the resolution (NUTS level) in demography data
-        demography_resolution <- unique(nchar(unique(demography$region)) - 2)
-
-        if (length(demography_resolution) > 1) {
-          pkgcond::pkg_error("`demography` has more data for more than one demography level")
-        }
-
-        if (!is.null(area)) {
-
-          # Get all nuts code within scope
-          all_nuts_within_scope <- nuts_at_resolution(demography_resolution) |>
-            purrr::keep(~ any(stringr::str_starts(., area)))
-
-          missing_regions <- setdiff(all_nuts_within_scope, demography$region)
-
-          if (length(missing_regions) > 0) {
-            pkgcond::pkg_error(
-              glue::glue(
-                "`demography` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
-              )
-            )
-          }
-
-        }
-      }
+      # Validate inputs
+      if (!is.null(adjacency))      check_completeness(adjacency$from, "adjacency")
+      if (!is.null(demography))     check_completeness(demography$region, "demography")
+      if (!is.null(regional_risks)) check_completeness(names(regional_risks), "regional_risks")
 
       return(invisible(NULL))
     },

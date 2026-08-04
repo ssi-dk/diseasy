@@ -288,6 +288,18 @@ rd_demography <- function(type = "param") {
   )
 }
 
+rd_regional_risks <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+
+  paste(
+    "(`named numeric()`)\\cr",
+    "Modifiers tied to each region (identified by vector names).\\cr",
+
+    switch(type == "field", "Read only.")
+  )
+}
+
+
 ## Templates for DiseasyModel
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",
