@@ -21,4 +21,12 @@ test_that("hash_environment works", {
   expect_identical(f1, f2)
   expect_identical(hash_environment(list(f1)), hash_environment(list(f2)))
 
+  # Check errors can be hashed
+  expect_no_error(
+    hash_environment(simpleError("Test error"))
+  )
+  expect_no_error(
+    hash_environment(rlang::error_cnd(message = "Unable to load data", parent = simpleError("Test error")))
+  )
+
 })
