@@ -208,10 +208,10 @@ which is the `infected_contact_rate` ($\overline{\overline{CI}}$) adjusted for a
 - $\Gamma$: Overall infection rate scaling factor
 
 $$
-\overline{\overline{T}} = \Gamma\;\sigma(t)\;\overline{\overline{\mathcal{E}}} \odot \overline{\overline{CI}}
+\overline{\overline{T}} = \Gamma\;\sigma(t)\;\overline{\overline{\mathcal{E}}} \circ \overline{\overline{CI}}
 $$
 
-Where $\odot$ is the Hadamard product (element-wise multiplication), and $\overline{\overline{\mathcal{E}}}$ is the
+Where $\circ$ is the Hadamard product (element-wise multiplication), and $\overline{\overline{\mathcal{E}}}$ is the
 $D \times V$ matrix:
 
 $$
