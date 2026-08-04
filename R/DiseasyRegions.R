@@ -538,20 +538,42 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Resolve plot data
       if (is.null(data)) {
-        value_column <- "population"
 
-        plot_data <- self %.% demography |>
-          dplyr::summarise(
-            "value" = sum(.data$population),
-            .by = "region"
+        plot_layers <- list(
+          "Population" = list(
+            "data" = dplyr::summarise(
+              self %.% demography,
+              "value" = sum(.data$population),
+              .by = "region"
+            ),
+            "colour_high" = "#3d3d3d",
+            "colour_low"  = "#4bbd4b"
           )
+        )
 
-        # Set colours
-        colour_high <- "#3d3d3d"
-        colour_low <- "#4bbd4b"
+        # Plot regional risk modifiers if configured
+        if (!is.null(self %.% regional_risks)) {
+          plot_layers[["Relative regional risks"]] <- list(
+            "data" = tibble::enframe(
+              self %.% regional_risks,
+              name = "region"
+            ),
+            "colour_high" = "#ff0000",
+            "colour_low"  = "#ffffff"
+          )
+        }
 
         # Plot adjacency if configured
-        plot_adjacency <- !is.null(self %.% adjacency)
+        if (!is.null(self %.% adjacency)) {
+          plot_layers[["Intra-region flow"]] <- list(
+            "data" = data.frame(
+              "region" = names(diag(self %.% infection_flow_matrix)),
+              "value" = as.numeric(diag(self %.% infection_flow_matrix))
+            ),
+            "colour_high" = "#7e008f",
+            "colour_low"  = "#ffffff"
+          )
+        }
 
       } else {
         # Infer value column
@@ -602,89 +624,93 @@ DiseasyRegions <- R6::R6Class(                                                  
             )
         }
 
-        # Set colours
-        colour_high <- "#ff0000"
-        colour_low <- "#ffffff"
 
-        plot_adjacency <- FALSE
+        plot_layers <- tibble::lst(
+          !!value_column := list(
+            "data" = plot_data,
+            "colour_high" = "#ff0000",
+            "colour_low"  = "#ffffff"
+          )
+        )
       }
 
-      # Compare with configured regions
-      plot_regions <- sort(unique(plot_data %.% region))
+      # Add plot values, hover data, and animation meta-data to each layer
+      plot_layers <- purrr::imap(
+        plot_layers,
+        \(layer, layer_name) {
+
+          layer_data <- layer %.% data
+          layer_animate <- "date" %in% colnames(layer_data)
+
+          if (layer_animate) {
+            layer_regions <- sort(unique(layer_data %.% region))
+            layer_dates <- sort(unique(layer_data %.% date))
+
+            layer_data <- tidyr::expand_grid(
+              "region" = layer_regions,
+              "date" = layer_dates
+            ) |>
+              dplyr::left_join(layer_data, by = c("region", "date")) |>
+              dplyr::mutate(
+                "date" = factor(
+                  as.character(.data$date),
+                  levels = as.character(layer_dates)
+                )
+              )
+          }
+
+          layer_data <- layer_data |>
+            dplyr::mutate(
+              "value_label" = format(
+                .data$value,
+                big.mark = ",",
+                scientific = FALSE,
+                digits = 3,
+                trim = TRUE
+              ),
+              "hover_text" = paste0(
+                "Region: ", .data$region,
+                if (layer_animate) {
+                  paste0("<br>Date: ", as.character(.data$date))
+                } else {
+                  ""
+                },
+                "<br>", stringr::str_to_sentence(layer_name), ": ", .data$value_label
+              )
+            )
+
+          layer[["data"]] <- layer_data
+          layer[["animate"]] <- layer_animate
+
+          return(layer)
+        }
+      )
+
+      # Check if we require animation
+      animate_plot <- any(vapply(
+        X = plot_layers,
+        FUN = \(layer) isTRUE(layer[["animate"]]),
+        FUN.VALUE = logical(1)
+      ))
+
+      # Compare shapefiles with requested regions
+      plot_regions <- plot_layers |>
+        purrr::map(~ purrr::pluck(., "data")) |>
+        purrr::map(~ dplyr::pull(., "region")) |>
+        purrr::reduce(c) |>
+        unique() |>
+        sort()
       missing_regions <- setdiff(plot_regions, unique(shape_files %.% region))
 
       if (length(missing_regions) > 0) {
         pkgcond::pkg_error(
           glue::glue(
-            "`shape_files` is missing configured regions: {toString(missing_regions)}."
+            "`shape_files` is missing requested regions: {toString(missing_regions)}."
           )
         )
       }
 
       shape_files <- dplyr::filter(shape_files, .data$region %in% plot_regions)
-
-
-      # Use all available dates as animation frames.
-      animate_plot <- "date" %in% colnames(plot_data)
-
-      if (animate_plot) {
-        plot_dates <- sort(unique(plot_data %.% date))
-
-        plot_data <- tidyr::expand_grid(
-          "region" = plot_regions,
-          "date" = plot_dates
-        ) |>
-          dplyr::left_join(plot_data, by = c("region", "date")) |>
-          dplyr::mutate(
-            "date" = factor(
-              as.character(.data$date),
-              levels = as.character(plot_dates)
-            )
-          )
-      }
-
-      if (plot_adjacency) {
-        plot_data <- plot_data |>
-          dplyr::left_join(
-            data.frame(
-              "region" = names(diag(self %.% infection_flow_matrix)),
-              "intra_region_flow" = as.numeric(diag(self %.% infection_flow_matrix))
-            ),
-            by = "region"
-          )
-      } else {
-        plot_data <- plot_data |>
-          dplyr::mutate("intra_region_flow" = NA)
-      }
-
-      if (any(plot_data %.% value < 0, na.rm = TRUE)) {
-        pkgcond::pkg_error(
-          "`plot()` requires non-negative values when using log1p colour mapping."
-        )
-      }
-
-      value_max <- max(plot_data %.% value, na.rm = TRUE)
-      if (!is.finite(value_max) || value_max <= 0) value_max <- 1
-
-
-      plot_data <- plot_data |>
-        dplyr::mutate(
-          "plot_value" = .data$value,
-          "value_label" = format(.data$value, big.mark = ",", scientific = FALSE, digits = 3, trim = TRUE),
-          "hover_text" = paste0(
-            "Region: ", .data$region,
-            if (animate_plot) paste0("<br>Date: ", as.character(.data$date)) else "",
-            "<br>", stringr::str_to_sentence(value_column), ": ", .data$value_label,
-            dplyr::if_else(
-              is.na(.data$intra_region_flow),
-              "",
-              paste0(
-                "<br>Intra-region flow: ",
-                format(.data$intra_region_flow, digits = 2, scientific = FALSE, trim = TRUE)
-              )
-            )
-          )
-        )
 
       shape_geojson <- shape_files |>
         dplyr::select("region") |>
@@ -715,45 +741,63 @@ DiseasyRegions <- R6::R6Class(                                                  
         )
       }
 
-      # Create region choropleth.
+      # Create region choropleth layers.
       out <- plotly::plot_geo()
 
-      choropleth_args <- list(
-        p = out,
-        data = plot_data,
-        type = "choropleth",
-        geojson = shape_geojson,
-        featureidkey = "id",
-        locationmode = "geojson-id",
-        locations = stats::as.formula("~ region"),
-        z = stats::as.formula("~ plot_value"),
-        ids = stats::as.formula("~ region"),
-        text = stats::as.formula("~ hover_text"),
-        hovertemplate = "%{text}<extra></extra>",
-        colorscale = list(c(0, colour_low), c(1, colour_high)),
-        zmin = 0,
-        zmax = value_max,
-        marker = list(
-          line = list(
-            color = "grey70",
-            width = 0.3
-          )
-        ),
-        colorbar = list(
-          title = list(text = stringr::str_to_sentence(value_column))
-        ),
-        name = stringr::str_to_sentence(value_column),
-        showlegend = FALSE
-      )
+      for (layer_index in seq_along(plot_layers)) {
+        layer <- plot_layers[[layer_index]]
+        layer_name <- names(plot_layers)[layer_index]
 
-      if (animate_plot) {
-        choropleth_args[["frame"]] <- stats::as.formula("~ date")
+        layer_value_max <- max(layer %.% data %.% value, na.rm = TRUE)
+
+        if (!is.finite(layer_value_max) || layer_value_max <= 0) {
+          layer_value_max <- 1
+        }
+
+        choropleth_args <- list(
+          p = out,
+          data = layer %.% data,
+          type = "choropleth",
+          geojson = shape_geojson,
+          featureidkey = "id",
+          locationmode = "geojson-id",
+          locations = stats::as.formula("~ region"),
+          z = stats::as.formula("~ value"),
+          ids = stats::as.formula("~ region"),
+          text = stats::as.formula("~ hover_text"),
+          hovertemplate = "%{text}<extra></extra>",
+          colorscale = list(
+            c(0, unique(layer %.% colour_low)[[1]]),
+            c(1, unique(layer %.% colour_high)[[1]])
+          ),
+          zmin = 0,
+          zmax = layer_value_max,
+          marker = list(
+            line = list(
+              color = "grey70",
+              width = 0.3
+            )
+          ),
+          colorbar = list(
+            title = list(text = layer_name)
+          ),
+          name = layer_name,
+          visible = layer_index == 1,
+          showlegend = FALSE
+        )
+
+        if (isTRUE(layer[["animate"]])) {
+          choropleth_args[["frame"]] <- stats::as.formula("~ date")
+        }
+
+        out <- do.call(plotly::add_trace, choropleth_args)
       }
 
-      out <- do.call(plotly::add_trace, choropleth_args)
-
       # Add adjacency overlay for module-configuration plots.
-      if (plot_adjacency) {
+      initial_layer_name <- names(plot_layers)[[1]]
+      show_adjacency_graph <- identical(initial_layer_name, "Intra-region flow")
+
+      if (!is.null(self %.% adjacency)) {
 
         # Build nodes from the largest polygon belonging to each region.
         # This avoids placing nodes on small islands or remote multipolygon parts.
@@ -837,10 +881,11 @@ DiseasyRegions <- R6::R6Class(                                                  
 
           edge_groups <- sort(unique(edges %.% edge_group))
           max_edge_group <- max(edge_groups)
+          max_edge_adjacency <- max(edges %.% adjacency, na.rm = TRUE)
 
-          for (edge_group in edge_groups) {
+          for (edge_group_i in edge_groups) {
             edge_data <- edges |>
-              dplyr::filter(.data$edge_group == !!edge_group)
+              dplyr::filter(.data$edge_group == .env$edge_group_i)
 
             edge_longitude <- as.vector(
               rbind(edge_data %.% x, edge_data %.% x_end, NA_real_)
@@ -865,7 +910,8 @@ DiseasyRegions <- R6::R6Class(                                                  
                 ),
                 opacity = edge_alpha,
                 hoverinfo = "skip",
-                showlegend = edge_group == max_edge_group,
+                visible = show_adjacency_graph,
+                showlegend = edge_group_i == max_edge_group,
                 name = "Inter-region flows",
                 legendgroup = "Inter-region flows",
                 legendrank = 3,
@@ -882,6 +928,7 @@ DiseasyRegions <- R6::R6Class(                                                  
             lon = stats::as.formula("~ x"),
             lat = stats::as.formula("~ y"),
             hoverinfo = "skip",
+            visible = show_adjacency_graph,
             marker = list(
               size = nodes %.% node_size,
               color = "black",
@@ -890,7 +937,7 @@ DiseasyRegions <- R6::R6Class(                                                  
                 width = 0.5
               )
             ),
-            showlegend = TRUE,
+            showlegend = show_adjacency_graph,
             name = "Intra-region flows",
             legendrank = 2,
             inherit = FALSE
@@ -902,6 +949,10 @@ DiseasyRegions <- R6::R6Class(                                                  
           geo = list(
             scope = "world",
             fitbounds = "geojson",
+            domain = list(
+              x = c(0.02, 0.98),
+              y = c(0.02, 0.98)
+            ),
             projection = list(
               type = "orthographic"
             ),
@@ -917,7 +968,7 @@ DiseasyRegions <- R6::R6Class(                                                  
           ),
           paper_bgcolor = "white",
           plot_bgcolor = "white",
-          margin = list(l = 0, r = 0, b = 0, t = 0),
+          margin = list(l = 10, r = 10, b = 10, t = 10),
           legend = list(
             bgcolor = "rgba(255, 255, 255, 0.8)",
             bordercolor = "rgba(0, 0, 0, 0)",
@@ -938,6 +989,150 @@ DiseasyRegions <- R6::R6Class(                                                  
               font = list(color = "black")
             )
           )
+      }
+
+      out <- plotly::plotly_build(out)
+
+      # Remove Plotly's default animation menu and replace it with explicit controls.
+      out$x$layout$updatemenus <- list()
+
+      if (animate_plot) {
+        out$x$layout$updatemenus <- c(
+          out$x$layout$updatemenus,
+          list(
+            list(
+              type = "buttons",
+              direction = "left",
+              showactive = FALSE,
+              x = 0,
+              y = 0,
+              xanchor = "left",
+              yanchor = "bottom",
+              pad = list(
+                t = 10,
+                r = 10
+              ),
+              buttons = list(
+                list(
+                  label = "Play",
+                  method = "animate",
+                  args = list(
+                    NULL,
+                    list(
+                      fromcurrent = TRUE,
+                      mode = "immediate",
+                      frame = list(
+                        duration = 750,
+                        redraw = TRUE
+                      ),
+                      transition = list(
+                        duration = 0
+                      )
+                    )
+                  )
+                ),
+                list(
+                  label = "Pause",
+                  method = "animate",
+                  args = list(
+                    list(NULL),
+                    list(
+                      mode = "immediate",
+                      frame = list(
+                        duration = 0,
+                        redraw = FALSE
+                      ),
+                      transition = list(
+                        duration = 0
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      }
+
+      trace_types <- vapply(
+        X = out$x$data,
+        FUN = \(trace_data) {
+          if (is.null(trace_data$type)) {
+            return(NA_character_)
+          }
+
+          return(trace_data$type)
+        },
+        FUN.VALUE = character(1)
+      )
+
+      choropleth_trace_indices <- which(trace_types == "choropleth")
+
+
+      trace_names <- vapply(
+        X = out$x$data,
+        FUN = \(trace_data) {
+          if (is.null(trace_data$name)) {
+            return(NA_character_)
+          }
+
+          return(trace_data$name)
+        },
+        FUN.VALUE = character(1)
+      )
+
+      adjacency_trace_indices <- which(
+        trace_names %in% c("Inter-region flows", "Intra-region flows")
+      )
+
+      if (length(choropleth_trace_indices) > 1) {
+        layer_buttons <- vector("list", length(choropleth_trace_indices))
+
+        for (layer_index in seq_along(choropleth_trace_indices)) {
+          trace_index <- choropleth_trace_indices[[layer_index]]
+          layer <- plot_layers[[layer_index]]
+          layer_name <- names(plot_layers)[[layer_index]]
+
+          trace_visible <- rep(TRUE, length(out$x$data))
+
+          trace_visible[choropleth_trace_indices] <- FALSE
+          trace_visible[[trace_index]] <- TRUE
+
+          trace_visible[adjacency_trace_indices] <- identical(
+            layer_name,
+            "Intra-region flow"
+          )
+
+          layer_buttons[[layer_index]] <- list(
+            label = layer_name,
+            method = "restyle",
+            args = list(
+              list(
+                visible = trace_visible
+              )
+            )
+          )
+        }
+
+        out$x$layout$updatemenus <- c(
+          out$x$layout$updatemenus,
+          list(
+            list(
+              type = "buttons",
+              direction = "right",
+              showactive = TRUE,
+              x = 0,
+              y = 1,
+              xanchor = "left",
+              yanchor = "top",
+              pad = list(
+                t = 10,
+                r = 10
+              ),
+              buttons = layer_buttons
+            )
+          )
+        )
       }
 
       return(out)
