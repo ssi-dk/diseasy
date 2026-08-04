@@ -394,6 +394,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Specifies the optimisation strategy ("naive", "recursive" or "combination"). See details.
     #' @param M (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
+    #' @param models (`list(function())`)\cr
+    #'   A named list of functions to approximate.
+    #'   The functions must be of a single variable `t` that returns the immunity at time `t`.
+    #'   Optionally, if the function has a time scale, it should be included in the function as `time_scale`.
     #' @param monotonous (`logical(1)` or `numeric(1)`)\cr
     #'   Should non-monotonous approximations be penalised?
     #'   If a numeric value supplied, it is used as a penalty factor.
@@ -432,6 +436,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @seealso `vignette("diseasy-immunity")`
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
+      models = self$model,
       method = c("free_gamma", "free_delta", "all_free"),
       strategy = NULL,
       monotonous = FALSE,
@@ -493,7 +498,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
       # Look in the cache for data
-      hash <- private$get_hash()
+      hash <- private$get_hash(pure = TRUE)
       if (!private$is_cached(hash)) {
 
         tic <- Sys.time()
@@ -526,10 +531,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
         # We need to know the number of models the gamma's belong to
-        n_models <- length(self$model)
+        n_models <- length(models)
 
         # We pre-compute the value for the last gamma values
-        f_inf <- purrr::map(self$model, \(model) model(Inf))
+        f_inf <- purrr::map(models, \(model) model(Inf))
         stopifnot("The waning function(s) must have finite values at infinity." = purrr::every(f_inf, is.finite))
 
 
@@ -537,7 +542,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
           n_free_parameters <- M - 1
 
-          f_0 <- purrr::map(self$model, \(model) model(0))
+          f_0 <- purrr::map(models, \(model) model(0))
 
           par_to_delta <- \(par) p_0inf(par) # All parameters are delta
 
@@ -581,7 +586,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # The error is then the sum of these deviations across models
         obj_function <- function(par) {
 
-          metrics <- purrr::map(seq_along(self$model), \(model_id) {
+          metrics <- purrr::map(seq_along(models), \(model_id) {
 
             delta <- par_to_delta(par)
             gamma <- par_to_gamma(par, model_id)
@@ -597,7 +602,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               approximation <- private$get_approximation(gamma, delta, M)
 
               # Finds diff from approximation and target function
-              integrand <- \(t) (approximation(t) - self$model[[model_id]](t))^2
+              integrand <- \(t) (approximation(t) - models[[model_id]](t))^2
 
               # Numerically integrate the differences
               value <- tryCatch(
@@ -623,7 +628,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               ## Penalise spread of gamma and delta
 
               # Compute sd of equidistant gamma
-              gamma_eq <- seq(from = self$model[[model_id]](0), to = gamma[M], length.out = M)
+              gamma_eq <- seq(from = models[[model_id]](0), to = gamma[M], length.out = M)
 
               # Compute penalty spread of gamma and delta
               gamma_penalty <- ifelse(length(gamma) > 1, sd(gamma - gamma_eq), 0)
@@ -644,7 +649,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # If we have no free parameters we return the default rates
         if (n_free_parameters == 0) {
-          gamma <- stats::setNames(f_inf, names(self$model))
+          gamma <- stats::setNames(f_inf, names(models))
           delta <- numeric(0)
 
           # Get the metrics for the solution
