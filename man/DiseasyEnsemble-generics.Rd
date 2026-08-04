@@ -68,9 +68,11 @@ Standard generics for \code{DiseasyEnsemble} objects
 }
 \examples{
 \dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
+  conn <- DBI::dbConnect(duckdb::duckdb())
+
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
-    conn = DBI::dbConnect(duckdb::duckdb())
+    conn = conn
   )
 
   # Set the reference date in the observables module
@@ -93,5 +95,6 @@ Standard generics for \code{DiseasyEnsemble} objects
   plot(ensemble, "n_positive", prediction_length = 30)
 
   rm(ensemble, observables)
+  DBI::dbDisconnect(conn)
 \dontshow{\}) # examplesIf}
 }

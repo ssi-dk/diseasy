@@ -9,9 +9,11 @@
 #'   See vignette("diseasy-observables")
 #' @examplesIf rlang::is_installed("duckdb")
 #'   # Create observables module using the Simulist data
+#'   conn <- DBI::dbConnect(duckdb::duckdb())
+#'
 #'   obs <- DiseasyObservables$new(
 #'     diseasystore = "Simulist",
-#'     conn = DBI::dbConnect(duckdb::duckdb())
+#'     conn = conn
 #'   )
 #'
 #'   # See available observables
@@ -26,6 +28,7 @@
 #'   )
 #'
 #'   rm(obs)
+#'   DBI::dbDisconnect(conn)
 #' @return
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @keywords functional-module
@@ -68,6 +71,10 @@ DiseasyObservables <- R6::R6Class(                                              
       # Set the db connection
       private$.conn <- parse_diseasyconn(conn, type = "target_conn") # Open a new connection to the DB
       checkmate::assert_class(self %.% conn, "DBIConnection")
+
+      # Move the cleanup flag from connection to the module
+      private$conn_needs_cleanup <- isTRUE(attr(private$.conn, "needs_cleanup"))
+      attr(private$.conn, "needs_cleanup") <- NULL
 
       # Initialize based on input
       if (!is.null(slice_ts))                         self$set_slice_ts(slice_ts)
@@ -450,15 +457,7 @@ DiseasyObservables <- R6::R6Class(                                              
     conn = purrr::partial(
       .f = active_binding,
       name = "conn",
-      expr = {
-        conn <- private %.% .conn
-
-        # Remove the "needs_cleanup" attribute as it is only used during clean up
-        # and not meaningful in other contexts
-        attr(conn, "needs_cleanup") <- NULL
-
-        return(conn)
-      }
+      expr = private %.% .conn
     )
   ),
 
@@ -473,12 +472,27 @@ DiseasyObservables <- R6::R6Class(                                              
 
     .slice_ts = NULL,
     .conn = NULL,
+    conn_needs_cleanup = FALSE,
 
     # @description
     #   Handles the clean-up of the class
     finalize = function() {
-      # Close the connection if needed
-      if (isTRUE(attr(private$.conn, "needs_cleanup")) && DBI::dbIsValid(self$conn)) DBI::dbDisconnect(self$conn)
+      if (!isTRUE(private$conn_needs_cleanup)) {
+        return(invisible(NULL)) # If module is a reference, leave cleanup to main instance.
+      }
+
+      if (!inherits(private$.conn, "DBIConnection")) { # If connection is not DBIConnection, do not cleanup
+        return(invisible(NULL))
+      }
+
+      if (DBI::dbIsValid(private$.conn)) {
+        DBI::dbDisconnect(private$.conn)
+      }
+
+      # Mark connection as cleaned up
+      private$conn_needs_cleanup <- FALSE
+
+      return(invisible(NULL))
     }
   )
 )

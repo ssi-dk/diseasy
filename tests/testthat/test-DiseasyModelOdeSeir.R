@@ -5,7 +5,7 @@ test_that("$hash works", {
 
   # Create a observables module for the tests
   observables <- DiseasyObservables$new(
-    conn = DBI::dbConnect(RSQLite::SQLite()),
+    conn = \() DBI::dbConnect(RSQLite::SQLite()),
     last_queryable_date = as.Date("2020-01-01")
   )
 
@@ -139,7 +139,7 @@ test_that("active binding: malthusian_scaling_factor works", {
   # Creating an empty module
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = as.Date("2020-01-01")
     )
   )

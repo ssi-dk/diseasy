@@ -36,7 +36,7 @@ season$use_cosine_season()
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = \() DBI::dbConnect(RSQLite::SQLite())
 )
 
 # Get incidence data to infer initial state vector from

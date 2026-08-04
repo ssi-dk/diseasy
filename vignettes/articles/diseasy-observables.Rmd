@@ -35,9 +35,9 @@ The module needs some configuration to be initialized. Some of these can be set 
 Primarily, we need to specify the `diseasystore`:
 
 ```{r initialization, eval = suggests_available}
-obs <- DiseasyObservables$new(
-  conn = DBI::dbConnect(duckdb::duckdb())
-)
+conn <- DBI::dbConnect(duckdb::duckdb())
+
+obs <- DiseasyObservables$new(conn = conn)
 # NOTE: Alternatively we could set options("diseasy.conn" = ...)
 
 obs$set_diseasystore(diseasystore = DiseasystoreSeirExample)
@@ -185,5 +185,6 @@ obs$get_observation(
 
 ```{r cleanup, include = FALSE}
 if (exists("obs")) rm(obs)
+if (DBI::dbIsValid(conn)) DBI::dbDisconnect(conn)
 gc()
 ```

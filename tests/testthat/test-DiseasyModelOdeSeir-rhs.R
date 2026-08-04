@@ -24,7 +24,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   m <- DiseasyModelOdeSeir$new(
     activity = act,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = as.Date("2020-01-01")
     ),
     parameters = list(
@@ -76,7 +76,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   m <- DiseasyModelOdeSeir$new(
     activity = act,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -115,7 +115,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -168,7 +168,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = act,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -205,7 +205,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -236,7 +236,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
@@ -273,7 +273,7 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -312,7 +312,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
@@ -355,7 +355,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -397,7 +397,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
@@ -444,7 +444,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -489,7 +489,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
@@ -550,7 +550,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   m <- DiseasyModelOdeSeir$new(
     activity = act,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -608,7 +608,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   m <- DiseasyModelOdeSeir$new(
     activity = act,
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
@@ -665,7 +665,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -723,7 +723,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),

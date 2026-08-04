@@ -62,9 +62,11 @@ We first create an observables module to interface with this data:
 
 ```{r observables, eval = rlang::is_installed("RSQLite")}
 # Configure a observables module with the example data and database
+conn <- DBI::dbConnect(RSQLite::SQLite())
+
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = conn
 )
 ```
 
@@ -643,5 +645,6 @@ plot(
 
 ```{r cleanup, include = FALSE}
 if (exists("model")) rm(model)
+if (DBI::dbIsValid(conn)) DBI::dbDisconnect(conn)
 gc()
 ```

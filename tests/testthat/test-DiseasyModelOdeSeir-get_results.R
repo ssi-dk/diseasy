@@ -42,7 +42,7 @@ season$use_cosine_season()
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = \() DBI::dbConnect(RSQLite::SQLite())
 )
 
 # Lock the observation data to a simulation start date (30 day period)

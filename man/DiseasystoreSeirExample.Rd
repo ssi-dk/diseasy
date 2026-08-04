@@ -11,12 +11,15 @@ This \code{DiseasystoreSeirExample} \link[R6:R6Class]{R6} brings support the SEI
 }
 \examples{
 \dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+  conn <- DBI::dbConnect(RSQLite::SQLite())
+
   ds <- DiseasystoreSeirExample$new(
     source_conn = ".",
-    target_conn = DBI::dbConnect(RSQLite::SQLite())
+    target_conn = conn
   )
 
   rm(ds)
+  DBI::dbDisconnect(conn)
 \dontshow{\}) # examplesIf}
 }
 \keyword{data}

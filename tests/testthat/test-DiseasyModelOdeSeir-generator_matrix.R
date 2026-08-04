@@ -11,7 +11,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -77,7 +77,7 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -181,7 +181,7 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -218,7 +218,7 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -287,7 +287,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -428,7 +428,7 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
