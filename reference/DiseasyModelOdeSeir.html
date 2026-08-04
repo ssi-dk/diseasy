@@ -473,9 +473,11 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># First, we add a observables modules with example data bundled</span></span></span>
 <span class="r-in"><span>  <span class="co"># with the package.</span></span></span>
+<span class="r-in"><span>  <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">observables</span> <span class="op">&lt;-</span> <span class="va"><a href="DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    diseasystore <span class="op">=</span> <span class="va">DiseasystoreSeirExample</span>,</span></span>
-<span class="r-in"><span>    conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    conn <span class="op">=</span> <span class="va">conn</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># The observables module also defines the time if interest via</span></span></span>
@@ -525,9 +527,8 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 <span class="r-in"><span>  <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m</span>, observable <span class="op">=</span> <span class="st">"incidence"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="DiseasyModelOdeSeir-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">m</span>, <span class="va">act</span>, <span class="va">obs</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>object 'act' not found</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>object 'obs' not found</span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">m</span>, <span class="va">activity</span>, <span class="va">observables</span>, <span class="va">population</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">conn</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

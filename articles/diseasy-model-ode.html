@@ -174,9 +174,11 @@ context.</p>
 data:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Configure a observables module with the example data and database</span></span>
+<span><span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">observables</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  diseasystore <span class="op">=</span> <span class="va">DiseasystoreSeirExample</span>,</span>
-<span>  conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  conn <span class="op">=</span> <span class="va">conn</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The data is stratified by age and covers a single infection wave. It
 contains three observables of interest for our example:</p>
@@ -308,7 +310,7 @@ infection:</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; exp(-t/time_scale)</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5623ae199480&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55967c510738&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "exponential_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -564,7 +566,7 @@ form:
 <span><span class="co">#&gt; $admission</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 1</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5623af734538&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55967d3a0648&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "no_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>

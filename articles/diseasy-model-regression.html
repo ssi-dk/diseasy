@@ -214,9 +214,11 @@ class of models only.</p>
 <code><a href="../reference/DiseasystoreSeirExample.html">?DiseasystoreSeirExample</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Configure a observables module with the example data and database</span></span>
+<span><span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">observables</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  diseasystore <span class="op">=</span> <span class="va">DiseasystoreSeirExample</span>,</span>
-<span>  conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  conn <span class="op">=</span> <span class="va">conn</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The data is stratified by age and covers a single infection wave. It
 contains two observables of interest for our example:</p>
