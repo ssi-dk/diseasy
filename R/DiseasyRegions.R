@@ -153,13 +153,13 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param regional_risks `r rd_regional_risks()`
     #' @param regional_risks_type (`character(1)`)\cr
     #'   The interpretation of the risk modifiers (see details).
-    #'   Must be either "location" or "behavior".
+    #'   Must be either "location" or "behaviour".
     #' @details
     #'   If the relative risk modifier, $\Gamma_x$, is related to the location,
     #'   the elements of the infection-flow matrix, $\Theta_{x,y}$, is derived
     #'   from the elements of the movement matrix, `\phi_{x,y}` via the relation:
     #'   $\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}$, where as if the
-    #'   modifiers are related to behavioral differences, the relation is:
+    #'   modifiers are related to behavioural differences, the relation is:
     #'   $\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}$.
     #'
     #'   If the infection-flow matrix is specified directly, the location
@@ -167,7 +167,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @return `r rd_side_effects`
     set_regional_risks = function(
       regional_risks,
-      regional_risks_type = c("location", "behavior")
+      regional_risks_type = c("location", "behaviour")
     ) {
       regional_risks_type = match.arg(regional_risks_type)
 
@@ -296,7 +296,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param regional_risks `r rd_regional_risks()`
     #' @param regional_risks_type (`character(1)`)\cr
     #'   The interpretation of the risk modifiers.
-    #'   Must be either "location" or "behavior".
+    #'   Must be either "location" or "behaviour".
     adjacency_to_theta = function(
       adjacency, adjacency_type,
       regional_risks, regional_risks_type
@@ -316,7 +316,7 @@ DiseasyRegions <- R6::R6Class(                                                  
         checkmate::assert_set_equal(names(regional_risks), adjacency$from, add = coll)
       }
 
-      checkmate::assert_choice(regional_risks_type, c("location", "behavior"), null.ok = TRUE, add = coll)
+      checkmate::assert_choice(regional_risks_type, c("location", "behaviour"), null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       # Determine regions
@@ -383,8 +383,8 @@ DiseasyRegions <- R6::R6Class(                                                  
       ] <- theta_long %.% theta
 
 
-      # Apply the regional modifiers (if tied to behavior)
-      if (identical(regional_risks_type, "behavior")) {
+      # Apply the regional modifiers (if tied to behaviour)
+      if (identical(regional_risks_type, "behaviour")) {
         theta_matrix <- theta_matrix *
           sqrt(
             outer(
@@ -1234,7 +1234,7 @@ DiseasyRegions <- R6::R6Class(                                                  
             dimnames = list(self %.% area, self %.% area)
           )
 
-          if (attr(regional_risks, "type") == "behavior") {
+          if (attr(regional_risks, "type") == "behaviour") {
             infection_flow_matrix <- infection_flow_matrix *
               sqrt(
                 outer(
@@ -1246,7 +1246,7 @@ DiseasyRegions <- R6::R6Class(                                                  
             pkgcond::pkg_error(
               paste(
                 "The interpretation of regional modifiers (`regional_risks_type`) must be",
-                '"behavior" if no adjacency data is provided.'
+                '"behaviour" if no adjacency data is provided.'
               )
             )
           }

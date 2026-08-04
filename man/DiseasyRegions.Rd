@@ -205,7 +205,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyRegions$set_regional_risks(
   regional_risks,
-  regional_risks_type = c("location", "behavior")
+  regional_risks_type = c("location", "behaviour")
 )}
     \if{html}{\out{</div>}}
   }
@@ -215,7 +215,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
       \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
       \item{\code{regional_risks_type}}{(\code{character(1)})\cr
 The interpretation of the risk modifiers (see details).
-Must be either "location" or "behavior".}
+Must be either "location" or "behaviour".}
     }
     \if{html}{\out{</div>}}
   }
@@ -224,7 +224,7 @@ Must be either "location" or "behavior".}
 the elements of the infection-flow matrix, $\Theta_{x,y}$, is derived
 from the elements of the movement matrix, \verb{\\phi_\{x,y\}} via the relation:
 $\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}$, where as if the
-modifiers are related to behavioral differences, the relation is:
+modifiers are related to behavioural differences, the relation is:
 $\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}$.
 
 If the infection-flow matrix is specified directly, the location
@@ -336,7 +336,7 @@ area. If \code{NULL}, all values are matched.}
       \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
       \item{\code{regional_risks_type}}{(\code{character(1)})\cr
 The interpretation of the risk modifiers.
-Must be either "location" or "behavior".}
+Must be either "location" or "behaviour".}
     }
     \if{html}{\out{</div>}}
   }
