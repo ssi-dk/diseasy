@@ -278,7 +278,7 @@ Regional modifiers of infection risk can be set via the `$set_regional_risks()` 
 ```{r location_based_risks}
 regions$set_regional_risks(
   regional_risks = c("DK" = 1.1, "SE" = 0.9, "NO" = 0.8, "FI" = 0.5),
-  risk_type = "location"
+  regional_risks_type = "location"
 )
 
 regions %.% infection_flow_matrix
@@ -288,7 +288,7 @@ regions %.% infection_flow_matrix
 ```{r behaviour_based_risks}
 regions$set_regional_risks(
   regional_risks = c("DK" = 1.1, "SE" = 0.9, "NO" = 0.8, "FI" = 0.5),
-  risk_type = "behaviour"
+  regional_risks_type = "behaviour"
 )
 
 regions %.% infection_flow_matrix
