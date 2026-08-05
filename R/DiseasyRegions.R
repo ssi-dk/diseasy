@@ -189,7 +189,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       regional_risks_type = match.arg(regional_risks_type)
 
       self$validate_configuration(
-        area = sort(area),
+        area = private %.% .area,
         adjacency = private %.% .adjacency,
         demography = private %.% .demography,
         regional_risks = regional_risks
