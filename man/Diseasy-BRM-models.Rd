@@ -104,7 +104,7 @@ such as \link{DiseasyModelB0} and \link{DiseasyModelB1}.
 
 }
 \section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{DiseasyModel}} -> \code{\link[diseasy:DiseasyModelRegression]{DiseasyModelRegression}} -> \code{\link[diseasy:DiseasyModelBRM]{DiseasyModelBRM}} -> \code{NA} -> \code{DiseasyModelB0}
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{DiseasyModel}} -> \code{\link[diseasy:DiseasyModelRegression]{DiseasyModelRegression}} -> \code{\link[diseasy:DiseasyModelBRM]{DiseasyModelBRM}} -> \code{DiseasyModelB_} -> \code{DiseasyModelB0}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -164,7 +164,7 @@ such as \link{DiseasyModelB0} and \link{DiseasyModelB1}.
 
 }
 \section{Super classes}{
-\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{DiseasyModel}} -> \code{\link[diseasy:DiseasyModelRegression]{DiseasyModelRegression}} -> \code{\link[diseasy:DiseasyModelBRM]{DiseasyModelBRM}} -> \code{NA} -> \code{DiseasyModelB1}
+\code{\link[diseasy:DiseasyBaseModule]{DiseasyBaseModule}} -> \code{\link[diseasy:DiseasyModel]{DiseasyModel}} -> \code{\link[diseasy:DiseasyModelRegression]{DiseasyModelRegression}} -> \code{\link[diseasy:DiseasyModelBRM]{DiseasyModelBRM}} -> \code{DiseasyModelB_} -> \code{DiseasyModelB1}
 }
 \section{Methods}{
 \subsection{Public methods}{

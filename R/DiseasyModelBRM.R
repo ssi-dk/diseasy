@@ -133,6 +133,7 @@ DiseasyModelBRM <- R6::R6Class(                                                 
 # Meta module for the simple, b* reference models models
 #' @noRd
 DiseasyModelB_ <- R6::R6Class(                                                                                          # nolint: object_name_linter
+  classname = "DiseasyModelB_",
   inherit = DiseasyModelBRM,
   public = list(
 

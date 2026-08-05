@@ -92,6 +92,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
 # Meta module for the simple, g* reference models models
 #' @noRd
 DiseasyModelG_ <- R6::R6Class(                                                                                          # nolint: object_name_linter
+  classname = "DiseasyModelB_",
   inherit = DiseasyModelGLM,
   public = list(
 
