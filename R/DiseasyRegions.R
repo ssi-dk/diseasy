@@ -587,7 +587,7 @@ DiseasyRegions <- R6::R6Class(                                                  
               "region" = names(diag(self %.% infection_flow_matrix)),
               "value" = as.numeric(diag(self %.% infection_flow_matrix))
             ),
-            "colour_high" = "#7e008f",
+            "colour_high" = "#e100ff",
             "colour_low"  = "#ffffff"
           )
         }
