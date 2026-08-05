@@ -196,7 +196,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       )
 
       attr(regional_risks, "type") <- regional_risks_type
-      private$.regional_risks <- regional_risks[self %.% area]
+      private$.regional_risks <- regional_risks
 
       return(invisible(NULL))
     },
