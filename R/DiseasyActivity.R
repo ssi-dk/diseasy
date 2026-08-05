@@ -49,7 +49,6 @@
 #'   rm(act)
 #' @return
 #'   A new instance of the `DiseasyActivity` [R6][R6::R6Class] class.
-#' @importFrom Matrix sparseMatrix
 #' @keywords functional-module
 #' @export
 DiseasyActivity <- R6::R6Class(                                                                                         # nolint: object_name_linter
@@ -443,7 +442,6 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value\[\[date\]\]\[\[type\]\]
-    #' @importFrom pkgcond pkg_warning
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()

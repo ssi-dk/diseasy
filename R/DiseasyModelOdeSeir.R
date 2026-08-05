@@ -566,7 +566,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   The initialised state vector for the model.
     #'   NOTE: the output includes the complete state for `time = 0` and additional
     #'   history (`time < 0`) for some states (to allow observables with time-delays).
-    #' @importFrom tidyr expand_grid
     initialise_state_vector = function(
       incidence_data,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,

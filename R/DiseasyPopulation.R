@@ -311,7 +311,6 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @field activity (`diseasy::DiseasyActivity`)\cr
     #'   The local copy of an DiseasyActivity module. Read-only.
     #' @seealso [diseasy::DiseasyActivity]
-    #' @importFrom diseasystore `%.%`
     activity = purrr::partial(
       .f = active_binding,
       name = "activity",
@@ -322,7 +321,6 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @field regions (`diseasy::DiseasyRegions`)\cr
     #'   The local copy of an DiseasyRegions module. Read-only.
     #' @seealso [diseasy::DiseasyRegions]
-    #' @importFrom diseasystore `%.%`
     regions = purrr::partial(
       .f = active_binding,
       name = "regions",

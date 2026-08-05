@@ -19,7 +19,6 @@
 #' }
 #' @keywords data-generators
 #' @export
-#' @importFrom diseasystore `%.%`
 generate_adjacency_meta <- function(area = NULL) {
   checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
 

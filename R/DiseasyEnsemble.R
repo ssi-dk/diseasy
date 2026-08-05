@@ -165,7 +165,6 @@ predict.DiseasyEnsemble <- function(
 #'   Should the plot be stratified by model?
 #' @param ... (`Any`) \cr
 #'   Unused. Required to match the generic signature.
-#' @importFrom stats predict
 #' @export
 plot.DiseasyEnsemble <- function(
   x,
