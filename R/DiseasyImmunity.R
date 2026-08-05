@@ -71,7 +71,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Changing time_scale in {paste(names(time_scales), collapse = ', ')} model(s)")
 
-      invisible(return(private$.model))
+      return(invisible(private$.model))
     },
 
     #' @description
@@ -125,7 +125,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting no waning model")
 
-      invisible(return(tibble::lst({{target}} := model)))
+      return(invisible(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -157,7 +157,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting exponential waning model")
 
-      invisible(return(tibble::lst({{target}} := model)))
+      return(invisible(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -193,7 +193,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting sigmoidal waning model")
 
-      invisible(return(tibble::lst({{target}} := model)))
+      return(invisible(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -225,7 +225,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting linear waning model")
 
-      invisible(return(tibble::lst({{target}} := model)))
+      return(invisible(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -257,7 +257,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting heaviside waning model")
 
-      invisible(return(tibble::lst({{target}} := model)))
+      return(invisible(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -329,7 +329,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Logging
       private$lg$info("Setting custom waning function(s)")
 
-      invisible(return(tibble::lst({{target}} := model)))
+      return(invisible(tibble::lst({{target}} := model)))
     },
 
     #' @description
@@ -1077,7 +1077,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       private$lg$info("Setting approximated rates to target function(s)")
 
       # Return
-      invisible(return(private$cache(hash)))
+      return(invisible(private$cache(hash)))
     },
 
     #' @description
