@@ -249,7 +249,7 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Check demography is consistent with regional_risks
       if (!is.null(demography) && !is.null(regional_risks)) {
-        if (length(intersect(demography %.% region %.% from, names(regional_risks))) < 1) {
+        if (length(intersect(demography %.% region, names(regional_risks))) < 1) {
           pkgcond::pkg_error("`demography` and `regional_risks` must contain at least one common region.")
         }
       }
