@@ -1198,7 +1198,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     area = purrr::partial(
       .f = active_binding,
       name = "area",
-      expr = return(private %.% .area)
+      expr = return(sort(private %.% .area))
     ),
 
 
@@ -1327,6 +1327,9 @@ DiseasyRegions <- R6::R6Class(                                                  
         regional_risk <- private %.% .regional_risks[
             self %.% region_filter(names(private %.% .regional_risks))
           ]
+
+        # Sort
+        regional_risk <- regional_risk[order(names(regional_risk))]
 
         # Copy the type attribute
         attr(regional_risk, "type") <- attr(private %.% .regional_risks, "type")
