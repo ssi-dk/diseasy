@@ -274,6 +274,7 @@ regions %.% infection_flow_matrix
 ```
 
 Regional modifiers of infection risk can be set via the `$set_regional_risks()` method
+
 ... tied to location:
 ```{r location_based_risks}
 regions$set_regional_risks(
@@ -281,7 +282,8 @@ regions$set_regional_risks(
   regional_risks_type = "location"
 )
 
-regions %.% infection_flow_matrix
+# Our example produces an error since the provided `adjacency` is not movement data
+try(regions %.% infection_flow_matrix)
 ```
 
 ... or tied to population:
