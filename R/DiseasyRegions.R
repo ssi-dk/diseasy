@@ -409,8 +409,8 @@ DiseasyRegions <- R6::R6Class(                                                  
         theta_matrix <- theta_matrix *
           sqrt(
             outer(
-              X = self %.% regional_risks,
-              Y = self %.% regional_risks
+              X = regional_risks,
+              Y = regional_risks
             )
           )
       }
