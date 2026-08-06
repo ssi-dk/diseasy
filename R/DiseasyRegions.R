@@ -98,7 +98,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @return `r rd_side_effects`
     set_adjacency = function(
       adjacency,
-      adjacency_type = c("movement", "infection-flow")
+      adjacency_type = purrr::pluck(
+        adjacency, attributes, "type",
+        .default = c("movement", "infection-flow")
+      )
     ) {
 
       adjacency_type = match.arg(adjacency_type)
@@ -109,8 +112,6 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Sort the adjacency
       adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
-
-      # Store the type of adjacency matrix
       attr(adjacency, "type") <- adjacency_type
 
       # Check configuration works with existing area and demography
@@ -122,7 +123,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       )
 
       # Store the adjacency
-      private$.adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
+      private$.adjacency <- adjacency
 
       return(invisible(NULL))
     },
@@ -184,7 +185,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @return `r rd_side_effects`
     set_regional_risks = function(
       regional_risks,
-      regional_risks_type = c("location", "behaviour")
+      regional_risks_type = purrr::pluck(
+        regional_risks, attributes, "type",
+        .default = c("location", "behaviour")
+      )
     ) {
       regional_risks_type = match.arg(regional_risks_type)
 
@@ -1319,11 +1323,13 @@ DiseasyRegions <- R6::R6Class(                                                  
           return(NULL)
         }
 
-        return(
-          private %.% .regional_risks[
+        # Filter to area
+        regional_risk <- private %.% .regional_risks[
             self %.% region_filter(names(private %.% .regional_risks))
           ]
-        )
+
+        attributes(regional_risk) <- attributes(private %.% .regional_risks)
+        return(regional_risk)
       }
     )
   ),
