@@ -144,7 +144,7 @@ test_that("$load_module() works", {
   # We also check that a clone has been made, and that changes to obs after loading does not change m
   expect_false(identical(m %.% observables, obs))
   expect_identical(m %.% observables %.% hash, obs %.% hash)
-  obs$set_slice_ts(today())
+  obs$set_slice_ts(lubridate::today())
 
   expect_false(identical(m %.% observables, obs))
   expect_false(identical(m %.% observables %.% hash, obs %.% hash))
