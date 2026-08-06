@@ -220,7 +220,7 @@ $$
 \Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}
 $$
 
-Notice that if the infection-matrix is directly specified, these modifies are
+Notice that if the infection-matrix is directly specified, these modifies may
 already (implicitly) included.
 
 The region-specific modifiers can be set via the `set_regional_risks()` method,
