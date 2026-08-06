@@ -75,7 +75,7 @@ test_that("diseasyoption works", {
   expect_identical(diseasyoption("target_schema"), target_schema_1)
 
   # Check that it works for child classes
-  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
     classname = "DiseasystoreDummy",
     inherit = DiseasystoreBase,
     public = list(initialize = function(...) {})

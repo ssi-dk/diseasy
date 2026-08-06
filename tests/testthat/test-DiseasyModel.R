@@ -60,7 +60,7 @@ test_that("initialize works with model parameters", {
   skip_if_not_installed("RSQLite")
 
   # Create a simple model that takes parameters
-  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
     classname = "DiseasyModelParameterTest",
     inherit = DiseasyModel,
     private = list(
@@ -284,7 +284,7 @@ test_that("$hash works", {
 
 
   # Create a simple model that takes parameters
-  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
     classname = "DiseasyModelParameterTest",
     inherit = DiseasyModel,
     private = list(

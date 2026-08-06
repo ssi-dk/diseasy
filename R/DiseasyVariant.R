@@ -23,7 +23,7 @@
 #'   A new instance of the `DiseasyVariant` [R6][R6::R6Class] class.
 #' @keywords functional-module
 #' @export
-DiseasyVariant <- R6::R6Class(                                                                                          # nolint: object_name_linter
+DiseasyVariant <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyVariant",
   inherit = DiseasyBaseModule,
 

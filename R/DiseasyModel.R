@@ -31,7 +31,7 @@
 #' @keywords model-template-builder
 #' @export
 #' @seealso [lgr][lgr::lgr]
-DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter
+DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModel",
   inherit = DiseasyBaseModule,
 

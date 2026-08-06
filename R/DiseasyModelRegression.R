@@ -25,7 +25,7 @@
 #'   A new instance of the `DiseasyModelRegression` [R6][R6::R6Class] class.
 #' @keywords model-template-builder
 #' @export
-DiseasyModelRegression <- R6::R6Class(                                                                                  # nolint: object_name_linter
+DiseasyModelRegression <- R6::R6Class(                                                                                  # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelRegression",
   inherit = DiseasyModel,
 
