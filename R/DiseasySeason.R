@@ -622,7 +622,7 @@ DiseasySeason <- R6::R6Class(                                                   
         # Create the approximater that maps a scale to an a value
         compute_scale <- \(a) 1 - f(a)(max(climate_normal$max_temperature)) / f(a)(min(climate_normal$max_temperature))
         a_max <- stats::uniroot(\(a) compute_scale(a) - max_scale, c(k, 10000))$root
-        a_values <- pracma::logseq(k, a_max)
+        a_values <- pracma::logseq(k, a_max)                                                                            # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
         scales <- purrr::map_dbl(a_values, compute_scale)
 
         # Store in cache
