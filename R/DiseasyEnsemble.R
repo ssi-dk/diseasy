@@ -184,7 +184,7 @@ plot.DiseasyEnsemble <- function(
   observables <- purrr::pluck(x, 1, "observables")
 
   # Get results from ensemble
-  results <- predict(
+  results <- stats::predict(
     object = x,
     observable = observable,
     prediction_length = prediction_length,
