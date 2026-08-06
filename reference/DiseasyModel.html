@@ -4,10 +4,13 @@ DiseasyBaseModule.
 Most notably, the model module facilitates:
 Module interfaces:
 The module contains the functional modules via its active bindings:
-$activity: DiseasyActivity
 $observables: DiseasyObservables
+$population : DiseasyPopulation
+$activity: DiseasyActivity
+$regions: DiseasyRegions
 $season: DiseasySeason
 $variant : DiseasyVariant
+$immunity : DiseasyImmunity
 
 
 Configured instances of these modules can be provided during initialisation.
@@ -21,10 +24,13 @@ DiseasyBaseModule.
 Most notably, the model module facilitates:
 Module interfaces:
 The module contains the functional modules via its active bindings:
-$activity: DiseasyActivity
 $observables: DiseasyObservables
+$population : DiseasyPopulation
+$activity: DiseasyActivity
+$regions: DiseasyRegions
 $season: DiseasySeason
 $variant : DiseasyVariant
+$immunity : DiseasyImmunity
 
 
 Configured instances of these modules can be provided during initialisation.
@@ -105,10 +111,13 @@ These functions define the "API" of the models and ensure the models can take pa
     <p>The <code>DiseasyModel</code> module implements common functionality that all models have available beyond that provided by
 <code>DiseasyBaseModule</code>.</p>
 <p>Most notably, the model module facilitates:</p><ul><li><p>Module interfaces:
-The module contains the functional modules via its active bindings:</p><ul><li><p><code>$activity</code>: <code>DiseasyActivity</code></p></li>
-<li><p><code>$observables</code>: <code>DiseasyObservables</code></p></li>
+The module contains the functional modules via its active bindings:</p><ul><li><p><code>$observables</code>: <code>DiseasyObservables</code></p></li>
+<li><p><code>$population</code> : <code>DiseasyPopulation</code></p></li>
+<li><p><code>$activity</code>: <code>DiseasyActivity</code></p></li>
+<li><p><code>$regions</code>: <code>DiseasyRegions</code></p></li>
 <li><p><code>$season</code>: <code>DiseasySeason</code></p></li>
 <li><p><code>$variant</code> : <code>DiseasyVariant</code></p></li>
+<li><p><code>$immunity</code> : <code>DiseasyImmunity</code></p></li>
 </ul><p>Configured instances of these modules can be provided during initialisation.
 Alternatively, default instances of these modules can optionally be created.</p></li>
 <li><p>Model interface:
@@ -127,9 +136,10 @@ These functions define the "API" of the models and ensure the models can take pa
 <p><a href="DiseasyObservables.html">DiseasyObservables</a></p>
 <p><a href="DiseasyPopulation.html">DiseasyPopulation</a></p>
 <p><a href="DiseasyActivity.html">DiseasyActivity</a></p>
-<p><a href="DiseasyImmunity.html">DiseasyImmunity</a></p>
+<p><a href="DiseasyRegions.html">DiseasyRegions</a></p>
 <p><a href="DiseasySeason.html">DiseasySeason</a></p>
-<p><a href="DiseasyVariant.html">DiseasyVariant</a></p></div>
+<p><a href="DiseasyVariant.html">DiseasyVariant</a></p>
+<p><a href="DiseasyImmunity.html">DiseasyImmunity</a></p></div>
     </div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
@@ -137,7 +147,12 @@ These functions define the "API" of the models and ensure the models can take pa
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
-    <p></p><div class="r6-active-bindings"><dl><dt><code>population</code></dt>
+    <p></p><div class="r6-active-bindings"><dl><dt><code>observables</code></dt>
+<dd><p>(<code><a href="DiseasyObservables.html">diseasy::DiseasyObservables</a></code>)<br>
+The local copy of a DiseasyObservables module. Read-only.</p></dd>
+
+
+    <dt><code>population</code></dt>
 <dd><p>(<code><a href="DiseasyPopulation.html">diseasy::DiseasyPopulation</a></code>)<br>
 The local copy of a DiseasyPopulation module. Read-only.</p></dd>
 
@@ -147,14 +162,9 @@ The local copy of a DiseasyPopulation module. Read-only.</p></dd>
 The local copy of an DiseasyActivity module. Read-only.</p></dd>
 
 
-    <dt><code>immunity</code></dt>
-<dd><p>(<code><a href="DiseasyImmunity.html">diseasy::DiseasyImmunity</a></code>)<br>
-The local copy of a DiseasyImmunity module. Read-only.</p></dd>
-
-
-    <dt><code>observables</code></dt>
-<dd><p>(<code><a href="DiseasyObservables.html">diseasy::DiseasyObservables</a></code>)<br>
-The local copy of a DiseasyObservables module. Read-only.</p></dd>
+    <dt><code>regions</code></dt>
+<dd><p>(<code><a href="DiseasyRegions.html">diseasy::DiseasyRegions</a></code>)<br>
+The local copy of an DiseasyRegions module. Read-only.</p></dd>
 
 
     <dt><code>season</code></dt>
@@ -165,6 +175,11 @@ The local copy of a DiseasySeason module. Read-only.</p></dd>
     <dt><code>variant</code></dt>
 <dd><p>(<code>diseasy::.DiseasyVariant</code>)<br>
 The local copy of a DiseasyVariant module. Read-only.</p></dd>
+
+
+    <dt><code>immunity</code></dt>
+<dd><p>(<code><a href="DiseasyImmunity.html">diseasy::DiseasyImmunity</a></code>)<br>
+The local copy of a DiseasyImmunity module. Read-only.</p></dd>
 
 
     <dt><code>parameters</code></dt>
@@ -209,6 +224,7 @@ This module is typically not constructed directly but rather through <code>Disea
 <span>  observables <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  population <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  activity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  regions <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  season <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  variant <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  immunity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -218,7 +234,7 @@ This module is typically not constructed directly but rather through <code>Disea
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>observables, population, activity, season, variant, immunity</code></dt>
+<p></p><div class="arguments"><dl><dt><code>observables, population, activity, regions, season, variant, immunity</code></dt>
 <dd><p>(<code>boolean</code> or <code>R6::R6Class instance</code>)<br> If a boolean is given, it dictates whether to load a new instance module of this class.<br> If an instance of the module is provided instead, a copy of this instance is added to the <code>DiseasyModel</code> instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to <code>DiseasyModel</code>.</p></dd>
 
       <dt><code>parameters</code></dt>
