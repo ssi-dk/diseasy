@@ -343,6 +343,10 @@ DiseasyRegions <- R6::R6Class(                                                  
       # Determine regions
       regions <- sort(unique(adjacency %.% from))
 
+      # Ensure consistent sorting
+      adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
+      if (!is.null(regional_risks)) regional_risks <- regional_risks[order(names(regional_risks))]
+
       # Split computations based on input type
       if (adjacency_type == "movement") {
 
@@ -1228,6 +1232,9 @@ DiseasyRegions <- R6::R6Class(                                                  
             self$region_filter(values = .data$from),
             self$region_filter(values = .data$to)
           )
+
+        # Ensure consistent sorting
+        adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
 
         # Copy the type attribute
         attr(adjacency, "type") <- attr(private %.% .adjacency, "type")
