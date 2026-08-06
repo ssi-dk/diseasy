@@ -29,6 +29,8 @@ activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
 activity$set_activity_units(dk_activity_units)
 activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
+regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+
 # Configure the immunity module
 immunity <- DiseasyImmunity$new()
 immunity$set_exponential_waning(time_scale = 180)
@@ -93,6 +95,7 @@ M <- 2L                                                                         
 # Create the model instance
 model <- DiseasyModelOdeSeir$new(
   population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
+  regions = regions,
   activity = activity,
   immunity = immunity,
   season = season,
@@ -179,6 +182,7 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
+    regions = regions,
     immunity = immunity,
     season = season,
     observables = observables,
@@ -238,6 +242,7 @@ test_that("$get_results() (SEEIR, subset age groups - n_infected - stratificatio
   # Create the model instance
   model <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 30)),
+    regions = regions,
     activity = activity,
     immunity = immunity,
     season = season,
