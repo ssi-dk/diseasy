@@ -39,7 +39,6 @@ ones <- \(shape) matrix(rep(1, shape))
 #'   rhypo(10, shape = 2, rate = c(1, 2))
 #' @name hypoexponential
 #' @export
-#' @importFrom expm expm
 dhypo <- function(x, shape = 1, rate = rep(1, shape)) {
 
   # For the first compartment, the problem is simply an exponential distribution

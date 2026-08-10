@@ -25,7 +25,7 @@
 #'   A new instance of the `DiseasyModelRegression` [R6][R6::R6Class] class.
 #' @keywords model-template-builder
 #' @export
-DiseasyModelRegression <- R6::R6Class(                                                                                  # nolint: object_name_linter
+DiseasyModelRegression <- R6::R6Class(                                                                                  # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelRegression",
   inherit = DiseasyModel,
 
@@ -76,7 +76,6 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #' @param stratification `r rd_stratification()`
     #' @return `r rd_get_results_return`
     #' @seealso `r rd_get_results_seealso`
-    #' @importFrom diseasystore `%.%`
     get_results = function(observable, prediction_length, quantiles = NULL, stratification = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_true(!is.null(self %.% observables), add = coll)
@@ -343,7 +342,6 @@ DiseasyModelRegression <- R6::R6Class(                                          
   active = list(
     #' @field formula (`formula`)\cr
     #'   The base formula of the module. Stratification features extend this base formula. Read-only.
-    #' @importFrom diseasystore `%.%`
     formula = purrr::partial(
       .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "formula",
@@ -352,7 +350,6 @@ DiseasyModelRegression <- R6::R6Class(                                          
 
     #' @field family (`family`)\cr
     #'   The family used in the regression fit (see `glm` or `brms`). Read-only.
-    #' @importFrom diseasystore `%.%`
     family = purrr::partial(
       .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "family",

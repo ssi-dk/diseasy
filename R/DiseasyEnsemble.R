@@ -165,7 +165,6 @@ predict.DiseasyEnsemble <- function(
 #'   Should the plot be stratified by model?
 #' @param ... (`Any`) \cr
 #'   Unused. Required to match the generic signature.
-#' @importFrom stats predict
 #' @export
 plot.DiseasyEnsemble <- function(
   x,
@@ -185,7 +184,7 @@ plot.DiseasyEnsemble <- function(
   observables <- purrr::pluck(x, 1, "observables")
 
   # Get results from ensemble
-  results <- predict(
+  results <- stats::predict(
     object = x,
     observable = observable,
     prediction_length = prediction_length,

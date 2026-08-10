@@ -31,7 +31,7 @@
 #' @keywords model-template-builder
 #' @export
 #' @seealso [lgr][lgr::lgr]
-DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter
+DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModel",
   inherit = DiseasyBaseModule,
 
@@ -272,7 +272,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field observables (`diseasy::DiseasyObservables`)\cr
     #'   The local copy of a DiseasyObservables module. Read-only.
     #' @seealso [diseasy::DiseasyObservables]
-    #' @importFrom diseasystore `%.%`
     observables = purrr::partial(
       .f = active_binding,
       name = "observables",
@@ -283,7 +282,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field population (`diseasy::DiseasyPopulation`)\cr
     #'   The local copy of a DiseasyPopulation module. Read-only.
     #' @seealso [diseasy::DiseasyPopulation]
-    #' @importFrom diseasystore `%.%`
     population = purrr::partial(
       .f = active_binding,
       name = "population",
@@ -294,7 +292,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field activity (`diseasy::DiseasyActivity`)\cr
     #'   The local copy of an DiseasyActivity module. Read-only.
     #' @seealso [diseasy::DiseasyActivity]
-    #' @importFrom diseasystore `%.%`
     activity = purrr::partial(
       .f = active_binding,
       name = "activity",
@@ -305,7 +302,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field regions (`diseasy::DiseasyRegions`)\cr
     #'   The local copy of an DiseasyRegions module. Read-only.
     #' @seealso [diseasy::DiseasyRegions]
-    #' @importFrom diseasystore `%.%`
     regions = purrr::partial(
       .f = active_binding,
       name = "regions",
@@ -316,7 +312,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field season (`diseasy::DiseasySeason`)\cr
     #'   The local copy of a DiseasySeason module. Read-only.
     #' @seealso [diseasy::DiseasySeason]
-    #' @importFrom diseasystore `%.%`
     season = purrr::partial(
       .f = active_binding,
       name = "season",
@@ -327,7 +322,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field variant (`diseasy::.DiseasyVariant`)\cr
     #'  The local copy of a DiseasyVariant module. Read-only.
     #' @seealso [diseasy::DiseasyVariant]
-    #' @importFrom diseasystore `%.%`
     variant = purrr::partial(
       .f = active_binding,
       name = "variant",
@@ -338,7 +332,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field immunity (`diseasy::DiseasyImmunity`)\cr
     #'   The local copy of a DiseasyImmunity module. Read-only.
     #' @seealso [diseasy::DiseasyImmunity]
-    #' @importFrom diseasystore `%.%`
     immunity = purrr::partial(
       .f = active_binding,
       name = "Immunity",
@@ -348,7 +341,6 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @field parameters (`list()`)\cr
     #'   The parameters used in the model. Read-only.
-    #' @importFrom diseasystore `%.%`
     parameters = purrr::partial(
       .f = active_binding,
       name = "parameters",
@@ -358,7 +350,6 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @field training_period (`list`(`Date`))\cr
     #'   The start and end dates of the training period. Read-only.
-    #' @importFrom diseasystore `%.%`
     training_period = purrr::partial(
       .f = active_binding,
       name = "training_period",
@@ -406,7 +397,6 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @field testing_period (`list`(`Date`))\cr
     #'   The start and end dates of the testing period. Read-only.
-    #' @importFrom diseasystore `%.%`
     testing_period = purrr::partial(
       .f = active_binding,
       name = "testing_period",
@@ -438,7 +428,6 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @field validation_period (`list`(`Date`))\cr
     #'   The start and end dates of the validation period. Read-only.
-    #' @importFrom diseasystore `%.%`
     validation_period = purrr::partial(
       .f = active_binding,
       name = "validation_period",

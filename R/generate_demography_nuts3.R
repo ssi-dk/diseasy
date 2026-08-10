@@ -16,7 +16,6 @@
 #' }
 #' @keywords data-generators
 #' @export
-#' @importFrom diseasystore `%.%`
 generate_demography_nuts3 <- function(area = NULL, cache = FALSE, output_nuts = FALSE) {
   checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
   checkmate::assert_flag(cache)

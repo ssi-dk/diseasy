@@ -306,7 +306,7 @@ path <- tryCatch(
     "diseasy_immunity_optimiser_results/"
   }
 )
-cache <- cachem::cache_disk(dir = path, max_size = Inf)
+cache <- cachem::cache_disk(dir = path, max_size = Inf)                                                                 # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
 
 for (penalty in c(0, 0.5, 1)) {
   monotonous <- ceiling(penalty)
