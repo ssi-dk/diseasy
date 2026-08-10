@@ -526,7 +526,7 @@
     },
     {
       "package": "lintr",
-      "version": "3.3.0-1",
+      "version": "3.4.0",
       "binary": true
     },
     {
@@ -805,6 +805,11 @@
       "binary": true
     },
     {
+      "package": "rdtools",
+      "version": "0.1.0",
+      "binary": true
+    },
+    {
       "package": "reactable",
       "version": "0.4.5",
       "binary": true
@@ -871,7 +876,7 @@
     },
     {
       "package": "roxygen2",
-      "version": "8.0.0",
+      "version": "8.1.0",
       "binary": true
     },
     {
