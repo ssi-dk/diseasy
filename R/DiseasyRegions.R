@@ -804,7 +804,13 @@ DiseasyRegions <- R6::R6Class(                                                  
             )
           ),
           colorbar = list(
-            title = list(text = layer_name)
+            title = list(text = layer_name),
+            x = 0.72,
+            xanchor = "left",
+            y = 0.50,
+            yanchor = "middle",
+            len = 0.75,
+            thickness = 14
           ),
           name = layer_name,
           visible = layer_index == 1,
@@ -975,7 +981,7 @@ DiseasyRegions <- R6::R6Class(                                                  
             scope = "world",
             fitbounds = "geojson",
             domain = list(
-              x = c(0.02, 0.98),
+              x = c(0.02, 0.84),
               y = c(0.02, 0.98)
             ),
             projection = list(
@@ -993,7 +999,7 @@ DiseasyRegions <- R6::R6Class(                                                  
           ),
           paper_bgcolor = "white",
           plot_bgcolor = "white",
-          margin = list(l = 10, r = 10, b = 10, t = 10),
+          margin = list(l = 10, r = 10, b = 10, t = 10, autoexpand = FALSE),
           legend = list(
             bgcolor = "rgba(255, 255, 255, 0.8)",
             bordercolor = "rgba(0, 0, 0, 0)",
