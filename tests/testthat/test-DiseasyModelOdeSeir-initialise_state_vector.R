@@ -24,6 +24,9 @@ overall_infection_risk <- 0.025
 # Configure the activity module
 activity <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
 
+# Configure the regions module
+regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+
 # Configure the immunity module
 immunity <- DiseasyImmunity$new()
 immunity$set_exponential_waning(time_scale = 180)
@@ -36,7 +39,7 @@ season$use_cosine_season()
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = \() DBI::dbConnect(RSQLite::SQLite())
 )
 
 # Get incidence data to infer initial state vector from
@@ -69,6 +72,7 @@ tidyr::expand_grid(
 
       m <- DiseasyModelOdeSeir$new(
         activity = activity,
+        regions = regions,
         immunity = immunity,
         season = season,
         observables = observables,

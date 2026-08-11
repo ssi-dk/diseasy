@@ -3,15 +3,17 @@
 #' @description
 #'   This `DiseasystoreSeirExample` [R6][R6::R6Class] brings support the SEIR example data bundled with `diseasy`.
 #' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
+#'   conn <- DBI::dbConnect(RSQLite::SQLite())
+#'
 #'   ds <- DiseasystoreSeirExample$new(
 #'     source_conn = ".",
-#'     target_conn = DBI::dbConnect(RSQLite::SQLite())
+#'     target_conn = conn
 #'   )
 #'
 #'   rm(ds)
+#'   DBI::dbDisconnect(conn)
 #' @return
 #'   A new instance of the `DiseasystoreSeirExample` [R6][R6::R6Class] class.
-#' @importFrom R6 R6Class
 #' @keywords data
 #' @export
 DiseasystoreSeirExample <- R6::R6Class(                                                                                 # nolint: object_name_linter, object_length_linter

@@ -8,4 +8,10 @@
 
 library(testthat)
 
-test_check("diseasy")
+withr::with_options(
+  new = list("warn" = 1),
+  code = {
+    test_check("diseasy")
+    for (gc_index in seq_len(3L)) invisible(gc())
+  }
+)

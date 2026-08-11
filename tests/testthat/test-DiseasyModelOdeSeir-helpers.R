@@ -12,7 +12,7 @@ test_that("helpers works (SR single variant / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -66,7 +66,7 @@ test_that("helpers works (SIR single variant / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -123,9 +123,10 @@ test_that("helpers works (SIR double variant / double age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -194,7 +195,7 @@ test_that("helpers works (SEIR single variant / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -250,7 +251,7 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(
@@ -316,7 +317,7 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -395,9 +396,10 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     variant = var,
@@ -479,7 +481,7 @@ test_that("forcing functions can be configured as expected (SIR single variant /
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
     observables = DiseasyObservables$new(
-      conn = DBI::dbConnect(RSQLite::SQLite()),
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
     parameters = list(

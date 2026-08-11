@@ -31,6 +31,9 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   activity$set_activity_units(dk_activity_units)
   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
 
+  # Define the area and population of interest
+  regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+
   # Add a waning immunity scenario
   immunity <- DiseasyImmunity$new()
   immunity$set_exponential_waning(time_scale = 180)
@@ -42,12 +45,13 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # We need a dummy observables module
   observables <- DiseasyObservables$new(
-    conn = DBI::dbConnect(RSQLite::SQLite()),
+    conn = \() DBI::dbConnect(RSQLite::SQLite()),
     last_queryable_date = as.Date("2020-01-20")
   )
 
   model <- DiseasyModelOdeSeir$new(
     activity = activity,
+    regions = regions,
     immunity = immunity,
     season = season,
     observables = observables,
@@ -73,7 +77,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     activity$map_population(age_cuts_lower) |>
       dplyr::summarise(
         "proportion" = sum(.data$proportion),
-        .by = c("age_group_ref", "age_group_out")
+        .by = c("age_group_reference", "age_group_out")
       ),
     "activity" = rowSums(activity$get_scenario_contacts(weights = c(1, 1, 1, 1))[[1]])
   ) |>

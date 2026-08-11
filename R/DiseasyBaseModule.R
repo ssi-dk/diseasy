@@ -28,7 +28,7 @@
 #'   A new instance of the `DiseasyBaseModule` [R6][R6::R6Class] class.
 #' @export
 #' @seealso [lgr][lgr::lgr]
-DiseasyBaseModule <- R6::R6Class(                                                                                       # nolint: object_name_linter
+DiseasyBaseModule <- R6::R6Class(                                                                                       # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyBaseModule",
 
   public = list(
@@ -116,7 +116,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
       # If we are loading an observables module, make sure the connection is marked as not needing clean up
       if (inherits(module, "DiseasyObservables")) {
-        attr(module$.__enclos_env__$private$.conn, "needs_cleanup") <- FALSE
+        module$.__enclos_env__$private$conn_needs_cleanup <- FALSE
       }
 
 
@@ -259,7 +259,6 @@ DiseasyBaseModule <- R6::R6Class(                                               
     # @return
     #   (`NULL`) if object is given\cr
     #   (`object`) if no object is given
-    #' @import cachem
     cache = function(hash, obj, prefix = class(self)[[1]]) {
 
       # Add prefix to hash name to form valid key

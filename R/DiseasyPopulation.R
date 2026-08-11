@@ -25,7 +25,7 @@
 #'   A new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
 #' @keywords functional-module
 #' @export
-DiseasyPopulation <- R6::R6Class(                                                                                       # nolint: object_name_linter
+DiseasyPopulation <- R6::R6Class(                                                                                       # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyPopulation",
   inherit = DiseasyBaseModule,
 
@@ -243,25 +243,27 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @field population (`tibble`)\cr
     #'   The population groups and their sizes configured in the module.
     population = function() {
+      checkmate::assert_class(self %.% regions, "DiseasyRegions")
+      if (is.null(self %.% regions %.% demography)) {
+        pkgcond::pkg_error("`demography` must be set in `DiseasyRegions` to compute `population`")
+      }
 
       population <- self %.% groups |>
         dplyr::left_join(
           self %.% activity %.% map_population(
             age_cuts_lower = self %.% age_cuts_lower,
             age_groups_reference = names(self %.% activity %.% contact_basis %.% proportion),
-            demography = self %.% activity %.% contact_basis %.% demography
+            demography = self %.% regions %.% demography
           ) |>
             dplyr::summarise(
-              "proportion" = sum(.data$proportion),
-              "age_cuts_lower" = min(.data$age),
+              "population" = sum(.data$population),
               .by = "age_group_out"
             ) |>
-            dplyr::transmute(
-              "population" = .data$proportion * sum(self %.% activity %.% contact_basis %.% population),
-              .data$proportion,
-              "age_group" = diseasystore::age_labels(.data$age_cuts_lower)
-            ),
+            dplyr::rename("age_group" = "age_group_out"),
           by = "age_group"
+        ) |>
+        dplyr::mutate(
+          "proportion" = .data$population / sum(.data$population)
         )
 
       return(population)
@@ -309,7 +311,6 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @field activity (`diseasy::DiseasyActivity`)\cr
     #'   The local copy of an DiseasyActivity module. Read-only.
     #' @seealso [diseasy::DiseasyActivity]
-    #' @importFrom diseasystore `%.%`
     activity = purrr::partial(
       .f = active_binding,
       name = "activity",
@@ -320,7 +321,6 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @field regions (`diseasy::DiseasyRegions`)\cr
     #'   The local copy of an DiseasyRegions module. Read-only.
     #' @seealso [diseasy::DiseasyRegions]
-    #' @importFrom diseasystore `%.%`
     regions = purrr::partial(
       .f = active_binding,
       name = "regions",

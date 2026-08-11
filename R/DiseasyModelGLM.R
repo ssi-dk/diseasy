@@ -9,7 +9,7 @@
 #' @return `r rd_diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export
-DiseasyModelGLM <- R6::R6Class(                                                                                         # nolint: object_name_linter
+DiseasyModelGLM <- R6::R6Class(                                                                                         # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelGLM",
   inherit = DiseasyModelRegression,
 
@@ -91,7 +91,8 @@ DiseasyModelGLM <- R6::R6Class(                                                 
 
 # Meta module for the simple, g* reference models models
 #' @noRd
-DiseasyModelG_ <- R6::R6Class(                                                                                          # nolint: object_name_linter
+DiseasyModelG_ <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+  classname = "DiseasyModelB_",
   inherit = DiseasyModelGLM,
   public = list(
 
@@ -144,7 +145,7 @@ DiseasyModelG_ <- R6::R6Class(                                                  
 
 #' @rdname Diseasy-GLM-models
 #' @export
-DiseasyModelG0 <- R6::R6Class(                                                                                          # nolint: object_name_linter
+DiseasyModelG0 <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelG0",
   inherit = DiseasyModelG_,
   public = list(
@@ -171,7 +172,7 @@ DiseasyModelG0 <- R6::R6Class(                                                  
 
 #' @rdname Diseasy-GLM-models
 #' @export
-DiseasyModelG1 <- R6::R6Class(                                                                                          # nolint: object_name_linter
+DiseasyModelG1 <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelG1",
   inherit = DiseasyModelG_,
   public = list(

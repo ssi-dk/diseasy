@@ -88,7 +88,7 @@ test_that("$hash works", {
   # Create a model instance using example data
   observables <- DiseasyObservables$new(
     diseasystore = DiseasystoreSeirExample,
-    conn = DBI::dbConnect(RSQLite::SQLite())
+    conn = \() DBI::dbConnect(RSQLite::SQLite())
   )
 
   observables$define_synthetic_observable(
@@ -103,6 +103,7 @@ test_that("$hash works", {
   # Create a DiseasyModelOdeSeir instance (we need a child class with `$initialise_state_vector()` implemented)
   model <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     observables = observables
   )
 

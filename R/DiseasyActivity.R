@@ -49,10 +49,9 @@
 #'   rm(act)
 #' @return
 #'   A new instance of the `DiseasyActivity` [R6][R6::R6Class] class.
-#' @importFrom Matrix sparseMatrix
 #' @keywords functional-module
 #' @export
-DiseasyActivity <- R6::R6Class(                                                                                         # nolint: object_name_linter
+DiseasyActivity <- R6::R6Class(                                                                                         # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyActivity",
   inherit = DiseasyBaseModule,
 
@@ -85,7 +84,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (!is.null(activity_units)) self$set_activity_units(activity_units = activity_units)
       if (!is.null(contact_basis))  self$set_contact_basis(contact_basis = contact_basis)
 
-      lgr::without_logging(self$reset_scenario()) # Configure internal matrices to activity_unit dimensions
+      lgr::without_logging(self$reset_scenario()) # Configure internal matrices to activity_unit dimensions             # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
 
       # If the base_scenario is "dk_reference", we load a configured activity scenario into the module
       if (base_scenario == "dk_reference") {
@@ -443,7 +442,6 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value\[\[date\]\]\[\[type\]\]
-    #' @importFrom pkgcond pkg_warning
     get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()

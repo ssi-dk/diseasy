@@ -51,7 +51,7 @@ withr::local_options(
 )
 
 missing_suggests <- !purrr::every(
-  c("dfoptim", "nloptr", "optimx", "subplex", "ucminf"),
+  c("nloptr", "optimx", "ucminf"),
   rlang::is_installed
 )
 ```

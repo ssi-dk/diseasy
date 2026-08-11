@@ -27,7 +27,7 @@
 #'   A new instance of the `DiseasySeason` [R6][R6::R6Class] class.
 #' @keywords functional-module
 #' @export
-DiseasySeason <- R6::R6Class(                                                                                           # nolint: object_name_linter
+DiseasySeason <- R6::R6Class(                                                                                           # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasySeason",
   inherit = DiseasyBaseModule,
 
@@ -74,7 +74,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
       # Reset the season model if already set
       if (!is.null(private$.model_t)) {
-        lgr::without_logging(
+        lgr::without_logging(                                                                                           # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
           self$use_season_model(attr(private$.model_t, "name"),
                                 attr(private$.model_t, "dots"))
         )
@@ -101,7 +101,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
         # Set new scale
         dots$scale <- scale
-        lgr::without_logging(
+        lgr::without_logging(                                                                                           # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
           self$use_season_model(attr(private$.model_t, "name"), dots)
         )
       }
@@ -622,7 +622,7 @@ DiseasySeason <- R6::R6Class(                                                   
         # Create the approximater that maps a scale to an a value
         compute_scale <- \(a) 1 - f(a)(max(climate_normal$max_temperature)) / f(a)(min(climate_normal$max_temperature))
         a_max <- stats::uniroot(\(a) compute_scale(a) - max_scale, c(k, 10000))$root
-        a_values <- pracma::logseq(k, a_max)
+        a_values <- pracma::logseq(k, a_max)                                                                            # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
         scales <- purrr::map_dbl(a_values, compute_scale)
 
         # Store in cache

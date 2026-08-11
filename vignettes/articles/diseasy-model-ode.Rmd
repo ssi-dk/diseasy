@@ -19,7 +19,38 @@ library(diseasy)
 ```
 
 ```{r options, include = FALSE}
-withr::local_options("diseasy.logging" = FALSE)
+# Create a cache for this vignette since the examples take a long time to generate
+# We will destroy the cache if the source code for `DiseasyImmunity`,
+# `DiseasyObservables` or `DiseasyModelOdeSeir` changes
+cache <- cachem::cache_disk(dir = "article_data/cache/diseasy-model-ode")
+
+r6_hash <- \(r6_generator) {
+  c(
+    "public_methods",
+    "public_fields",
+    "private_methods",
+    "private_fields",
+    "active"
+  ) |>
+    purrr::map(~ purrr::pluck(r6_generator, .x)) |>
+    purrr::reduce(c) |>
+    hash_environment()
+}
+
+source_code_hash <- c(
+  DiseasyBaseModule, DiseasyImmunity, DiseasyObservables, DiseasyModelOdeSeir
+) |>
+  purrr::map(r6_hash) |>
+  rlang::hash()
+
+if (!identical(source_code_hash, cache$get("source-code-hash"))) {
+  cache$reset()
+  cache$set("source-code-hash", source_code_hash)
+}
+
+withr::local_options(
+  "diseasy.cache" = cache
+)
 ```
 
 # Introduction
@@ -62,9 +93,11 @@ We first create an observables module to interface with this data:
 
 ```{r observables, eval = rlang::is_installed("RSQLite")}
 # Configure a observables module with the example data and database
+conn <- DBI::dbConnect(RSQLite::SQLite())
+
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
-  conn = DBI::dbConnect(RSQLite::SQLite())
+  conn = conn
 )
 ```
 
@@ -152,9 +185,11 @@ before finally defining the seasonality scenario via the `?DiseasySeason` module
 In this example scenario, we use a simple three age-group stratification of the population in the model.
 
 ```{r diseasy_population}
+# To stratify the population, we need to define the population
+regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+
 # Split the model population into three age groups
-population <- DiseasyPopulation$new()
-population$stratify_age(age_cuts_lower = c(0, 30, 60))
+population <- DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60))
 ```
 
 ## Activity scenario
@@ -402,6 +437,7 @@ With all the configuration done above, we can now create our model instance.
 model <- DiseasyModelOdeSeir$new(
   # Scenario configuration
   population = population,
+  regions = regions,
   activity = activity,
   immunity = immunity,
   season = season,
@@ -643,5 +679,6 @@ plot(
 
 ```{r cleanup, include = FALSE}
 if (exists("model")) rm(model)
+if (DBI::dbIsValid(conn)) DBI::dbDisconnect(conn)
 gc()
 ```

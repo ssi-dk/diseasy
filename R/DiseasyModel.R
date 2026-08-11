@@ -7,10 +7,13 @@
 #'   Most notably, the model module facilitates:
 #'   * Module interfaces:
 #'     The module contains the functional modules via its active bindings:
-#'     * `$activity`: `DiseasyActivity`
 #'     * `$observables`: `DiseasyObservables`
+#'     * `$population` : `DiseasyPopulation`
+#'     * `$activity`: `DiseasyActivity`
+#'     * `$regions`: `DiseasyRegions`
 #'     * `$season`: `DiseasySeason`
 #'     * `$variant` : `DiseasyVariant`
+#'     * `$immunity` : `DiseasyImmunity`
 #'
 #'     Configured instances of these modules can be provided during initialisation.
 #'     Alternatively, default instances of these modules can optionally be created.
@@ -28,7 +31,7 @@
 #' @keywords model-template-builder
 #' @export
 #' @seealso [lgr][lgr::lgr]
-DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter
+DiseasyModel <- R6::R6Class(                                                                                            # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModel",
   inherit = DiseasyBaseModule,
 
@@ -37,7 +40,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param observables,population,activity,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,regions,season,variant,immunity `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -59,6 +62,7 @@ DiseasyModel <- R6::R6Class(                                                    
       observables = FALSE,
       population  = FALSE,
       activity    = FALSE,
+      regions     = FALSE,
       season      = FALSE,
       variant     = FALSE,
       immunity    = FALSE,
@@ -81,6 +85,11 @@ DiseasyModel <- R6::R6Class(                                                    
       checkmate::assert(
         checkmate::check_logical(activity, null.ok = TRUE),
         checkmate::check_class(activity, "DiseasyActivity", null.ok = TRUE),
+        add = coll
+      )
+      checkmate::assert(
+        checkmate::check_logical(regions, null.ok = TRUE),
+        checkmate::check_class(regions, "DiseasyRegions", null.ok = TRUE),
         add = coll
       )
       checkmate::assert(
@@ -130,6 +139,12 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(DiseasyActivity$new())
       } else if (inherits(activity, "DiseasyActivity")) {
         self$load_module(activity)
+      }
+
+      if (isTRUE(regions)) {
+        self$load_module(DiseasyRegions$new())
+      } else if (inherits(regions, "DiseasyRegions")) {
+        self$load_module(regions)
       }
 
       if (isTRUE(season)) {
@@ -254,10 +269,19 @@ DiseasyModel <- R6::R6Class(                                                    
   # Make active bindings to the private variables
   active  = list(
 
+    #' @field observables (`diseasy::DiseasyObservables`)\cr
+    #'   The local copy of a DiseasyObservables module. Read-only.
+    #' @seealso [diseasy::DiseasyObservables]
+    observables = purrr::partial(
+      .f = active_binding,
+      name = "observables",
+      expr = return(private %.% .DiseasyObservables)
+    ),
+
+
     #' @field population (`diseasy::DiseasyPopulation`)\cr
     #'   The local copy of a DiseasyPopulation module. Read-only.
     #' @seealso [diseasy::DiseasyPopulation]
-    #' @importFrom diseasystore `%.%`
     population = purrr::partial(
       .f = active_binding,
       name = "population",
@@ -268,7 +292,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field activity (`diseasy::DiseasyActivity`)\cr
     #'   The local copy of an DiseasyActivity module. Read-only.
     #' @seealso [diseasy::DiseasyActivity]
-    #' @importFrom diseasystore `%.%`
     activity = purrr::partial(
       .f = active_binding,
       name = "activity",
@@ -276,32 +299,19 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
-    #' @field immunity (`diseasy::DiseasyImmunity`)\cr
-    #'   The local copy of a DiseasyImmunity module. Read-only.
-    #' @seealso [diseasy::DiseasyImmunity]
-    #' @importFrom diseasystore `%.%`
-    immunity = purrr::partial(
+    #' @field regions (`diseasy::DiseasyRegions`)\cr
+    #'   The local copy of an DiseasyRegions module. Read-only.
+    #' @seealso [diseasy::DiseasyRegions]
+    regions = purrr::partial(
       .f = active_binding,
-      name = "Immunity",
-      expr = return(private %.% .DiseasyImmunity)
-    ),
-
-
-    #' @field observables (`diseasy::DiseasyObservables`)\cr
-    #'   The local copy of a DiseasyObservables module. Read-only.
-    #' @seealso [diseasy::DiseasyObservables]
-    #' @importFrom diseasystore `%.%`
-    observables = purrr::partial(
-      .f = active_binding,
-      name = "observables",
-      expr = return(private %.% .DiseasyObservables)
+      name = "regions",
+      expr = return(private %.% .DiseasyRegions)
     ),
 
 
     #' @field season (`diseasy::DiseasySeason`)\cr
     #'   The local copy of a DiseasySeason module. Read-only.
     #' @seealso [diseasy::DiseasySeason]
-    #' @importFrom diseasystore `%.%`
     season = purrr::partial(
       .f = active_binding,
       name = "season",
@@ -312,7 +322,6 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @field variant (`diseasy::.DiseasyVariant`)\cr
     #'  The local copy of a DiseasyVariant module. Read-only.
     #' @seealso [diseasy::DiseasyVariant]
-    #' @importFrom diseasystore `%.%`
     variant = purrr::partial(
       .f = active_binding,
       name = "variant",
@@ -320,9 +329,18 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
+    #' @field immunity (`diseasy::DiseasyImmunity`)\cr
+    #'   The local copy of a DiseasyImmunity module. Read-only.
+    #' @seealso [diseasy::DiseasyImmunity]
+    immunity = purrr::partial(
+      .f = active_binding,
+      name = "Immunity",
+      expr = return(private %.% .DiseasyImmunity)
+    ),
+
+
     #' @field parameters (`list()`)\cr
     #'   The parameters used in the model. Read-only.
-    #' @importFrom diseasystore `%.%`
     parameters = purrr::partial(
       .f = active_binding,
       name = "parameters",
@@ -332,7 +350,6 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @field training_period (`list`(`Date`))\cr
     #'   The start and end dates of the training period. Read-only.
-    #' @importFrom diseasystore `%.%`
     training_period = purrr::partial(
       .f = active_binding,
       name = "training_period",
@@ -380,7 +397,6 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @field testing_period (`list`(`Date`))\cr
     #'   The start and end dates of the testing period. Read-only.
-    #' @importFrom diseasystore `%.%`
     testing_period = purrr::partial(
       .f = active_binding,
       name = "testing_period",
@@ -412,7 +428,6 @@ DiseasyModel <- R6::R6Class(                                                    
 
     #' @field validation_period (`list`(`Date`))\cr
     #'   The start and end dates of the validation period. Read-only.
-    #' @importFrom diseasystore `%.%`
     validation_period = purrr::partial(
       .f = active_binding,
       name = "validation_period",
@@ -444,12 +459,13 @@ DiseasyModel <- R6::R6Class(                                                    
 
   private = list(
 
+    .DiseasyObservables = NULL,
     .DiseasyPopulation  = NULL,
     .DiseasyActivity    = NULL,
-    .DiseasyImmunity    = NULL,
-    .DiseasyObservables = NULL,
+    .DiseasyRegions     = NULL,
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
+    .DiseasyImmunity    = NULL,
     .parameters = NULL,
 
     # @field default_parameters (`list`)\cr

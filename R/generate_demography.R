@@ -16,7 +16,6 @@
 #' }
 #' @keywords data-generators
 #' @export
-#' @importFrom diseasystore `%.%`
 generate_demography <- function(
   area = NULL,
   year = 2020L,
