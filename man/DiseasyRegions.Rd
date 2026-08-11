@@ -33,13 +33,10 @@ See the vignette("diseasy-regions") for examples of use.
   )
 
   # Restrict the model scope to two regions.
-  regions <- DiseasyRegions$new()
-
-  regions$set_area(area = c("north", "south"))
-  regions$set_demography(demography = demography)
-  regions$set_adjacency(
+  regions <- DiseasyRegions$new(
+    area = c("north", "south"),
     adjacency = adjacency,
-    adjacency_type = "movement"
+    demography = demography
   )
 
   # Active bindings return data for configured regions.
@@ -168,7 +165,8 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
-      \item{\code{adjacency_type}}{(\code{character})\cr The type of adjacency provided ("movement" versus "infection-flow"). See \code{vignette("diseasy-regions")} for details.}
+      \item{\code{adjacency_type}}{(\code{character})\cr The type of adjacency provided ("movement" versus "infection-flow"). See \code{vignette("diseasy-regions")} for details.
+Defaults to "movement" if not provided.}
     }
     \if{html}{\out{</div>}}
   }
@@ -218,7 +216,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
       \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
       \item{\code{regional_risks_type}}{(\code{character(1)})\cr
 The interpretation of the risk modifiers (see details).
-Must be either \code{"location"} or \code{"behaviour"}.}
+Must be either \code{"location"} or \code{"behaviour"} (default).}
     }
     \if{html}{\out{</div>}}
   }

@@ -25,13 +25,10 @@
 #'   )
 #'
 #'   # Restrict the model scope to two regions.
-#'   regions <- DiseasyRegions$new()
-#'
-#'   regions$set_area(area = c("north", "south"))
-#'   regions$set_demography(demography = demography)
-#'   regions$set_adjacency(
+#'   regions <- DiseasyRegions$new(
+#'     area = c("north", "south"),
 #'     adjacency = adjacency,
-#'     adjacency_type = "movement"
+#'     demography = demography
 #'   )
 #'
 #'   # Active bindings return data for configured regions.
@@ -98,12 +95,16 @@ DiseasyRegions <- R6::R6Class(                                                  
     #'   Sets the regional adjacency data.
     #' @param adjacency `r rd_adjacency()`
     #' @param adjacency_type `r rd_adjacency_type`
+    #'   Defaults to "movement" if not provided.
     #' @return `r rd_side_effects`
     set_adjacency = function(
       adjacency,
       adjacency_type = attr(adjacency, "type")
     ) {
 
+      if (is.null(adjacency_type)) {
+        adjacency_type <- "movement"
+      }
       checkmate::assert_choice(adjacency_type, c("movement", "infection-flow"))
 
       if (!checkmate::test_permutation(adjacency$from, adjacency$to)) {
@@ -154,7 +155,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param regional_risks `r rd_regional_risks()`
     #' @param regional_risks_type (`character(1)`)\cr
     #'   The interpretation of the risk modifiers (see details).
-    #'   Must be either `"location"` or `"behaviour"`.
+    #'   Must be either `"location"` or `"behaviour"` (default).
     #' @details
     #'   If the relative risk modifier, \eqn{\Gamma_x}{Gamma[x]}, is related
     #'   to the location, the elements of the infection-flow matrix,
@@ -188,6 +189,9 @@ DiseasyRegions <- R6::R6Class(                                                  
       regional_risks_type = attr(regional_risks, "type")
     ) {
 
+      if (is.null(adjacency_type)) {
+        regional_risks_type <- "behaviour"
+      }
       checkmate::assert_choice(regional_risks_type, c("location", "behaviour"))
 
       self$validate_configuration(
