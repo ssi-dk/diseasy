@@ -46,7 +46,7 @@ For `DiseasyPopulation`, this is done via `DiseasyRegions`[^1] which handles dem
 ```{r regions}
 regions <- DiseasyRegionsNuts$new(
   demography = demography_nordic_nuts3, # Use demography data from EUROSTAT
-  adjacency = adjacency_meta_nordic_nuts3, # Use adjacency data from Meta
+  adjacency = adjacency_meta_nordic_nuts, # Use adjacency data from Meta
   area = "DK" # Restrict population of interest to Danish population
 )
 
