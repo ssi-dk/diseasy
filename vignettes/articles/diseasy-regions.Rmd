@@ -140,7 +140,7 @@ $$
 
 That leads to the following expression:
 $$
-S_1 (\phi_{1,1}^2 + \phi_{2,1}^2) I_1 + S_1 (\phi_{1,1}\phi_{1,2} + \phi_{2,1}\phi_{2,2}) I_2 + \\
+S_1 (\phi_{1,1}^2 + \phi_{2,1}^2) I_1 + S_1 (\phi_{1,1}\phi_{1,2} + \phi_{2,1}\phi_{2,2}) I_2 +
 S_2 (\phi_{2,2}^2 + \phi_{1,2}^2) I_2 + S_2 (\phi_{2,2}\phi_{2,1} + \phi_{1,2}\phi_{1,1}) I_1
 $$
 
@@ -198,10 +198,34 @@ The $\Phi$ matrix will be normalised such that its row sums are 1.
 The stored adjacency input is long form, but the module also exposes an `?DiseasyRegions$infection_flow_matrix` field.
 This field returns a matrix representation of adjacency for the currently selected regions.
 
-The matrix is derived in three steps:
+# Regional differences in infection risk
 
-- the stored adjacency data are filtered to the selected regions;
-- the matrix is normalised so that row sums are 1.
+In `DiseasyRegions` we implement a regional modifier for the infection risk as a
+named vector of relative risks for each region in the model.
+
+This modifier can conceptually be thought of as either a modifier on the human
+behaviour of individual residing in the region (e.g. socio-economic differences
+in behaviour) or a modifier relating to the physical location itself
+(e.g. related to infrastructure of the region).
+
+If the modifier $\Gamma_x$ is related to the location, the elements of the
+infection-flow matrix is modified to
+$$
+\Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}
+$$
+
+Whereas if the modifier is related to behavioural differences, the elements
+are modified to:
+$$
+\Theta_{x,y} = \sqrt{\Gamma_x\Gamma_y} \sum_z \phi_{z,x} \phi_{z,y}
+$$
+
+Notice that if the infection-matrix is directly specified, these modifies may
+already (implicitly) included.
+
+The region-specific modifiers can be set via the `set_regional_risks()` method,
+and the interpretation of the modifier can be toggled via the `risk_type`
+argument.
 
 # Creating a regional module
 
@@ -246,6 +270,29 @@ regions %.% adjacency
 ```
 
 ```{r filtered_theta_matrix}
+regions %.% infection_flow_matrix
+```
+
+Regional modifiers of infection risk can be set via the `$set_regional_risks()` method
+
+... tied to location:
+```{r location_based_risks}
+regions$set_regional_risks(
+  regional_risks = c("DK" = 1.1, "SE" = 0.9, "NO" = 0.8, "FI" = 0.5),
+  regional_risks_type = "location"
+)
+
+# Our example produces an error since the provided `adjacency` is not movement data
+try(regions %.% infection_flow_matrix)
+```
+
+... or tied to population:
+```{r behaviour_based_risks}
+regions$set_regional_risks(
+  regional_risks = c("DK" = 1.1, "SE" = 0.9, "NO" = 0.8, "FI" = 0.5),
+  regional_risks_type = "behaviour"
+)
+
 regions %.% infection_flow_matrix
 ```
 

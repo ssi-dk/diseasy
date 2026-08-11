@@ -81,7 +81,8 @@ DiseasyRegions <- R6::R6Class(                                                  
       self$validate_configuration(
         area = sort(area),
         adjacency = private %.% .adjacency,
-        demography = private %.% .demography
+        demography = private %.% .demography,
+        regional_risks = private %.% .regional_risks
       )
 
       private$.area <- sort(area)
@@ -93,11 +94,18 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Sets the regional adjacency data.
     #' @param adjacency `r rd_adjacency()`
-    #' @param type `r rd_adjacency_type`
+    #' @param adjacency_type `r rd_adjacency_type`
+    #'   Defaults to "movement" if not provided.
     #' @return `r rd_side_effects`
-    set_adjacency = function(adjacency, type = c("movement", "infection-flow")) {
+    set_adjacency = function(
+      adjacency,
+      adjacency_type = attr(adjacency, "type")
+    ) {
 
-      type = match.arg(type)
+      if (is.null(adjacency_type)) {
+        adjacency_type <- "movement"
+      }
+      checkmate::assert_choice(adjacency_type, c("movement", "infection-flow"))
 
       if (!checkmate::test_permutation(adjacency$from, adjacency$to)) {
         pkgcond::pkg_error("`adjacency` incomplete: All two-way connections between regions must be specified!")
@@ -105,19 +113,18 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Sort the adjacency
       adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
-
-      # Store the type of adjacency matrix
-      attr(adjacency, "type") <- type
+      attr(adjacency, "type") <- adjacency_type
 
       # Check configuration works with existing area and demography
       self$validate_configuration(
         area = self %.% area,
         adjacency = adjacency,
-        demography = private %.% .demography
+        demography = private %.% .demography,
+        regional_risks = private %.% .regional_risks
       )
 
       # Store the adjacency
-      private$.adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
+      private$.adjacency <- adjacency
 
       return(invisible(NULL))
     },
@@ -133,10 +140,69 @@ DiseasyRegions <- R6::R6Class(                                                  
       self$validate_configuration(
         area = self %.% area,
         adjacency = private %.% .adjacency,
-        demography = demography
+        demography = demography,
+        regional_risks = private %.% .regional_risks
       )
 
       private$.demography <- demography
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Set modifiers to regional risks for all regions.
+    #' @param regional_risks `r rd_regional_risks()`
+    #' @param regional_risks_type (`character(1)`)\cr
+    #'   The interpretation of the risk modifiers (see details).
+    #'   Must be either `"location"` or `"behaviour"` (default).
+    #' @details
+    #'   If the relative risk modifier, \eqn{\Gamma_x}{Gamma[x]}, is related
+    #'   to the location, the elements of the infection-flow matrix,
+    #'   \eqn{\Theta_{x,y}}{Theta[x,y]}, are derived from the elements of the
+    #'   movement matrix, \eqn{\phi_{x,y}}{phi[x,y]}, via the relation:
+    #'
+    #'   \deqn{
+    #'     \Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}
+    #'   }{
+    #'     Theta[x,y] = sum_z Gamma[z] phi[z,x] phi[z,y]
+    #'   }
+    #'
+    #'   If the modifiers instead represent behavioural differences, the
+    #'   relation is:
+    #'
+    #'   \deqn{
+    #'     \Theta_{x,y}
+    #'       = \sqrt{\Gamma_x \Gamma_y}
+    #'         \sum_z \phi_{z,x} \phi_{z,y}
+    #'   }{
+    #'     Theta[x,y]
+    #'       = sqrt(Gamma[x] Gamma[y])
+    #'         sum_z phi[z,x] phi[z,y]
+    #'   }
+    #'
+    #'   If the infection-flow matrix is specified directly, the location
+    #'   interpretation cannot be computed and results in an error.
+    #' @return `r rd_side_effects`
+    set_regional_risks = function(
+      regional_risks,
+      regional_risks_type = attr(regional_risks, "type")
+    ) {
+
+      if (is.null(regional_risks_type)) {
+        regional_risks_type <- "behaviour"
+      }
+      checkmate::assert_choice(regional_risks_type, c("location", "behaviour"))
+
+      self$validate_configuration(
+        area = private %.% .area,
+        adjacency = private %.% .adjacency,
+        demography = private %.% .demography,
+        regional_risks = regional_risks
+      )
+
+      attr(regional_risks, "type") <- regional_risks_type
+      private$.regional_risks <- regional_risks
 
       return(invisible(NULL))
     },
@@ -147,13 +213,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
+    #' @param regional_risks `r rd_regional_risks()`
     #' @return `r rd_side_effects`
     #' @keywords internal
-    validate_configuration = function(
-      area,
-      adjacency,
-      demography
-    ) {
+    validate_configuration = function(area, adjacency, demography, regional_risks) {
 
       # Check area are consistent with adjacency
       if (!is.null(area) && !is.null(adjacency)) {
@@ -169,6 +232,13 @@ DiseasyRegions <- R6::R6Class(                                                  
         }
       }
 
+      # Check area are consistent with regional_risks
+      if (!is.null(area) && !is.null(regional_risks)) {
+        if (length(intersect(area, names(regional_risks))) < 1) {
+          pkgcond::pkg_error("`area` and `regional_risks` must contain at least one common region.")
+        }
+      }
+
       # Check adjacency is consistent with demography
       if (!is.null(adjacency) && !is.null(demography)) {
         if (length(intersect(adjacency %.% from, demography %.% region)) < 1) {
@@ -176,6 +246,19 @@ DiseasyRegions <- R6::R6Class(                                                  
         }
       }
 
+      # Check adjacency is consistent with regional_risks
+      if (!is.null(adjacency) && !is.null(regional_risks)) {
+        if (length(intersect(adjacency %.% from, names(regional_risks))) < 1) {
+          pkgcond::pkg_error("`adjacency` and `regional_risks` must contain at least one common region.")
+        }
+      }
+
+      # Check demography is consistent with regional_risks
+      if (!is.null(demography) && !is.null(regional_risks)) {
+        if (length(intersect(demography %.% region, names(regional_risks))) < 1) {
+          pkgcond::pkg_error("`demography` and `regional_risks` must contain at least one common region.")
+        }
+      }
 
       return(invisible(NULL))
     },
@@ -232,8 +315,15 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @description
     #'   Converts long form adjacency to the "Theta" infection matrix.
     #' @param adjacency `r rd_adjacency()`
-    #' @param type `r rd_adjacency_type`
-    adjacency_to_theta = function(adjacency, type = c("movement", "infection-flow")) {
+    #' @param adjacency_type `r rd_adjacency_type`
+    #' @param regional_risks `r rd_regional_risks()`
+    #' @param regional_risks_type (`character(1)`)\cr
+    #'   The interpretation of the risk modifiers.
+    #'   Must be either "location" or "behaviour".
+    adjacency_to_theta = function(
+      adjacency, adjacency_type,
+      regional_risks, regional_risks_type
+    ) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_data_frame(adjacency, add = coll)
       checkmate::assert_set_equal(colnames(adjacency), c("from", "to", "adjacency"), add = coll)
@@ -242,14 +332,25 @@ DiseasyRegions <- R6::R6Class(                                                  
       checkmate::assert_character(adjacency$to, any.missing = FALSE, add = coll)
       checkmate::assert_numeric(adjacency$adjacency, lower = 0, any.missing = FALSE, add = coll)
 
-      checkmate::assert_choice(type, c("movement", "infection-flow"), add = coll)
+      checkmate::assert_choice(adjacency_type, c("movement", "infection-flow"), add = coll)
+
+      checkmate::assert_numeric(regional_risks, lower = 0, any.missing = FALSE, null.ok = TRUE, add = coll)
+      if (!is.null(regional_risks)) {
+        checkmate::assert_set_equal(names(regional_risks), adjacency$from, add = coll)
+      }
+
+      checkmate::assert_choice(regional_risks_type, c("location", "behaviour"), null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       # Determine regions
       regions <- sort(unique(adjacency %.% from))
 
+      # Ensure consistent sorting
+      adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
+      if (!is.null(regional_risks)) regional_risks <- regional_risks[order(names(regional_risks))]
+
       # Split computations based on input type
-      if (type == "movement") {
+      if (adjacency_type == "movement") {
 
         # Normalise the movement matrix
         phi_long <- adjacency |>
@@ -259,20 +360,37 @@ DiseasyRegions <- R6::R6Class(                                                  
           ) |>
           dplyr::select(!"adjacency")
 
-        # Generate the infection matrix
+        # Generate the interactions
         theta_long <- tidyr::expand_grid("x" = regions, "y" = regions, "z" = regions) |>
           dplyr::left_join(phi_long, by = c("x" = "from", "z" = "to")) |>
-          dplyr::left_join(phi_long, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy")) |>
+          dplyr::left_join(phi_long, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy"))
+
+        # ... add regional modifiers
+        if (identical(regional_risks_type, "location")) {
+          theta_long <- dplyr::left_join(
+            theta_long,
+            tibble::tibble("z" = regions, "modifier" = regional_risks[sort(names(regional_risks))]),
+            by = "z"
+          )
+        } else {
+          theta_long <- dplyr::mutate(theta_long, "modifier" = 1)
+        }
+
+        # Generate the infection matrix
+        theta_long <- theta_long |>
           dplyr::summarise(
-            "theta" = sum(.data$phi_zx * .data$phi_zy),
+            "theta" = sum(.data$modifier * .data$phi_zx * .data$phi_zy),
             .by = c("x", "y")
           )
 
-      } else if (type == "infection-flow") {
+      } else if (adjacency_type == "infection-flow") {
 
         theta_long <- adjacency |>
           dplyr::rename("x" = "from", "y" = "to", "theta" = "adjacency")
 
+        if (identical(regional_risks_type, "location")) {
+          pkgcond::pkg_error('`regional_risks_type` can only be "location" if `adjacency_type = "movement"`')
+        }
       }
 
       # Cast to matrix
@@ -290,6 +408,18 @@ DiseasyRegions <- R6::R6Class(                                                  
           match(theta_long %.% y, regions)
         )
       ] <- theta_long %.% theta
+
+
+      # Apply the regional modifiers (if tied to behaviour)
+      if (identical(regional_risks_type, "behaviour")) {
+        theta_matrix <- theta_matrix *
+          sqrt(
+            outer(
+              X = regional_risks,
+              Y = regional_risks
+            )
+          )
+      }
 
       return(theta_matrix)
     },
@@ -435,20 +565,42 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       # Resolve plot data
       if (is.null(data)) {
-        value_column <- "population"
 
-        plot_data <- self %.% demography |>
-          dplyr::summarise(
-            "value" = sum(.data$population),
-            .by = "region"
+        plot_layers <- list(
+          "Population" = list(
+            "data" = dplyr::summarise(
+              self %.% demography,
+              "value" = sum(.data$population),
+              .by = "region"
+            ),
+            "colour_high" = "#3d3d3d",
+            "colour_low"  = "#4bbd4b"
           )
+        )
 
-        # Set colours
-        colour_high <- "#3d3d3d"
-        colour_low <- "#4bbd4b"
+        # Plot regional risk modifiers if configured
+        if (!is.null(self %.% regional_risks)) {
+          plot_layers[["Relative regional risks"]] <- list(
+            "data" = tibble::enframe(
+              self %.% regional_risks,
+              name = "region"
+            ),
+            "colour_high" = "#ff0000",
+            "colour_low"  = "#ffffff"
+          )
+        }
 
         # Plot adjacency if configured
-        plot_adjacency <- !is.null(self %.% adjacency)
+        if (!is.null(self %.% adjacency)) {
+          plot_layers[["Intra-region flow"]] <- list(
+            "data" = data.frame(
+              "region" = names(diag(self %.% infection_flow_matrix)),
+              "value" = as.numeric(diag(self %.% infection_flow_matrix))
+            ),
+            "colour_high" = "#e100ff",
+            "colour_low"  = "#ffffff"
+          )
+        }
 
       } else {
         # Infer value column
@@ -499,89 +651,93 @@ DiseasyRegions <- R6::R6Class(                                                  
             )
         }
 
-        # Set colours
-        colour_high <- "#ff0000"
-        colour_low <- "#ffffff"
 
-        plot_adjacency <- FALSE
+        plot_layers <- tibble::lst(
+          !!value_column := list(
+            "data" = plot_data,
+            "colour_high" = "#ff0000",
+            "colour_low"  = "#ffffff"
+          )
+        )
       }
 
-      # Compare with configured regions
-      plot_regions <- sort(unique(plot_data %.% region))
+      # Add plot values, hover data, and animation meta-data to each layer
+      plot_layers <- purrr::imap(
+        plot_layers,
+        \(layer, layer_name) {
+
+          layer_data <- layer %.% data
+          layer_animate <- "date" %in% colnames(layer_data)
+
+          if (layer_animate) {
+            layer_regions <- sort(unique(layer_data %.% region))
+            layer_dates <- sort(unique(layer_data %.% date))
+
+            layer_data <- tidyr::expand_grid(
+              "region" = layer_regions,
+              "date" = layer_dates
+            ) |>
+              dplyr::left_join(layer_data, by = c("region", "date")) |>
+              dplyr::mutate(
+                "date" = factor(
+                  as.character(.data$date),
+                  levels = as.character(layer_dates)
+                )
+              )
+          }
+
+          layer_data <- layer_data |>
+            dplyr::mutate(
+              "value_label" = format(
+                .data$value,
+                big.mark = ",",
+                scientific = FALSE,
+                digits = 3,
+                trim = TRUE
+              ),
+              "hover_text" = paste0(
+                "Region: ", .data$region,
+                if (layer_animate) {
+                  paste0("<br>Date: ", as.character(.data$date))
+                } else {
+                  ""
+                },
+                "<br>", stringr::str_to_sentence(layer_name), ": ", .data$value_label
+              )
+            )
+
+          layer[["data"]] <- layer_data
+          layer[["animate"]] <- layer_animate
+
+          return(layer)
+        }
+      )
+
+      # Check if we require animation
+      animate_plot <- any(vapply(
+        X = plot_layers,
+        FUN = \(layer) isTRUE(layer[["animate"]]),
+        FUN.VALUE = logical(1)
+      ))
+
+      # Compare shapefiles with requested regions
+      plot_regions <- plot_layers |>
+        purrr::map(~ purrr::pluck(., "data")) |>
+        purrr::map(~ dplyr::pull(., "region")) |>
+        purrr::reduce(c) |>
+        unique() |>
+        sort()
       missing_regions <- setdiff(plot_regions, unique(shape_files %.% region))
 
       if (length(missing_regions) > 0) {
         pkgcond::pkg_error(
           glue::glue(
-            "`shape_files` is missing configured regions: {toString(missing_regions)}."
+            "`shape_files` is missing requested regions: {toString(missing_regions)}."
           )
         )
       }
 
       shape_files <- dplyr::filter(shape_files, .data$region %in% plot_regions)
-
-
-      # Use all available dates as animation frames.
-      animate_plot <- "date" %in% colnames(plot_data)
-
-      if (animate_plot) {
-        plot_dates <- sort(unique(plot_data %.% date))
-
-        plot_data <- tidyr::expand_grid(
-          "region" = plot_regions,
-          "date" = plot_dates
-        ) |>
-          dplyr::left_join(plot_data, by = c("region", "date")) |>
-          dplyr::mutate(
-            "date" = factor(
-              as.character(.data$date),
-              levels = as.character(plot_dates)
-            )
-          )
-      }
-
-      if (plot_adjacency) {
-        plot_data <- plot_data |>
-          dplyr::left_join(
-            data.frame(
-              "region" = names(diag(self %.% infection_flow_matrix)),
-              "intra_region_flow" = as.numeric(diag(self %.% infection_flow_matrix))
-            ),
-            by = "region"
-          )
-      } else {
-        plot_data <- plot_data |>
-          dplyr::mutate("intra_region_flow" = NA)
-      }
-
-      if (any(plot_data %.% value < 0, na.rm = TRUE)) {
-        pkgcond::pkg_error(
-          "`plot()` requires non-negative values when using log1p colour mapping."
-        )
-      }
-
-      value_max <- max(plot_data %.% value, na.rm = TRUE)
-      if (!is.finite(value_max) || value_max <= 0) value_max <- 1
-
-
-      plot_data <- plot_data |>
-        dplyr::mutate(
-          "plot_value" = .data$value,
-          "value_label" = format(.data$value, big.mark = ",", scientific = FALSE, digits = 3, trim = TRUE),
-          "hover_text" = paste0(
-            "Region: ", .data$region,
-            if (animate_plot) paste0("<br>Date: ", as.character(.data$date)) else "",
-            "<br>", stringr::str_to_sentence(value_column), ": ", .data$value_label,
-            dplyr::if_else(
-              is.na(.data$intra_region_flow),
-              "",
-              paste0(
-                "<br>Intra-region flow: ",
-                format(.data$intra_region_flow, digits = 2, scientific = FALSE, trim = TRUE)
-              )
-            )
-          )
-        )
 
       shape_geojson <- shape_files |>
         dplyr::select("region") |>
@@ -612,45 +768,69 @@ DiseasyRegions <- R6::R6Class(                                                  
         )
       }
 
-      # Create region choropleth.
+      # Create region choropleth layers.
       out <- plotly::plot_geo()
 
-      choropleth_args <- list(
-        p = out,
-        data = plot_data,
-        type = "choropleth",
-        geojson = shape_geojson,
-        featureidkey = "id",
-        locationmode = "geojson-id",
-        locations = stats::as.formula("~ region"),
-        z = stats::as.formula("~ plot_value"),
-        ids = stats::as.formula("~ region"),
-        text = stats::as.formula("~ hover_text"),
-        hovertemplate = "%{text}<extra></extra>",
-        colorscale = list(c(0, colour_low), c(1, colour_high)),
-        zmin = 0,
-        zmax = value_max,
-        marker = list(
-          line = list(
-            color = "grey70",
-            width = 0.3
-          )
-        ),
-        colorbar = list(
-          title = list(text = stringr::str_to_sentence(value_column))
-        ),
-        name = stringr::str_to_sentence(value_column),
-        showlegend = FALSE
-      )
+      for (layer_index in seq_along(plot_layers)) {
+        layer <- plot_layers[[layer_index]]
+        layer_name <- names(plot_layers)[layer_index]
 
-      if (animate_plot) {
-        choropleth_args[["frame"]] <- stats::as.formula("~ date")
+        layer_value_max <- max(layer %.% data %.% value, na.rm = TRUE)
+
+        if (!is.finite(layer_value_max) || layer_value_max <= 0) {
+          layer_value_max <- 1
+        }
+
+        choropleth_args <- list(
+          p = out,
+          data = layer %.% data,
+          type = "choropleth",
+          geojson = shape_geojson,
+          featureidkey = "id",
+          locationmode = "geojson-id",
+          locations = stats::as.formula("~ region"),
+          z = stats::as.formula("~ value"),
+          ids = stats::as.formula("~ region"),
+          text = stats::as.formula("~ hover_text"),
+          hovertemplate = "%{text}<extra></extra>",
+          colorscale = list(
+            c(0, unique(layer %.% colour_low)[[1]]),
+            c(1, unique(layer %.% colour_high)[[1]])
+          ),
+          zmin = 0,
+          zmax = layer_value_max,
+          marker = list(
+            line = list(
+              color = "grey70",
+              width = 0.3
+            )
+          ),
+          colorbar = list(
+            title = list(text = layer_name),
+            x = 0.72,
+            xanchor = "left",
+            y = 0.50,
+            yanchor = "middle",
+            len = 0.75,
+            thickness = 14
+          ),
+          name = layer_name,
+          visible = layer_index == 1,
+          showlegend = FALSE
+        )
+
+        if (isTRUE(layer[["animate"]])) {
+          choropleth_args[["frame"]] <- stats::as.formula("~ date")
+        }
+
+        out <- do.call(plotly::add_trace, choropleth_args)
       }
 
-      out <- do.call(plotly::add_trace, choropleth_args)
-
       # Add adjacency overlay for module-configuration plots.
-      if (plot_adjacency) {
+      initial_layer_name <- names(plot_layers)[[1]]
+      show_adjacency_graph <- identical(initial_layer_name, "Intra-region flow")
+
+      if (!is.null(self %.% adjacency)) {
 
         # Build nodes from the largest polygon belonging to each region.
         # This avoids placing nodes on small islands or remote multipolygon parts.
@@ -734,10 +914,11 @@ DiseasyRegions <- R6::R6Class(                                                  
 
           edge_groups <- sort(unique(edges %.% edge_group))
           max_edge_group <- max(edge_groups)
+          max_edge_adjacency <- max(edges %.% adjacency, na.rm = TRUE)
 
-          for (edge_group in edge_groups) {
+          for (edge_group_i in edge_groups) {
             edge_data <- edges |>
-              dplyr::filter(.data$edge_group == !!edge_group)
+              dplyr::filter(.data$edge_group == .env$edge_group_i)
 
             edge_longitude <- as.vector(
               rbind(edge_data %.% x, edge_data %.% x_end, NA_real_)
@@ -762,7 +943,8 @@ DiseasyRegions <- R6::R6Class(                                                  
                 ),
                 opacity = edge_alpha,
                 hoverinfo = "skip",
-                showlegend = edge_group == max_edge_group,
+                visible = show_adjacency_graph,
+                showlegend = edge_group_i == max_edge_group,
                 name = "Inter-region flows",
                 legendgroup = "Inter-region flows",
                 legendrank = 3,
@@ -779,6 +961,7 @@ DiseasyRegions <- R6::R6Class(                                                  
             lon = stats::as.formula("~ x"),
             lat = stats::as.formula("~ y"),
             hoverinfo = "skip",
+            visible = show_adjacency_graph,
             marker = list(
               size = nodes %.% node_size,
               color = "black",
@@ -787,7 +970,7 @@ DiseasyRegions <- R6::R6Class(                                                  
                 width = 0.5
               )
             ),
-            showlegend = TRUE,
+            showlegend = show_adjacency_graph,
             name = "Intra-region flows",
             legendrank = 2,
             inherit = FALSE
@@ -799,6 +982,10 @@ DiseasyRegions <- R6::R6Class(                                                  
           geo = list(
             scope = "world",
             fitbounds = "geojson",
+            domain = list(
+              x = c(0.02, 0.84),
+              y = c(0.02, 0.98)
+            ),
             projection = list(
               type = "orthographic"
             ),
@@ -814,7 +1001,7 @@ DiseasyRegions <- R6::R6Class(                                                  
           ),
           paper_bgcolor = "white",
           plot_bgcolor = "white",
-          margin = list(l = 0, r = 0, b = 0, t = 0),
+          margin = list(l = 10, r = 10, b = 10, t = 10, autoexpand = FALSE),
           legend = list(
             bgcolor = "rgba(255, 255, 255, 0.8)",
             bordercolor = "rgba(0, 0, 0, 0)",
@@ -835,6 +1022,150 @@ DiseasyRegions <- R6::R6Class(                                                  
               font = list(color = "black")
             )
           )
+      }
+
+      out <- plotly::plotly_build(out)
+
+      # Remove Plotly's default animation menu and replace it with explicit controls.
+      out$x$layout$updatemenus <- list()
+
+      if (animate_plot) {
+        out$x$layout$updatemenus <- c(
+          out$x$layout$updatemenus,
+          list(
+            list(
+              type = "buttons",
+              direction = "left",
+              showactive = FALSE,
+              x = 0,
+              y = 0,
+              xanchor = "left",
+              yanchor = "bottom",
+              pad = list(
+                t = 10,
+                r = 10
+              ),
+              buttons = list(
+                list(
+                  label = "Play",
+                  method = "animate",
+                  args = list(
+                    NULL,
+                    list(
+                      fromcurrent = TRUE,
+                      mode = "immediate",
+                      frame = list(
+                        duration = 750,
+                        redraw = TRUE
+                      ),
+                      transition = list(
+                        duration = 0
+                      )
+                    )
+                  )
+                ),
+                list(
+                  label = "Pause",
+                  method = "animate",
+                  args = list(
+                    list(NULL),
+                    list(
+                      mode = "immediate",
+                      frame = list(
+                        duration = 0,
+                        redraw = FALSE
+                      ),
+                      transition = list(
+                        duration = 0
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      }
+
+      trace_types <- vapply(
+        X = out$x$data,
+        FUN = \(trace_data) {
+          if (is.null(trace_data$type)) {
+            return(NA_character_)
+          }
+
+          return(trace_data$type)
+        },
+        FUN.VALUE = character(1)
+      )
+
+      choropleth_trace_indices <- which(trace_types == "choropleth")
+
+
+      trace_names <- vapply(
+        X = out$x$data,
+        FUN = \(trace_data) {
+          if (is.null(trace_data$name)) {
+            return(NA_character_)
+          }
+
+          return(trace_data$name)
+        },
+        FUN.VALUE = character(1)
+      )
+
+      adjacency_trace_indices <- which(
+        trace_names %in% c("Inter-region flows", "Intra-region flows")
+      )
+
+      if (length(choropleth_trace_indices) > 1) {
+        layer_buttons <- vector("list", length(choropleth_trace_indices))
+
+        for (layer_index in seq_along(choropleth_trace_indices)) {
+          trace_index <- choropleth_trace_indices[[layer_index]]
+          layer <- plot_layers[[layer_index]]
+          layer_name <- names(plot_layers)[[layer_index]]
+
+          trace_visible <- rep(TRUE, length(out$x$data))
+
+          trace_visible[choropleth_trace_indices] <- FALSE
+          trace_visible[[trace_index]] <- TRUE
+
+          trace_visible[adjacency_trace_indices] <- identical(
+            layer_name,
+            "Intra-region flow"
+          )
+
+          layer_buttons[[layer_index]] <- list(
+            label = layer_name,
+            method = "restyle",
+            args = list(
+              list(
+                visible = trace_visible
+              )
+            )
+          )
+        }
+
+        out$x$layout$updatemenus <- c(
+          out$x$layout$updatemenus,
+          list(
+            list(
+              type = "buttons",
+              direction = "right",
+              showactive = TRUE,
+              x = 0,
+              y = 1,
+              xanchor = "left",
+              yanchor = "top",
+              pad = list(
+                t = 10,
+                r = 10
+              ),
+              buttons = layer_buttons
+            )
+          )
+        )
       }
 
       return(out)
@@ -879,7 +1210,7 @@ DiseasyRegions <- R6::R6Class(                                                  
     area = purrr::partial(
       .f = active_binding,
       name = "area",
-      expr = return(private %.% .area)
+      expr = return(sort(private %.% .area))
     ),
 
 
@@ -910,6 +1241,9 @@ DiseasyRegions <- R6::R6Class(                                                  
             self$region_filter(values = .data$to)
           )
 
+        # Ensure consistent sorting
+        adjacency <- dplyr::arrange(adjacency, .data$from, .data$to)
+
         # Copy the type attribute
         attr(adjacency, "type") <- attr(private %.% .adjacency, "type")
 
@@ -925,22 +1259,45 @@ DiseasyRegions <- R6::R6Class(                                                  
       name = "infection_flow_matrix",
       expr = {
         adjacency <- self %.% adjacency
+        regional_risks <- self %.% regional_risks
 
         if (is.null(adjacency)) {
-          return(
-            matrix(
-              data = 1 / sqrt(length(self %.% area)),
-              nrow = length(self %.% area),
-              ncol = length(self %.% area),
-              dimnames = list(self %.% area, self %.% area)
-            )
+
+          infection_flow_matrix <- matrix(
+            data = 1 / sqrt(length(self %.% area)),
+            nrow = length(self %.% area),
+            ncol = length(self %.% area),
+            dimnames = list(self %.% area, self %.% area)
           )
+
+          if (attr(regional_risks, "type") == "behaviour") {
+            infection_flow_matrix <- infection_flow_matrix *
+              sqrt(
+                outer(
+                  X = self %.% regional_risks,
+                  Y = self %.% regional_risks
+                )
+              )
+          } else {
+            pkgcond::pkg_error(
+              paste(
+                "The interpretation of regional modifiers (`regional_risks_type`) must be",
+                '"behaviour" if no adjacency data is provided.'
+              )
+            )
+          }
+
+        } else {
+
+          infection_flow_matrix <- self$adjacency_to_theta(
+            adjacency = adjacency,
+            adjacency_type = attr(adjacency, "type"),
+            regional_risks = regional_risks,
+            regional_risks_type = attr(regional_risks, "type")
+          )
+
         }
 
-        infection_flow_matrix <- self$adjacency_to_theta(
-          adjacency = adjacency,
-          type = attr(adjacency, "type")
-        )
         return(infection_flow_matrix)
       }
     ),
@@ -969,6 +1326,31 @@ DiseasyRegions <- R6::R6Class(                                                  
 
         return(demography)
       }
+    ),
+
+
+    #' @field regional_risks `r rd_regional_risks(type = "field")`
+    regional_risks = purrr::partial(
+      .f = active_binding,
+      name = "regional_risks",
+      expr = {
+        if (is.null(private %.% .regional_risks)) {
+          return(NULL)
+        }
+
+        # Filter to area
+        regional_risk <- private %.% .regional_risks[
+          self %.% region_filter(names(private %.% .regional_risks))
+        ]
+
+        # Sort
+        regional_risk <- regional_risk[order(names(regional_risk))]
+
+        # Copy the type attribute
+        attr(regional_risk, "type") <- attr(private %.% .regional_risks, "type")
+
+        return(regional_risk)
+      }
     )
   ),
 
@@ -976,7 +1358,8 @@ DiseasyRegions <- R6::R6Class(                                                  
   private = list(
     .area = NULL,
     .adjacency = NULL,
-    .demography = NULL
+    .demography = NULL,
+    .regional_risks = NULL
   )
 )
 
@@ -995,8 +1378,9 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
     #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
+    #' @param regional_risks `r rd_regional_risks()`
     #' @return `r rd_side_effects`
-    validate_configuration = function(area, adjacency, demography) {
+    validate_configuration = function(area, adjacency, demography, regional_risks) {
 
       valid_nuts <- nuts$region
 
@@ -1008,7 +1392,9 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
         )
       }
 
-      # Helper function to retrieve all NUTS codes for the given area
+      # Helper functions
+
+      # ... to retrieve all NUTS codes for the given area
       nuts_at_resolution <- function(nuts_level) {
         nuts |>
           dplyr::filter(level <= nuts_level) |>
@@ -1017,15 +1403,18 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
           dplyr::pull("region")
       }
 
-
-      # adjacency must include a complete set of NUTS codes at its resolution
-      if (!is.null(adjacency)) {
+      # ... to validate completeness
+      check_completeness <- function(regions, variable_name) {
 
         # Infer the resolution (NUTS level) in adjacency data
-        adjacency_resolution <- unique(nchar(unique(adjacency$from)) - 2)
+        adjacency_resolution <- unique(nchar(unique(regions)) - 2)
 
         if (length(adjacency_resolution) > 1) {
-          pkgcond::pkg_error("`adjacency` has more data for more than one NUTS level")
+          pkgcond::pkg_error(
+            glue::glue(
+              "`{variable_name}` has data for more than one NUTS level"
+            )
+          )
         }
 
         if (!is.null(area)) {
@@ -1034,12 +1423,12 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
           all_nuts_within_scope <- nuts_at_resolution(adjacency_resolution) |>
             purrr::keep(~ any(stringr::str_starts(., area)))
 
-          missing_regions <- setdiff(all_nuts_within_scope, adjacency$from)
+          missing_regions <- setdiff(all_nuts_within_scope, regions)
 
           if (length(missing_regions) > 0) {
             pkgcond::pkg_error(
               glue::glue(
-                "`adjacency` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
+                "`{variable_name}` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
               )
             )
           }
@@ -1047,34 +1436,11 @@ DiseasyRegionsNuts <- R6::R6Class(                                              
 
       }
 
-      # demography must include a complete set of NUTS codes at its resolution
-      if (!is.null(demography)) {
 
-        # Infer the resolution (NUTS level) in demography data
-        demography_resolution <- unique(nchar(unique(demography$region)) - 2)
-
-        if (length(demography_resolution) > 1) {
-          pkgcond::pkg_error("`demography` has more data for more than one demography level")
-        }
-
-        if (!is.null(area)) {
-
-          # Get all nuts code within scope
-          all_nuts_within_scope <- nuts_at_resolution(demography_resolution) |>
-            purrr::keep(~ any(stringr::str_starts(., area)))
-
-          missing_regions <- setdiff(all_nuts_within_scope, demography$region)
-
-          if (length(missing_regions) > 0) {
-            pkgcond::pkg_error(
-              glue::glue(
-                "`demography` does not have all regions at its NUTS level (missing: {toString(missing_regions)})"
-              )
-            )
-          }
-
-        }
-      }
+      # Validate inputs
+      if (!is.null(adjacency))      check_completeness(adjacency$from, "adjacency")
+      if (!is.null(demography))     check_completeness(demography$region, "demography")
+      if (!is.null(regional_risks)) check_completeness(names(regional_risks), "regional_risks")
 
       return(invisible(NULL))
     },
