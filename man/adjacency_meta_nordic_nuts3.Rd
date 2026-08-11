@@ -6,7 +6,7 @@
 \title{Meta Social Connectedness Index as adjacency for NUTS 3 regions (Nordics)}
 \source{
 Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
-Retrieved June 15, 2026.
+Retrieved \verb{r format(attr(adjacency_meta_nordic_nuts3, "creation_date"), "\%B \%d, \%Y", tz = "Europe/Copenhagen")}.
 See \url{https://data.humdata.org/dataset/social-connectedness-index} and
 \url{https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/}.
 }
