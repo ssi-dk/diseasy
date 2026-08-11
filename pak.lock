@@ -805,11 +805,6 @@
       "binary": true
     },
     {
-      "package": "rdtools",
-      "version": "0.1.0",
-      "binary": true
-    },
-    {
       "package": "reactable",
       "version": "0.4.5",
       "binary": true
@@ -876,7 +871,7 @@
     },
     {
       "package": "roxygen2",
-      "version": "8.1.0",
+      "version": "8.0.0",
       "binary": true
     },
     {
