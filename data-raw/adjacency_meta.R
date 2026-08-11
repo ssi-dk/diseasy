@@ -1,14 +1,14 @@
-adjacency_meta_nordic_nuts <- generate_adjacency_meta(
+adjacency_meta_nordic_nuts3 <- generate_adjacency_meta(
   area = c("DK", "FI", "IS", "NO", "SE")
 ) |>
   dplyr::inner_join(dplyr::select(nuts, "region"), by = c("from" = "region")) |>
   dplyr::inner_join(dplyr::select(nuts, "region"), by = c("to" = "region"))
 
-usethis::use_data(adjacency_meta_nordic_nuts, overwrite = TRUE)
+usethis::use_data(adjacency_meta_nordic_nuts3, overwrite = TRUE)
 
 
 # Aggregate from NUIS3 to Country level
-adjacency_meta_nordic <- adjacency_meta_nordic_nuts |>
+adjacency_meta_nordic <- adjacency_meta_nordic_nuts3 |>
   dplyr::left_join(
     dplyr::summarise(demography_nordic_nuts3, "population" = sum(.data$population), .by = "region"),
     by = c("from" = "region")
