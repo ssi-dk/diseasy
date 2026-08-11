@@ -157,8 +157,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyRegions$set_adjacency(
   adjacency,
-  adjacency_type = purrr::pluck(adjacency, attributes, "type", .default = c("movement",
-    "infection-flow"))
+  adjacency_type = attr(adjacency, "type")
 )}
     \if{html}{\out{</div>}}
   }
@@ -206,8 +205,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyRegions$set_regional_risks(
   regional_risks,
-  regional_risks_type = purrr::pluck(regional_risks, attributes, "type", .default =
-    c("location", "behaviour"))
+  regional_risks_type = attr(regional_risks, "type")
 )}
     \if{html}{\out{</div>}}
   }

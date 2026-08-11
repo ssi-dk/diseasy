@@ -98,13 +98,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @return `r rd_side_effects`
     set_adjacency = function(
       adjacency,
-      adjacency_type = purrr::pluck(
-        adjacency, attributes, "type",
-        .default = c("movement", "infection-flow")
-      )
+      adjacency_type = attr(adjacency, "type")
     ) {
 
-      adjacency_type = match.arg(adjacency_type)
+      checkmate::assert_choice(adjacency_type, c("movement", "infection-flow"))
 
       if (!checkmate::test_permutation(adjacency$from, adjacency$to)) {
         pkgcond::pkg_error("`adjacency` incomplete: All two-way connections between regions must be specified!")
@@ -185,12 +182,10 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @return `r rd_side_effects`
     set_regional_risks = function(
       regional_risks,
-      regional_risks_type = purrr::pluck(
-        regional_risks, attributes, "type",
-        .default = c("location", "behaviour")
-      )
+      regional_risks_type = attr(regional_risks, "type")
     ) {
-      regional_risks_type = match.arg(regional_risks_type)
+
+      checkmate::assert_choice(regional_risks_type, c("location", "behaviour"))
 
       self$validate_configuration(
         area = private %.% .area,
