@@ -189,7 +189,7 @@ DiseasyRegions <- R6::R6Class(                                                  
       regional_risks_type = attr(regional_risks, "type")
     ) {
 
-      if (is.null(adjacency_type)) {
+      if (is.null(regional_risks_type)) {
         regional_risks_type <- "behaviour"
       }
       checkmate::assert_choice(regional_risks_type, c("location", "behaviour"))
