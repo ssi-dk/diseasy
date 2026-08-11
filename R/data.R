@@ -243,11 +243,11 @@ NULL
 #'
 #' The adjacency values are two-way contact between regions and should be interpreted a type of "infection-flow" matrix.
 #'
-#' @name adjacency_meta_nordic_nuts
+#' @name adjacency_meta_nordic_nuts3
 #' @docType data
 #' @source
 #'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
-#'   Retrieved `r format(attr(adjacency_meta_nordic_nuts, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
+#'   Retrieved `r format(attr(adjacency_meta_nordic_nuts3, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
 #'   See <https://data.humdata.org/dataset/social-connectedness-index> and
 #'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
 #' @keywords data
