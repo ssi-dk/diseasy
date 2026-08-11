@@ -338,7 +338,7 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
   # Intersection of demography and adjacency
   regions_nuts$set_adjacency(
     dplyr::filter(
-      adjacency_meta_nordic_nuts3,
+      adjacency_meta_nordic_nuts,
       substr(.data$from, 1, 2) %in% c("DK", "SE"),
       substr(.data$to, 1, 2) %in% c("DK", "SE")
     )
