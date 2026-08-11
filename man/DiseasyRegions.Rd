@@ -33,10 +33,13 @@ See the vignette("diseasy-regions") for examples of use.
   )
 
   # Restrict the model scope to two regions.
-  regions <- DiseasyRegions$new(
-    area = c("north", "south"),
+  regions <- DiseasyRegions$new()
+
+  regions$set_area(area = c("north", "south"))
+  regions$set_demography(demography = demography)
+  regions$set_adjacency(
     adjacency = adjacency,
-    demography = demography
+    adjacency_type = "movement"
   )
 
   # Active bindings return data for configured regions.
