@@ -635,15 +635,17 @@ DiseasyActivity <- R6::R6Class(                                                 
           N_original <- self$contact_basis$population                                                                   # nolint: object_name_linter
           N_original <- outer(N_original, rep(1, length(N_original)))                                                   # nolint: object_name_linter
 
-          # For each contact matrix, m, in the scenario, we perform the transformation
-          # (p %*% (m * N_original) %*% t(p)) / N_new                                                                   # nolint: commented_code_linter
-          # As m is the number of contacts from each individual m * N_original scales to all contacts between
-          # age groups ("t" domain).
+          # For each per-capita contact matrix, c, in the scenario, we perform the transformation
+          # (p %*% (c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N__new))                                     # nolint: commented_code_linter
+          # As c is the per-capita contacts from each individual c * N_original * t(N_original) scales to all contacts ¨
+          # between age groups ("t" domain).
           # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-          # Finally, the division by N_new transforms back to contacts per individual in the new age groups
-          # ("m" domain).
+          # Finally, the division by N_new * t(N_new) transforms back to per-capita contacts individual in the new age
+          # groups ("c" domain).
           scenario_contacts <- scenario_contacts |>
-            lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
+            lapply(
+              \(contacts) lapply(contacts, \(c) (p %*% (c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new)))
+            )
         }
       }
 
@@ -793,8 +795,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       checkmate::assert_numeric(population, add = coll)
       checkmate::reportAssertions(coll)
 
-      proportion <- population / sum(population)
-      out <- input / matrix(rep(proportion, length(proportion)), nrow = length(proportion), byrow = TRUE)
+      out <- input * sum(population)
 
       return(out)
     },
@@ -966,6 +967,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       return(list("contact_matrix" = contacts_plot, "openness" = openness_plot))
     },
+
 
     #' @description `r rd_describe`
     describe = function() {
