@@ -46,7 +46,7 @@
 #'   A new instance of the `DiseasyRegions` [R6][R6::R6Class] class.
 #' @keywords functional-module
 #' @export
-DiseasyRegions <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyRegions <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyRegions",
   inherit = DiseasyBaseModule,
 
@@ -1366,7 +1366,7 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 #' @rdname DiseasyRegions
 #' @export
-DiseasyRegionsNuts <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyRegionsNuts <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyRegionsNuts",
   inherit = DiseasyRegions,
 

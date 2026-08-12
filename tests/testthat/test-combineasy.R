@@ -1,5 +1,5 @@
 # Create two dummy model template to use in the tests
-DiseasyModelDummy1 <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyModelDummy1 <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelDummy1",
   inherit = DiseasyModel,
 
@@ -11,7 +11,7 @@ DiseasyModelDummy1 <- R6::R6Class(                                              
   )
 )
 
-DiseasyModelDummy2 <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyModelDummy2 <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelDummy2",
   inherit = DiseasyModel,
 

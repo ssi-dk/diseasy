@@ -60,7 +60,7 @@ test_that("initialize works with model parameters", {
   skip_if_not_installed("RSQLite")
 
   # Create a simple model that takes parameters
-  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
     classname = "DiseasyModelParameterTest",
     inherit = DiseasyModel,
     private = list(
@@ -284,7 +284,7 @@ test_that("$hash works", {
 
 
   # Create a simple model that takes parameters
-  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
     classname = "DiseasyModelParameterTest",
     inherit = DiseasyModel,
     private = list(
@@ -303,7 +303,7 @@ test_that("$hash works", {
   default_hash <- m$hash
   rm(m)
 
-  # Hash instance with permutated parameters
+  # Hash instance with perturbated parameters
   m <- DiseasyModelParameterTest$new(parameters = list("num" = 2, "list" = list("a" = 1, "b" = 2)))
   expect_identical(m$hash, default_hash)
   rm(m)
