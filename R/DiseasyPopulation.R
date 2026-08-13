@@ -174,16 +174,9 @@ DiseasyPopulation <- R6::R6Class(                                               
         weights = weights
       )
 
-      # If no demography is provided, assume even distribution
-      if (is.null(self %.% activity$contact_basis) || (is.null(self %.% regions %.% demography))) {
-        population_proportion <- rep(1 / length(self %.% age_cuts_lower), length(self %.% age_cuts_lower))
-      } else {
-        population_proportion <- self %.% model_population %.% proportion
-      }
-
       # We then construct the normalised matrices
       per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, population_proportion))
+        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% model_population %.% proportion))
 
       return(per_capita_contact_matrices)
     },
@@ -251,19 +244,31 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   The population groups and their sizes configured in the module.
     model_population = function() {
 
-      model_population <- self %.% groups |>
-        dplyr::left_join(
-          self %.% activity %.% map_population(age_cuts_lower = self %.% age_cuts_lower) |>
-            dplyr::summarise(
-              "population" = sum(.data$population),
-              .by = "age_group_out"
-            ) |>
-            dplyr::rename("age_group" = "age_group_out"),
-          by = "age_group"
-        ) |>
-        dplyr::mutate(
-          "proportion" = .data$population / sum(.data$population)
-        )
+      # If no demography is provided, assume even distribution
+      if (is.null(self %.% activity$contact_basis) || (is.null(self %.% regions %.% demography))) {
+
+        model_population <- self %.% groups |>
+          dplyr::mutate(
+            "population" = 1 / dplyr::n(),
+            "proportion" = 1 / dplyr::n()
+          )
+
+      } else {
+
+        model_population <- self %.% groups |>
+          dplyr::left_join(
+            self %.% activity %.% map_population(age_cuts_lower = self %.% age_cuts_lower) |>
+              dplyr::summarise(
+                "population" = sum(.data$population),
+                .by = "age_group_out"
+              ) |>
+              dplyr::rename("age_group" = "age_group_out"),
+            by = "age_group"
+          ) |>
+          dplyr::mutate(
+            "proportion" = .data$population / sum(.data$population)
+          )
+      }
 
       return(model_population)
     },
