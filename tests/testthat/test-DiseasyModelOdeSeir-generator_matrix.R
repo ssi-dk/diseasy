@@ -2,6 +2,13 @@
 rE <- 1 / 2 # Overall disease progression rate from E to I                                                              # nolint: object_name_linter
 rI <- 1 / 4 # Overall disease progression rate from I to R                                                              # nolint: object_name_linter
 
+# Create a test contact_basis with unit demography
+test_basis <- contact_basis_nordic %.% DK
+test_basis$proportion <- stats::setNames(rep(1 / 16, 16), names(test_basis$proportion)) # And "unit" population
+test_basis$population <- test_basis$proportion * sum(test_basis$population)
+test_basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
+test_basis$demography$population <- test_basis$demography$proportion * sum(test_basis$demography$population)
+
 
 test_that("$generator_matrix() (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
@@ -9,7 +16,7 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   skip_if_not_installed("ucminf")
 
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -74,9 +81,9 @@ test_that("$generator_matrix() (SIR multiple variants / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -185,6 +192,7 @@ test_that("$generator_matrix() (SEIR single variant / single age group)", {
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
     ),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
       "disease_progression_rates" = c("E" = rE, "I" = rI),
@@ -217,7 +225,7 @@ test_that("$generator_matrix() (SEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
 
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -286,7 +294,7 @@ test_that("$generator_matrix() (SEIIRR multiple variants / single age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -426,9 +434,9 @@ test_that("$generator_matrix() (SEIR double variant / double age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
     regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1

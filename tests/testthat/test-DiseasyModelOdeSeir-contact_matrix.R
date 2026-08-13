@@ -1,3 +1,11 @@
+# Create a test contact_basis with unit demography
+test_basis <- contact_basis_nordic %.% DK
+test_basis$proportion <- stats::setNames(rep(1 / 16, 16), names(test_basis$proportion)) # And "unit" population
+test_basis$population <- test_basis$proportion * sum(test_basis$population)
+test_basis$demography$proportion <- c(rep(1 / 90, 90), rep(0, 11))
+test_basis$demography$population <- test_basis$demography$proportion * sum(test_basis$demography$population)
+
+
 test_that("$contact_matrix() works (no scenario - single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("optimx")
@@ -5,7 +13,7 @@ test_that("$contact_matrix() works (no scenario - single age group)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -50,9 +58,9 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 45)),
     regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -73,18 +81,18 @@ test_that("$contact_matrix() works (no scenario - two age groups)", {
   # Then from 1970-01-01, it should always be the same
   expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-44", "45+"), c("00-44", "45+")))
   )
 
   expect_identical(
     private %.% contact_matrix(0),
-    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-44", "45+"), c("00-44", "45+")))
   )
 
   # The contact matrix should be valid forever
   expect_identical(
     private %.% contact_matrix(Inf),
-    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+")))
+    matrix(rep(1, 4), ncol = 2, dimnames = list(c("00-44", "45+"), c("00-44", "45+")))
   )
 
   rm(m)
@@ -97,9 +105,9 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
-    population = DiseasyPopulation$new(age_cuts_lower = c(0, 40, 80)),
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 30, 60)),
     regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
-    activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
+    activity = DiseasyActivity$new(contact_basis = test_basis),
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
       last_queryable_date = Sys.Date() - 1
@@ -118,20 +126,23 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
   expect_null(private %.% contact_matrix(- as.numeric(Sys.Date())))
 
   # Then from 1970-01-01, it should always be the same
-  expect_identical(
+  expect_equal(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
-    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-29", "30-59", "60+"), c("00-29", "30-59", "60+"))),
+    tolerance = 1e-10
   )
 
-  expect_identical(
+  expect_equal(
     private %.% contact_matrix(0),
-    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-29", "30-59", "60+"), c("00-29", "30-59", "60+"))),
+    tolerance = 1e-10
   )
 
   # The contact matrix should be valid forever
-  expect_identical(
+  expect_equal(
     private %.% contact_matrix(Inf),
-    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-39", "40-79", "80+"), c("00-39", "40-79", "80+")))
+    matrix(rep(1, 9), ncol = 3, dimnames = list(c("00-29", "30-59", "60+"), c("00-29", "30-59", "60+"))),
+    tolerance = 1e-10
   )
 
   rm(m)
