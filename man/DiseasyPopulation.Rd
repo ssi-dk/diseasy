@@ -43,11 +43,8 @@ See vignette("diseasy-population").
     \item{\code{groups}}{(\code{data.frame()})\cr
 The demographic groups that have been configured in the module.}
 
-    \item{\code{population}}{(\code{tibble})\cr
+    \item{\code{model_population}}{(\code{tibble})\cr
 The population groups and their sizes configured in the module.}
-
-    \item{\code{population_proportion}}{(\code{numeric()})\cr
-The distribution of individuals across the demography groups defined in the module.}
 
     \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population. Read only.}
 
