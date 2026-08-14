@@ -135,7 +135,7 @@ the following code.</p>
 <span><span class="co">#&gt; $infection</span></span>
 <span><span class="co">#&gt; function (t) </span></span>
 <span><span class="co">#&gt; 1</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x559bf593ef30&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x564bcfb70910&gt;</span></span>
 <span><span class="co">#&gt; attr(,"name")</span></span>
 <span><span class="co">#&gt; [1] "no_waning"</span></span>
 <span><span class="co">#&gt; attr(,"dots")</span></span>
@@ -171,19 +171,7 @@ an observable for “hospitalisation” and “death” when they exist in the
 given &lt;code&gt;&lt;a href="../reference/DiseasyImmunity.html"&gt;?DiseasyImmunity&lt;/a&gt;&lt;/code&gt; module.&lt;/p&gt;'><sup>1</sup></a>.</p>
 <p>Here is an example of how to set the exponential waning model.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">set_sigmoidal_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">9</span>, target <span class="op">=</span> <span class="st">"infection"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $infection</span></span>
-<span><span class="co">#&gt; function (t) </span></span>
-<span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x559bf7052840&gt;</span></span>
-<span><span class="co">#&gt; attr(,"name")</span></span>
-<span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
-<span><span class="co">#&gt; attr(,"dots")</span></span>
-<span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 9</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"dots")$shape</span></span>
-<span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">set_sigmoidal_waning</span><span class="op">(</span>time_scale <span class="op">=</span> <span class="fl">9</span>, target <span class="op">=</span> <span class="st">"infection"</span><span class="op">)</span></span></code></pre></div>
 <p>To inspect that the model has been set correctly use
 <code>im$model</code></p>
 <p>To visualize the model, the plot function provided by the module can
@@ -224,23 +212,7 @@ outcome following infection (used in some models).</li>
 <span>  name <span class="op">=</span> <span class="st">"gaussian_waning"</span>,</span>
 <span>  delay <span class="op">=</span> <span class="fl">7</span>,</span>
 <span>  risks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"00-29"</span> <span class="op">=</span> <span class="fl">0.001</span>, <span class="st">"30-59"</span> <span class="op">=</span> <span class="fl">0.01</span>, <span class="st">"60+"</span> <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; $hospitalisation</span></span>
-<span><span class="co">#&gt; function (t) </span></span>
-<span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x559bf7e2d370&gt;</span></span>
-<span><span class="co">#&gt; attr(,"name")</span></span>
-<span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
-<span><span class="co">#&gt; attr(,"dots")</span></span>
-<span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 12</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"dots")$delay</span></span>
-<span><span class="co">#&gt; [1] 7</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"dots")$risks</span></span>
-<span><span class="co">#&gt; 00-29 30-59   60+ </span></span>
-<span><span class="co">#&gt; 0.001 0.010 0.100</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p>To visualize all the functions in the model, use the same plot
 function as above:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -270,38 +242,13 @@ additional arguments.</p>
 <code><a href=".{2}/reference/DiseasyImmunity.html#method-DiseasyImmunity-set_waning_model">$set_waning_model()</a></code> is as follows:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">set_waning_model</span><span class="op">(</span>model <span class="op">=</span> <span class="st">"sigmoidal_waning"</span>, time_scale <span class="op">=</span> <span class="fl">9</span>, target <span class="op">=</span> <span class="st">"infection"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $infection</span></span>
-<span><span class="co">#&gt; function (t) </span></span>
-<span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x559bf9244a38&gt;</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x559bf8d384d8&gt;</span></span>
-<span><span class="co">#&gt; attr(,"name")</span></span>
-<span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
-<span><span class="co">#&gt; attr(,"dots")</span></span>
-<span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 9</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"dots")$shape</span></span>
-<span><span class="co">#&gt; [1] 6</span></span>
 <span><span class="va">im</span><span class="op">$</span><span class="fu">set_waning_model</span><span class="op">(</span></span>
 <span>  model <span class="op">=</span> \<span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span> <span class="op">(</span><span class="va">t</span> <span class="op">/</span> <span class="va">time_scale</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.2</span>,</span>
 <span>  time_scale <span class="op">=</span> <span class="fl">18</span>,</span>
 <span>  target <span class="op">=</span> <span class="st">"hospitalisation"</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"gaussian_waning"</span>,</span>
 <span>  delay <span class="op">=</span> <span class="fl">7</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; $hospitalisation</span></span>
-<span><span class="co">#&gt; function (t) </span></span>
-<span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x559bf9b7aad8&gt;</span></span>
-<span><span class="co">#&gt; attr(,"name")</span></span>
-<span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
-<span><span class="co">#&gt; attr(,"dots")</span></span>
-<span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 18</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"dots")$delay</span></span>
-<span><span class="co">#&gt; [1] 7</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -316,33 +263,7 @@ named targets.</p>
 <p>Following is an example of how to change the time scale for the two
 targets in the current models.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">set_time_scales</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"infection"</span> <span class="op">=</span> <span class="fl">6</span>, <span class="st">"hospitalisation"</span> <span class="op">=</span> <span class="fl">18</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $infection</span></span>
-<span><span class="co">#&gt; function (t) </span></span>
-<span><span class="co">#&gt; exp(-(t - time_scale)/shape)/(1 + exp(-(t - time_scale)/shape))</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x559bf8d384d8&gt;</span></span>
-<span><span class="co">#&gt; attr(,"name")</span></span>
-<span><span class="co">#&gt; [1] "sigmoidal_waning"</span></span>
-<span><span class="co">#&gt; attr(,"dots")</span></span>
-<span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 6</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"dots")$shape</span></span>
-<span><span class="co">#&gt; [1] 6</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $hospitalisation</span></span>
-<span><span class="co">#&gt; function (t) </span></span>
-<span><span class="co">#&gt; 0.8 * exp(-(t/time_scale)^2) + 0.2</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x559bf9b7aad8&gt;</span></span>
-<span><span class="co">#&gt; attr(,"name")</span></span>
-<span><span class="co">#&gt; [1] "gaussian_waning"</span></span>
-<span><span class="co">#&gt; attr(,"dots")</span></span>
-<span><span class="co">#&gt; attr(,"dots")$time_scale</span></span>
-<span><span class="co">#&gt; [1] 18</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"dots")$delay</span></span>
-<span><span class="co">#&gt; [1] 7</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">set_time_scales</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"infection"</span> <span class="op">=</span> <span class="fl">6</span>, <span class="st">"hospitalisation"</span> <span class="op">=</span> <span class="fl">18</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="approximating-to-a-compartmental-model">Approximating to a compartmental model<a class="anchor" aria-label="anchor" href="#approximating-to-a-compartmental-model"></a>
@@ -491,66 +412,7 @@ information on the optimiser configuration.</li>
 <p>In this example, the module contains the infection and
 hospitalisation targets defined earlier, which will be approximated.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">approximate_compartmental</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"free_gamma"</span>, M <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $par</span></span>
-<span><span class="co">#&gt; [1]  0.8882986  0.7822130 -2.5422976 36.0436534 22.3618923 23.2247382 -1.5961190</span></span>
-<span><span class="co">#&gt; attr(,"status")</span></span>
-<span><span class="co">#&gt; [1] " " " " " " " " " " " " " "</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 0.121092</span></span>
-<span><span class="co">#&gt; attr(,"fname")</span></span>
-<span><span class="co">#&gt; function(p) sum(obj_function(p))</span></span>
-<span><span class="co">#&gt; attr(,"method")</span></span>
-<span><span class="co">#&gt; [1] "ucminf"</span></span>
-<span><span class="co">#&gt; attr(,"ptype")</span></span>
-<span><span class="co">#&gt; [1] "U"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $convergence</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $message</span></span>
-<span><span class="co">#&gt; [1] "Stopped by small gradient (grtol)."</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $counts</span></span>
-<span><span class="co">#&gt; [1] 59 59</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $scounts</span></span>
-<span><span class="co">#&gt; [1] 472   0   0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $gamma</span></span>
-<span><span class="co">#&gt; $gamma$infection</span></span>
-<span><span class="co">#&gt; [1] 0.70853894 0.68615688 0.07294565 0.00000000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $gamma$hospitalisation</span></span>
-<span><span class="co">#&gt; [1] 1.0 1.0 1.0 0.2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $delta</span></span>
-<span><span class="co">#&gt; [1] 0.1845537 0.1845537 0.1845537</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $method</span></span>
-<span><span class="co">#&gt; [1] "free_gamma"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $strategy</span></span>
-<span><span class="co">#&gt; [1] "naive"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $M</span></span>
-<span><span class="co">#&gt; [1] 4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $error</span></span>
-<span><span class="co">#&gt; [1] 0.121092</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $penalty</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $execution_time</span></span>
-<span><span class="co">#&gt; [1] "1M 27.6276321411133S"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "ucminf"</span></span>
-<span><span class="co">#&gt; attr(,"maximize")</span></span>
-<span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">im</span><span class="op">$</span><span class="fu">approximate_compartmental</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"free_gamma"</span>, M <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <p>To visualize how the approximations compare to the target functions,
 the plot function can be used. Simply specify the approach and the
 number of compartments (<code>M</code>). The plot will display both the
@@ -648,6 +510,7 @@ For more examples, see the optimisation vignette
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/list_transpose.html" class="external-link">list_transpose</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required namespace: lubridate</span></span>
 <span></span>
 <span><span class="co"># Plot</span></span>
 <span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">M</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">method</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>

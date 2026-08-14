@@ -126,6 +126,10 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <dd><p>(<code>data.frame(1)</code>)<br> The demography of the population per region.<br> The <code>data.frame</code> must include the following columns:<br> * <code>region</code> (<code>character</code>) Region identifier.<br> * <code>...</code> Optional additional stratification columns (e.g. sex, ethnicity).<br> * <code>population</code> (<code>numeric</code>) Number of individuals in the group. Read only.</p></dd>
 
 
+    <dt><code>regional_risks</code></dt>
+<dd><p>(<code>named numeric()</code>)<br> Modifiers tied to each region (identified by vector names).<br> Read only.</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -137,6 +141,7 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <li><p><a href="#method-DiseasyRegions-set_area"><code>DiseasyRegions$set_area()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-set_adjacency"><code>DiseasyRegions$set_adjacency()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-set_demography"><code>DiseasyRegions$set_demography()</code></a></p></li>
+<li><p><a href="#method-DiseasyRegions-set_regional_risks"><code>DiseasyRegions$set_regional_risks()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-validate_configuration"><code>DiseasyRegions$validate_configuration()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-region_filter"><code>DiseasyRegions$region_filter()</code></a></p></li>
 <li><p><a href="#method-DiseasyRegions-regions_at_stratification"><code>DiseasyRegions$regions_at_stratification()</code></a></p></li>
@@ -194,14 +199,18 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <h3 id="diseasyregions-set-adjacency-"><code>DiseasyRegions$set_adjacency()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-set-adjacency-"></a></h3>
 <p>Sets the regional adjacency data.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">set_adjacency</span><span class="op">(</span><span class="va">adjacency</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"movement"</span>, <span class="st">"infection-flow"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">set_adjacency</span><span class="op">(</span></span>
+<span>  <span class="va">adjacency</span>,</span>
+<span>  adjacency_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">adjacency</span>, <span class="st">"type"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>adjacency</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The adjacency (connectedness) of the regions. Effectively, the <code>adjacency</code> is a long-form of the adjacency-matrix<br> The <code>data.frame</code> must include the following columns:<br> - <code>from</code> (<code>character</code>): Region identifier.<br> - <code>to</code>   (<code>character</code>): Region identifier.<br> - <code>adjacency</code> (<code>numeric</code>): Strength of the connectedness.<br> The <code>from</code> and <code>to</code> columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.</p></dd>
 
-      <dt><code>type</code></dt>
-<dd><p>(<code>character</code>)<br> The type of adjacency provided ("movement" versus "infection-flow"). See <code>vignette("diseasy-regions")</code> for details.</p></dd>
+      <dt><code>adjacency_type</code></dt>
+<dd><p>(<code>character</code>)<br> The type of adjacency provided ("movement" versus "infection-flow"). See <code>vignette("diseasy-regions")</code> for details.
+Defaults to "movement" if not provided.</p></dd>
 
 
 </dl><p></p></div>
@@ -231,13 +240,63 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 
 </div>
 
+<p></p><hr><a id="method-DiseasyRegions-set_regional_risks"></a><div class="section">
+<h3 id="diseasyregions-set-regional-risks-"><code>DiseasyRegions$set_regional_risks()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-set-regional-risks-"></a></h3>
+<p>Set modifiers to regional risks for all regions.</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">set_regional_risks</span><span class="op">(</span></span>
+<span>  <span class="va">regional_risks</span>,</span>
+<span>  regional_risks_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">regional_risks</span>, <span class="st">"type"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>regional_risks</code></dt>
+<dd><p>(<code>named numeric()</code>)<br> Modifiers tied to each region (identified by vector names).<br></p></dd>
+
+      <dt><code>regional_risks_type</code></dt>
+<dd><p>(<code>character(1)</code>)<br>
+The interpretation of the risk modifiers (see details).
+Must be either <code>"location"</code> or <code>"behaviour"</code> (default).</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
+<p>If the relative risk modifier, \(\Gamma_x\), is related
+to the location, the elements of the infection-flow matrix,
+\(\Theta_{x,y}\), are derived from the elements of the
+movement matrix, \(\phi_{x,y}\), via the relation:</p>
+<p>$$
+    \Theta_{x,y} = \sum_z \Gamma_z \phi_{z,x} \phi_{z,y}
+  $$</p>
+<p>If the modifiers instead represent behavioural differences, the
+relation is:</p>
+<p>$$
+    \Theta_{x,y}
+      = \sqrt{\Gamma_x \Gamma_y}
+        \sum_z \phi_{z,x} \phi_{z,y}
+  $$</p>
+<p>If the infection-flow matrix is specified directly, the location
+interpretation cannot be computed and results in an error.</p>
+</div><p></p><div class="section">
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<p><code>NULL</code> (called for side effects)</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-DiseasyRegions-validate_configuration"></a><div class="section">
 <h3 id="diseasyregions-validate-configuration-"><code>DiseasyRegions$validate_configuration()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-validate-configuration-"></a></h3>
 <p>Check whether <code>area</code>, <code>adjacency</code>, and <code>demography</code> are mutually consistent.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span><span class="va">area</span>, <span class="va">adjacency</span>, <span class="va">demography</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span></span>
+<span>  <span class="va">area</span>,</span>
+<span>  <span class="va">adjacency</span>,</span>
+<span>  <span class="va">demography</span>,</span>
+<span>  <span class="va">regional_risks</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>area</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
 
@@ -247,10 +306,13 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
       <dt><code>demography</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The demography of the population per region.<br> The <code>data.frame</code> must include the following columns:<br> * <code>region</code> (<code>character</code>) Region identifier.<br> * <code>...</code> Optional additional stratification columns (e.g. sex, ethnicity).<br> * <code>population</code> (<code>numeric</code>) Number of individuals in the group.</p></dd>
 
+      <dt><code>regional_risks</code></dt>
+<dd><p>(<code>named numeric()</code>)<br> Modifiers tied to each region (identified by vector names).<br></p></dd>
+
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
@@ -259,10 +321,10 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <p></p><hr><a id="method-DiseasyRegions-region_filter"></a><div class="section">
 <h3 id="diseasyregions-region-filter-"><code>DiseasyRegions$region_filter()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-region-filter-"></a></h3>
 <p>Create a logical filter for values matching one or more regions.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">region_filter</span><span class="op">(</span><span class="va">values</span>, target_area <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">area</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>values</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 Values to filter, typically region identifiers.</p></dd>
@@ -275,7 +337,7 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
+<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
 <p>A <code><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical()</a></code> vector with the same length as <code>values</code>.</p>
 </div>
 
@@ -284,17 +346,17 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 <p></p><hr><a id="method-DiseasyRegions-regions_at_stratification"></a><div class="section">
 <h3 id="diseasyregions-regions-at-stratification-"><code>DiseasyRegions$regions_at_stratification()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-regions-at-stratification-"></a></h3>
 <p>Get the regions available at the given stratification level</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">regions_at_stratification</span><span class="op">(</span><span class="va">regional_stratification</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>regional_stratification</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The level of spatial stratification of the population.</p></dd>
 
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
+<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p>The (sorted) list of available regions within the defined scope at the given stratification level.</p>
 </div>
 
@@ -303,18 +365,28 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 <p></p><hr><a id="method-DiseasyRegions-adjacency_to_theta"></a><div class="section">
 <h3 id="diseasyregions-adjacency-to-theta-"><code>DiseasyRegions$adjacency_to_theta()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-adjacency-to-theta-"></a></h3>
 <p>Converts long form adjacency to the "Theta" infection matrix.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">adjacency_to_theta</span><span class="op">(</span></span>
 <span>  <span class="va">adjacency</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"movement"</span>, <span class="st">"infection-flow"</span><span class="op">)</span></span>
+<span>  <span class="va">adjacency_type</span>,</span>
+<span>  <span class="va">regional_risks</span>,</span>
+<span>  <span class="va">regional_risks_type</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>adjacency</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The adjacency (connectedness) of the regions. Effectively, the <code>adjacency</code> is a long-form of the adjacency-matrix<br> The <code>data.frame</code> must include the following columns:<br> - <code>from</code> (<code>character</code>): Region identifier.<br> - <code>to</code>   (<code>character</code>): Region identifier.<br> - <code>adjacency</code> (<code>numeric</code>): Strength of the connectedness.<br> The <code>from</code> and <code>to</code> columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.</p></dd>
 
-      <dt><code>type</code></dt>
+      <dt><code>adjacency_type</code></dt>
 <dd><p>(<code>character</code>)<br> The type of adjacency provided ("movement" versus "infection-flow"). See <code>vignette("diseasy-regions")</code> for details.</p></dd>
+
+      <dt><code>regional_risks</code></dt>
+<dd><p>(<code>named numeric()</code>)<br> Modifiers tied to each region (identified by vector names).<br></p></dd>
+
+      <dt><code>regional_risks_type</code></dt>
+<dd><p>(<code>character(1)</code>)<br>
+The interpretation of the risk modifiers.
+Must be either "location" or "behaviour".</p></dd>
 
 
 </dl><p></p></div>
@@ -325,10 +397,10 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 <p></p><hr><a id="method-DiseasyRegions-plot"></a><div class="section">
 <h3 id="diseasyregions-plot-"><code>DiseasyRegions$plot()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-plot-"></a></h3>
 <p>Plot model outputs or module configuration spatially.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>data <span class="op">=</span> <span class="cn">NULL</span>, shape_files <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>data</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br>
 The data to plot spatially on the configured area.
@@ -349,7 +421,7 @@ to the configured area is used.</p></dd>
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
+<h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
@@ -358,7 +430,7 @@ to the configured area is used.</p></dd>
 <p></p><hr><a id="method-DiseasyRegions-describe"></a><div class="section">
 <h3 id="diseasyregions-describe-"><code>DiseasyRegions$describe()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-describe-"></a></h3>
 <p>Prints a human readable report of the internal state of the module.</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">describe</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -367,10 +439,10 @@ to the configured area is used.</p></dd>
 <p></p><hr><a id="method-DiseasyRegions-clone"></a><div class="section">
 <h3 id="diseasyregions-clone-"><code>DiseasyRegions$clone()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegions</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
+<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -413,14 +485,20 @@ The available levels of stratification supported. Read only.</p></dd>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_adjacency"><a href="DiseasyRegions.html#method-set_adjacency"><code>DiseasyRegions$set_adjacency()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_area"><a href="DiseasyRegions.html#method-set_area"><code>DiseasyRegions$set_area()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_demography"><a href="DiseasyRegions.html#method-set_demography"><code>DiseasyRegions$set_demography()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_regional_risks"><a href="DiseasyRegions.html#method-set_regional_risks"><code>DiseasyRegions$set_regional_risks()</code></a></span></li>
 </ul></details></p><hr><a id="method-DiseasyRegionsNuts-validate_configuration"></a><div class="section">
 <h3 id="diseasyregionsnuts-validate-configuration-"><code>DiseasyRegionsNuts$validate_configuration()</code><a class="anchor" aria-label="anchor" href="#diseasyregionsnuts-validate-configuration-"></a></h3>
 <p>Check whether area, adjacency, and demography are mutually consistent
 and complete under NUTS hierarchy semantics.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span><span class="va">area</span>, <span class="va">adjacency</span>, <span class="va">demography</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">validate_configuration</span><span class="op">(</span></span>
+<span>  <span class="va">area</span>,</span>
+<span>  <span class="va">adjacency</span>,</span>
+<span>  <span class="va">demography</span>,</span>
+<span>  <span class="va">regional_risks</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>area</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The geographic area (list of regions) of interest. The specified regions must be available in the <code>demography</code> and <code>adjacency</code> data.</p></dd>
 
@@ -430,10 +508,13 @@ and complete under NUTS hierarchy semantics.</p><div class="section">
       <dt><code>demography</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The demography of the population per region.<br> The <code>data.frame</code> must include the following columns:<br> * <code>region</code> (<code>character</code>) Region identifier.<br> * <code>...</code> Optional additional stratification columns (e.g. sex, ethnicity).<br> * <code>population</code> (<code>numeric</code>) Number of individuals in the group.</p></dd>
 
+      <dt><code>regional_risks</code></dt>
+<dd><p>(<code>named numeric()</code>)<br> Modifiers tied to each region (identified by vector names).<br></p></dd>
+
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
+<h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
 <p><code>NULL</code> (called for side effects)</p>
 </div>
 
@@ -442,10 +523,10 @@ and complete under NUTS hierarchy semantics.</p><div class="section">
 <p></p><hr><a id="method-DiseasyRegionsNuts-region_filter"></a><div class="section">
 <h3 id="diseasyregionsnuts-region-filter-"><code>DiseasyRegionsNuts$region_filter()</code><a class="anchor" aria-label="anchor" href="#diseasyregionsnuts-region-filter-"></a></h3>
 <p>Create a logical filter using NUTS hierarchy prefix matching.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">region_filter</span><span class="op">(</span><span class="va">values</span>, target_area <span class="op">=</span> <span class="va">self</span> <span class="op">%.%</span> <span class="va">area</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>values</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 Values to filter, typically NUTS codes.</p></dd>
@@ -458,7 +539,7 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
+<h4 id="returns-9">Returns<a class="anchor" aria-label="anchor" href="#returns-9"></a></h4>
 <p>A <code><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical()</a></code> vector with the same length as <code>values</code>.</p>
 </div>
 
@@ -467,17 +548,17 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 <p></p><hr><a id="method-DiseasyRegionsNuts-regions_at_stratification"></a><div class="section">
 <h3 id="diseasyregionsnuts-regions-at-stratification-"><code>DiseasyRegionsNuts$regions_at_stratification()</code><a class="anchor" aria-label="anchor" href="#diseasyregionsnuts-regions-at-stratification-"></a></h3>
 <p>Get the regions available at the given stratification level</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">regions_at_stratification</span><span class="op">(</span><span class="va">regional_stratification</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>regional_stratification</code></dt>
 <dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br> The level of spatial stratification of the population.</p></dd>
 
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-9">Returns<a class="anchor" aria-label="anchor" href="#returns-9"></a></h4>
+<h4 id="returns-10">Returns<a class="anchor" aria-label="anchor" href="#returns-10"></a></h4>
 <p>The (sorted) list of available regions within the defined scope at the given stratification level.</p>
 </div>
 
@@ -486,10 +567,10 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 <p></p><hr><a id="method-DiseasyRegionsNuts-plot"></a><div class="section">
 <h3 id="diseasyregionsnuts-plot-"><code>DiseasyRegionsNuts$plot()</code><a class="anchor" aria-label="anchor" href="#diseasyregionsnuts-plot-"></a></h3>
 <p></p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
+<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Parameters sent to <code><a href=".{2}/reference/DiseasyRegions.html#method-DiseasyRegions-plot">$plot()</a></code>.</p></dd>
 
@@ -502,10 +583,10 @@ area. If <code>NULL</code>, all values are matched.</p></dd>
 <p></p><hr><a id="method-DiseasyRegionsNuts-clone"></a><div class="section">
 <h3 id="diseasyregionsnuts-clone-"><code>DiseasyRegionsNuts$clone()</code><a class="anchor" aria-label="anchor" href="#diseasyregionsnuts-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyRegionsNuts</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
+<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

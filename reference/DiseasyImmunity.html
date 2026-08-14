@@ -555,29 +555,7 @@ Number of compartments to be used in the model.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">im</span> <span class="op">&lt;-</span> <span class="va">DiseasyImmunity</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">im</span><span class="op">$</span><span class="fu">set_exponential_waning</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $infection</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> function (t) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> exp(-t/time_scale)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x56154466b440&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"name")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "exponential_waning"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")$time_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span>  <span class="va">im</span><span class="op">$</span><span class="fu">set_time_scales</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"infection"</span> <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $infection</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> function (t) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> exp(-t/time_scale)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x56154466b440&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"name")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "exponential_waning"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"dots")$time_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">im</span><span class="op">)</span></span></span>
 </code></pre></div>
