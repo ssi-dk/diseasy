@@ -463,7 +463,8 @@ test_that("$get_scenario_contacts() works with given scenario", {
       ),
       1, 1, length
     ),
-  1L) # 1 (no) age groups
+    1L
+  ) # 1 (no) age groups
 
   rm(act, population)
 })

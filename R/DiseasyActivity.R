@@ -435,7 +435,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(activities)
     },
 
-
+                                                                                                                        # nolint start: param_and_field_linter, identation_linter
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
@@ -443,7 +443,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value\[\[date\]\]\[\[type\]\]
-    get_scenario_openness = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {
+    get_scenario_openness = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {                        # nolint end: param_and_field_linter, identation_linter
 
       scenario_activities <- self$get_scenario_activities()
 
@@ -522,7 +522,7 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(openness)
     },
 
-
+                                                                                                                        # nolint start: param_and_field_linter, identation_linter
     #' @description
     #'   Return contacts across age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
@@ -531,7 +531,7 @@ DiseasyActivity <- R6::R6Class(                                                 
     #' @return
     #'   If no weights are supplied, a `list()` of depth of two: value\[\[date\]\]\[\[type\]\] is returned.
     #    If weights are supplied, a `list()` of depth one: value\[\[date\]\] is returned
-    get_scenario_contacts = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {
+    get_scenario_contacts = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {                        # nolint end: param_and_field_linter, identation_linter
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
