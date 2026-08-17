@@ -114,13 +114,8 @@ DiseasyPopulation <- R6::R6Class(                                               
       # If `DiseasyRegions` is configured, age and regional splits must be consistent with demography data
       if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
 
-        if (!identical(age_cuts_lower, 0L)) {
-
-          if (is.null(self %.% regions %.% demography)) {
-            pkgcond::pkg_error(
-              "When stratifying by age, `DiseasyRegions` must be loaded with a `demography`."
-            )
-          }
+        # If no demography is set, map_population creates unit demography across the group and no validation is needed
+        if (!identical(age_cuts_lower, 0L) && !is.null(self %.% regions %.% demography)) {
 
           # Check the given age groups can be mapped to the demography data
           coll <- checkmate::makeAssertCollection()
@@ -182,7 +177,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       return(per_capita_contact_matrices)
     },
 
-                                                                                                                        # nolint start: documentation_template_linter, identation_linter
+
     #' Map population between age groups
     #'
     #' @description
@@ -198,10 +193,23 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
     #'   those supplied to the function.
     map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
-      age_cuts_lower,
-      age_groups_reference = names(self$activity$contact_basis$proportion),
-      demography = self$activity$contact_basis$demography
+      age_cuts_lower = self %.% age_cuts_lower,
+      age_groups_reference = NULL,
+      demography = self %.% regions %.% demography
     ) {
+
+      # Use unit demography if not set
+      if (is.null(demography)) {
+        demography <- dplyr::cross_join(
+          dplyr::distinct(dplyr::select(self %.% groups, !"age_group")),
+          data.frame("age_group" = purrr::pluck(
+            self %.% activity %.% contact_basis, "contacts", 1, colnames,
+            .default = diseasystore::age_labels(self %.% age_cuts_lower)
+          ))
+        ) |>
+          dplyr::select(dplyr::all_of(colnames(self %.% groups))) |>
+          dplyr::mutate(, "population" = 1 / dplyr::n())
+      }
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -209,7 +217,9 @@ DiseasyPopulation <- R6::R6Class(                                               
         age_cuts_lower, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE, add = coll
       )
       checkmate::assert_character(
-        age_groups_reference, any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", add = coll
+        age_groups_reference,
+        any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", null.ok = TRUE,
+        add = coll
       )
 
       checkmate::assert_data_frame(demography, min.rows = 1, add = coll)
@@ -231,7 +241,6 @@ DiseasyPopulation <- R6::R6Class(                                               
         )
       }
 
-      checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
       checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
 
       checkmate::reportAssertions(coll)
@@ -285,10 +294,17 @@ DiseasyPopulation <- R6::R6Class(                                               
           "age_group_id"           = age_cuts_lower_demography,
           "age_group"              = diseasystore::age_labels(age_cuts_lower_demography),
           "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower)),
-          "age_group_out"          = age_labels_out[.data$age_group_id_out],
-          "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
-          "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
+          "age_group_out"          = age_labels_out[.data$age_group_id_out]
         )
+
+      # Add maps to reference if given
+      if (!is.null(age_groups_reference)) {
+        population <- population |>
+          dplyr::mutate(
+            "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
+            "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
+          )
+      }
 
       return(population)
     },

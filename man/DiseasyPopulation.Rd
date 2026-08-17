@@ -46,9 +46,6 @@ The demographic groups that have been configured in the module.}
     \item{\code{population}}{(\code{tibble})\cr
 The population groups and their sizes configured in the module.}
 
-    \item{\code{population_proportion}}{(\code{numeric()})\cr
-The distribution of individuals across the demography groups defined in the module.}
-
     \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population. Read only.}
 
     \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used. Read only.}
@@ -212,9 +209,9 @@ Map population between age groups
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyPopulation$map_population(
-  age_cuts_lower,
-  age_groups_reference = names(self$activity$contact_basis$proportion),
-  demography = self$activity$contact_basis$demography
+  age_cuts_lower = self \%.\% age_cuts_lower,
+  age_groups_reference = NULL,
+  demography = self \%.\% regions \%.\% demography
 )}
     \if{html}{\out{</div>}}
   }
