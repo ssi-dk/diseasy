@@ -69,12 +69,15 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Generate a initial state_vector
   y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
 
-  population_proportion <- population$map_population(age_cuts_lower) |>
+  population_proportion <- model$population$map_population(age_cuts_lower) |>
     dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
     dplyr::pull("proportion")
 
   activity_proportion <- cbind(
-    population$map_population(age_cuts_lower) |>
+    model$population$map_population(
+      age_cuts_lower = age_cuts_lower,
+      age_group_reference = purrr::pluck(model %.% activity %.% contact_basis, "contacts", 1, colnames)
+    ) |>
       dplyr::summarise(
         "proportion" = sum(.data$proportion),
         .by = c("age_group_reference", "age_group_out")
