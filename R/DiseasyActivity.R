@@ -435,15 +435,13 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(activities)
     },
 
-                                                                                                                        # nolint start: param_and_field_linter, identation_linter
+
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
-    #' @param age_cuts_lower `r rd_age_cuts_lower()`
-    #' @param population Output of `$map_population()` to allow age mapping (will be removed soon).
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value\[\[date\]\]\[\[type\]\]
-    get_scenario_openness = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {                        # nolint end: param_and_field_linter, identation_linter
+    get_scenario_openness = function(weights = NULL) {
 
       scenario_activities <- self$get_scenario_activities()
 
@@ -459,12 +457,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
         }
 
-        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
-        age_labels <- age_cuts_lower |>
-          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
-          purrr::pluck(.default = 0) |>
-          diseasystore::age_labels()
-
+        age_labels <- diseasystore::age_labels(seq(from = 0, to = 75, by = 5))
 
         openness <- rep(1, length(age_labels)) |>    # All age groups are fully open
           stats::setNames(age_labels) |>
@@ -488,31 +481,6 @@ DiseasyActivity <- R6::R6Class(                                                 
         if (private$direction == "closing") {
           openness <- lapply(openness, \(x) lapply(x, \(y) 1 - y))
         }
-
-        # Project into new age_groups if given
-        if (!is.null(age_cuts_lower)) {
-          p <- private$population_transform_matrix(age_cuts_lower, population) |>
-            t() |>          # To get the right dimensions
-            as.data.frame() # To enable the mapping below
-
-          # Get the population proportion in the new age groups
-          proportion <- aggregate(proportion ~ age_group_reference, data = population, FUN = sum)$proportion
-
-          # Weight the population transformation matrix by the population proportion
-          p <- p * proportion
-
-          # Get the nested vectors, then compute the weighted average using `p` as weights
-          openness <- openness |>
-            purrr::map(
-              ~ purrr::map(
-                .,
-                ~ {
-                  purrr::map2_dbl(as.data.frame(.), p, \(v, w) sum(v * w / sum(w))) |>
-                    stats::setNames(names(p))
-                }
-              )
-            )
-        }
       }
 
       # Weight if weights are given
@@ -522,21 +490,17 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(openness)
     },
 
-                                                                                                                        # nolint start: param_and_field_linter, identation_linter
+
     #' @description
     #'   Return contacts across age groups and activities on all dates.
-    #' @param age_cuts_lower `r rd_age_cuts_lower()`
-    #' @param population Output of `$map_population()` to allow age mapping (will be removed soon).
     #' @param weights `r rd_activity_weights`
     #' @return
     #'   If no weights are supplied, a `list()` of depth of two: value\[\[date\]\]\[\[type\]\] is returned.
     #    If weights are supplied, a `list()` of depth one: value\[\[date\]\] is returned
-    get_scenario_contacts = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {                        # nolint end: param_and_field_linter, identation_linter
+    get_scenario_contacts = function(weights = NULL) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-                                lower = 0, unique = TRUE, add = coll)
       checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -554,25 +518,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           pkgcond::pkg_warning(misconfigured_diseasyactivity_warning)
         }
 
-        # In order, use age_cuts_lower, contact_basis age_cuts_lower or 0 for the age labels
-        age_labels <- age_cuts_lower |>
-          purrr::pluck(.default = as.numeric(stringr::str_extract(names(self$contact_basis$population), r"{^\d+}"))) |>
-          purrr::pluck(.default = 0) |>
-          diseasystore::age_labels()
-
-        scenario_contacts <- matrix(
-          rep(
-            1 / (length(age_labels) * length(private$activity_types)), # Contacts are uniform across all age groups
-            length(age_labels) * length(age_labels)
-          ),
-          ncol = length(age_labels),
-          dimnames = list(age_labels, age_labels)
-        ) |>
-          list() |>
-          rep(length(private$activity_types)) |>     # ... across all arenas
-          stats::setNames(private$activity_types) |>
-          list() |>                                  # ... and nested to match output format
-          stats::setNames(as.Date("1970-01-01"))
+        return(NULL)
 
       } else { # otherwise, we compute the contact matrices from the scenario
 
@@ -590,38 +536,8 @@ DiseasyActivity <- R6::R6Class(                                                 
             # be reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
             # non-commutative.
             scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
-              self$contact_basis$contacts[[tt]]
+              self %.% contact_basis %.% contacts[[tt]]
           }
-        }
-
-        # Project into new age_groups if given
-        if (!is.null(age_cuts_lower)) {
-          p <- private$population_transform_matrix(age_cuts_lower, population)
-
-          # To perform the projection, we need the number of persons in the new and original age groups
-          # Determine the population in the new age groups
-          population <- self$contact_basis$demography |>
-            dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
-            dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
-            dplyr::pull("population")
-
-          # Store as a square matrix with the new population repeated as columns
-          N_new <- outer(population, rep(1, length(population)))                                                        # nolint: object_name_linter
-
-          # Determine the population in the original age groups and store as a matrix with population repeated
-          # as columns
-          N_original <- self$contact_basis$population                                                                   # nolint: object_name_linter
-          N_original <- outer(N_original, rep(1, length(N_original)))                                                   # nolint: object_name_linter
-
-          # For each contact matrix, m, in the scenario, we perform the transformation
-          # (p %*% (m * N_original) %*% t(p)) / N_new                                                                   # nolint: commented_code_linter
-          # As m is the number of contacts from each individual m * N_original scales to all contacts between
-          # age groups ("t" domain).
-          # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-          # Finally, the division by N_new transforms back to contacts per individual in the new age groups
-          # ("m" domain).
-          scenario_contacts <- scenario_contacts |>
-            lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
         }
       }
 
@@ -631,40 +547,6 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(scenario_contacts)
     },
 
-
-    #' Rescale contact matrices to population contact rates
-    #'
-    #' @description
-    #'   Re-scale from contacts to rates per individual to fractional population.
-    #'  @details
-    #'   If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
-    #'   this function returns the rescaled elements \eqn{\left(sum_j N_j\right)  \beta_{i,j} / N_j}.
-    #' @param input (`matrix array` or `list`(`matrix array`))\cr
-    #'   Contacts to be re-scaled.
-    #' @param population (`numeric`)\cr
-    #'   Population vector to weight contacts by.
-    #'   Must use same age_groups as the contact matrix input.
-    #' @return
-    #'   Returns an object with the same structure as the input
-    rescale_contacts_to_rates = function(input, population) {
-
-      # If input is a list, iteratively apply function to list elements
-      if (checkmate::test_class(input, "list")) {
-        checkmate::assert_class(input[[1]], "matrix")
-        return(purrr::map(input, .f = \(xx) self$rescale_contacts_to_rates(input = xx, population = population)))
-      }
-
-      # Input checks
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_class(input, "matrix", add = coll)
-      checkmate::assert_numeric(population, add = coll)
-      checkmate::reportAssertions(coll)
-
-      proportion <- population / sum(population)
-      out <- input / matrix(rep(proportion, length(proportion)), nrow = length(proportion), byrow = TRUE)
-
-      return(out)
-    },
 
     #' @description
     #'   Resets the scenario in the module.
@@ -681,28 +563,20 @@ DiseasyActivity <- R6::R6Class(                                                 
 
     #' @description
     #'   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
-    #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param weights `r rd_activity_weights`
     #' @param contacts_date (`Date(1)`)\cr
     #'   The date to plot contact matrix for (default is earliest contact matrix).
     #' @return `r rd_side_effects`
-    plot = function(age_cuts_lower = NULL, weights = rep(1, 4), contacts_date = NULL) {
+    plot = function(weights = rep(1, 4), contacts_date = NULL) {
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_numeric(
-        age_cuts_lower, any.missing = FALSE, null.ok = TRUE,
-        lower = 0, unique = TRUE, add = coll
-      )
       checkmate::assert_class(self$contact_basis, "list", null.ok = TRUE, add = coll)
       checkmate::assert_date(contacts_date, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
       # Retrieve the contact matrices
-      contacts <- self$get_scenario_contacts(
-        age_cuts_lower = age_cuts_lower,
-        weights = weights
-      )
+      contacts <- self$get_scenario_contacts(weights = weights)
 
       if (is.null(contacts_date)) {
         contacts_date <- as.Date(names(contacts[1]))
@@ -763,10 +637,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
 
       # Retrieve the openness
-      openness <- self$get_scenario_openness(
-        age_cuts_lower = age_cuts_lower,
-        weights = weights
-      )
+      openness <- self$get_scenario_openness(weights = weights)
 
       # Collapse to single plottable data.frame
       gg_openness <- purrr::imap(
@@ -1046,33 +917,6 @@ DiseasyActivity <- R6::R6Class(                                                 
         h[i, (1:i)] <- h[(1:i), i] <- vector[i]
       }
       return(h)
-    },
-
-
-    # Compute the population proportion matrix
-    # @description
-    #   The function provides the population proportion matrix `p` used to project age_groups.
-    # @param age_cuts_lower `r rd_age_cuts_lower()`
-    population_transform_matrix = function(age_cuts_lower = NULL, population = NULL) {
-
-      # Early return if no projection is requested
-      if (is.null(age_cuts_lower)) {
-        return(obj)
-      }
-
-      # Calculating transformation matrix
-      tt <- merge(
-        aggregate(proportion ~ age_group_id_reference + age_group_id_out, data = population, FUN = sum),
-        aggregate(proportion ~ age_group_id_reference,                    data = population, FUN = sum),
-        by = "age_group_id_reference"
-      )
-      tt$proportion <- tt$proportion.x / tt$proportion.y
-      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_id_out, j = age_group_id_reference, x = proportion)))
-
-      # Label the matrix
-      dimnames(p) <- list(unique(population$age_group_out), unique(population$age_group_reference))
-
-      return(p)
     },
 
 
