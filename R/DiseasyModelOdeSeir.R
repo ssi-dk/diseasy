@@ -881,6 +881,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = self %.% observables,
         population = self %.% population,
         activity = self %.% activity,
+        regions = self %.% regions,
         variant = self %.% variant,
         season = self %.% season,
         immunity = self %.% immunity,
@@ -1603,7 +1604,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
 
       # Apply the scaling factor to the contact matrices
-      scaled_per_capita_contact_matrices <- purrr::map(per_capita_contact_matrices, ~ .x * scaling_factor)
+      scaled_per_capita_contact_matrices <- purrr::map(
+        per_capita_contact_matrices,
+        ~ .x * scaling_factor * sum(self %.% population %.% model_population %.% population)
+      )
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: the end of the training period)
