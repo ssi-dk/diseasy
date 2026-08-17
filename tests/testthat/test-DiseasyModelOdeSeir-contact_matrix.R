@@ -142,7 +142,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
   expect_null(private %.% contact_matrix(- as.numeric(Sys.Date())))
 
   # Then from 1970-01-01, it should always be the same
-  expect_equal(
+  expect_identical(
     private %.% contact_matrix(- as.numeric(Sys.Date() - 1)),
     matrix(
       data = 1,
@@ -155,7 +155,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
     )
   )
 
-  expect_equal(
+  expect_identical(
     private %.% contact_matrix(0),
     matrix(
       data = 1,
@@ -169,7 +169,7 @@ test_that("$contact_matrix() works (no scenario - three age groups)", {
   )
 
   # The contact matrix should be valid forever
-  expect_equal(
+  expect_identical(
     private %.% contact_matrix(Inf),
     matrix(
       data = 1,

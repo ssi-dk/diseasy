@@ -246,7 +246,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       return(per_capita_contact_matrices)
     },
 
-
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
     #' Map population between age groups
     #'
     #' @description
@@ -277,7 +277,7 @@ DiseasyPopulation <- R6::R6Class(                                               
           ))
         ) |>
           dplyr::select(dplyr::all_of(colnames(self %.% groups))) |>
-          dplyr::mutate(, "population" = 1 / dplyr::n())
+          dplyr::mutate("population" = 1 / dplyr::n())
       }
 
       # Input checks
