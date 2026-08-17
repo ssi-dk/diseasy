@@ -164,15 +164,84 @@ DiseasyPopulation <- R6::R6Class(                                               
       checkmate::assert_numeric(weights, lower = 0, len = 4)
 
       # Retrieve the time-varying contact matrices projected onto target age-groups
-      contact_matrices <- self %.% activity %.% get_scenario_contacts(
-        age_cuts_lower = self %.% age_cuts_lower,
-        population = self %.% map_population(self %.% age_cuts_lower),
-        weights = weights
-      )
+      mean_contact_matrices <- self %.% activity %.% get_scenario_contacts(weights = weights)
 
-      # We then construct the normalised matrices
-      per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
+      if (is.null(mean_contact_matrices)) {
+
+        # If no scenario is defined, return unit contact matrices
+        labels <- tidyr::unite(self %.% groups, "label", dplyr::everything(), sep = "/") |>
+          dplyr::pull("label")
+
+        c_matrix <- matrix(
+          rep(
+            1, # Contacts are uniform across all age groups
+            length(labels) * length(labels)
+          ),
+          ncol = length(labels),
+          dimnames = list(labels, labels)
+        ) / purrr::pluck(self %.% model_population, "population", sum)
+
+        per_capita_contact_matrices <- stats::setNames(
+          list(c_matrix),
+          as.Date("1970-01-01")
+        )
+
+      } else {
+
+        # To perform the projection, we need the number of persons in the new and original age groups
+        # Determine the population in the new age groups
+        population_map <- self %.% map_population(
+          age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "contacts", 1, colnames)
+        )
+
+        population_per_group <- population_map |>
+          dplyr::summarise(
+            "population" = sum(.data$population),
+            .by = "age_group_out"
+          ) |>
+          dplyr::pull("population")
+
+        population_reference <- population_map |>
+          dplyr::summarise(
+            "population" = sum(.data$population),
+            .by = "age_group_reference"
+          ) |>
+          dplyr::pull("population")
+
+        # Create square matrix with the new population repeated as columns
+        N_new <- outer(population_per_group, rep(1, length(population_per_group)))                                      # nolint: object_name_linter
+
+        # Create a square matrix in the original population repeated as columns
+        N_original <- outer(population_reference, rep(1, length(population_reference)))                                 # nolint: object_name_linter
+
+
+        # Compute proportion of population in new and old age_groups
+        # Calculating transformation matrix
+        tt <- merge(
+          aggregate(proportion ~ age_group_id_reference + age_group_id_out, data = population_map, FUN = sum),
+          aggregate(proportion ~ age_group_id_reference,                    data = population_map, FUN = sum),
+          by = "age_group_id_reference"
+        )
+        tt$proportion <- tt$proportion.x / tt$proportion.y
+        p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_id_out, j = age_group_id_reference, x = proportion)))
+
+        # Label the matrix
+        dimnames(p) <- list(unique(population_map$age_group_out), unique(population_map$age_group_reference))
+
+
+        # For each contact matrix, m, in the scenario, we perform the transformation
+        # (p %*% (c * N_original) %*% t(p)) / (N_new * t(N_new))                                                        # nolint: commented_code_linter
+        # As c is the mean contacts from each individual m * N_original scales to all contacts
+        # between age groups ("t" domain).
+        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
+        # Finally, the division by N_new * t(N_new) transforms back to per-capita contacts in the new age groups
+        # ("c" domain).
+        per_capita_contact_matrices <- lapply(
+          X = mean_contact_matrices,
+          FUN = \(c) (p %*% (c * N_original) %*% t(p)) / (N_new * t(N_new))
+        )
+
+      }
 
       return(per_capita_contact_matrices)
     },
