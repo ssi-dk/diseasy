@@ -69,32 +69,20 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Generate a initial state_vector
   y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
 
-  population_proportion <- model$population$map_population(age_cuts_lower) |>
-    dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
-    dplyr::pull("proportion")
 
-  activity_proportion <- cbind(
-    model$population$map_population(
-      age_cuts_lower = age_cuts_lower,
-      age_group_reference = purrr::pluck(model %.% activity %.% contact_basis, "contacts", 1, colnames)
-    ) |>
-      dplyr::summarise(
-        "proportion" = sum(.data$proportion),
-        .by = c("age_group_reference", "age_group_out")
-      ),
-    "activity" = rowSums(activity$get_scenario_contacts(weights = c(1, 1, 1, 1))[[1]])
+  eigen_activity_vector <- model %.% population %.% per_capita_contact_matrices(
+    weights = c(1, 1, 1, 1)
   ) |>
-    dplyr::summarise("activity" = sum(.data$activity), .by = "age_group_out") |>
-    dplyr::pull("activity")
+    purrr::pluck(1, eigen, "vectors")
 
-  activity <- population_proportion * activity_proportion
+  activity <- eigen_activity_vector[, 1]
   activity <- activity / sum(activity)
 
   # 0.05% are newly infected
   y0[private$e1_state_indices] <- activity * 0.0005
 
   # 99.95% are susceptible
-  y0[private$s_state_indices] <- population_proportion - y0[private$e1_state_indices]
+  y0[private$s_state_indices] <- model %.% population %.% model_population %.% proportion - y0[private$e1_state_indices]
 
 
   # Run solver across scenario change to check for long-term leakage
@@ -102,7 +90,8 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
 
   # Extract the maximal test positive signal from the I1 states
-  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI * sum(contact_basis_nordic %.% DK %.% population)
+  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI *
+    sum(model %.% population %.% model_population %.% population)
   colnames(true_infected) <- diseasystore::age_labels(age_cuts_lower)
 
   # Convert to long format

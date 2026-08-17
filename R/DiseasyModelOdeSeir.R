@@ -80,7 +80,7 @@
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
 #' @export
-DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelOdeSeir",
   inherit = DiseasyModelOde,
 
@@ -650,7 +650,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Rescale to the number of infections relative to the full population
       incidence_data <- incidence_data |>
-        dplyr::left_join(
+        dplyr::full_join(
           self %.% population %.% model_population,
           by = names(self %.% population %.% groups)
         ) |>
@@ -777,7 +777,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))                                                 # nolint: object_name_linter
 
           # Compute I states from polynomial fit
-          I_star <- stats::predict(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+          I_star <- stats::predict(                                                                                     # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
             incidence_poly_fits[[group_id]],
             newdata = data.frame(t = -(seq_len(L) - 1) / ri)
           )
@@ -1603,10 +1603,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # @return `r rd_side_effects()`
     set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
 
-      # Apply the scaling factor to the contact matrices
+      # Apply the scaling factors to the contact matrices
       scaled_per_capita_contact_matrices <- purrr::map(
         per_capita_contact_matrices,
-        ~ .x * scaling_factor * sum(self %.% population %.% model_population %.% population)
+        ~ .x * scaling_factor * purrr::pluck(self %.% population %.% model_population, "population", sum)
       )
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
@@ -1771,24 +1771,40 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
+
+      # Define a modified list of model parameters
+      parameters <- modifyList(
+        self %.% parameters,
+        list(
+          "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+          "disease_progression_rates" = purrr::discard_at(
+            self %.% parameters %.% disease_progression_rates,
+            ~ . == "E"
+          ),
+          "malthusian_matching" = FALSE
+        ),
+        keep.null = TRUE
+      )
+
+      # Remove the outputs generated from `$configure_output()`
+      parameters[["model_output_to_observable"]] <- purrr::pluck(
+        private %.% default_parameters(),
+        "model_output_to_observable"
+      )
+
       reference_model <- DiseasyModelOdeSeir$new(
-        activity = self %.% activity,
         observables = self %.% observables,
+        population = self %.% population,
+        activity = self %.% activity,
+        regions = self %.% regions,
         season = self %.% season,
         variant = self %.% variant,
-        parameters = modifyList(
-          self %.% parameters,
-          list(
-            "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
-            "disease_progression_rates" = purrr::discard_at(
-              self %.% parameters %.% disease_progression_rates,
-              ~ . == "E"
-            ),
-            "malthusian_matching" = FALSE
-          ),
-          keep.null = TRUE
-        )
+        immunity = self %.% immunity,
+        parameters = parameters
       )
+
+      # Ensure RHS is initialised
+      reference_model %.% prepare_rhs()
 
       reference_growth_rate <- reference_model$malthusian_growth_rate(...)
 

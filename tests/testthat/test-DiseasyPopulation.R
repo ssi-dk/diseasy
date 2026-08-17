@@ -246,6 +246,34 @@ test_that("$groups works", {
 })
 
 
+test_that("$per_capita_contact_matrices() works", {
+
+  # `DiseasyRegionsNuts` supports "null" or NUTS levels depending on loaded demography
+  regions_nuts <- DiseasyRegionsNuts$new(
+    area = "DK",
+    demography = demography_nordic_nuts3,
+    adjacency = adjacency_meta_nordic_nuts,
+  )
+
+  # Configure an activity module using Danish population and contact information.
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis_nordic$DK)
+  activity$set_activity_units(dk_activity_units)
+
+  # The level of activity is fixed to the "baseline" level throughout the simulation.
+  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+  population <- DiseasyPopulation$new(activity = activity, regions = regions_nuts)
+  population$stratify_regions("NUTS 2")
+
+  self <- population
+  private <- self$.__enclos_env__$private
+  weights = rep(1, 4)
+
+  rm(population, activity, regions_nuts)
+})
+
+
 test_that("active binding: age_cuts_lower works", {
   population <- DiseasyPopulation$new()
 

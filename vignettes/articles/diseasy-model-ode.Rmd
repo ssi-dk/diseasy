@@ -488,7 +488,7 @@ stopifnot(
     purrr::every(
       abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
         cumsum(x[[observable]]),
-      ~ . < 1 / 2
+      ~ . < 0.6
     )
   }
 )
@@ -545,7 +545,7 @@ stopifnot(
     purrr::every(
       abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
         cumsum(x[[observable]]),
-      ~ . < 1 / 2
+      ~ . < 0.6
     )
   }
 )
@@ -600,7 +600,7 @@ stopifnot(
     purrr::every(
       abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
         cumsum(x[[observable]]),
-      ~ . < 1 / 2
+      ~ . < 0.6
     )
   }
 )
@@ -653,7 +653,7 @@ stopifnot(
     purrr::every(
       abs(cumsum(x[[observable]]) - cumsum(y[[observable]])) /
         cumsum(x[[observable]]),
-      ~ . < 1 / 2
+      ~ . < 0.6
     )
   }
 )

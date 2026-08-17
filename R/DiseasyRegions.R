@@ -1310,10 +1310,6 @@ DiseasyRegions <- R6::R6Class(                                                  
       expr = {
         demography <- private %.% .demography
 
-        if (is.null(demography)) {
-          return(NULL)
-        }
-
         demography <- demography |>
           dplyr::filter( # Filter demography to the given area
             self$region_filter(values = .data$region)
