@@ -70,6 +70,7 @@ Suggests:
     minqa,
     optimx,
     plotly,
+    progress,
     progressr,
     readr,
     rmarkdown,
