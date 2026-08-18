@@ -1,0 +1,39 @@
+name: Export container for HPC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+            docker login ghcr.io \
+            -u "${{ github.actor }}" \
+            --password-stdin
+
+      - name: Pull image
+        run: |
+          docker pull \
+            --platform linux/amd64 \
+            ghcr.io/ssi-dk/diseasy:main
+
+      - name: Save image
+        run: |
+          docker save \
+            -o diseasy-apptainer.tar \
+            ghcr.io/ssi-dk/diseasy:main
+
+      - name: Upload container
+        uses: actions/upload-artifact@v4
+        with:
+          name: hpc-container
+          path: diseasy-apptainer.tar
+          retention-days: 7
