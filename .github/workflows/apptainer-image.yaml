@@ -1,4 +1,4 @@
-name: Export container for HPC
+name: Export Apptainer container for HPC
 
 on:
   workflow_dispatch:
@@ -12,28 +12,37 @@ jobs:
       packages: read
 
     steps:
+      - name: Install Apptainer
+        run: |
+          sudo apt update
+          sudo apt install -y software-properties-common
+          sudo add-apt-repository -y ppa:apptainer/ppa
+          sudo apt update
+          sudo apt install -y apptainer
+          apptainer version
+
       - name: Login to GHCR
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | \
-            docker login ghcr.io \
-            -u "${{ github.actor }}" \
-            --password-stdin
+            apptainer registry login \
+            --username "${{ github.actor }}" \
+            --password-stdin \
+            docker://ghcr.io
 
-      - name: Pull image
+      - name: Create SIF
         run: |
-          docker pull \
-            --platform linux/amd64 \
-            ghcr.io/ssi-dk/diseasy:main
+          apptainer pull \
+            diseasy.sif \
+            docker://ghcr.io/ssi-dk/diseasy:main
 
-      - name: Save image
+      - name: Inspect SIF
         run: |
-          docker save \
-            -o diseasy-apptainer.tar \
-            ghcr.io/ssi-dk/diseasy:main
+          ls -lh diseasy.sif
+          apptainer inspect diseasy.sif
 
-      - name: Upload container
+      - name: Upload SIF
         uses: actions/upload-artifact@v4
         with:
-          name: hpc-container
-          path: diseasy-apptainer.tar
+          name: diseasy-apptainer
+          path: diseasy.sif
           retention-days: 7
