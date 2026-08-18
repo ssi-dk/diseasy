@@ -735,6 +735,11 @@
       "binary": true
     },
     {
+      "package": "progress",
+      "version": "1.2.3",
+      "binary": true
+    },
+    {
       "package": "progressr",
       "version": "1.0.0",
       "binary": true
