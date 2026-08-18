@@ -18,14 +18,13 @@ adjacency_meta_nordic <- adjacency_meta_nordic_nuts3 |>
     by = c("to" = "region"),
     suffix = c("_from", "_to")
   ) |>
-  dplyr::mutate(
-    "t" = .data$adjacency * .data$population_from * .data$population_to,
+  dplyr::group_by(
     "from" = substr(.data$from, 1, 2),
     "to" = substr(.data$to, 1, 2)
   ) |>
   dplyr::summarise(
-    "adjacency" = sum(.data$t) / (sum(.data$population_from) * sum(.data$population_to)),
-    .by = c("from", "to")
+    "adjacency" = mean(.data$adjacency),
+    .groups = "drop"
   )
 
 attr(adjacency_meta_nordic, "type") <- "infection-flow"
