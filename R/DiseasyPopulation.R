@@ -245,7 +245,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       N_full_squared <- outer(N_full, N_full)
 
-      t_matrices_full <- purrr::map(c_matrices_full, ~ . / N_full_squared)
+      t_matrices_full <- purrr::map(c_matrices_full, ~ . * N_full_squared)
 
 
       # Create map from full (reference) groups to model groups
@@ -311,7 +311,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       N_model_squared <- outer(N_model, N_model)
 
       # Map to the model groups and convert back from "T" domain to "C" domain
-      c_matrices_model <- purrr::map(t_matrices_full, ~ (p_reduce %*% . %*% t(p_reduce)) * N_model_squared)
+      c_matrices_model <- purrr::map(t_matrices_full, ~ (p_reduce %*% . %*% t(p_reduce)) / N_model_squared)
 
       return(c_matrices_model)
     },
