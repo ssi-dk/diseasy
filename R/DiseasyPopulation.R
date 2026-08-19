@@ -178,439 +178,142 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       checkmate::assert_numeric(weights, lower = 0, len = 4)
 
-      # The process of generating per-capita contact matrices for the model
-      # requires a couple of steps.
-
-      # Step 1
-      # Get time-varying age-specific contact matrices from `DiseasyActivity`
-      # and cast from matrix form to long form
-
-      # Step 2
-      # Get region-specific modifiers of contacts between and within regions
-      # from `DiseasyRegions` and cast from matrix form to long form
-
-      # Step 3
-      # Get the demography (population) for all age groups defined in the data
-
-      # Step 4
-      # Generate a matrix-mapping (p) from the contact matrix age groups to the
-      # target age groups (the age stratification of the model).
-
-      # Step 5
-      # Aggregate demography data to the age groups of the age-specific contact matrices
-
-      # Step 6
-      # Merge the reduced demography data from step 5 with the region-specific
-      # mixing modifiers
-
-      # Step 7
-      # Loop over the time-varying age-specific contact matrices
-
-      # Step 7.1
-      # Merge the data set from step 6 with the age-specific contact matrices
-      # for the time point and compute the raw number of contacts ("T" domain)
-
-      # Step 7.2
-      # Group the "T" domain data of step 7.1 and the reduced demography data
-      # of step 5 at the spatial resolution of the model
-
-      # Step 7.3
-      # Reduce the "T" domain to the given spatial resoltion
-
-      # Step 7.4
-      # Cast back to per-capita ("C" domain)
-
-      # Step 7.5
-      # Cast back to matrix form
-
-      # Step 7.6
-      # Use the tranformation matrix of step 4 to aggregate matrix form to the
-      # age groups of the model
-
-
-
-      # Step 1 #################################################################
       # Retrieve the time-varying per-capita contact matrices
       c_matrices_age <- self %.% activity %.% get_scenario_contacts(weights = weights)
+      age_groups_reference <- purrr::pluck(c_matrices_age, 1, colnames)
 
-      # Convert to long form
-      c_matrices_age_long <- c_matrices_age |>
-        purrr::map(
-          \(c_matrix_age) {
-            c_matrix_age |>
-              as.data.frame() |>
-              tibble::rownames_to_column(var = "age_group_from") |>
-              tidyr::pivot_longer(
-                cols = !"age_group_from",
-                names_to = "age_group_to",
-                values_to = "per_capita_contacts"
-              )
-          }
-        )
+      # Retrieve the regional mixing matrices
+      regional_mixing_modifiers <- self %.% regions %.% infection_flow_matrix
 
+      # Normalise the regional mixing to a scaling of 1
+      regional_mixing_modifiers <- regional_mixing_modifiers / max(eigen(regional_mixing_modifiers)$values)
 
-      # Step 2 #################################################################
-      # Retrieve the regional mixing matrix
-      regional_mixing_modifiers <- self %.% regions %.% infection_flow_matrix |>
-        as.data.frame() |>
-        tibble::rownames_to_column(var = "region_from") |>
-        tidyr::pivot_longer(
-          cols = !"region_from",
-          names_to = "region_to",
-          values_to = "regional_mixing"
-        ) |>
-        dplyr::mutate("regional_mixing" = .data$regional_mixing / sum(.data$regional_mixing))
+      # Get all groups and their population
+      population_map <- self %.% map_population(age_groups_reference = age_groups_reference)
 
-
-      # Step 3 #################################################################
-      # Get the demography in the full groups
-      population_map <- self %.% map_population(
-        age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "per_capita_contacts", 1, colnames)
-      )
-
-
-      # Step 4 #################################################################
-      # Compute proportion of population in new and reference age groups
-      tt <- merge(
-        aggregate(proportion ~ age_group_id_reference + age_group_id_out, data = population_map, FUN = sum),
-        aggregate(proportion ~ age_group_id_reference,                    data = population_map, FUN = sum),
-        by = "age_group_id_reference"
-      )
-      tt$proportion <- tt$proportion.x / tt$proportion.y
-      p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_id_out, j = age_group_id_reference, x = proportion)))
-
-      # Label the matrix
-      dimnames(p) <- list(unique(population_map$age_group_out), unique(population_map$age_group_reference))
-
-
-      # Step 5 #################################################################
-      # Reduce the demography to the contact matrix age groups
-      non_age_group_stratifications <- purrr::discard(colnames(self %.% groups), ~ . == "age_group")
-
-      population_map_age_reduced <- population_map |>
-        dplyr::summarise(
-          "population" = sum(.data$population),
-          .by = dplyr::all_of(c("age_group_reference", non_age_group_stratifications))
-        ) |>
+      # Aggregate population to the reference age groups of the age-specific contact matrices
+      full_population <- population_map |>
+        dplyr::select(dplyr::all_of(c("age_group_reference", colnames(self %.% groups), "population"))) |>
+        dplyr::group_by(dplyr::across(!c("age_group", "population"))) |>
+        dplyr::summarise("population" = sum(.data$population), .groups = "drop") |>
         dplyr::rename("age_group" = "age_group_reference")
 
 
-      # Step 6 #################################################################
-      # Construct the static interactions (between age groups and regional mixing modifiers)
-      population_and_regional_interactions <- dplyr::cross_join(
-        dplyr::select(population_map_age_reduced, c("age_group", "region", "population")),
-        dplyr::select(population_map_age_reduced, c("age_group", "region", "population")),
-        suffix = c("_from", "_to")
+      # Expand regional mixing modifiers to the full dimensionality of the model population
+      p_expand_region <- purrr::map(
+        colnames(regional_mixing_modifiers),
+        ~ as.numeric(full_population %.% region == .)
       ) |>
-        dplyr::left_join(
-          regional_mixing_modifiers,
-          by = c("region_from", "region_to")
+        purrr::reduce(cbind)
+
+      colnames(p_expand_region) <- colnames(regional_mixing_modifiers)
+      rownames(p_expand_region) <- tidyr::unite(
+        full_population,
+        "label",
+        dplyr::all_of(colnames(self %.% groups)),
+        sep = "/"
+      ) %.% label
+
+      regional_mixing_modifiers_full <- p_expand_region %*% regional_mixing_modifiers %*% t(p_expand_region)
+
+
+      # Expand age-stratified age groups to the full dimensionality of the model population
+      p_expand_age <- purrr::map(
+        age_groups_reference,
+        ~ as.numeric(full_population %.% age_group == .)
+      ) |>
+        purrr::reduce(cbind)
+
+      colnames(p_expand_age) <- age_groups_reference
+      rownames(p_expand_age) <- tidyr::unite(
+        full_population,
+        "label",
+        dplyr::all_of(colnames(self %.% groups)),
+        sep = "/"
+      ) %.% label
+
+      c_matrices_full <- c_matrices_age |>
+        purrr::map(~ (p_expand_age %*% . %*% t(p_expand_age))) |>
+        purrr::map(~ . * regional_mixing_modifiers_full) # .. and apply the regional mixing modifiers
+
+      # Convert from "C" domain to "T" domain
+      N_full <- full_population |>
+        tidyr::unite("label", dplyr::all_of(colnames(self %.% groups)), sep = "/") |>
+        dplyr::select("label", "population") |>
+        tibble::deframe()
+
+      N_full_squared <- outer(N_full, N_full)
+
+      t_matrices_full <- purrr::map(c_matrices_full, ~ . / N_full_squared)
+
+
+      # Create map from full (reference) groups to model groups
+      # ... starting first with age groups only (which can have partial overlap to reference age groups)
+      tt <- merge(
+        aggregate(
+          population ~ age_group_reference + region + age_group_out + region_out,
+          data = population_map,
+          FUN = sum
+        ),
+        aggregate(
+          population ~ age_group_reference + region + region_out,
+          data = population_map,
+          FUN = sum
+        ),
+        by = c("age_group_reference", "region", "region_out"),
+        suffixes = c("_full", "_model")
+      ) |>
+        dplyr::mutate(
+          "proportion" = .data$population_full / .data$population_model
+        ) |>
+        dplyr::select(!dplyr::ends_with(c("_full", "_model")))
+
+      # Add labels
+      tt <- tt |>
+        tidyr::unite(
+          col = "label_full",
+          dplyr::any_of(sort(c("age_group_reference", colnames(self %.% groups)))),
+          sep = "/",
+          remove  = FALSE
+        ) |>
+        dplyr::select(!c("age_group_reference", "region")) |>
+        tidyr::unite(
+          col = "label_out",
+          dplyr::any_of(sort(c("age_group_out", "region_out", colnames(self %.% groups)))),
+          sep = "/"
         )
 
-      # Store stratification columns
-      stratification_columns <- colnames(population_and_regional_interactions) |>
-        purrr::keep(~ endsWith(., "_from") || endsWith(., "_to")) |>
-        purrr::discard(~ startsWith(., "population_"))
-
-      non_regional_stratifications <- purrr::discard(stratification_columns, ~ startsWith(., "region_"))
-
-
-      # Step 7 #################################################################
-      # Loop over changes in restrictions
-      c_matrices_age_region <- c_matrices_age_long |>
-        purrr::map(
-          \(c_matrix_age_long) {
-
-            # Step 7.1 ########################################################
-            # Add the age-specific interactions for the given time-point
-            t_matrix_full_long <- population_and_regional_interactions |>
-              dplyr::left_join(
-                c_matrix_age_long,
-                  by = c("age_group_from", "age_group_to")
-              ) |>
-              dplyr::mutate(
-                "c" = .data$per_capita_contacts * .data$regional_mixing,
-                "t" = .data$c * .data$population_from * .data$population_to,
-                .before = dplyr::everything()
-              ) |>
-              dplyr::select(!c("per_capita_contacts", "regional_mixing"))
-
-
-            # Step 7.2 #########################################################
-            # Group t_matrix and population at the given spatial resolution
-            if (is.null(self %.% regional_stratification)) {
-
-              t_matrix_full_long_grouped <- t_matrix_full_long |>
-                dplyr::group_by(
-                  "region_from" = "All",
-                  "region_to"   = "All",
-                  dplyr::across(non_regional_stratifications)
-                )
-
-              population_map_fully_reduced <- population_map_age_reduced |>
-                dplyr::group_by(
-                  "region" = "All",
-                  dplyr::across(purrr::discard(colnames(population_map_age_reduced), ~ . %in% c("region", "population")))
-                ) |>
-                dplyr::summarise(
-                  "population" = sum(.data$population),
-                  .groups = "drop"
-                )
-
-            } else {
-
-              # With spatial stratification, we need to group to the requested stratification level before summarising
-              regions_at_stratification <- self %.% regions %.% regions_at_stratification(
-                self %.% regional_stratification
-              )
-
-              t_matrix_full_long_grouped <- t_matrix_full_long |>
-                dplyr::group_by(
-                  "region_from" = purrr::map_chr(
-                    .data$region_from,
-                    ~ regions_at_stratification[which(stringr::str_starts(., regions_at_stratification))]
-                  ),
-                  "region_to"   = purrr::map_chr(
-                    .data$region_to,
-                    ~ regions_at_stratification[which(stringr::str_starts(., regions_at_stratification))]
-                  ),
-                  dplyr::across(non_regional_stratifications)
-                )
-
-              population_map_fully_reduced <- population_map_age_reduced |>
-                dplyr::group_by(
-                  "region" = purrr::map_chr(
-                    .data$region,
-                    ~ regions_at_stratification[which(stringr::str_starts(., regions_at_stratification))]
-                  ),
-                  dplyr::across(purrr::discard(colnames(population_map_age_reduced), ~ . %in% c("region", "population")))
-                ) |>
-                  dplyr::summarise(
-                    "population" = sum(.data$population),
-                    .groups = "drop"
-                  )
-            }
-
-
-            dplyr::select(t_matrix_full_long_grouped, "t", dplyr::everything())
-            # Step 7.3 #########################################################
-            # Reduce the t_matrix to the given spatial resoltion
-            t_matrix_reduced_long <- t_matrix_full_long_grouped |>
-              dplyr::summarise(
-                "t" = sum(.data$t),
-                .groups = "drop"
-              ) |>
-                dplyr::left_join(
-                  dplyr::cross_join(
-                    population_map_fully_reduced,
-                    population_map_fully_reduced,
-                    suffix = c("_from", "_to")
-                  ),
-                  by = stratification_columns
-                ) |>
-                dplyr::select(!dplyr::starts_with("population"))
-
-
-            # # Step 7.4 #########################################################
-            # # Cast back to per-capita ("C" domain)
-            # c_matrix_reduced_long <- t_matrix_reduced_long |>
-            #   dplyr::mutate("c" = .data$t / (.data$population_from * .data$population_to)) |>
-            #   dplyr::select(!c("t", dplyr::starts_with("population")))
-
-
-            # Step 7.5 #########################################################
-            # Generate group labels for the age-group / region reduced
-            labels_reduced <- population_map_fully_reduced |>
-              dplyr::select(colnames(self %.% groups)) |>
-              tidyr::unite("label", dplyr::everything(), sep = "/") |>
-              dplyr::pull("label")
-
-            t_matrix_reduced_long_labelled <- t_matrix_reduced_long |>
-              tidyr::unite(
-                "label_from", dplyr::all_of(paste(colnames(self %.% groups), "from", sep = "_")), sep = "/"
-              ) |>
-              tidyr::unite(
-                "label_to", dplyr::all_of(paste(colnames(self %.% groups), "to", sep = "_")), sep = "/"
-              )
-
-            # Cast back to matrix form
-            t_matrix_reduced <- matrix(
-              NA_real_,
-              nrow = nrow(population_map_fully_reduced),
-              ncol = nrow(population_map_fully_reduced),
-              dimnames = list(labels_reduced, labels_reduced)
-            )
-
-            # Fill with existing values
-            t_matrix_reduced[
-              cbind(
-                match(t_matrix_reduced_long_labelled %.% label_from, labels_reduced),
-                match(t_matrix_reduced_long_labelled %.% label_to,   labels_reduced)
-              )
-            ] <- t_matrix_reduced_long_labelled %.% t
-
-
-            # Step 7.6 #########################################################
-            # Expand the tranformation matrix to cast to the model age groups
-            p_expanded <- p |>
-              list() |>
-              rep(nrow(dplyr::distinct(dplyr::select(self %.% groups, !"age_group")))) |>
-              purrr::reduce(rbind) |>
-              list() |>
-              rep(nrow(dplyr::distinct(dplyr::select(self %.% groups, !"age_group")))) |>
-              purrr::reduce(cbind)
-
-            (p_expanded %*% t_matrix_reduced %*% t(p_expanded))
-
-          }
-        )
-
-
-      # Compute the population in the reference groups to transform from C domain to T domain
-      reference_population <- population_map |>
-        dplyr::summarise(
-          "population" = sum(.data$population),
-          .by = c("region", "age_group_reference")
-        )
-
-      # Generate the full mixing matrices
-      # 1) Cross the age-specific per-capita contact matrix with the regional mixing matrix
-      # 2) Add population information
-      # 3) Convert contact matrix from "C" domain to "T" domain
-      # 4) Aggregate "T" in the new age groups
-      # 5) Convert from "T" domain back to "C" domain
-      c_matrices_long <- c_matrices_age_long |>
-        purrr::map(
-          \(c_matrix_age_long) {
-            step_1 <- dplyr::cross_join(
-              c_matrix_age_long,
-              regional_mixing_modifiers
-            ) |>
-              dplyr::mutate("c" = .data$per_capita_contacts * .data$regional_mixing) |>
-              dplyr::select(dplyr::starts_with("age_"), dplyr::starts_with("region_"), "c")
-
-            step_2 <- step_1 |>
-              dplyr::left_join(
-                reference_population,
-                c("age_from" = "age_group_reference", "region_from" = "region")
-              ) |>
-              dplyr::left_join(
-                reference_population,
-                c("age_to" = "age_group_reference", "region_to" = "region"),
-                suffix = c("_from", "_to")
-              )
-
-            step_3 <- step_2 |>
-              dplyr::mutate("t" = .data$c * .data$population_from * .data$population_to)
-
-            step_4 <- step_3 |>
-              dplyr::left_join(
-                dplyr::cross_join(
-                  dplyr::transmute(
-                    population_transformations_proportions,
-                    "age_from" = .data$age_group_out,
-                    "proportion_from" = .data$proportion
-                  ),
-                  dplyr::transmute(
-                    population_transformations_proportions,
-                    "age_to" = .data$age_group_out,
-                    "proportion_to" = .data$proportion
-                  )
-                ),
-                c("age_from", "age_to")
-              )
-
-            step_5 <- step_4 |>
-              dplyr::summarise(
-                "t" = sum(.data$t * .data$proportion_from * .data$proportion_to),
-                .by = c()
-              )
-          }
-        )
-
-
-      # Project into target age groups
-      if (is.null(C_age)) {
-
-        # If no scenario is defined, return unit contact matrices
-        labels <- tidyr::unite(self %.% groups, "label", dplyr::everything(), sep = "/") |>
-          dplyr::pull("label")
-
-        C_age <- matrix(
-          rep(
-            1, # Contacts are uniform across all age groups
-            length(labels) * length(labels)
+      # Convert labels to index
+      tt <- tt |>
+        dplyr::mutate(
+          "index_full" = purrr::map_dbl(
+            .data$label_full,
+            ~ which(. == unique(.data$label_full))
           ),
-          ncol = length(labels),
-          dimnames = list(labels, labels)
+          "index_out" = purrr::map_dbl(
+            .data$label_out,
+            ~ which(. == unique(.data$label_out))
+          )
         )
 
-        C_age <- stats::setNames(
-          list(c_matrix),
-          as.Date("1970-01-01")
-        )
+      p_reduce <- with(tt, as.matrix(Matrix::sparseMatrix(i = index_out, j = index_full, x = proportion)))
 
-      } else {
+      rownames(p_reduce) <- unique(tt %.% label_out)
+      colnames(p_reduce) <- unique(tt %.% label_full)
 
-        # To perform the projection, we need the number of persons in the new and original age groups
-        # Determine the population in the new age groups
-        population_map <- self %.% map_population(
-          age_groups_reference = purrr::pluck(self %.% activity %.% contact_basis, "per_capita_contacts", 1, colnames)
-        )
+      # Compute N_squared in the model populations
+      N_model <- self %.% model_population |>
+        tidyr::unite("label", dplyr::all_of(colnames(self %.% groups)), sep = "/") |>
+        dplyr::select("label", "population") |>
+        tibble::deframe()
 
-        population_per_group <- population_map |>
-          dplyr::summarise(
-            "population" = sum(.data$population),
-            .by = "age_group_out"
-          ) |>
-          dplyr::pull("population")
+      N_model_squared <- outer(N_model, N_model)
 
-        population_reference <- population_map |>
-          dplyr::summarise(
-            "population" = sum(.data$population),
-            .by = "age_group_reference"
-          ) |>
-          dplyr::pull("population")
+      # Map to the model groups and convert back from "T" domain to "C" domain
+      c_matrices_model <- purrr::map(t_matrices_full, ~ (p_reduce %*% . %*% t(p_reduce)) * N_model_squared)
 
-        # Create square matrix with the new population repeated as columns
-        N_new <- outer(population_per_group, rep(1, length(population_per_group)))                                      # nolint: object_name_linter
-
-        # Create a square matrix in the original population repeated as columns
-        N_original <- outer(population_reference, rep(1, length(population_reference)))                                 # nolint: object_name_linter
-
-
-        # Compute proportion of population in new and old age_groups
-        # Calculating transformation matrix
-        tt <- merge(
-          aggregate(proportion ~ age_group_id_reference + age_group_id_out, data = population_map, FUN = sum),
-          aggregate(proportion ~ age_group_id_reference,                    data = population_map, FUN = sum),
-          by = "age_group_id_reference"
-        )
-        tt$proportion <- tt$proportion.x / tt$proportion.y
-        p <- with(tt, as.matrix(Matrix::sparseMatrix(i = age_group_id_out, j = age_group_id_reference, x = proportion)))
-
-        # Label the matrix
-        dimnames(p) <- list(unique(population_map$age_group_out), unique(population_map$age_group_reference))
-
-
-        # For each contact matrix, c, in the scenario, we perform the transformation
-        # (p %*% (c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))                                        # nolint: commented_code_linter
-        # As c is the per capita contacts from each individual c * N_original * t(N_original) scales to all contacts
-        # between age groups ("t" domain).
-        # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-        # Finally, the division by N_new * t(N_new) transforms back to per-capita contacts in the new age groups
-        # ("c" domain).
-        C_age <- lapply(
-          X = C_age,
-          FUN = \(c) (p %*% (c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new))
-        )
-      }
-
-      # Retrieve the regional mixing
-
-      return(per_capita_contact_matrices)
+      return(c_matrices_model)
     },
-
 
                                                                                                                         # nolint start: documentation_template_linter, identation_linter
     #' Map population between age groups
@@ -618,6 +321,8 @@ DiseasyPopulation <- R6::R6Class(                                               
     #' @description
     #'   The function computes the proportion of population in the new and old age groups.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param regions (`character()`)\cr
+    #'   The regions the population should be mapped to (e.g. NUTS 1 regions).
     #' @param age_groups_reference (`character()`)\cr
     #'   Age labels (created by `diseasystore::age_labels()` of reference data.
     #' @param demography (`data.frame`)\cr
@@ -629,6 +334,7 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   those supplied to the function.
     map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
       age_cuts_lower = self %.% age_cuts_lower,
+      regions = purrr::pluck(self %.% groups, "region", unique),
       age_groups_reference = NULL,
       demography = self %.% regions %.% demography
     ) {
@@ -647,6 +353,19 @@ DiseasyPopulation <- R6::R6Class(                                               
         any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", null.ok = TRUE,
         add = coll
       )
+
+      if (!is.null(regions)) {
+        checkmate::assert_names(names(demography), must.include = "region", add = coll)
+
+        unmatchable_regions_in_demography <- purrr::discard(
+          demography$region,
+          ~ any(stringr::str_starts(., regions))
+        )
+
+        if (length(unmatchable_regions_in_demography) > 0) {
+          coll$push("Not all regions in demography are matched by the given `regions`!")
+        }
+      }
 
       checkmate::assert_data_frame(demography, min.rows = 1, add = coll)
       checkmate::assert_names(names(demography), must.include = "population", add = coll)
@@ -739,6 +458,34 @@ DiseasyPopulation <- R6::R6Class(                                               
           )
       }
 
+      # Map reference regions to the requested regions
+      if (!is.null(regions)) {
+        region_regexes <- purrr::map_chr(regions, ~ paste0("^(", ., r"{)\w+$}"))
+
+        population <- region_regexes |>
+          purrr::map(
+            ~ population |>
+              dplyr::mutate(
+                "region_out" = stringr::str_extract(.data$region, ., group = 1)
+              ) |>
+              dplyr::filter(!is.na(.data$region_out))
+          ) |>
+          purrr::list_rbind()
+
+
+        # Reorder output
+        population <- population |>
+          dplyr::select(
+            dplyr::starts_with("age"),
+            dplyr::starts_with("region"),
+            dplyr::everything()
+          ) |>
+          dplyr::relocate(
+            dplyr::matches("_id"),
+            .after = dplyr::everything()
+          )
+      }
+
       return(population)
     },
 
@@ -812,12 +559,13 @@ DiseasyPopulation <- R6::R6Class(                                               
       model_population <- self %.% groups |>
         dplyr::left_join(
           self %.% map_population() |>
+            dplyr::select(dplyr::all_of(c(paste0(colnames(self %.% groups), "_out"), "population"))) |>
+            dplyr::rename(!!!stats::setNames(paste0(colnames(self %.% groups), "_out"), colnames(self %.% groups))) |>
             dplyr::summarise(
               "population" = sum(.data$population),
-              .by = "age_group_out"
-            ) |>
-            dplyr::rename("age_group" = "age_group_out"),
-          by = "age_group"
+              .by = colnames(self %.% groups)
+            ),
+          by = colnames(self %.% groups)
         ) |>
         dplyr::mutate(
           "proportion" = .data$population / sum(.data$population)

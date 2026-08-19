@@ -87,6 +87,7 @@ The local copy of an DiseasyRegions module. Read-only.}
     \preformatted{DiseasyPopulation$new(
   age_cuts_lower = 0L,
   regional_stratification = NULL,
+  activity = NULL,
   regions = NULL,
   ...
 )}
@@ -97,8 +98,7 @@ The local copy of an DiseasyRegions module. Read-only.}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population.}
-      \item{\code{regions}}{(\code{DiseasyRegions})\cr
-An instance of a regional module which should provide the demography of the population.}
+      \item{\code{activity, regions}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}
@@ -210,6 +210,7 @@ Map population between age groups
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyPopulation$map_population(
   age_cuts_lower = self \%.\% age_cuts_lower,
+  regions = purrr::pluck(self \%.\% groups, "region", unique),
   age_groups_reference = NULL,
   demography = self \%.\% regions \%.\% demography
 )}
@@ -219,6 +220,8 @@ Map population between age groups
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{regions}}{(\code{character()})\cr
+The regions the population should be mapped to (e.g. NUTS 1 regions).}
       \item{\code{age_groups_reference}}{(\code{character()})\cr
 Age labels (created by \code{diseasystore::age_labels()} of reference data.}
       \item{\code{demography}}{(\code{data.frame})\cr

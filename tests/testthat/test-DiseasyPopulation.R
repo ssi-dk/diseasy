@@ -252,7 +252,7 @@ test_that("$per_capita_contact_matrices() works", {
   regions_nuts <- DiseasyRegionsNuts$new(
     area = "DK",
     demography = demography_nordic_nuts3,
-    adjacency = adjacency_meta_nordic_nuts,
+    adjacency = adjacency_meta_nordic_nuts3,
   )
 
   # Configure an activity module using Danish population and contact information.
