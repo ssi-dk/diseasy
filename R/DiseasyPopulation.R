@@ -234,7 +234,8 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       c_matrices_full <- c_matrices_age |>
         purrr::map(~ (p_expand_age %*% . %*% t(p_expand_age))) |>
-        purrr::map(~ . * regional_mixing_modifiers_full) # .. and apply the regional mixing modifiers
+        purrr::map(~ . * regional_mixing_modifiers_full) |> # .. and apply the regional mixing modifiers
+        purrr::map(~ . / length(unique(self %.% groups %.% region))) # ... and remove the regional re-scaling
 
       # Convert from "C" domain to "T" domain
       N_full <- full_population |>
