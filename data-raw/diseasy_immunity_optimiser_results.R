@@ -314,8 +314,12 @@ for (penalty in c(0, 0.5, 1)) {
 
   closeAllConnections()
 
-  workers <- unname(future::availableCores(omit = 1))
-  future::plan("multisession", gc = TRUE, workers = workers)
+  if (interactive()) {
+     future::plan(plan, gc = TRUE)
+  } else {
+     future::plan(multisession, gc = TRUE, workers = unname(future::availableCores(omit = 1)))
+  }
+
 
   candidates <- tidyr::expand_grid(
     "optim_method" = optim_labels,
