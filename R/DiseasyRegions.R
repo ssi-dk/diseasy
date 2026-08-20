@@ -1263,28 +1263,33 @@ DiseasyRegions <- R6::R6Class(                                                  
 
         if (is.null(adjacency)) {
 
+          labels <- purrr::pluck(self %.% area, .default = "All")
+          n <- purrr::pluck(labels, length, .default = 1)
+
           infection_flow_matrix <- matrix(
-            data = 1 / sqrt(length(self %.% area)),
-            nrow = length(self %.% area),
-            ncol = length(self %.% area),
-            dimnames = list(self %.% area, self %.% area)
+            data = 1 / sqrt(n),
+            nrow = n,
+            ncol = n,
+            dimnames = list(labels, labels)
           )
 
-          if (attr(regional_risks, "type") == "behaviour") {
-            infection_flow_matrix <- infection_flow_matrix *
-              sqrt(
-                outer(
-                  X = self %.% regional_risks,
-                  Y = self %.% regional_risks
+          if (!is.null(regional_risks)) {
+            if (attr(regional_risks, "type") == "behaviour") {
+              infection_flow_matrix <- infection_flow_matrix *
+                sqrt(
+                  outer(
+                    X = self %.% regional_risks,
+                    Y = self %.% regional_risks
+                  )
+                )
+            } else {
+              pkgcond::pkg_error(
+                paste(
+                  "The interpretation of regional modifiers (`regional_risks_type`) must be",
+                  '"behaviour" if no adjacency data is provided.'
                 )
               )
-          } else {
-            pkgcond::pkg_error(
-              paste(
-                "The interpretation of regional modifiers (`regional_risks_type`) must be",
-                '"behaviour" if no adjacency data is provided.'
-              )
-            )
+            }
           }
 
         } else {
@@ -1309,6 +1314,10 @@ DiseasyRegions <- R6::R6Class(                                                  
       name = "demography",
       expr = {
         demography <- private %.% .demography
+
+        if (is.null(demography)) {
+          return(demography)
+        }
 
         demography <- demography |>
           dplyr::filter( # Filter demography to the given area

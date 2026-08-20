@@ -180,6 +180,21 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       # Retrieve the time-varying per-capita contact matrices
       c_matrices_age <- self %.% activity %.% get_scenario_contacts(weights = weights)
+
+      if (is.null(c_matrices_age)) {
+        c_matrices_age <- list(
+          "1970-01-01" = matrix(
+              1,
+              nrow = length(unique(self %.% groups %.% age_group)),
+              ncol = length(unique(self %.% groups %.% age_group)),
+              dimnames = list(
+                unique(self %.% groups %.% age_group),
+                unique(self %.% groups %.% age_group)
+              )
+            ) * mean(weights)
+          )
+      }
+
       age_groups_reference <- purrr::pluck(c_matrices_age, 1, colnames)
 
       # Retrieve the regional mixing matrices
@@ -222,7 +237,8 @@ DiseasyPopulation <- R6::R6Class(                                               
         age_groups_reference,
         ~ as.numeric(full_population %.% age_group == .)
       ) |>
-        purrr::reduce(cbind)
+        purrr::reduce(cbind) |>
+        as.matrix()
 
       colnames(p_expand_age) <- age_groups_reference
       rownames(p_expand_age) <- tidyr::unite(
@@ -235,7 +251,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       c_matrices_full <- c_matrices_age |>
         purrr::map(~ (p_expand_age %*% . %*% t(p_expand_age))) |>
         purrr::map(~ . * regional_mixing_modifiers_full) |> # .. and apply the regional mixing modifiers
-        purrr::map(~ . / length(unique(self %.% groups %.% region))) # ... and remove the regional re-scaling
+        purrr::map(~ . * length(unique(self %.% groups %.% region))) # ... and remove the regional re-scaling
 
       # Convert from "C" domain to "T" domain
       N_full <- full_population |>
@@ -341,7 +357,31 @@ DiseasyPopulation <- R6::R6Class(                                               
     ) {
 
       if (is.null(demography)) {
-        pkgcond::pkg_error("`demography` must be set to use `map_population`")
+        # If no demography is set, use a unit demography across the model groups
+
+        age_cuts_lower_reference <- as.numeric(
+          stringr::str_extract(
+            purrr::pluck(age_groups_reference, .default = "0+"),
+            r"{\d+}"
+          )
+        )
+
+        demography <- self %.% groups |>
+          dplyr::select(!"age_group") |>
+          dplyr::cross_join(
+            data.frame(
+              "age_group" = sort(unique(c(age_cuts_lower_reference, age_cuts_lower)))
+            )
+          ) |>
+          dplyr::left_join(
+            data.frame("age_cuts_lower_model" = c(0, 7)),
+            by = dplyr::join_by(closest(age_group >= age_cuts_lower_model))
+          ) |>
+          dplyr::mutate(
+            "population" = 1 / (dplyr::n() * length(age_cuts_lower)),
+            .by = !"age_group"
+          )
+
       }
 
       # Input checks
@@ -461,7 +501,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       # Map reference regions to the requested regions
       if (!is.null(regions)) {
-        region_regexes <- purrr::map_chr(regions, ~ paste0("^(", ., r"{)\w+$}"))
+        region_regexes <- purrr::map_chr(regions, ~ paste0("^(", ., r"{)\w{0,}$}"))
 
         population <- region_regexes |>
           purrr::map(
@@ -504,7 +544,11 @@ DiseasyPopulation <- R6::R6Class(                                               
       if (is.null(self %.% regional_stratification)) {
         printr("Space: No spatial stratification has been configured")
       } else {
-        printr(glue::glue("Space: Stratified by {self %.% regional_stratification}"))
+        printr(
+          glue::glue(
+            "Space: Stratified by {self %.% regional_stratification}: ",
+            "{toString(self %.% regions %.% regions_at_stratification(self %.% regional_stratification))}")
+          )
       }
     }
   ),
@@ -553,8 +597,12 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   The population groups and their sizes configured in the module.
     model_population = function() {
       checkmate::assert_class(self %.% regions, "DiseasyRegions")
-      if (is.null(self %.% regions %.% demography)) {
-        pkgcond::pkg_error("`demography` must be set in `DiseasyRegions` to compute `model_population`")
+
+      demography <- self %.% regions %.% demography
+
+      if (is.null(demography)) {
+        # Use unit demography if none is set
+        demography <- dplyr::mutate(self %.% groups, "population" = 1 / dplyr::n())
       }
 
       model_population <- self %.% groups |>
