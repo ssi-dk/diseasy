@@ -1,1143 +1,1522 @@
 {
-  "lockfile_version": 1,
-  "os": "Ubuntu 24.04.4 LTS",
-  "r_version": "R version 4.6.1 (2026-06-24)",
-  "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
       "package": "abind",
       "version": "1.4-8",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "abind"
+    },
+    {
+      "package": "arrow",
+      "version": "24.0.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "arrow"
     },
     {
       "package": "askpass",
       "version": "1.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "askpass"
     },
     {
       "package": "assertthat",
       "version": "0.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "assertthat"
     },
     {
       "package": "backports",
       "version": "1.5.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "backports"
     },
     {
       "package": "base64enc",
       "version": "0.1-6",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "base64enc"
     },
     {
       "package": "bayesplot",
       "version": "1.15.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bayesplot"
     },
     {
       "package": "BB",
       "version": "2026.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "BB"
     },
     {
       "package": "bibtex",
       "version": "0.5.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bibtex"
     },
     {
       "package": "bigD",
       "version": "0.3.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bigD"
+    },
+    {
+      "package": "BiocManager",
+      "version": "1.30.27",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "BiocManager"
     },
     {
       "package": "bit",
       "version": "4.6.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bit"
     },
     {
       "package": "bit64",
       "version": "4.8.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bit64"
     },
     {
       "package": "bitops",
-      "version": "1.0-9",
-      "binary": true
+      "version": "1.1-0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bitops"
     },
     {
       "package": "blob",
       "version": "1.3.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "blob"
     },
     {
       "package": "brew",
       "version": "1.0-10",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "brew"
     },
     {
       "package": "bridgesampling",
       "version": "1.2-1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bridgesampling"
     },
     {
       "package": "brio",
       "version": "1.1.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "brio"
     },
     {
       "package": "brms",
       "version": "2.23.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "brms"
     },
     {
       "package": "Brobdingnag",
       "version": "1.2-9",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "Brobdingnag"
+    },
+    {
+      "package": "broom",
+      "version": "1.0.13",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "broom"
     },
     {
       "package": "bslib",
-      "version": "0.11.0",
-      "binary": true
+      "version": "0.12.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "bslib"
     },
     {
       "package": "cachem",
       "version": "1.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "cachem"
     },
     {
       "package": "callr",
       "version": "3.8.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "callr"
     },
     {
       "package": "cellranger",
       "version": "1.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "cellranger"
     },
     {
       "package": "checkmate",
       "version": "2.3.4",
-      "binary": true
-    },
-    {
-      "package": "class",
-      "version": "7.3-23",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "checkmate"
     },
     {
       "package": "classInt",
       "version": "0.4-11",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "classInt"
     },
     {
       "package": "cli",
       "version": "3.6.6",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "cli"
     },
     {
       "package": "clipr",
       "version": "0.8.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "clipr"
     },
     {
       "package": "coda",
       "version": "0.19-4.1",
-      "binary": true
-    },
-    {
-      "package": "codetools",
-      "version": "0.2-20",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "coda"
     },
     {
       "package": "commonmark",
       "version": "2.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "commonmark"
+    },
+    {
+      "package": "conflicted",
+      "version": "1.2.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "conflicted"
     },
     {
       "package": "contactdata",
       "version": "1.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "contactdata"
     },
     {
       "package": "countrycode",
       "version": "1.8.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "countrycode"
+    },
+    {
+      "package": "covr",
+      "version": "3.6.5",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "covr"
+    },
+    {
+      "package": "cpp11",
+      "version": "0.5.5",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "cpp11"
     },
     {
       "package": "crayon",
       "version": "1.5.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "crayon"
     },
     {
       "package": "credentials",
       "version": "2.0.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "credentials"
     },
     {
       "package": "crosstalk",
       "version": "1.2.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "crosstalk"
     },
     {
       "package": "curl",
       "version": "7.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "curl"
     },
     {
       "package": "data.table",
       "version": "1.18.4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "data.table"
     },
     {
       "package": "DBI",
       "version": "1.3.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "DBI"
     },
     {
       "package": "dbplyr",
       "version": "2.6.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "dbplyr"
     },
     {
       "package": "desc",
       "version": "1.4.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "desc"
     },
     {
       "package": "deSolve",
       "version": "1.42",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "deSolve"
     },
     {
       "package": "devtools",
       "version": "2.5.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "devtools"
     },
     {
       "package": "dfoptim",
       "version": "2023.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "dfoptim"
     },
     {
       "package": "diffobj",
-      "version": "0.3.6",
-      "binary": true
+      "version": "0.3.8",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "diffobj"
     },
     {
       "package": "digest",
       "version": "0.6.39",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "digest"
     },
     {
       "package": "diseasy",
       "version": "0.0.0.9001",
-      "binary": false
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "diseasy"
     },
     {
       "package": "diseasystore",
       "version": "0.3.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "diseasystore"
     },
     {
       "package": "distributional",
       "version": "0.8.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "distributional"
+    },
+    {
+      "package": "docopt",
+      "version": "0.7.2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "docopt"
     },
     {
       "package": "doParallel",
       "version": "1.0.17",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "doParallel"
     },
     {
       "package": "downlit",
       "version": "0.4.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "downlit"
     },
     {
       "package": "dplyr",
       "version": "1.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "dplyr"
+    },
+    {
+      "package": "dtplyr",
+      "version": "1.3.3",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "dtplyr"
     },
     {
       "package": "duckdb",
-      "version": "1.5.4.2",
-      "binary": true
+      "version": "1.5.5",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "duckdb"
     },
     {
       "package": "e1071",
       "version": "1.7-17",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "e1071"
     },
     {
       "package": "ellipsis",
       "version": "0.3.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ellipsis"
     },
     {
       "package": "eurostat",
       "version": "4.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "eurostat"
     },
     {
       "package": "evaluate",
       "version": "1.0.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "evaluate"
     },
     {
       "package": "expm",
       "version": "1.0-0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "expm"
     },
     {
       "package": "fansi",
       "version": "1.0.7",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "fansi"
     },
     {
       "package": "farver",
       "version": "2.1.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "farver"
     },
     {
       "package": "fastmap",
       "version": "1.2.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "fastmap"
     },
     {
       "package": "fontawesome",
       "version": "0.5.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "fontawesome"
+    },
+    {
+      "package": "forcats",
+      "version": "1.0.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "forcats"
     },
     {
       "package": "foreach",
       "version": "1.5.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "foreach"
     },
     {
       "package": "fs",
       "version": "2.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "fs"
+    },
+    {
+      "package": "fst",
+      "version": "0.9.8",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "fst"
+    },
+    {
+      "package": "fstcore",
+      "version": "0.10.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "fstcore"
     },
     {
       "package": "future",
-      "version": "1.70.0",
-      "binary": true
+      "version": "1.75.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "future"
     },
     {
       "package": "future.apply",
       "version": "1.20.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "future.apply"
+    },
+    {
+      "package": "gargle",
+      "version": "1.6.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "gargle"
     },
     {
       "package": "generics",
       "version": "0.1.4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "generics"
     },
     {
       "package": "geojsonsf",
       "version": "2.0.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "geojsonsf"
     },
     {
       "package": "gert",
-      "version": "2.3.1",
-      "binary": true
+      "version": "2.4.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "gert"
     },
     {
       "package": "ggplot2",
       "version": "4.0.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ggplot2"
     },
     {
       "package": "ggridges",
       "version": "0.5.7",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ggridges"
     },
     {
       "package": "gh",
-      "version": "1.6.0",
-      "binary": true
+      "version": "1.6.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "gh"
     },
     {
       "package": "giscoR",
       "version": "1.1.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "giscoR"
     },
     {
       "package": "gitcreds",
       "version": "0.1.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "gitcreds"
     },
     {
       "package": "globals",
       "version": "0.19.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "globals"
     },
     {
       "package": "glue",
       "version": "1.8.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "glue"
+    },
+    {
+      "package": "googledrive",
+      "version": "2.1.2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "googledrive"
+    },
+    {
+      "package": "googlesheets4",
+      "version": "1.1.2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "googlesheets4"
     },
     {
       "package": "gridExtra",
       "version": "2.3.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "gridExtra"
     },
     {
       "package": "gt",
       "version": "1.3.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "gt"
     },
     {
       "package": "gtable",
       "version": "0.3.6",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "gtable"
+    },
+    {
+      "package": "haven",
+      "version": "2.5.5",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "haven"
     },
     {
       "package": "here",
       "version": "1.0.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "here"
     },
     {
       "package": "highr",
       "version": "0.12",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "highr"
     },
     {
       "package": "hms",
       "version": "1.1.4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "hms"
     },
     {
       "package": "htmltools",
       "version": "0.5.9",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "htmltools"
     },
     {
       "package": "htmlwidgets",
       "version": "1.6.4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "htmlwidgets"
     },
     {
       "package": "httpuv",
       "version": "1.6.17",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "httpuv"
     },
     {
       "package": "httr",
       "version": "1.4.8",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "httr"
     },
     {
       "package": "httr2",
-      "version": "1.2.3",
-      "binary": true
+      "version": "1.3.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "httr2"
     },
     {
       "package": "hunspell",
       "version": "3.0.6",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "hunspell"
+    },
+    {
+      "package": "ids",
+      "version": "1.0.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ids"
     },
     {
       "package": "ini",
       "version": "0.3.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ini"
     },
     {
       "package": "inline",
       "version": "0.3.21",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "inline"
     },
     {
       "package": "isoband",
       "version": "0.3.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "isoband"
     },
     {
       "package": "ISOweek",
       "version": "0.6-2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ISOweek"
     },
     {
       "package": "iterators",
       "version": "1.0.14",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "iterators"
     },
     {
       "package": "jquerylib",
       "version": "0.1.4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "jquerylib"
     },
     {
       "package": "jsonlite",
       "version": "2.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "jsonlite"
     },
     {
       "package": "juicyjuice",
       "version": "0.1.0",
-      "binary": true
-    },
-    {
-      "package": "KernSmooth",
-      "version": "2.23-26",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "juicyjuice"
     },
     {
       "package": "knitr",
       "version": "1.51",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "knitr"
     },
     {
       "package": "labeling",
       "version": "0.4.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "labeling"
+    },
+    {
+      "package": "Lahman",
+      "version": "14.0-0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "Lahman"
     },
     {
       "package": "later",
       "version": "1.4.8",
-      "binary": true
-    },
-    {
-      "package": "lattice",
-      "version": "0.22-9",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "later"
     },
     {
       "package": "lazyeval",
       "version": "0.2.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "lazyeval"
     },
     {
       "package": "lbfgsb3c",
       "version": "2024-3.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "lbfgsb3c"
     },
     {
       "package": "lgr",
       "version": "0.5.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "lgr"
     },
     {
       "package": "lifecycle",
       "version": "1.0.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "lifecycle"
     },
     {
       "package": "lintr",
       "version": "3.4.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "lintr"
     },
     {
       "package": "listenv",
       "version": "1.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "listenv"
     },
     {
       "package": "litedown",
-      "version": "0.9",
-      "binary": true
+      "version": "0.10",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "litedown"
+    },
+    {
+      "package": "littler",
+      "version": "0.3.23",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "littler"
     },
     {
       "package": "loo",
-      "version": "2.10.0",
-      "binary": true
+      "version": "2.10.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "loo"
     },
     {
       "package": "lubridate",
       "version": "1.9.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "lubridate"
     },
     {
       "package": "lwgeom",
-      "version": "0.2-16",
-      "binary": true
+      "version": "0.2-17",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "lwgeom"
     },
     {
       "package": "magrittr",
       "version": "2.0.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "magrittr"
     },
     {
       "package": "markdown",
       "version": "2.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "markdown"
     },
     {
       "package": "marqLevAlg",
       "version": "2.0.8",
-      "binary": true
-    },
-    {
-      "package": "MASS",
-      "version": "7.3-65",
-      "binary": true
-    },
-    {
-      "package": "Matrix",
-      "version": "1.7-5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "marqLevAlg"
     },
     {
       "package": "matrixStats",
       "version": "1.5.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "matrixStats"
     },
     {
       "package": "memoise",
       "version": "2.0.1",
-      "binary": true
-    },
-    {
-      "package": "mgcv",
-      "version": "1.9-4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "memoise"
     },
     {
       "package": "microbenchmark",
       "version": "1.5.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "microbenchmark"
     },
     {
       "package": "mime",
       "version": "0.13",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "mime"
     },
     {
       "package": "miniUI",
       "version": "0.1.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "miniUI"
     },
     {
       "package": "minqa",
       "version": "1.2.8",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "minqa"
+    },
+    {
+      "package": "modelr",
+      "version": "0.1.11",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "modelr"
     },
     {
       "package": "mvtnorm",
-      "version": "1.4-1",
-      "binary": true
+      "version": "1.4-2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "mvtnorm"
     },
     {
       "package": "nleqslv",
       "version": "3.3.7",
-      "binary": true
-    },
-    {
-      "package": "nlme",
-      "version": "3.1-169",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "nleqslv"
     },
     {
       "package": "nloptr",
       "version": "2.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "nloptr"
     },
     {
       "package": "numDeriv",
       "version": "2016.8-1.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "numDeriv"
+    },
+    {
+      "package": "nycflights13",
+      "version": "1.0.2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "nycflights13"
     },
     {
       "package": "openssl",
       "version": "2.4.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "openssl"
     },
     {
       "package": "optimx",
       "version": "2025-4.9",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "optimx"
     },
     {
       "package": "otel",
       "version": "0.2.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "otel"
     },
     {
       "package": "pak",
-      "version": "0.10.0",
-      "binary": true
+      "version": "0.11.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pak"
     },
     {
       "package": "parallelly",
       "version": "1.48.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "parallelly"
     },
     {
       "package": "pillar",
       "version": "1.11.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pillar"
     },
     {
       "package": "pkgbuild",
       "version": "1.4.8",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pkgbuild"
     },
     {
       "package": "pkgcond",
       "version": "0.1.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pkgcond"
     },
     {
       "package": "pkgconfig",
       "version": "2.0.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pkgconfig"
     },
     {
       "package": "pkgdown",
       "version": "2.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pkgdown"
     },
     {
       "package": "pkgload",
       "version": "1.5.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pkgload"
     },
     {
       "package": "plotly",
-      "version": "4.12.0",
-      "binary": true
+      "version": "4.12.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "plotly"
     },
     {
       "package": "plyr",
       "version": "1.8.9",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "plyr"
     },
     {
       "package": "posterior",
       "version": "1.7.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "posterior"
     },
     {
       "package": "pracma",
       "version": "2.4.6",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "pracma"
     },
     {
       "package": "praise",
       "version": "1.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "praise"
     },
     {
       "package": "prettyunits",
       "version": "1.2.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "prettyunits"
     },
     {
       "package": "processx",
       "version": "3.9.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "processx"
     },
     {
       "package": "profvis",
       "version": "0.4.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "profvis"
+    },
+    {
+      "package": "progress",
+      "version": "1.2.3",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "progress"
     },
     {
       "package": "progressr",
       "version": "1.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "progressr"
     },
     {
       "package": "promises",
       "version": "1.5.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "promises"
     },
     {
       "package": "proxy",
       "version": "0.4-29",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "proxy"
     },
     {
       "package": "ps",
       "version": "1.9.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ps"
     },
     {
       "package": "purrr",
       "version": "1.2.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "purrr"
     },
     {
       "package": "quadprog",
       "version": "1.5-8",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "quadprog"
     },
     {
       "package": "QuickJSR",
       "version": "1.10.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "QuickJSR"
+    },
+    {
+      "package": "R.cache",
+      "version": "0.17.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "R.cache"
+    },
+    {
+      "package": "R.methodsS3",
+      "version": "1.8.2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "R.methodsS3"
+    },
+    {
+      "package": "R.oo",
+      "version": "1.27.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "R.oo"
+    },
+    {
+      "package": "R.utils",
+      "version": "2.13.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "R.utils"
     },
     {
       "package": "R6",
       "version": "2.6.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "R6"
     },
     {
       "package": "ragg",
       "version": "1.5.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ragg"
     },
     {
       "package": "rappdirs",
       "version": "0.3.4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rappdirs"
     },
     {
       "package": "rcmdcheck",
       "version": "1.4.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rcmdcheck"
     },
     {
       "package": "RColorBrewer",
       "version": "1.1-3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "RColorBrewer"
     },
     {
       "package": "Rcpp",
       "version": "1.1.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "Rcpp"
     },
     {
       "package": "RcppParallel",
-      "version": "5.1.11-2",
-      "binary": true
+      "version": "6.2.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "RcppParallel"
     },
     {
       "package": "rdtools",
       "version": "0.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rdtools"
     },
     {
       "package": "reactable",
       "version": "0.4.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "reactable"
     },
     {
       "package": "reactR",
       "version": "0.6.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "reactR"
     },
     {
       "package": "readr",
       "version": "2.2.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "readr"
     },
     {
       "package": "readxl",
       "version": "1.5.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "readxl"
     },
     {
       "package": "RefManageR",
       "version": "1.4.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "RefManageR"
     },
     {
       "package": "regions",
       "version": "0.1.8",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "regions"
     },
     {
       "package": "rematch",
       "version": "2.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rematch"
+    },
+    {
+      "package": "rematch2",
+      "version": "2.1.2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rematch2"
+    },
+    {
+      "package": "reprex",
+      "version": "2.1.1",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "reprex"
     },
     {
       "package": "reshape2",
       "version": "1.4.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "reshape2"
     },
     {
       "package": "rex",
       "version": "1.2.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rex"
     },
     {
       "package": "rlang",
       "version": "1.3.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rlang"
+    },
+    {
+      "package": "RMariaDB",
+      "version": "1.3.5",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "RMariaDB"
     },
     {
       "package": "rmarkdown",
       "version": "2.31",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rmarkdown"
     },
     {
       "package": "rnaturalearth",
       "version": "1.2.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rnaturalearth"
     },
     {
       "package": "rnaturalearthdata",
       "version": "1.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rnaturalearthdata"
     },
     {
       "package": "roxygen2",
       "version": "8.1.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "roxygen2"
+    },
+    {
+      "package": "RPostgres",
+      "version": "1.4.10",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "RPostgres"
     },
     {
       "package": "rprojroot",
       "version": "2.1.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rprojroot"
     },
     {
       "package": "RSQLite",
       "version": "3.53.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "RSQLite"
     },
     {
       "package": "rstan",
       "version": "2.32.7",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rstan"
     },
     {
       "package": "rstantools",
-      "version": "2.6.0",
-      "binary": true
+      "version": "2.7.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rstantools"
     },
     {
       "package": "rstudioapi",
       "version": "0.19.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rstudioapi"
     },
     {
       "package": "rversions",
       "version": "3.0.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rversions"
+    },
+    {
+      "package": "rvest",
+      "version": "1.0.5",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "rvest"
     },
     {
       "package": "s2",
       "version": "1.1.11",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "s2"
     },
     {
       "package": "S7",
       "version": "0.2.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "S7"
     },
     {
       "package": "sass",
       "version": "0.4.10",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "sass"
     },
     {
       "package": "scales",
       "version": "1.4.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "scales"
     },
     {
       "package": "SCDB",
       "version": "0.6.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "SCDB"
+    },
+    {
+      "package": "selectr",
+      "version": "0.6-0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "selectr"
     },
     {
       "package": "sessioninfo",
       "version": "1.2.4",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "sessioninfo"
     },
     {
       "package": "sf",
-      "version": "1.1-1",
-      "binary": true
+      "version": "1.1-2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "sf"
     },
     {
       "package": "shiny",
       "version": "1.14.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "shiny"
     },
     {
       "package": "sourcetools",
       "version": "0.1.7-2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "sourcetools"
     },
     {
       "package": "spelling",
       "version": "2.3.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "spelling"
     },
     {
       "package": "StanHeaders",
       "version": "2.32.10",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "StanHeaders"
     },
     {
       "package": "stringi",
-      "version": "1.8.7",
-      "binary": true
+      "version": "1.8.9",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "stringi"
     },
     {
       "package": "stringr",
       "version": "1.6.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "stringr"
+    },
+    {
+      "package": "styler",
+      "version": "1.11.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "styler"
     },
     {
       "package": "subplex",
       "version": "1.9",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "subplex"
     },
     {
       "package": "sys",
       "version": "3.4.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "sys"
     },
     {
       "package": "systemfonts",
       "version": "1.3.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "systemfonts"
     },
     {
       "package": "tensorA",
       "version": "0.36.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "tensorA"
     },
     {
       "package": "terra",
       "version": "1.9-34",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "terra"
     },
     {
       "package": "testthat",
       "version": "3.3.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "testthat"
     },
     {
       "package": "textshaping",
       "version": "1.0.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "textshaping"
     },
     {
       "package": "tibble",
       "version": "3.3.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "tibble"
     },
     {
       "package": "tidyr",
       "version": "1.3.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "tidyr"
     },
     {
       "package": "tidyselect",
       "version": "1.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "tidyselect"
+    },
+    {
+      "package": "tidyverse",
+      "version": "2.0.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "tidyverse"
     },
     {
       "package": "timechange",
       "version": "0.4.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "timechange"
     },
     {
       "package": "tinytex",
       "version": "0.60",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "tinytex"
     },
     {
       "package": "tzdb",
       "version": "0.5.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "tzdb"
     },
     {
       "package": "ucminf",
       "version": "1.2.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ucminf"
     },
     {
       "package": "units",
       "version": "1.0-1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "units"
     },
     {
       "package": "urlchecker",
-      "version": "1.0.1",
-      "binary": true
+      "version": "2.0.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "urlchecker"
     },
     {
       "package": "usethis",
       "version": "3.2.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "usethis"
     },
     {
       "package": "utf8",
       "version": "1.2.6",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "utf8"
+    },
+    {
+      "package": "uuid",
+      "version": "1.2-2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "uuid"
     },
     {
       "package": "V8",
       "version": "8.2.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "V8"
     },
     {
       "package": "vctrs",
       "version": "0.7.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "vctrs"
     },
     {
       "package": "viridisLite",
       "version": "0.4.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "viridisLite"
     },
     {
       "package": "vroom",
       "version": "1.7.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "vroom"
     },
     {
       "package": "waldo",
       "version": "0.6.2",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "waldo"
     },
     {
       "package": "whisker",
       "version": "0.4.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "whisker"
     },
     {
       "package": "withr",
       "version": "3.0.3",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "withr"
     },
     {
       "package": "wk",
       "version": "0.9.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "wk"
     },
     {
       "package": "xfun",
-      "version": "0.59",
-      "binary": true
+      "version": "0.60",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "xfun"
     },
     {
       "package": "xml2",
       "version": "1.6.0",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "xml2"
     },
     {
       "package": "xmlparsedata",
       "version": "1.0.5",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "xmlparsedata"
     },
     {
       "package": "xopen",
       "version": "1.0.1",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "xopen"
     },
     {
       "package": "xtable",
       "version": "1.8-8",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "xtable"
     },
     {
       "package": "yaml",
       "version": "2.3.12",
-      "binary": true
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "yaml"
     },
     {
       "package": "zip",
-      "version": "3.0.0",
-      "binary": true
+      "version": "3.0.2",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "zip"
     }
   ]
 }
