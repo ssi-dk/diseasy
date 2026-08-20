@@ -12,6 +12,12 @@ jobs:
       packages: read
 
     steps:
+      - name: Set SIF filename
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          SHA=${GITHUB_SHA::7}
+          echo "SIF_NAME=diseasy-${DATE}-${SHA}.sif" >> "$GITHUB_ENV"
+
       - name: Install Apptainer
         run: |
           sudo apt update
@@ -32,17 +38,17 @@ jobs:
       - name: Create SIF
         run: |
           apptainer pull \
-            diseasy.sif \
+            "$SIF_NAME" \
             docker://ghcr.io/ssi-dk/diseasy:main
 
       - name: Inspect SIF
         run: |
-          ls -lh diseasy.sif
-          apptainer inspect diseasy.sif
+          ls -lh "$SIF_NAME"
+          apptainer inspect "$SIF_NAME"
 
       - name: Upload SIF
         uses: actions/upload-artifact@v4
         with:
           name: diseasy-apptainer
-          path: diseasy.sif
+          path: ${{ env.SIF_NAME }}
           retention-days: 7
