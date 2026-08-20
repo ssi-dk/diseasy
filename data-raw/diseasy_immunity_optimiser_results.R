@@ -86,9 +86,9 @@ optim_configs <- tibble::tibble(
 
     # optimx algorithms:
     list("optim_method" = "lbfgsb3c"),
-    list("optim_method" = "Rcgmin"),
-    list("optim_method" = "Rtnmin"),
-    list("optim_method" = "Rvmmin"),
+    #list("optim_method" = "Rcgmin"), # Needs gradient
+    #list("optim_method" = "Rtnmin"), # Needs gradient
+    #list("optim_method" = "Rvmmin"), # Needs gradient
     #list("optim_method" = "snewton"), # Needs gradient/Hessian
     #list("optim_method" = "snewtonm"), # Needs gradient/Hessian
     list("optim_method" = "spg"),
@@ -96,17 +96,17 @@ optim_configs <- tibble::tibble(
     #list("optim_method" = "newuoa"), # Wrapper to minqa::newuoa - masked by nloptr::newuoa
     #list("optim_method" = "bobyqa"), # Wrapper to minqa::bobyqa - masked by nloptr::bobyqa
     list("optim_method" = "uobyqa"),
-    list("optim_method" = "nmkb"),
-    list("optim_method" = "hjkb"),
-    list("optim_method" = "hjn"),
+    list("optim_method" = "nmkb"), # Cannot do univariate optimisation (M = 2, non-all_free methods)
+    list("optim_method" = "hjkb"), # Cannot do univariate optimisation (M = 2, non-all_free methods)
+    list("optim_method" = "hjn"), # Cannot do univariate optimisation (M = 2, non-all_free methods)
     #list("optim_method" = "lbfgs"), # Wrapper to lfbgs::lfbgs - masked by nloptr::lfbgs
     list("optim_method" = "subplex"),
-    list("optim_method" = "ncg"),
-    list("optim_method" = "nvm"),
+    #list("optim_method" = "ncg"), # Needs gradient
+    #list("optim_method" = "nvm"), # Needs gradient
     list("optim_method" = "mla"),
     #list("optim_method" = "slsqp"), # Wrapper to nloptr::slsqp
     #list("optim_method" = "tnewt"), # Wrapper to nloptr::tnewton
-    list("optim_method" = "anms"),
+    list("optim_method" = "anms"), # Cannot do univariate optimisation (M = 2, non-all_free methods)
     list("optim_method" = "pracmanm")
     #list("optim_method" = "nlnm"), # Wrapper to nloptr::neldermead
     #list("optim_method" = "snewtm"), # Needs gradient/Hessian
