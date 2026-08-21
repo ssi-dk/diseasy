@@ -335,7 +335,7 @@ test_that("$get_scenario_contacts() works with default parameters", {
 
   expect_identical(
     act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
+    list("1970-01-01" = matrix(rep(1, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
   )
 
   rm(act)
@@ -352,6 +352,8 @@ test_that("$get_scenario_contacts() works no scenario", {
   # (inferred from the contact_basis)
 
   age_labels <- names(contact_basis_nordic %.% DK %.% population)
+  N_j_contact_basis <- outer(rep(1, length(age_labels)), contact_basis_nordic %.% DK %.% population)                    # nolint: object_name_linter
+
 
   expect_identical(
     act$get_scenario_contacts(),
@@ -362,8 +364,9 @@ test_that("$get_scenario_contacts() works no scenario", {
             matrix(
               rep(0.25 / length(age_labels), length(age_labels) * length(age_labels)),
               ncol = length(age_labels),
+              nrow = length(age_labels),
               dimnames = list(age_labels, age_labels)
-            )
+            ) / N_j_contact_basis
           ),
           4
         ),
@@ -379,15 +382,32 @@ test_that("$get_scenario_contacts() works no scenario", {
       matrix(
         rep(1 / length(age_labels), length(age_labels) * length(age_labels)),
         ncol = length(age_labels),
+        nrow = length(age_labels),
         dimnames = list(age_labels, age_labels)
-      )
+      ) / N_j_contact_basis
     ) |>
       stats::setNames("1970-01-01")
   )
 
+
+  # And projected to 2 age groups split at 60
+  N_2_age_groups <- purrr::map_dbl(                                                                                     # nolint: object_name_linter
+    split(
+      contact_basis_nordic %.% DK %.% population,
+      names(contact_basis_nordic %.% DK %.% population) > "60"
+    ),
+    sum
+  )
+
   expect_identical(
     act$get_scenario_contacts(age_cuts_lower = c(0, 60), weights = c(1, 1, 1, 1)),
-    list("1970-01-01" = matrix(rep(0.5, 4), nrow = 2, dimnames = list(c("00-59", "60+"), c("00-59", "60+"))))
+    list(
+      "1970-01-01" = matrix(
+        rep(0.5, 4),
+        nrow = 2,
+        dimnames = list(c("00-59", "60+"), c("00-59", "60+"))
+      ) / outer(rep(1, 2), N_2_age_groups)
+    )
   )
 
   rm(act)
@@ -507,7 +527,7 @@ test_that("$set_contact_basis() works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis_nordic %.% DK
-  custom_basis$contacts <- custom_basis$contacts[-1]
+  custom_basis$per_capita_contacts <- custom_basis$per_capita_contacts[-1]
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
     class = "simpleError",
