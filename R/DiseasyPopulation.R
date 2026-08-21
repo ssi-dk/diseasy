@@ -124,13 +124,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       # If `DiseasyRegions` is configured, age and regional splits must be consistent with demography data
       if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
 
-        if (!identical(age_cuts_lower, 0L)) {
-
-          if (is.null(self %.% regions %.% demography)) {
-            pkgcond::pkg_error(
-              "When stratifying by age, `DiseasyRegions` must be loaded with a `demography`."
-            )
-          }
+        if (!identical(age_cuts_lower, 0L) && !is.null(self %.% regions %.% demography)) {
 
           # Check the given age groups can be mapped to the demography data
           coll <- checkmate::makeAssertCollection()
@@ -224,7 +218,8 @@ DiseasyPopulation <- R6::R6Class(                                               
         colnames(regional_mixing_modifiers),
         ~ as.numeric(full_population %.% region == .)
       ) |>
-        purrr::reduce(cbind)
+        purrr::reduce(cbind) |>
+        as.matrix(ncol = ncol(regional_mixing_modifiers), nrow = length(age_groups_reference))
 
       colnames(p_expand_region) <- colnames(regional_mixing_modifiers)
       rownames(p_expand_region) <- tidyr::unite(
@@ -255,8 +250,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       c_matrices_full <- c_matrices_age |>
         purrr::map(~ (p_expand_age %*% . %*% t(p_expand_age))) |>
-        purrr::map(~ . * regional_mixing_modifiers_full) |> # .. and apply the regional mixing modifiers
-        purrr::map(~ . * length(unique(self %.% groups %.% region))) # ... and remove the regional re-scaling
+        purrr::map(~ . * regional_mixing_modifiers_full) # .. and apply the regional mixing modifiers
 
       # Convert from "C" domain to "T" domain
       N_full <- full_population |>
@@ -373,22 +367,27 @@ DiseasyPopulation <- R6::R6Class(                                               
 
         demography <- self %.% groups |>
           dplyr::select(!"age_group") |>
+          dplyr::distinct() |>
           dplyr::cross_join(
             data.frame(
               "age_cuts" = sort(unique(c(age_cuts_lower_reference, age_cuts_lower)))
             )
           ) |>
           dplyr::left_join(
-            data.frame("age_cuts_lower_model" = c(0, 7)),
+            data.frame("age_cuts_lower_model" = age_cuts_lower),
             by = dplyr::join_by(closest(age_cuts >= age_cuts_lower_model))
           ) |>
+          dplyr::select(!"age_cuts_lower_model") |>
           dplyr::mutate(
-            "population" = 1 / (dplyr::n() * nrow(self %.% groups)),
+            "population" = 1 / (
+              dplyr::n() * nrow(dplyr::distinct(dplyr::select(self %.% groups, !"age_group")))
+            ),
             .by = !"age_cuts"
           ) |>
           dplyr::mutate(
             "age_group" = diseasystore::age_labels(.data$age_cuts),
-            .by = !"age_cuts"
+            .by = !"age_cuts",
+            .before = "population"
           ) |>
           dplyr::select(!"age_cuts")
 
@@ -405,7 +404,7 @@ DiseasyPopulation <- R6::R6Class(                                               
         add = coll
       )
 
-      if (!is.null(regions)) {
+      if (!identical(regions, "All")) {
         checkmate::assert_names(names(demography), must.include = "region", add = coll)
 
         unmatchable_regions_in_demography <- purrr::discard(
@@ -510,32 +509,36 @@ DiseasyPopulation <- R6::R6Class(                                               
       }
 
       # Map reference regions to the requested regions
-      if (!is.null(regions)) {
+      if (identical(regions, "All")) {
+
+        population <- dplyr::mutate(population, "region_out" = "All")
+
+      } else {
         region_regexes <- purrr::map_chr(regions, ~ paste0("^(", ., r"{)\w{0,}$}"))
 
         population <- region_regexes |>
-          purrr::map(
-            ~ population |>
-              dplyr::mutate(
-                "region_out" = stringr::str_extract(.data$region, ., group = 1)
-              ) |>
-              dplyr::filter(!is.na(.data$region_out))
-          ) |>
-          purrr::list_rbind()
-
-
-        # Reorder output
-        population <- population |>
-          dplyr::select(
-            dplyr::starts_with("age"),
-            dplyr::starts_with("region"),
-            dplyr::everything()
-          ) |>
-          dplyr::relocate(
-            dplyr::matches("_id"),
-            .after = dplyr::everything()
-          )
+        purrr::map(
+          ~ population |>
+            dplyr::mutate(
+              "region_out" = stringr::str_extract(.data$region, ., group = 1)
+            ) |>
+            dplyr::filter(!is.na(.data$region_out))
+        ) |>
+        purrr::list_rbind()
       }
+
+
+      # Reorder output
+      population <- population |>
+        dplyr::select(
+          dplyr::starts_with("age"),
+          dplyr::starts_with("region"),
+          dplyr::everything()
+        ) |>
+        dplyr::relocate(
+          dplyr::matches("_id"),
+          .after = dplyr::everything()
+        )
 
       return(population)
     },

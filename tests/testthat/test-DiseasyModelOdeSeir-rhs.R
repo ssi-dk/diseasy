@@ -851,10 +851,19 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed)", {
   # Get a reference to the private environment
   private <- model$.__enclos_env__$private
 
-  # Ensure regional mixing is as epxected
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
   expect_identical(
     model$regions$infection_flow_matrix,
     matrix(1, nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(c(0.5, 0.5, 0.5, 0.5), nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -862,18 +871,19 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed)", {
   y0[c(private$i1_state_indices[1], private$r1_state_indices[[2]])] <- 0.05 / 2
   y0[private$s_state_indices] <- 0.95 / 2
 
+
   expect_identical(sum(y0), 1)
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (0.05 / 2) * (0.95 / 2),   # I_A * S_A
-      - (0.05 / 2) * rI,         # - I_A * rI
-      (0.05 / 2) * rI,           # I_A * rI
-      (0.05 / 2) * (0.95 / 2),   # I_A * S_B
-      0,                         # - I_B * rI = 0
-      0,                         # I_B * rI = 0
-      - (0.05 / 2) * (0.95 / 2), # - I_A * S_A
-      - (0.05 / 2) * (0.95 / 2)  # - I_A * S_B
+      0.5 * (0.05 / 2) * (0.95 / 2),   # 0.5 * I_A * S_A
+      - (0.05 / 2) * rI,               # - I_A * rI
+      (0.05 / 2) * rI,                 # I_A * rI
+      0.5 * (0.05 / 2) * (0.95 / 2),   # I_A * S_B
+      0,                               # - I_B * rI = 0
+      0,                               # I_B * rI = 0
+      - 0.5 * (0.05 / 2) * (0.95 / 2), # - I_A * S_A
+      - 0.5 * (0.05 / 2) * (0.95 / 2)  # - I_A * S_B
     )
   )
 
@@ -922,10 +932,19 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing)", {
   # Get a reference to the private environment
   private <- model$.__enclos_env__$private
 
-  # Ensure regional mixing is as epxected
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
   expect_identical(
     model$regions$infection_flow_matrix,
     matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -993,10 +1012,19 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing)", {
   # Get a reference to the private environment
   private <- model$.__enclos_env__$private
 
-  # Ensure regional mixing is as epxected
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
   expect_identical(
     model$regions$infection_flow_matrix,
-    matrix(1, nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+    matrix(c(0, 1, 1, 0), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(c(0, 1, 1, 0), nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -1016,7 +1044,7 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing)", {
       0,                         # - I_B * rI = 0
       0,                         # I_B * rI = 0
       0,                         # - I_A * S_A * 0
-      - (0.05 / 2) * (0.95 / 2), # - I_A * S_B
+      - (0.05 / 2) * (0.95 / 2)  # - I_A * S_B
     )
   )
 
