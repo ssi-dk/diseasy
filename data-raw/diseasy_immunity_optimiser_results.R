@@ -1,4 +1,5 @@
 required_suggested_packages <- c(
+  "callr",
   "optimx",
   "lbfgsb3c",
   "BB", # Provides spg
@@ -135,11 +136,98 @@ optim_configs <- optim_configs |>
 
 ## Optimisation helper
 
+# Run one approximation in a subprocess so native optimiser code can be
+# terminated if it exceeds the walltime.
+run_approximation <- function(
+  model,
+  time_scale,
+  method,
+  strategy,
+  M,
+  monotonous,
+  individual_level,
+  optim_control,
+  walltime
+) {
+
+  out <- tryCatch(
+    callr::r(
+      func = function(
+        model,
+        time_scale,
+        method,
+        strategy,
+        M,
+        monotonous,
+        individual_level,
+        optim_control
+      ) {
+
+        im_p <- diseasy::DiseasyImmunity$new()
+        im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
+
+        im_p$plot(
+          method = method,
+          strategy = strategy,
+          M = M,
+          monotonous = monotonous,
+          individual_level = individual_level,
+          optim_control = optim_control
+        )
+
+        return(
+          im_p$approximate_compartmental(
+            method = method,
+            strategy = strategy,
+            M = M,
+            monotonous = monotonous,
+            individual_level = individual_level,
+            optim_control = optim_control
+          )
+        )
+      },
+      args = list(
+        "model" = model,
+        "time_scale" = time_scale,
+        "method" = method,
+        "strategy" = strategy,
+        "M" = M,
+        "monotonous" = monotonous,
+        "individual_level" = individual_level,
+        "optim_control" = optim_control
+      ),
+      timeout = walltime
+    ),
+    callr_timeout_error = function(e) {
+      return(
+        list(
+          "method" = method,
+          "strategy" = strategy,
+          "M" = M,
+          "value" = Inf,
+          "execution_time" = walltime
+        )
+      )
+    }
+  )
+
+  return(out)
+}
+
+
 # Below we implement a optimisation helper that:
 # 1: Unpacks the problem configuration (M, method, optimisation algorithm, etc)
 # 2: Configures the `DiseasyImmunity` instance
 # 3: Runs and stores the approximation to disk
-optimiser <- function(combinations, monotonous, individual_level, cache, ordering, future_scheduling = 1) {
+optimiser <- function(
+  combinations,
+  monotonous,
+  individual_level,
+  cache,
+  ordering,
+  walltime,
+  future_scheduling = 1
+) {
 
   # Run approximations with a progress bar
   progressr::with_progress(
@@ -187,11 +275,6 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
             stringr::str_replace(stringr::fixed("1e-"), "r1e")
 
 
-          # Configure `DiseasyImmunity`
-          im_p <- diseasy::DiseasyImmunity$new()
-          im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
-
-
           # Generate approximations and store them
           key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{M}")
 
@@ -203,22 +286,16 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
             try(
               {
-                im_p$plot(
+                approx <- run_approximation(
+                  model = model,
+                  time_scale = time_scale,
                   method = method,
                   strategy = strategy,
                   M = M,
                   monotonous = monotonous,
                   individual_level = individual_level,
-                  optim_control = optim_control
-                )
-
-                approx <- im_p$approximate_compartmental(
-                  method = method,
-                  strategy = strategy,
-                  M = M,
-                  monotonous = monotonous,
-                  individual_level = individual_level,
-                  optim_control = optim_control
+                  optim_control = optim_control,
+                  walltime = walltime
                 )
 
                 # Get cache again
@@ -243,7 +320,6 @@ optimiser <- function(combinations, monotonous, individual_level, cache, orderin
 
           p()
 
-          rm(im_p)
         }
       ))
     }
@@ -320,7 +396,6 @@ for (penalty in c(0, 0.5, 1)) {
      future::plan(multisession, gc = TRUE, workers = unname(future::availableCores(omit = 1)))
   }
 
-
   candidates <- tidyr::expand_grid(
     "optim_method" = optim_labels,
     "target_label" = model_names,
@@ -392,11 +467,14 @@ for (penalty in c(0, 0.5, 1)) {
 
 
     # Run the optimisation problem for the configurations
+    walltime <- 60 * M
+
     optimiser(
       combinations_zip,
       monotonous = monotonous,
       individual_level = individual_level,
       cache = cache,
+      walltime = walltime,
       future_scheduling = future_scheduling
     )
 
@@ -422,7 +500,18 @@ for (penalty in c(0, 0.5, 1)) {
             )
           )
       }) |>
-      purrr::list_rbind() |>
+      purrr::reduce(
+        rbind,
+        .init = data.frame(
+          "method" = character(0),
+          "strategy" = character(0),
+          "M" = numeric(0),
+          "value" = numeric(0),
+          "execution_time" = numeric(0),
+          "target_label" = character(0),
+          "optim_method" = character(0)
+        )
+      ) |>
       dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
       dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
@@ -430,7 +519,7 @@ for (penalty in c(0, 0.5, 1)) {
 
     # Eliminate too slow candidates
     candidates <- round_results |>
-      dplyr::filter(.data$execution_time < 60 * !!M, .data$value < 1e3) |>
+      dplyr::filter(.data$execution_time < walltime, .data$value < 1e3) |>
       dplyr::select("optim_method", "target_label", "method", "strategy")
   }
 }
@@ -483,7 +572,10 @@ results <- results |>
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
-  dplyr::filter(.data$execution_time >= 60 * .data$M, .data$value >= 1e3) |>
+  dplyr::filter(
+    .data$execution_time >= 60 * .data$M |
+      .data$value >= 1e3
+  ) |>
   dplyr::slice_min(M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::transmute(
     .data$optim_method,
