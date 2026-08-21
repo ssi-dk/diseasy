@@ -651,7 +651,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Rescale to the number of infections relative to the full population
       incidence_data <- incidence_data |>
         dplyr::left_join(
-          self %.% population %.% population,
+          self %.% population %.% model_population,
           by = names(self %.% population %.% groups)
         ) |>
         dplyr::mutate(
@@ -680,7 +680,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
         pkgcond::pkg_error(
           glue::glue(
-            "Missing `incidence_data` or `population_proportion` for {groups_w_missing_data}!"
+            "Missing `incidence_data` or `model_population` for {groups_w_missing_data}!"
           )
         )
       }
@@ -881,6 +881,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = self %.% observables,
         population = self %.% population,
         activity = self %.% activity,
+        regions = self %.% regions,
         variant = self %.% variant,
         season = self %.% season,
         immunity = self %.% immunity,
@@ -1040,7 +1041,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Run the simulation forward to estimate the R and S states
       y0 <- c(
         rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
-        self %.% population %.% population_proportion, # S states
+        self %.% population %.% model_population %.% proportion, # S states
         rep(0, length(initialisation_submodel %.% model_outputs)) # Surveillance states
       )
 
@@ -1603,7 +1604,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
 
       # Apply the scaling factor to the contact matrices
-      scaled_per_capita_contact_matrices <- purrr::map(per_capita_contact_matrices, ~ .x * scaling_factor)
+      scaled_per_capita_contact_matrices <- purrr::map(
+        per_capita_contact_matrices,
+        ~ .x * scaling_factor * sum(self %.% population %.% model_population %.% population)
+      )
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: the end of the training period)
@@ -1634,7 +1638,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(                                                                                                    # nolint: object_name_linter
         rep(0, private %.% n_age_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R),
-        self %.% population %.% population_proportion
+        self %.% population %.% model_population %.% proportion
       )
     ) {
 

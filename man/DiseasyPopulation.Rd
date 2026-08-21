@@ -43,11 +43,8 @@ See vignette("diseasy-population").
     \item{\code{groups}}{(\code{data.frame()})\cr
 The demographic groups that have been configured in the module.}
 
-    \item{\code{population}}{(\code{tibble})\cr
+    \item{\code{model_population}}{(\code{tibble})\cr
 The population groups and their sizes configured in the module.}
-
-    \item{\code{population_proportion}}{(\code{numeric()})\cr
-The distribution of individuals across the demography groups defined in the module.}
 
     \item{\code{regional_stratification}}{(\code{character()})\cr The level of spatial stratification of the population. Read only.}
 
@@ -69,6 +66,7 @@ The local copy of an DiseasyRegions module. Read-only.}
     \item \href{#method-DiseasyPopulation-stratify_regions}{\code{DiseasyPopulation$stratify_regions()}}
     \item \href{#method-DiseasyPopulation-validate_configuration}{\code{DiseasyPopulation$validate_configuration()}}
     \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
+    \item \href{#method-DiseasyPopulation-map_population}{\code{DiseasyPopulation$map_population()}}
     \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
     \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
   }
@@ -199,6 +197,40 @@ Throw error if misconfigured.
     \code{list}(\code{matrix})\cr
 A \code{list} (with names indicating the dates of changes in contacts)
 of contact rates (\code{matrix}).
+Map population between age groups
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyPopulation-map_population"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-map_population}{}}}
+\subsection{\code{DiseasyPopulation$map_population()}}{
+  The function computes the proportion of population in the new and old age groups.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyPopulation$map_population(
+  age_cuts_lower = self \%.\% age_cuts_lower,
+  age_groups_reference = NULL,
+  demography = self \%.\% regions \%.\% demography
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
+      \item{\code{age_groups_reference}}{(\code{character()})\cr
+Age labels (created by \code{diseasystore::age_labels()} of reference data.}
+      \item{\code{demography}}{(\code{data.frame})\cr
+"A \code{data.frame} with the columns\\cr",
+"  * \code{age} (\code{integer()}) 1-year age groups or \code{age_group} (\code{integer()}) dynamic age groups\\cr",
+"  * \code{population} (\code{numeric()}) size of population in age group\\cr"}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{data.frame} which maps the age groups from their reference in \code{contact_basis} to
+those supplied to the function.
   }
 }
 

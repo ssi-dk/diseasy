@@ -539,9 +539,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   skip_if_not_installed("deSolve")
 
   # Create a activity scenario for the tests
-  basis <- contact_basis_nordic %.% DK
-  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
-  act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
+  test_basis <- contact_basis_nordic %.% DK
+  test_basis$contacts <- purrr::map(test_basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
+
+  act <- DiseasyActivity$new(contact_basis = test_basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
   act$change_risk(Sys.Date(), type = "work",   risk = 0.5)
@@ -593,13 +594,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   skip_if_not_installed("deSolve")
 
   # Create a activity scenario for the tests
-  basis <- contact_basis_nordic %.% DK
-  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
-  basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
-  basis$population <- basis$proportion * sum(basis$population)
-  basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
-  basis$demography$population <- basis$demography$proportion * sum(basis$demography$population)
-  act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
+  test_basis <- contact_basis_nordic %.% DK
+  test_basis$contacts <- purrr::map(test_basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
+
+  act <- DiseasyActivity$new(contact_basis = test_basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
   act$change_risk(Sys.Date(), type = "work",   risk = 0.5)
@@ -617,7 +615,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
