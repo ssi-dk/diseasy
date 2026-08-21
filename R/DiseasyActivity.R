@@ -435,14 +435,15 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(activities)
     },
 
-
+                                                                                                                        # nolint start: param_and_field_linter, identation_linter
     #' @description
     #'   Return openness \[0 ; 1\] for all age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param population Output of `$map_population()` to allow age mapping (will be removed soon).
     #' @param weights `r rd_activity_weights` The weights are normalized before applying.
     #' @return (`list()`)\cr
     #'   Returns a list with depth of two: value\[\[date\]\]\[\[type\]\]
-    get_scenario_openness = function(age_cuts_lower = NULL, weights = NULL) {
+    get_scenario_openness = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {                        # nolint end: param_and_field_linter, identation_linter
 
       scenario_activities <- self$get_scenario_activities()
 
@@ -490,12 +491,11 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Project into new age_groups if given
         if (!is.null(age_cuts_lower)) {
-          p <- private$population_transform_matrix(age_cuts_lower) |>
+          p <- private$population_transform_matrix(age_cuts_lower, population) |>
             t() |>          # To get the right dimensions
             as.data.frame() # To enable the mapping below
 
           # Get the population proportion in the new age groups
-          population <- self$map_population(age_cuts_lower)
           proportion <- aggregate(proportion ~ age_group_reference, data = population, FUN = sum)$proportion
 
           # Weight the population transformation matrix by the population proportion
@@ -522,15 +522,16 @@ DiseasyActivity <- R6::R6Class(                                                 
       return(openness)
     },
 
-
+                                                                                                                        # nolint start: param_and_field_linter, identation_linter
     #' @description
     #'   Return contacts across age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param population Output of `$map_population()` to allow age mapping (will be removed soon).
     #' @param weights `r rd_activity_weights`
     #' @return
     #'   If no weights are supplied, a `list()` of depth of two: value\[\[date\]\]\[\[type\]\] is returned.
     #    If weights are supplied, a `list()` of depth one: value\[\[date\]\] is returned
-    get_scenario_contacts = function(age_cuts_lower = NULL, weights = NULL) {
+    get_scenario_contacts = function(age_cuts_lower = NULL, population = NULL, weights = NULL) {                        # nolint end: param_and_field_linter, identation_linter
 
       # Input checks
       coll <- checkmate::makeAssertCollection()
@@ -595,7 +596,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
         # Project into new age_groups if given
         if (!is.null(age_cuts_lower)) {
-          p <- private$population_transform_matrix(age_cuts_lower)
+          p <- private$population_transform_matrix(age_cuts_lower, population)
 
           # To perform the projection, we need the number of persons in the new and original age groups
           # Determine the population in the new age groups
@@ -628,117 +629,6 @@ DiseasyActivity <- R6::R6Class(                                                 
       scenario_contacts <- private$weight_activities(scenario_contacts, weights)
 
       return(scenario_contacts)
-    },
-
-                                                                                                                        # nolint start: documentation_template_linter, identation_linter
-    #' Map population between age groups
-    #'
-    #' @description
-    #'   The function computes the proportion of population in the new and old age groups.
-    #' @param age_cuts_lower `r rd_age_cuts_lower()`
-    #' @param age_groups_reference (`character()`)\cr
-    #'   Age labels (created by `diseasystore::age_labels()` of reference data.
-    #' @param demography (`data.frame`)\cr
-    #'   "A `data.frame` with the columns\\cr",
-    #'   "  * `age` (`integer()`) 1-year age groups or `age_group` (`integer()`) dynamic age groups\\cr",
-    #'   "  * `population` (`numeric()`) size of population in age group\\cr"
-    #' @return
-    #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
-    #'   those supplied to the function.
-    map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
-      age_cuts_lower,
-      age_groups_reference = names(self$contact_basis$proportion),
-      demography = self$contact_basis$demography
-    ) {
-
-      # Input checks
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_integerish(
-        age_cuts_lower, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE, add = coll
-      )
-      checkmate::assert_character(
-        age_groups_reference, any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", add = coll
-      )
-
-      checkmate::assert_data_frame(demography, min.rows = 1, add = coll)
-      checkmate::assert_names(names(demography), must.include = "population", add = coll)
-
-      demography_age_column <- intersect(c("age", "age_group"), names(demography))
-      if (length(demography_age_column) != 1) {
-        coll$push("`demography` must contain exactly one of `age` and `age_group`.")
-      }
-
-      if (identical(demography_age_column, "age")) {
-        checkmate::assert_integerish(demography$age, any.missing = FALSE, lower = 0, unique = TRUE, add = coll)
-      }
-
-      if (identical(demography_age_column, "age_group")) {
-        checkmate::assert_character(
-          demography$age_group,
-          any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", add = coll
-        )
-      }
-
-      checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
-      checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
-
-      checkmate::reportAssertions(coll)
-
-
-      # Determine the age cuts of the reference and the demography data
-      age_cuts_lower_reference <- as.integer(stringr::str_extract(age_groups_reference, r"{^\d+}"))
-      age_cuts_lower_demography <- purrr::pluck(demography, demography_age_column) |>
-        purrr::map_if(is.character, ~ stringr::str_extract(., r"{^\d+}")) |>
-        as.integer()
-
-      # Ensure age_cuts_lower is fully formed
-      age_cuts_lower <- unique(c(0, age_cuts_lower))
-
-      # Verify that the demography has the age information needed to perform the map
-      missing_age_cuts_reference <- setdiff(age_cuts_lower_reference, age_cuts_lower_demography)
-      missing_age_cuts_out       <- setdiff(age_cuts_lower,           age_cuts_lower_demography)
-
-      coll <- checkmate::makeAssertCollection()
-      if (length(missing_age_cuts_out) > 0) {
-        coll$push(
-          glue::glue(
-            "`demography` is missing age group splits to facilitate splits at ",
-            'age{ifelse(length(missing_age_cuts_out) > 1, "s", "")} = {missing_age_cuts_out}'
-          )
-        )
-      }
-      if (length(missing_age_cuts_reference) > 0) {
-        coll$push(
-          glue::glue(
-            "`demography` is missing age group splits to facilitate splits at ",
-            'age{ifelse(length(missing_age_cuts_reference) > 1, "s", "")} = {missing_age_cuts_reference}'
-          )
-        )
-      }
-      checkmate::reportAssertions(coll)
-
-
-      # Generate age labels for the output
-      age_labels_out       <- diseasystore::age_labels(age_cuts_lower)
-      age_labels_reference <- diseasystore::age_labels(age_cuts_lower_reference)
-
-      #  Map reference and return age groups to the demography age groups
-      population <- demography |>
-        dplyr::mutate(
-          "population" = .data$population,
-          .by = dplyr::all_of(demography_age_column)
-        ) |>
-        dplyr::mutate(
-          "proportion" = .data$population / sum(.data$population),
-          "age_group_id"           = age_cuts_lower_demography,
-          "age_group"              = diseasystore::age_labels(age_cuts_lower_demography),
-          "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower)),
-          "age_group_out"          = age_labels_out[.data$age_group_id_out],
-          "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
-          "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
-        )
-
-      return(population)
     },
 
 
@@ -1163,15 +1053,12 @@ DiseasyActivity <- R6::R6Class(                                                 
     # @description
     #   The function provides the population proportion matrix `p` used to project age_groups.
     # @param age_cuts_lower `r rd_age_cuts_lower()`
-    population_transform_matrix = function(age_cuts_lower = NULL) {
+    population_transform_matrix = function(age_cuts_lower = NULL, population = NULL) {
 
       # Early return if no projection is requested
       if (is.null(age_cuts_lower)) {
         return(obj)
       }
-
-      # Compute proportion of population in new and old age_groups
-      population <- self$map_population(age_cuts_lower)
 
       # Calculating transformation matrix
       tt <- merge(
