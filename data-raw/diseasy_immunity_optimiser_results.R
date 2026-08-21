@@ -143,7 +143,7 @@ run_approximation <- function(
   time_scale,
   method,
   strategy,
-  M,
+  M,                                                                                                                    # nolint: object_name_linter
   monotonous,
   individual_level,
   optim_control,
@@ -157,7 +157,7 @@ run_approximation <- function(
         time_scale,
         method,
         strategy,
-        M,
+        M,                                                                                                              # nolint: object_name_linter
         monotonous,
         individual_level,
         optim_control
@@ -391,9 +391,9 @@ for (penalty in c(0, 0.5, 1)) {
   closeAllConnections()
 
   if (interactive()) {
-     future::plan(plan, gc = TRUE)
+    future::plan(plan, gc = TRUE)
   } else {
-     future::plan(multisession, gc = TRUE, workers = unname(future::availableCores(omit = 1)))
+    future::plan(multisession, gc = TRUE, workers = unname(future::availableCores(omit = 1)))
   }
 
   candidates <- tidyr::expand_grid(
