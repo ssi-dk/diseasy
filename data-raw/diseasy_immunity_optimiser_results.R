@@ -391,9 +391,11 @@ for (penalty in c(0, 0.5, 1)) {
   closeAllConnections()
 
   if (interactive()) {
-    future::plan(plan, gc = TRUE)
+    workers <- 1
+    future::plan("plan", gc = TRUE)
   } else {
-    future::plan(multisession, gc = TRUE, workers = unname(future::availableCores(omit = 1)))
+    workers <- unname(future::availableCores(omit = 1))
+    future::plan("multisession", gc = TRUE, workers = workers)
   }
 
   candidates <- tidyr::expand_grid(
@@ -500,18 +502,7 @@ for (penalty in c(0, 0.5, 1)) {
             )
           )
       }) |>
-      purrr::reduce(
-        rbind,
-        .init = data.frame(
-          "method" = character(0),
-          "strategy" = character(0),
-          "M" = numeric(0),
-          "value" = numeric(0),
-          "execution_time" = numeric(0),
-          "target_label" = character(0),
-          "optim_method" = character(0)
-        )
-      ) |>
+      purrr::list_rbind() |>
       dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
       dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
