@@ -9,7 +9,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   rE <- 1 / 2.1                                                                                                         # nolint: object_name_linter
   rI <- 1 / 4.5                                                                                                         # nolint: object_name_linter
 
-  overall_infection_risk <- 0.025
+  overall_infection_risk <- 0.035
 
   # Set the age resolution
   age_cuts_lower <- c(0, 30, 60)
@@ -21,18 +21,30 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   # Build model
 
+  # Define the area and population of interest
+  regions <- DiseasyRegions$new(
+    area = c("DK", "SE"),
+    demography = demography_nordic,
+    adjacency = adjacency_meta_nordic |>
+      dplyr::mutate("adjacency" = mean(.data$adjacency))
+  )
+
   # Define the model population
-  population <- DiseasyPopulation$new()
+  population <- DiseasyPopulation$new(regions = regions)
   population$stratify_age(age_cuts_lower = age_cuts_lower)
+  population$stratify_regions("region")
 
   # Define the activity scenario
   activity <- DiseasyActivity$new()
-  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
+  contact_basis <- contact_basis_nordic %.% DK
+  contact_basis$per_capita_contacts$other  <- mean(contact_basis$per_capita_contacts$other)  + 0 * contact_basis$per_capita_contacts$other
+  contact_basis$per_capita_contacts$home   <- mean(contact_basis$per_capita_contacts$home)   + 0 * contact_basis$per_capita_contacts$home
+  contact_basis$per_capita_contacts$school <- mean(contact_basis$per_capita_contacts$school) + 0 * contact_basis$per_capita_contacts$school
+  contact_basis$per_capita_contacts$work   <- mean(contact_basis$per_capita_contacts$work)   + 0 * contact_basis$per_capita_contacts$work
+
+  activity$set_contact_basis(contact_basis = contact_basis)
   activity$set_activity_units(dk_activity_units)
   activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
-
-  # Define the area and population of interest
-  regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
 
   # Add a waning immunity scenario
   immunity <- DiseasyImmunity$new()
@@ -67,7 +79,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   private <- model$.__enclos_env__$private
 
   # Generate a initial state_vector
-  y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
+  y0 <- rep(0, (K + L + M + 1) * nrow(population %.% groups))
 
 
   eigen_activity_vector <- model %.% population %.% per_capita_contact_matrices(
@@ -79,7 +91,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   activity <- activity / sum(activity)
 
   # 0.05% are newly infected
-  y0[private$e1_state_indices] <- activity * 0.0005
+  y0[private$e1_state_indices[[1]]] <- 0.0005
 
   # 99.95% are susceptible
   y0[private$s_state_indices] <- model %.% population %.% model_population %.% proportion - y0[private$e1_state_indices]
@@ -92,14 +104,19 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Extract the maximal test positive signal from the I1 states
   true_infected <- tt[, 1 + private$i1_state_indices] * L * rI *
     sum(model %.% population %.% model_population %.% population)
-  colnames(true_infected) <- diseasystore::age_labels(age_cuts_lower)
+  colnames(true_infected) <- tidyr::unite(population %.% groups, "label", dplyr::everything(), sep = "/") %.% label
 
   # Convert to long format
   seir_example_data <- true_infected |>
     tibble::as_tibble(rownames = "t") |>
-    tidyr::pivot_longer(cols = !"t", names_to = "age_group", values_to = "n_infected") |>
+    tidyr::pivot_longer(cols = !"t", names_to = "population_group", values_to = "n_infected") |>
     dplyr::mutate(date = as.Date("2020-01-01") + as.numeric(.data$t), .after = "t") |>
-    dplyr::select(!"t")
+    dplyr::select(!"t") |>
+    tidyr::separate_wider_delim(
+      cols = "population_group",
+      delim = "/",
+      names = colnames(population %.% groups)
+    )
 
 
   # Unnest to develop a testing model with simple and realistic testing patterns
@@ -116,8 +133,16 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
       "n_infected" = dplyr::first(.data$n_infected),
       "n_positive_simple" = sum(.data$simple_test),
       "n_positive" = sum(.data$realistic_test),
-      .by = c("age_group", "date")
+      .by = c(colnames(population %.% groups), "date")
     )
+
+  seir_example_data |>
+    dplyr::summarise(
+      "n_infected" = sum(.data$n_infected),
+      .by = c("date", "region")
+    ) |>
+    ggplot2::ggplot(ggplot2::aes(x = date, y = n_infected, color = region)) +
+      ggplot2::geom_line()
 
 
   # Reorder columns

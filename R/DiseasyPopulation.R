@@ -200,6 +200,11 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Retrieve the regional mixing matrices
       regional_mixing_modifiers <- self %.% regions %.% infection_flow_matrix
 
+      # regional_mixing_modifiers <- regional_mixing_modifiers /
+      #   outer(rowSums(regional_mixing_modifiers), rep(1, nrow(regional_mixing_modifiers)))
+
+      # regional_mixing_modifiers <- 0.5 * (regional_mixing_modifiers + t(regional_mixing_modifiers))
+
       # Normalise the regional mixing to a scaling of 1
       regional_mixing_modifiers <- regional_mixing_modifiers / max(eigen(regional_mixing_modifiers)$values)
 
@@ -446,7 +451,7 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       # Determine the age cuts of the reference and the demography data
       age_cuts_lower_reference <- as.integer(stringr::str_extract(age_groups_reference, r"{^\d+}"))
-      age_cuts_lower_demography <- purrr::pluck(demography, demography_age_column) |>
+      age_cuts_lower_demography <- purrr::pluck(demography, "age_group") |>
         purrr::map_if(is.character, ~ stringr::str_extract(., r"{^\d+}")) |>
         as.integer() |>
         unique()
