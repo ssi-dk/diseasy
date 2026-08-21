@@ -12,12 +12,6 @@ jobs:
       packages: read
 
     steps:
-      - name: Set SIF filename
-        run: |
-          DATE=$(date -u +%Y-%m-%d)
-          SHA=${GITHUB_SHA::7}
-          echo "SIF_NAME=diseasy-${DATE}-${SHA}.sif" >> "$GITHUB_ENV"
-
       - name: Install Apptainer
         run: |
           sudo apt update
@@ -27,6 +21,13 @@ jobs:
           sudo apt install -y apptainer
           apptainer version
 
+      - name: Determine image tag
+        run: |
+          TAG=$(echo "$GITHUB_REF_NAME" | sed -E 's/[^A-Za-z0-9_.-]+/-/g')
+          echo "IMAGE_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "Using GHCR image tag: $TAG"
+
+
       - name: Login to GHCR
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | \
@@ -35,11 +36,19 @@ jobs:
             --password-stdin \
             docker://ghcr.io
 
+      - name: Set SIF filename
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          SHA=${GITHUB_SHA::7}
+          echo "SIF_NAME=diseasy-${DATE}-${SHA}.sif" >> "$GITHUB_ENV"
+
       - name: Create SIF
         run: |
+          echo "Pulling ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
+
           apptainer pull \
             "$SIF_NAME" \
-            docker://ghcr.io/ssi-dk/diseasy:main
+            "docker://ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
 
       - name: Inspect SIF
         run: |
