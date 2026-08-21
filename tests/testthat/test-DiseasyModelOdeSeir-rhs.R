@@ -925,7 +925,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing)", {
   # Ensure regional mixing is as epxected
   expect_identical(
     model$regions$infection_flow_matrix,
-    matrix(1, nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+    matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2

@@ -370,17 +370,22 @@ DiseasyPopulation <- R6::R6Class(                                               
           dplyr::select(!"age_group") |>
           dplyr::cross_join(
             data.frame(
-              "age_group" = sort(unique(c(age_cuts_lower_reference, age_cuts_lower)))
+              "age_cuts" = sort(unique(c(age_cuts_lower_reference, age_cuts_lower)))
             )
           ) |>
           dplyr::left_join(
             data.frame("age_cuts_lower_model" = c(0, 7)),
-            by = dplyr::join_by(closest(age_group >= age_cuts_lower_model))
+            by = dplyr::join_by(closest(age_cuts >= age_cuts_lower_model))
           ) |>
           dplyr::mutate(
-            "population" = 1 / (dplyr::n() * length(age_cuts_lower)),
-            .by = !"age_group"
-          )
+            "population" = 1 / (dplyr::n() * nrow(self %.% groups)),
+            .by = !"age_cuts"
+          ) |>
+          dplyr::mutate(
+            "age_group" = diseasystore::age_labels(.data$age_cuts),
+            .by = !"age_cuts"
+          ) |>
+          dplyr::select(!"age_cuts")
 
       }
 
