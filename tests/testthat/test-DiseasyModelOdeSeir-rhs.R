@@ -811,7 +811,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
 })
 
 
-test_that("RHS sanity check 7: Regional-mixing (well-mixed)", {
+test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
 
@@ -863,7 +863,7 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed)", {
   # Ensure contact matrix is as expected
   expect_identical(
     private$contact_matrix(0),
-    matrix(c(0.5, 0.5, 0.5, 0.5), nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
+    matrix(0.5, nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -891,8 +891,92 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed)", {
 
 })
 
+test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
 
-test_that("RHS sanity check 7: Regional-mixing (no-mixing)", {
+  regions <- DiseasyRegions$new(
+    area = c("A", "B", "C")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "A", "B", "B", "B", "C", "C", "C"),
+      to        = c("A", "B", "C", "A", "B", "C", "A", "B", "C"),
+      adjacency = c(1,   1,   1,   1,   1,   1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(1, nrow = 3, ncol = 3, dimnames = list(c("A", "B", "C"), c("A", "B", "C")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(1 / 3, nrow = 3, ncol = 3, dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C")))
+  )
+
+  # We start with I_A = R_B = R_C = 0.05 / 2, S_A = S_B = S_C = 0.95 / 3
+  y0 <- rep(0, private$n_states)
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[[2:3]])] <- 0.05 / 3
+  y0[private$s_state_indices] <- 0.95 / 3
+
+
+  expect_identical(sum(y0), 1)
+  expect_identical(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      1 / 3 * (0.05 / 3) * (0.95 / 3),   # 1 / 3 * I_A * S_A
+      - (0.05 / 3) * rI,                 # - I_A * rI
+      (0.05 / 3) * rI,                   # I_A * rI
+      1 / 3 * (0.05 / 3) * (0.95 / 3),   # I_A * S_B
+      0,                                 # - I_B * rI = 0
+      0,                                 # I_B * rI = 0
+      1 / 3 * (0.05 / 3) * (0.95 / 3),   # I_A * S_C
+      0,                                 # - I_C * rI = 0
+      0,                                 # I_C * rI = 0
+      - 1 / 3 * (0.05 / 3) * (0.95 / 3), # - I_A * S_A
+      - 1 / 3 * (0.05 / 3) * (0.95 / 3), # - I_A * S_B
+      - 1 / 3 * (0.05 / 3) * (0.95 / 3)  # - I_A * S_C
+    )
+  )
+
+  rm(model)
+
+})
+
+
+test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
 
@@ -971,8 +1055,101 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing)", {
 
 })
 
+test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
 
-test_that("RHS sanity check 7: Regional-mixing (only cross-mixing)", {
+  regions <- DiseasyRegions$new(
+    area = c("A", "B", "C")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "A", "B", "B", "B", "C", "C", "C"),
+      to        = c("A", "B", "C", "A", "B", "C", "A", "B", "C"),
+      adjacency = c(1,   0,   0,   0,   1,   0,   0,   0,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(
+      as.vector(diag(1, nrow = 3)),
+      nrow = 3,
+      ncol = 3,
+      dimnames = list(c("A", "B", "C"), c("A", "B", "C"))
+    )
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(
+      as.vector(diag(1, nrow = 3)),
+      nrow = 3,
+      ncol = 3,
+      dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))
+    )
+  )
+
+  # We start with I_A = R_B = R_C = 0.05 / 3, S_A = S_B = S_C = 0.95 / 3
+  y0 <- rep(0, private$n_states)
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[[2:3]])] <- 0.05 / 3
+  y0[private$s_state_indices] <- 0.95 / 3
+
+  expect_identical(sum(y0), 1)
+  expect_identical(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      (0.05 / 3) * (0.95 / 3),   # I_A * S_A
+      - (0.05 / 2) * rI,         # - I_A * rI
+      (0.05 / 2) * rI,           # I_A * rI
+      0,                         # I_A * S_B * 0
+      0,                         # - I_B * rI = 0
+      0,                         # I_B * rI = 0
+      0,                         # I_A * S_C * 0
+      0,                         # - I_C * rI = 0
+      0,                         # I_C * rI = 0
+      - (0.05 / 2) * (0.95 / 2), # - I_A * S_A
+      0,                         # - I_A * S_B * 0
+      0                          # - I_A * S_C * 0
+    )
+  )
+
+  rm(model)
+
+})
+
+
+test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
 
