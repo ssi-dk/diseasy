@@ -111,7 +111,13 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
   Creates a new instance of the \code{DiseasyRegions} \link[R6:R6Class]{R6} class.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyRegions$new(area = NULL, adjacency = NULL, demography = NULL, ...)}
+    \preformatted{DiseasyRegions$new(
+  area = NULL,
+  adjacency = NULL,
+  demography = NULL,
+  regional_risks = NULL,
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -120,9 +126,15 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
       \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
+      \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
     }
     \if{html}{\out{</div>}}
+  }
+  \subsection{Details}{
+    If \code{adjacency} or \code{regional_risks} are provided to the constructor directly, the default interpretations
+are used. See \verb{$set_adjacency()} and \verb{$set_regional_risks()} for more details. Notice that a "type" attribute
+may be set on the objects before passing to this constructor to control the interpretation of each variable.
   }
 }
 
