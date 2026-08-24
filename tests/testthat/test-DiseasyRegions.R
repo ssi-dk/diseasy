@@ -556,6 +556,185 @@ test_that("`adjacency` (infection_flow) produces correct `infection_flow_matrix`
 })
 
 
+test_that("`regional_risks` (behaviour) modify the adjacency (movement) correctly", {
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Set regional risks for the test
+  regions$set_regional_risks(c("A" = 1, "B" = 2), regional_risks_type = "behaviour")
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # Matrix elements are
+  # phi_xy = sqrt(r_x * r_y) * sum_(z = 1)^2 phi_xz*phi_zy =
+  #        = sqrt(r_x * r_y) * 2 * 0.5 * 0.5
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(2 * 0.5 * 0.5 * c(1, sqrt(2), sqrt(2), 2), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+
+  # Un-equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.9, 0.1, 0.1, 0.9)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # Matrix elements are
+  # (diagonal)
+  # phi_xx = sum_(z = 1)^2 phi_xz*phi_zx =
+  #         = 0.9 * 0.9 + 0.1 * 0.1
+  d <- 0.9 * 0.9 + 0.1 * 0.1
+
+  # (off-diagonal)
+  # phi_xy = sum_(z = 1)^2 phi_xz*phi_zy =
+  #         = 2 * 0.9 * 0.1
+  od <- 2 * 0.9 * 0.1
+
+  # again modified by the risk matrix with elements
+  # r_xy = sqrt(r_x * r_y)
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(c(d, od, od, d) * c(1, sqrt(2), sqrt(2), 2), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  rm(regions)
+})
+
+test_that("`regional_risks` (behaviour) modify the adjacency (infection-flow) correctly", {
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Set regional risks for the test
+  regions$set_regional_risks(c("A" = 1, "B" = 2), regional_risks_type = "behaviour")
+
+  # Equal infection flow
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(c(1, sqrt(2), sqrt(2), 2), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Un-equal infection flow
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.9, 0.1, 0.1, 0.9)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(
+      c(0.9, 0.1, 0.1, 0.9) * c(1, sqrt(2), sqrt(2), 2),
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("A", "B"), c("A", "B"))
+    )
+  )
+
+  rm(regions)
+})
+
+test_that("`regional_risks` (location) modify the adjacency (movement) correctly", {
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Set regional risks for the test
+  regions$set_regional_risks(c("A" = 1, "B" = 2), regional_risks_type = "location")
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # Matrix elements are
+  # phi_xy = sum_(z = 1)^2 phi_xz * r_z * phi_zy
+  # All elements are equal in this special case (since movement probs. equal)
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(0.5 * 1 * 0.5 + 0.5 * 2 * 0.5, nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+
+  # Un-equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.9, 0.1, 0.1, 0.9)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # Matrix elements are
+  # phi_xy = sum_(z = 1)^2 phi_xz * r_z * phi_zy
+  phi_aa <- 0.9 * 1 * 0.9 + 0.1 * 2 * 0.1
+  phi_ab <- phi_ba <- 0.9 * 1 * 0.1 + 0.1 * 2 * 0.9
+  phi_bb <- 0.1 * 1 * 0.1 + 0.9 * 2 * 0.9
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(c(phi_aa, phi_ab, phi_ba, phi_bb), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  rm(regions)
+})
+
+test_that("`regional_risks` (location) produces error with adjacency (infection-flow)", {
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Set regional risks for the test
+  regions$set_regional_risks(c("A" = 1, "B" = 2), regional_risks_type = "location")
+
+  # Equal infection flow
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  expect_error(
+    regions$infection_flow_matrix,
+    regexp = '`regional_risks_type` can only be "location" if `adjacency_type = "movement"`'
+  )
+  rm(regions)
+})
+
+
 test_that("active binding: area works", {
 
   regions <- DiseasyRegions$new(
