@@ -1228,3 +1228,86 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
   rm(model)
 
 })
+
+
+test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mixed, 2 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+
+  regions <- DiseasyRegions$new(
+    area = c("A", "B")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "B", "B"),
+      to        = c("A", "B", "A", "B"),
+      adjacency = c(1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+  regions$set_regional_risks(c("A" = 1, "B" = 2))
+
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(c(1, sqrt(2), sqrt(2), 2), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  # Largest eigenvalue of the infection flow matrix is 3, so contact matrix should be 1 / 3 of the infection_flow_matrix
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(c(1, sqrt(2), sqrt(2), 2) / 3, nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
+  )
+
+  # We start with I_A = I_B = 0.05 / 2, S_A = S_B = 0.95 / 2
+  y0 <- rep(0, private$n_states)
+  y0[private$i1_state_indices[1:2]] <- 0.05 / 2
+  y0[private$s_state_indices] <- 0.95 / 2
+  expect_identical(sum(y0), 1)
+
+  expect_equal(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2),   # (1/3 * I_A + sqrt(2)/3 * I_B) * S_A
+      - (0.05 / 2) * rI,                             # - I_A * rI
+      (0.05 / 2) * rI,                               # I_A * rI
+      (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2),   # (sqrt(2)/3 * I_A + 2/3 * I_B) * S_B
+      - (0.05 / 2) * rI,                             # - I_B * rI
+      (0.05 / 2) * rI,                               # I_B * rI
+      - (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2), # - (1/3 * I_A + sqrt(2)/3 * I_B) * S_A
+      - (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2)  # - (sqrt(2)/3 * I_A + 2/3 * I_B) * S_B
+    ),
+    tolerance = 1e-14 # Some numerical error has been introduced
+  )
+
+  rm(model)
+})
