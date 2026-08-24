@@ -106,6 +106,53 @@ test_that("`$set_demography()`` works", {
 })
 
 
+test_that("`$set_regional_risks()` works", {
+
+  # 1 ) Empty module
+  regions <- DiseasyRegions$new()
+  hash_no_risks <- regions$hash
+
+
+  # 2) With increasing risks
+  regions$set_regional_risks(c("north" = 1, "east" = 2))
+  hash_increasing_risks <- regions$hash
+
+  expected_risks <- c("north" = 1, "east" = 2)[order(c("north", "east"))]
+  attr(expected_risks, "type") <- "behaviour"
+
+  expect_identical(regions %.% regional_risks, expected_risks)
+  expect_false(hash_increasing_risks == hash_no_risks)
+
+
+  # 3) With decreasing risks
+  regions$set_regional_risks(c("north" = 3, "east" = 2))
+  hash_decreasing_risks <- regions$hash
+
+  expected_risks <- c("north" = 3, "east" = 2)[order(c("north", "east"))]
+  attr(expected_risks, "type") <- "behaviour"
+
+  expect_identical(regions %.% regional_risks, expected_risks)
+  expect_false(hash_no_risks == hash_increasing_risks)
+  expect_false(hash_no_risks == hash_decreasing_risks)
+
+
+  # 4) With different interpretation
+  regions$set_regional_risks(c("north" = 3, "east" = 2), regional_risks_type = "location")
+  hash_decreasing_risks_location <- regions$hash
+
+  expected_risks <- c("north" = 3, "east" = 2)[order(c("north", "east"))]
+  attr(expected_risks, "type") <- "location"
+
+  expect_identical(regions %.% regional_risks, expected_risks)
+  expect_false(hash_decreasing_risks_location == hash_no_risks)
+  expect_false(hash_decreasing_risks_location == hash_increasing_risks)
+  expect_false(hash_decreasing_risks_location == hash_decreasing_risks)
+
+
+  rm(regions)
+})
+
+
 test_that("Malformed inputs to initialize works", {
 
   # Check if input validation works
@@ -155,6 +202,39 @@ test_that("Malformed inputs to initialize works", {
     class = "simpleError",
     regexp = "`adjacency` and `demography` must contain at least one common region."
   )
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(
+        area = "east",
+        regional_risks = c("north" = 1)
+      )
+    ),
+    class = "simpleError",
+    regexp = "`area` and `regional_risks` must contain at least one common region."
+  )
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(
+        demography = dplyr::filter(test_demography, .data$region != "north"),
+        regional_risks = c("north" = 1)
+      )
+    ),
+    class = "simpleError",
+    regexp = "`demography` and `regional_risks` must contain at least one common region."
+  )
+
+  expect_error(
+    checkmate_err_msg(
+      DiseasyRegions$new(
+        adjacency = dplyr::filter(test_adjacency, .data$from != "north", .data$to != "north"),
+        regional_risks = c("north" = 1)
+      )
+    ),
+    class = "simpleError",
+    regexp = "`adjacency` and `regional_risks` must contain at least one common region."
+  )
 })
 
 
@@ -180,7 +260,7 @@ test_that("Non-empty initialize works", {
 
 test_that("Setters are commutative", {
 
-  # Permutaiton 1
+  # Permutation 1
   regions <- DiseasyRegions$new()
   regions$set_area(c("north", "south"))
   regions$set_adjacency(test_adjacency)
@@ -442,6 +522,26 @@ test_that("active binding: demography works", {
   )
   expect_identical(demography_error, simpleError("`$demography` is read only"))
   expect_identical(regions %.% demography %.% region, "north")
+
+  rm(regions)
+})
+
+
+test_that("active binding: regional_risks works", {
+
+  regions <- DiseasyRegions$new()
+  regions$set_regional_risks(c("north" = 1, "south" = 2, "east" = 3))
+
+  demography_error <- tryCatch(
+    regions$regional_risks <- c("north" = 3, "south" = 2, "east" = 1),                                                  # nolint: implicit_assignment_linter
+    error = \(e) e
+  )
+  expect_identical(demography_error, simpleError("`$regional_risks` is read only"))
+
+  expected_risks <- c("north" = 1, "south" = 2, "east" = 3)[order(c("north", "south", "east"))]
+  attr(expected_risks, "type") <- "behaviour"
+
+  expect_identical(regions %.% regional_risks, expected_risks)
 
   rm(regions)
 })
