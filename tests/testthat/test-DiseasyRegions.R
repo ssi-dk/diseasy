@@ -464,6 +464,98 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
 })
 
 
+test_that("`adjacency` (movement) produces correct `infection_flow_matrix`", {
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # Matrix elements are
+  # phi_xy = sum_(z = 1)^2 phi_xz*phi_zy =
+  #        = 2 * 0.5 * 0.5
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(2 * 0.5 * 0.5, nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+
+  # Un-equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.9, 0.1, 0.1, 0.9)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # Matrix elements are
+  # (diagonal)
+  # phi_xx = sum_(z = 1)^2 phi_xz*phi_zx =
+  #         = 0.9 * 0.9 + 0.1 * 0.1
+  d <- 0.9 * 0.9 + 0.1 * 0.1
+
+  # (off-diagonal)
+  # phi_xy = sum_(z = 1)^2 phi_xz*phi_zy =
+  #         = 2 * 0.9 * 0.1
+  od <- 2 * 0.9 * 0.1
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(c(d, od, od, d), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  rm(regions)
+})
+
+test_that("`adjacency` (infection_flow) produces correct `infection_flow_matrix`", {
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Equal infection flow
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(1, nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+
+  # Un-equal infection flow
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(1,   0.1, 0.1, 1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  expect_identical(
+    regions$infection_flow_matrix,
+    matrix(c(1, 0.1, 0.1, 1), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  rm(regions)
+})
+
+
 test_that("active binding: area works", {
 
   regions <- DiseasyRegions$new(
