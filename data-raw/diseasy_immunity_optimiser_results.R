@@ -392,7 +392,7 @@ for (penalty in c(0, 0.5, 1)) {
 
   if (interactive()) {
     workers <- 1
-    future::plan("plan", gc = TRUE)
+    future::plan("sequential", gc = TRUE)
   } else {
     workers <- unname(future::availableCores(omit = 1))
     future::plan("multisession", gc = TRUE, workers = workers)
