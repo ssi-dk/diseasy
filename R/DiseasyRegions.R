@@ -1345,17 +1345,17 @@ DiseasyRegions <- R6::R6Class(                                                  
         }
 
         # Filter to area
-        regional_risk <- private %.% .regional_risks[
+        regional_risks <- private %.% .regional_risks[
           self %.% region_filter(names(private %.% .regional_risks))
         ]
 
         # Sort
-        regional_risk <- regional_risk[order(names(regional_risk))]
+        regional_risks <- regional_risks[order(names(regional_risks))]
 
         # Copy the type attribute
-        attr(regional_risk, "type") <- attr(private %.% .regional_risks, "type")
+        attr(regional_risks, "type") <- attr(private %.% .regional_risks, "type")
 
-        return(regional_risk)
+        return(regional_risks)
       }
     )
   ),
