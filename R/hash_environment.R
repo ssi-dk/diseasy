@@ -45,11 +45,18 @@ hash_environment <- function(environment) {
 
   # Create helper function to recursively dive into a list and hash function elements
   hash_nested_list <- function(obj) {
+
+    # By default we mark attributes for copy
+    copy_attributes <- TRUE
+
     if (inherits(obj, "condition")) {
 
       # Conditions are list-like, but their call, trace and parent can carry
       # unstable state. Hash a normalized representation instead.
       out <- hash_condition(obj)
+
+      # Here we explicitly remove some attributes
+      copy_attributes <- FALSE
 
     } else if (checkmate::test_list(obj)) {
 
@@ -67,6 +74,9 @@ hash_environment <- function(environment) {
         "function_attributes" = attributes(rlang::zap_srcref(obj)) |>
           purrr::discard_at("body") # Partialised functions have the source repeated as "body"
       )
+
+      # Here we explicitly remove some attributes
+      copy_attributes <- FALSE
 
     } else if (checkmate::test_formula(obj)) {
 
@@ -86,6 +96,10 @@ hash_environment <- function(environment) {
     } else {
       # Everything else we hash as is
       out <- obj
+    }
+
+    if (copy_attributes) {
+      attributes(out) <- attributes(obj)
     }
 
     return(out)
