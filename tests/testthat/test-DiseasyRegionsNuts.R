@@ -54,8 +54,9 @@ test_that("`$set_area()`` works", {
 })
 
 
-test_that("`$set_adjacency()`` works", {
+test_that("`$set_adjacency()` works", {
 
+  # 1) With default interpretation
   regions_nuts_1 <- DiseasyRegionsNuts$new()
   regions_nuts_1$set_adjacency(test_adjacency)
 
@@ -66,8 +67,14 @@ test_that("`$set_adjacency()`` works", {
   expect_identical(regions_nuts_1 %.% infection_flow_matrix, regions_nuts_2 %.% infection_flow_matrix)
   expect_identical(regions_nuts_1 %.% hash, regions_nuts_2 %.% hash)
 
-  rm(regions_nuts_1)
-  rm(regions_nuts_2)
+
+  # 2) With different intepretation
+  regions_nuts_3 <- DiseasyRegionsNuts$new()
+  regions_nuts_3$set_adjacency(test_adjacency, adjacency_type = "infection-flow")
+
+  expect_false(rlang::hash(regions_nuts_3$adjacency) == rlang::hash(regions_nuts_2$adjacency))
+
+  rm(regions_nuts_1, regions_nuts_2, regions_nuts_3)
 })
 
 

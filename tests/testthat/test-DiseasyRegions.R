@@ -63,20 +63,27 @@ test_that("`$set_area()`` works", {
 })
 
 
-test_that("`$set_adjacency()`` works", {
+test_that("`$set_adjacency()` works", {
 
-  region_1 <- DiseasyRegions$new()
-  region_1$set_adjacency(test_adjacency)
+  # 1) With default interpretation
+  regions_1 <- DiseasyRegions$new()
+  regions_1$set_adjacency(test_adjacency)
 
-  region_2 <- DiseasyRegions$new()
-  region_2$set_adjacency(test_adjacency[sample(nrow(test_adjacency)), ])
+  regions_2 <- DiseasyRegions$new()
+  regions_2$set_adjacency(test_adjacency[sample(nrow(test_adjacency)), ])
 
-  expect_identical(region_1 %.% adjacency, region_2 %.% adjacency)
-  expect_identical(region_1 %.% infection_flow_matrix, region_2 %.% infection_flow_matrix)
-  expect_identical(region_1 %.% hash, region_2 %.% hash)
+  expect_identical(regions_1 %.% adjacency, regions_2 %.% adjacency)
+  expect_identical(regions_1 %.% infection_flow_matrix, regions_2 %.% infection_flow_matrix)
+  expect_identical(regions_1 %.% hash, regions_2 %.% hash)
 
-  rm(region_1)
-  rm(region_2)
+
+  # 2) With different intepretation
+  regions_3 <- DiseasyRegions$new()
+  regions_3$set_adjacency(test_adjacency, adjacency_type = "infection-flow")
+
+  expect_false(rlang::hash(regions_3$adjacency) == rlang::hash(regions_2$adjacency))
+
+  rm(regions_1, regions_2, regions_3)
 })
 
 
