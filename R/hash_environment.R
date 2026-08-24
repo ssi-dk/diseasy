@@ -46,17 +46,14 @@ hash_environment <- function(environment) {
   # Create helper function to recursively dive into a list and hash function elements
   hash_nested_list <- function(obj) {
 
-    # By default we mark attributes for copy
-    copy_attributes <- TRUE
+    # By default we strip attributes
+    copy_attributes <- FALSE
 
     if (inherits(obj, "condition")) {
 
       # Conditions are list-like, but their call, trace and parent can carry
       # unstable state. Hash a normalized representation instead.
       out <- hash_condition(obj)
-
-      # Here we explicitly remove some attributes
-      copy_attributes <- FALSE
 
     } else if (checkmate::test_list(obj)) {
 
@@ -75,9 +72,6 @@ hash_environment <- function(environment) {
           purrr::discard_at("body") # Partialised functions have the source repeated as "body"
       )
 
-      # Here we explicitly remove some attributes
-      copy_attributes <- FALSE
-
     } else if (checkmate::test_formula(obj)) {
 
       # Formulas carry environments. We hash them as text
@@ -92,6 +86,9 @@ hash_environment <- function(environment) {
 
       # Numbers have different precision in different systems. Convert to string and hash
       out <- stringr::str_sub(as.character(obj), 1, 16)
+
+      # Copy any attributes stored on the object
+      copy_attributes <- TRUE
 
     } else {
       # Everything else we hash as is
