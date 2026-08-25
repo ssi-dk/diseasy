@@ -599,11 +599,10 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
   # "free_delta-recursive": generates 2 items in the cache (M = 2 and M = 3)
   # "free_gamma-recursive": generates 2 items in the cache (M = 2 and M = 3)
   # "all_free-recursive":   generates 2 items in the cache (M = 2 and M = 3)
-  # "all_free-combination": generates 2 items in the cache (M = 2 and M = 3) and generates two
-  #                         corresponding free_gamma items in the cache with the "naive" strategy ("free_gamma" default)
-  # In total, we expect 10 items in the cache
+  # "all_free-combination": generates 2 items in the cache (M = 2 and M = 3)
+  # In total, we expect 8 items in the cache
   # If we have more, a cache have been missed
-  expect_length(cache$keys(), 10)
+  expect_length(cache$keys(), 8)
 
   rm(im)
 })
