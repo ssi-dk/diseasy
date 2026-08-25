@@ -363,6 +363,7 @@ existing_results <- function(M, monotonous, individual_level) {                 
           purrr::list_transpose() |>
           tibble::as_tibble() |>
           dplyr::mutate(
+            "execution_time" = as.numeric(.data$execution_time, units = "secs"),
             "optim_method" = stringr::str_extract(
               !!file,
               r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
@@ -496,6 +497,7 @@ for (penalty in c(0, 0.5, 1)) {
           purrr::list_transpose() |>
           tibble::as_tibble() |>
           dplyr::mutate(
+            "execution_time" = as.numeric(.data$execution_time, units = "secs"),
             "optim_method" = stringr::str_extract(
               !!file,
               r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
@@ -503,7 +505,6 @@ for (penalty in c(0, 0.5, 1)) {
           )
       }) |>
       purrr::list_rbind() |>
-      dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
       dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
 
@@ -532,6 +533,7 @@ results <- list.files(path) |>
       purrr::list_transpose() |>
       tibble::as_tibble() |>
       dplyr::mutate(
+        "execution_time" = as.numeric(.data$execution_time, units = "secs"),
         "optim_method" = stringr::str_extract(
           !!file,
           r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
@@ -541,7 +543,6 @@ results <- list.files(path) |>
       )
   }) |>
   purrr::list_rbind() |>
-  dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
   dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
 
