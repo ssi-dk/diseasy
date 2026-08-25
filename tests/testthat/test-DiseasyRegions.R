@@ -611,7 +611,7 @@ test_that("`regional_risks` (behaviour) modify the adjacency (movement) correctl
   od <- 2 * 0.9 * 0.1
 
   # again modified by the risk matrix with elements
-  # r_xy = sqrt(r_x * r_y)
+  # r_xy = sqrt(r_x * r_y)                                                                                              # nolint: commented_code_linter
 
   expect_identical(
     regions$infection_flow_matrix,
