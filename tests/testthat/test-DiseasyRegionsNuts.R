@@ -54,8 +54,9 @@ test_that("`$set_area()`` works", {
 })
 
 
-test_that("`$set_adjacency()`` works", {
+test_that("`$set_adjacency()` works", {
 
+  # 1) With default interpretation
   regions_nuts_1 <- DiseasyRegionsNuts$new()
   regions_nuts_1$set_adjacency(test_adjacency)
 
@@ -66,8 +67,14 @@ test_that("`$set_adjacency()`` works", {
   expect_identical(regions_nuts_1 %.% infection_flow_matrix, regions_nuts_2 %.% infection_flow_matrix)
   expect_identical(regions_nuts_1 %.% hash, regions_nuts_2 %.% hash)
 
-  rm(regions_nuts_1)
-  rm(regions_nuts_2)
+
+  # 2) With different intepretation
+  regions_nuts_3 <- DiseasyRegionsNuts$new()
+  regions_nuts_3$set_adjacency(test_adjacency, adjacency_type = "infection-flow")
+
+  expect_false(rlang::hash(regions_nuts_3$adjacency) == rlang::hash(regions_nuts_2$adjacency))
+
+  rm(regions_nuts_1, regions_nuts_2, regions_nuts_3)
 })
 
 
@@ -84,6 +91,53 @@ test_that("`$set_demography()`` works", {
 
   rm(regions_nuts_1)
   rm(regions_nuts_2)
+})
+
+
+test_that("`$set_regional_risks()` works", {
+
+  # 1 ) Empty module
+  regions_nuts <- DiseasyRegionsNuts$new()
+  hash_no_risks <- regions_nuts$hash
+
+
+  # 2) With increasing risks
+  regions_nuts$set_regional_risks(c("IS001" = 1, "IS002" = 2))
+  hash_increasing_risks <- regions_nuts$hash
+
+  expected_risks <- c("IS001" = 1, "IS002" = 2)
+  attr(expected_risks, "type") <- "behaviour"
+
+  expect_identical(regions_nuts %.% regional_risks, expected_risks)
+  expect_false(hash_increasing_risks == hash_no_risks)
+
+
+  # 3) With decreasing risks
+  regions_nuts$set_regional_risks(c("IS001" = 3, "IS002" = 2))
+  hash_decreasing_risks <- regions_nuts$hash
+
+  expected_risks <- c("IS001" = 3, "IS002" = 2)
+  attr(expected_risks, "type") <- "behaviour"
+
+  expect_identical(regions_nuts %.% regional_risks, expected_risks)
+  expect_false(hash_no_risks == hash_increasing_risks)
+  expect_false(hash_no_risks == hash_decreasing_risks)
+
+
+  # 4) With different interpretation
+  regions_nuts$set_regional_risks(c("IS001" = 3, "IS002" = 2), regional_risks_type = "location")
+  hash_decreasing_risks_location <- regions_nuts$hash
+
+  expected_risks <- c("IS001" = 3, "IS002" = 2)[order(c("IS001", "IS002"))]
+  attr(expected_risks, "type") <- "location"
+
+  expect_identical(regions_nuts %.% regional_risks, expected_risks)
+  expect_false(hash_decreasing_risks_location == hash_no_risks)
+  expect_false(hash_decreasing_risks_location == hash_increasing_risks)
+  expect_false(hash_decreasing_risks_location == hash_decreasing_risks)
+
+
+  rm(regions_nuts)
 })
 
 
@@ -141,7 +195,7 @@ test_that("Non-empty initialize works", {
 
 test_that("Setters are commutative", {
 
-  # Permutaiton 1
+  # Permutation 1
   regions_nuts <- DiseasyRegionsNuts$new()
   regions_nuts$set_area(c("IS001", "IS002"))
   regions_nuts$set_adjacency(test_adjacency)
