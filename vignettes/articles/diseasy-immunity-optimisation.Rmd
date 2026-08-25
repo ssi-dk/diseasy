@@ -103,7 +103,11 @@ best_optim_results <- results |>
     "value" = sum(.data$value),
     "execution_time" = sum(.data$execution_time),
     "n_targets" = dplyr::n(),
-    .by = c("target", "method", "monotonous", "individual_level", "optim_method", "strategy")
+    .by = c(
+      "target", "method",
+      "monotonous", "individual_level",
+      "optim_method", "strategy"
+    )
   ) |>
   dplyr::filter(
     .data$n_targets == max(.data$n_targets),
@@ -220,7 +224,10 @@ total_results <- best_optim_results |>
   dplyr::mutate(
     "value" = round(.data$value, 2)
   ) |>
-  dplyr::slice_max(.data$n_targets, by = c("monotonous", "individual_level", "method"))
+  dplyr::slice_max(
+    .data$n_targets,
+    by = c("monotonous", "individual_level", "method")
+  )
 
 total_results |>
   dplyr::slice_min(
@@ -463,7 +470,7 @@ visualise_methods <- function(total_results, method) {
       linetype = 2, color = "grey"
     ) +
     ggplot2::facet_wrap(
-      ggplot2::vars(monotonous, individual_level),
+      ggplot2::vars(.data$monotonous, .data$individual_level),
       labeller = ggplot2::label_both,
       scales = "free"
     ) +
@@ -547,7 +554,8 @@ split_data <- per_target_results |>
     by = c("target", "method", "monotonous", "individual_level")
   ) |>
   dplyr::select(
-    "target", "monotonous", "individual_level", "method", "strategy", "value", "optim_method"
+    "target", "monotonous", "individual_level",
+    "method", "strategy", "value", "optim_method"
   ) |>
   dplyr::arrange(
     .data$target,
