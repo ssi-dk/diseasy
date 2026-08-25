@@ -19,13 +19,13 @@ if (!all(rlang::is_installed(c("RSQLite", "optimx", "ucminf")))) {
 # - see data-raw/seir_example_data.R
 rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
 rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
+overall_infection_risk <- 0.035
 
 # Configure the activity module
 activity <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
 
 # Configure the regions module
-regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+regions <- DiseasyRegions$new(area = c("DK", "SE"), demography = demography_nordic)
 
 # Configure the immunity module
 immunity <- DiseasyImmunity$new()

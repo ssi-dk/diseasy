@@ -37,10 +37,10 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Define the activity scenario
   activity <- DiseasyActivity$new()
   contact_basis <- contact_basis_nordic %.% DK
-  contact_basis$per_capita_contacts$other  <- mean(contact_basis$per_capita_contacts$other)  + 0 * contact_basis$per_capita_contacts$other
-  contact_basis$per_capita_contacts$home   <- mean(contact_basis$per_capita_contacts$home)   + 0 * contact_basis$per_capita_contacts$home
-  contact_basis$per_capita_contacts$school <- mean(contact_basis$per_capita_contacts$school) + 0 * contact_basis$per_capita_contacts$school
-  contact_basis$per_capita_contacts$work   <- mean(contact_basis$per_capita_contacts$work)   + 0 * contact_basis$per_capita_contacts$work
+  # contact_basis$per_capita_contacts$other  <- mean(contact_basis$per_capita_contacts$other)  + 0 * contact_basis$per_capita_contacts$other
+  # contact_basis$per_capita_contacts$home   <- mean(contact_basis$per_capita_contacts$home)   + 0 * contact_basis$per_capita_contacts$home
+  # contact_basis$per_capita_contacts$school <- mean(contact_basis$per_capita_contacts$school) + 0 * contact_basis$per_capita_contacts$school
+  # contact_basis$per_capita_contacts$work   <- mean(contact_basis$per_capita_contacts$work)   + 0 * contact_basis$per_capita_contacts$work
 
   activity$set_contact_basis(contact_basis = contact_basis)
   activity$set_activity_units(dk_activity_units)
@@ -149,8 +149,16 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   seir_example_data <- seir_example_data |>
     dplyr::select("date", dplyr::everything())
 
-  # set parameters for hospitalization
-  risk_of_admission <- c(0.001, 0.01, 0.1) # Risk per age group
+  # Set parameters for hospitalization
+  risk_of_admission <- population %.% groups |>
+    dplyr::left_join(
+      data.frame(
+        "age_group" = c("00-29", "30-59", "60+"),
+        "risk" = c(0.001, 0.01, 0.1)
+      ),
+      by = "age_group"
+    ) |>
+    dplyr::pull("risk")
   frac_to_hosp_after_days <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # must sum =1
 
   future_admitted <- t(t(true_infected) * risk_of_admission)
@@ -159,22 +167,27 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   for (i in seq_along(frac_to_hosp_after_days)) {
     admitted <- admitted + rbind(
-      array(0, dim = c(i, 3)),
-      frac_to_hosp_after_days[i] * future_admitted[1: (NROW(future_admitted) - i), ]
+      array(0, dim = c(i, ncol(true_infected))),
+      frac_to_hosp_after_days[i] * future_admitted[1:(NROW(future_admitted) - i), ]
     )
   }
 
-  for (i in 1:3) admitted[, i] <- rpois(length(admitted[, i]), admitted[, i])
+  for (i in seq_len(ncol(true_infected))) admitted[, i] <- rpois(length(admitted[, i]), admitted[, i])
 
   # Convert to long format
   seir_example_data_hosp <- admitted |>
     tibble::as_tibble(rownames = "t") |>
-    tidyr::pivot_longer(cols = !"t", names_to = "age_group", values_to = "n_admission") |>
+    tidyr::pivot_longer(cols = !"t", names_to = "population_group", values_to = "n_admission") |>
+    tidyr::separate_wider_delim(
+      cols = "population_group",
+      delim = "/",
+      names = colnames(population %.% groups)
+    ) |>
     dplyr::mutate("date" = as.Date("2020-01-01") + as.numeric(.data$t), .after = "t") |>
     dplyr::select(!"t")
 
-  # merge data
-  seir_example_data <- dplyr::left_join(seir_example_data, seir_example_data_hosp, by = c("date", "age_group"))
+  # Merge data
+  seir_example_data <- dplyr::left_join(seir_example_data, seir_example_data_hosp, by = c("date", colnames(population %.% groups)))
 
   # Visualise the example data
   ggplot2::ggplot(seir_example_data) +
@@ -182,7 +195,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     ggplot2::geom_line(ggplot2::aes(x = date, y = n_positive_simple, color = "Test positive (simple)"), linewidth = 1) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = 10 * n_admission, color = "Admissions * 10")) +
-    ggplot2::facet_wrap(~ age_group) +
+    ggplot2::facet_grid(region ~ age_group) +
     ggplot2::ylab("Test positive / Infected / Admissions") +
     ggplot2::scale_color_manual(
       values = c("Infected" = "black", "Test positive (simple)" = "blue",
