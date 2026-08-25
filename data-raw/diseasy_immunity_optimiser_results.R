@@ -423,6 +423,10 @@ for (penalty in c(0, 0.5, 1)) {
     # Remove existing computations
     candidates_needing_compute <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
 
+    if (nrow(candidates_needing_compute) > 0) {
+      print(candidates_needing_compute)
+    }
+
     # Compute new/missing runs
     combinations <- tidyr::expand_grid(
       "model" = zip(models, model_names, time_scales),
