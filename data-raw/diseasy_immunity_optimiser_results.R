@@ -487,7 +487,10 @@ for (penalty in c(0, 0.5, 1)) {
 
 
     # Gather the results for the round and eliminate stragglers
-    round_results <- list.files(path, pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}.rds')) |>
+    round_results <- list.files(
+      path,
+      pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}.rds')
+    ) |>
       purrr::map(\(file) {
         tmp <- file.path(path, file) |>
           readRDS()
