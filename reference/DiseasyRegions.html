@@ -155,7 +155,13 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
 <h3 id="diseasyregions-new-"><code>DiseasyRegions$new()</code><a class="anchor" aria-label="anchor" href="#diseasyregions-new-"></a></h3>
 <p>Creates a new instance of the <code>DiseasyRegions</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyRegions.html">DiseasyRegions</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>area <span class="op">=</span> <span class="cn">NULL</span>, adjacency <span class="op">=</span> <span class="cn">NULL</span>, demography <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyRegions.html">DiseasyRegions</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  area <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  adjacency <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  demography <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  regional_risks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>area</code></dt>
@@ -167,11 +173,19 @@ The "Theta" matrix (see <code>vignette("diseasy-regions")</code>) that describes
       <dt><code>demography</code></dt>
 <dd><p>(<code>data.frame(1)</code>)<br> The demography of the population per region.<br> The <code>data.frame</code> must include the following columns:<br> * <code>region</code> (<code>character</code>) Region identifier.<br> * <code>...</code> Optional additional stratification columns (e.g. sex, ethnicity).<br> * <code>population</code> (<code>numeric</code>) Number of individuals in the group.</p></dd>
 
+      <dt><code>regional_risks</code></dt>
+<dd><p>(<code>named numeric()</code>)<br> Modifiers tied to each region (identified by vector names).<br></p></dd>
+
       <dt><code>...</code></dt>
 <dd><p>Parameters sent to <code>DiseasyBaseModule</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
 
 
 </dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
+<p>If <code>adjacency</code> or <code>regional_risks</code> are provided to the constructor directly, the default interpretations
+are used. See <code>$set_adjacency()</code> and <code>$set_regional_risks()</code> for more details. Notice that a "type" attribute
+may be set on the objects before passing to this constructor to control the interpretation of each variable.</p>
 </div>
 
 </div>
@@ -261,7 +275,7 @@ Must be either <code>"location"</code> or <code>"behaviour"</code> (default).</p
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
+<h4 id="details-1">Details<a class="anchor" aria-label="anchor" href="#details-1"></a></h4>
 <p>If the relative risk modifier, \(\Gamma_x\), is related
 to the location, the elements of the infection-flow matrix,
 \(\Theta_{x,y}\), are derived from the elements of the
