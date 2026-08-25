@@ -276,7 +276,7 @@ optimiser <- function(
 
 
           # Generate approximations and store them
-          key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{M}")
+          key <- glue::glue('{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{sprintf("%02d", M)}')
 
           # Get the results up until now
           current_approximations <- cache$get(key = key)
@@ -331,7 +331,7 @@ optimiser <- function(
 # collects the existing results from the round
 existing_results <- function(M, monotonous, individual_level) {                                                         # nolint: object_name_linter
 
-  existing_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
+  existing_files <- list.files(path, pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}.rds'))
 
   # Early return if no files exist
   if (length(existing_files) == 0) {
@@ -482,7 +482,7 @@ for (penalty in c(0, 0.5, 1)) {
 
 
     # Gather the results for the round and eliminate stragglers
-    round_results <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds")) |>
+    round_results <- list.files(path, pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}.rds')) |>
       purrr::map(\(file) {
         tmp <- file.path(path, file) |>
           readRDS()
