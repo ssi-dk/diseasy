@@ -888,7 +888,6 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   )
 
   rm(model)
-
 })
 
 test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
@@ -974,7 +973,6 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
   )
 
   rm(model)
-
 })
 
 
@@ -1054,7 +1052,6 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   )
 
   rm(model)
-
 })
 
 test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
@@ -1147,7 +1144,6 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
   )
 
   rm(model)
-
 })
 
 
@@ -1228,7 +1224,6 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
   )
 
   rm(model)
-
 })
 
 
