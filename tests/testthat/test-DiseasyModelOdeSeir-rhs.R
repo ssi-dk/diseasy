@@ -941,34 +941,36 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
   )
 
   # Ensure contact matrix is as expected
-  expect_identical(
+  expect_equal(
     private$contact_matrix(0),
-    matrix(1 / 3, nrow = 3, ncol = 3, dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C")))
+    matrix(1 / 3, nrow = 3, ncol = 3, dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))),
+    tolerance = 1e-14 # Some numerical error has been introduced
   )
 
   # We start with I_A = R_B = R_C = 0.05 / 2, S_A = S_B = S_C = 0.95 / 3
   y0 <- rep(0, private$n_states)
-  y0[c(private$i1_state_indices[1], private$r1_state_indices[[2:3]])] <- 0.05 / 3
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[2:3])] <- 0.05 / 3
   y0[private$s_state_indices] <- 0.95 / 3
 
 
   expect_identical(sum(y0), 1)
-  expect_identical(
+  expect_equal(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      1 / 3 * (0.05 / 3) * (0.95 / 3),   # 1 / 3 * I_A * S_A
-      - (0.05 / 3) * rI,                 # - I_A * rI
-      (0.05 / 3) * rI,                   # I_A * rI
-      1 / 3 * (0.05 / 3) * (0.95 / 3),   # I_A * S_B
-      0,                                 # - I_B * rI = 0
-      0,                                 # I_B * rI = 0
-      1 / 3 * (0.05 / 3) * (0.95 / 3),   # I_A * S_C
-      0,                                 # - I_C * rI = 0
-      0,                                 # I_C * rI = 0
-      - 1 / 3 * (0.05 / 3) * (0.95 / 3), # - I_A * S_A
-      - 1 / 3 * (0.05 / 3) * (0.95 / 3), # - I_A * S_B
-      - 1 / 3 * (0.05 / 3) * (0.95 / 3)  # - I_A * S_C
-    )
+      1 / 3 * (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * rI,
+      (0.05 / 3) * rI,
+      1 / 3 * (0.05 / 3) * (0.95 / 3),
+      0,
+      0,
+      1 / 3 * (0.05 / 3) * (0.95 / 3),
+      0,
+      0,
+      - 1 / 3 * (0.05 / 3) * (0.95 / 3),
+      - 1 / 3 * (0.05 / 3) * (0.95 / 3),
+      - 1 / 3 * (0.05 / 3) * (0.95 / 3)
+    ),
+    tolerance = 1e-14 # Some numerical error has been introduced
   )
 
   rm(model)
@@ -1040,14 +1042,14 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (0.05 / 2) * (0.95 / 2),   # I_A * S_A
-      - (0.05 / 2) * rI,         # - I_A * rI
-      (0.05 / 2) * rI,           # I_A * rI
-      0,                         # I_A * S_B * 0
-      0,                         # - I_B * rI = 0
-      0,                         # I_B * rI = 0
-      - (0.05 / 2) * (0.95 / 2), # - I_A * S_A
-      0                          # - I_A * S_B * 0
+      (0.05 / 2) * (0.95 / 2),
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      0,
+      0,
+      0,
+      - (0.05 / 2) * (0.95 / 2),
+      0
     )
   )
 
@@ -1122,25 +1124,25 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
 
   # We start with I_A = R_B = R_C = 0.05 / 3, S_A = S_B = S_C = 0.95 / 3
   y0 <- rep(0, private$n_states)
-  y0[c(private$i1_state_indices[1], private$r1_state_indices[[2:3]])] <- 0.05 / 3
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[2:3])] <- 0.05 / 3
   y0[private$s_state_indices] <- 0.95 / 3
 
   expect_identical(sum(y0), 1)
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (0.05 / 3) * (0.95 / 3),   # I_A * S_A
-      - (0.05 / 2) * rI,         # - I_A * rI
-      (0.05 / 2) * rI,           # I_A * rI
-      0,                         # I_A * S_B * 0
-      0,                         # - I_B * rI = 0
-      0,                         # I_B * rI = 0
-      0,                         # I_A * S_C * 0
-      0,                         # - I_C * rI = 0
-      0,                         # I_C * rI = 0
-      - (0.05 / 2) * (0.95 / 2), # - I_A * S_A
-      0,                         # - I_A * S_B * 0
-      0                          # - I_A * S_C * 0
+      (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * rI,
+      (0.05 / 3) * rI,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      - (0.05 / 3) * (0.95 / 3),
+      0,
+      0
     )
   )
 
@@ -1214,14 +1216,14 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      0,                         # I_A * S_A * 0
-      - (0.05 / 2) * rI,         # - I_A * rI
-      (0.05 / 2) * rI,           # I_A * rI
-      (0.05 / 2) * (0.95 / 2),   # I_A * S_B
-      0,                         # - I_B * rI = 0
-      0,                         # I_B * rI = 0
-      0,                         # - I_A * S_A * 0
-      - (0.05 / 2) * (0.95 / 2)  # - I_A * S_B
+      0,
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      (0.05 / 2) * (0.95 / 2),
+      0,
+      0,
+      0,
+      - (0.05 / 2) * (0.95 / 2)
     )
   )
 
@@ -1297,14 +1299,14 @@ test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mix
   expect_equal(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2),   # (1/3 * I_A + sqrt(2)/3 * I_B) * S_A
-      - (0.05 / 2) * rI,                             # - I_A * rI
-      (0.05 / 2) * rI,                               # I_A * rI
-      (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2),   # (sqrt(2)/3 * I_A + 2/3 * I_B) * S_B
-      - (0.05 / 2) * rI,                             # - I_B * rI
-      (0.05 / 2) * rI,                               # I_B * rI
-      - (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2), # - (1/3 * I_A + sqrt(2)/3 * I_B) * S_A
-      - (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2)  # - (sqrt(2)/3 * I_A + 2/3 * I_B) * S_B
+      (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2),
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2),
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      - (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2),
+      - (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2)
     ),
     tolerance = 1e-14 # Some numerical error has been introduced
   )
