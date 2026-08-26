@@ -34,7 +34,10 @@ r6_hash <- \(r6_generator) {
 
 source_code_hash <- list(
   purrr::map(
-    c(DiseasyBaseModule, DiseasyImmunity, DiseasyObservables, DiseasyModelOdeSeir, DiseasystoreSeirExample),
+    c(
+      DiseasyBaseModule, DiseasyImmunity, DiseasyObservables,
+      DiseasyModelOdeSeir, DiseasystoreSeirExample
+    ),
     r6_hash
   ),
   seir_example_data
