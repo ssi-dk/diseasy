@@ -208,6 +208,17 @@ run_approximation <- function(
           "execution_time" = walltime
         )
       )
+    },
+    error = function(e) {
+      return(
+        list(
+          "method" = method,
+          "strategy" = strategy,
+          "M" = M,
+          "value" = Inf,
+          "execution_time" = Inf
+        )
+      )
     }
   )
 
