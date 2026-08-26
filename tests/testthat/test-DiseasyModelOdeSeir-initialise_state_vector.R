@@ -15,26 +15,6 @@ if (!all(rlang::is_installed(c("RSQLite", "optimx", "ucminf")))) {
   return(NULL)
 }
 
-# We here use the parameters of the generating model
-# - see data-raw/seir_example_data.R
-rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
-rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
-
-# Configure the activity module
-activity <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
-
-# Configure the regions module
-regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
-
-# Configure the immunity module
-immunity <- DiseasyImmunity$new()
-immunity$set_exponential_waning(time_scale = 180)
-
-# Configure the season module
-season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-20"))
-season$use_cosine_season()
 
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
@@ -50,6 +30,7 @@ observables$define_synthetic_observable(
 
 # Lock the observation data to a simulation start date
 observables$set_last_queryable_date(observables %.% ds %.% min_start_date + 30)
+
 
 # Test initialisation of the state vector for different models
 tidyr::expand_grid(
@@ -70,35 +51,31 @@ tidyr::expand_grid(
 
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
 
-      m <- DiseasyModelOdeSeir$new(
-        activity = activity,
-        regions = regions,
-        immunity = immunity,
-        season = season,
-        observables = observables,
-        parameters = list(
-          "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-          "disease_progression_rates" = c("E" = rE, "I" = rI),
-          "overall_infection_risk" = overall_infection_risk
-        )
+      # Modify the example model with different compartments and no age groups
+      model <- generate_example_seir_model(
+        module_overrides = list(
+          "observables" = observables,
+          "population" = DiseasyPopulation$new(age_cuts_lower = 0)
+        ),
+        parameter_overrides = list("compartment_structure" = c("E" = K, "I" = L, "R" = M))
       )
 
       # Get a reference to the private environment
-      private <- m$.__enclos_env__$private
+      private <- model$.__enclos_env__$private
 
       # Retrieve incidence data
-      incidence_data <- m$get_data(
+      incidence_data <- model$get_data(
         observable = "incidence",
         stratification = private$model_stratification(),
         period = "training"
       ) |>
-        dplyr::rename("incidence" = m %.% parameters %.% incidence_feature_name)
+        dplyr::rename("incidence" = model %.% parameters %.% incidence_feature_name)
 
       # Estimate the initial state vector but suppress messages about negative states being set to zero
       pkgcond::suppress_conditions(
         pattern = "Negative values in estimate",
         expr = {
-          psi <- m$initialise_state_vector(incidence_data) |>                                                           # nolint: implicit_assignment_linter
+          psi <- model$initialise_state_vector(incidence_data) |>                                                       # nolint: implicit_assignment_linter
             dplyr::filter(.data$time == 0)
         }
       )
@@ -107,13 +84,14 @@ tidyr::expand_grid(
       sol <- deSolve::ode(
         y = psi %.% value,
         times = seq_len(60) - 1,
-        func = m %.% rhs
+        func = model %.% rhs
       )
 
+      rI <- model %.% parameters %.% disease_progression_rates %.% I                                                    # nolint: object_name_linter
       model_incidence <- rI * rowSums(sol[, private$i1_state_indices + 1, drop = FALSE])
 
       # Check that the initialisation works "well" - always within 10% of the true incidence
-      true_incidence <- m$get_data(
+      true_incidence <- model$get_data(
         observable = "incidence",
         stratification = private$model_stratification(),
         period = "plotting",
@@ -129,13 +107,13 @@ tidyr::expand_grid(
       # This will not generally be true, but should be true if the model we fit match the model
       # used to generate the data. If there is a misspecification of the model, the initial
       # behaviour of the model output may be "noisy" and not have the same number of turning points
-      if (identical(c(K, L, M), c(2L, 1L, 2L))) {
+      if (identical(model %.% parameters %.% compartment_structure, c("E" = 2L, "I" = 1L, "R" = 2L))) {
         expect_identical(
           sum(diff(sign(diff(model_incidence))) != 0),
           sum(diff(sign(diff(true_incidence))) != 0)
         )
       }
 
-      rm(m)
+      rm(model)
     })
   })
