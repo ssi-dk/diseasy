@@ -3,6 +3,7 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.devcontainer$
 ^\.github$
 .lintr
 ^cran-comments\.md$
