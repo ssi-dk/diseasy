@@ -3,1519 +3,1369 @@
     {
       "package": "abind",
       "version": "1.4-8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "abind"
-    },
-    {
-      "package": "arrow",
-      "version": "25.0.0",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "arrow"
     },
     {
       "package": "askpass",
       "version": "1.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "askpass"
     },
     {
       "package": "assertthat",
       "version": "0.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "assertthat"
     },
     {
       "package": "backports",
       "version": "1.5.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "backports"
     },
     {
       "package": "base64enc",
       "version": "0.1-6",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "base64enc"
     },
     {
       "package": "bayesplot",
-      "version": "1.15.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.16.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bayesplot"
     },
     {
       "package": "BB",
       "version": "2026.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "BB"
     },
     {
       "package": "bibtex",
       "version": "0.5.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bibtex"
     },
     {
       "package": "bigD",
       "version": "0.3.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bigD"
-    },
-    {
-      "package": "BiocManager",
-      "version": "1.30.27",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "BiocManager"
     },
     {
       "package": "bit",
       "version": "4.6.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bit"
     },
     {
       "package": "bit64",
-      "version": "4.8.2",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "4.8.4",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bit64"
     },
     {
       "package": "bitops",
-      "version": "1.0-9",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.1-0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bitops"
     },
     {
       "package": "blob",
       "version": "1.3.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "blob"
     },
     {
       "package": "brew",
       "version": "1.0-10",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "brew"
     },
     {
       "package": "bridgesampling",
       "version": "1.2-1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bridgesampling"
     },
     {
       "package": "brio",
       "version": "1.1.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "brio"
     },
     {
       "package": "brms",
       "version": "2.23.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "brms"
     },
     {
       "package": "Brobdingnag",
       "version": "1.2-9",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "Brobdingnag"
     },
     {
-      "package": "broom",
-      "version": "1.0.13",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "broom"
-    },
-    {
       "package": "bslib",
-      "version": "0.11.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "0.12.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "bslib"
     },
     {
       "package": "cachem",
       "version": "1.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "cachem"
     },
     {
       "package": "callr",
       "version": "3.8.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "callr"
     },
     {
       "package": "cellranger",
       "version": "1.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "cellranger"
     },
     {
       "package": "checkmate",
       "version": "2.3.4",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "checkmate"
     },
     {
       "package": "classInt",
       "version": "0.4-11",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "classInt"
     },
     {
       "package": "cli",
       "version": "3.6.6",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "cli"
     },
     {
       "package": "clipr",
       "version": "0.8.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "clipr"
     },
     {
       "package": "coda",
       "version": "0.19-4.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "coda"
     },
     {
       "package": "commonmark",
       "version": "2.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "commonmark"
-    },
-    {
-      "package": "conflicted",
-      "version": "1.2.0",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "conflicted"
     },
     {
       "package": "contactdata",
       "version": "1.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "contactdata"
     },
     {
       "package": "countrycode",
-      "version": "1.8.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.9.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "countrycode"
     },
     {
       "package": "covr",
       "version": "3.6.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "covr"
-    },
-    {
-      "package": "cpp11",
-      "version": "0.5.5",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "cpp11"
     },
     {
       "package": "crayon",
       "version": "1.5.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "crayon"
     },
     {
       "package": "credentials",
       "version": "2.0.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "credentials"
     },
     {
       "package": "crosstalk",
       "version": "1.2.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "crosstalk"
     },
     {
       "package": "curl",
-      "version": "7.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "8.0.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "curl"
     },
     {
       "package": "data.table",
-      "version": "1.18.4",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.18.6.1",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "data.table"
     },
     {
       "package": "DBI",
       "version": "1.3.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "DBI"
     },
     {
       "package": "dbplyr",
       "version": "2.6.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "dbplyr"
     },
     {
       "package": "desc",
       "version": "1.4.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "desc"
     },
     {
       "package": "deSolve",
       "version": "1.42",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "deSolve"
     },
     {
       "package": "devtools",
       "version": "2.5.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "devtools"
     },
     {
       "package": "dfoptim",
       "version": "2023.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "dfoptim"
     },
     {
       "package": "diffobj",
-      "version": "0.3.6",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "0.3.8",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "diffobj"
     },
     {
       "package": "digest",
       "version": "0.6.39",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "digest"
     },
     {
       "package": "diseasy",
       "version": "0.0.0.9001",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "diseasy"
     },
     {
       "package": "diseasystore",
       "version": "0.3.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "diseasystore"
     },
     {
       "package": "distributional",
       "version": "0.8.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "distributional"
-    },
-    {
-      "package": "docopt",
-      "version": "0.7.2",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "docopt"
     },
     {
       "package": "doParallel",
       "version": "1.0.17",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "doParallel"
     },
     {
       "package": "downlit",
       "version": "0.4.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "downlit"
     },
     {
       "package": "dplyr",
       "version": "1.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "dplyr"
     },
     {
-      "package": "dtplyr",
-      "version": "1.3.3",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "dtplyr"
-    },
-    {
       "package": "duckdb",
-      "version": "1.5.4.2",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.5.5",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "duckdb"
     },
     {
       "package": "e1071",
       "version": "1.7-17",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "e1071"
     },
     {
       "package": "ellipsis",
       "version": "0.3.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ellipsis"
     },
     {
       "package": "eurostat",
       "version": "4.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "eurostat"
     },
     {
       "package": "evaluate",
       "version": "1.0.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "evaluate"
     },
     {
       "package": "expm",
-      "version": "1.0-0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.0-1",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "expm"
     },
     {
       "package": "fansi",
       "version": "1.0.7",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "fansi"
     },
     {
       "package": "farver",
       "version": "2.1.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "farver"
     },
     {
       "package": "fastmap",
       "version": "1.2.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "fastmap"
     },
     {
       "package": "fontawesome",
       "version": "0.5.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "fontawesome"
-    },
-    {
-      "package": "forcats",
-      "version": "1.0.1",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "forcats"
     },
     {
       "package": "foreach",
       "version": "1.5.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "foreach"
     },
     {
       "package": "fs",
       "version": "2.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "fs"
     },
     {
-      "package": "fst",
-      "version": "0.9.8",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "fst"
-    },
-    {
-      "package": "fstcore",
-      "version": "0.10.0",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "fstcore"
-    },
-    {
       "package": "future",
-      "version": "1.70.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.75.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "future"
     },
     {
       "package": "future.apply",
       "version": "1.20.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "future.apply"
-    },
-    {
-      "package": "gargle",
-      "version": "1.6.1",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "gargle"
     },
     {
       "package": "generics",
       "version": "0.1.4",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "generics"
     },
     {
       "package": "geojsonsf",
       "version": "2.0.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "geojsonsf"
     },
     {
       "package": "gert",
-      "version": "2.3.1",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "2.4.1",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "gert"
+    },
+    {
+      "package": "ggdist",
+      "version": "3.3.3",
+      "library": "/home/runner/work/_temp/Library",
+      "_row": "ggdist"
     },
     {
       "package": "ggplot2",
       "version": "4.0.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ggplot2"
     },
     {
       "package": "ggridges",
       "version": "0.5.7",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ggridges"
     },
     {
       "package": "gh",
-      "version": "1.6.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.6.1",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "gh"
     },
     {
       "package": "giscoR",
       "version": "1.1.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "giscoR"
     },
     {
       "package": "gitcreds",
       "version": "0.1.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "gitcreds"
     },
     {
       "package": "globals",
       "version": "0.19.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "globals"
     },
     {
       "package": "glue",
       "version": "1.8.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "glue"
-    },
-    {
-      "package": "googledrive",
-      "version": "2.1.2",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "googledrive"
-    },
-    {
-      "package": "googlesheets4",
-      "version": "1.1.2",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "googlesheets4"
     },
     {
       "package": "gridExtra",
       "version": "2.3.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "gridExtra"
     },
     {
       "package": "gt",
       "version": "1.3.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "gt"
     },
     {
       "package": "gtable",
       "version": "0.3.6",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "gtable"
-    },
-    {
-      "package": "haven",
-      "version": "2.5.5",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "haven"
     },
     {
       "package": "here",
       "version": "1.0.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "here"
     },
     {
       "package": "highr",
       "version": "0.12",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "highr"
     },
     {
       "package": "hms",
       "version": "1.1.4",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "hms"
     },
     {
       "package": "htmltools",
       "version": "0.5.9",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "htmltools"
     },
     {
       "package": "htmlwidgets",
       "version": "1.6.4",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "htmlwidgets"
     },
     {
       "package": "httpuv",
       "version": "1.6.17",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "httpuv"
     },
     {
       "package": "httr",
       "version": "1.4.8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "httr"
     },
     {
       "package": "httr2",
-      "version": "1.2.3",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.3.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "httr2"
     },
     {
       "package": "hunspell",
       "version": "3.0.6",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "hunspell"
-    },
-    {
-      "package": "ids",
-      "version": "1.0.1",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "ids"
     },
     {
       "package": "ini",
       "version": "0.3.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ini"
     },
     {
       "package": "inline",
       "version": "0.3.21",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "inline"
     },
     {
       "package": "isoband",
       "version": "0.3.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "isoband"
     },
     {
       "package": "ISOweek",
       "version": "0.6-2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ISOweek"
     },
     {
       "package": "iterators",
       "version": "1.0.14",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "iterators"
     },
     {
       "package": "jquerylib",
       "version": "0.1.4",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "jquerylib"
     },
     {
       "package": "jsonlite",
       "version": "2.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "jsonlite"
     },
     {
       "package": "juicyjuice",
       "version": "0.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "juicyjuice"
     },
     {
       "package": "knitr",
       "version": "1.51",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "knitr"
     },
     {
       "package": "labeling",
       "version": "0.4.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "labeling"
-    },
-    {
-      "package": "Lahman",
-      "version": "14.0-0",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "Lahman"
     },
     {
       "package": "later",
       "version": "1.4.8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "later"
     },
     {
       "package": "lazyeval",
       "version": "0.2.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "lazyeval"
     },
     {
       "package": "lbfgsb3c",
       "version": "2024-3.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "lbfgsb3c"
     },
     {
       "package": "lgr",
       "version": "0.5.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "lgr"
     },
     {
       "package": "lifecycle",
       "version": "1.0.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "lifecycle"
     },
     {
       "package": "lintr",
       "version": "3.4.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "lintr"
     },
     {
       "package": "listenv",
       "version": "1.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "listenv"
     },
     {
       "package": "litedown",
-      "version": "0.9",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "0.11",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "litedown"
     },
     {
-      "package": "littler",
-      "version": "0.3.23",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "littler"
-    },
-    {
       "package": "loo",
-      "version": "2.10.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "2.10.1",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "loo"
     },
     {
       "package": "lubridate",
       "version": "1.9.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "lubridate"
     },
     {
       "package": "lwgeom",
-      "version": "0.2-16",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "0.2-17",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "lwgeom"
     },
     {
       "package": "magrittr",
       "version": "2.0.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "magrittr"
     },
     {
       "package": "markdown",
       "version": "2.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "markdown"
     },
     {
       "package": "marqLevAlg",
       "version": "2.0.8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "marqLevAlg"
     },
     {
       "package": "matrixStats",
       "version": "1.5.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "matrixStats"
     },
     {
       "package": "memoise",
       "version": "2.0.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "memoise"
     },
     {
       "package": "microbenchmark",
       "version": "1.5.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "microbenchmark"
     },
     {
       "package": "mime",
       "version": "0.13",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "mime"
     },
     {
       "package": "miniUI",
       "version": "0.1.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "miniUI"
     },
     {
       "package": "minqa",
       "version": "1.2.8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "minqa"
     },
     {
-      "package": "modelr",
-      "version": "0.1.11",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "modelr"
-    },
-    {
       "package": "mvtnorm",
-      "version": "1.4-1",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.4-2",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "mvtnorm"
     },
     {
       "package": "nleqslv",
       "version": "3.3.7",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "nleqslv"
     },
     {
       "package": "nloptr",
       "version": "2.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "nloptr"
     },
     {
       "package": "numDeriv",
       "version": "2016.8-1.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "numDeriv"
-    },
-    {
-      "package": "nycflights13",
-      "version": "1.0.2",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "nycflights13"
     },
     {
       "package": "openssl",
       "version": "2.4.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "openssl"
     },
     {
       "package": "optimx",
       "version": "2025-4.9",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "optimx"
     },
     {
       "package": "otel",
       "version": "0.2.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "otel"
     },
     {
       "package": "pak",
-      "version": "0.10.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "0.11.1",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pak"
+    },
+    {
+      "package": "pak",
+      "version": "0.11.1",
+      "library": "/opt/R/4.6.1/lib/R/site-library",
+      "_row": "pak.1"
     },
     {
       "package": "parallelly",
       "version": "1.48.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "parallelly"
     },
     {
       "package": "pillar",
       "version": "1.11.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pillar"
     },
     {
       "package": "pkgbuild",
       "version": "1.4.8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pkgbuild"
     },
     {
       "package": "pkgcond",
       "version": "0.1.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pkgcond"
     },
     {
       "package": "pkgconfig",
       "version": "2.0.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pkgconfig"
     },
     {
       "package": "pkgdown",
       "version": "2.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pkgdown"
     },
     {
       "package": "pkgload",
       "version": "1.5.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pkgload"
     },
     {
       "package": "plotly",
-      "version": "4.12.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "4.12.1",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "plotly"
     },
     {
       "package": "plyr",
       "version": "1.8.9",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "plyr"
     },
     {
       "package": "posterior",
       "version": "1.7.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "posterior"
     },
     {
       "package": "pracma",
       "version": "2.4.6",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "pracma"
     },
     {
       "package": "praise",
       "version": "1.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "praise"
     },
     {
       "package": "prettyunits",
       "version": "1.2.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "prettyunits"
     },
     {
       "package": "processx",
       "version": "3.9.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "processx"
     },
     {
       "package": "profvis",
       "version": "0.4.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "profvis"
     },
     {
       "package": "progress",
       "version": "1.2.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "progress"
     },
     {
       "package": "progressr",
       "version": "1.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "progressr"
     },
     {
       "package": "promises",
       "version": "1.5.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "promises"
     },
     {
       "package": "proxy",
       "version": "0.4-29",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "proxy"
     },
     {
       "package": "ps",
       "version": "1.9.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ps"
     },
     {
       "package": "purrr",
       "version": "1.2.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "purrr"
     },
     {
       "package": "quadprog",
       "version": "1.5-8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "quadprog"
     },
     {
       "package": "QuickJSR",
-      "version": "1.10.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.11.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "QuickJSR"
     },
     {
       "package": "R.cache",
       "version": "0.17.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "R.cache"
     },
     {
       "package": "R.methodsS3",
       "version": "1.8.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "R.methodsS3"
     },
     {
       "package": "R.oo",
       "version": "1.27.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "R.oo"
     },
     {
       "package": "R.utils",
       "version": "2.13.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "R.utils"
     },
     {
       "package": "R6",
       "version": "2.6.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "R6"
     },
     {
       "package": "ragg",
       "version": "1.5.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ragg"
     },
     {
       "package": "rappdirs",
       "version": "0.3.4",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rappdirs"
     },
     {
       "package": "rcmdcheck",
       "version": "1.4.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rcmdcheck"
     },
     {
       "package": "RColorBrewer",
       "version": "1.1-3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "RColorBrewer"
     },
     {
       "package": "Rcpp",
       "version": "1.1.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "Rcpp"
     },
     {
       "package": "RcppParallel",
-      "version": "5.1.11-2",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "6.2.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "RcppParallel"
     },
     {
       "package": "rdtools",
       "version": "0.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rdtools"
     },
     {
       "package": "reactable",
       "version": "0.4.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "reactable"
     },
     {
       "package": "reactR",
       "version": "0.6.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "reactR"
     },
     {
       "package": "readr",
       "version": "2.2.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "readr"
     },
     {
       "package": "readxl",
       "version": "1.5.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "readxl"
     },
     {
       "package": "RefManageR",
       "version": "1.4.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "RefManageR"
     },
     {
       "package": "regions",
       "version": "0.1.8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "regions"
     },
     {
       "package": "rematch",
       "version": "2.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rematch"
-    },
-    {
-      "package": "rematch2",
-      "version": "2.1.2",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "rematch2"
-    },
-    {
-      "package": "reprex",
-      "version": "2.1.1",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "reprex"
     },
     {
       "package": "reshape2",
       "version": "1.4.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "reshape2"
     },
     {
       "package": "rex",
       "version": "1.2.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rex"
     },
     {
       "package": "rlang",
       "version": "1.3.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rlang"
-    },
-    {
-      "package": "RMariaDB",
-      "version": "1.3.5",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "RMariaDB"
     },
     {
       "package": "rmarkdown",
       "version": "2.31",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rmarkdown"
     },
     {
       "package": "rnaturalearth",
       "version": "1.2.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rnaturalearth"
     },
     {
       "package": "rnaturalearthdata",
       "version": "1.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rnaturalearthdata"
     },
     {
       "package": "roxygen2",
       "version": "8.1.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "roxygen2"
-    },
-    {
-      "package": "RPostgres",
-      "version": "1.4.10",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "RPostgres"
     },
     {
       "package": "rprojroot",
       "version": "2.1.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rprojroot"
     },
     {
       "package": "RSQLite",
       "version": "3.53.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "RSQLite"
     },
     {
       "package": "rstan",
       "version": "2.32.7",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rstan"
     },
     {
       "package": "rstantools",
-      "version": "2.6.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "2.7.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rstantools"
     },
     {
       "package": "rstudioapi",
       "version": "0.19.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rstudioapi"
     },
     {
       "package": "rversions",
       "version": "3.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "rversions"
-    },
-    {
-      "package": "rvest",
-      "version": "1.0.5",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "rvest"
     },
     {
       "package": "s2",
       "version": "1.1.11",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "s2"
     },
     {
       "package": "S7",
       "version": "0.2.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "S7"
     },
     {
       "package": "sass",
       "version": "0.4.10",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "sass"
     },
     {
       "package": "scales",
       "version": "1.4.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "scales"
     },
     {
       "package": "SCDB",
       "version": "0.6.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "SCDB"
-    },
-    {
-      "package": "selectr",
-      "version": "0.6-0",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "selectr"
     },
     {
       "package": "sessioninfo",
       "version": "1.2.4",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "sessioninfo"
     },
     {
       "package": "sf",
-      "version": "1.1-1",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.1-2",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "sf"
     },
     {
       "package": "shiny",
       "version": "1.14.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "shiny"
     },
     {
       "package": "sourcetools",
       "version": "0.1.7-2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "sourcetools"
     },
     {
       "package": "spelling",
       "version": "2.3.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "spelling"
     },
     {
       "package": "StanHeaders",
       "version": "2.32.10",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "StanHeaders"
     },
     {
       "package": "stringi",
-      "version": "1.8.7",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.8.9",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "stringi"
     },
     {
       "package": "stringr",
       "version": "1.6.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "stringr"
     },
     {
       "package": "styler",
       "version": "1.11.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "styler"
     },
     {
       "package": "subplex",
       "version": "1.9",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "subplex"
     },
     {
       "package": "sys",
       "version": "3.4.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "sys"
     },
     {
       "package": "systemfonts",
       "version": "1.3.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "systemfonts"
     },
     {
       "package": "tensorA",
       "version": "0.36.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "tensorA"
     },
     {
       "package": "terra",
-      "version": "1.9-34",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "1.9-46",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "terra"
     },
     {
       "package": "testthat",
       "version": "3.3.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "testthat"
     },
     {
       "package": "textshaping",
       "version": "1.0.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "textshaping"
     },
     {
       "package": "tibble",
       "version": "3.3.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "tibble"
     },
     {
       "package": "tidyr",
       "version": "1.3.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "tidyr"
     },
     {
       "package": "tidyselect",
       "version": "1.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "tidyselect"
-    },
-    {
-      "package": "tidyverse",
-      "version": "2.0.0",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "tidyverse"
     },
     {
       "package": "timechange",
       "version": "0.4.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "timechange"
     },
     {
       "package": "tinytex",
       "version": "0.60",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "tinytex"
     },
     {
       "package": "tzdb",
       "version": "0.5.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "tzdb"
     },
     {
       "package": "ucminf",
       "version": "1.2.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "ucminf"
     },
     {
       "package": "units",
       "version": "1.0-1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "units"
     },
     {
       "package": "urlchecker",
-      "version": "1.0.1",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "2.0.0",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "urlchecker"
     },
     {
       "package": "usethis",
       "version": "3.2.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "usethis"
     },
     {
       "package": "utf8",
       "version": "1.2.6",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "utf8"
-    },
-    {
-      "package": "uuid",
-      "version": "1.2-2",
-      "library": "/usr/local/lib/R/site-library",
-      "_row": "uuid"
     },
     {
       "package": "V8",
       "version": "8.2.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "V8"
     },
     {
       "package": "vctrs",
       "version": "0.7.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "vctrs"
     },
     {
       "package": "viridisLite",
       "version": "0.4.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "viridisLite"
     },
     {
       "package": "vroom",
       "version": "1.7.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "vroom"
     },
     {
       "package": "waldo",
       "version": "0.6.2",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "waldo"
     },
     {
       "package": "whisker",
       "version": "0.4.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "whisker"
     },
     {
       "package": "withr",
       "version": "3.0.3",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "withr"
     },
     {
       "package": "wk",
       "version": "0.9.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "wk"
     },
     {
       "package": "xfun",
-      "version": "0.59",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "0.60",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "xfun"
     },
     {
       "package": "xml2",
       "version": "1.6.0",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "xml2"
     },
     {
       "package": "xmlparsedata",
       "version": "1.0.5",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "xmlparsedata"
     },
     {
       "package": "xopen",
       "version": "1.0.1",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "xopen"
     },
     {
       "package": "xtable",
       "version": "1.8-8",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "xtable"
     },
     {
       "package": "yaml",
       "version": "2.3.12",
-      "library": "/usr/local/lib/R/site-library",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "yaml"
     },
     {
       "package": "zip",
-      "version": "3.0.0",
-      "library": "/usr/local/lib/R/site-library",
+      "version": "3.0.2",
+      "library": "/home/runner/work/_temp/Library",
       "_row": "zip"
     }
   ]
