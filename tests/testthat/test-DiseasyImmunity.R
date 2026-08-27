@@ -512,7 +512,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   im <- DiseasyImmunity$new()
 
   # Set the exponential waning model
-  im$set_sigmoidal_waning()
+  im$set_exponential_waning()
 
   # Test the approximations for M = 1 to M = 4 using defaults
   test_combinations <- tidyr::expand_grid(
@@ -583,7 +583,7 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
   im <- DiseasyImmunity$new(cache = cache)
 
   # Set the exponential waning model
-  im$set_sigmoidal_waning()
+  im$set_exponential_waning()
 
   # Test all combinations of method and strategy
   test_combinations <- tidyr::expand_grid(
@@ -618,7 +618,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
   im <- DiseasyImmunity$new()
 
   # Set the exponential waning model
-  im$set_sigmoidal_waning()
+  im$set_exponential_waning()
 
   expect_no_condition(
     im$approximate_compartmental(
