@@ -439,6 +439,9 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
 
 
 test_that("`plot()` produces no errors with defaults", {
+  skip_if_not_installed("giscoR")
+  skip_if_not_installed("lwgeom")
+
   regions <- DiseasyRegionsNuts$new(
     area = "DK",
     demography = demography_nordic_nuts3,
@@ -455,6 +458,9 @@ test_that("`plot()` produces no errors with defaults", {
 })
 
 test_that("`plot()` produces no errors with given data", {
+  skip_if_not_installed("giscoR")
+  skip_if_not_installed("lwgeom")
+
   regions <- DiseasyRegionsNuts$new(
     area = "DK"
   )

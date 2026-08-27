@@ -743,6 +743,9 @@ test_that("`regional_risks` (location) produces error with adjacency (infection-
 
 
 test_that("`plot()` produces no errors with defaults", {
+  skip_if_not_installed("giscoR")
+  skip_if_not_installed("lwgeom")
+
   regions <- DiseasyRegions$new(
     area = "DK",
     demography = demography_nordic,
@@ -756,6 +759,9 @@ test_that("`plot()` produces no errors with defaults", {
 
 
 test_that("`plot()` produces no errors with given data", {
+  skip_if_not_installed("giscoR")
+  skip_if_not_installed("lwgeom")
+
   regions <- DiseasyRegions$new(
     area = "DK"
   )
