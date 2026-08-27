@@ -707,6 +707,8 @@ test_that("`map_population` works with 5-year age groups in demography", {
 
 
 test_that("`plot()` produces no errors with defaults", {
+  skip_if_not_installed("ggplot2")
+
   activity <- DiseasyActivity$new()
   activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
   activity$set_activity_units(dk_activity_units)
