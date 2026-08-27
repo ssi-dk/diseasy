@@ -38,7 +38,7 @@
     },
     {
       "package": "bayesplot",
-      "version": "1.15.0",
+      "version": "1.16.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "bayesplot"
     },
@@ -74,13 +74,13 @@
     },
     {
       "package": "bit64",
-      "version": "4.8.2",
+      "version": "4.8.4",
       "library": "/usr/local/lib/R/site-library",
       "_row": "bit64"
     },
     {
       "package": "bitops",
-      "version": "1.0-9",
+      "version": "1.1-0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "bitops"
     },
@@ -128,7 +128,7 @@
     },
     {
       "package": "bslib",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "bslib"
     },
@@ -181,6 +181,12 @@
       "_row": "coda"
     },
     {
+      "package": "collections",
+      "version": "0.3.12",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "collections"
+    },
+    {
       "package": "commonmark",
       "version": "2.0.0",
       "library": "/usr/local/lib/R/site-library",
@@ -200,7 +206,7 @@
     },
     {
       "package": "countrycode",
-      "version": "1.8.0",
+      "version": "1.9.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "countrycode"
     },
@@ -236,13 +242,13 @@
     },
     {
       "package": "curl",
-      "version": "7.1.0",
+      "version": "8.0.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "curl"
     },
     {
       "package": "data.table",
-      "version": "1.18.4",
+      "version": "1.18.6.1",
       "library": "/usr/local/lib/R/site-library",
       "_row": "data.table"
     },
@@ -284,7 +290,7 @@
     },
     {
       "package": "diffobj",
-      "version": "0.3.6",
+      "version": "0.3.8",
       "library": "/usr/local/lib/R/site-library",
       "_row": "diffobj"
     },
@@ -344,7 +350,7 @@
     },
     {
       "package": "duckdb",
-      "version": "1.5.4.2",
+      "version": "1.5.5",
       "library": "/usr/local/lib/R/site-library",
       "_row": "duckdb"
     },
@@ -374,7 +380,7 @@
     },
     {
       "package": "expm",
-      "version": "1.0-0",
+      "version": "1.0-1",
       "library": "/usr/local/lib/R/site-library",
       "_row": "expm"
     },
@@ -434,7 +440,7 @@
     },
     {
       "package": "future",
-      "version": "1.70.0",
+      "version": "1.75.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "future"
     },
@@ -464,9 +470,15 @@
     },
     {
       "package": "gert",
-      "version": "2.3.1",
+      "version": "2.4.1",
       "library": "/usr/local/lib/R/site-library",
       "_row": "gert"
+    },
+    {
+      "package": "ggdist",
+      "version": "3.3.3",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "ggdist"
     },
     {
       "package": "ggplot2",
@@ -482,7 +494,7 @@
     },
     {
       "package": "gh",
-      "version": "1.6.0",
+      "version": "1.6.1",
       "library": "/usr/local/lib/R/site-library",
       "_row": "gh"
     },
@@ -577,6 +589,12 @@
       "_row": "htmlwidgets"
     },
     {
+      "package": "httpgd",
+      "version": "2.1.4",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "httpgd"
+    },
+    {
       "package": "httpuv",
       "version": "1.6.17",
       "library": "/usr/local/lib/R/site-library",
@@ -590,7 +608,7 @@
     },
     {
       "package": "httr2",
-      "version": "1.2.3",
+      "version": "1.3.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "httr2"
     },
@@ -673,6 +691,12 @@
       "_row": "Lahman"
     },
     {
+      "package": "languageserver",
+      "version": "0.3.18",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "languageserver"
+    },
+    {
       "package": "later",
       "version": "1.4.8",
       "library": "/usr/local/lib/R/site-library",
@@ -716,7 +740,7 @@
     },
     {
       "package": "litedown",
-      "version": "0.9",
+      "version": "0.11",
       "library": "/usr/local/lib/R/site-library",
       "_row": "litedown"
     },
@@ -728,7 +752,7 @@
     },
     {
       "package": "loo",
-      "version": "2.10.0",
+      "version": "2.10.1",
       "library": "/usr/local/lib/R/site-library",
       "_row": "loo"
     },
@@ -740,7 +764,7 @@
     },
     {
       "package": "lwgeom",
-      "version": "0.2-16",
+      "version": "0.2-17",
       "library": "/usr/local/lib/R/site-library",
       "_row": "lwgeom"
     },
@@ -806,7 +830,7 @@
     },
     {
       "package": "mvtnorm",
-      "version": "1.4-1",
+      "version": "1.4-2",
       "library": "/usr/local/lib/R/site-library",
       "_row": "mvtnorm"
     },
@@ -854,7 +878,7 @@
     },
     {
       "package": "pak",
-      "version": "0.10.0",
+      "version": "0.11.1",
       "library": "/usr/local/lib/R/site-library",
       "_row": "pak"
     },
@@ -902,7 +926,7 @@
     },
     {
       "package": "plotly",
-      "version": "4.12.0",
+      "version": "4.12.1",
       "library": "/usr/local/lib/R/site-library",
       "_row": "plotly"
     },
@@ -992,7 +1016,7 @@
     },
     {
       "package": "QuickJSR",
-      "version": "1.10.0",
+      "version": "1.11.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "QuickJSR"
     },
@@ -1058,7 +1082,7 @@
     },
     {
       "package": "RcppParallel",
-      "version": "5.1.11-2",
+      "version": "6.2.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "RcppParallel"
     },
@@ -1196,7 +1220,7 @@
     },
     {
       "package": "rstantools",
-      "version": "2.6.0",
+      "version": "2.7.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "rstantools"
     },
@@ -1262,7 +1286,7 @@
     },
     {
       "package": "sf",
-      "version": "1.1-1",
+      "version": "1.1-2",
       "library": "/usr/local/lib/R/site-library",
       "_row": "sf"
     },
@@ -1292,7 +1316,7 @@
     },
     {
       "package": "stringi",
-      "version": "1.8.7",
+      "version": "1.8.9",
       "library": "/usr/local/lib/R/site-library",
       "_row": "stringi"
     },
@@ -1334,7 +1358,7 @@
     },
     {
       "package": "terra",
-      "version": "1.9-34",
+      "version": "1.9-46",
       "library": "/usr/local/lib/R/site-library",
       "_row": "terra"
     },
@@ -1399,6 +1423,12 @@
       "_row": "ucminf"
     },
     {
+      "package": "unigd",
+      "version": "0.2.0",
+      "library": "/usr/local/lib/R/site-library",
+      "_row": "unigd"
+    },
+    {
       "package": "units",
       "version": "1.0-1",
       "library": "/usr/local/lib/R/site-library",
@@ -1406,7 +1436,7 @@
     },
     {
       "package": "urlchecker",
-      "version": "1.0.1",
+      "version": "2.0.0",
       "library": "/usr/local/lib/R/site-library",
       "_row": "urlchecker"
     },
@@ -1478,7 +1508,7 @@
     },
     {
       "package": "xfun",
-      "version": "0.59",
+      "version": "0.60",
       "library": "/usr/local/lib/R/site-library",
       "_row": "xfun"
     },
@@ -1514,7 +1544,7 @@
     },
     {
       "package": "zip",
-      "version": "3.0.0",
+      "version": "3.0.2",
       "library": "/usr/local/lib/R/site-library",
       "_row": "zip"
     }
