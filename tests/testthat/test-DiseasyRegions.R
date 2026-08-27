@@ -755,6 +755,30 @@ test_that("`plot()` produces no errors with defaults", {
 })
 
 
+test_that("`plot()` produces no errors with given data", {
+  regions <- DiseasyRegions$new(
+    area = "DK"
+  )
+
+  # Create a dummy test data set
+  data <- demography_nordic |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "region"
+    ) |>
+    dplyr::cross_join(
+      data.frame(
+        "date" = seq.Date(from = "2021-01-01", to = "2021-01-15")
+      )
+    )
+
+  # Try to plot
+  expect_no_error(regions$plot(data = data))
+
+  rm(regions)
+})
+
+
 test_that("active binding: area works", {
 
   regions <- DiseasyRegions$new(
