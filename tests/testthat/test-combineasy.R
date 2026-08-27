@@ -43,6 +43,20 @@ season_modules <- list(
 )
 
 
+test_that("`combineasy()` fails gracefully for malformed input", {
+
+  expect_error(
+    checkmate_err_msg(
+      combineasy(
+        model_templates = list(DiseasyBaseModule)
+      )
+    ),
+    regexp = "model_templates is not of class `DiseasyModel`"
+  )
+
+})
+
+
 test_that("`combineasy()` can create a model ensembles using functional modules", {
 
   # Functional modules to load
