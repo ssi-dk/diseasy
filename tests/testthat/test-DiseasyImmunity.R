@@ -737,6 +737,31 @@ for (M in c(1, 2, 5)) { # Number of compartments
 rm(im)
 
 
+test_that("$describe() does not produce errror", {
+
+  im <- DiseasyImmunity$new()
+  expect_no_error(im$describe())
+
+  im$set_exponential_waning()
+  expect_no_error(im$describe())
+
+  im$set_sigmoidal_waning(target = "hospitalisation")
+  expect_no_error(im$describe())
+
+  custom_function <- \(t) exp(-(t / time_scale)^2)
+  im$set_custom_waning(
+    time_scale = 20,
+    custom_function = custom_function,
+    target = "death",
+    name = "gaussian_waning"
+  )
+  expect_no_error(im$describe())
+
+  rm(im)
+
+})
+
+
 test_that("active binding: available_waning_models works", {
   im <- DiseasyImmunity$new()
 
