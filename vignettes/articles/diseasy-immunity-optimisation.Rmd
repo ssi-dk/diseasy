@@ -312,6 +312,11 @@ total_results |>
       rows = c(5, 9)
     )
   ) |>
+  gt::tab_options(
+    table.font.size = gt::px(12),
+    column_labels.font.size = gt::px(12),
+    data_row.padding = gt::px(3)
+  ) |>
   gt::tab_caption(
     "Table 1: Global results (excluding heaviside and linear targets)"
   ) |>
@@ -641,6 +646,11 @@ gt_tables <- split_data |>
         )
       ) |>
       gt::cols_hide("target") |>
+      gt::tab_options(
+        table.font.size = gt::px(12),
+        column_labels.font.size = gt::px(12),
+        data_row.padding = gt::px(3)
+      ) |>
       gt::tab_caption(
         paste0("Table ", .y + 1, ": Results for ", .x$target[[1]], " target")
       )
