@@ -2,6 +2,11 @@ name: Export Apptainer container for HPC
 
 on:
   workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Development image tag"
+        required: true
+        type: string
 
 jobs:
   export:
@@ -12,26 +17,6 @@ jobs:
       packages: read
 
     steps:
-      # 1. Check out exactly the commit selected when triggering the workflow
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-
-      # 2. Determine the GHCR tag corresponding to the branch
-      #    feature/branch -> feature-branch
-      - name: Determine image tag
-        run: |
-          TAG=$(echo "$GITHUB_REF_NAME" | sed -E 's/[^A-Za-z0-9_.-]+/-/g')
-
-          echo "IMAGE_TAG=$TAG" >> "$GITHUB_ENV"
-          echo "SHORT_SHA=${GITHUB_SHA:0:12}" >> "$GITHUB_ENV"
-
-          echo "Selected ref:  $GITHUB_REF_NAME"
-          echo "Selected SHA:  $GITHUB_SHA"
-          echo "Container tag: $TAG"
-
-      # 3. Authenticate against GHCR
       - name: Login to GHCR
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | \
@@ -39,141 +24,28 @@ jobs:
               -u "${{ github.actor }}" \
               --password-stdin
 
-      # 4. Try the branch image.
-      #    Fall back to :main only if the tag does not exist.
-      - name: Select base image
+      - name: Pull development image
         run: |
-          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
-          MAIN_IMAGE="ghcr.io/ssi-dk/diseasy:main"
+          IMAGE="ghcr.io/ssi-dk/diseasy:${{ inputs.image_tag }}"
 
-          echo "Checking for ${BRANCH_IMAGE}"
+          docker pull --platform linux/amd64 "$IMAGE"
 
-          if OUTPUT=$(docker pull --platform linux/amd64 "$BRANCH_IMAGE" 2>&1); then
-            echo "$OUTPUT"
-            BASE_IMAGE="$BRANCH_IMAGE"
-            echo "Using branch image: $BASE_IMAGE"
-          else
-            echo "$OUTPUT"
+          echo "DEV_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
-            # Only fall back if the tag/image genuinely doesn't exist.
-            # Authentication/network/etc. errors should fail the workflow.
-            if echo "$OUTPUT" | grep -qiE \
-              'manifest unknown|manifest.*not found|not found'; then
-
-              echo "No image exists for ${IMAGE_TAG}"
-              echo "Falling back to ${MAIN_IMAGE}"
-
-              docker pull --platform linux/amd64 "$MAIN_IMAGE"
-              BASE_IMAGE="$MAIN_IMAGE"
-            else
-              echo "Failed to query/pull GHCR image."
-              exit 1
-            fi
-          fi
-
-          echo "BASE_IMAGE=$BASE_IMAGE" >> "$GITHUB_ENV"
-
-      # 5. Determine where diseasy is installed in the base image.
-      #    This lets us replace the existing package rather than
-      #    accidentally install the new version in another library.
-      - name: Determine R library
-        run: |
-          R_LIB=$(docker run --rm \
-            --entrypoint Rscript \
-            "$BASE_IMAGE" \
-            -e '
-              p <- find.package("diseasy", quiet = TRUE)
-              if (length(p)) {
-                cat(dirname(p))
-              } else {
-                cat(.libPaths()[1])
-              }
-            ')
-
-          echo "diseasy will be installed into: $R_LIB"
-          echo "R_LIB=$R_LIB" >> "$GITHUB_ENV"
-
-          BASE_USER=$(docker image inspect \
-            --format '{{.Config.User}}' \
-            "$BASE_IMAGE")
-
-          echo "Base container user: ${BASE_USER:-root}"
-          echo "BASE_USER=$BASE_USER" >> "$GITHUB_ENV"
-
-      # 6. Generate a small Dockerfile.
-      #    The dependencies come from BASE_IMAGE.
-      #    The diseasy package itself comes from the CURRENT checkout.
-      - name: Create HPC Dockerfile
-        run: |
-          cat > Dockerfile.hpc <<'EOF'
-          ARG BASE_IMAGE
-          FROM ${BASE_IMAGE}
-
-          ARG R_LIB
-          ARG SOURCE_SHA
-          ARG SOURCE_REF
-
-          USER root
-
-          COPY . /tmp/diseasy
-
-          RUN R CMD INSTALL \
-                --library="${R_LIB}" \
-                /tmp/diseasy \
-              && rm -rf /tmp/diseasy
-
-          ENV DISEASY_SOURCE_SHA="${SOURCE_SHA}"
-          ENV DISEASY_SOURCE_REF="${SOURCE_REF}"
-
-          LABEL org.opencontainers.image.revision="${SOURCE_SHA}"
-          EOF
-
-          # Restore the original USER if the base image specified one.
-          if [ -n "$BASE_USER" ]; then
-            echo "USER $BASE_USER" >> Dockerfile.hpc
-          fi
-
-          cat Dockerfile.hpc
-
-      # 7. Build updated image
-      - name: Build updated container
-        run: |
-          DERIVED_IMAGE="diseasy-hpc:${IMAGE_TAG}-${SHORT_SHA}"
-
-          docker build \
-            --platform linux/amd64 \
-            --build-arg BASE_IMAGE="$BASE_IMAGE" \
-            --build-arg R_LIB="$R_LIB" \
-            --build-arg SOURCE_SHA="$GITHUB_SHA" \
-            --build-arg SOURCE_REF="$GITHUB_REF_NAME" \
-            -f Dockerfile.hpc \
-            -t "$DERIVED_IMAGE" \
-            .
-
-          echo "DERIVED_IMAGE=$DERIVED_IMAGE" >> "$GITHUB_ENV"
-
-      # 8. Verify that R sees the newly-installed package
-      - name: Verify R package
+      - name: Verify Docker image
         run: |
           docker run --rm \
             --entrypoint Rscript \
-            "$DERIVED_IMAGE" \
+            "$DEV_IMAGE" \
             -e '
               cat("diseasy version: ",
                   as.character(packageVersion("diseasy")),
                   "\n",
                   sep = "")
-              cat("Library: ",
-                  dirname(find.package("diseasy")),
-                  "\n",
-                  sep = "")
+              cat("Source ref: ", Sys.getenv("DISEASY_SOURCE_REF"), "\n")
+              cat("Source SHA: ", Sys.getenv("DISEASY_SOURCE_SHA"), "\n")
             '
 
-          echo "Source ref: $GITHUB_REF_NAME"
-          echo "Source SHA: $GITHUB_SHA"
-          echo "Base image: $BASE_IMAGE"
-
-      # 9. Install Apptainer
       - name: Install Apptainer
         run: |
           sudo apt update
@@ -187,17 +59,25 @@ jobs:
       - name: Create SIF
         run: |
           DATE=$(date -u +%Y-%m-%d)
-          SHA=${GITHUB_SHA::7}
+
+          SOURCE_SHA=$(docker inspect \
+            --format '{{index .Config.Env}}' \
+            "$DEV_IMAGE")
+
+          SHA=$(docker run --rm \
+            --entrypoint sh \
+            "$DEV_IMAGE" \
+            -c 'printf "%.7s" "$DISEASY_SOURCE_SHA"')
+
           SIF_NAME="diseasy-${DATE}-${SHA}.sif"
 
           apptainer build \
             "$SIF_NAME" \
-            "docker-daemon:${DERIVED_IMAGE}"
+            "docker-daemon:${DEV_IMAGE}"
 
           echo "SIF_NAME=$SIF_NAME" >> "$GITHUB_ENV"
 
-      # 11. Verify the SIF
-      - name: Inspect SIF
+      - name: Verify SIF
         run: |
           ls -lh "$SIF_NAME"
 
@@ -213,10 +93,9 @@ jobs:
               cat("Source SHA: ", Sys.getenv("DISEASY_SOURCE_SHA"), "\n")
             '
 
-      # 12. Upload
       - name: Upload SIF
         uses: actions/upload-artifact@v4
         with:
-          name: diseasy-apptainer-${{ env.IMAGE_TAG }}-${{ env.SHORT_SHA }}
+          name: diseasy-apptainer-${{ inputs.image_tag }}
           path: ${{ env.SIF_NAME }}
           retention-days: 7
