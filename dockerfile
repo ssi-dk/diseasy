@@ -22,7 +22,7 @@ RUN curl --proto '=https' --tlsv1.2 -LsSf \
       "https://github.com/eitsupi/arf/releases/download/v${ARF_VERSION}/arf-console-installer.sh" \
       -o /tmp/arf-installer.sh \
     && echo "${ARF_INSTALLER_SHA256}  /tmp/arf-installer.sh" | sha256sum -c - \
-    && CARGO_DIST_FORCE_INSTALL_DIR=/usr/local/bin sh /tmp/arf-installer.sh \
+    && CARGO_DIST_FORCE_INSTALL_DIR=/usr/local sh /tmp/arf-installer.sh \
     && rm /tmp/arf-installer.sh \
     && arf --version
 
