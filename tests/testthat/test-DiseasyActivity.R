@@ -704,3 +704,15 @@ test_that("`map_population` works with 5-year age groups in demography", {
 
   rm(activity)
 })
+
+
+test_that("`plot()` produces no errors with defaults", {
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
+  activity$set_activity_units(dk_activity_units)
+  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+  expect_no_error(activity$plot())
+
+  rm(activity)
+})
