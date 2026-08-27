@@ -774,7 +774,7 @@ test_that("`plot()` produces no errors with given data", {
     ) |>
     dplyr::cross_join(
       data.frame(
-        "date" = seq.Date(from = "2021-01-01", to = "2021-01-15")
+        "date" = seq.Date(from = as.Date("2021-01-01"), to = as.Date("2021-01-15"))
       )
     )
 
