@@ -629,6 +629,58 @@ test_that("`$approximate_compartmental()` works with custom controls", {
     )
   )
 
+  # Test all supported providers of optimiers
+  # ... stats::optim()
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "Nelder-Mead")
+    )
+  )
+
+  # ... stats::nlm()
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "nlm")
+    )
+  )
+
+  # ... stats::nlminb()
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "nlminb")
+    )
+  )
+
+  # ... nloptr
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "bobyqa")
+    )
+  )
+
+  # ... and a malformed input
+  expect_error(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "non-existent-method")
+    ),
+    regexp = "matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::optimr`!"
+  )
+
   rm(im)
 })
 
