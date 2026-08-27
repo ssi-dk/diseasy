@@ -436,3 +436,16 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
 
   rm(regions_nuts)
 })
+
+
+test_that("`plot()` produces no errors with defaults", {
+  regions <- DiseasyRegionsNuts$new(
+    area = "DK",
+    demography = demography_nordic_nuts3,
+    adjacency = adjacency_meta_nordic_nuts3
+  )
+
+  expect_no_error(regions$plot())
+
+  rm(regions)
+})

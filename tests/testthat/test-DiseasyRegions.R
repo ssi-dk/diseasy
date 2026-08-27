@@ -742,6 +742,19 @@ test_that("`regional_risks` (location) produces error with adjacency (infection-
 })
 
 
+test_that("`plot()` produces no errors with defaults", {
+  regions <- DiseasyRegions$new(
+    area = "DK",
+    demography = demography_nordic,
+    adjacency = adjacency_meta_nordic
+  )
+
+  expect_no_error(regions$plot())
+
+  rm(regions)
+})
+
+
 test_that("active binding: area works", {
 
   regions <- DiseasyRegions$new(
