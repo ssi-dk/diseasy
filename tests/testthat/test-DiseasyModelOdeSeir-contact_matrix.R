@@ -170,6 +170,7 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   )
 
   # Get a reference to the private environment
+  self <- m
   private <- m$.__enclos_env__$private
 
   # Our test scenario starts on 2020-01-01

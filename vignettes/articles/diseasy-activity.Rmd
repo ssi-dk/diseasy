@@ -172,7 +172,13 @@ To retrieve the _population contact matrix_ $\overline{\overline{M}}$ from the m
 ```{r scenario_contacts}
 # We can project the matrices into custom age-groups by providing the
 # "age_cuts_lower" argument
-act$get_scenario_contacts(age_cuts_lower = c(0, 60))
+population <- DiseasyPopulation$new()
+population$load_module(act)
+
+act$get_scenario_contacts(
+  age_cuts_lower = c(0, 60),
+  population = population$map_population(c(0, 60))
+)
 ```
 The `DiseasyActivity` module provides separate matrices for the four arenas: "home", "school", "work", and "other".
 These matrices can be combined by supplying a `weights` argument to the `$get_scenario_contacts()` method.
@@ -180,6 +186,7 @@ These matrices can be combined by supplying a `weights` argument to the `$get_sc
 ```{r scenario_contacts_weighted}
 act$get_scenario_contacts(
   age_cuts_lower = c(0, 20, 40, 60, 80),
+  population = population$map_population(c(0, 20, 40, 60, 80)),
   weights = c(1, 1, 1, 1)
 )
 ```
@@ -197,6 +204,7 @@ The degree of openness can be queried similarly to the contact matrices:
 ```{r scenario_openness_weighted}
 act$get_scenario_openness(
   age_cuts_lower = c(0, 20, 40, 60, 80),
+  population = population$map_population(c(0, 20, 40, 60, 80)),
   weights = c(1, 1, 1, 1)
 )
 ```
