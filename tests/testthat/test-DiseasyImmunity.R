@@ -666,7 +666,17 @@ test_that("`$approximate_compartmental()` works with custom controls", {
       M = 3,
       method = "free_gamma",
       strategy = "naive",
-      optim_control = list("optim_method" = "bobyqa")
+      optim_control = list("optim_method" = "auglag", localsolver = "COBYLA")
+    )
+  )
+
+  # ... optimx
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "ucminf")
     )
   )
 
