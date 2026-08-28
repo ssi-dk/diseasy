@@ -43,8 +43,8 @@ jobs:
       #    Fall back to :main only if the tag does not exist.
       - name: Select base image
         run: |
-          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
-          MAIN_IMAGE="ghcr.io/ssi-dk/diseasy:main"
+          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-ci"
+          MAIN_IMAGE="ghcr.io/ssi-dk/diseasy:main-ci"
 
           echo "Checking for ${BRANCH_IMAGE}"
 
@@ -176,15 +176,8 @@ jobs:
 
       - name: Push development image
         run: |
-          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-dev"
-          SHA_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-${SHORT_SHA}-dev"
-
+          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
           docker tag "$DERIVED_IMAGE" "$BRANCH_IMAGE"
-          docker tag "$DERIVED_IMAGE" "$SHA_IMAGE"
-
           docker push "$BRANCH_IMAGE"
-          docker push "$SHA_IMAGE"
-
           echo "Published:"
           echo "  $BRANCH_IMAGE"
-          echo "  $SHA_IMAGE"
