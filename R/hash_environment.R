@@ -45,6 +45,10 @@ hash_environment <- function(environment) {
 
   # Create helper function to recursively dive into a list and hash function elements
   hash_nested_list <- function(obj) {
+
+    # By default we strip attributes
+    copy_attributes <- FALSE
+
     if (inherits(obj, "condition")) {
 
       # Conditions are list-like, but their call, trace and parent can carry
@@ -83,9 +87,16 @@ hash_environment <- function(environment) {
       # Numbers have different precision in different systems. Convert to string and hash
       out <- stringr::str_sub(as.character(obj), 1, 16)
 
+      # Copy any attributes stored on the object
+      copy_attributes <- TRUE
+
     } else {
       # Everything else we hash as is
       out <- obj
+    }
+
+    if (copy_attributes) {
+      attributes(out) <- attributes(obj)
     }
 
     return(out)

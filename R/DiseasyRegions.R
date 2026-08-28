@@ -46,7 +46,7 @@
 #'   A new instance of the `DiseasyRegions` [R6][R6::R6Class] class.
 #' @keywords functional-module
 #' @export
-DiseasyRegions <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyRegions <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyRegions",
   inherit = DiseasyBaseModule,
 
@@ -57,14 +57,20 @@ DiseasyRegions <- R6::R6Class(                                                  
     #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
     #' @param demography `r rd_demography()`
+    #' @param regional_risks `r rd_regional_risks()`
+    #' @details
+    #'   If `adjacency` or `regional_risks` are provided to the constructor directly, the default interpretations
+    #'   are used. See `$set_adjacency()` and `$set_regional_risks()` for more details. Notice that a "type" attribute
+    #'   may be set on the objects before passing to this constructor to control the interpretation of each variable.
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
-    initialize = function(area = NULL, adjacency = NULL, demography = NULL, ...) {
+    initialize = function(area = NULL, adjacency = NULL, demography = NULL, regional_risks = NULL, ...) {
 
       # Load objects
-      if (!is.null(demography)) self$set_demography(demography)
-      if (!is.null(adjacency))  self$set_adjacency(adjacency)
-      if (!is.null(area))       self$set_area(area)
+      if (!is.null(area))           self$set_area(area)
+      if (!is.null(adjacency))      self$set_adjacency(adjacency)
+      if (!is.null(demography))     self$set_demography(demography)
+      if (!is.null(regional_risks)) self$set_regional_risks(regional_risks)
 
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
@@ -720,7 +726,7 @@ DiseasyRegions <- R6::R6Class(                                                  
         FUN.VALUE = logical(1)
       ))
 
-      # Compare shapefiles with requested regions
+      # Compare shape files with requested regions
       plot_regions <- plot_layers |>
         purrr::map(~ purrr::pluck(., "data")) |>
         purrr::map(~ dplyr::pull(., "region")) |>
@@ -1339,17 +1345,17 @@ DiseasyRegions <- R6::R6Class(                                                  
         }
 
         # Filter to area
-        regional_risk <- private %.% .regional_risks[
+        regional_risks <- private %.% .regional_risks[
           self %.% region_filter(names(private %.% .regional_risks))
         ]
 
         # Sort
-        regional_risk <- regional_risk[order(names(regional_risk))]
+        regional_risks <- regional_risks[order(names(regional_risks))]
 
         # Copy the type attribute
-        attr(regional_risk, "type") <- attr(private %.% .regional_risks, "type")
+        attr(regional_risks, "type") <- attr(private %.% .regional_risks, "type")
 
-        return(regional_risk)
+        return(regional_risks)
       }
     )
   ),
@@ -1366,7 +1372,7 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 #' @rdname DiseasyRegions
 #' @export
-DiseasyRegionsNuts <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyRegionsNuts <- R6::R6Class(                                                                                      # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyRegionsNuts",
   inherit = DiseasyRegions,
 
