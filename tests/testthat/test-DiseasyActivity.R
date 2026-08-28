@@ -718,3 +718,17 @@ test_that("`plot()` produces no errors with defaults", {
 
   rm(activity)
 })
+
+
+test_that("`plot()` produces no errors with no weights", {
+  skip_if_not_installed("ggplot2")
+
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
+  activity$set_activity_units(dk_activity_units)
+  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+  expect_no_error(activity$plot(weights = NULL))
+
+  rm(activity)
+})
