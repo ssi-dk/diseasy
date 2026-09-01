@@ -172,8 +172,17 @@ regions ("x", "y").
 ```{r}
 population <- c(
   rep("A/x", 1), rep("B/x", 2), rep("C/x", 3),
-  rep("A/y", 3), rep("B/y", 2), rep("C/y", 1)
+  rep("A/y", 2), rep("B/y", 2), rep("C/y", 1)
 )
+regions <- unique(stringr::str_replace(population, "[A-Z]", "*"))
+print(lengths(split(population, factor(population))[unique(population)]))
+```
+
+with per-capita contact rates ("C" domain) of:
+```{r}
+c <- sqrt(outer(c(1, 2, 3), c(1, 2, 3)))
+dimnames(c) <- list(c("A/*", "B/*", "C/*"), c("A/*", "B/*", "C/*"))
+print(c)
 ```
 
 ### A small-world example
@@ -181,8 +190,106 @@ Consider a the fully-connected case where a population of individuals across dif
 spatial locations are all connected by one contact (a extremely "small-world" network).
 
 ```{r}
-adjacency_sw <- matrix(1, nrow = length(population), ncol = length(population))
-colnames(adjacency_sw) <- rownames(adjacency_sw) <- population
+mixing_sw <- matrix(
+  1 / 2,
+  nrow = n_regions,
+  ncol = n_regions,
+  dimnames = list(regions, regions)
+)
+print(mixing_sw)
+```
+
+
+```{r}
+c_sw <- kronecker(mixing_sw, c)
+dimnames(c_sw) <- list(unique(population), unique(population))
+print(c_sw)
+```
+
+```{r}
+# Start fully mixed
+adjacency_sw <- matrix(
+  1,
+  nrow = length(population),
+  ncol = length(population),
+  dimnames = list(population, population)
+) - diag(1, nrow = length(population))
+
+# Convert to upper
+idx <- tidyr::expand_grid(
+  "i" = seq_along(population),
+  "j" = seq_along(population)
+) |>
+  dplyr::mutate("lin" = dplyr::row_number()) |>
+  dplyr::filter(.data$i <= .data$j) |>
+  dplyr::pull("lin")
+
+#adjacency_sw[idx] <- 0
+
+
+foo <- 5 * adjacency_sw
+
+for (iter in range(25)) {
+  # Then drop connections randomly until we match contact rates
+  diff <- contact_matrix(
+    adjacency = foo,
+    population = population,
+    groups = population
+  ) - c_sw * outer(
+    lengths(split(population, factor(population))[unique(population)]),
+    lengths(split(population, factor(population))[unique(population)])
+  )
+
+  contacts_to_drop <- pmax(round(diff/ 2), 0)
+
+  updates <- tidyr::expand_grid(
+    "i_lab" = unique(population),
+    "j_lab" = unique(population)
+  ) |>
+    dplyr::mutate("contacts_to_drop" = as.vector(contacts_to_drop)) |>
+    dplyr::filter(.data$contacts_to_drop > 0) |>
+    tidyr::uncount(.data$contacts_to_drop) |>
+    dplyr::group_by(dplyr::row_number()) |>
+    dplyr::group_modify(
+      ~ {
+        options <- which(population == .x$i_lab)
+        if (length(options) == 1) options <- c(options, options)
+        i <- sample(options, 1)
+        options <- which(population == .x$j_lab & seq_along(population) != i)
+        if (length(options) == 1) options <- c(options, options)
+        if (length(options) == 0) {
+          return(data.frame(i = numeric(0), j = numeric(0)))
+        }
+
+        j <- sample(options, 1)
+        return(data.frame(i = i, j = j))
+      }
+    ) |>
+    dplyr::count(.data$i, .data$j)
+
+  u <- as.matrix(
+    Matrix::sparseMatrix(
+      i = updates$i,
+      j = updates$j,
+      x = updates$n,
+      dims = c(length(population), length(population))
+    )
+  )
+  foo <- pmax(foo - round(0.5 * (u + t(u))), 0)
+
+  bar <- contact_matrix(
+    adjacency = foo,
+    population = population,
+    groups = population
+  ) - c_sw * outer(
+    lengths(split(population, factor(population))[unique(population)]),
+    lengths(split(population, factor(population))[unique(population)])
+  )
+
+  sum(bar)
+}
+
+adjacency_sw <- foo
 print(adjacency_sw)
 ```
 
@@ -248,10 +355,13 @@ contact_matrix <- function(adjacency, population, groups) {
     purrr::reduce(rbind) |>
     as.matrix()
 
-  colnames(p) <- population
-  rownames(p) <- unique(groups)
+  # Count population by group
+  n_groups <- lengths(split(groups, factor(groups)))[unique(groups)]
 
-  return(p %*% adjacency %*% t(p) - diag(rowSums(p)))
+  colnames(p) <- population
+  rownames(p) <- paste0(names(n_groups), " (", n_groups, ")")
+
+  return(p %*% adjacency %*% t(p))
 }
 ```
 
@@ -289,6 +399,7 @@ T_age <- contact_matrix(
 
 print(T_age)
 print(sum(T_age))
+print(round(c_sw*length(population)^2))
 ```
 
 
@@ -314,7 +425,7 @@ adjacency_silo <- outer(
   X = substr(population, 3, 3),
   Y = substr(population, 3, 3),
   FUN = \(x, y) as.numeric(x == y)
-)
+) - diag(1, nrow = length(population))
 colnames(adjacency_silo) <- population
 rownames(adjacency_silo) <- population
 print(adjacency_silo)
@@ -375,6 +486,36 @@ print(sum(T_merged_age_region))
 ```
 
 ## Mapping between examples
+```{r}
+groups <- stringr::str_replace(population, r"{[A-Z]}", "*")
+
+T <- contact_matrix(
+  adjacency = adjacency_sw,
+  population = population,
+  groups = groups
+)
+
+print(T)
+
+N <- lengths(split(groups, factor(groups))[unique(groups)])
+print(T / outer(N, N) + diag(1 / N))
+```
+
+```{r}
+groups <- stringr::str_replace(population, r"{[a-z]}", "*")
+
+T <- contact_matrix(
+  adjacency = adjacency_sw,
+  population = population,
+  groups = groups
+)
+
+print(T)
+
+N <- lengths(split(groups, factor(groups))[unique(groups)])
+print(T / outer(N, N) + diag(1 / N))
+```
+
 Notice that both examples build on the idea of "one contact" between individuals
 and an idea of regional connectedness (small-world vs silo).
 
