@@ -1,0 +1,24 @@
+{
+  "name": "diseasy",
+  "image": "ghcr.io/ssi-dk/diseasy:feature-regional-contact-matrices",
+  "overrideCommand": false,
+  "remoteUser": "rstudio",
+  "containerEnv": {
+    "ROOT": "true",
+    "GIT_EDITOR": "code --wait"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "mhutchie.git-graph"
+      ],
+      "settings": {
+        "r.rpath.linux": "/usr/local/bin/R",
+        "r.rterm.linux": "/usr/local/bin/arf",
+        "r.bracketedPaste": true,
+        "r.alwaysUseActiveTerminal": true
+      }
+    }
+  }
+}
