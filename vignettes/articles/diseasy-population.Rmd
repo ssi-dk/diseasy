@@ -133,10 +133,10 @@ regions ("x", "y").
 
 ```{r}
 population <- c(
-  rep("A/x", 1), #rep("B/x", 2), rep("C/x", 3),
-  rep("A/y", 2), #rep("B/y", 2), rep("C/y", 1),
-  rep("A/z", 1), #rep("B/z", 1), rep("C/z", 1),
-  rep("A/w", 6)#, rep("B/w", 6), rep("C/w", 6)
+  rep("A/x", 1), rep("B/x", 2), rep("C/x", 3),
+  rep("A/y", 2), rep("B/y", 2), rep("C/y", 1),
+  rep("A/z", 1), rep("B/z", 1), rep("C/z", 1),
+  rep("A/w", 6), rep("B/w", 6), rep("C/w", 6)
 )
 regions <- unique(stringr::str_replace(population, "[A-Z]", "*"))
 age_groups <- unique(stringr::str_replace(population, "[a-z]", "*"))
@@ -392,34 +392,26 @@ print(round(t_matrix_full_sw, digits = 1))
 ```
 
 ```{r}
+N_region <- lengths(
+  split(
+    stringr::str_replace(population, "[A-Z]", "*"), 
+    factor(stringr::str_replace(population, "[A-Z]", "*"))
+  )[unique(stringr::str_replace(population, "[A-Z]", "*"))]
+)
+
 T_age_indirect <- contact_matrix(
   t_matrix_full_sw,
   population = unique(population),
   groups = stringr::str_replace(unique(population), r"{[a-z]}", "*")
 )
 
+T_age_indirect <- T_age_indirect * sum(N)^2 / as.numeric(N_region %*% mixing_sw %*% N_region)
+
 print(round(T_age_indirect, digits = 1))
 cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
 
 cat("\n\nReference:\n")
 print(t_matrix)
-```
-
-```{r}
-N <- lengths(split(population, factor(population))[unique(population)])
-print(N)
-print(max(eigen(outer(N, N))$values))
-
-N_age <- lengths(
-  split(
-    stringr::str_replace(population, r"{[a-z]}", "*"), 
-    factor(stringr::str_replace(population, r"{[a-z]}", "*"))
-  )
-)
-print(N_age)
-print(max(eigen(outer(N_age, N_age))$values))
-
-print(max(eigen(outer(N_age, N_age))$values) / max(eigen(outer(N, N))$values))
 ```
 
 ## A silo example
@@ -615,6 +607,8 @@ T_age_indirect <- contact_matrix(
   groups = stringr::str_replace(unique(population), r"{[a-z]}", "*")
 )
 
+T_age_indirect <- T_age_indirect * sum(N)^2 / as.numeric(N_region %*% mixing_silo %*% N_region)
+
 print(round(T_age_indirect, digits = 1))
 cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
 
@@ -626,7 +620,6 @@ print(t_matrix)
 # Population in most stratified groups
 N <- lengths(split(population, factor(population))[unique(population)])
 print(N)
-print(max(eigen(outer(N, N))$values))
 
 # Population stratified by age
 N_age <- lengths(
@@ -636,10 +629,9 @@ N_age <- lengths(
   )
 )
 print(N_age)
-print(max(eigen(outer(N_age, N_age))$values))
 
 # Scaling factor difference
-s <- max(eigen(outer(N_age, N_age))$values) / max(eigen(outer(N, N))$values)
+s <- sum(N_age^2) / sum(N^2)
 print(s)
 
 print(round(s * T_age_indirect, digits = 1))
@@ -647,8 +639,6 @@ cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
 ```
 
 ```{r}
-
-#adjacency_silo
 idx <- split(
   seq_along(population), 
   stringr::str_extract(population, "[a-z]")
@@ -656,7 +646,7 @@ idx <- split(
 
 T_matrices <- purrr::map(
   idx,
-  ~ adjacency_silo[., .]
+  ~ adjacency_silo[., ., drop = FALSE]
 ) |>
   purrr::map(
     ~ contact_matrix(
@@ -667,21 +657,20 @@ T_matrices <- purrr::map(
   )
 
 print(T_matrices)
+```
 
-C_matrices <- T_matrices |>
+```{r}
+M_matrices <- T_matrices |>
   purrr::map(
     ~ {
       N <- as.numeric(stringr::str_extract(colnames(.), r"{\d+}"))
       
-      . / outer(N, N)
+      . / outer(N, rep(1, length(N)))
     }
   )
 
-print(C_matrices)
-
-
+print(M_matrices)
 ```
-
 
 ## Mapping between examples
 
