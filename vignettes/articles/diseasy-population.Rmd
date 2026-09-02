@@ -107,7 +107,7 @@ To stratify by region, we use the `?DiseasyPopulation$stratify_regions()` method
 population$stratify_regions(regional_stratification = "NUTS 2")
 
 # .. and we can inspect the updated demographic groups
-population$group
+population$groups
 ```
 
 # Populations outside the Nordics
@@ -117,6 +117,688 @@ for the Nordic countries.
 
 To generate data for other regions, see the data generating functions:
 `generate_demography()`, `generate_contact_basis()`, etc.
+
+
+
+# Notes: Regional aggregation of contact matrices
+The source data for the contact matrices we use in `diseasy` is typically collections of survey data where
+participants have been instructed to count contacts with other individuals along with the approximate age of
+these individuals. These survey data are then corrected for differences in demography of the participants
+and the group they are meant to represent (e.g. a given country) for form a "full" contact matrix for the
+target population.
+
+To gain some intuition on the how these contact matrices can be interpreted and manipulated we will
+begin by considering some toy-examples with a toy population of age groups ("A", "B", "C") and spatial
+regions ("x", "y").
+
+```{r}
+population <- c(
+  rep("A/x", 1), #rep("B/x", 2), rep("C/x", 3),
+  rep("A/y", 2), #rep("B/y", 2), rep("C/y", 1),
+  rep("A/z", 1), #rep("B/z", 1), rep("C/z", 1),
+  rep("A/w", 6)#, rep("B/w", 6), rep("C/w", 6)
+)
+regions <- unique(stringr::str_replace(population, "[A-Z]", "*"))
+age_groups <- unique(stringr::str_replace(population, "[a-z]", "*"))
+
+print(lengths(split(population, factor(population))[unique(population)]))
+```
+
+with per-capita contact rates ("C" domain) of:
+```{r}
+age_groups <- unique(stringr::str_replace(population, "[a-z]", "*"))
+c_matrix <- sqrt(outer(1 / seq_along(age_groups), 1 / seq_along(age_groups)))
+dimnames(c_matrix) <- list(age_groups, age_groups)
+print(round(c_matrix, digits = 2))
+```
+and corresponding total contacts ("T" domain):
+with per-capita contact rates ("C" domain) of:
+```{r}
+N <- lengths(
+  split(
+    stringr::str_extract(population, "[A-Z]"), 
+    factor(stringr::str_extract(population, "[A-Z]"))
+  )
+)
+
+N_effective <- tibble::tibble(
+  "population" = population
+) |>
+  tidyr::separate_wider_delim(
+    cols = "population", 
+    delim = "/", 
+    names = c("age_group", "region")
+  ) |>
+  dplyr::count(.data$age_group, .data$region) |>
+  dplyr::summarise("avg_n" = mean(n), .by = "age_group") |>
+  tibble::deframe()
+
+t_matrix <- round(c_matrix * outer(N, N))
+print(t_matrix)
+```
+
+## A well-mixed example
+Consider a the fully-connected case where a population of individuals across different age groups and
+spatial locations are equally likely to be connected.
+
+We can draw a realisation of such a network from our contact matrices
+```{r}
+# First we need a implementation of `sample` which is not moronic
+# - Just sample from the vector and by "sample" I mean "sample" not "permutate"
+sample <- \(x, size) x[sample.int(length(x), size, replace = TRUE)]
+
+one_way_links <- tidyr::expand_grid(
+  i_age_group = age_groups,
+  j_age_group = age_groups
+) |>
+  dplyr::mutate(
+    "n_contacts" = as.vector(t_matrix)
+  ) |>
+  tidyr::uncount(.data$n_contacts) |>
+  dplyr::select(!"n_contacts") |>
+  dplyr::group_by(.data$i_age_group) |>
+  dplyr::group_modify(
+    ~ .x |>
+      dplyr::mutate(
+        "i" = sample(
+          x = which(
+            stringr::str_starts(population, .y$i_age_group)
+          ), 
+          size = dplyr::n()
+        )
+      )
+  ) |> 
+  dplyr::group_by(.data$i, .data$j_age_group) |>
+  dplyr::group_modify(
+    ~ .x |> 
+      dplyr::mutate(
+        "j" = sample(
+          x = which(
+            stringr::str_starts(population, .y$j_age_group) & seq_along(population) != .y$i
+          ), 
+          size = dplyr::n()
+        )
+      )
+  ) |>
+  dplyr::mutate( # Make lower
+    "i_u" = pmax(.data$i, .data$j),
+    "j_u" = pmin(.data$i, .data$j)
+  ) |>
+  dplyr::group_by(.data$i_u, .data$j_u) |>
+  dplyr::summarise("n" = dplyr::n(), .groups = "drop")
+
+# Convert to adjacency matrix with 2-way interactions
+adjacency_sw <- as.matrix(
+  Matrix::sparseMatrix(
+    i = one_way_links$i_u, 
+    j = one_way_links$j_u, 
+    x = one_way_links$n,
+    dims = c(length(population), length(population)),
+    dimnames = list(population, population)
+  )
+)
+
+#adjacency_sw <- floor(adjacency_sw / 2 + runif(length(population)^2)) # Prevent double counting
+
+adjacency_sw <- (adjacency_sw + t(adjacency_sw)) / 2
+
+print(adjacency_sw)
+```
+
+```{r, include = FALSE}
+adjacency_graph <- function(adjacency) {
+  graph <- igraph::graph_from_adjacency_matrix(
+    adjmatrix = adjacency,
+    mode = "undirected",
+    diag = FALSE
+  )
+
+  region <- stringr::str_extract(population, r"{\w+$}")
+  age <- stringr::str_extract(population, r"{^\w+}")
+
+  layout <- cbind(
+    x = as.numeric(factor(region)),
+    y = as.numeric(factor(age))
+  )
+
+  # Add some jitter so vertices in the same region/age group do not overlap
+  layout <- layout + matrix(
+    stats::runif(length(layout), -0.3, 0.3),
+    ncol = 2
+  )
+
+  plot(
+    graph,
+    layout = layout,
+    vertex.color = factor(region),
+    vertex.shape = "circle",
+    vertex.label = population,
+    vertex.size = stats::setNames(
+      seq(
+        from = 30,
+        by = 5,
+        along.with = unique(age)
+      ),
+      unique(age)
+    )[age]
+  )
+}
+```
+
+
+```{r, eval = rlang::is_installed("igraph")}
+adjacency_graph(adjacency_sw)
+```
+
+From this full adjacency graph, we can project the contacts ("T" domain) into contact matrices in different stratifications.
+
+```{r}
+contact_matrix <- function(adjacency, population, groups) {
+
+  p <- purrr::map(
+    unique(groups),
+    ~ as.numeric(groups == .x)
+  ) |>
+    purrr::reduce(
+      rbind, 
+      .init = matrix(0, nrow = 0, ncol = length(population))
+    )
+
+  # Count population by group
+  n_groups <- lengths(split(groups, factor(groups)))[unique(groups)]
+
+  colnames(p) <- population
+  rownames(p) <- paste0(names(n_groups), " (", n_groups, ")")
+
+  return(p %*% adjacency %*% t(p))
+}
+```
+
+Number of contacts stratified by age group and region
+```{r}
+T_age_region <- contact_matrix(
+  adjacency = adjacency_sw,
+  population = population,
+  groups = population # No aggregation
+)
+
+print(T_age_region)
+cat("Total contacts: ", sum(T_age_region))
+```
+
+Stratify only by region
+```{r}
+T_region <- contact_matrix(
+  adjacency = adjacency_sw,
+  population = population,
+  groups = stringr::str_replace(population, r"{[A-Z]}", "*")
+)
+
+print(T_region)
+cat("Total contacts: ", sum(T_region))
+```
+
+Stratify only by age group (and compare with input used to generate the adjacency graph)
+```{r}
+T_age <- contact_matrix(
+  adjacency = adjacency_sw,
+  population = population,
+  groups = stringr::str_replace(population, r"{[a-z]}", "*")
+)
+
+print(T_age)
+cat("Total contacts: ", sum(T_age))
+
+cat("\n\nReference:\n")
+print(t_matrix)
+```
+
+
+Merging age groups A and B
+```{r}
+T_merged_age_region <- contact_matrix(
+  adjacency = adjacency_sw,
+  population = population,
+  groups = stringr::str_replace(population, r"{^A|B}", "AB")
+)
+
+print(T_merged_age_region)
+cat("Total contacts: ", sum(T_merged_age_region))
+```
+
+Lets see if we can achieve these same contacts without generating the network.
+
+```{r}
+mixing_sw <- matrix(
+  1 / length(regions),
+  nrow = length(regions),
+  ncol = length(regions),
+  dimnames = list(regions, regions)
+)
+print(mixing_sw)
+```
+
+
+```{r}
+c_matrix_full_sw <- kronecker(mixing_sw, c_matrix)
+dimnames(c_matrix_full_sw) <- list(unique(population), unique(population))
+print(round(c_matrix_full_sw, digits = 1))
+```
+
+```{r}
+N <- lengths(split(population, factor(population))[unique(population)])
+t_matrix_full_sw <- c_matrix_full_sw * outer(N, N)
+print(round(t_matrix_full_sw, digits = 1))
+```
+
+```{r}
+T_age_indirect <- contact_matrix(
+  t_matrix_full_sw,
+  population = unique(population),
+  groups = stringr::str_replace(unique(population), r"{[a-z]}", "*")
+)
+
+print(round(T_age_indirect, digits = 1))
+cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
+
+cat("\n\nReference:\n")
+print(t_matrix)
+```
+
+```{r}
+N <- lengths(split(population, factor(population))[unique(population)])
+print(N)
+print(max(eigen(outer(N, N))$values))
+
+N_age <- lengths(
+  split(
+    stringr::str_replace(population, r"{[a-z]}", "*"), 
+    factor(stringr::str_replace(population, r"{[a-z]}", "*"))
+  )
+)
+print(N_age)
+print(max(eigen(outer(N_age, N_age))$values))
+
+print(max(eigen(outer(N_age, N_age))$values) / max(eigen(outer(N, N))$values))
+```
+
+## A silo example
+Consider a complementary network where a population of individuals across different age groups and
+spatial locations are well-mixed only within their spatial region (a extremely "siloed" network).
+
+We can draw a realisation of such a network from our contact matrices
+```{r}
+one_way_links <- tidyr::expand_grid(
+  i_age_group = age_groups,
+  j_age_group = age_groups
+) |>
+  dplyr::mutate(
+    "n_contacts" = as.vector(t_matrix)
+  ) |>
+  tidyr::uncount(.data$n_contacts) |>
+  dplyr::select(!"n_contacts") |>
+  dplyr::group_by(.data$i_age_group) |>
+  dplyr::group_modify(
+    ~ {
+      i_sampled <- .x |>
+        dplyr::mutate(
+          "i_age_group" = .y$i_age_group,
+          "i" = sample(
+            x = which(
+              stringr::str_detect(population, .y$i_age_group)
+            ), 
+            size = dplyr::n()
+          ),
+          "i_lab" = population[.data$i],
+          "i_region" = stringr::str_extract(.data$i_lab, "[a-z]")
+        )
+      
+      # Determine reachable connections
+      i_sampled <- i_sampled |> 
+        dplyr::mutate(
+          "any_j_reachable" = purrr::pmap_lgl(
+            dplyr::select(i_sampled, "j_age_group", "i_region", "i"),
+            \(j_age_group, i_region, i) {
+              any(
+                stringr::str_detect(population, stringr::str_replace(j_age_group, r"{\*}", i_region)) & 
+                  seq_along(population) != i
+              )
+            }
+          )
+        )
+      
+      # Determine reachable connections
+      i_accepted <- i_sampled |>
+        dplyr::filter(.data$any_j_reachable)
+      
+      # Re-sample unreachable from reachable
+      i_resampled <- i_sampled |>
+        dplyr::filter(!.data$any_j_reachable) |>
+        dplyr::count(.data$i_age_group, .data$j_age_group) |>
+        purrr::pmap(
+          \(i_age_group, j_age_group, n) {
+            i_accepted |>
+              dplyr::filter(.data$i_age_group == {{ i_age_group }}, .data$j_age_group == {{ j_age_group }}) |>
+              dplyr::slice_sample(n = {{ n }})
+          }
+        ) |>
+        purrr::list_rbind()
+        
+      return(dplyr::select(rbind(i_accepted, i_resampled), !"i_age_group"))
+    }
+  ) |> 
+  dplyr::group_by(.data$i, .data$j_age_group, .data$i_region) |>
+  dplyr::group_modify(
+    ~ .x |> 
+      dplyr::mutate(
+        "j" = sample(
+          x = which(
+            stringr::str_detect(population, stringr::str_replace(.y$j_age_group, r"{\*}", .y$i_region)) & seq_along(population) != .y$i
+          ), 
+          size = dplyr::n()
+        ),
+        "j_lab" = population[.data$j],
+        "j_region" = stringr::str_extract(.data$j_lab, "[a-z]")
+      )
+  ) |>
+  dplyr::mutate( # Make lower
+    "i_u" = pmax(.data$i, .data$j),
+    "j_u" = pmin(.data$i, .data$j)
+  ) |>
+  dplyr::group_by(.data$i_u, .data$j_u) |>
+  dplyr::summarise("n" = dplyr::n(), .groups = "drop")
+
+# Convert to adjacency matrix with 2-way interactions
+adjacency_silo <- as.matrix(
+  Matrix::sparseMatrix(
+    i = one_way_links$i_u, 
+    j = one_way_links$j_u, 
+    x = one_way_links$n,
+    dims = c(length(population), length(population)),
+    dimnames = list(population, population)
+  )
+)
+
+#adjacency_silo <- floor(adjacency_silo / 2 + runif(length(population)^2)) # Prevent double counting
+
+adjacency_silo <- (adjacency_silo + t(adjacency_silo)) / 2
+
+print(adjacency_silo)
+```
+
+```{r, eval = rlang::is_installed("igraph")}
+adjacency_graph(adjacency_silo)
+```
+
+
+Number of contacts stratified by age group and region
+```{r}
+T_age_region <- contact_matrix(
+  adjacency = adjacency_silo,
+  population = population,
+  groups = population # No aggregation
+)
+
+print(T_age_region)
+cat("Total contacts: ", sum(T_age_region))
+```
+
+Stratify only by region
+```{r}
+T_region <- contact_matrix(
+  adjacency = adjacency_silo,
+  population = population,
+  groups = stringr::str_replace(population, r"{[A-Z]}", "*")
+)
+
+print(T_region)
+cat("Total contacts: ", sum(T_region))
+```
+
+Stratify only by age group
+```{r}
+T_age <- contact_matrix(
+  adjacency = adjacency_silo,
+  population = population,
+  groups = stringr::str_replace(population, r"{[a-z]}", "*")
+)
+
+print(T_age)
+cat("Total contacts: ", sum(T_age))
+
+cat("\n\nReference:\n")
+print(t_matrix)
+```
+
+
+Merging age groups A and B
+```{r}
+T_merged_age_region <- contact_matrix(
+  adjacency = adjacency_silo,
+  population = population,
+  groups = stringr::str_replace(population, r"{^A|B}", "AB")
+)
+
+print(T_merged_age_region)
+cat("Total contacts: ", sum(T_merged_age_region))
+```
+
+Again, lets see if we can achieve these same contacts without generating the network.
+
+```{r}
+mixing_silo <- diag(
+  1,
+  nrow = length(regions),
+  ncol = length(regions)
+)
+dimnames(mixing_silo) <- list(regions, regions)
+print(mixing_silo)
+```
+
+
+```{r}
+c_matrix_full_silo <- kronecker(mixing_silo, c_matrix)
+dimnames(c_matrix_full_silo) <- list(unique(population), unique(population))
+print(round(c_matrix_full_silo, digits = 1))
+```
+
+```{r}
+N <- lengths(split(population, factor(population))[unique(population)])
+t_matrix_full_silo <- c_matrix_full_silo * outer(N, N)
+print(round(t_matrix_full_silo, digits = 1))
+```
+
+```{r}
+T_age_indirect <- contact_matrix(
+  t_matrix_full_silo,
+  population = unique(population),
+  groups = stringr::str_replace(unique(population), r"{[a-z]}", "*")
+)
+
+print(round(T_age_indirect, digits = 1))
+cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
+
+cat("\n\nReference:\n")
+print(t_matrix)
+```
+
+```{r}
+# Population in most stratified groups
+N <- lengths(split(population, factor(population))[unique(population)])
+print(N)
+print(max(eigen(outer(N, N))$values))
+
+# Population stratified by age
+N_age <- lengths(
+  split(
+    stringr::str_replace(population, r"{[a-z]}", "*"), 
+    factor(stringr::str_replace(population, r"{[a-z]}", "*"))
+  )
+)
+print(N_age)
+print(max(eigen(outer(N_age, N_age))$values))
+
+# Scaling factor difference
+s <- max(eigen(outer(N_age, N_age))$values) / max(eigen(outer(N, N))$values)
+print(s)
+
+print(round(s * T_age_indirect, digits = 1))
+cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
+```
+
+```{r}
+
+#adjacency_silo
+idx <- split(
+  seq_along(population), 
+  stringr::str_extract(population, "[a-z]")
+)[unique(stringr::str_extract(population, "[a-z]"))]
+
+T_matrices <- purrr::map(
+  idx,
+  ~ adjacency_silo[., .]
+) |>
+  purrr::map(
+    ~ contact_matrix(
+      .,
+      population = colnames(.),
+      groups = stringr::str_replace(colnames(.), r"{[a-z]}", "*")
+    )
+  )
+
+print(T_matrices)
+
+C_matrices <- T_matrices |>
+  purrr::map(
+    ~ {
+      N <- as.numeric(stringr::str_extract(colnames(.), r"{\d+}"))
+      
+      . / outer(N, N)
+    }
+  )
+
+print(C_matrices)
+
+
+```
+
+
+## Mapping between examples
+
+Notice that both examples build on the idea of "one contact" between individuals
+and an idea of regional connectedness (small-world vs silo).
+
+These examples are the extremes of what we may expect the real world to be like,
+where individuals are likely to have many local contacts and fewer far-reaching
+contacts. The spatial resolution that we impose on the model should not dictate
+the number of contacts and we therefore need to correct for the differences in
+the number of contacts seen in the toy-examples.
+
+In `vignette("diseasy-regions")` we cover the idea of regional "connectedness"
+(here "adjacency") and also derive the "neutral" connectedness across regions
+which leaves the equations invariant to spatial stratification.
+
+Here, we derive that movement probabilities of $\phi_{x,y} = 1 / \sqrt{n}$ for
+an $n$-region system will be "neutral". The resulting "infection-flow" adjacency
+from these movement probabilities are then $\Theta_{x,y} = 1  /n$.
+
+Notice that the "adjacency" in our examples can be expressed in the
+following decompositions:
+
+Small-world example:
+
+$$
+\textrm{adjacency} = \begin{bmatrix}
+  \overline{\overline{C}} & \overline{\overline{C}} \\
+  \overline{\overline{C}} & \overline{\overline{C}}
+\end{bmatrix} \cdot
+\begin{bmatrix}
+  \overline{\overline{1}} & \overline{\overline{1}} \\
+  \overline{\overline{1}} & \overline{\overline{1}}
+\end{bmatrix}
+$$
+
+Silo example:
+
+$$
+\textrm{adjacency} = \begin{bmatrix}
+  \overline{\overline{C}} & \overline{\overline{C}} \\
+  \overline{\overline{C}} & \overline{\overline{C}}
+\end{bmatrix} \cdot
+\begin{bmatrix}
+  \overline{\overline{1}} & \overline{\overline{0}} \\
+  \overline{\overline{0}} & \overline{\overline{1}}
+\end{bmatrix}
+$$
+
+Where $\overline{\overline{C}}$ and $\overline{\overline{1}}$ is this example are
+square unit matrices with dimensions equal to the number of age groups.
+And $\overline{\overline{0}} = 0 \cdot \overline{\overline{1}}$
+
+One way of summarising the effect of this adjacency on the SEIR models is to
+consider maximum eigenvalue of the matrix which defines an overall scaling of
+the transformation.
+
+If we here compute these scaling factors
+```{r}
+print(max(eigen(adjacency_sw)$values))
+print(max(eigen(adjacency_silo)$values))
+```
+
+... we see that the well-mixed small world example is exactly different in scaling
+by the factor of $1/2$ expected from the considerations in neutral example.
+
+If we have an intermediate adjacency matrix with some mixing across regions but
+predominant mixing within regions we may get adjacencies such as:
+
+```{r}
+adjacency_mix <- outer(
+  X = substr(population, 3, 3),
+  Y = substr(population, 3, 3),
+  FUN = \(x, y) ifelse(x == y, 0.8, 0.2)
+)
+
+colnames(adjacency_mix) <- rownames(adjacency_mix) <- population
+
+print(adjacency_mix)
+print(max(eigen(adjacency_mix)$values))
+```
+which for these parameters matches the scaling factor of the silo example.
+
+If we instead consider only the regional mixing matrices of the above
+adjacency matrices, we can isolate the effect of these mixing matrices alone.
+
+```{r}
+regional_mixing_sw   <- matrix(
+  c(1,   1,   1,   1  ), nrow = 2, dimnames = list(c("x", "y"), c("x", "y"))
+)
+regional_mixing_silo <- matrix(
+  c(1,   0,   0,   1  ), nrow = 2, dimnames = list(c("x", "y"), c("x", "y"))
+)
+regional_mixing_mix  <- matrix(
+  c(0.8, 0.2, 0.2, 0.8), nrow = 2, dimnames = list(c("x", "y"), c("x", "y"))
+)
+
+print(regional_mixing_sw)
+print(max(eigen(regional_mixing_sw)$values))
+
+print(regional_mixing_silo)
+print(max(eigen(regional_mixing_silo)$values))
+
+print(regional_mixing_mix)
+print(max(eigen(regional_mixing_mix)$values))
+```
+with the remaining scaling being due to the size of the population.
+
+Notably, these results suggest that given a specific contact matrix derived
+from survey data, there may be some regional length scale that these results
+apply to and interpreting these contacts matrices at a different length scale
+will introduce a different scaling constant. However, the most important aspect
+of the contact matrices is the pattern of contacts across age groups and
+therefore it is likely prudent to normalise both the regional mixing matrices
+and the contact matrices to a unit scale and let the overall scaling factor
+describe the strength of the interactions.
+
 
 ```{r cleanup, include = FALSE}
 rm(
