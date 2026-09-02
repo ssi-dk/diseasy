@@ -131,6 +131,88 @@ To gain some intuition on the how these contact matrices can be interpreted and 
 begin by considering some toy-examples with a toy population of age groups ("A", "B", "C") and spatial
 regions ("x", "y").
 
+
+```{r, include = FALSE}
+# Define some helper functions
+adjacency_graph <- function(adjacency) {
+  graph <- igraph::graph_from_adjacency_matrix(
+    adjmatrix = adjacency,
+    mode = "undirected",
+    diag = FALSE
+  )
+
+  region <- stringr::str_extract(population, r"{\w+$}")
+  age <- stringr::str_extract(population, r"{^\w+}")
+
+  layout <- cbind(
+    x = as.numeric(factor(region)),
+    y = as.numeric(factor(age))
+  )
+
+  # Add some jitter so vertices in the same region/age group do not overlap
+  layout <- layout + matrix(
+    stats::runif(length(layout), -0.3, 0.3),
+    ncol = 2
+  )
+
+  plot(
+    graph,
+    layout = layout,
+    vertex.color = factor(region),
+    vertex.shape = "circle",
+    vertex.label = population,
+    vertex.size = stats::setNames(
+      seq(
+        from = 30,
+        by = 5,
+        along.with = unique(age)
+      ),
+      unique(age)
+    )[age]
+  )
+}
+
+contact_matrix <- function(adjacency, population, groups) {
+
+  p <- purrr::map(
+    unique(groups),
+    ~ as.numeric(groups == .x)
+  ) |>
+    purrr::reduce(
+      rbind, 
+      .init = matrix(0, nrow = 0, ncol = length(population))
+    )
+
+  # Count population by group
+  n_groups <- lengths(split(groups, factor(groups)))[unique(groups)]
+
+  colnames(p) <- population
+  rownames(p) <- paste0(names(n_groups), " (", n_groups, ")")
+
+  return(p %*% adjacency %*% t(p))
+}
+
+
+print_truncated <- function(x, n = 5) {
+  nr <- nrow(x)
+  nc <- ncol(x)
+
+  rows <- unique(c(seq_len(min(n, nr)), seq.int(max(nr - n + 1, 1), nr)))
+  cols <- unique(c(seq_len(min(n, nc)), seq.int(max(nc - n + 1, 1), nc)))
+
+  y <- format(x[rows, cols, drop = FALSE])
+
+  if (nr > 2 * n)
+    y <- rbind(y[seq_len(n), , drop = FALSE], "...", y[(n + 1):(2 * n), , drop = FALSE])
+
+  if (nc > 2 * n)
+    y <- cbind(y[, seq_len(n), drop = FALSE], "...", y[, (n + 1):(2 * n), drop = FALSE])
+
+  print(y, quote = FALSE)
+}
+```
+
+
 ```{r}
 population <- c(
   rep("A/x", 1), rep("B/x", 2), rep("C/x", 3),
@@ -242,47 +324,7 @@ adjacency_sw <- as.matrix(
 
 adjacency_sw <- (adjacency_sw + t(adjacency_sw)) / 2
 
-print(adjacency_sw)
-```
-
-```{r, include = FALSE}
-adjacency_graph <- function(adjacency) {
-  graph <- igraph::graph_from_adjacency_matrix(
-    adjmatrix = adjacency,
-    mode = "undirected",
-    diag = FALSE
-  )
-
-  region <- stringr::str_extract(population, r"{\w+$}")
-  age <- stringr::str_extract(population, r"{^\w+}")
-
-  layout <- cbind(
-    x = as.numeric(factor(region)),
-    y = as.numeric(factor(age))
-  )
-
-  # Add some jitter so vertices in the same region/age group do not overlap
-  layout <- layout + matrix(
-    stats::runif(length(layout), -0.3, 0.3),
-    ncol = 2
-  )
-
-  plot(
-    graph,
-    layout = layout,
-    vertex.color = factor(region),
-    vertex.shape = "circle",
-    vertex.label = population,
-    vertex.size = stats::setNames(
-      seq(
-        from = 30,
-        by = 5,
-        along.with = unique(age)
-      ),
-      unique(age)
-    )[age]
-  )
-}
+print_truncated(adjacency_sw)
 ```
 
 
@@ -291,28 +333,6 @@ adjacency_graph(adjacency_sw)
 ```
 
 From this full adjacency graph, we can project the contacts ("T" domain) into contact matrices in different stratifications.
-
-```{r}
-contact_matrix <- function(adjacency, population, groups) {
-
-  p <- purrr::map(
-    unique(groups),
-    ~ as.numeric(groups == .x)
-  ) |>
-    purrr::reduce(
-      rbind, 
-      .init = matrix(0, nrow = 0, ncol = length(population))
-    )
-
-  # Count population by group
-  n_groups <- lengths(split(groups, factor(groups)))[unique(groups)]
-
-  colnames(p) <- population
-  rownames(p) <- paste0(names(n_groups), " (", n_groups, ")")
-
-  return(p %*% adjacency %*% t(p))
-}
-```
 
 Number of contacts stratified by age group and region
 ```{r}
@@ -515,7 +535,7 @@ adjacency_silo <- as.matrix(
 
 adjacency_silo <- (adjacency_silo + t(adjacency_silo)) / 2
 
-print(adjacency_silo)
+print_truncated(adjacency_silo)
 ```
 
 ```{r, eval = rlang::is_installed("igraph")}
