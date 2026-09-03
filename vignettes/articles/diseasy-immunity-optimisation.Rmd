@@ -77,15 +77,20 @@ methods for approximation.
 Once the round is complete, we update the list of eliminated algorithms and then we run the optimisation of $M + 1$ with
 the reduced set of algorithms.
 
-The entire optimisation process is run both without penalty (`monotonous = 0` and `individual_level = 0`) and with a
-penalty (`monotonous = 1` and `individual_level = 1`),
+The entire optimisation process is run for three configurations of `monotonous` and `individual_level`:
+- `monotonous = 0` and `individual_level = 0`
+- `monotonous = 1` and `individual_level = 0`
+- `monotonous = 1` and `individual_level = 1`
 see `vignette("diseasy-immunity")` for `monotonous` and `individual_level` definitions.
-
 The results of the optimisation round are stored in the `?diseasy_immunity_optimiser_results` data-set.
 
 ```{r}
-results <- diseasy_immunity_optimiser_results
-
+results <- diseasy_immunity_optimiser_results |>
+  dplyr::mutate(
+    "monotonous" = dplyr::if_else(.data$penalty >= 0.5, "yes", "no"),
+    "individual_level" = dplyr::if_else(.data$penalty > 0.5, "yes", "no")
+  ) |>
+  dplyr::select(!"penalty")
 results
 ```
 
@@ -98,11 +103,15 @@ best_optim_results <- results |>
     "value" = sum(.data$value),
     "execution_time" = sum(.data$execution_time),
     "n_targets" = dplyr::n(),
-    .by = c("target", "method", "penalty", "optim_method", "strategy")
+    .by = c(
+      "target", "method",
+      "monotonous", "individual_level",
+      "optim_method", "strategy"
+    )
   ) |>
   dplyr::filter(
     .data$n_targets == max(.data$n_targets),
-    .by = c("target", "method", "penalty")
+    .by = c("target", "method", "monotonous", "individual_level")
   )
 
 
@@ -117,15 +126,14 @@ best_optim_results <- best_optim_results |>
       labels = c(
         "Exponential", "Sum of exponentials", "Sigmoidal", "Linear", "Heaviside"
       )
-    ),
-    "penalty" = dplyr::if_else(.data$penalty, "yes", "no")
+    )
   )
 ```
 
 ## Global results
 To get an overview of the best performing optimisers, we present an aggregated view of the results in the table
 below.
-Here we present the top 5 "best" optimiser/strategy combination for each method and penalty setting.
+Here we present the top 5 "best" optimiser/strategy combination for each method and `monotonous`/`individual_level` setting.
 To define what it means to be the "best" we simply take the total integral difference between the approximation
 and the target function across all target functions and problem sizes ($M$).
 
@@ -135,31 +143,36 @@ In addition, we only consider problems up to size $M = 5$ for the general result
 # Function to apply bold style to the smallest value in each section
 bold_min_value <- function(gt_table) {
   min_value <- gt_table$`_data` |>
-    dplyr::select(dplyr::starts_with("value"), "penalty") |>
+    dplyr::select(
+      dplyr::starts_with("value"),
+      "monotonous",
+      "individual_level"
+    ) |>
     dplyr::mutate("row_id" = dplyr::row_number()) |>
-    tidyr::pivot_longer(!c("row_id", "penalty")) |>
-    dplyr::slice_min(.data$value, with_ties = FALSE, by = "penalty") |>
+    tidyr::pivot_longer(
+      !c("row_id", "monotonous", "individual_level")
+    ) |>
+    dplyr::slice_min(
+      .data$value,
+      with_ties = FALSE,
+      by = c("monotonous", "individual_level")
+    ) |>
     dplyr::mutate("name" = stringr::str_remove(.data$name, "^value/"))
 
-  gt_table |>
-    gt::tab_style(
-      style = list(
-        gt::cell_text(weight = "bold")
-      ),
-      locations = gt::cells_body(
-        columns = dplyr::ends_with(min_value$name[[1]]),
-        rows =  min_value$row_id[[1]]
-      )
-    ) |>
-    gt::tab_style(
-      style = list(
-        gt::cell_text(weight = "bold")
-      ),
-      locations = gt::cells_body(
-        columns = dplyr::ends_with(min_value$name[[2]]),
-        rows =  min_value$row_id[[2]]
-      )
-    )
+  purrr::reduce(
+    seq_len(nrow(min_value)),
+    \(gt_table, row_index) {
+      gt_table |>
+        gt::tab_style(
+          style = list(gt::cell_text(weight = "bold")),
+          locations = gt::cells_body(
+            columns = dplyr::ends_with(min_value$name[[row_index]]),
+            rows = min_value$row_id[[row_index]]
+          )
+        )
+    },
+    .init = gt_table
+  )
 }
 
 
@@ -206,19 +219,28 @@ total_results <- best_optim_results |>
     "value" = sum(.data$value),
     "execution_time" = sum(.data$execution_time) / 3600,
     "n_targets" = sum(.data$n_targets),
-    .by = c("penalty", "method", "strategy", "optim_method")
+    .by = c("monotonous", "individual_level", "method", "strategy", "optim_method")
   ) |>
   dplyr::mutate(
     "value" = round(.data$value, 2)
   ) |>
-  dplyr::slice_max(.data$n_targets, by = c("penalty", "method"))
+  dplyr::slice_max(
+    .data$n_targets,
+    by = c("monotonous", "individual_level", "method")
+  )
 
 total_results |>
   dplyr::slice_min(
     .data$value,
-    n = 5,
+    n = 4,
     with_ties = FALSE,
-    by = c("penalty", "method")
+    by = c("monotonous", "individual_level", "method")
+  ) |>
+  dplyr::arrange(
+    .data$monotonous,
+    .data$individual_level,
+    .data$method,
+    .data$value
   ) |>
   dplyr::select(!"execution_time") |>
   tidyr::pivot_wider(
@@ -228,12 +250,13 @@ total_results |>
     values_fn = list
   ) |>
   dplyr::select(
-    "penalty",
+    "monotonous",
+    "individual_level",
     dplyr::ends_with("free_delta"),
     dplyr::ends_with("free_gamma"),
     dplyr::ends_with("all_free")
   ) |>
-  tidyr::unnest_longer(!"penalty") |>
+  tidyr::unnest_longer(!c("monotonous", "individual_level")) |>
   dplyr::select(!dplyr::ends_with("_id")) |>
   gt::gt() |>
   gt::tab_spanner(
@@ -286,8 +309,13 @@ total_results |>
       color = "grey40"
     ),
     locations = gt::cells_body(
-      rows = 6
+      rows = c(5, 9)
     )
+  ) |>
+  gt::tab_options(
+    table.font.size = gt::px(12),
+    column_labels.font.size = gt::px(12),
+    data_row.padding = gt::px(3)
   ) |>
   gt::tab_caption(
     "Table 1: Global results (excluding heaviside and linear targets)"
@@ -303,37 +331,80 @@ methods are. For that purpose, we have also measured the time to run the optimis
 # Define the defaults for DiseasyImmunity
 chosen_defaults <- tibble::tibble(
   "method" = character(0),
-  "penalty" = character(0),
+  "monotonous" = character(0),
+  "individual_level" = character(0),
   "strategy" = character(0),
   "optim_method" = character(0)
-) |>
+)
+
+# Free delta
+chosen_defaults <- chosen_defaults |>
   tibble::add_row(
-    "method" = "free_delta", "penalty" = "no",
+    "method" = "free_delta",
+    "monotonous" = "no",
+    "individual_level" = "no",
+    "strategy" = "recursive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_delta",
+    "monotonous" = "yes",
+    "individual_level" = "no",
+    "strategy" = "recursive",
+    "optim_method" = "ucminf"
+  ) |>
+  tibble::add_row(
+    "method" = "free_delta",
+    "monotonous" = "yes",
+    "individual_level" = "yes",
+    "strategy" = "recursive",
+    "optim_method" = "ucminf"
+  )
+
+# Free gamma
+chosen_defaults <- chosen_defaults |>
+  tibble::add_row(
+    "method" = "free_gamma",
+    "monotonous" = "no",
+    "individual_level" = "no",
+    "strategy" = "recursive",
+    "optim_method" = "nmkb"
+  ) |>
+  tibble::add_row(
+    "method" = "free_gamma",
+    "monotonous" = "yes",
+    "individual_level" = "no",
+    "strategy" = "recursive",
+    "optim_method" = "nmkb"
+  ) |>
+  tibble::add_row(
+    "method" = "free_gamma",
+    "monotonous" = "yes",
+    "individual_level" = "yes",
+    "strategy" = "recursive",
+    "optim_method" = "nmkb"
+  )
+
+# All free
+chosen_defaults <- chosen_defaults |>
+  tibble::add_row(
+    "method" = "all_free",
+    "monotonous" = "no",
+    "individual_level" = "no",
     "strategy" = "naive",
     "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
-    "method" = "free_delta", "penalty" = "yes",
+    "method" = "all_free",
+    "monotonous" = "yes",
+    "individual_level" = "no",
     "strategy" = "naive",
     "optim_method" = "ucminf"
   ) |>
   tibble::add_row(
-    "method" = "free_gamma", "penalty" = "no",
-    "strategy" = "naive",
-    "optim_method" = "subplex"
-  ) |>
-  tibble::add_row(
-    "method" = "free_gamma", "penalty" = "yes",
-    "strategy" = "naive",
-    "optim_method" = "hjkb"
-  ) |>
-  tibble::add_row(
-    "method" = "all_free", "penalty" = "no",
-    "strategy" = "naive",
-    "optim_method" = "ucminf"
-  ) |>
-  tibble::add_row(
-    "method" = "all_free", "penalty" = "yes",
+    "method" = "all_free",
+    "monotonous" = "yes",
+    "individual_level" = "yes",
     "strategy" = "naive",
     "optim_method" = "ucminf"
   )
@@ -345,11 +416,11 @@ total_results <- total_results |>
   dplyr::summarise(
     "min_value" = min(.data$value, na.rm = TRUE),
     "min_execution_time" = min(.data$execution_time, na.rm = TRUE),
-    .by = c("penalty", "method")
+    .by = c("monotonous", "individual_level", "method")
   ) |>
   dplyr::left_join(
     total_results,
-    by = c("penalty", "method")
+    by = c("monotonous", "individual_level", "method")
   )
 
 visualise_methods <- function(total_results, method) {
@@ -359,11 +430,11 @@ visualise_methods <- function(total_results, method) {
         .data$execution_time - .data$min_execution_time,
       n = 10,
       with_ties = FALSE,
-      by = c("penalty", "method")
+      by = c("monotonous", "individual_level", "method")
     ) |>
     dplyr::left_join(
       dplyr::mutate(chosen_defaults, "default" = TRUE),
-      by = c("method", "penalty", "strategy", "optim_method")
+      by = c("method", "monotonous", "individual_level", "strategy", "optim_method")
     ) |>
     dplyr::mutate(
       "default" = dplyr::if_else(!is.na(.data$default), "Yes", "No")
@@ -395,13 +466,17 @@ visualise_methods <- function(total_results, method) {
       size = 4
     ) +
     ggplot2::geom_hline(
-      data = dplyr::summarise(gg_data, "value" = min(.data$value), .by = "penalty"),
+      data = dplyr::summarise(
+        gg_data,
+        "value" = min(.data$value),
+        .by = c("monotonous", "individual_level")
+      ),
       mapping = ggplot2::aes(yintercept = .data$value),
       linetype = 2, color = "grey"
     ) +
     ggplot2::facet_wrap(
-      ~ penalty,
-      labeller = ggplot2::labeller(.cols = ggplot2::label_both),
+      ggplot2::vars(.data$monotonous, .data$individual_level),
+      labeller = ggplot2::label_both,
       scales = "free"
     ) +
     ggplot2::labs(
@@ -437,11 +512,12 @@ visualise_methods(total_results, "all_free")
 
 In total, we find that there is no clear choice for best, general optimiser/strategy combination.
 
-For the defaults, we have chose the optimiser/strategy combination dependent on the method of parametrisation and the
-inclusion of penalty.
+For the defaults, we have chosen the optimiser/strategy combination dependent on the method of parametrisation and the
+values of `monotonous` and `individual_level`.
 
-The following optimiser/strategy combinations acts as defaults for the `?DiseasyImmunity` class:
-
+The following optimiser/strategy combinations act as the currently selected defaults for the `?DiseasyImmunity` class.
+No default is assigned yet for `monotonous = yes`, `individual_level = no`; the new results are included in the
+comparisons above so that this choice can be made from the benchmark.
 ```{r, echo = FALSE, results = "asis", eval = rlang::is_installed("gt")}
 chosen_defaults |>
   gt::gt() |>
@@ -452,7 +528,7 @@ chosen_defaults |>
       color = "grey40"
     ),
     locations = gt::cells_body(
-      rows = c(3, 5)
+      rows = c(4, 7)
     )
   )
 ```
@@ -480,12 +556,19 @@ split_data <- per_target_results |>
   dplyr::slice_min(
     tibble::tibble(value, execution_time),
     n = 3,
-    by = c("target", "method", "penalty")
+    by = c("target", "method", "monotonous", "individual_level")
   ) |>
   dplyr::select(
-    "target", "penalty", "method", "strategy", "value", "optim_method"
+    "target", "monotonous", "individual_level",
+    "method", "strategy", "value", "optim_method"
   ) |>
-  dplyr::arrange(.data$target, .data$method, .data$value) |>
+  dplyr::arrange(
+    .data$target,
+    .data$monotonous,
+    .data$individual_level,
+    .data$method,
+    .data$value
+  ) |>
   dplyr::group_split(.data$target)
 
 # Create tables for each target
@@ -500,12 +583,13 @@ gt_tables <- split_data |>
       ) |>
       dplyr::select(
         "target",
-        "penalty",
+        "monotonous",
+        "individual_level",
         dplyr::ends_with("free_delta"),
         dplyr::ends_with("free_gamma"),
         dplyr::ends_with("all_free")
       ) |>
-      tidyr::unnest_longer(!c("target", "penalty")) |>
+      tidyr::unnest_longer(!c("target", "monotonous", "individual_level")) |>
       dplyr::select(!dplyr::ends_with("_id")) |>
       gt::gt() |>
       gt::tab_spanner(
@@ -558,10 +642,15 @@ gt_tables <- split_data |>
           color = "grey40"
         ),
         locations = gt::cells_body(
-          rows = 4
+          rows = c(4, 7)
         )
       ) |>
       gt::cols_hide("target") |>
+      gt::tab_options(
+        table.font.size = gt::px(12),
+        column_labels.font.size = gt::px(12),
+        data_row.padding = gt::px(3)
+      ) |>
       gt::tab_caption(
         paste0("Table ", .y + 1, ": Results for ", .x$target[[1]], " target")
       )

@@ -14,7 +14,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: read
+      packages: write
 
     steps:
       - name: Login to GHCR
@@ -99,3 +99,15 @@ jobs:
           name: diseasy-apptainer-${{ inputs.image_tag }}
           path: ${{ env.SIF_NAME }}
           retention-days: 7
+
+       # 13. Update the branch image on GHCR
+      - name: Push updated branch image to GHCR
+        run: |
+          TARGET_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-dev"
+
+          echo "Publishing ${DERIVED_IMAGE} as ${TARGET_IMAGE}"
+
+          docker tag "$DERIVED_IMAGE" "$TARGET_IMAGE"
+          docker push "$TARGET_IMAGE"
+
+          echo "Published: $TARGET_IMAGE"

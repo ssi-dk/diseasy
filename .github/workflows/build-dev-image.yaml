@@ -2,6 +2,12 @@ name: Build development container
 
 on:
   workflow_dispatch:
+    inputs:
+      r_packages:
+        description: "Optional extra R packages (comma-separated pak refs)"
+        required: false
+        default: "furrr"
+        type: string
 
 jobs:
   build:
@@ -39,12 +45,12 @@ jobs:
               -u "${{ github.actor }}" \
               --password-stdin
 
-      # 4. Try the branch image.
+      # 4. Try the branch CI image.
       #    Fall back to :main only if the tag does not exist.
       - name: Select base image
         run: |
-          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
-          MAIN_IMAGE="ghcr.io/ssi-dk/diseasy:main"
+          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-ci"
+          MAIN_IMAGE="ghcr.io/ssi-dk/diseasy:main-ci"
 
           echo "Checking for ${BRANCH_IMAGE}"
 
@@ -112,8 +118,13 @@ jobs:
           ARG R_LIB
           ARG SOURCE_SHA
           ARG SOURCE_REF
+          ARG EXTRA_R_PACKAGES=""
 
           USER root
+
+          RUN if [ -n "$EXTRA_R_PACKAGES" ]; then \
+              Rscript -e 'pkgs <- trimws(strsplit(Sys.getenv("EXTRA_R_PACKAGES"), ",", fixed = TRUE)[[1]]); pak::pkg_install(pkgs, lib = Sys.getenv("R_LIB"))'; \
+            fi
 
           COPY . /tmp/diseasy
 
@@ -147,6 +158,7 @@ jobs:
             --build-arg R_LIB="$R_LIB" \
             --build-arg SOURCE_SHA="$GITHUB_SHA" \
             --build-arg SOURCE_REF="$GITHUB_REF_NAME" \
+            --build-arg EXTRA_R_PACKAGES="${{ inputs.r_packages }}" \
             -f Dockerfile.dev \
             -t "$DERIVED_IMAGE" \
             .
@@ -176,15 +188,8 @@ jobs:
 
       - name: Push development image
         run: |
-          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-dev"
-          SHA_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-${SHORT_SHA}-dev"
-
+          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
           docker tag "$DERIVED_IMAGE" "$BRANCH_IMAGE"
-          docker tag "$DERIVED_IMAGE" "$SHA_IMAGE"
-
           docker push "$BRANCH_IMAGE"
-          docker push "$SHA_IMAGE"
-
           echo "Published:"
           echo "  $BRANCH_IMAGE"
-          echo "  $SHA_IMAGE"
