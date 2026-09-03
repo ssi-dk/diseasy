@@ -102,6 +102,15 @@ test_that("diseasyoption works", {
     regex = r"{Multiple options found \(diseasy.target_schema, diseasystore.target_schema\)!}"
   )
 
+  # Look up all options associated with class
+  checkmate::expect_list(diseasyoption(class = ds))
+
+  # Test that errors are trhown for malformed inputs
+  expect_error(
+    diseasyoption("target_schema", class = ds, namespace = "diseasy"),
+    regex = "Only one of `namespace` or `class` can be given!"
+  )
+
   rm(ds)
   invisible(gc())
 })

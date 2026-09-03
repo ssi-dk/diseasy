@@ -222,6 +222,54 @@ test_that("$change_risk()'s secret_hash works", {
 })
 
 
+test_that("$crop_scenario() works", {
+  # Create a new instance of the activity module
+  activity <- DiseasyActivity$new()
+
+  # Store the current hash
+  hash_new_instance <- activity$hash
+
+  # Then load activity units into the module
+  activity$set_activity_units(dk_activity_units_subset)
+
+
+  # Set a scenario
+  activity$change_activity(scenario_1)
+  hash_scenario_1_loaded <- activity$hash
+
+  # hash should change now that a scenario is defined
+  expect_false(hash_new_instance == hash_scenario_1_loaded)
+
+  # Check scenario matrix is correctly configured inside the module
+  expect_identical(activity$scenario_matrix, ref_scenario_1)
+
+
+  # Crop the scenario from the right
+  activity$crop_scenario(last_date = as.Date("2020-03-12"))
+  hash_scenario_cropped_right <- activity$hash
+
+  # hash should change now that a scenario is defined
+  expect_false(hash_scenario_cropped_right == hash_new_instance)
+  expect_false(hash_scenario_cropped_right == hash_scenario_1_loaded)
+
+  expect_identical(activity$scenario_matrix, ref_scenario_1[1:2, 1:2])
+
+
+  # Crop the scenario from the left
+  activity$crop_scenario(first_date = as.Date("2020-03-12"))
+  hash_scenario_cropped_both <- activity$hash
+
+  # hash should change now that a scenario is defined
+  expect_false(hash_scenario_cropped_both == hash_new_instance)
+  expect_false(hash_scenario_cropped_both == hash_scenario_1_loaded)
+  expect_false(hash_scenario_cropped_both == hash_scenario_cropped_right)
+
+  expect_identical(activity$scenario_matrix, ref_scenario_1[2, 2, drop = FALSE])
+
+  rm(activity)
+})
+
+
 test_that("$get_scenario_openness() works with default parameters", {
 
   # Test openness with default parameters
@@ -701,6 +749,34 @@ test_that("`map_population` works with 5-year age groups in demography", {
     ),
     regexp = "`demography` is missing age group splits to facilitate splits at"
   )
+
+  rm(activity)
+})
+
+
+test_that("`plot()` produces no errors with defaults", {
+  skip_if_not_installed("ggplot2")
+
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
+  activity$set_activity_units(dk_activity_units)
+  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+  expect_no_error(activity$plot())
+
+  rm(activity)
+})
+
+
+test_that("`plot()` produces no errors with no weights", {
+  skip_if_not_installed("ggplot2")
+
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
+  activity$set_activity_units(dk_activity_units)
+  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
+
+  expect_no_error(activity$plot(weights = NULL))
 
   rm(activity)
 })

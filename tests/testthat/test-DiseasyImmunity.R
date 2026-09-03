@@ -512,7 +512,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   im <- DiseasyImmunity$new()
 
   # Set the exponential waning model
-  im$set_sigmoidal_waning()
+  im$set_exponential_waning()
 
   # Test the approximations for M = 1 to M = 4 using defaults
   test_combinations <- tidyr::expand_grid(
@@ -583,7 +583,7 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
   im <- DiseasyImmunity$new(cache = cache)
 
   # Set the exponential waning model
-  im$set_sigmoidal_waning()
+  im$set_exponential_waning()
 
   # Test all combinations of method and strategy
   test_combinations <- tidyr::expand_grid(
@@ -618,7 +618,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
   im <- DiseasyImmunity$new()
 
   # Set the exponential waning model
-  im$set_sigmoidal_waning()
+  im$set_exponential_waning()
 
   expect_no_condition(
     im$approximate_compartmental(
@@ -627,6 +627,68 @@ test_that("`$approximate_compartmental()` works with custom controls", {
       strategy = "recursive",
       optim_control = list("optim_method" = "neldermead", "xtol_rel" = 1e-2)
     )
+  )
+
+  # Test all supported providers of optimiers
+  # ... stats::optim()
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "Nelder-Mead")
+    )
+  )
+
+  # ... stats::nlm()
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "nlm")
+    )
+  )
+
+  # ... stats::nlminb()
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "nlminb")
+    )
+  )
+
+  # ... nloptr
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "auglag", localsolver = "COBYLA")
+    )
+  )
+
+  # ... optimx
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "ucminf")
+    )
+  )
+
+  # ... and a malformed input
+  expect_error(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "non-existent-method")
+    ),
+    regexp = "matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::optimr`!"
   )
 
   rm(im)
@@ -735,6 +797,31 @@ for (M in c(1, 2, 5)) { # Number of compartments
   })
 }
 rm(im)
+
+
+test_that("$describe() does not produce errror", {
+
+  im <- DiseasyImmunity$new()
+  expect_no_error(im$describe())
+
+  im$set_exponential_waning()
+  expect_no_error(im$describe())
+
+  im$set_sigmoidal_waning(target = "hospitalisation")
+  expect_no_error(im$describe())
+
+  custom_function <- \(t) exp(-(t / time_scale)^2)
+  im$set_custom_waning(
+    time_scale = 20,
+    custom_function = custom_function,
+    target = "death",
+    name = "gaussian_waning"
+  )
+  expect_no_error(im$describe())
+
+  rm(im)
+
+})
 
 
 test_that("active binding: available_waning_models works", {
