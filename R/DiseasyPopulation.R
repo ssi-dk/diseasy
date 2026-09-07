@@ -174,9 +174,22 @@ DiseasyPopulation <- R6::R6Class(                                               
         weights = weights
       )
 
+      # Project from per-capita to M domain
+      if (!is.null(self %.% activity$contact_basis)) {
+        population <- self %.% activity$contact_basis$demography |>
+          dplyr::mutate(age_group = cut(.data$age, c(self %.% age_cuts_lower, Inf), right = FALSE)) |>
+          dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
+          dplyr::pull("population")
+      } else {
+        population <- rep(1 / length(self %.% age_cuts_lower), length(self %.% age_cuts_lower))
+      }
+
+      # Store as a square matrix with the population repeated as columns
+      N_j <- outer(rep(1, length(population)), population)                                                              # nolint: object_name_linter
+
       # We then construct the normalised matrices
       per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
+        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x * N_j, self %.% population_proportion))
 
       return(per_capita_contact_matrices)
     },
