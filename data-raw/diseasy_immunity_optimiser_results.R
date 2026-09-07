@@ -556,8 +556,8 @@ results <- list.files(path) |>
           !!file,
           r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
         ),
-        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}") +
-          0.5 * stringr::str_detect(!!file, r"{-1-0-[0-9]+.rds}")
+        "monotonous" = stringr::str_detect(!!file, r"{-1-[0-9]-[0-9]+.rds}"),
+        "individual_level" = stringr::str_detect(!!file, r"{-[0-9]-1-[0-9]+.rds}")
       )
   }) |>
   purrr::list_rbind() |>
@@ -586,60 +586,73 @@ round_eliminated <- results |>
     .data$execution_time >= 60 * .data$M |
       .data$value >= 1e3
   ) |>
-  dplyr::slice_min(M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::slice_min(
+    .data$M,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
   dplyr::transmute(
     .data$optim_method,
     .data$target,
     .data$variation,
     .data$method,
     .data$strategy,
-    .data$penalty,
+    .data$monotonous,
+    .data$individual_level,
     "N_eliminated" = .data$M
   )
 
 should_have_been_eliminated <- results |>
-  dplyr::left_join(round_eliminated, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::left_join(
+    round_eliminated,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
   dplyr::filter(
     .data$N_eliminated < .data$M,
-    .by = c("optim_method", "target", "variation", "method", "strategy", "penalty")
+    .by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
   )
 
 if (nrow(should_have_been_eliminated) > 0) {
   cat("should_have_been_eliminated")
   print(dplyr::select(should_have_been_eliminated, !c("target", "variation", "target_label")))
-  print(dplyr::count(should_have_been_eliminated, method, strategy, penalty))
+  print(dplyr::count(should_have_been_eliminated, method, strategy, monotonous, individual_level))
 }
 
 results <- dplyr::anti_join(
   results,
   dplyr::select(
     should_have_been_eliminated,
-    "optim_method", "target", "variation", "method", "strategy", "penalty", "M"
+    "optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level", "M"
   ),
-  by = c("optim_method", "target", "variation", "method", "strategy", "penalty", "M")
+  by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level", "M")
 )
 
 
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
-  dplyr::slice_max(.data$M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::slice_max(
+    .data$M,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
   dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10, .data$value < 1e3)
 
 if (nrow(should_not_have_been_eliminated) > 0) {
   cat("should_not_have_been_eliminated")
   print(dplyr::select(should_not_have_been_eliminated, !c("target", "variation", "target_label")))
-  print(dplyr::count(should_not_have_been_eliminated, method, strategy, penalty))
+  print(dplyr::count(should_not_have_been_eliminated, method, strategy, monotonous, individual_level))
 }
 
 # Re-arrange the columns
 results <- results |>
   dplyr::select(
-    "target", "variation", "method", "strategy", "penalty", "M", "value", "execution_time", dplyr::everything()
+    "target", "variation", "method", "strategy",
+    "monotonous", "individual_level",
+    "M", "value", "execution_time", dplyr::everything()
   ) |>
   dplyr::arrange(
     .data$optim_method,
     .data$M,
-    .data$penalty,
+    .data$monotonous,
+    .data$individual_level,
     .data$target,
     .data$variation,
     .data$method,
