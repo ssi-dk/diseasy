@@ -21,7 +21,7 @@ One of: "free_delta", "free_gamma" or "all_free".
 \item \code{strategy}: The strategy employed for optimisation.
 One of: "naive", "recursive" or "combination".
 }
-\item \code{monotonous}: Were unit penalties for monoticity added to the objective function?
+\item \code{monotonous}: Were unit penalties for monotonicity added to the objective function?
 \item \code{individual_level}: Were unit penalties for individual level optimisation added to the objective function?
 \item \code{M}: The number of compartments.
 \item \code{value}: The smallest determined value of the objective function for the optimiser.
