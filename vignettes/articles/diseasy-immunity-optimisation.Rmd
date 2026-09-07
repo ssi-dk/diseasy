@@ -85,12 +85,8 @@ see `vignette("diseasy-immunity")` for `monotonous` and `individual_level` defin
 The results of the optimisation round are stored in the `?diseasy_immunity_optimiser_results` data-set.
 
 ```{r}
-results <- diseasy_immunity_optimiser_results |>
-  dplyr::mutate(
-    "monotonous" = dplyr::if_else(.data$penalty >= 0.5, "yes", "no"),
-    "individual_level" = dplyr::if_else(.data$penalty > 0.5, "yes", "no")
-  ) |>
-  dplyr::select(!"penalty")
+results <- diseasy_immunity_optimiser_results
+
 results
 ```
 
