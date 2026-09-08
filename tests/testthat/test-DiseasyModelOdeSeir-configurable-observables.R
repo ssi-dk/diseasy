@@ -10,29 +10,6 @@ if (!rlang::is_installed(c("RSQLite", "deSolve", "optimx", "ucminf"))) {
   return(NULL)
 }
 
-# We here use the parameters of the generating model
-# - see data-raw/seir_example_data.R
-rE <- 1 / 2.1 # Overall disease progression rate from E to I                                                            # nolint: object_name_linter
-rI <- 1 / 4.5 # Overall disease progression rate from I to R                                                            # nolint: object_name_linter
-overall_infection_risk <- 0.025
-
-# Configure the activity module
-activity <- DiseasyActivity$new()
-activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
-activity$set_activity_units(dk_activity_units)
-activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
-
-regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
-
-# Configure the immunity module
-immunity <- DiseasyImmunity$new()
-immunity$set_exponential_waning(time_scale = 180)
-
-# Configure the season module
-season <- DiseasySeason$new()
-season$set_reference_date(as.Date("2020-01-20"))
-season$use_cosine_season()
-
 # Configure a observables module for use in the tests
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
@@ -83,22 +60,21 @@ tidyr::expand_grid(
 
     test_that(glue::glue("$configure_output() ({model_string} single variant / {age_group_string} age group)"), {
 
-      m <- DiseasyModelOdeSeir$new(
-        observables = observables,
-        population = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower),
-        regions = regions,
-        activity = activity,
-        immunity = immunity,
-        season = season,
-        parameters = list(
-          "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-          "overall_infection_risk" = overall_infection_risk,
-          "disease_progression_rates" = c("E" = rE, "I" = rI)
+      # Modify the example model for our test
+      model <- generate_example_seir_model(
+        module_overrides = list(
+          "observables" = observables,
+          "population" = DiseasyPopulation$new(age_cuts_lower = age_cuts_lower)
+        ),
+        parameter_overrides = list(
+          "compartment_structure" = c("E" = K, "I" = L, "R" = M)
         )
       )
+      rE <- model %.% parameters %.% disease_progression_rates %.% E                                                    # nolint: object_name_linter
+      rI <- model %.% parameters %.% disease_progression_rates %.% I                                                    # nolint: object_name_linter
 
       # Compute n_infected observable before configuring observables
-      reference_before <- m$get_results("n_infected", prediction_length = 10)$n_infected
+      reference_before <- model$get_results("n_infected", prediction_length = 10)$n_infected
 
 
       ## Configure two different methods for measuring "n_infected"
@@ -122,7 +98,7 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_output(
+      model$configure_output(
         weights = weights_infection_matrix,
         name = "n_infected_infection_matrix",
         derived_from = "infection_matrix",
@@ -145,14 +121,14 @@ tidyr::expand_grid(
         ) |>
         purrr::reduce(rbind)
 
-      m$configure_output(
+      model$configure_output(
         weights = weights_state_vector,
         name = "n_infected_state_vector",
         derived_from = "state_vector"
       )
 
       # Compute n_infected observable after configuring observables
-      reference_after <- m$get_results("n_infected", prediction_length = 10)$n_infected
+      reference_after <- model$get_results("n_infected", prediction_length = 10)$n_infected
 
       # These should be very close to identical
       expect_equal(reference_before, reference_after, tolerance = 5e-3) # within 5 per mille
@@ -166,18 +142,18 @@ tidyr::expand_grid(
       # The time difference is roughly: 1 / rE + 1 / (L * rI) days
 
       expect_equal(
-        m$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
+        model$get_results("n_infected_state_vector", prediction_length = 10)$n_infected_state_vector,
         reference_after,
         tolerance = 5e-2 # Within 5 %
       )
 
       expect_equal(
-        m$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
+        model$get_results("n_infected_infection_matrix", prediction_length = 10)$n_infected_infection_matrix,
         reference_after,
         tolerance = 5e-2 # Within 5 %
       )
 
-      rm(m)
+      rm(model)
     })
   })
 
@@ -232,6 +208,8 @@ test_that("Loading modules resets user configured observables", {
 
 
 # Add additional waning immunity targets
+model <- generate_example_seir_model()
+immunity <- model %.% immunity
 immunity$set_no_waning(target = "hospitalisation")
 immunity$set_no_waning(target = "death")
 
@@ -253,8 +231,8 @@ test_that("Consecutive `$prepare_rhs()` calls works without error", {
 test_that("waning immunity targets other than 'infection' configures outputs", {
 
   m <- DiseasyModelOdeSeir$new(
-    activity = activity,
-    regions = regions,
+    activity = model$activity,
+    regions = model$regions,
     immunity = immunity,
     observables = observables
   )
@@ -278,3 +256,5 @@ test_that("waning immunity targets other than 'infection' configures outputs", {
 
   rm(m)
 })
+
+rm(model)
