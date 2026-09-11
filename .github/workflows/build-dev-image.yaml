@@ -132,12 +132,13 @@ jobs:
               Rscript -e 'pkgs <- trimws(strsplit(Sys.getenv("EXTRA_R_PACKAGES"), ",", fixed = TRUE)[[1]]); pak::pkg_install(pkgs, lib = Sys.getenv("R_LIB"))'; \
             fi
 
-          COPY . /tmp/diseasy
+          COPY . /app
+          WORKDIR /app
 
           RUN R CMD INSTALL \
                 --library="${R_LIB}" \
-                /tmp/diseasy \
-              && rm -rf /tmp/diseasy
+                /app
+
 
           ENV DISEASY_SOURCE_SHA="${SOURCE_SHA}"
           ENV DISEASY_SOURCE_REF="${SOURCE_REF}"
