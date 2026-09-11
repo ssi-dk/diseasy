@@ -1,6 +1,6 @@
 {
   "name": "diseasy",
-  "image": "ghcr.io/ssi-dk/diseasy:main",
+  "image": "ghcr.io/ssi-dk/diseasy:feature-more-optimiser-script-changes",
   "overrideCommand": false,
   "remoteUser": "rstudio",
   "containerEnv": {
