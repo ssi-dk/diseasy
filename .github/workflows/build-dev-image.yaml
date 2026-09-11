@@ -106,7 +106,13 @@ jobs:
           echo "Base container user: ${BASE_USER:-root}"
           echo "BASE_USER=$BASE_USER" >> "$GITHUB_ENV"
 
-      # 6. Generate a small Dockerfile.
+      # 6. Encode the commit SHA into the development package.
+      - name: Set development package version
+        run: |
+          SHA_HEX="${GITHUB_SHA:0:8}"
+          echo "GitSHA: ${GITHUB_SHA}" >> DESCRIPTION
+
+      # 7. Generate a small Dockerfile.
       #    The dependencies come from BASE_IMAGE.
       #    The diseasy package itself comes from the CURRENT checkout.
       - name: Create development Dockerfile
@@ -147,7 +153,7 @@ jobs:
 
           cat Dockerfile.dev
 
-      # 7. Build updated image
+      # 8. Build updated image
       - name: Build updated container
         run: |
           DERIVED_IMAGE="diseasy-dev:${IMAGE_TAG}-${SHORT_SHA}"
@@ -165,7 +171,7 @@ jobs:
 
           echo "DERIVED_IMAGE=$DERIVED_IMAGE" >> "$GITHUB_ENV"
 
-      # 8. Verify that R sees the newly-installed package
+      # 9. Verify that R sees the newly-installed package
       - name: Verify R package
         run: |
           docker run --rm \
@@ -174,6 +180,10 @@ jobs:
             -e '
               cat("diseasy version: ",
                   as.character(packageVersion("diseasy")),
+                  "\n",
+                  sep = "")
+              cat("GitSHA for diseasy: ",
+                  as.character(packageDescription("diseasy", fields = "GitSHA")),
                   "\n",
                   sep = "")
               cat("Library: ",
