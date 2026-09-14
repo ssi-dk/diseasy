@@ -32,10 +32,16 @@ r6_hash <- \(r6_generator) {
     hash_environment()
 }
 
-source_code_hash <- c(
-  DiseasyBaseModule, DiseasyImmunity, DiseasyObservables, DiseasyModelOdeSeir
+source_code_hash <- list(
+  purrr::map(
+    c(
+      DiseasyBaseModule, DiseasyImmunity, DiseasyObservables,
+      DiseasyModelOdeSeir, DiseasystoreSeirExample
+    ),
+    r6_hash
+  ),
+  seir_example_data
 ) |>
-  purrr::map(r6_hash) |>
   rlang::hash()
 
 if (!identical(source_code_hash, cache$get("source-code-hash"))) {
