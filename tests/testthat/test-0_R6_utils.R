@@ -105,7 +105,7 @@ test_that("diseasyoption works", {
   # Look up all options associated with class
   checkmate::expect_list(diseasyoption(class = ds))
 
-  # Test that errors are trhown for malformed inputs
+  # Test that errors are thrown for malformed inputs
   expect_error(
     diseasyoption("target_schema", class = ds, namespace = "diseasy"),
     regex = "Only one of `namespace` or `class` can be given!"

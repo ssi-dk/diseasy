@@ -208,6 +208,17 @@ run_approximation <- function(
           "execution_time" = walltime
         )
       )
+    },
+    error = function(e) {
+      return(
+        list(
+          "method" = method,
+          "strategy" = strategy,
+          "M" = M,
+          "value" = Inf,
+          "execution_time" = Inf
+        )
+      )
     }
   )
 
@@ -276,7 +287,7 @@ optimiser <- function(
 
 
           # Generate approximations and store them
-          key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{M}")
+          key <- glue::glue('{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{sprintf("%02d", M)}')
 
           # Get the results up until now
           current_approximations <- cache$get(key = key)
@@ -331,7 +342,7 @@ optimiser <- function(
 # collects the existing results from the round
 existing_results <- function(M, monotonous, individual_level) {                                                         # nolint: object_name_linter
 
-  existing_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
+  existing_files <- list.files(path, pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}.rds'))
 
   # Early return if no files exist
   if (length(existing_files) == 0) {
@@ -363,6 +374,7 @@ existing_results <- function(M, monotonous, individual_level) {                 
           purrr::list_transpose() |>
           tibble::as_tibble() |>
           dplyr::mutate(
+            "execution_time" = as.numeric(.data$execution_time, units = "secs"),
             "optim_method" = stringr::str_extract(
               !!file,
               r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
@@ -421,6 +433,10 @@ for (penalty in c(0, 0.5, 1)) {
 
     # Remove existing computations
     candidates_needing_compute <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
+
+    if (nrow(candidates_needing_compute) > 0) {
+      print(candidates_needing_compute)
+    }
 
     # Compute new/missing runs
     combinations <- tidyr::expand_grid(
@@ -482,7 +498,10 @@ for (penalty in c(0, 0.5, 1)) {
 
 
     # Gather the results for the round and eliminate stragglers
-    round_results <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds")) |>
+    round_results <- list.files(
+      path,
+      pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}.rds')
+    ) |>
       purrr::map(\(file) {
         tmp <- file.path(path, file) |>
           readRDS()
@@ -496,6 +515,7 @@ for (penalty in c(0, 0.5, 1)) {
           purrr::list_transpose() |>
           tibble::as_tibble() |>
           dplyr::mutate(
+            "execution_time" = as.numeric(.data$execution_time, units = "secs"),
             "optim_method" = stringr::str_extract(
               !!file,
               r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
@@ -503,7 +523,6 @@ for (penalty in c(0, 0.5, 1)) {
           )
       }) |>
       purrr::list_rbind() |>
-      dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
       dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
 
@@ -532,16 +551,16 @@ results <- list.files(path) |>
       purrr::list_transpose() |>
       tibble::as_tibble() |>
       dplyr::mutate(
+        "execution_time" = as.numeric(.data$execution_time, units = "secs"),
         "optim_method" = stringr::str_extract(
           !!file,
           r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
         ),
-        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}") +
-          0.5 * stringr::str_detect(!!file, r"{-1-0-[0-9]+.rds}")
+        "monotonous" = stringr::str_detect(!!file, r"{-1-[0-9]-[0-9]+.rds}"),
+        "individual_level" = stringr::str_detect(!!file, r"{-[0-9]-1-[0-9]+.rds}")
       )
   }) |>
   purrr::list_rbind() |>
-  dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
   dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
 
@@ -567,60 +586,73 @@ round_eliminated <- results |>
     .data$execution_time >= 60 * .data$M |
       .data$value >= 1e3
   ) |>
-  dplyr::slice_min(M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::slice_min(
+    .data$M,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
   dplyr::transmute(
     .data$optim_method,
     .data$target,
     .data$variation,
     .data$method,
     .data$strategy,
-    .data$penalty,
+    .data$monotonous,
+    .data$individual_level,
     "N_eliminated" = .data$M
   )
 
 should_have_been_eliminated <- results |>
-  dplyr::left_join(round_eliminated, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::left_join(
+    round_eliminated,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
   dplyr::filter(
     .data$N_eliminated < .data$M,
-    .by = c("optim_method", "target", "variation", "method", "strategy", "penalty")
+    .by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
   )
 
 if (nrow(should_have_been_eliminated) > 0) {
   cat("should_have_been_eliminated")
   print(dplyr::select(should_have_been_eliminated, !c("target", "variation", "target_label")))
-  print(dplyr::count(should_have_been_eliminated, method, strategy, penalty))
+  print(dplyr::count(should_have_been_eliminated, method, strategy, monotonous, individual_level))
 }
 
 results <- dplyr::anti_join(
   results,
   dplyr::select(
     should_have_been_eliminated,
-    "optim_method", "target", "variation", "method", "strategy", "penalty", "M"
+    "optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level", "M"
   ),
-  by = c("optim_method", "target", "variation", "method", "strategy", "penalty", "M")
+  by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level", "M")
 )
 
 
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
-  dplyr::slice_max(.data$M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::slice_max(
+    .data$M,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
   dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10, .data$value < 1e3)
 
 if (nrow(should_not_have_been_eliminated) > 0) {
   cat("should_not_have_been_eliminated")
   print(dplyr::select(should_not_have_been_eliminated, !c("target", "variation", "target_label")))
-  print(dplyr::count(should_not_have_been_eliminated, method, strategy, penalty))
+  print(dplyr::count(should_not_have_been_eliminated, method, strategy, monotonous, individual_level))
 }
 
 # Re-arrange the columns
 results <- results |>
   dplyr::select(
-    "target", "variation", "method", "strategy", "penalty", "M", "value", "execution_time", dplyr::everything()
+    "target", "variation", "method", "strategy",
+    "monotonous", "individual_level",
+    "M", "value", "execution_time", dplyr::everything()
   ) |>
   dplyr::arrange(
     .data$optim_method,
     .data$M,
-    .data$penalty,
+    .data$monotonous,
+    .data$individual_level,
     .data$target,
     .data$variation,
     .data$method,
