@@ -436,3 +436,60 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
 
   rm(regions_nuts)
 })
+
+
+test_that("`plot()` produces no errors with defaults", {
+  skip_if_not_installed("giscoR")
+  skip_if_not_installed("lwgeom")
+
+  regions <- DiseasyRegionsNuts$new(
+    area = "DK",
+    demography = demography_nordic_nuts3,
+    adjacency = adjacency_meta_nordic_nuts3,
+    regional_risks = stats::setNames(
+      runif(length(unique(demography_nordic_nuts3$region))),
+      unique(demography_nordic_nuts3$region)
+    )
+  )
+
+  expect_no_error(regions$plot())
+
+  rm(regions)
+})
+
+test_that("`plot()` produces no errors with given data", {
+  skip_if_not_installed("giscoR")
+  skip_if_not_installed("lwgeom")
+
+  regions <- DiseasyRegionsNuts$new(
+    area = "DK"
+  )
+
+  # Create a dummy test data set
+  data <- demography_nordic_nuts3 |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "region"
+    ) |>
+    dplyr::cross_join(
+      data.frame(
+        "date" = seq.Date(
+          from = as.Date("2021-01-01"),
+          to = as.Date("2021-01-15"),
+          by = "1 day"
+        )
+      )
+    )
+
+  # Try to plot
+  expect_error(
+    regions$plot(data = data),
+    regexp = "`DiseasyRegionsNuts` must be configured with a `demography` to determine available NUTS levels."
+  )
+
+  # Set demography and re-plot
+  regions$set_demography(demography_nordic_nuts3)
+  expect_no_error(regions$plot(data = data))
+
+  rm(regions)
+})

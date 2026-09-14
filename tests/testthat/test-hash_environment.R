@@ -23,10 +23,10 @@ test_that("hash_environment works", {
 
   # Check errors can be hashed
   expect_no_error(
-    hash_environment(simpleError("Test error"))
+    hash_environment(list(simpleError("Test error")))
   )
   expect_no_error(
-    hash_environment(rlang::error_cnd(message = "Unable to load data", parent = simpleError("Test error")))
+    hash_environment(list(rlang::error_cnd(message = "Unable to load data", parent = simpleError("Test error"))))
   )
 
 })

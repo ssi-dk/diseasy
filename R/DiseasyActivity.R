@@ -414,12 +414,12 @@ DiseasyActivity <- R6::R6Class(                                                 
       if (!is.null(first_date) && any(as.Date(colnames(private$.scenario_matrix)) < first_date)) {
         col_id <- max(which(as.Date(colnames(private$.scenario_matrix)) <= first_date)) # First column to keep
         colnames(private$.scenario_matrix)[col_id] <- as.character(first_date)
-        private$.scenario_matrix <- private$.scenario_matrix[, col_id : ncol(private$.scenario_matrix)]
+        private$.scenario_matrix <- private$.scenario_matrix[, col_id : ncol(private$.scenario_matrix), drop = FALSE]
       }
 
       if (!is.null(last_date) && any(as.Date(colnames(private$.scenario_matrix)) > last_date)) {
         col_id <- min(which(as.Date(colnames(private$.scenario_matrix)) > last_date)) # First column to delete
-        private$.scenario_matrix <- private$.scenario_matrix[, 1 : (col_id - 1)]
+        private$.scenario_matrix <- private$.scenario_matrix[, 1 : (col_id - 1), drop = FALSE]
       }
     },
 

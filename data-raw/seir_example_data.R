@@ -2,66 +2,17 @@
 
 if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
-  # Generate synthetic disease data for testing from a simple SEIR model with some noise added
   withr::local_seed(4260)
 
-  # Set the time scales of the problem
-  rE <- 1 / 2.1                                                                                                         # nolint: object_name_linter
-  rI <- 1 / 4.5                                                                                                         # nolint: object_name_linter
+  # Generate the example model
+  model <- generate_example_seir_model()
 
-  overall_infection_risk <- 0.025
+  K <- model %.% parameters %.% compartment_structure[["E"]]                                                            # nolint start: object_name_linter
+  L <- model %.% parameters %.% compartment_structure[["I"]]
+  M <- model %.% parameters %.% compartment_structure[["R"]]
+  rI <- model %.% parameters %.% disease_progression_rates[["I"]]                                                       # nolint end: object_name_linter
 
-  # Set the age resolution
-  age_cuts_lower <- c(0, 30, 60)
-
-  # Setup the number of compartments for the generating model
-  K <- 2L                                                                                                               # nolint start: object_name_linter
-  L <- 1L
-  M <- 2L                                                                                                               # nolint end
-
-  # Build model
-
-  # Define the model population
-  population <- DiseasyPopulation$new()
-  population$stratify_age(age_cuts_lower = age_cuts_lower)
-
-  # Define the activity scenario
-  activity <- DiseasyActivity$new()
-  activity$set_contact_basis(contact_basis = contact_basis_nordic %.% DK)
-  activity$set_activity_units(dk_activity_units)
-  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
-
-  # Define the area and population of interest
-  regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
-
-  # Add a waning immunity scenario
-  immunity <- DiseasyImmunity$new()
-  immunity$set_exponential_waning(time_scale = 180)
-
-  # Add a season scenario
-  season <- DiseasySeason$new()
-  season$set_reference_date(as.Date("2020-01-20"))
-  season$use_cosine_season()
-
-  # We need a dummy observables module
-  observables <- DiseasyObservables$new(
-    conn = \() DBI::dbConnect(RSQLite::SQLite()),
-    last_queryable_date = as.Date("2020-01-20")
-  )
-
-  model <- DiseasyModelOdeSeir$new(
-    activity = activity,
-    regions = regions,
-    immunity = immunity,
-    season = season,
-    observables = observables,
-    population = population,
-    parameters = list(
-      "compartment_structure" = c("E" = K, "I" = L, "R" = M),
-      "overall_infection_risk" = overall_infection_risk,
-      "disease_progression_rates" = c("E" = rE, "I" = rI)
-    )
-  )
+  age_cuts_lower <- model %.% population %.% age_cuts_lower
 
   # Get a reference to the private environment
   private <- model$.__enclos_env__$private
@@ -69,17 +20,17 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Generate a initial state_vector
   y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
 
-  population_proportion <- activity$map_population(age_cuts_lower) |>
+  population_proportion <- model %.% activity %.% map_population(age_cuts_lower) |>
     dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
     dplyr::pull("proportion")
 
   activity_proportion <- cbind(
-    activity$map_population(age_cuts_lower) |>
+    model %.% activity %.% map_population(age_cuts_lower) |>
       dplyr::summarise(
         "proportion" = sum(.data$proportion),
         .by = c("age_group_reference", "age_group_out")
       ),
-    "activity" = rowSums(activity$get_scenario_contacts(weights = c(1, 1, 1, 1))[[1]])
+    "activity" = rowSums(model %.% activity %.% get_scenario_contacts(weights = c(1, 1, 1, 1))[[1]])
   ) |>
     dplyr::summarise("activity" = sum(.data$activity), .by = "age_group_out") |>
     dplyr::pull("activity")
@@ -168,8 +119,12 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     ggplot2::facet_wrap(~ age_group) +
     ggplot2::ylab("Test positive / Infected / Admissions") +
     ggplot2::scale_color_manual(
-      values = c("Infected" = "black", "Test positive (simple)" = "blue",
-                 "Test positive (realistic)" = "red", "Admissions * 10" = "darkgreen")
+      values = c(
+        "Infected" = "black",
+        "Test positive (simple)" = "blue",
+        "Test positive (realistic)" = "red",
+        "Admissions * 10" = "darkgreen"
+      )
     )
 
   # Store data set
