@@ -412,7 +412,7 @@ chosen_defaults <- chosen_defaults |>
 
 
 ```{r, echo = FALSE, eval = rlang::is_installed("gt")}
-total_results <- total_results |>
+total_results_for_plotting <- total_results |>
   dplyr::summarise(
     "min_value" = min(.data$value, na.rm = TRUE),
     "min_execution_time" = min(.data$execution_time, na.rm = TRUE),
@@ -423,7 +423,9 @@ total_results <- total_results |>
     by = c("monotonous", "individual_level", "method")
   )
 
-visualise_methods <- function(total_results, method) {
+visualise_methods <- function(method, total_results = total_results_for_plotting) {
+
+  # Form a subset to plot
   gg_data <- total_results |>
     dplyr::slice_min(
       .data$value - .data$min_value +
@@ -498,15 +500,15 @@ visualise_methods <- function(total_results, method) {
 ```
 
 ```{r overview free_delta, echo = FALSE, fig.alt = "Total error vs execution time for the free_delta method.", eval = rlang::is_installed("gt")}
-visualise_methods(total_results, "free_delta")
+visualise_methods("free_delta")
 ```
 
 ```{r overview free_gamma, echo = FALSE, fig.alt = "Total error vs execution time for the free_gamma method.", eval = rlang::is_installed("gt")}
-visualise_methods(total_results, "free_gamma")
+visualise_methods("free_gamma")
 ```
 
 ```{r overview all_free, echo = FALSE, fig.alt = "Total error vs execution time for the all_free method.", eval = rlang::is_installed("gt")}
-visualise_methods(total_results, "all_free")
+visualise_methods("all_free")
 ```
 
 
