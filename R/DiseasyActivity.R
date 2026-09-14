@@ -179,23 +179,29 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       # Check structure of contact_basis
       checkmate::assert_list(contact_basis, add = coll)
-      checkmate::assert_set_equal(names(contact_basis),
-                                  c("contacts", "population", "proportion", "demography", "description"),
-                                  add = coll)
+      checkmate::assert_set_equal(
+        names(contact_basis),
+        c("per_capita_contacts", "population", "proportion", "demography", "description"),
+        add = coll
+      )
 
-      # Checks on contact_basis contacts
-      checkmate::assert_list(purrr::pluck(contact_basis, "contacts"), min.len = 1, add = coll)
-      checkmate::assert_set_equal(names(purrr::pluck(contact_basis, "contacts")), private$activity_types, add = coll)
+      # Checks on contact_basis per_capita_contacts
+      checkmate::assert_list(purrr::pluck(contact_basis, "per_capita_contacts"), min.len = 1, add = coll)
+      checkmate::assert_set_equal(
+        names(purrr::pluck(contact_basis, "per_capita_contacts")),
+        private$activity_types,
+        add = coll
+      )
       purrr::walk(
-        contact_basis$contacts,
+        contact_basis$per_capita_contacts,
         \(contacts) checkmate::assert_matrix(contacts, min.rows = 1, min.cols = 1, any.missing = FALSE, add = coll)
       )
 
       # - Check for consistency of the number of age groups in the contact matrices
       # All matrices should be square matrices with of the same dimensions
-      n_age_groups <- purrr::pluck(contact_basis, "contacts", 1, dim, 1) # Get first dimensions of the first matrix
+      n_age_groups <- purrr::pluck(contact_basis, "per_capita_contacts", 1, dim, 1) # Get first dim of the first matrix
       purrr::walk(
-        purrr::pluck(contact_basis, "contacts"),
+        purrr::pluck(contact_basis, "per_capita_contacts"),
         ~ checkmate::assert_matrix(., ncols = n_age_groups, nrows = n_age_groups, add = coll)
       )
 
@@ -218,9 +224,30 @@ DiseasyActivity <- R6::R6Class(                                                 
                                   c("age", "population", "proportion"), add = coll)
 
       # Check for dimension mismatch
-      checkmate::assert_number(unique(c(nrow(purrr::pluck(contact_basis, "contacts", 1)),
-                                        ncol(purrr::pluck(contact_basis, "contacts", 1)),
-                                        length(purrr::pluck(contact_basis, "proportion")))), add = coll)
+      checkmate::assert_number(
+        unique(
+          c(
+            purrr::pluck(contact_basis, "per_capita_contacts", 1, nrow),
+            purrr::pluck(contact_basis, "per_capita_contacts", 1, ncol)
+          )
+        ),
+        add = coll
+      )
+
+      checkmate::assert_true(
+        identical(
+          purrr::pluck(contact_basis, "per_capita_contacts", 1, rownames),
+          purrr::pluck(contact_basis, "per_capita_contacts", 1, colnames)
+        ),
+        add = coll
+      )
+
+      # Checks on contact_basis labels
+      checkmate::assert_character(
+        purrr::pluck(contact_basis, "per_capita_contacts", 1, colnames),
+        pattern = r"{\d+(-\d+|\+)}",
+        add = coll
+      )
 
       # End checks
       checkmate::reportAssertions(coll)
@@ -524,7 +551,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
 
     #' @description
-    #'   Return contacts across age groups and activities on all dates.
+    #'   Return per-capita contacts across age groups and activities on all dates.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param weights `r rd_activity_weights`
     #' @return
@@ -559,14 +586,35 @@ DiseasyActivity <- R6::R6Class(                                                 
           purrr::pluck(.default = 0) |>
           diseasystore::age_labels()
 
+        # Ensure age_cuts_lower is set
+        age_cuts_lower <- as.numeric(stringr::str_extract(age_labels, r"{\d+}"))
+
+
+        # To perform the projection, we need the number of persons in the new and original age groups
+        # Determine the population in the new age groups
+        if (!is.null(self$contact_basis)) {
+          population <- self$contact_basis$demography |>
+            dplyr::mutate(age_group = cut(.data$age, c(age_cuts_lower, Inf), right = FALSE)) |>
+            dplyr::summarise(population = sum(.data$population), .by = "age_group") |>
+            dplyr::pull("population")
+        } else {
+          population <- rep(1 / length(age_cuts_lower), length(age_cuts_lower))
+        }
+
+        # Store as a square matrix with the population repeated as columns
+        N_i <- outer(population, rep(1, length(population)))                                                            # nolint: object_name_linter
+
+        # Contacts are uniform across all age groups
         scenario_contacts <- matrix(
           rep(
-            1 / (length(age_labels) * length(private$activity_types)), # Contacts are uniform across all age groups
+            1 / (length(age_labels) * length(private$activity_types)),
             length(age_labels) * length(age_labels)
           ),
           ncol = length(age_labels),
           dimnames = list(age_labels, age_labels)
-        ) |>
+        ) / t(N_i)
+
+        scenario_contacts <- scenario_contacts |>
           list() |>
           rep(length(private$activity_types)) |>     # ... across all arenas
           stats::setNames(private$activity_types) |>
@@ -589,7 +637,7 @@ DiseasyActivity <- R6::R6Class(                                                 
             # be reduced to 0.5 * 0.8 = 40 %. For this choice the adding of activities and expansion to matrix are
             # non-commutative.
             scenario_contacts[[dd]][[tt]] <- private$vector_to_matrix(openness[[dd]][[tt]]) *
-              self$contact_basis$contacts[[tt]]
+              self %.% contact_basis %.% per_capita_contacts[[tt]]
           }
         }
 
@@ -612,15 +660,17 @@ DiseasyActivity <- R6::R6Class(                                                 
           N_original <- self$contact_basis$population                                                                   # nolint: object_name_linter
           N_original <- outer(N_original, rep(1, length(N_original)))                                                   # nolint: object_name_linter
 
-          # For each contact matrix, m, in the scenario, we perform the transformation
-          # (p %*% (m * N_original) %*% t(p)) / N_new                                                                   # nolint: commented_code_linter
-          # As m is the number of contacts from each individual m * N_original scales to all contacts between
-          # age groups ("t" domain).
+          # For each per-capita contact matrix, c, in the scenario, we perform the transformation
+          # (p %*% (c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N__new))                                     # nolint: commented_code_linter
+          # As c is the per-capita contacts from each individual c * N_original * t(N_original) scales to all contacts
+          # between age groups ("t" domain).
           # Pre- and post-multiplying with p collects the contacts as if originally collected in the new groups.
-          # Finally, the division by N_new transforms back to contacts per individual in the new age groups
-          # ("m" domain).
+          # Finally, the division by N_new * t(N_new) transforms back to per-capita contacts individual in the new age
+          # groups ("c" domain).
           scenario_contacts <- scenario_contacts |>
-            lapply(\(contacts) lapply(contacts, \(m) (p %*% (m * N_original) %*% t(p)) / N_new))
+            lapply(
+              \(contacts) lapply(contacts, \(c) (p %*% (c * N_original * t(N_original)) %*% t(p)) / (N_new * t(N_new)))
+            )
         }
       }
 
@@ -834,7 +884,7 @@ DiseasyActivity <- R6::R6Class(                                                 
               "from" = rownames(.x),
               "arena" = .y
             ) |>
-              dplyr::mutate("contacts" = as.vector(.x))
+              dplyr::mutate("per_capita_contacts" = as.vector(.x))
           }
         ) |>
           purrr::list_rbind()
@@ -843,7 +893,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           "to" = colnames(contact_matrix_to_plot),
           "from" = rownames(contact_matrix_to_plot)
         ) |>
-          dplyr::mutate("contacts" = as.vector(contact_matrix_to_plot))
+          dplyr::mutate("per_capita_contacts" = as.vector(contact_matrix_to_plot))
       }
 
       # Plot contacts
@@ -855,7 +905,7 @@ DiseasyActivity <- R6::R6Class(                                                 
           x = "Contacts from",
           y = "Contacts to",
           title = "Mean number of daily contacts ",
-          fill = "Contacts",
+          fill = "Per-capita contacts",
           caption = glue::glue("Contact matrix as of {contacts_date}")
         ) +
         ggplot2::theme(
@@ -943,6 +993,7 @@ DiseasyActivity <- R6::R6Class(                                                 
 
       return(list("contact_matrix" = contacts_plot, "openness" = openness_plot))
     },
+
 
     #' @description `r rd_describe`
     describe = function() {

@@ -24,7 +24,7 @@ generate_contact_basis <- function(area = NULL) {
     ))
   }
 
-  age_cuts_lower <- (0:15) * 5
+  age_cuts_lower <- seq(from = 0, to = 75, by = 5)
   age_labels <- diseasystore::age_labels(age_cuts_lower)
 
   demography <- generate_demography(area)
@@ -54,7 +54,7 @@ generate_contact_basis <- function(area = NULL) {
         tibble::deframe()
 
       tibble::lst(
-        "contacts" = NULL, # pre-allocate for below
+        "per_capita_contacts" = NULL, # pre-allocate for below
         "population" = N,
         "proportion" = N / sum(N),
         "demography" = demography |>
@@ -85,7 +85,7 @@ generate_contact_basis <- function(area = NULL) {
 
     # Retrieve and transform contact matrices for each arena
     arenas <- c("home", "work", "school", "other")
-    contacts <- purrr::map(arenas, \(arena) {
+    per_capita_contacts <- purrr::map(arenas, \(arena) {
 
       # The Diseasy SEIR models are configured to use a scale of contact matrices.
       # To make the definition of "contact" matrix more clear, lets start with the
@@ -192,15 +192,19 @@ generate_contact_basis <- function(area = NULL) {
         rlang::abort("mp is not reciprocal")
       }
 
-      # Return the contact matrices directly
-      return(mp)
+      # Convert to per-capita rates
+      N_j <- t(N_i)                                                                                                     # nolint: object_name_linter
+      cp <- mp / N_j
+
+      # Return the per-capita contact rates
+      return(cp)
 
     }) |>
       stats::setNames(arenas)
 
     return(utils::modifyList(
       purrr::pluck(contact_basis, country_code),
-      list("contacts" = contacts)
+      list("per_capita_contacts" = per_capita_contacts)
     ))
   }) |>
     stats::setNames(common_country_codes)
