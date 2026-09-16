@@ -28,6 +28,8 @@ checkmate::reportAssertions(coll)
 
 # See vignette("DiseasyImmunity-optimisation") for full context
 
+# Set the time limit
+time_limit <- 60 # per compartment
 
 # We define our list of test functions:
 # f: "base" functions
@@ -362,10 +364,8 @@ existing_results <- function(M, monotonous, individual_level) {                 
     purrr::map(
       .progress = TRUE,
       \(file) {
-        tmp <- file.path(path, file) |>
-          readRDS()
-
-        tmp |>
+        file.path(path, file) |>
+          readRDS() |>
           purrr::imap(\(approx, target_label) {
             approx |>
               purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
@@ -395,6 +395,45 @@ path <- tryCatch(
   }
 )
 cache <- cachem::cache_disk(dir = path, max_size = Inf)                                                                 # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
+
+
+# Determine the wall-time of the current run
+existing_files <- list.files(path, pattern = ".rds")
+
+compartment_time <- purrr::map(
+  .progress = TRUE,
+  .x = existing_files,
+  .f = \(file) {
+    purrr::map_dbl(
+      readRDS(file.path(path, file)),
+      \(target_results) {
+        as.numeric(purrr::pluck(target_results, "execution_time"), units = "secs") / purrr::pluck(target_results, "M")
+      }
+    )
+  }
+) |>
+  purrr::reduce(c) |>
+  purrr::keep(is.finite)
+
+# Determine the most frequent execution time per compartment (which should be the used wall time)
+current_time_limit <- unique(compartment_time)[which.max(tabulate(match(compartment_time, unique(compartment_time))))]
+
+# Then delete runs killed by wall time
+if (current_time_limit != time_limit) {
+  purrr::walk(
+    .progress = TRUE,
+    .x = existing_files,
+    .f = \(file) {
+      file.path(path, file) |>
+        readRDS() |>
+        purrr::discard(
+          ~ purrr::pluck(., "execution_time") == current_time_limit * purrr::pluck(., "M")
+        ) |>
+        saveRDS(file.path(path, file))
+    }
+  )
+}
+
 
 for (penalty in c(0, 0.5, 1)) {
   monotonous <- ceiling(penalty)
@@ -485,7 +524,7 @@ for (penalty in c(0, 0.5, 1)) {
 
 
     # Run the optimisation problem for the configurations
-    walltime <- 60 * M
+    walltime <- time_limit * M
 
     optimiser(
       combinations_zip,
@@ -583,7 +622,7 @@ results <- results |>
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
   dplyr::filter(
-    .data$execution_time >= 60 * .data$M |
+    .data$execution_time >= time_limit * .data$M |
       .data$value >= 1e3
   ) |>
   dplyr::slice_min(
@@ -633,7 +672,7 @@ should_not_have_been_eliminated <- results |>
     .data$M,
     by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
   ) |>
-  dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10, .data$value < 1e3)
+  dplyr::filter(.data$execution_time < time_limit * .data$M, .data$M < 10, .data$value < 1e3)
 
 if (nrow(should_not_have_been_eliminated) > 0) {
   cat("should_not_have_been_eliminated")
