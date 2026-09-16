@@ -33,6 +33,8 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -85,6 +87,8 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -123,6 +127,8 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -178,6 +184,8 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -215,6 +223,8 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -247,6 +257,8 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
       "disease_progression_rates" = c("E" = rI, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -284,6 +296,8 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -325,6 +339,8 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
       "disease_progression_rates" = c("E" = rI, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -369,6 +385,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -412,6 +430,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -459,6 +479,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -505,6 +527,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -566,6 +590,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -626,6 +652,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -681,6 +709,8 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -741,6 +771,8 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
