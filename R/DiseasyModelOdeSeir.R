@@ -1798,24 +1798,40 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
+
+      # Define a modified list of model parameters
+      parameters <- modifyList(
+        self %.% parameters,
+        list(
+          "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+          "disease_progression_rates" = purrr::discard_at(
+            self %.% parameters %.% disease_progression_rates,
+            ~ . == "E"
+          ),
+          "malthusian_matching" = FALSE
+        ),
+        keep.null = TRUE
+      )
+
+      # Remove the outputs generated from `$configure_output()`
+      parameters[["model_output_to_observable"]] <- purrr::pluck(
+        private %.% default_parameters(),
+        "model_output_to_observable"
+      )
+
       reference_model <- DiseasyModelOdeSeir$new(
-        activity = self %.% activity,
         observables = self %.% observables,
+        population = self %.% population,
+        activity = self %.% activity,
+        regions = self %.% regions,
         season = self %.% season,
         variant = self %.% variant,
-        parameters = modifyList(
-          self %.% parameters,
-          list(
-            "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
-            "disease_progression_rates" = purrr::discard_at(
-              self %.% parameters %.% disease_progression_rates,
-              ~ . == "E"
-            ),
-            "malthusian_matching" = FALSE
-          ),
-          keep.null = TRUE
-        )
+        immunity = self %.% immunity,
+        parameters = parameters
       )
+
+      # Ensure RHS is initialised
+      reference_model %.% prepare_rhs()
 
       reference_growth_rate <- reference_model$malthusian_growth_rate(...)
 
