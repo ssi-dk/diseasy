@@ -37,7 +37,7 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
@@ -89,7 +89,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
@@ -128,7 +128,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
@@ -182,7 +182,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
