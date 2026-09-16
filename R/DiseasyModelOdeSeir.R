@@ -80,7 +80,7 @@
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
 #' @export
-DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelOdeSeir",
   inherit = DiseasyModelOde,
 
@@ -777,7 +777,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))                                                 # nolint: object_name_linter
 
           # Compute I states from polynomial fit
-          I_star <- stats::predict(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+          I_star <- stats::predict(                                                                                     # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
             incidence_poly_fits[[group_id]],
             newdata = data.frame(t = -(seq_len(L) - 1) / ri)
           )

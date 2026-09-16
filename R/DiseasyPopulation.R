@@ -25,7 +25,7 @@
 #'   A new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
 #' @keywords functional-module
 #' @export
-DiseasyPopulation <- R6::R6Class(                                                                                       # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyPopulation <- R6::R6Class(                                                                                       # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyPopulation",
   inherit = DiseasyBaseModule,
 
