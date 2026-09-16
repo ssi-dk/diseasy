@@ -124,13 +124,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       # If `DiseasyRegions` is configured, age and regional splits must be consistent with demography data
       if (checkmate::test_class(self %.% regions, "DiseasyRegions")) {
 
-        if (!identical(age_cuts_lower, 0L)) {
-
-          if (is.null(self %.% regions %.% demography)) {
-            pkgcond::pkg_error(
-              "When stratifying by age, `DiseasyRegions` must be loaded with a `demography`."
-            )
-          }
+        if (!identical(age_cuts_lower, 0L) && !is.null(self %.% regions %.% demography)) {
 
           # Check the given age groups can be mapped to the demography data
           coll <- checkmate::makeAssertCollection()
