@@ -181,6 +181,223 @@ DiseasyPopulation <- R6::R6Class(                                               
       return(per_capita_contact_matrices)
     },
 
+                                                                                                                        # nolint start: documentation_template_linter, identation_linter
+    #' Map population between age groups
+    #'
+    #' @description
+    #'   The function computes the proportion of population in the new and old age groups.
+    #' @param age_cuts_lower `r rd_age_cuts_lower()`
+    #' @param regions (`character()`)\cr
+    #'   The regions the population should be mapped to (e.g. NUTS 1 regions).
+    #' @param age_groups_reference (`character()`)\cr
+    #'   Age labels (created by `diseasystore::age_labels()` of reference data.
+    #' @param demography (`data.frame`)\cr
+    #'   "A `data.frame` with the columns\\cr",
+    #'   "  * `age` (`integer()`) 1-year age groups or `age_group` (`integer()`) dynamic age groups\\cr",
+    #'   "  * `population` (`numeric()`) size of population in age group\\cr"
+    #' @return
+    #'   A `data.frame` which maps the age groups from their reference in `contact_basis` to
+    #'   those supplied to the function.
+    map_population = function(                                                                                          # nolint end: documentation_template_linter, identation_linter
+      age_cuts_lower = self %.% age_cuts_lower,
+      regions = purrr::pluck(self %.% groups, "region", unique),
+      age_groups_reference = NULL,
+      demography = self %.% regions %.% demography
+    ) {
+
+      if (is.null(demography)) {
+        # If no demography is set, use a unit demography across the model groups
+
+        age_cuts_lower_reference <- as.numeric(
+          stringr::str_extract(
+            purrr::pluck(age_groups_reference, .default = "0+"),
+            r"{\d+}"
+          )
+        )
+
+        demography <- self %.% groups |>
+          dplyr::select(!c("age_group", "region")) |>
+          dplyr::distinct() |>
+          dplyr::cross_join(
+            data.frame(
+              "age_cuts" = sort(unique(c(age_cuts_lower_reference, age_cuts_lower)))
+            )
+          ) |>
+          dplyr::left_join(
+            data.frame("age_cuts_lower_model" = age_cuts_lower),
+            by = dplyr::join_by(closest(age_cuts >= age_cuts_lower_model))
+          ) |>
+          dplyr::select(!"age_cuts_lower_model") |>
+          dplyr::cross_join(
+            data.frame(
+              "region" = colnames(self$regions$infection_flow_matrix)
+            )
+          ) |>
+          dplyr::mutate(
+            "population" = 1 / (
+              dplyr::n() * nrow(dplyr::distinct(dplyr::select(self %.% groups, !"age_group")))
+            ),
+            .by = !"age_cuts"
+          ) |>
+          dplyr::mutate(
+            "age_group" = diseasystore::age_labels(.data$age_cuts),
+            .by = !"age_cuts",
+            .before = "population"
+          ) |>
+          dplyr::select(dplyr::all_of(c(colnames(self %.% groups), "population")))
+
+      }
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_integerish(
+        age_cuts_lower, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE, add = coll
+      )
+      checkmate::assert_character(
+        age_groups_reference,
+        any.missing = FALSE, min.len = 1, unique = TRUE, pattern = r"{\d+(-\d+|\+)}", null.ok = TRUE,
+        add = coll
+      )
+
+      if (!identical(regions, "All")) {
+        checkmate::assert_names(names(demography), must.include = "region", add = coll)
+
+        unmatchable_regions_in_demography <- purrr::discard(
+          demography$region,
+          ~ any(stringr::str_starts(., regions))
+        )
+
+        if (length(unmatchable_regions_in_demography) > 0) {
+          coll$push("Not all regions in demography are matched by the given `regions`!")
+        }
+      }
+
+      checkmate::assert_data_frame(demography, min.rows = 1, add = coll)
+      checkmate::assert_names(names(demography), must.include = "population", add = coll)
+
+      demography_age_column <- intersect(c("age", "age_group"), names(demography))
+      if (length(demography_age_column) != 1) {
+        coll$push("`demography` must contain exactly one of `age` and `age_group`.")
+      }
+
+      if (identical(demography_age_column, "age")) {
+        checkmate::assert_integerish(demography$age, any.missing = FALSE, lower = 0, add = coll)
+      }
+
+      if (identical(demography_age_column, "age_group")) {
+        checkmate::assert_character(
+          demography$age_group,
+          any.missing = FALSE, min.len = 1, pattern = r"{\d+(-\d+|\+)}", add = coll
+        )
+      }
+
+      checkmate::assert_numeric(demography$population, any.missing = FALSE, lower = 0, add = coll)
+
+      checkmate::reportAssertions(coll)
+
+      # Reduce demography to stratifiable columns
+      demography <- demography |>
+        dplyr::rename("age_group" = {{ demography_age_column }}) |>
+        dplyr::summarise(
+          "population" = sum(.data$population),
+          .by = colnames(self %.% groups)
+        )
+
+      # Determine the age cuts of the reference and the demography data
+      age_cuts_lower_reference <- as.integer(stringr::str_extract(age_groups_reference, r"{^\d+}"))
+      age_cuts_lower_demography <- purrr::pluck(demography, "age_group") |>
+        purrr::map_if(is.character, ~ stringr::str_extract(., r"{^\d+}")) |>
+        as.integer() |>
+        unique()
+
+      # Ensure age_cuts_lower is fully formed
+      age_cuts_lower <- unique(c(0, age_cuts_lower))
+
+      # Verify that the demography has the age information needed to perform the map
+      missing_age_cuts_reference <- setdiff(age_cuts_lower_reference, age_cuts_lower_demography)
+      missing_age_cuts_out       <- setdiff(age_cuts_lower,           age_cuts_lower_demography)
+
+      coll <- checkmate::makeAssertCollection()
+      if (length(missing_age_cuts_out) > 0) {
+        coll$push(
+          glue::glue(
+            "`demography` is missing age group splits to facilitate splits at ",
+            'age{ifelse(length(missing_age_cuts_out) > 1, "s", "")} = {missing_age_cuts_out}'
+          )
+        )
+      }
+      if (length(missing_age_cuts_reference) > 0) {
+        coll$push(
+          glue::glue(
+            "`demography` is missing age group splits to facilitate splits at ",
+            'age{ifelse(length(missing_age_cuts_reference) > 1, "s", "")} = {missing_age_cuts_reference}'
+          )
+        )
+      }
+      checkmate::reportAssertions(coll)
+
+
+      # Generate age labels for the output
+      age_labels_out       <- diseasystore::age_labels(age_cuts_lower)
+      age_labels_reference <- diseasystore::age_labels(age_cuts_lower_reference)
+
+      #  Map reference and return age groups to the demography age groups
+      population <- demography |>
+        dplyr::mutate(
+          "proportion" = .data$population / sum(.data$population),
+          "age_group_id"           = age_cuts_lower_demography,
+          "age_group"              = diseasystore::age_labels(age_cuts_lower_demography),
+          .by = "region"
+        ) |>
+        dplyr::mutate(
+          "age_group_id_out"       = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower)),
+          "age_group_out"          = age_labels_out[.data$age_group_id_out]
+        )
+
+      # Add maps to reference if given
+      if (!is.null(age_groups_reference)) {
+        population <- population |>
+          dplyr::mutate(
+            "age_group_id_reference" = purrr::map_dbl(age_group_id, ~ sum(. >= age_cuts_lower_reference)),
+            "age_group_reference"    = age_labels_reference[.data$age_group_id_reference]
+          )
+      }
+
+      # Map reference regions to the requested regions
+      if (identical(regions, "All")) {
+
+        population <- dplyr::mutate(population, "region_out" = "All")
+
+      } else {
+        region_regexes <- purrr::map_chr(regions, ~ paste0("^(", ., r"{)\w{0,}$}"))
+
+        population <- region_regexes |>
+        purrr::map(
+          ~ population |>
+            dplyr::mutate(
+              "region_out" = stringr::str_extract(.data$region, ., group = 1)
+            ) |>
+            dplyr::filter(!is.na(.data$region_out))
+        ) |>
+        purrr::list_rbind()
+      }
+
+
+      # Reorder output
+      population <- population |>
+        dplyr::select(
+          dplyr::starts_with("age"),
+          dplyr::starts_with("region"),
+          dplyr::everything()
+        ) |>
+        dplyr::relocate(
+          dplyr::matches("_id"),
+          .after = dplyr::everything()
+        )
+
+      return(population)
+    },
+
 
     #' @description `r rd_describe`
     describe = function() {
