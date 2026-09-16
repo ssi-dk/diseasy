@@ -320,7 +320,7 @@ test_that("$get_scenario_openness() works with no scenario", {
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- names(contact_basis_nordic %.% DK %.% population)
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% per_capita_contacts, 1, colnames)
 
   expect_identical(
     act$get_scenario_openness(),
@@ -348,7 +348,7 @@ test_that("$get_scenario_openness() works with given scenario", {
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
-  age_labels <- names(contact_basis_nordic %.% DK %.% population)
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% population, 1, colnames)
 
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
@@ -483,19 +483,11 @@ test_that("$set_contact_basis() works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis_nordic %.% DK
-  custom_basis$contacts <- custom_basis$contacts[-1]
+  custom_basis$per_capita_contacts <- custom_basis$per_capita_contacts[-1]
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
     class = "simpleError",
     regexp = r"{Must be a set equal to \{'home','work','school','other'\}, but is missing elements \{'home'\}}"
-  )
-
-  custom_basis <- contact_basis_nordic %.% DK
-  custom_basis$proportion <- custom_basis$proportion[-1]
-  expect_error(
-    checkmate_err_msg(act$set_contact_basis(custom_basis)),
-    class = "simpleError",
-    regexp = "Must have length 16, but has length 15"
   )
 
   custom_basis <- contact_basis_nordic %.% DK
@@ -504,13 +496,6 @@ test_that("$set_contact_basis() works", {
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
     class = "simpleError",
     regexp = r"{Must be a permutation of set .+, but has extra elements \{'extra_element'\}}"
-  )
-
-  custom_basis <- contact_basis_nordic %.% DK
-  expect_error(
-    checkmate_err_msg(act$set_contact_basis(custom_basis[-5])),
-    class = "simpleError",
-    regexp = r"{Must be a set equal to .+, but is missing elements \{'description'\}}"
   )
 
   rm(act)
