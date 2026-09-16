@@ -179,8 +179,16 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   # Then from 2020-01-01, it should be "baseline" with risk 1, which is just the contact_basis matrices
   # However, the model uses per capita-ish rates, so we need to convert.
 
-  # To convert, we need the proportion of the population in the different age groups
-  proportion <- m$activity$contact_basis$proportion
+  population <- m %.% population %.% map_population(
+    age_groups_reference = names(m %.% activity %.% contact_basis, "population")
+  ) |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "age_group_reference"
+    ) |>
+    dplyr::pull("population")
+
+  proportion <- population / sum(population)                                                                            # nolint: object_name_linter
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
     private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),

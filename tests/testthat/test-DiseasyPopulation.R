@@ -279,3 +279,153 @@ test_that("$describe() works", {
   rm(regions)
   rm(population)
 })
+
+
+test_that("`map_population` works with 1-year age groups in demography", {
+
+  # Generate test demography
+  demography_1yr <- data.frame(
+    age = seq(from = 0, to = 100),
+    population = seq(from = 100, to = 0, by = -1)
+  )
+
+  population <- DiseasyPopulation$new()
+
+  # We should be able to map the population as long as demography has
+  # all the age cuts requested by age_cuts_lower and included in age_groups_reference
+
+  # So for 1-year age group demography, we should almost never fail
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = c(2, 4, 6),
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = c(2, 4, 6),
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
+      demography = demography_1yr
+    )
+  )
+
+  # .. but if we go outside the range of demography, we should get errors
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 200,
+        age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+        demography = demography_1yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  rm(population)
+})
+
+
+test_that("`map_population` works with 5-year age groups in demography", {
+
+  # Generate test demography
+  demography_5yr <- data.frame(
+    age_group = diseasystore::age_labels(seq(from = 0, to = 100, by = 5)),
+    population = seq(from = 100, to = 0, by = -5)
+  )
+
+  population <- DiseasyPopulation$new()
+
+  # For stratified demographies we are more restricted since the age cuts must be a subset of the demography groups
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = demography_5yr$age_group,
+      demography = demography_5yr
+    )
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = c(2, 4, 6),
+        age_groups_reference = demography_5yr$age_group,
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 5,
+        age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = demography_5yr$age_group,
+      demography = demography_5yr
+    )
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = c(2, 4, 6),
+        age_groups_reference = demography_5yr$age_group,
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 5,
+        age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  # .. and if we go outside the range of demography, we should still errors
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 200,
+        age_groups_reference = demography_5yr$age_group,
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  rm(population)
+})
