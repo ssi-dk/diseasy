@@ -540,7 +540,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
-  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
+  basis$per_capita_contacts <- purrr::map(basis$per_capita_contacts, ~ 0.25 + 0 * .) # Create "unit" contact matrices
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
@@ -569,6 +569,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  # Ensure we have unit activity matrices
+  expect_identical(as.numeric(m$population$per_capita_contact_matrices()[[1]]), 1)
+  expect_identical(as.numeric(m$population$per_capita_contact_matrices()[[2]]), 0.5)
+
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
   # so we rerun the test above for t = 1 instead of t = 0 and check that infections are halved
@@ -594,11 +598,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
-  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
-  basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
-  basis$population <- basis$proportion * sum(basis$population)
-  basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
-  basis$demography$population <- basis$demography$proportion * sum(basis$demography$population)
+  basis$per_capita_contacts <- purrr::map(basis$per_capita_contacts, ~ 0.25 + 0 * .) # Create "unit" contact matrices
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
@@ -628,6 +628,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
+
+  # Ensure we have unit activity matrices
+  expect_identical(unique(as.numeric(m$population$per_capita_contact_matrices()[[1]])), 1)
+  expect_identical(unique(as.numeric(m$population$per_capita_contact_matrices()[[2]])), 0.5)
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day

@@ -180,51 +180,45 @@ test_that("$contact_matrix() works (with scenario - single age group)", {
   # However, the model uses per capita-ish rates, so we need to convert.
 
   population <- m %.% population %.% map_population(
-    age_groups_reference = names(m %.% activity %.% contact_basis, "population")
+    age_groups_reference = purrr::pluck(m %.% activity %.% contact_basis, "per_capita_contacts", 1, colnames)
   ) |>
     dplyr::summarise(
       "population" = sum(.data$population),
       .by = "age_group_reference"
-    ) |>
-    dplyr::pull("population")
+    )
 
-  proportion <- population / sum(population)                                                                            # nolint: object_name_linter
+  N <- dplyr::pull(population, "population")                                                                            # nolint: object_name_linter
+
+  N_squared <- outer(X = N, Y = N)                                                                                      # nolint: object_name_linter
+
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
-      act$rescale_contacts_to_rates(proportion) |>
-      (\(m) m * outer(proportion, proportion, "*"))() |>
-      sum() |>
+    private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)) / sum(N),
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(N) |>
       matrix(dimnames = list("0+", "0+"))
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
-      act$rescale_contacts_to_rates(proportion) |>
-      (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
-      sum() |>
+    private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)) / sum(N),
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(N) * 0.5 |>
       matrix(dimnames = list("0+", "0+"))
   )
 
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(0),
-    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
-      act$rescale_contacts_to_rates(proportion) |>
-      (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
-      sum() |>
+    private %.% contact_matrix(0) / sum(N),
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(N) * 0.5 |>
       matrix(dimnames = list("0+", "0+"))
   )
 
   # The contact matrix should be valid forever
   expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(Inf),
-    purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) |>
-      act$rescale_contacts_to_rates(proportion) |>
-      (\(m) 0.5 * m * outer(proportion, proportion, "*"))() |>
-      sum() |>
+    private %.% contact_matrix(Inf) / sum(N),
+    (purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * N_squared) |>
+      sum() / sum(N) * 0.5 |>
       matrix(dimnames = list("0+", "0+"))
   )
 
@@ -253,7 +247,12 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
     population = DiseasyPopulation$new(
-      age_cuts_lower = as.numeric(stringr::str_extract(names(contact_basis_nordic %.% DK %.% population), r"{^\d+}"))
+      age_cuts_lower = as.numeric(
+        stringr::str_extract(
+          purrr::pluck(contact_basis_nordic %.% DK %.% per_capita_contacts, 1, colnames),
+          r"{^\d+}"
+        )
+      )
     ),
     regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     activity = act,
@@ -270,44 +269,44 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
+  N <- sum(m %.% population %.% model_population %.% population)                                                        # nolint: object_name_linter
+
+  labels <- paste0(purrr::pluck(contact_basis_nordic %.% DK %.% per_capita_contacts, 1, colnames), "/All")
+
   # Our test scenario starts on 2020-01-01
   # (.. So it should not be there before)
   expect_null(private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date())))
 
   # Then from 2020-01-01, it should be "baseline" with risk 1, which is just the contact_basis matrices
   # However, the model uses per capita-ish rates, so we need to convert.
-  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)),
-    act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`),
-      contact_basis_nordic %.% DK %.% proportion
-    )
+  expectation <- purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`)
+  dimnames(expectation) <- list(labels, labels)
+  expect_equal(
+    private %.% contact_matrix(as.numeric(as.Date("2020-01-01") - Sys.Date() + 1)) / N,
+    expectation,
+    tolerance = 1e-14
   )
 
   # Then from 2020-01-01, it should be "baseline" with risk 0.5, which is just half the contact_basis matrices
-  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)),
-    act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) * 0.5,
-      contact_basis_nordic %.% DK %.% proportion
-    )
+  expectation <- purrr::reduce(contact_basis_nordic %.% DK %.% per_capita_contacts, `+`) * 0.5
+  dimnames(expectation) <- list(labels, labels)
+  expect_equal(
+    private %.% contact_matrix(as.numeric(as.Date("2021-01-01") - Sys.Date() + 1)) / N,
+    expectation,
+    tolerance = 1e-14
   )
 
-  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(0),
-    act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) * 0.5,
-      contact_basis_nordic %.% DK %.% proportion
-    )
+  expect_equal(
+    private %.% contact_matrix(0) / N,
+    expectation,
+    tolerance = 1e-14
   )
 
   # The contact matrix should be valid forever
-  expect_equal(                                                                                                         # nolint: expect_identical_linter. The matrix operations have small numerical errors.
-    private %.% contact_matrix(Inf),
-    act$rescale_contacts_to_rates(
-      purrr::reduce(contact_basis_nordic %.% DK %.% contacts, `+`) * 0.5,
-      contact_basis_nordic %.% DK %.% proportion
-    )
+  expect_equal(
+    private %.% contact_matrix(Inf) / N,
+    expectation,
+    tolerance = 1e-14
   )
 
   rm(m, act)
