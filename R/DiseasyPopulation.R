@@ -422,7 +422,11 @@ DiseasyPopulation <- R6::R6Class(                                               
       if (is.null(self %.% regional_stratification)) {
         printr("Space: No spatial stratification has been configured")
       } else {
-        printr(glue::glue("Space: Stratified by {self %.% regional_stratification}"))
+        printr(
+          glue::glue(
+            "Space: Stratified by {self %.% regional_stratification}: ",
+            "{toString(self %.% regions %.% regions_at_stratification(self %.% regional_stratification))}")
+          )
       }
     }
   ),
