@@ -172,17 +172,121 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       checkmate::assert_numeric(weights, lower = 0, len = 4)
 
-      # Retrieve the time-varying contact matrices projected onto target age-groups
-      contact_matrices <- self %.% activity %.% get_scenario_contacts(
-        age_cuts_lower = self %.% age_cuts_lower,
-        weights = weights
-      )
+      # Retrieve the time-varying per-capita contact matrices
+      c_matrices_age <- self %.% activity %.% get_scenario_contacts(weights = weights)
 
-      # We then construct the normalised matrices
-      per_capita_contact_matrices <- contact_matrices |>
-        purrr::map(~ self %.% activity %.% rescale_contacts_to_rates(.x, self %.% population_proportion))
+      if (is.null(c_matrices_age)) {
+        c_matrices_age <- list(
+          "1970-01-01" = matrix(
+              1,
+              nrow = length(unique(self %.% groups %.% age_group)),
+              ncol = length(unique(self %.% groups %.% age_group)),
+              dimnames = list(
+                unique(self %.% groups %.% age_group),
+                unique(self %.% groups %.% age_group)
+              )
+            ) * mean(weights)
+          )
+      }
 
-      return(per_capita_contact_matrices)
+      age_groups_reference <- purrr::pluck(c_matrices_age, 1, colnames)
+
+      # Get all groups and their population
+      population_map <- self %.% map_population(age_groups_reference = age_groups_reference)
+
+      # Aggregate population to the reference age groups of the age-specific contact matrices
+      full_population <- population_map |>
+        dplyr::select(dplyr::all_of(c("age_group_reference", colnames(self %.% groups), "population"))) |>
+        dplyr::group_by(dplyr::across(!c("age_group", "population"))) |>
+        dplyr::summarise("population" = sum(.data$population), .groups = "drop") |>
+        dplyr::rename("age_group" = "age_group_reference")
+
+      # Retrieve the regional mixing matrices
+      theta <- self %.% regions %.% infection_flow_matrix
+
+      # Count population in regions
+      N_regions <- full_population |>
+        dplyr::summarise(
+          "population" = sum(.data$population),
+          .by = "region"
+        ) |>
+        tibble::deframe()
+      N_regions <- matrix(N_regions[colnames(theta)], ncol = 1)
+
+      # Construct the population-pair normalised mixing matrices
+      theta_norm <- theta * sum(N_regions)^2 / drop(t(N_regions) %*% theta %*% N_regions)
+
+      # Use normalised mixing matrices to "fold" age-specific contact matrices to the full contact matrices
+      c_matrices_full <- purrr::map(c_matrices_age, ~ kronecker(theta_norm, .))
+
+      # Convert to raw contacts ("T" domain)
+      t_matrices_full <- purrr::map(c_matrices_full, ~ . * tcrossprod(dplyr::pull(full_population, "population")))
+
+      # Reduce to model population
+      # Create map from full (reference) groups to model groups
+      # ... starting first with age groups only (which can have partial overlap to reference age groups)
+      tt <- merge(
+        aggregate(
+          population ~ age_group_reference + region + age_group_out + region_out,
+          data = population_map,
+          FUN = sum
+        ),
+        aggregate(
+          population ~ age_group_reference + region + region_out,
+          data = population_map,
+          FUN = sum
+        ),
+        by = c("age_group_reference", "region", "region_out"),
+        suffixes = c("_full", "_model")
+      ) |>
+        dplyr::mutate(
+          "proportion" = .data$population_full / .data$population_model
+        ) |>
+        dplyr::select(!dplyr::ends_with(c("_full", "_model")))
+
+      # Add labels
+      tt <- tt |>
+        tidyr::unite(
+          col = "label_full",
+          dplyr::any_of(sort(c("age_group_reference", colnames(self %.% groups)))),
+          sep = "/",
+          remove  = FALSE
+        ) |>
+        dplyr::select(!c("age_group_reference", "region")) |>
+        tidyr::unite(
+          col = "label_out",
+          dplyr::any_of(sort(c("age_group_out", "region_out", colnames(self %.% groups)))),
+          sep = "/"
+        )
+
+      # Convert labels to index
+      tt <- tt |>
+        dplyr::mutate(
+          "index_full" = purrr::map_dbl(
+            .data$label_full,
+            ~ which(. == unique(.data$label_full))
+          ),
+          "index_out" = purrr::map_dbl(
+            .data$label_out,
+            ~ which(. == unique(.data$label_out))
+          )
+        )
+
+      p_reduce <- with(tt, as.matrix(Matrix::sparseMatrix(i = index_out, j = index_full, x = proportion)))
+
+      rownames(p_reduce) <- unique(tt %.% label_out)
+      colnames(p_reduce) <- unique(tt %.% label_full)
+
+      # Compute N_squared in the model populations
+      N_model <- self %.% model_population |>
+        tidyr::unite("label", dplyr::all_of(colnames(self %.% groups)), sep = "/") |>
+        dplyr::select("label", "population") |>
+        tibble::deframe()
+
+      # Map to the model groups and convert back from "T" domain to "C" domain
+      c_matrices_model <- purrr::map(t_matrices_full, ~ (p_reduce %*% . %*% t(p_reduce)) / tcrossprod(N_model))
+
+      return(c_matrices_model)
     },
 
                                                                                                                         # nolint start: documentation_template_linter, identation_linter
