@@ -1603,8 +1603,38 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     # @return `r rd_side_effects()`
     set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
 
-      # Apply the scaling factor to the contact matrices
-      scaled_per_capita_contact_matrices <- purrr::map(per_capita_contact_matrices, ~ .x * scaling_factor)
+      # When converting the per-capita contact matrices to the ODE formulation,
+      # there is an important subtlety that we need to account for.
+      # The ODE equations in this model are made scale-free by expressing as
+      # proportions of the _total_ population. E.g. I = \tilde{I} / N where
+      # \tilde{I} are the total number of infectious individuals.
+
+      # This works well until we introduce regions to the model.
+      # In the dynamics, the force of infection contributed by source region x
+      # should be proportional to the regional prevalence: \tilde{I} / N_x.
+
+      # Since the model equations are expressed in terms of the total population
+      # we to scale contacts originating in region x by a scaling factor
+      # of N / N_x to account for this difference.
+      N_regions <- self %.% population %.% model_population |>
+        dplyr::summarise(
+          "N_regions" = sum(.data$population),
+          .by = "region"
+        ) |>
+        dplyr::pull("N_regions")
+
+      N_total <- sum(N_regions)
+
+      # Apply the scaling factors to the contact matrices
+      scaled_per_capita_contact_matrices <- purrr::map(
+        per_capita_contact_matrices,
+        ~ sweep(
+            .x * scaling_factor * N_total,
+            MARGIN = 2,
+            STATS = N_total / N_regions,
+            FUN = "*"
+          )
+      )
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: the end of the training period)
