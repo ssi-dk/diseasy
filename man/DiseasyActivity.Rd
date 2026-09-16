@@ -296,13 +296,12 @@ The activity units active in the scenario.
   Return openness [0 ; 1] for all age groups and activities on all dates.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$get_scenario_openness(age_cuts_lower = NULL, weights = NULL)}
+    \preformatted{DiseasyActivity$get_scenario_openness(weights = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done. The weights are normalized before applying.}
     }
     \if{html}{\out{</div>}}
@@ -320,13 +319,12 @@ Returns a list with depth of two: value[[date]][[type]]
   Return contacts across age groups and activities on all dates.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$get_scenario_contacts(age_cuts_lower = NULL, weights = NULL)}
+    \preformatted{DiseasyActivity$get_scenario_contacts(weights = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
     }
     \if{html}{\out{</div>}}
@@ -423,17 +421,12 @@ NOTE: Called automatically when setting/changing activity units.
   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$plot(
-  age_cuts_lower = NULL,
-  weights = rep(1, 4),
-  contacts_date = NULL
-)}
+    \preformatted{DiseasyActivity$plot(weights = rep(1, 4), contacts_date = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
       \item{\code{contacts_date}}{(\code{Date(1)})\cr
 The date to plot contact matrix for (default is earliest contact matrix).}
