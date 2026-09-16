@@ -35,15 +35,25 @@ DiseasyPopulation <- R6::R6Class(                                               
     #'   Creates a new instance of the `DiseasyPopulation` [R6][R6::R6Class] class.
     #' @param age_cuts_lower `r rd_age_cuts_lower()`
     #' @param regional_stratification `r rd_regional_stratification()`
-    #' @param regions (`DiseasyRegions`)\cr
-    #'   An instance of a regional module which should provide the demography of the population.
+    #' @param activity,regions `r rd_diseasy_module`
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor
-    initialize = function(age_cuts_lower = 0L, regional_stratification = NULL, regions = NULL, ...) {
+    initialize = function(
+      age_cuts_lower = 0L,
+      regional_stratification = NULL,
+      activity = NULL,
+      regions = NULL,
+      ...
+    ) {
+      checkmate::assert_class(activity, "DiseasyActivity", null.ok = TRUE)
       checkmate::assert_class(regions, "DiseasyRegions", null.ok = TRUE)
 
       # Pass additional arguments to the DiseasyBaseModule initializer
       super$initialize(...)
+
+      if (!is.null(activity)) {
+        self$load_module(activity)
+      }
 
       if (!is.null(regions)) {
         self$load_module(regions)
