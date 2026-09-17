@@ -185,7 +185,7 @@ contact_matrix <- function(adjacency, population, groups) {
   return(p %*% adjacency %*% t(p))
 }
 
-# A printing function which uses dots (...) to prevent wide and long matrices in vignette
+# A printing function which uses dots (...) to print wide and long matrices
 print_truncated <- function(x, n = 4) {
   nr <- nrow(x)
   nc <- ncol(x)
@@ -196,10 +196,18 @@ print_truncated <- function(x, n = 4) {
   y <- format(x[rows, cols, drop = FALSE])
 
   if (nr > 2 * n)
-    y <- rbind(y[seq_len(n), , drop = FALSE], "...", y[(n + 1):(2 * n), , drop = FALSE])
+    y <- rbind(
+      y[seq_len(n), , drop = FALSE],
+      "...",
+      y[(n + 1):(2 * n), , drop = FALSE]
+    )
 
   if (nc > 2 * n)
-    y <- cbind(y[, seq_len(n), drop = FALSE], "...", y[, (n + 1):(2 * n), drop = FALSE])
+    y <- cbind(
+      y[, seq_len(n), drop = FALSE],
+      "...",
+      y[, (n + 1):(2 * n), drop = FALSE]
+    )
 
   print(y, quote = FALSE)
 }
@@ -303,7 +311,7 @@ one_way_links <- one_way_links |>
     "j_u" = pmin(.data$i, .data$j)
   ) |>
   dplyr::group_by(.data$i_u, .data$j_u) |>
-  dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections between nodes
+  dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections
 
 # Convert to adjacency matrix with 2-way interactions
 adjacency_sw <- as.matrix(
@@ -531,8 +539,10 @@ one_way_links <- one_way_links |>
             dplyr::select(i_sampled, "j_age_group", "i_region", "i"),
             \(j_age_group, i_region, i) {
               any(
-                stringr::str_detect(population, stringr::str_replace(j_age_group, r"{\*}", i_region)) &
-                  seq_along(population) != i
+                stringr::str_detect(
+                  population,
+                  stringr::str_replace(j_age_group, stringr::fixed("*"), i_region)
+                ) & seq_along(population) != i
               )
             }
           )
@@ -549,7 +559,10 @@ one_way_links <- one_way_links |>
         purrr::pmap(
           \(i_age_group, j_age_group, n) {
             i_accepted |>
-              dplyr::filter(.data$i_age_group == {{ i_age_group }}, .data$j_age_group == {{ j_age_group }}) |>
+              dplyr::filter(
+                .data$i_age_group == {{ i_age_group }},
+                .data$j_age_group == {{ j_age_group }}
+              ) |>
               dplyr::slice_sample(n = {{ n }})
           }
         ) |>
@@ -567,7 +580,10 @@ one_way_links <- one_way_links |>
       dplyr::mutate(
         "j" = sample(
           x = which(
-            stringr::str_detect(population, stringr::str_replace(.y$j_age_group, r"{\*}", .y$i_region)) & seq_along(population) != .y$i
+            stringr::str_detect(
+              population,
+              stringr::str_replace(.y$j_age_group, stringr::fixed("*"), .y$i_region)
+            ) & seq_along(population) != .y$i
           ),
           size = dplyr::n()
         ),
@@ -583,7 +599,7 @@ one_way_links <- one_way_links |>
     "j_u" = pmin(.data$i, .data$j)
   ) |>
   dplyr::group_by(.data$i_u, .data$j_u) |>
-  dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections between nodes
+  dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections
 
 # Convert to adjacency matrix with 2-way interactions
 adjacency_silo <- as.matrix(

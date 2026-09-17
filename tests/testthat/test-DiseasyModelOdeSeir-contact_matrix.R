@@ -325,7 +325,10 @@ test_that("$contact_matrix() works (with scenario - all age groups)", {
 
   N <- sum(m %.% population %.% model_population %.% population)                                                        # nolint: object_name_linter
 
-  labels <- paste0(purrr::pluck(contact_basis_nordic %.% DK %.% per_capita_contacts, 1, colnames), "/All")
+  labels <- paste0(                                                                                                     # nolint: paste_linter
+    purrr::pluck(contact_basis_nordic %.% DK %.% per_capita_contacts, 1, colnames),
+    "/All"
+  )
 
   # Our test scenario starts on 2020-01-01
   # (.. So it should not be there before)

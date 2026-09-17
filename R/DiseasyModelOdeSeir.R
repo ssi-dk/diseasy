@@ -260,7 +260,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # In RHS, we need a mapping from i_state_indices to the relative infection risk of the corresponding variant.
       private$indexed_variant_infection_risk <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
         purrr::map(
-          \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_population_groups)
+          \(variant) {
+            rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_population_groups)
+          }
         ) |>
         purrr::reduce(c)
 
@@ -275,7 +277,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       private$rs_age_group <- seq_len(private %.% n_population_groups) |> # Starting with the number of age groups
         purrr::map(~ rep(., purrr::pluck(compartment_structure, "R"))) |> # We repeat for each R state
         rep(private %.% n_variants) |> # And since we have multiple variants, this is repeated
-        purrr::reduce(c, .init = seq_len(private %.% n_population_groups), .dir = "backward") # Collapse and add the S states
+        purrr::reduce( # Collapse and add the S states
+          c,
+          .init = seq_len(private %.% n_population_groups),
+          .dir = "backward"
+        )
 
       # We now expand the previous map to also include an id for variant.
       # This map is used later in the RHS where we have a n x v matrix called BI_av, where n is the length of the
@@ -1616,24 +1622,26 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Since the model equations are expressed in terms of the total population
       # we to scale contacts originating in region x by a scaling factor
       # of N / N_x to account for this difference.
-      N_regions <- self %.% population %.% model_population |>
+      N_regions <- self %.% population %.% model_population |>                                                          # nolint: object_name_linter
         dplyr::summarise(
           "N_regions" = sum(.data$population),
           .by = "region"
         ) |>
         dplyr::pull("N_regions")
 
-      N_total <- sum(N_regions)
+      N_total <- sum(N_regions)                                                                                         # nolint: object_name_linter
 
       # Apply the scaling factors to the contact matrices
       scaled_per_capita_contact_matrices <- purrr::map(
         per_capita_contact_matrices,
-        ~ sweep(
-            .x * scaling_factor * N_total,
+        \(matrix) {
+          sweep(
+            matrix * scaling_factor * N_total,
             MARGIN = 2,
             STATS = N_total / N_regions,
             FUN = "*"
           )
+        }
       )
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
@@ -1664,7 +1672,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       t = 0,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(                                                                                                    # nolint: object_name_linter
-        rep(0, private %.% n_population_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R),
+        rep(
+          0,
+          private %.% n_population_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R
+        ),
         self %.% population %.% model_population %.% proportion
       )
     ) {

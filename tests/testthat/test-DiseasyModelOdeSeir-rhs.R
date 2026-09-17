@@ -875,7 +875,7 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   expect_identical(sum(y0), 1)
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
-    c(
+    c(                                                                                                                  # nolint start: commented_code_linter
       0.5 * (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_A
       - (0.05 / 2) * rI,               # - I_A * rI
       (0.05 / 2) * rI,                 # I_A * rI
@@ -884,7 +884,7 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
       0,                               # I_B * rI = 0
       - 0.5 * (0.05 / 2) * (0.95 / 2), # - beta * I_A * S_A
       - 0.5 * (0.05 / 2) * (0.95 / 2)  # - beta * I_A * S_B
-    )
+    )                                                                                                                   # nolint end: commented_code_linter
   )
 
   rm(model)
@@ -1294,14 +1294,14 @@ test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mix
   expect_equal(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2),
+      (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2),
+      (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      - (1/3 + sqrt(2)/3) * (0.05 / 2) * (0.95 / 2),
-      - (sqrt(2)/3 + 2/3) * (0.05 / 2) * (0.95 / 2)
+      - (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
+      - (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2)
     ),
     tolerance = 1e-14 # Some numerical error has been introduced
   )

@@ -178,15 +178,15 @@ DiseasyPopulation <- R6::R6Class(                                               
       if (is.null(c_matrices_age)) {
         c_matrices_age <- list(
           "1970-01-01" = matrix(
-              1,
-              nrow = length(unique(self %.% groups %.% age_group)),
-              ncol = length(unique(self %.% groups %.% age_group)),
-              dimnames = list(
-                unique(self %.% groups %.% age_group),
-                unique(self %.% groups %.% age_group)
-              )
-            ) * mean(weights)
-          )
+            data = 1,
+            nrow = length(unique(self %.% groups %.% age_group)),
+            ncol = length(unique(self %.% groups %.% age_group)),
+            dimnames = list(
+              unique(self %.% groups %.% age_group),
+              unique(self %.% groups %.% age_group)
+            )
+          ) * mean(weights)
+        )
       }
 
       age_groups_reference <- purrr::pluck(c_matrices_age, 1, colnames)
@@ -205,13 +205,13 @@ DiseasyPopulation <- R6::R6Class(                                               
       theta <- self %.% regions %.% infection_flow_matrix
 
       # Count population in regions
-      N_regions <- full_population |>
+      N_regions <- full_population |>                                                                                   # nolint: object_name_linter
         dplyr::summarise(
           "population" = sum(.data$population),
           .by = "region"
         ) |>
         tibble::deframe()
-      N_regions <- matrix(N_regions[colnames(theta)], ncol = 1)
+      N_regions <- matrix(N_regions[colnames(theta)], ncol = 1)                                                         # nolint: object_name_linter
 
       # Construct the population-pair normalised mixing matrices
       theta_norm <- theta * sum(N_regions)^2 / drop(t(N_regions) %*% theta %*% N_regions)
@@ -278,7 +278,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       colnames(p_reduce) <- unique(tt %.% label_full)
 
       # Compute N_squared in the model populations
-      N_model <- self %.% model_population |>
+      N_model <- self %.% model_population |>                                                                           # nolint: object_name_linter
         tidyr::unite("label", dplyr::all_of(colnames(self %.% groups)), sep = "/") |>
         dplyr::select("label", "population") |>
         tibble::deframe()
@@ -480,14 +480,14 @@ DiseasyPopulation <- R6::R6Class(                                               
         region_regexes <- purrr::map_chr(regions, ~ paste0("^(", ., r"{)\w{0,}$}"))
 
         population <- region_regexes |>
-        purrr::map(
-          ~ population |>
-            dplyr::mutate(
-              "region_out" = stringr::str_extract(.data$region, ., group = 1)
-            ) |>
-            dplyr::filter(!is.na(.data$region_out))
-        ) |>
-        purrr::list_rbind()
+          purrr::map(
+            ~ population |>
+              dplyr::mutate(
+                "region_out" = stringr::str_extract(.data$region, ., group = 1)
+              ) |>
+              dplyr::filter(!is.na(.data$region_out))
+          ) |>
+          purrr::list_rbind()
       }
 
 
@@ -523,8 +523,9 @@ DiseasyPopulation <- R6::R6Class(                                               
         printr(
           glue::glue(
             "Space: Stratified by {self %.% regional_stratification}: ",
-            "{toString(self %.% regions %.% regions_at_stratification(self %.% regional_stratification))}")
+            "{toString(self %.% regions %.% regions_at_stratification(self %.% regional_stratification))}"
           )
+        )
       }
     }
   ),
