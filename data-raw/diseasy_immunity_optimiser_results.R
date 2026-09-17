@@ -29,7 +29,7 @@ checkmate::reportAssertions(coll)
 # See vignette("DiseasyImmunity-optimisation") for full context
 
 # Set the time limit
-time_limit <- 60 # per compartment
+time_limit <- 120 # per compartment
 
 # We define our list of test functions:
 # f: "base" functions
@@ -200,18 +200,19 @@ run_approximation <- function(
       ),
       timeout = walltime
     ),
-    callr_timeout_error = function(e) {
+    "system_command_timeout_error" = function(e) {
       return(
         list(
           "method" = method,
           "strategy" = strategy,
           "M" = M,
           "value" = Inf,
-          "execution_time" = walltime
+          "execution_time" = walltime,
+          "timed_out" = TRUE
         )
       )
     },
-    error = function(e) {
+    "error" = function(e) {
       return(
         list(
           "method" = method,
@@ -400,39 +401,19 @@ cache <- cachem::cache_disk(dir = path, max_size = Inf)                         
 # Determine the wall-time of the current run
 existing_files <- list.files(path, pattern = ".rds")
 
-compartment_time <- purrr::map(
+# Then delete runs killed by wall time
+purrr::walk(
   .progress = TRUE,
   .x = existing_files,
   .f = \(file) {
-    purrr::map_dbl(
-      readRDS(file.path(path, file)),
-      \(target_results) {
-        as.numeric(purrr::pluck(target_results, "execution_time"), units = "secs") / purrr::pluck(target_results, "M")
-      }
-    )
+    tmp <- file.path(path, file) |>
+      readRDS() |>
+      purrr::discard(~ purrr::pluck(., "timed_out", .default = FALSE))
+
+    if (length(tmp) > 0) saveRDS(tmp, file.path(path, file))
+    else file.remove(file.path(path, file))
   }
-) |>
-  purrr::reduce(c) |>
-  purrr::keep(is.finite)
-
-# Determine the most frequent execution time per compartment (which should be the used wall time)
-current_time_limit <- unique(compartment_time)[which.max(tabulate(match(compartment_time, unique(compartment_time))))]
-
-# Then delete runs killed by wall time
-if (current_time_limit != time_limit) {
-  purrr::walk(
-    .progress = TRUE,
-    .x = existing_files,
-    .f = \(file) {
-      file.path(path, file) |>
-        readRDS() |>
-        purrr::discard(
-          ~ purrr::pluck(., "execution_time") == current_time_limit * purrr::pluck(., "M")
-        ) |>
-        saveRDS(file.path(path, file))
-    }
-  )
-}
+)
 
 
 for (penalty in c(0, 0.5, 1)) {
@@ -445,6 +426,10 @@ for (penalty in c(0, 0.5, 1)) {
     workers <- 1
     future::plan("sequential", gc = TRUE)
   } else {
+    withr::local_options(
+      "cli.progress_enable" = TRUE,
+      "progressr.enable" = TRUE
+    )
     workers <- unname(future::availableCores(omit = 1))
     future::plan("multisession", gc = TRUE, workers = workers)
   }
