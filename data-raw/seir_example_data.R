@@ -80,7 +80,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
       .by = c("date", "region")
     ) |>
     ggplot2::ggplot(ggplot2::aes(x = date, y = n_infected, color = region)) +
-      ggplot2::geom_line()
+    ggplot2::geom_line()
 
 
   # Reorder columns
