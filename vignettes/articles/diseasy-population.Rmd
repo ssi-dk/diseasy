@@ -99,7 +99,7 @@ To stratify by age, we use the `?DiseasyPopulation$stratify_age()` method:
 population$stratify_age(age_cuts_lower = c(0, 20, 40, 60, 80))
 
 # and we can inspect the defined demographic groups
-population$group
+population$groups
 ```
 
 To stratify by region, we use the `?DiseasyPopulation$stratify_regions()` method:
@@ -160,14 +160,7 @@ adjacency_graph <- function(adjacency) {
     vertex.color = factor(region),
     vertex.shape = "circle",
     vertex.label = population,
-    vertex.size = stats::setNames(
-      seq(
-        from = 30,
-        by = 5,
-        along.with = unique(age)
-      ),
-      unique(age)
-    )[age]
+    vertex.size = 30
   )
 }
 
@@ -219,8 +212,10 @@ regions ("x", "y", "z", "w").
 
 ```{r}
 population <- c(
-  rep("A/x", 1), rep("B/x", 1), rep("C/x", 1),
-  rep("A/y", 1), rep("B/y", 1), rep("C/y", 1)
+  rep("A/x", 3), rep("B/x", 2), rep("C/x", 1),
+  rep("A/y", 1), rep("B/y", 2), rep("C/y", 3),
+  rep("A/z", 1), rep("B/z", 1), rep("C/z", 1),
+  rep("A/w", 1), rep("B/w", 2), rep("C/w", 1)
 )
 regions <- unique(stringr::str_replace(population, "[A-Z]", "*"))
 age_groups <- unique(stringr::str_replace(population, "[a-z]", "*"))
@@ -232,11 +227,10 @@ with age-specific per-capita contact rates ("C" domain) of:
 ```{r}
 c_matrix <- sqrt(outer(1 / seq_along(age_groups), 1 / seq_along(age_groups)))
 dimnames(c_matrix) <- list(age_groups, age_groups)
-c_matrix <- c_matrix / c_matrix
 print(round(c_matrix, digits = 2))
 ```
+
 and corresponding total contacts ("T" domain):
-with per-capita contact rates ("C" domain) of:
 ```{r}
 N_age <- lengths(
   split(
@@ -286,7 +280,7 @@ one_way_links <- one_way_links |>
       )
   )
 
-# Randomly draw j indicies (to nodes)
+# Randomly draw j indices (to nodes)
 one_way_links <- one_way_links |>
   dplyr::group_by(.data$i, .data$j_age_group) |>
   dplyr::group_modify(
@@ -294,7 +288,7 @@ one_way_links <- one_way_links |>
       dplyr::mutate(
         "j" = sample(
           x = which(
-            stringr::str_starts(population, .y$j_age_group) & 
+            stringr::str_starts(population, .y$j_age_group) &
               seq_along(population) != .y$i
           ),
           size = dplyr::n()
@@ -334,7 +328,7 @@ adjacency_graph(adjacency_sw)
 
 From this full adjacency graph, we can project the contacts ("T" domain) into contact matrices in different stratifications.
 
-Number of contacts stratified by age group and region
+Number of contacts stratified by age group and region (with population size in parentheses):
 ```{r}
 T_age_region <- contact_matrix(
   adjacency = adjacency_sw,
@@ -346,7 +340,7 @@ print_truncated(T_age_region)
 cat("Total contacts: ", sum(T_age_region))
 ```
 
-Stratify only by region
+Stratify only by region:
 ```{r}
 T_region <- contact_matrix(
   adjacency = adjacency_sw,
@@ -373,25 +367,12 @@ cat("Total contacts: ", sum(T_age))
 print(t_matrix)
 ```
 
-
-Merging age groups A and B
-```{r}
-T_merged_age_region <- contact_matrix(
-  adjacency = adjacency_sw,
-  population = population,
-  groups = stringr::str_replace(population, r"{^A|B}", "AB")
-)
-
-print_truncated(T_merged_age_region)
-cat("Total contacts: ", sum(T_merged_age_region))
-```
-
 Lets see if we can achieve these same contacts without generating the network.
 
 First, the mixing matrix for well-mixed scenario
 ```{r}
 mixing_sw <- matrix(
-  1 / length(regions),
+  data = 1,
   nrow = length(regions),
   ncol = length(regions),
   dimnames = list(regions, regions)
@@ -399,7 +380,7 @@ mixing_sw <- matrix(
 print(mixing_sw)
 ```
 
-We compute the full per-capita contact matrix ($\overline{\overline{C}}$) from the age-specific contact matrix, $\overline{\overline{C}}_{age}$, the mixing matrix, $\overline{\overline{\Theta}}$, and the population vector, $\overline{N}$, via the relation:
+We compute the full per-capita contact matrix, $\overline{\overline{C}}$, from the age-specific contact matrix, $\overline{\overline{C}}_{age}$, the mixing matrix, $\overline{\overline{\Theta}}$, and the population vector, $\overline{N}$, via the relation:
 
 $$
 \frac{\overline{\overline{C}}}{\overline{N}\overline{\overline{1}}\overline{N}} = \frac{\overline{\overline{\Theta}} \otimes \overline{\overline{C}}_{age}}{\overline{N}(\overline{\overline{\Theta}} \otimes \overline{\overline{1}}_{age})\overline{N}}
@@ -413,61 +394,70 @@ $$
 \overline{\overline{C}} = \left(\frac{\overline{N}\overline{\overline{1}}\overline{N}}{\overline{N}(\overline{\overline{\Theta}} \otimes \overline{\overline{1}}_{age})\overline{N}}\overline{\overline{\Theta}}\right)\otimes \overline{\overline{C}}_{age}
 $$
 
-
-ChatGPT simplification:
+Or, in simplified form:
 $$
-\overline{\overline{C}} = \overline{\overline{\Theta}}_{\textrm{norm}} \otimes \overline{\overline{C}}_{age}
+\overline{\overline{C}} = \overline{\overline{\Theta^\ast}} \otimes \overline{\overline{C}}_{age}
 $$
+Where
 $$
-\overline{\overline{\Theta^\ast}} = \frac{\overline{\overline{\Theta}}}{\overline{p}^T\overline{\overline{\Theta}}\overline{p}}
+\overline{\overline{\Theta^\ast}} = \frac{\overline{\overline{\Theta}}}{\overline{n}^T\overline{\overline{\Theta}}\overline{n}}
 $$
+with $\overline{n}$ being the population fraction:
 $$
-\overline{p} = \frac{\overline{N}}{\overline{1}^T\overline{N}}
+\overline{n} = \frac{\overline{N}}{\overline{1}^T\overline{N}}
 $$
-Acording to ChatGPT:
-
 The normalizing constant is:
 $$
-\overline{p}^T\overline{\overline{\Theta}}\overline{p}
+\overline{n}^T\overline{\overline{\Theta}}\overline{n}
 $$
+This is the *population-pair-weighted* average of the entries of $\Theta$.
 
-This is the *population-pair-weighted* average of the entries of $\Theta$. Equivalently, if I and J are the mixing-group labels of two independently selected people,
-
+Consider a case where P and Q are the mixing-group labels of two independently selected people.
+In this case,
 $$
-\overline{p}^T\overline{\overline{\Theta}}\overline{p} = \mathbb{E}[\Theta_{IJ}]
+\overline{n}^T\overline{\overline{\Theta}}\overline{n} = \mathbb{E}[\Theta_{P,Q}].
 $$
 Therefore,
 $$
-\sum_{i,j} p_i p_j \Theta_{i,j}^\ast = 1
+\sum_{i,j} n_i n_j \Theta_{p,q}^\ast = 1.
 $$
 So the normalized mixing matrix has population-weighted mean equal to one.
 
 
-The normalized entry $\Theta^\ast_{ij} $ is a relative contact multiplier:
+The normalized entry $\Theta^{\ast}_{ij}$ is a relative contact multiplier:
 For example,
 
-$$ \Theta^\ast_{ij}=1.4 $$
+$$
+\Theta^\ast_{p,q} = 1.4
+$$
 
-means that contacts between mixing groups i and j are multiplied by 1.4, relative to the average mixing effect.
+means that contacts between mixing groups p and q are multiplied by 1.4, relative to the average mixing effect.
 
+
+Let's see that computation in practice:
 ```{r}
 N_regions <- matrix(
   lengths(
     split(
-      stringr::str_replace(population, "[A-Z]", "*"), 
+      stringr::str_replace(population, "[A-Z]", "*"),
       factor(stringr::str_replace(population, "[A-Z]", "*"))
     )[unique(stringr::str_replace(population, "[A-Z]", "*"))]
   ),
-  ncol = 1
+  ncol = 1,
+  dimnames = list(regions, "n")
 )
+n_regions <- N_regions / sum(N_regions)
 
+print(n_regions)
+```
+
+```{r}
 tm <- mixing_sw
 cm <- c_matrix
 
-p_regions <- N_regions / sum(N_regions)
-tm_norm <- tm / drop(t(p_regions) %*% tm %*% p_regions)
+tm_norm <- tm / drop(t(n_regions) %*% tm %*% n_regions)
 
-c_matrix_full_sw <-  kronecker(tm_norm, cm)
+c_matrix_full_sw <- kronecker(tm_norm, cm)
 dimnames(c_matrix_full_sw) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_sw, digits = 1))
 ```
@@ -482,7 +472,7 @@ N <- matrix(
 t_matrix_full_sw <- c_matrix_full_sw * tcrossprod(N)
 print_truncated(round(t_matrix_full_sw, digits = 1))
 ```
-Finally, we can aggregate the raw contact matrix in the same groups as the original reference (i.e. age groups only).
+Finally, we can aggregate the raw contact matrix in the same groups as the original reference (i.e. age groups only) and compare with that reference.
 ```{r}
 T_age_indirect <- contact_matrix(
   t_matrix_full_sw,
@@ -495,15 +485,6 @@ cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
 
 # Reference
 print(t_matrix)
-```
-```{r}
-C_age_indirect <- contact_matrix(
-  t_matrix_full_sw,
-  population = unique(population),
-  groups = stringr::str_replace(unique(population), r"{[A-Z]}", "*")
-) / tcrossprod(N_regions)
-
-print(round(C_age_indirect, digits = 1))
 ```
 
 ## A silo example
@@ -615,7 +596,6 @@ adjacency_silo <- as.matrix(
   )
 )
 
-#adjacency_silo <- floor(adjacency_silo / 2 + runif(length(population)^2)) # Prevent double counting
 adjacency_silo <- (adjacency_silo + t(adjacency_silo)) / 2
 
 print_truncated(adjacency_silo)
@@ -666,23 +646,11 @@ print(t_matrix)
 ```
 
 
-Merging age groups A and B
-```{r}
-T_merged_age_region <- contact_matrix(
-  adjacency = adjacency_silo,
-  population = population,
-  groups = stringr::str_replace(population, r"{^A|B}", "AB")
-)
-
-print_truncated(T_merged_age_region)
-cat("Total contacts: ", sum(T_merged_age_region))
-```
-
 Again, lets see if we can achieve these same contacts without generating the network.
 
 ```{r}
 mixing_silo <- diag(
-  1,
+  x = 1,
   nrow = length(regions),
   ncol = length(regions)
 )
@@ -693,7 +661,11 @@ print(mixing_silo)
 
 ```{r}
 tm <- mixing_silo
-c_matrix_full_silo <- kronecker(tm, cm) * drop(N %*% jm %*% N) / drop(N %*% kronecker(tm, jm_age) %*% N)
+cm <- c_matrix
+
+tm_norm <- tm / drop(t(n_regions) %*% tm %*% n_regions)
+
+c_matrix_full_silo <- kronecker(tm_norm, cm)
 dimnames(c_matrix_full_silo) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_silo, digits = 1))
 ```
@@ -719,14 +691,16 @@ print(t_matrix)
 
 ## A mixture example
 
+Finally, lets test the indirect method on a mixture of the two examples:
+
 ```{r}
 mixing_mix <- matrix(
-  0.2 / (length(regions) - 1),
+  data = 0.2,
   nrow = length(regions),
   ncol = length(regions)
 ) +
   diag(
-    0.8 - 0.2 / (length(regions) - 1),
+    x = 0.8,
     nrow = length(regions),
     ncol = length(regions)
   )
@@ -738,7 +712,11 @@ print(mixing_mix)
 
 ```{r}
 tm <- mixing_mix
-c_matrix_full_mix <- kronecker(tm, cm) * drop(N %*% jm %*% N) / drop(N %*% kronecker(tm, jm_age) %*% N)
+cm <- c_matrix
+
+tm_norm <- tm / drop(t(n_regions) %*% tm %*% n_regions)
+
+c_matrix_full_mix <- kronecker(tm_norm, cm)
 dimnames(c_matrix_full_mix) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_mix, digits = 1))
 ```
