@@ -988,7 +988,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         private %.% n_population_groups * private %.% n_variants
 
 
-      c_state_vector_indicies <- private$surveillance_indices$state_vector -
+      c_state_vector_indices <- private$surveillance_indices$state_vector -
         private %.% n_population_groups * private %.% n_variants
 
 
@@ -1029,7 +1029,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
           # If the user has configured custom outputs, we need to add the forcing to these states as well
           if (!is.null(private$output_mapping$state_vector))  {
-            dy_dt[c_state_vector_indicies] <- dy_dt[c_state_vector_indicies] +
+            dy_dt[c_state_vector_indices] <- dy_dt[c_state_vector_indices] +
               rowSums(private$output_mapping$state_vector[, private$i1_state_indices, drop = FALSE] * s) / ri
           }
 
