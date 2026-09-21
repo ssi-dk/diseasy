@@ -8,13 +8,13 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # Generate the example model
   model <- generate_example_seir_model()
 
-  # Get a reference to the private environment
-  private <- model$.__enclos_env__$private
-
   K <- model %.% parameters %.% compartment_structure[["E"]]                                                            # nolint start: object_name_linter
   L <- model %.% parameters %.% compartment_structure[["I"]]
   M <- model %.% parameters %.% compartment_structure[["R"]]
   rI <- model %.% parameters %.% disease_progression_rates[["I"]]                                                       # nolint end: object_name_linter
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
 
   # Determine the eigenvector with largest eigenvalue
   eigen_activity_vector <- private %.% contact_matrix(0) |>
@@ -74,14 +74,6 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
       .by = c(colnames(model %.% population %.% groups), "date")
     )
 
-  seir_example_data |>
-    dplyr::summarise(
-      "n_infected" = sum(.data$n_infected),
-      .by = c("date", "region")
-    ) |>
-    ggplot2::ggplot(ggplot2::aes(x = date, y = n_infected, color = region)) +
-    ggplot2::geom_line()
-
 
   # Reorder columns
   seir_example_data <- seir_example_data |>
@@ -137,7 +129,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
     ggplot2::geom_line(ggplot2::aes(x = date, y = n_positive_simple, color = "Test positive (simple)"), linewidth = 1) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = 10 * n_admission, color = "Admissions * 10")) +
-    ggplot2::facet_grid(region ~ age_group) +
+    ggplot2::facet_wrap(~ age_group) +
     ggplot2::ylab("Test positive / Infected / Admissions") +
     ggplot2::scale_color_manual(
       values = c(
