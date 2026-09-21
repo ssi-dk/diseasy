@@ -129,7 +129,7 @@ and the group they are meant to represent (e.g. a given country) for form a "ful
 target population.
 
 
-```{r, include = rlang::is_installed("igraph")}
+```{r, include = FALSE, eval = rlang::is_installed("igraph")}
 # Define some helper functions
 
 # A plotter for the adjacency graphs
