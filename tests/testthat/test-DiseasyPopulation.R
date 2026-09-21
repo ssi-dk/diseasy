@@ -314,6 +314,7 @@ test_that("`map_population` works with 1-year age groups in demography", {
   # Generate test demography
   demography_1yr <- data.frame(
     age = seq(from = 0, to = 100),
+    region = "All",
     population = seq(from = 100, to = 0, by = -1)
   )
 
@@ -381,6 +382,7 @@ test_that("`map_population` works with 5-year age groups in demography", {
   # Generate test demography
   demography_5yr <- data.frame(
     age_group = diseasystore::age_labels(seq(from = 0, to = 100, by = 5)),
+    region = "All",
     population = seq(from = 100, to = 0, by = -5)
   )
 
