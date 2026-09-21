@@ -863,7 +863,12 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   # Ensure contact matrix is as expected
   expect_identical(
     private$contact_matrix(0),
-    matrix(0.5, nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
+    matrix(
+      2, # A factor of 2 from ODE scaling
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -876,14 +881,14 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(                                                                                                                  # nolint start: commented_code_linter
-      0.5 * (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_A
-      - (0.05 / 2) * rI,               # - I_A * rI
-      (0.05 / 2) * rI,                 # I_A * rI
-      0.5 * (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_B
-      0,                               # - I_B * rI = 0
-      0,                               # I_B * rI = 0
-      - 0.5 * (0.05 / 2) * (0.95 / 2), # - beta * I_A * S_A
-      - 0.5 * (0.05 / 2) * (0.95 / 2)  # - beta * I_A * S_B
+      2 * (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_A
+      - (0.05 / 2) * rI,             # - I_A * rI
+      (0.05 / 2) * rI,               # I_A * rI
+      2 * (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_B
+      0,                             # - I_B * rI = 0
+      0,                             # I_B * rI = 0
+      - 2 * (0.05 / 2) * (0.95 / 2), # - beta * I_A * S_A
+      - 2 * (0.05 / 2) * (0.95 / 2)  # - beta * I_A * S_B
     )                                                                                                                   # nolint end: commented_code_linter
   )
 
@@ -942,7 +947,12 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
   # Ensure contact matrix is as expected
   expect_equal(
     private$contact_matrix(0),
-    matrix(1 / 3, nrow = 3, ncol = 3, dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))),
+    matrix(
+      3, # A factor of 3 from ODE scaling
+      nrow = 3,
+      ncol = 3,
+      dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))
+    ),
     tolerance = 1e-14 # Some numerical error has been introduced
   )
 
@@ -956,18 +966,18 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
   expect_equal(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      1 / 3 * (0.05 / 3) * (0.95 / 3),
+      3 * (0.05 / 3) * (0.95 / 3),
       - (0.05 / 3) * rI,
       (0.05 / 3) * rI,
-      1 / 3 * (0.05 / 3) * (0.95 / 3),
+      3 * (0.05 / 3) * (0.95 / 3),
       0,
       0,
-      1 / 3 * (0.05 / 3) * (0.95 / 3),
+      3 * (0.05 / 3) * (0.95 / 3),
       0,
       0,
-      - 1 / 3 * (0.05 / 3) * (0.95 / 3),
-      - 1 / 3 * (0.05 / 3) * (0.95 / 3),
-      - 1 / 3 * (0.05 / 3) * (0.95 / 3)
+      - 3 * (0.05 / 3) * (0.95 / 3),
+      - 3 * (0.05 / 3) * (0.95 / 3),
+      - 3 * (0.05 / 3) * (0.95 / 3)
     ),
     tolerance = 1e-14 # Some numerical error has been introduced
   )
@@ -1028,7 +1038,12 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   # Ensure contact matrix is as expected
   expect_identical(
     private$contact_matrix(0),
-    matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
+    matrix(
+      c(1, 0, 0, 1) * 2 * 2, # A factor of 2 from both per-capita scaling and ODE scaling
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -1040,13 +1055,13 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (0.05 / 2) * (0.95 / 2),
+      4 * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
       0,
       0,
       0,
-      - (0.05 / 2) * (0.95 / 2),
+      - 4 * (0.05 / 2) * (0.95 / 2),
       0
     )
   )
@@ -1112,7 +1127,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
   expect_identical(
     private$contact_matrix(0),
     matrix(
-      as.vector(diag(1, nrow = 3)),
+      as.vector(diag(1, nrow = 3)) * 3 * 3,  # A factor of 3 from both per-capita scaling and ODE scaling
       nrow = 3,
       ncol = 3,
       dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))
@@ -1128,7 +1143,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (0.05 / 3) * (0.95 / 3),
+      9 * (0.05 / 3) * (0.95 / 3),
       - (0.05 / 3) * rI,
       (0.05 / 3) * rI,
       0,
@@ -1137,7 +1152,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
       0,
       0,
       0,
-      - (0.05 / 3) * (0.95 / 3),
+      - 9 * (0.05 / 3) * (0.95 / 3),
       0,
       0
     )
@@ -1199,7 +1214,12 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
   # Ensure contact matrix is as expected
   expect_identical(
     private$contact_matrix(0),
-    matrix(c(0, 1, 1, 0), nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
+    matrix(
+      c(0, 1, 1, 0) * 2 * 2, # A factor of 2 from both per-capita scaling and ODE scaling
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
   )
 
   # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -1215,11 +1235,11 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
       0,
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      (0.05 / 2) * (0.95 / 2),
+      4 * (0.05 / 2) * (0.95 / 2),
       0,
       0,
       0,
-      - (0.05 / 2) * (0.95 / 2)
+      - 4 * (0.05 / 2) * (0.95 / 2)
     )
   )
 
@@ -1279,10 +1299,16 @@ test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mix
   )
 
   # Ensure contact matrix is as expected
-  # Largest eigenvalue of the infection flow matrix is 3, so contact matrix should be 1 / 3 of the infection_flow_matrix
   expect_identical(
     private$contact_matrix(0),
-    matrix(c(1, sqrt(2), sqrt(2), 2) / 3, nrow = 2, ncol = 2, dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B")))
+    matrix(
+      c(1, sqrt(2), sqrt(2), 2) *
+        2 / (1 + 2 * sqrt(2) + 2) * # A factor from per-capita contact matrix normalisation
+        2, # A factor of 2 ODE scaling
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
   )
 
   # We start with I_A = I_B = 0.05 / 2, S_A = S_B = 0.95 / 2
@@ -1294,14 +1320,14 @@ test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mix
   expect_equal(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
+      2 * (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2),
+      2 * (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      - (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
-      - (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2)
+      - 2 * (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
+      - 2 * (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2)
     ),
     tolerance = 1e-14 # Some numerical error has been introduced
   )
