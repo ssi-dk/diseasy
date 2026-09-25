@@ -662,8 +662,14 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   private <- m$.__enclos_env__$private
 
   # Ensure we have unit activity matrices
-  expect_identical(unique(as.numeric(m$population$mean_contact_rates()[[1]])), 1)
-  expect_identical(unique(as.numeric(m$population$mean_contact_rates()[[2]])), 0.5)
+  expect_identical(
+    unique(as.numeric(m$population$mean_contact_rates()[[1]])),
+    1 / length(m %.% population %.% age_cuts_lower)
+  )
+  expect_identical(
+    unique(as.numeric(m$population$mean_contact_rates()[[2]])),
+    0.5 / length(m %.% population %.% age_cuts_lower)
+  )
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
