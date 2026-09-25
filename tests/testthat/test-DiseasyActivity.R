@@ -320,7 +320,7 @@ test_that("$get_scenario_openness() works with no scenario", {
   # but since we have the contact_basis loaded, we should get the age information by default
   # (inferred from the contact_basis)
 
-  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% per_capita_contacts, 1, colnames)
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK %.% mean_contacts_per_person, 1, colnames)
 
   expect_identical(
     act$get_scenario_openness(),
@@ -348,7 +348,7 @@ test_that("$get_scenario_openness() works with given scenario", {
   act <- DiseasyActivity$new(base_scenario = "closed", contact_basis = contact_basis_nordic %.% DK)
   act$set_activity_units(dk_activity_units_subset)
 
-  age_labels <- purrr::pluck(contact_basis_nordic %.% DK, "per_capita_contacts", 1, colnames)
+  age_labels <- purrr::pluck(contact_basis_nordic %.% DK, "mean_contacts_per_person", 1, colnames)
 
   # Now we load a scenario
   act$change_activity(date = as.Date(c("2020-01-01", "2020-03-12",    "2020-04-15")),
@@ -483,7 +483,7 @@ test_that("$set_contact_basis() works", {
 
   # Check malformed inputs
   custom_basis <- contact_basis_nordic %.% DK
-  custom_basis$per_capita_contacts <- custom_basis$per_capita_contacts[-1]
+  custom_basis$mean_contacts_per_person <- custom_basis$mean_contacts_per_person[-1]
   expect_error(
     checkmate_err_msg(act$set_contact_basis(custom_basis)),
     class = "simpleError",
