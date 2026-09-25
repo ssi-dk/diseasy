@@ -177,15 +177,13 @@ DiseasyPopulation <- R6::R6Class(                                               
       m_matrices_age <- self %.% activity %.% get_scenario_contacts(weights = weights)
 
       # Get all groups and their population
-      age_groups_reference <- purrr::pluck(m_matrices_age, 1, colnames)
+      age_groups_reference <- purrr::pluck(
+        m_matrices_age, 1, colnames,
+        .default = unique(self %.% groups %.% age_group)
+      )
       population_map <- self %.% map_population(age_groups_reference = age_groups_reference)
 
       # Aggregate population to the reference age groups of the age-specific contact matrices
-      if (is.null(age_groups_reference)) {
-        population_map <- population_map |>
-          dplyr::mutate("age_group_reference" = "0+")
-      }
-
       full_population <- population_map |>
         dplyr::select(dplyr::all_of(c("age_group_reference", colnames(self %.% groups), "population"))) |>
         dplyr::group_by(dplyr::across(!c("age_group", "population"))) |>
