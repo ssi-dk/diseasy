@@ -222,7 +222,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We retrieve normalised matrices
       private$set_contact_matrix(
-        per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
+        mean_contact_rates = self %.% population %.% mean_contact_rates(
           weights = self %.% parameters %.% activity.weights
         )
       )
@@ -477,7 +477,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (self %.% parameters %.% malthusian_matching) {
         private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
         private$set_contact_matrix(
-          per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
+          mean_contact_rates = self %.% population %.% mean_contact_rates(
             weights = self %.% parameters %.% activity.weights
           ),
           scaling_factor = self$malthusian_scaling_factor
@@ -1601,13 +1601,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # @description
     #  Configure the contact matrix helper in the model.
-    # @param per_capita_contact_matrices (`list`(`list`(`matrix`)))\cr
+    # @param mean_contact_rates (`list`(`list`(`matrix`)))\cr
     #   A `list` (named with dates signifying when contact matrix takes effect
     #   of `lists` of per-arena ("home", "school", "work", "other") contact matrices (`matrix`).
     # @param scaling_factor (`numeric(1)`)\cr
     #   The scaling factor to apply to the contact matrices.
     # @return `r rd_side_effects()`
-    set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
+    set_contact_matrix = function(mean_contact_rates, scaling_factor = 1) {
 
       # When converting the per-capita contact matrices to the ODE formulation,
       # there is an important subtlety that we need to account for.
@@ -1622,23 +1622,18 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Since the model equations are expressed in terms of the total population
       # we to scale contacts originating in region x by a scaling factor
       # of N / N_x to account for this difference.
-      N_regions <- self %.% population %.% model_population |>                                                          # nolint: object_name_linter
-        dplyr::summarise(
-          "N_regions" = sum(.data$population),
-          .by = "region"
-        ) |>
-        dplyr::pull("N_regions")
+      N_model <- self %.% population %.% model_population |>                                                            # nolint: object_name_linter
+        tidyr::unite("label", dplyr::all_of(colnames(self %.% population %.% groups)), sep = "/") |>
+        dplyr::select("label", "population") |>
+        tibble::deframe()
 
-      N_total <- sum(N_regions)                                                                                         # nolint: object_name_linter
-
-      # Apply the scaling factors to the contact matrices
-      scaled_per_capita_contact_matrices <- purrr::map(
-        per_capita_contact_matrices,
+      contact_matrices <- purrr::map(
+        mean_contact_rates,
         \(matrix) {
           sweep(
-            matrix * scaling_factor * N_total,
+            matrix * scaling_factor,
             MARGIN = 2,
-            STATS = N_total / N_regions,
+            STATS = sum(N_model) / N_model,
             FUN = "*"
           )
         }
@@ -1646,11 +1641,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: the end of the training period)
-      activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrices)) -
+      activity_matrix_changes <- as.Date(names(contact_matrices)) -
         self %.% training_period %.% end
 
       # We can then create a switch that selects the correct contact matrix at the given point in time
-      contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrices)
+      contact_matrix_switch <- purrr::partial(switch, !!!contact_matrices)
       private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
     },
 

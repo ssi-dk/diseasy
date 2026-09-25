@@ -870,7 +870,7 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   expect_identical(
     private$contact_matrix(0),
     matrix(
-      2, # A factor of 2 from ODE scaling
+      1,
       nrow = 2,
       ncol = 2,
       dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
@@ -887,14 +887,14 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(                                                                                                                  # nolint start: commented_code_linter
-      2 * (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_A
-      - (0.05 / 2) * rI,             # - I_A * rI
-      (0.05 / 2) * rI,               # I_A * rI
-      2 * (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_B
-      0,                             # - I_B * rI = 0
-      0,                             # I_B * rI = 0
-      - 2 * (0.05 / 2) * (0.95 / 2), # - beta * I_A * S_A
-      - 2 * (0.05 / 2) * (0.95 / 2)  # - beta * I_A * S_B
+      (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_A
+      - (0.05 / 2) * rI,         # - I_A * rI
+      (0.05 / 2) * rI,           # I_A * rI
+      (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_B
+      0,                         # - I_B * rI = 0
+      0,                         # I_B * rI = 0
+      - (0.05 / 2) * (0.95 / 2), # - beta * I_A * S_A
+      - (0.05 / 2) * (0.95 / 2)  # - beta * I_A * S_B
     )                                                                                                                   # nolint end: commented_code_linter
   )
 
@@ -954,7 +954,7 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
   expect_equal(
     private$contact_matrix(0),
     matrix(
-      3, # A factor of 3 from ODE scaling
+      1,
       nrow = 3,
       ncol = 3,
       dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))
@@ -972,18 +972,18 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
   expect_equal(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      3 * (0.05 / 3) * (0.95 / 3),
+      (0.05 / 3) * (0.95 / 3),
       - (0.05 / 3) * rI,
       (0.05 / 3) * rI,
-      3 * (0.05 / 3) * (0.95 / 3),
+      (0.05 / 3) * (0.95 / 3),
       0,
       0,
-      3 * (0.05 / 3) * (0.95 / 3),
+      (0.05 / 3) * (0.95 / 3),
       0,
       0,
-      - 3 * (0.05 / 3) * (0.95 / 3),
-      - 3 * (0.05 / 3) * (0.95 / 3),
-      - 3 * (0.05 / 3) * (0.95 / 3)
+      - (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * (0.95 / 3)
     ),
     tolerance = 1e-14 # Some numerical error has been introduced
   )
@@ -1045,7 +1045,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   expect_identical(
     private$contact_matrix(0),
     matrix(
-      c(1, 0, 0, 1) * 2 * 2, # A factor of 2 from both per-capita scaling and ODE scaling
+      c(1, 0, 0, 1) * 2, # A factor of 2 from per-capita scaling
       nrow = 2,
       ncol = 2,
       dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
@@ -1061,13 +1061,13 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      4 * (0.05 / 2) * (0.95 / 2),
+      2 * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
       0,
       0,
       0,
-      - 4 * (0.05 / 2) * (0.95 / 2),
+      - 2 * (0.05 / 2) * (0.95 / 2),
       0
     )
   )
@@ -1133,7 +1133,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
   expect_identical(
     private$contact_matrix(0),
     matrix(
-      as.vector(diag(1, nrow = 3)) * 3 * 3,  # A factor of 3 from both per-capita scaling and ODE scaling
+      as.vector(diag(1, nrow = 3)) * 3,  # A factor of 3 from per-capita scaling
       nrow = 3,
       ncol = 3,
       dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))
@@ -1149,7 +1149,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
   expect_identical(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      9 * (0.05 / 3) * (0.95 / 3),
+      3 * (0.05 / 3) * (0.95 / 3),
       - (0.05 / 3) * rI,
       (0.05 / 3) * rI,
       0,
@@ -1158,7 +1158,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
       0,
       0,
       0,
-      - 9 * (0.05 / 3) * (0.95 / 3),
+      - 3 * (0.05 / 3) * (0.95 / 3),
       0,
       0
     )
@@ -1221,7 +1221,7 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
   expect_identical(
     private$contact_matrix(0),
     matrix(
-      c(0, 1, 1, 0) * 2 * 2, # A factor of 2 from both per-capita scaling and ODE scaling
+      c(0, 1, 1, 0) * 2, # A factor of 2 from per-capita scaling
       nrow = 2,
       ncol = 2,
       dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
@@ -1241,11 +1241,11 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
       0,
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      4 * (0.05 / 2) * (0.95 / 2),
+      2 * (0.05 / 2) * (0.95 / 2),
       0,
       0,
       0,
-      - 4 * (0.05 / 2) * (0.95 / 2)
+      - 2 * (0.05 / 2) * (0.95 / 2)
     )
   )
 
@@ -1326,14 +1326,14 @@ test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mix
   expect_equal(
     unname(model %.% rhs(0, y0)[[1]]),
     c(
-      2 * (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
+      4 / (1 + 2 * sqrt(2) + 2) * (1 + sqrt(2)) * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      2 * (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2),
+      4 / (1 + 2 * sqrt(2) + 2) * (sqrt(2) + 2) * (0.05 / 2) * (0.95 / 2),
       - (0.05 / 2) * rI,
       (0.05 / 2) * rI,
-      - 2 * (1 / 3 + sqrt(2) / 3) * (0.05 / 2) * (0.95 / 2),
-      - 2 * (sqrt(2) / 3 + 2 / 3) * (0.05 / 2) * (0.95 / 2)
+      - 4 / (1 + 2 * sqrt(2) + 2) * (1 + sqrt(2)) * (0.05 / 2) * (0.95 / 2),
+      - 4 / (1 + 2 * sqrt(2) + 2) * (sqrt(2) + 2) * (0.05 / 2) * (0.95 / 2)
     ),
     tolerance = 1e-14 # Some numerical error has been introduced
   )
