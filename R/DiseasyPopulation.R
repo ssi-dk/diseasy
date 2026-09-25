@@ -200,11 +200,11 @@ DiseasyPopulation <- R6::R6Class(                                               
         tidyr::unite("label", !"population", sep = "/") |>
         tibble::deframe()
 
-      # Convert to per-capita contacts ("C" domain) (and use fallback if no scenario exist)
+      # Use fallback if no scenario exist
       if (is.null(m_matrices_age)) {
-        c_matrices_age <- list(
+        m_matrices_age <- list(
           "1970-01-01" = matrix(
-            data = 1,
+            data = 1 / length(unique(self %.% groups %.% age_group)),
             nrow = length(unique(self %.% groups %.% age_group)),
             ncol = length(unique(self %.% groups %.% age_group)),
             dimnames = list(
@@ -213,9 +213,10 @@ DiseasyPopulation <- R6::R6Class(                                               
             )
           ) * mean(weights)
         )
-      } else {
-        c_matrices_age <- purrr::map(m_matrices_age, ~ . / outer(rep(1, length(N_age)), N_age))
       }
+
+      # Convert to per-capita contacts ("C" domain) (and u
+      c_matrices_age <- purrr::map(m_matrices_age, ~ . / outer(rep(1, length(N_age)), N_age))
 
       # Retrieve the regional mixing matrices
       theta <- self %.% regions %.% infection_flow_matrix
