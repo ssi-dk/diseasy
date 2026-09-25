@@ -202,7 +202,7 @@ DiseasyPopulation <- R6::R6Class(                                               
         tidyr::unite("label", !"population", sep = "/") |>
         tibble::deframe()
 
-       # Convert to per-capita contacts ("C" domain) (and use fallback if no scenario exist)
+      # Convert to per-capita contacts ("C" domain) (and use fallback if no scenario exist)
       if (is.null(m_matrices_age)) {
         c_matrices_age <- list(
           "1970-01-01" = matrix(
