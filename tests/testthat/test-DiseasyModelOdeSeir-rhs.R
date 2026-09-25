@@ -598,8 +598,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
   private <- m$.__enclos_env__$private
 
   # Ensure we have unit activity matrices
-  expect_identical(as.numeric(m$population$per_capita_contact_matrices()[[1]]), 1)
-  expect_identical(as.numeric(m$population$per_capita_contact_matrices()[[2]]), 0.5)
+  expect_identical(as.numeric(m$population$mean_contact_rates()[[1]]), 1)
+  expect_identical(as.numeric(m$population$mean_contact_rates()[[2]]), 0.5)
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
@@ -662,8 +662,8 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
   private <- m$.__enclos_env__$private
 
   # Ensure we have unit activity matrices
-  expect_identical(unique(as.numeric(m$population$per_capita_contact_matrices()[[1]])), 1)
-  expect_identical(unique(as.numeric(m$population$per_capita_contact_matrices()[[2]])), 0.5)
+  expect_identical(unique(as.numeric(m$population$mean_contact_rates()[[1]])), 1)
+  expect_identical(unique(as.numeric(m$population$mean_contact_rates()[[2]])), 0.5)
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day

@@ -163,19 +163,47 @@ DiseasyPopulation <- R6::R6Class(                                               
 
 
     #' @description
-    #'   Compute the per-capita contact matrices. See vignette("diseasy-activity") for details.
+    #'   Compute the mean contact rate matrices. "M" domain.
+    #'   See vignette("diseasy-population") for details.
     #' @param weights `r rd_activity_weights`
     #' @return `list`(`matrix`)\cr
     #'   A `list` (with names indicating the dates of changes in contacts)
     #'   of contact rates (`matrix`).
-    per_capita_contact_matrices = function(weights = rep(1, 4)) {
+    mean_contact_rates = function(weights = rep(1, 4)) {
 
       checkmate::assert_numeric(weights, lower = 0, len = 4)
 
       # Retrieve the time-varying per-capita contact matrices
-      c_matrices_age <- self %.% activity %.% get_scenario_contacts(weights = weights)
+      m_matrices_age <- self %.% activity %.% get_scenario_contacts(weights = weights)
 
-      if (is.null(c_matrices_age)) {
+      # Get all groups and their population
+      age_groups_reference <- purrr::pluck(m_matrices_age, 1, colnames)
+      population_map <- self %.% map_population(age_groups_reference = age_groups_reference)
+
+      # Aggregate population to the reference age groups of the age-specific contact matrices
+      if (is.null(age_groups_reference)) {
+        population_map <- population_map |>
+          dplyr::mutate("age_group_reference" = "0+")
+      }
+
+      full_population <- population_map |>
+        dplyr::select(dplyr::all_of(c("age_group_reference", colnames(self %.% groups), "population"))) |>
+        dplyr::group_by(dplyr::across(!c("age_group", "population"))) |>
+        dplyr::summarise("population" = sum(.data$population), .groups = "drop") |>
+        dplyr::rename("age_group" = "age_group_reference")
+
+
+      # Grab the per-age group population
+      N_age <- full_population |>                                                                                       # nolint: object_name_linter
+        dplyr::summarise(
+          "population" = sum(.data$population),
+          .by = "age_group"
+        ) |>
+        tidyr::unite("label", !"population", sep = "/") |>
+        tibble::deframe()
+
+       # Convert to per-capita contacts ("C" domain) (and use fallback if no scenario exist)
+      if (is.null(m_matrices_age)) {
         c_matrices_age <- list(
           "1970-01-01" = matrix(
             data = 1,
@@ -187,19 +215,9 @@ DiseasyPopulation <- R6::R6Class(                                               
             )
           ) * mean(weights)
         )
+      } else {
+        c_matrices_age <- purrr::map(m_matrices_age, ~ . / outer(rep(1, length(N_age)), N_age))
       }
-
-      age_groups_reference <- purrr::pluck(c_matrices_age, 1, colnames)
-
-      # Get all groups and their population
-      population_map <- self %.% map_population(age_groups_reference = age_groups_reference)
-
-      # Aggregate population to the reference age groups of the age-specific contact matrices
-      full_population <- population_map |>
-        dplyr::select(dplyr::all_of(c("age_group_reference", colnames(self %.% groups), "population"))) |>
-        dplyr::group_by(dplyr::across(!c("age_group", "population"))) |>
-        dplyr::summarise("population" = sum(.data$population), .groups = "drop") |>
-        dplyr::rename("age_group" = "age_group_reference")
 
       # Retrieve the regional mixing matrices
       theta <- self %.% regions %.% infection_flow_matrix
@@ -211,7 +229,12 @@ DiseasyPopulation <- R6::R6Class(                                               
           .by = "region"
         ) |>
         tibble::deframe()
-      N_regions <- matrix(N_regions[colnames(theta)], ncol = 1)                                                         # nolint: object_name_linter
+
+      N_regions <- matrix(                                                                                              # nolint: object_name_linter
+        N_regions[colnames(theta)],
+        ncol = 1,
+        dimnames = list(colnames(theta), "N")
+      )
 
       # Construct the population-pair normalised mixing matrices
       theta_norm <- theta * sum(N_regions)^2 / drop(t(N_regions) %*% theta %*% N_regions)
@@ -219,8 +242,13 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Use normalised mixing matrices to "fold" age-specific contact matrices to the full contact matrices
       c_matrices_full <- purrr::map(c_matrices_age, ~ kronecker(theta_norm, .))
 
+      # Grab the model population
+      N_full <- full_population |>                                                                                      # nolint: object_name_linter
+        tidyr::unite("label", !"population", sep = "/") |>
+        tibble::deframe()
+
       # Convert to raw contacts ("T" domain)
-      t_matrices_full <- purrr::map(c_matrices_full, ~ . * tcrossprod(dplyr::pull(full_population, "population")))
+      t_matrices_full <- purrr::map(c_matrices_full, ~ . * tcrossprod(N_full))
 
       # Reduce to model population
       # Create map from full (reference) groups to model groups
@@ -283,10 +311,13 @@ DiseasyPopulation <- R6::R6Class(                                               
         dplyr::select("label", "population") |>
         tibble::deframe()
 
-      # Map to the model groups and convert back from "T" domain to "C" domain
-      c_matrices_model <- purrr::map(t_matrices_full, ~ (p_reduce %*% . %*% t(p_reduce)) / tcrossprod(N_model))
+      # Map to the model groups and convert back from "T" domain to "M" domain
+      m_matrices_model <- purrr::map(
+        t_matrices_full,
+        ~ (p_reduce %*% . %*% t(p_reduce)) / outer(N_model, rep(1, length(N_model)))
+      )
 
-      return(c_matrices_model)
+      return(m_matrices_model)
     },
 
                                                                                                                         # nolint start: documentation_template_linter, identation_linter
