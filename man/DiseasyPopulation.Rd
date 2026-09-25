@@ -65,7 +65,7 @@ The local copy of an DiseasyRegions module. Read-only.}
     \item \href{#method-DiseasyPopulation-stratify_age}{\code{DiseasyPopulation$stratify_age()}}
     \item \href{#method-DiseasyPopulation-stratify_regions}{\code{DiseasyPopulation$stratify_regions()}}
     \item \href{#method-DiseasyPopulation-validate_configuration}{\code{DiseasyPopulation$validate_configuration()}}
-    \item \href{#method-DiseasyPopulation-per_capita_contact_matrices}{\code{DiseasyPopulation$per_capita_contact_matrices()}}
+    \item \href{#method-DiseasyPopulation-mean_contact_rates}{\code{DiseasyPopulation$mean_contact_rates()}}
     \item \href{#method-DiseasyPopulation-map_population}{\code{DiseasyPopulation$map_population()}}
     \item \href{#method-DiseasyPopulation-describe}{\code{DiseasyPopulation$describe()}}
     \item \href{#method-DiseasyPopulation-clone}{\code{DiseasyPopulation$clone()}}
@@ -177,13 +177,14 @@ Throw error if misconfigured.
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyPopulation-per_capita_contact_matrices"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyPopulation-per_capita_contact_matrices}{}}}
-\subsection{\code{DiseasyPopulation$per_capita_contact_matrices()}}{
-  Compute the per-capita contact matrices. See vignette("diseasy-activity") for details.
+\if{html}{\out{<a id="method-DiseasyPopulation-mean_contact_rates"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyPopulation-mean_contact_rates}{}}}
+\subsection{\code{DiseasyPopulation$mean_contact_rates()}}{
+  Compute the mean contact rate matrices. "M" domain.
+See vignette("diseasy-population") for details.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyPopulation$per_capita_contact_matrices(weights = rep(1, 4))}
+    \preformatted{DiseasyPopulation$mean_contact_rates(weights = rep(1, 4))}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
