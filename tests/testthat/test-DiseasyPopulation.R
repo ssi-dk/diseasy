@@ -246,34 +246,6 @@ test_that("$groups works", {
 })
 
 
-test_that("$per_capita_contact_matrices() works", {
-
-  # `DiseasyRegionsNuts` supports "null" or NUTS levels depending on loaded demography
-  regions_nuts <- DiseasyRegionsNuts$new(
-    area = "DK",
-    demography = demography_nordic_nuts3,
-    adjacency = adjacency_meta_nordic_nuts3
-  )
-
-  # Configure an activity module using Danish population and contact information.
-  activity <- DiseasyActivity$new()
-  activity$set_contact_basis(contact_basis = contact_basis_nordic$DK)
-  activity$set_activity_units(dk_activity_units)
-
-  # The level of activity is fixed to the "baseline" level throughout the simulation.
-  activity$change_activity(date = as.Date("2020-01-01"), opening = "baseline")
-
-  population <- DiseasyPopulation$new(activity = activity, regions = regions_nuts)
-  population$stratify_regions("NUTS 2")
-
-  self <- population
-  private <- self$.__enclos_env__$private
-  weights = rep(1, 4)
-
-  rm(population, activity, regions_nuts)
-})
-
-
 test_that("active binding: age_cuts_lower works", {
   population <- DiseasyPopulation$new()
 
@@ -458,4 +430,65 @@ test_that("`map_population` works with 5-year age groups in demography", {
   )
 
   rm(population)
+})
+
+
+test_that("`mean_contact_rates()` preserves the total number of contacts", {
+
+  regions <- DiseasyRegions$new(
+    area = c("DK", "SE"),
+    demography = demography_nordic
+  )
+
+  activity <- DiseasyActivity$new()
+
+  population_no_stratification <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions
+  )
+
+  population_age_stratified <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions,
+    age_cuts_lower = c(20, 40, 60)
+  )
+
+  population_region_stratified <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions,
+    regional_stratification = "region"
+  )
+
+  population_fully_stratified <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions,
+    regional_stratification = "region",
+    age_cuts_lower = c(20, 40, 60)
+  )
+
+  number_of_contacts <- list(
+    population_no_stratification,
+    population_age_stratified,
+    population_region_stratified,
+    population_fully_stratified
+  ) |>
+    purrr::map_dbl(\(population) {
+      N <- population %.% model_population |>                                                                           # nolint: object_name_linter
+        dplyr::select(dplyr::all_of(c(colnames(population %.% groups), "population"))) |>
+        tidyr::unite("label", !"population", sep = "/") |>
+        tibble::deframe()
+
+      c_matrix <- population %.% per_capita_contact_matrices()[[1]]
+
+      t_matrix <- c_matrix *  tcrossprod(N)
+
+      sum(t_matrix)
+    })
+
+  expect_equal(
+    sd(number_of_contacts),
+    0,
+    tolerance = 1e-12
+  )
+
 })
