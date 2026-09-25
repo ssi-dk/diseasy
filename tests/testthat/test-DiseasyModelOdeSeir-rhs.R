@@ -563,7 +563,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
-  basis$per_capita_contacts <- purrr::map(basis$per_capita_contacts, ~ 0.25 + 0 * .) # Create "unit" contact matrices
+  basis$mean_contacts_per_person <- purrr::map( # Create "unit" contact matrices
+    basis$mean_contacts_per_person,
+    ~ 0.25 / 16 + 0 * .
+  )
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
@@ -623,7 +626,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
-  basis$per_capita_contacts <- purrr::map(basis$per_capita_contacts, ~ 0.25 + 0 * .) # Create "unit" contact matrices
+  basis$mean_contacts_per_person <- purrr::map( # Create "unit" contact matrices
+    basis$mean_contacts_per_person,
+    ~ 0.25 / 16 + 0 * .
+  )
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)

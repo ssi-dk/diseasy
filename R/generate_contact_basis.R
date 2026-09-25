@@ -55,7 +55,7 @@ generate_contact_basis <- function(area = NULL) {
 
     # Retrieve and transform contact matrices for each arena
     arenas <- c("home", "work", "school", "other")
-    per_capita_contacts <- purrr::map(arenas, \(arena) {
+    mean_contacts_per_person <- purrr::map(arenas, \(arena) {
 
       # The Diseasy SEIR models are configured to use a scale of contact matrices.
       # To make the definition of "contact" matrix more clear, lets start with the
@@ -162,19 +162,15 @@ generate_contact_basis <- function(area = NULL) {
         rlang::abort("mp is not reciprocal")
       }
 
-      # Convert to per-capita rates
-      N_j <- t(N_i)                                                                                                     # nolint: object_name_linter
-      cp <- mp / N_j
-
-      # Return the per-capita contact rates
-      return(cp)
+      # Return the mean number of contacts per person
+      return(mp)
 
     }) |>
       stats::setNames(arenas)
 
     return(
       list(
-        "per_capita_contacts" = per_capita_contacts,
+        "mean_contacts_per_person" = mean_contacts_per_person,
         "description" = glue::glue(
           "Contact matrices for ",
           "{countrycode::countrycode(country_code,  origin = 'iso2c', destination = 'country.name')} ",
