@@ -1,15 +1,17 @@
 {
   "name": "diseasy",
-  "image": "ghcr.io/ssi-dk/diseasy:main",
+  "image": "ghcr.io/ssi-dk/diseasy:feature-regional-contact-matrices",
   "overrideCommand": false,
   "remoteUser": "rstudio",
   "containerEnv": {
-    "ROOT": "true"
+    "ROOT": "true",
+    "GIT_EDITOR": "code --wait"
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "REditorSupport.r"
+        "REditorSupport.r",
+        "mhutchie.git-graph"
       ],
       "settings": {
         "r.rpath.linux": "/usr/local/bin/R",
