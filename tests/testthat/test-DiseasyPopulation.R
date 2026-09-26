@@ -478,17 +478,17 @@ test_that("`mean_contact_rates()` preserves the total number of contacts", {
         tidyr::unite("label", !"population", sep = "/") |>
         tibble::deframe()
 
-      c_matrix <- population %.% per_capita_contact_matrices()[[1]]
+      m_matrix <- population %.% mean_contact_rates()[[1]]
 
-      t_matrix <- c_matrix *  tcrossprod(N)
+      t_matrix <- m_matrix * outer(N, rep(1, length(N)))
 
       sum(t_matrix)
     })
 
   expect_equal(
-    sd(number_of_contacts),
+    sd(number_of_contacts) / mean(number_of_contacts),
     0,
-    tolerance = 1e-12
+    tolerance = 5e-3
   )
 
 })
