@@ -62,7 +62,7 @@
     },
     {
       "package": "bit64",
-      "version": "4.8.4",
+      "version": "4.8.6",
       "_row": "bit64"
     },
     {
@@ -97,7 +97,7 @@
     },
     {
       "package": "Brobdingnag",
-      "version": "1.2-9",
+      "version": "1.3-1",
       "_row": "Brobdingnag"
     },
     {
@@ -242,7 +242,7 @@
     },
     {
       "package": "diffobj",
-      "version": "0.3.8",
+      "version": "0.3.9",
       "_row": "diffobj"
     },
     {
@@ -262,7 +262,7 @@
     },
     {
       "package": "distributional",
-      "version": "0.8.1",
+      "version": "0.9.0",
       "_row": "distributional"
     },
     {
@@ -307,7 +307,7 @@
     },
     {
       "package": "eurostat",
-      "version": "4.0.0",
+      "version": "4.1.1",
       "_row": "eurostat"
     },
     {
@@ -367,7 +367,7 @@
     },
     {
       "package": "future",
-      "version": "1.75.0",
+      "version": "1.76.0",
       "_row": "future"
     },
     {
@@ -417,7 +417,7 @@
     },
     {
       "package": "giscoR",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "_row": "giscoR"
     },
     {
@@ -502,7 +502,7 @@
     },
     {
       "package": "httr",
-      "version": "1.4.8",
+      "version": "1.4.9",
       "_row": "httr"
     },
     {
@@ -519,6 +519,11 @@
       "package": "ids",
       "version": "1.0.1",
       "_row": "ids"
+    },
+    {
+      "package": "igraph",
+      "version": "2.3.3",
+      "_row": "igraph"
     },
     {
       "package": "ini",
@@ -562,7 +567,7 @@
     },
     {
       "package": "knitr",
-      "version": "1.51",
+      "version": "1.52",
       "_row": "knitr"
     },
     {
@@ -902,7 +907,7 @@
     },
     {
       "package": "RcppParallel",
-      "version": "6.2.0",
+      "version": "6.2.1",
       "_row": "RcppParallel"
     },
     {
@@ -927,7 +932,7 @@
     },
     {
       "package": "readxl",
-      "version": "1.5.0",
+      "version": "1.5.0.1",
       "_row": "readxl"
     },
     {
@@ -977,7 +982,7 @@
     },
     {
       "package": "rmarkdown",
-      "version": "2.31",
+      "version": "2.32",
       "_row": "rmarkdown"
     },
     {
@@ -1017,7 +1022,7 @@
     },
     {
       "package": "rstantools",
-      "version": "2.7.0",
+      "version": "2.7.1",
       "_row": "rstantools"
     },
     {
@@ -1037,7 +1042,7 @@
     },
     {
       "package": "s2",
-      "version": "1.1.11",
+      "version": "1.1.12",
       "_row": "s2"
     },
     {
@@ -1072,7 +1077,7 @@
     },
     {
       "package": "sf",
-      "version": "1.1-2",
+      "version": "1.1-3",
       "_row": "sf"
     },
     {
@@ -1092,7 +1097,7 @@
     },
     {
       "package": "StanHeaders",
-      "version": "2.32.10",
+      "version": "2.39.1",
       "_row": "StanHeaders"
     },
     {
@@ -1132,7 +1137,7 @@
     },
     {
       "package": "terra",
-      "version": "1.9-46",
+      "version": "1.9-50",
       "_row": "terra"
     },
     {
@@ -1172,7 +1177,7 @@
     },
     {
       "package": "tinytex",
-      "version": "0.60",
+      "version": "0.61",
       "_row": "tinytex"
     },
     {
@@ -1202,7 +1207,7 @@
     },
     {
       "package": "usethis",
-      "version": "3.2.1",
+      "version": "3.2.2",
       "_row": "usethis"
     },
     {
@@ -1257,7 +1262,7 @@
     },
     {
       "package": "xfun",
-      "version": "0.60",
+      "version": "0.61",
       "_row": "xfun"
     },
     {
