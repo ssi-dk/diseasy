@@ -1,6 +1,6 @@
 {
   "name": "diseasy",
-  "image": "ghcr.io/ssi-dk/diseasy:main",
+  "image": "ghcr.io/ssi-dk/diseasy:feature-regional-contact-matrices",
   "overrideCommand": false,
   "remoteUser": "rstudio",
   "containerEnv": {
