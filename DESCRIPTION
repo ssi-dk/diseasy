@@ -59,6 +59,7 @@ Suggests:
     giscoR,
     ggplot2,
     gt,
+    igraph,
     jsonlite,
     knitr,
     lbfgsb3c,

@@ -1,0 +1,6 @@
+.devcontainer/devcontainer.json linguist-generated=true
+.github/r-devel-base-digest linguist-generated=true
+.github/arf-release linguist-generated=true
+
+dockerfile linguist-generated=true
+dockerfile-r-devel linguist-generated=true

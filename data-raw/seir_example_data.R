@@ -2,6 +2,7 @@
 
 if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
+  # Generate synthetic disease data for testing from a simple SEIR model with some noise added
   withr::local_seed(4260)
 
   # Generate the example model
@@ -12,37 +13,24 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   M <- model %.% parameters %.% compartment_structure[["R"]]
   rI <- model %.% parameters %.% disease_progression_rates[["I"]]                                                       # nolint end: object_name_linter
 
-  age_cuts_lower <- model %.% population %.% age_cuts_lower
-
   # Get a reference to the private environment
   private <- model$.__enclos_env__$private
 
-  # Generate a initial state_vector
-  y0 <- rep(0, (K + L + M + 1) * length(age_cuts_lower))
+  # Determine the eigenvector with largest eigenvalue
+  eigen_activity_vector <- private %.% contact_matrix(0) |>
+    purrr::pluck(eigen, "vectors")
 
-  population_proportion <- model %.% activity %.% map_population(age_cuts_lower) |>
-    dplyr::summarise("proportion" = sum(.data$proportion), .by = "age_group_out") |>
-    dplyr::pull("proportion")
-
-  activity_proportion <- cbind(
-    model %.% activity %.% map_population(age_cuts_lower) |>
-      dplyr::summarise(
-        "proportion" = sum(.data$proportion),
-        .by = c("age_group_reference", "age_group_out")
-      ),
-    "activity" = rowSums(model %.% activity %.% get_scenario_contacts(weights = c(1, 1, 1, 1))[[1]])
-  ) |>
-    dplyr::summarise("activity" = sum(.data$activity), .by = "age_group_out") |>
-    dplyr::pull("activity")
-
-  activity <- population_proportion * activity_proportion
+  activity <- eigen_activity_vector[, 1]
   activity <- activity / sum(activity)
 
+  # Generate a initial state_vector
+  y0 <- rep(0, private$n_states)
+
   # 0.05% are newly infected
-  y0[private$e1_state_indices] <- activity * 0.0005
+  y0[private$e1_state_indices] <- 0.0005 * activity
 
   # 99.95% are susceptible
-  y0[private$s_state_indices] <- population_proportion - y0[private$e1_state_indices]
+  y0[private$s_state_indices] <- model %.% population %.% model_population %.% proportion - y0[private$e1_state_indices]
 
 
   # Run solver across scenario change to check for long-term leakage
@@ -50,15 +38,23 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
 
   # Extract the maximal test positive signal from the I1 states
-  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI * sum(contact_basis_nordic %.% DK %.% population)
-  colnames(true_infected) <- diseasystore::age_labels(age_cuts_lower)
+  true_infected <- tt[, 1 + private$i1_state_indices] * L * rI *
+    sum(model %.% population %.% model_population %.% population)
+  colnames(true_infected) <- model %.% population %.% groups |>
+    tidyr::unite("label", dplyr::everything(), sep = "/") |>
+    dplyr::pull("label")
 
   # Convert to long format
   seir_example_data <- true_infected |>
     tibble::as_tibble(rownames = "t") |>
-    tidyr::pivot_longer(cols = !"t", names_to = "age_group", values_to = "n_infected") |>
+    tidyr::pivot_longer(cols = !"t", names_to = "population_group", values_to = "n_infected") |>
     dplyr::mutate(date = as.Date("2020-01-01") + as.numeric(.data$t), .after = "t") |>
-    dplyr::select(!"t")
+    dplyr::select(!"t") |>
+    tidyr::separate_wider_delim(
+      cols = "population_group",
+      delim = "/",
+      names = colnames(model %.% population %.% groups)
+    )
 
 
   # Unnest to develop a testing model with simple and realistic testing patterns
@@ -75,7 +71,7 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
       "n_infected" = dplyr::first(.data$n_infected),
       "n_positive_simple" = sum(.data$simple_test),
       "n_positive" = sum(.data$realistic_test),
-      .by = c("age_group", "date")
+      .by = c(colnames(model %.% population %.% groups), "date")
     )
 
 
@@ -83,8 +79,16 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   seir_example_data <- seir_example_data |>
     dplyr::select("date", dplyr::everything())
 
-  # set parameters for hospitalization
-  risk_of_admission <- c(0.001, 0.01, 0.1) # Risk per age group
+  # Set parameters for hospitalization
+  risk_of_admission <- model %.% population %.% groups |>
+    dplyr::left_join(
+      data.frame(
+        "age_group" = c("00-29", "30-59", "60+"),
+        "risk" = c(0.001, 0.01, 0.1)
+      ),
+      by = "age_group"
+    ) |>
+    dplyr::pull("risk")
   frac_to_hosp_after_days <- c(0, 0, 0.2, 0.3, 0.3, 0.1, 0.1) # must sum =1
 
   future_admitted <- t(t(true_infected) * risk_of_admission)
@@ -93,22 +97,31 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
 
   for (i in seq_along(frac_to_hosp_after_days)) {
     admitted <- admitted + rbind(
-      array(0, dim = c(i, 3)),
-      frac_to_hosp_after_days[i] * future_admitted[1: (NROW(future_admitted) - i), ]
+      array(0, dim = c(i, ncol(true_infected))),
+      frac_to_hosp_after_days[i] * future_admitted[1:(NROW(future_admitted) - i), ]
     )
   }
 
-  for (i in 1:3) admitted[, i] <- rpois(length(admitted[, i]), admitted[, i])
+  for (i in seq_len(ncol(true_infected))) admitted[, i] <- rpois(length(admitted[, i]), admitted[, i])
 
   # Convert to long format
   seir_example_data_hosp <- admitted |>
     tibble::as_tibble(rownames = "t") |>
-    tidyr::pivot_longer(cols = !"t", names_to = "age_group", values_to = "n_admission") |>
+    tidyr::pivot_longer(cols = !"t", names_to = "population_group", values_to = "n_admission") |>
+    tidyr::separate_wider_delim(
+      cols = "population_group",
+      delim = "/",
+      names = colnames(model %.% population %.% groups)
+    ) |>
     dplyr::mutate("date" = as.Date("2020-01-01") + as.numeric(.data$t), .after = "t") |>
     dplyr::select(!"t")
 
-  # merge data
-  seir_example_data <- dplyr::left_join(seir_example_data, seir_example_data_hosp, by = c("date", "age_group"))
+  # Merge data
+  seir_example_data <- dplyr::left_join(
+    seir_example_data,
+    seir_example_data_hosp,
+    by = c("date", colnames(model %.% population %.% groups))
+  )
 
   # Visualise the example data
   ggplot2::ggplot(seir_example_data) +

@@ -35,6 +35,8 @@ To begin, here we define a fixed meaning to the different indices and accents us
 | $L,l$   | Infected states            |
 | $M,m$   | Recovered states           |
 | $D,p,q$ | Demographic groups         |
+| $i,j$   | Age-group indices          |
+| $x,y$   | Regional indices           |
 | $V,a,b$ | Variants                   |
 | $^\sim$ | Non-normalised quantity    |
 
