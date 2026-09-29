@@ -500,7 +500,7 @@ for (penalty in c(0, 0.5, 1)) {
         )^2
       )
 
-    stopifnot("Walltime could not be determined for all combinations" = anyNA(combinations$walltime))
+    stopifnot("Walltime could not be determined for all combinations" = !anyNA(combinations$walltime))
 
     # Run the approximations for the round
     combinations_zip <- combinations |>
