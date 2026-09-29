@@ -924,7 +924,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             delta_jacobian <- evaluation$delta_mapping$jacobian
             value_rate_gradient <- delta_rate_gradient(evaluation)
 
-            gradient <- gradient + drop(crossprod(delta_ jacobian, value_rate_gradient))
+            gradient <- gradient + drop(crossprod(delta_jacobian, value_rate_gradient))
 
             # The delta spread penalty is repeated once for every immunity
             # target in the objective. Differentiate it with respect to the
