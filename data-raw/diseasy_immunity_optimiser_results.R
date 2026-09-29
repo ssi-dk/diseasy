@@ -29,7 +29,7 @@ checkmate::reportAssertions(coll)
 # See vignette("DiseasyImmunity-optimisation") for full context
 
 # Set the time limit
-time_limit <- 120 # per compartment
+time_limit <- 1 # seconds per degree of freedom
 
 # We define our list of test functions:
 # f: "base" functions
@@ -239,7 +239,6 @@ optimiser <- function(
   individual_level,
   cache,
   ordering,
-  walltime,
   future_scheduling = 1
 ) {
 
@@ -278,6 +277,9 @@ optimiser <- function(
           # Unpack problem size and optimisation algorithm
           M <- combination[[1]][[4]]                                                                                    # nolint: object_name_linter
           optim_control <- combination[[1]][[5]]
+
+          # Unpack the walltime
+          walltime <- combination[[1]][[6]]
 
           # Determine the "label" for the optimisation algorithm
           mc <- optim_control |>
@@ -402,18 +404,26 @@ cache <- cachem::cache_disk(dir = path, max_size = Inf)                         
 existing_files <- list.files(path, pattern = ".rds")
 
 # Then delete runs killed by wall time
-purrr::walk(
-  .progress = TRUE,
-  .x = existing_files,
-  .f = \(file) {
-    tmp <- file.path(path, file) |>
-      readRDS() |>
-      purrr::discard(~ purrr::pluck(., "timed_out", .default = FALSE))
+existing_time_limit <- cache$get("time_limit")
+if (!cachem::is.key_missing(existing_time_limit) && existing_time_limit < time_limit) {
 
-    if (length(tmp) > 0) saveRDS(tmp, file.path(path, file))
-    else file.remove(file.path(path, file))
-  }
-)
+  purrr::walk(
+    .progress = TRUE,
+    .x = existing_files,
+    .f = \(file) {
+      tmp <- file.path(path, file) |>
+        readRDS() |>
+        purrr::discard(~ purrr::pluck(., "timed_out", .default = FALSE))
+
+      if (length(tmp) > 0) saveRDS(tmp, file.path(path, file))
+      else file.remove(file.path(path, file))
+    }
+  )
+
+}
+
+cache$set("time_limit", time_limit)
+
 
 
 for (penalty in c(0, 0.5, 1)) {
@@ -479,11 +489,26 @@ for (penalty in c(0, 0.5, 1)) {
         names = c("method", "strategy")
       ) |>
       dplyr::inner_join(candidates_needing_compute, by = c("optim_method", "target_label", "method", "strategy")) |>
-      dplyr::left_join(optim_configs, by = "optim_method")
+      dplyr::left_join(optim_configs, by = "optim_method") |>
+      dplyr::mutate(
+        "walltime" = time_limit * dplyr::case_when(
+          .data$method == "free_delta" ~ M - 1,
+          .data$method == "free_gamma" ~ M - 1 + as.numeric(M > 1),
+          .data$strategy == "combination" ~ ((M - 1) + M - 1) + (M - 1 + as.numeric(M > 1)),
+          .data$method == "all_free" ~ (M - 1) + M - 1,
+          TRUE ~ NA
+        )^2
+      )
+
+    stopifnot(
+      "Walltime could not be determined for all combinations" = {
+        nrow(dplyr::filter(combinations, is.na(.data$walltime))) == 0
+      }
+    )
 
     # Run the approximations for the round
     combinations_zip <- combinations |>
-      purrr::pmap(~ zip(list(..1), ..2, ..3, ..4, list(..7)))
+      purrr::pmap(~ zip(list(..1), ..2, ..3, ..4, list(..7), ..8))
 
     # Since we have very uneven workloads, we need to balance the load on the workers
     if (M == 2) {
@@ -507,16 +532,11 @@ for (penalty in c(0, 0.5, 1)) {
     future_scheduling <- 1
     attr(future_scheduling, "ordering") <- ordering
 
-
-    # Run the optimisation problem for the configurations
-    walltime <- time_limit * M
-
     optimiser(
       combinations_zip,
       monotonous = monotonous,
       individual_level = individual_level,
       cache = cache,
-      walltime = walltime,
       future_scheduling = future_scheduling
     )
 
@@ -560,8 +580,10 @@ for (penalty in c(0, 0.5, 1)) {
 
 # With the optimisations complete, we load all of the approximations into a single data object.
 
+
 # Gather the results for all the rounds
 results <- list.files(path) |>
+  purrr::discard(~ . == "time_limit.rds") |>
   purrr::map(\(file) {
     tmp <- file.path(path, file) |>
       readRDS()
@@ -606,10 +628,7 @@ results <- results |>
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
-  dplyr::filter(
-    .data$execution_time >= time_limit * .data$M |
-      .data$value >= 1e3
-  ) |>
+  dplyr::filter(.data$execution_time >= .data$walltime |.data$value >= 1e3) |>
   dplyr::slice_min(
     .data$M,
     by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
@@ -657,13 +676,20 @@ should_not_have_been_eliminated <- results |>
     .data$M,
     by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
   ) |>
-  dplyr::filter(.data$execution_time < time_limit * .data$M, .data$M < 10, .data$value < 1e3)
+  dplyr::filter(.data$execution_time < .data$walltime, .data$M < 10, .data$value < 1e3)
 
 if (nrow(should_not_have_been_eliminated) > 0) {
   cat("should_not_have_been_eliminated")
   print(dplyr::select(should_not_have_been_eliminated, !c("target", "variation", "target_label")))
   print(dplyr::count(should_not_have_been_eliminated, method, strategy, monotonous, individual_level))
 }
+
+# Check the number of optimisers run for each case
+cat("Number of remaining optimisers (ascending order)")
+results |>
+  dplyr::count(.data$target, .data$method, .data$strategy, .data$M) |>
+  dplyr::arrange(-dplyr::desc(.data$n)) |>
+  print()
 
 # Re-arrange the columns
 results <- results |>
