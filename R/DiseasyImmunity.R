@@ -778,7 +778,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           gamma <- purrr::map(gamma_mapping, "value")
 
           # Some optimisers may propose non-finite parameter values.
-          if (any(!is.finite(delta)) || purrr::some(gamma, \(x) any(!is.finite(x)))) {
+          if (!all(is.finite(delta)) || purrr::some(gamma, \(x) !all(is.finite(x)))) {
             wall <- 1 / .Machine$double.eps
             return(
               list(
@@ -932,9 +932,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
             delta_sd <- stats::sd(evaluation$delta)
             if (
               individual_level != 0 &&
-              length(evaluation$delta) > 1 &&
-              is.finite(delta_sd) &&
-              delta_sd > sqrt(.Machine$double.eps)
+                length(evaluation$delta) > 1 &&
+                is.finite(delta_sd) &&
+                delta_sd > sqrt(.Machine$double.eps)
             ) {
               centred_delta <- evaluation$delta - mean(evaluation$delta)
               delta_penalty_rate_gradient <- centred_delta /
