@@ -500,11 +500,7 @@ for (penalty in c(0, 0.5, 1)) {
         )^2
       )
 
-    stopifnot(
-      "Walltime could not be determined for all combinations" = {
-        nrow(dplyr::filter(combinations, is.na(.data$walltime))) == 0
-      }
-    )
+    stopifnot("Walltime could not be determined for all combinations" = anyNA(combinations$walltime))
 
     # Run the approximations for the round
     combinations_zip <- combinations |>
@@ -628,7 +624,7 @@ results <- results |>
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
-  dplyr::filter(.data$execution_time >= .data$walltime |.data$value >= 1e3) |>
+  dplyr::filter(.data$execution_time >= .data$walltime | .data$value >= 1e3) |>
   dplyr::slice_min(
     .data$M,
     by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
