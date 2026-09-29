@@ -89,9 +89,9 @@ optim_configs <- tibble::tibble(
 
     # optimx algorithms:
     list("optim_method" = "lbfgsb3c"),
-    #list("optim_method" = "Rcgmin"), # Needs gradient
-    #list("optim_method" = "Rtnmin"), # Needs gradient
-    #list("optim_method" = "Rvmmin"), # Needs gradient
+    list("optim_method" = "Rcgmin"), # Needs gradient
+    list("optim_method" = "Rtnmin"), # Needs gradient
+    list("optim_method" = "Rvmmin"), # Needs gradient
     #list("optim_method" = "snewton"), # Needs gradient/Hessian
     #list("optim_method" = "snewtonm"), # Needs gradient/Hessian
     list("optim_method" = "spg"),
@@ -104,8 +104,8 @@ optim_configs <- tibble::tibble(
     list("optim_method" = "hjn"), # Cannot do univariate optimisation (M = 2, non-all_free methods)
     #list("optim_method" = "lbfgs"), # Wrapper to lfbgs::lfbgs - masked by nloptr::lfbgs
     list("optim_method" = "subplex"),
-    #list("optim_method" = "ncg"), # Needs gradient
-    #list("optim_method" = "nvm"), # Needs gradient
+    list("optim_method" = "ncg"), # Needs gradient
+    list("optim_method" = "nvm"), # Needs gradient
     list("optim_method" = "mla"),
     #list("optim_method" = "slsqp"), # Wrapper to nloptr::slsqp
     #list("optim_method" = "tnewt"), # Wrapper to nloptr::tnewton
