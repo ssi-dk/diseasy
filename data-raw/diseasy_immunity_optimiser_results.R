@@ -514,34 +514,11 @@ for (penalty in c(0, 0.5, 1)) {
     combinations_zip <- combinations |>
       purrr::pmap(~ zip(list(..1), ..2, ..3, ..4, list(..7), ..9))
 
-    # Since we have very uneven workloads, we need to balance the load on the workers
-    if (M == 2) {
-      # For the first round, we use no balancing
-      ordering <- NULL
-    } else {
-      # After the first round, we use the results from the previous round to balance the load
-      combinations_w_time <- round_results |>
-        dplyr::select("optim_method", "target_label", "method", "strategy", "execution_time") |>
-        dplyr::right_join(combinations, by = c("optim_method", "target_label", "method", "strategy"))
-
-      # Order by execution time high to low
-      index <- rev(order(combinations_w_time$execution_time))
-
-      # Use matrix to distribute across workers
-      ordering <- matrix(index[1:(ceiling(length(index) / workers) * workers)], ncol = workers, byrow = TRUE) |>
-        as.numeric()
-      ordering <- ordering[!is.na(ordering)]
-    }
-
-    future_scheduling <- 1
-    attr(future_scheduling, "ordering") <- ordering
-
     optimiser(
       combinations_zip,
       monotonous = monotonous,
       individual_level = individual_level,
-      cache = cache,
-      future_scheduling = future_scheduling
+      cache = cache
     )
 
 
