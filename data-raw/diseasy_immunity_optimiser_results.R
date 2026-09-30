@@ -231,7 +231,7 @@ run_approximation <- function(
         )
       )
     },
-     "callr_timeout_error" = function(e) {
+    "callr_timeout_error" = function(e) {
       return(
         list(
           "method" = method,
