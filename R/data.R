@@ -189,7 +189,8 @@ NULL
 #'      One of: "free_delta", "free_gamma" or "all_free".
 #'    - `strategy`: The strategy employed for optimisation.
 #'      One of: "naive", "recursive" or "combination".
-#'  - `penalty`: Were unit penalties (`monotonous` and `individual_level`) added to the objective function?
+#'  - `monotonous`: Were unit penalties for monotonicity added to the objective function?
+#'  - `individual_level`: Were unit penalties for individual level optimisation added to the objective function?
 #'  - `M`: The number of compartments.
 #'  - `value`: The smallest determined value of the objective function for the optimiser.
 #'  - `execution_time`: The time spent by the optimiser.

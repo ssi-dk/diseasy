@@ -28,6 +28,22 @@ checkmate::reportAssertions(coll)
 
 # See vignette("DiseasyImmunity-optimisation") for full context
 
+# Set the time limit
+time_limit <- 2 # seconds per degree of freedom squared
+
+add_walltime <- function(.data) {
+  dplyr::mutate(
+    .data,
+    "n_dof" = dplyr::case_when(
+      .data$method == "free_delta" ~ .data$M - 1,
+      .data$method == "free_gamma" ~ .data$M - 1 + as.numeric(.data$M > 1),
+      .data$strategy == "combination" ~ 2 * (.data$M - 1) + (.data$M - 1 + as.numeric(.data$M > 1)),
+      .data$method == "all_free" ~ 2 * (.data$M - 1),
+      TRUE ~ NA
+    ),
+    "walltime" = time_limit * .data$n_dof^2
+  )
+}
 
 # We define our list of test functions:
 # f: "base" functions
@@ -87,9 +103,9 @@ optim_configs <- tibble::tibble(
 
     # optimx algorithms:
     list("optim_method" = "lbfgsb3c"),
-    #list("optim_method" = "Rcgmin"), # Needs gradient
-    #list("optim_method" = "Rtnmin"), # Needs gradient
-    #list("optim_method" = "Rvmmin"), # Needs gradient
+    list("optim_method" = "Rcgmin"), # Needs gradient
+    list("optim_method" = "Rtnmin"), # Needs gradient
+    list("optim_method" = "Rvmmin"), # Needs gradient
     #list("optim_method" = "snewton"), # Needs gradient/Hessian
     #list("optim_method" = "snewtonm"), # Needs gradient/Hessian
     list("optim_method" = "spg"),
@@ -102,8 +118,8 @@ optim_configs <- tibble::tibble(
     list("optim_method" = "hjn"), # Cannot do univariate optimisation (M = 2, non-all_free methods)
     #list("optim_method" = "lbfgs"), # Wrapper to lfbgs::lfbgs - masked by nloptr::lfbgs
     list("optim_method" = "subplex"),
-    #list("optim_method" = "ncg"), # Needs gradient
-    #list("optim_method" = "nvm"), # Needs gradient
+    list("optim_method" = "ncg"), # Needs gradient
+    list("optim_method" = "nvm"), # Needs gradient
     list("optim_method" = "mla"),
     #list("optim_method" = "slsqp"), # Wrapper to nloptr::slsqp
     #list("optim_method" = "tnewt"), # Wrapper to nloptr::tnewton
@@ -114,19 +130,21 @@ optim_configs <- tibble::tibble(
   )
 )
 
+create_optim_label <- function(config) {
+  config |>
+    purrr::map_if(is.numeric, \(x) sprintf("%1.0e", x)) |>
+    as.data.frame() |>
+    tidyr::unite("label", tidyselect::everything()) |>
+    dplyr::pull("label") |>
+    paste(collapse = "_") |>
+    tolower() |>
+    stringr::str_replace(stringr::fixed("1e-"), "r1e")
+}
+
 
 # Set labels for the methods
 optim_labels <- optim_configs$config |>
-  purrr::map_chr(~ {
-    .x |>
-      purrr::map_if(is.numeric, ~ sprintf("%1.0e", .)) |>
-      as.data.frame() |>
-      tidyr::unite("label", tidyselect::everything()) |>
-      dplyr::pull("label") |>
-      paste(collapse = "_") |>
-      stringr::str_replace(stringr::fixed("1e-"), "r1e")
-  }) |>
-  tolower()
+  purrr::map_chr(create_optim_label)
 
 optim_configs <- optim_configs |>
   dplyr::mutate("optim_method" = optim_labels, .before = dplyr::everything())
@@ -163,10 +181,19 @@ run_approximation <- function(
         optim_control
       ) {
 
+        # Ensure subprocesses run on single core
+        Sys.setenv(
+          "OMP_NUM_THREADS" = 1,
+          "OPENBLAS_NUM_THREADS" = 1,
+          "MKL_NUM_THREADS" = 1,
+          "VECLIB_MAXIMUM_THREADS" = 1
+        )
+
+
         im_p <- diseasy::DiseasyImmunity$new()
         im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
 
-        im_p$plot(
+        res <- im_p$approximate_compartmental(
           method = method,
           strategy = strategy,
           M = M,
@@ -175,16 +202,10 @@ run_approximation <- function(
           optim_control = optim_control
         )
 
-        return(
-          im_p$approximate_compartmental(
-            method = method,
-            strategy = strategy,
-            M = M,
-            monotonous = monotonous,
-            individual_level = individual_level,
-            optim_control = optim_control
-          )
-        )
+        # Ensure consistent "value"
+        res[["value"]] <- sum(c(res$error, res$penalty))
+
+        return(res)
       },
       args = list(
         "model" = model,
@@ -198,14 +219,39 @@ run_approximation <- function(
       ),
       timeout = walltime
     ),
-    callr_timeout_error = function(e) {
+    "system_command_timeout_error" = function(e) {
       return(
         list(
           "method" = method,
           "strategy" = strategy,
           "M" = M,
           "value" = Inf,
-          "execution_time" = walltime
+          "execution_time" = walltime,
+          "timed_out" = TRUE
+        )
+      )
+    },
+    "callr_timeout_error" = function(e) {
+      return(
+        list(
+          "method" = method,
+          "strategy" = strategy,
+          "M" = M,
+          "value" = Inf,
+          "execution_time" = walltime,
+          "timed_out" = TRUE
+        )
+      )
+    },
+    "error" = function(e) {
+      return(
+        list(
+          "method" = method,
+          "strategy" = strategy,
+          "M" = M,
+          "value" = Inf,
+          "execution_time" = Inf,
+          "runtime_error" = e$message
         )
       )
     }
@@ -224,8 +270,6 @@ optimiser <- function(
   monotonous,
   individual_level,
   cache,
-  ordering,
-  walltime,
   future_scheduling = 1
 ) {
 
@@ -265,57 +309,44 @@ optimiser <- function(
           M <- combination[[1]][[4]]                                                                                    # nolint: object_name_linter
           optim_control <- combination[[1]][[5]]
 
-          # Determine the "label" for the optimisation algorithm
-          mc <- optim_control |>
-            purrr::map_if(is.numeric, ~ sprintf("%1.e", .)) |>
-            as.data.frame() |>
-            tidyr::unite("label", tidyselect::everything())
+          # Unpack the walltime
+          walltime <- combination[[1]][[6]]
 
-          optim_label <- tolower(paste(mc$label, collapse = "_")) |>
-            stringr::str_replace(stringr::fixed("1e-"), "r1e")
+          # Determine the "label" for the optimisation algorithm
+          optim_label <- create_optim_label(optim_control)
 
 
           # Generate approximations and store them
-          key <- glue::glue("{method}-{strategy}-{optim_label}-{monotonous}-{individual_level}-{M}")
+          key <- glue::glue(
+            "{model_name}-{method}-{strategy}-{optim_label}-",
+            "{monotonous}-{individual_level}-{sprintf('%02d', M)}"
+          )
 
-          # Get the results up until now
-          current_approximations <- cache$get(key = key)
-
-          # Compute next values
-          if (!(model_name %in% names(current_approximations))) {
-
-            try(
-              {
-                approx <- run_approximation(
-                  model = model,
-                  time_scale = time_scale,
-                  method = method,
-                  strategy = strategy,
-                  M = M,
-                  monotonous = monotonous,
-                  individual_level = individual_level,
-                  optim_control = optim_control,
-                  walltime = walltime
-                )
-
-                # Get cache again
-                current_approximations <- cache$get(key = key)
-
-
-                # Generate initial list if needed
-                if (cachem::is.key_missing(current_approximations)) {
-                  current_approximations <- list()
-                }
-
-
-                # Append approximation to existing results for the algorithm
-                current_approximations <- modifyList(current_approximations, stats::setNames(list(approx), model_name))
-
-
-                # Store to cache
-                cache$set(key = key, current_approximations)
-              }
+          if (cachem::is.key_missing(cache$get(key))) {
+            approx <- run_approximation(
+              model = model,
+              time_scale = time_scale,
+              method = method,
+              strategy = strategy,
+              M = M,
+              monotonous = monotonous,
+              individual_level = individual_level,
+              optim_control = optim_control,
+              walltime = walltime
             )
+
+            # Add meta data
+            approx <- utils::modifyList(
+              approx,
+              list(
+                "target_label" = model_name,
+                "optim_method" = optim_label,
+                "monotonous" = monotonous,
+                "individual_level" = individual_level
+              )
+            )
+
+            cache$set(key, approx)
           }
 
           p()
@@ -326,12 +357,30 @@ optimiser <- function(
   )
 }
 
+# A optimisation helper that reads approximation from file
+read_approximation <- function(file) {
+  file.path(path, file) |>
+    readRDS() |>
+    unclass() |>
+    purrr::keep_at(
+      c(
+        "method", "strategy", "M", "value", "execution_time",
+        "target_label", "optim_method", "monotonous", "individual_level"
+      )
+    ) |>
+    tibble::as_tibble_row() |>
+    dplyr::mutate(
+      "execution_time" = as.numeric(.data$execution_time, units = "secs")
+    )
+}
 
-# Below we implement a optimisation helper that
-# collects the existing results from the round
+# A optimisation helper that collects the existing results from the round
 existing_results <- function(M, monotonous, individual_level) {                                                         # nolint: object_name_linter
 
-  existing_files <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds"))
+  existing_files <- list.files(
+    path,
+    pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}[.]rds')
+  )
 
   # Early return if no files exist
   if (length(existing_files) == 0) {
@@ -350,32 +399,14 @@ existing_results <- function(M, monotonous, individual_level) {                 
   existing_files |>
     purrr::map(
       .progress = TRUE,
-      \(file) {
-        tmp <- file.path(path, file) |>
-          readRDS()
-
-        tmp |>
-          purrr::imap(\(approx, target_label) {
-            approx |>
-              purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
-              modifyList(list("target_label" = target_label))
-          }) |>
-          purrr::list_transpose() |>
-          tibble::as_tibble() |>
-          dplyr::mutate(
-            "optim_method" = stringr::str_extract(
-              !!file,
-              r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
-            )
-          )
-      }
+      \(file) read_approximation(file)
     ) |>
     purrr::list_rbind() |>
     dplyr::select("optim_method", "target_label", "method", "strategy")
 }
 
 
-# Run the optimisation
+# Clean up old runs
 path <- tryCatch(
   devtools::package_file("data-raw/diseasy_immunity_optimiser_results/"),
   error = function(e) {
@@ -384,6 +415,31 @@ path <- tryCatch(
 )
 cache <- cachem::cache_disk(dir = path, max_size = Inf)                                                                 # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
 
+existing_files <- list.files(path, pattern = "[.]rds")
+
+# Determine the wall-time of the current run
+# Then delete runs killed by wall time
+existing_time_limit <- cache$get("time_limit")
+if (!cachem::is.key_missing(existing_time_limit) && existing_time_limit < time_limit) {
+
+  purrr::walk(
+    .progress = TRUE,
+    .x = existing_files,
+    .f = \(file) {
+      approx <- readRDS(file.path(path, file))
+
+      if (isTRUE(approx$timed_out)) {
+        file.remove(file.path(path, file))
+      }
+    }
+  )
+
+}
+
+cache$set("time_limit", time_limit)
+
+
+# Run the optimisation
 for (penalty in c(0, 0.5, 1)) {
   monotonous <- ceiling(penalty)
   individual_level <- floor(penalty)
@@ -394,6 +450,10 @@ for (penalty in c(0, 0.5, 1)) {
     workers <- 1
     future::plan("sequential", gc = TRUE)
   } else {
+    withr::local_options(
+      "cli.progress_enable" = TRUE,
+      "progressr.enable" = TRUE
+    )
     workers <- unname(future::availableCores(omit = 1))
     future::plan("multisession", gc = TRUE, workers = workers)
   }
@@ -402,8 +462,9 @@ for (penalty in c(0, 0.5, 1)) {
     "optim_method" = optim_labels,
     "target_label" = model_names,
     "method_label" = c(
-      "free_delta-naive", "free_gamma-naive", "all_free-naive", "all_free-combination",
-      "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
+      "free_delta-naive", "free_gamma-naive",
+      "free_delta-recursive", "free_gamma-recursive",
+      "all_free-naive", "all_free-recursive", "all_free-combination"
     )
   ) |>
     tidyr::separate_wider_delim(
@@ -422,12 +483,17 @@ for (penalty in c(0, 0.5, 1)) {
     # Remove existing computations
     candidates_needing_compute <- dplyr::setdiff(candidates, existing_results(M, monotonous, individual_level))
 
+    if (nrow(candidates_needing_compute) > 0) {
+      print(candidates_needing_compute)
+    }
+
     # Compute new/missing runs
     combinations <- tidyr::expand_grid(
       "model" = zip(models, model_names, time_scales),
       "method_label" = c(
-        "free_delta-naive", "free_gamma-naive", "all_free-naive", "all_free-combination",
-        "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
+        "free_delta-naive", "free_delta-recursive",
+        "free_gamma-naive", "free_gamma-recursive",
+        "all_free-naive", "all_free-recursive", "all_free-combination"
       ),
       "M" = M,
       "optim_method" = optim_labels
@@ -439,109 +505,79 @@ for (penalty in c(0, 0.5, 1)) {
         names = c("method", "strategy")
       ) |>
       dplyr::inner_join(candidates_needing_compute, by = c("optim_method", "target_label", "method", "strategy")) |>
-      dplyr::left_join(optim_configs, by = "optim_method")
+      dplyr::left_join(optim_configs, by = "optim_method") |>
+      add_walltime()
+
+    stopifnot("Walltime could not be determined for all combinations" = !anyNA(combinations$walltime))
 
     # Run the approximations for the round
     combinations_zip <- combinations |>
-      purrr::pmap(~ zip(list(..1), ..2, ..3, ..4, list(..7)))
+      purrr::pmap(~ zip(list(..1), ..2, ..3, ..4, list(..7), ..9))
 
     # Since we have very uneven workloads, we need to balance the load on the workers
-    if (M == 2) {
-      # For the first round, we use no balancing
-      ordering <- NULL
-    } else {
-      # After the first round, we use the results from the previous round to balance the load
-      combinations_w_time <- round_results |>
-        dplyr::select("optim_method", "target_label", "method", "strategy", "execution_time") |>
-        dplyr::right_join(combinations, by = c("optim_method", "target_label", "method", "strategy"))
+    # Order by walltime high to low
+    index <- rev(order(combinations$walltime))
 
-      # Order by execution time high to low
-      index <- rev(order(combinations_w_time$execution_time))
-
-      # Use matrix to distribute across workers
-      ordering <- matrix(index[1:(ceiling(length(index) / workers) * workers)], ncol = workers, byrow = TRUE) |>
-        as.numeric()
-      ordering <- ordering[!is.na(ordering)]
-    }
+    # Use matrix to distribute across workers
+    ordering <- matrix(index[1:(ceiling(length(index) / workers) * workers)], ncol = workers, byrow = TRUE) |>
+      as.numeric()
+    ordering <- ordering[!is.na(ordering)]
 
     future_scheduling <- 1
     attr(future_scheduling, "ordering") <- ordering
-
-
-    # Run the optimisation problem for the configurations
-    walltime <- 60 * M
 
     optimiser(
       combinations_zip,
       monotonous = monotonous,
       individual_level = individual_level,
       cache = cache,
-      walltime = walltime,
       future_scheduling = future_scheduling
     )
 
 
     # Gather the results for the round and eliminate stragglers
-    round_results <- list.files(path, pattern = glue::glue("-{monotonous}-{individual_level}-{M}.rds")) |>
+    round_results <- list.files(
+      path,
+      pattern = glue::glue('-{monotonous}-{individual_level}-{sprintf("%02d", M)}[.]rds')
+    ) |>
       purrr::map(\(file) {
-        tmp <- file.path(path, file) |>
-          readRDS()
-
-        tmp |>
-          purrr::imap(\(approx, target_label) {
-            approx |>
-              purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
-              modifyList(list("target_label" = target_label))
-          }) |>
-          purrr::list_transpose() |>
-          tibble::as_tibble() |>
-          dplyr::mutate(
-            "optim_method" = stringr::str_extract(
-              !!file,
-              r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
-            )
-          )
+        read_approximation(file) |>
+          dplyr::select("optim_method", "target_label", "method", "strategy", "M", "value", "execution_time")
       }) |>
-      purrr::list_rbind() |>
-      dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
-      dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
+      purrr::reduce(
+        rbind,
+        .init = data.frame(
+          "optim_method" = character(0),
+          "target_label" = character(0),
+          "method" = character(0),
+          "strategy" = character(0),
+          "M" = integer(0),
+          "value" = numeric(0),
+          "execution_time" = numeric(0)
+        )
+      )
 
 
 
     # Eliminate too slow candidates
     candidates <- round_results |>
-      dplyr::filter(.data$execution_time < walltime, .data$value < 1e3) |>
+      add_walltime() |>
+      dplyr::filter(.data$execution_time < .data$walltime, .data$value < 1e3) |>
       dplyr::select("optim_method", "target_label", "method", "strategy")
   }
 }
 
 # With the optimisations complete, we load all of the approximations into a single data object.
 
+
 # Gather the results for all the rounds
 results <- list.files(path) |>
-  purrr::map(\(file) {
-    tmp <- file.path(path, file) |>
-      readRDS()
-
-    tmp |>
-      purrr::imap(\(approx, target) {
-        approx |>
-          purrr::keep_at(c("method", "strategy", "M", "value", "execution_time")) |>
-          modifyList(list("target_label" = target))
-      }) |>
-      purrr::list_transpose() |>
-      tibble::as_tibble() |>
-      dplyr::mutate(
-        "optim_method" = stringr::str_extract(
-          !!file,
-          r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
-        ),
-        "penalty" = stringr::str_detect(!!file, r"{-1-1-[0-9]+.rds}") +
-          0.5 * stringr::str_detect(!!file, r"{-1-0-[0-9]+.rds}")
-      )
-  }) |>
+  purrr::discard(~ . == "time_limit.rds") |>
+  purrr::map(
+    .progress = TRUE,
+    \(file) read_approximation(file)
+  ) |>
   purrr::list_rbind() |>
-  dplyr::mutate("execution_time" = as.numeric(.data$execution_time, units = "secs")) |>
   dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
 
 
@@ -557,70 +593,88 @@ results <- results |>
     .data$variation == "0" ~ "Base",
     .data$variation == "2t" ~ "Twice the time scale",
     .data$variation == "c" ~ "Non-zero asymptote"
-  ))
+  )) |>
+  add_walltime()
 
 
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
 # eliminated. Until I can determine why this occurs, we filter them out from the result.
 round_eliminated <- results |>
-  dplyr::filter(
-    .data$execution_time >= 60 * .data$M |
-      .data$value >= 1e3
+  dplyr::filter(.data$execution_time >= .data$walltime | .data$value >= 1e3) |>
+  dplyr::slice_min(
+    .data$M,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
   ) |>
-  dplyr::slice_min(M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
   dplyr::transmute(
     .data$optim_method,
     .data$target,
     .data$variation,
     .data$method,
     .data$strategy,
-    .data$penalty,
+    .data$monotonous,
+    .data$individual_level,
     "N_eliminated" = .data$M
   )
 
 should_have_been_eliminated <- results |>
-  dplyr::left_join(round_eliminated, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
+  dplyr::left_join(
+    round_eliminated,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
   dplyr::filter(
     .data$N_eliminated < .data$M,
-    .by = c("optim_method", "target", "variation", "method", "strategy", "penalty")
+    .by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
   )
 
 if (nrow(should_have_been_eliminated) > 0) {
   cat("should_have_been_eliminated")
   print(dplyr::select(should_have_been_eliminated, !c("target", "variation", "target_label")))
-  print(dplyr::count(should_have_been_eliminated, method, strategy, penalty))
+  print(dplyr::count(should_have_been_eliminated, method, strategy, monotonous, individual_level))
 }
 
 results <- dplyr::anti_join(
   results,
   dplyr::select(
     should_have_been_eliminated,
-    "optim_method", "target", "variation", "method", "strategy", "penalty", "M"
+    "optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level", "M"
   ),
-  by = c("optim_method", "target", "variation", "method", "strategy", "penalty", "M")
+  by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level", "M")
 )
 
 
 # Also check for the reverse case
 should_not_have_been_eliminated <- results |>
-  dplyr::slice_max(.data$M, by = c("optim_method", "target", "variation", "method", "strategy", "penalty")) |>
-  dplyr::filter(.data$execution_time < 60 * .data$M, .data$M < 10, .data$value < 1e3)
+  dplyr::slice_max(
+    .data$M,
+    by = c("optim_method", "target", "variation", "method", "strategy", "monotonous", "individual_level")
+  ) |>
+  dplyr::filter(.data$execution_time < .data$walltime, .data$M < 10, .data$value < 1e3)
 
 if (nrow(should_not_have_been_eliminated) > 0) {
   cat("should_not_have_been_eliminated")
   print(dplyr::select(should_not_have_been_eliminated, !c("target", "variation", "target_label")))
-  print(dplyr::count(should_not_have_been_eliminated, method, strategy, penalty))
+  print(dplyr::count(should_not_have_been_eliminated, method, strategy, monotonous, individual_level))
 }
+
+# Check the number of optimisers run for each case
+cat("Number of remaining optimisers (ascending order)")
+results |>
+  dplyr::count(.data$target, .data$method, .data$strategy, .data$M) |>
+  dplyr::arrange(-dplyr::desc(.data$n)) |>
+  print()
 
 # Re-arrange the columns
 results <- results |>
   dplyr::select(
-    "target", "variation", "method", "strategy", "penalty", "M", "value", "execution_time", dplyr::everything()
+    "target", "variation", "method", "strategy",
+    "monotonous", "individual_level",
+    "M", "value", "execution_time", dplyr::everything()
   ) |>
   dplyr::arrange(
     .data$optim_method,
     .data$M,
-    .data$penalty,
+    .data$monotonous,
+    .data$individual_level,
     .data$target,
     .data$variation,
     .data$method,
