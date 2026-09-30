@@ -29,7 +29,20 @@ checkmate::reportAssertions(coll)
 # See vignette("DiseasyImmunity-optimisation") for full context
 
 # Set the time limit
-time_limit <- 1 # seconds per degree of freedom
+time_limit <- 2 # seconds per degree of freedom squared
+
+add_walltime <- function(.data) {
+  dplyr::mutate(
+    .data,
+    "walltime" = time_limit * dplyr::case_when(
+      .data$method == "free_delta" ~ M - 1,
+      .data$method == "free_gamma" ~ M - 1 + as.numeric(M > 1),
+      .data$strategy == "combination" ~ ((M - 1) + M - 1) + (M - 1 + as.numeric(M > 1)),
+      .data$method == "all_free" ~ (M - 1) + M - 1,
+      TRUE ~ NA
+    )^2
+  )
+}
 
 # We define our list of test functions:
 # f: "base" functions
@@ -168,7 +181,7 @@ run_approximation <- function(
         im_p <- diseasy::DiseasyImmunity$new()
         im_p$set_waning_model(model, time_scale = time_scale, target = "infection")
 
-        im_p$plot(
+        res <- im_p$approximate_compartmental(
           method = method,
           strategy = strategy,
           M = M,
@@ -177,16 +190,10 @@ run_approximation <- function(
           optim_control = optim_control
         )
 
-        return(
-          im_p$approximate_compartmental(
-            method = method,
-            strategy = strategy,
-            M = M,
-            monotonous = monotonous,
-            individual_level = individual_level,
-            optim_control = optim_control
-          )
-        )
+        # Ensure consistent "value"
+        res[["value"]] <- sum(c(res$error, res$penalty))
+
+        return(res)
       },
       args = list(
         "model" = model,
@@ -212,6 +219,18 @@ run_approximation <- function(
         )
       )
     },
+     "callr_timeout_error" = function(e) {
+      return(
+        list(
+          "method" = method,
+          "strategy" = strategy,
+          "M" = M,
+          "value" = Inf,
+          "execution_time" = walltime,
+          "timed_out" = TRUE
+        )
+      )
+    },
     "error" = function(e) {
       return(
         list(
@@ -219,7 +238,8 @@ run_approximation <- function(
           "strategy" = strategy,
           "M" = M,
           "value" = Inf,
-          "execution_time" = Inf
+          "execution_time" = Inf,
+          "runtime_error" = e$message
         )
       )
     }
@@ -390,7 +410,7 @@ existing_results <- function(M, monotonous, individual_level) {                 
 }
 
 
-# Run the optimisation
+# Clean up old runs
 path <- tryCatch(
   devtools::package_file("data-raw/diseasy_immunity_optimiser_results/"),
   error = function(e) {
@@ -399,10 +419,9 @@ path <- tryCatch(
 )
 cache <- cachem::cache_disk(dir = path, max_size = Inf)                                                                 # nolint: namespace_linter. We need to supress until R-CMD-Check works with R6 fully
 
-
-# Determine the wall-time of the current run
 existing_files <- list.files(path, pattern = ".rds")
 
+# Determine the wall-time of the current run
 # Then delete runs killed by wall time
 existing_time_limit <- cache$get("time_limit")
 if (!cachem::is.key_missing(existing_time_limit) && existing_time_limit < time_limit) {
@@ -425,7 +444,7 @@ if (!cachem::is.key_missing(existing_time_limit) && existing_time_limit < time_l
 cache$set("time_limit", time_limit)
 
 
-
+# Run the optimisation
 for (penalty in c(0, 0.5, 1)) {
   monotonous <- ceiling(penalty)
   individual_level <- floor(penalty)
@@ -448,8 +467,9 @@ for (penalty in c(0, 0.5, 1)) {
     "optim_method" = optim_labels,
     "target_label" = model_names,
     "method_label" = c(
-      "free_delta-naive", "free_gamma-naive", "all_free-naive", "all_free-combination",
-      "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
+      "free_delta-naive", "free_gamma-naive",
+      "free_delta-recursive", "free_gamma-recursive",
+      "all_free-naive", "all_free-recursive", "all_free-combination"
     )
   ) |>
     tidyr::separate_wider_delim(
@@ -476,8 +496,9 @@ for (penalty in c(0, 0.5, 1)) {
     combinations <- tidyr::expand_grid(
       "model" = zip(models, model_names, time_scales),
       "method_label" = c(
-        "free_delta-naive", "free_gamma-naive", "all_free-naive", "all_free-combination",
-        "free_delta-recursive", "free_gamma-recursive", "all_free-recursive"
+        "free_delta-naive", "free_delta-recursive",
+        "free_gamma-naive", "free_gamma-recursive",
+        "all_free-naive", "all_free-recursive", "all_free-combination"
       ),
       "M" = M,
       "optim_method" = optim_labels
@@ -560,16 +581,28 @@ for (penalty in c(0, 0.5, 1)) {
               !!file,
               r"{(?<=naive-|recursive-|combination-)[a-z0-9-_]+(?=-[0-9]+-[0-9]+-[0-9]+.rds)}"
             )
-          )
+          ) |>
+          dplyr::select("optim_method", "target_label", "method", "strategy", "M", "value", "execution_time")
       }) |>
-      purrr::list_rbind() |>
-      dplyr::select("optim_method", "target_label", "method", "strategy", dplyr::everything())
+      purrr::reduce(
+        rbind,
+        .init = data.frame(
+          "optim_method" = character(0),
+          "target_label" = character(0),
+          "method" = character(0),
+          "strategy" = character(0),
+          "M" = integer(0),
+          "value" = numeric(0),
+          "execution_time" = numeric(0)
+        )
+      )
 
 
 
     # Eliminate too slow candidates
     candidates <- round_results |>
-      dplyr::filter(.data$execution_time < walltime, .data$value < 1e3) |>
+      add_walltime() |>
+      dplyr::filter(.data$execution_time < .data$walltime, .data$value < 1e3) |>
       dplyr::select("optim_method", "target_label", "method", "strategy")
   }
 }
@@ -618,7 +651,8 @@ results <- results |>
     .data$variation == "0" ~ "Base",
     .data$variation == "2t" ~ "Twice the time scale",
     .data$variation == "c" ~ "Non-zero asymptote"
-  ))
+  )) |>
+  add_walltime()
 
 
 # For some reason, when repeating the generation above, optimisers get additional rounds after they should have been
