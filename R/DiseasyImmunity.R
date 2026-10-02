@@ -498,30 +498,42 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         tic <- Sys.time()
 
-        # To perform the optimisation, we need to produce a vector of gamma and delta "rates" from
-        # the free parameters given to the optimiser.
+        # To perform the optimisation, we need to produce a vector of gamma and
+        # delta "rates" from the free parameters given to the optimiser.
         # This map depends on the method used.
 
-        # We need some helper functions that can map the optimiser parameters `par` to either
-        # [0, 1] or [0, Inf]
-        p_01 <- \(p) 1 / (1 + exp(-p)) # Sigmoid mapping of parameters from -Inf / Inf to 0 / 1
-        p_0inf <- \(p) log(1 + exp(p)) # Mapping of parameters from -Inf / Inf to 0 / Inf ("Softplus" function)
+        # The optimiser runs over the unconstrained parameter space p (-Inf, Inf),
+        # while we want to constraint the optimisation to a domain x:
+        # with gamma between [0, 1] and delta between [0, Inf).
 
-        # Later, we will need the inversion functions also
-        inv_p_01 <- \(p) {
-          # As we near the machine precision, we need to avoid the Inf and -Inf
-          # values from the mapping. The optimiser cannot handle these values.
-          p <- pmax(p, .Machine$double.eps)
-          pm <- pmax(1 - p, .Machine$double.eps)
+        # We need helper functions that map the unconstrained optimiser parameters
+        # `p` to either [0, 1] or [0, Inf]. I.e. allow us to create x(p)
+        p_01 <- \(p) stats::plogis(p)
+        p_0inf <- \(p) pmax(p, 0) + log1p(exp(-abs(p)))
 
-          log(p) - log(pm)  # Inverse mapping of p_01
+        # We also provide gradient functions to the optimiser, so we will require
+        # the gradient of x(p): dx(p)/dp
+
+        # So we create helpers that compute these derivatives at p.
+        dp_01 <- \(p) {
+          mapped <- p_01(p)
+          return(mapped * (1 - mapped))
         }
-        inv_p_0inf <- \(p) {
-          p <- p |>
-            pmin(log(.Machine$double.xmax)) |> # Prevent exp(p) = Inf
-            pmax(.Machine$double.eps) # Prevent exp(p) = 1
+        dp_0inf <- \(p) stats::plogis(p) # The derivative of softplus is the logistic function.
 
-          log(exp(p) - 1)
+        # Later, we will need the inversion functions also p(x).
+        inv_p_01 <- \(x) {
+          # As we near machine precision, we need to avoid Inf and -Inf
+          # values from the mapping. The optimiser cannot handle these values.
+          x <- pmax(x, .Machine$double.eps)
+          x <- pmin(x, 1 - .Machine$double.eps)
+
+          return(stats::qlogis(x))
+        }
+        inv_p_0inf <- \(x) {
+          x <- pmax(x, .Machine$double.eps) # The inverse softplus is undefined at zero.
+
+          return(x + log(-expm1(-x)))
         }
 
 
@@ -533,129 +545,520 @@ DiseasyImmunity <- R6::R6Class(                                                 
         stopifnot("The waning function(s) must have finite values at infinity." = purrr::every(f_inf, is.finite))
 
 
+        # With the helpers defined, we can now compute, depending on the method chosen:
+        # the number of free parameters
+        # the mappings from p -> x and p -> dx(p)/dp
         if (method == "free_delta") {                                                                                   # nolint: if_switch_linter
-          # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf
+          # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf.
           n_free_parameters <- M - 1
 
           f_0 <- purrr::map(self$model, \(model) model(0))
 
-          par_to_delta <- \(par) p_0inf(par) # All parameters are delta
+          map_delta <- function(par) {
+            delta <- p_0inf(par)
+            jacobian <- matrix(0, nrow = M - 1, ncol = n_free_parameters)
 
-          # gammas: f_0 to f_inf. Has to be in reverse order for M = 1, since then only the from
-          # value is generated. This needs to be f_inf to make the integral difference go to zero
-          # as we integrate to infinity
-          par_to_gamma <- \(par, model_id) rev(seq(from = f_inf[[model_id]], to = f_0[[model_id]], length.out = M))
+            if (M > 1) {
+              indices <- seq_len(M - 1)
+              jacobian[cbind(indices, indices)] <- dp_0inf(par)
+            }
 
-        } else if (method  == "free_gamma") {
+            return(list("value" = delta, "jacobian" = jacobian))
+          }
+
+          map_gamma <- function(par, model_id) {
+            # Gammas run from f_0 to f_inf. This has to be generated in reverse
+            # order for M = 1 so that the only value is f_inf and the integral
+            # difference converges to zero as time approaches infinity.
+            gamma <- rev(seq(from = f_inf[[model_id]], to = f_0[[model_id]], length.out = M))
+            jacobian <- matrix(0, nrow = M, ncol = n_free_parameters)
+
+            return(list("value" = gamma, "jacobian" = jacobian))
+          }
+
+        } else if (method == "free_gamma") {
           # The first n_models * (M-1) parameters are the gamma rates (M-1 for each model)
           # The last parameter is the delta rate which is identical for all compartments
           n_free_parameters <- (M - 1) * n_models + as.numeric(M > 1)
 
-          # Last parameter is delta - repeat to match the number of transitions
-          par_to_delta <- \(par) rep(p_0inf(par[-seq_len(max(0, n_free_parameters - 1))]), max(1, M - 1))
+          map_delta <- function(par) {
+            jacobian <- matrix(0, nrow = M - 1, ncol = n_free_parameters)
+            if (M == 1) return(list("value" = numeric(0), "jacobian" = jacobian))
 
-          par_to_gamma <- \(par, model_id) {
-            c(
-              p_01(par[seq_len(M - 1) + (model_id - 1) * (M - 1)]), # The gamma parameters of the n'th model
-              f_inf[[model_id]] # And inject the fixed end-point
-            )
+            delta_index <- n_free_parameters
+            delta <- rep(p_0inf(par[[delta_index]]), M - 1)
+            jacobian[, delta_index] <- dp_0inf(par[[delta_index]])
+
+            return(list("value" = delta, "jacobian" = jacobian))
+          }
+
+          map_gamma <- function(par, model_id) {
+            gamma_indices <- seq_len(M - 1) + (model_id - 1) * (M - 1)
+            gamma <- c(p_01(par[gamma_indices]), f_inf[[model_id]])
+            jacobian <- matrix(0, nrow = M, ncol = n_free_parameters)
+
+            if (length(gamma_indices) > 0) {
+              gamma_rows <- seq_len(M - 1)
+              jacobian[cbind(gamma_rows, gamma_indices)] <- dp_01(par[gamma_indices])
+            }
+
+            return(list("value" = gamma, "jacobian" = jacobian))
           }
 
         } else if (method == "all_free") {
           # All parameters are free to vary
           # The first n_models * (M-1) parameters are the gamma rates  (M-1 for each model)
           # The last M-1 parameters are the delta rates
-          n_free_parameters <- (M - 1) * n_models + M - 1
+          n_gamma_parameters <- (M - 1) * n_models
+          n_free_parameters <- n_gamma_parameters + M - 1
 
-          par_to_delta <- \(par) p_0inf(par[-seq_len(n_free_parameters - (M - 1))]) # Last M-1 parameters are the deltas
-          par_to_gamma <- \(par, model_id) {
-            c(
-              p_01(par[seq_len(M - 1) + (model_id - 1) * (M - 1)]), # The gamma parameters of the n'th model
-              f_inf[[model_id]] # And inject the fixed end-point
-            )
+          map_delta <- function(par) {
+            delta_indices <- n_gamma_parameters + seq_len(M - 1)
+            delta <- p_0inf(par[delta_indices])
+            jacobian <- matrix(0, nrow = M - 1, ncol = n_free_parameters)
+
+            if (length(delta_indices) > 0) {
+              delta_rows <- seq_len(M - 1)
+              jacobian[cbind(delta_rows, delta_indices)] <- dp_0inf(par[delta_indices])
+            }
+
+            return(list("value" = delta, "jacobian" = jacobian))
+          }
+
+          map_gamma <- function(par, model_id) {
+            gamma_indices <- seq_len(M - 1) + (model_id - 1) * (M - 1)
+            gamma <- c(p_01(par[gamma_indices]), f_inf[[model_id]])
+            jacobian <- matrix(0, nrow = M, ncol = n_free_parameters)
+
+            if (length(gamma_indices) > 0) {
+              gamma_rows <- seq_len(M - 1)
+              jacobian[cbind(gamma_rows, gamma_indices)] <- dp_01(par[gamma_indices])
+            }
+
+            return(list("value" = gamma, "jacobian" = jacobian))
           }
         }
 
-        # For the optimisation, we define the objective function which loops over each model and computes the total
-        # square deviation from the target.
-        # The error is then the sum of these deviations across models
-        obj_function <- function(par) {
 
-          metrics <- purrr::map(seq_along(self$model), \(model_id) {
+        # The objective function has optional penalties for non-monotonous gamma
+        # values which we need to implement in a differentiable function so
+        # that we can compute the gradient of the objective function later.
+        # This penalty function is chosen as the squared softplus which has
+        # a sharpness parameter:
+        monotonicity_penalty <- function(gamma, monotonicity_sharpness = 50) {
 
-            delta <- par_to_delta(par)
-            gamma <- par_to_gamma(par, model_id)
+          gradient <- numeric(length(gamma))
 
-            # Some optimisers yield non-finite delta
-            if (any(is.infinite(delta)) || anyNA(delta) || anyNA(gamma)) {
+          if (length(gamma) <= 1 || monotonous == 0) {
+            return(list("value" = 0, "gradient" = gradient))
+          }
 
-              # We define the objective function as infinite in this case
-              return(list("value" = 1 / .Machine$double.eps, "penalty" = 1 / .Machine$double.eps))
+          # The monotonous penalty function:
+          # penalty = monotonous * sum_i((softplus(k * (gamma_{i+1} - gamma_i)) / k)^2)
+          # where softplus (= p_0inf) is pmax(p, 0) + log1p(exp(-abs(p)))
 
-            } else {
+          # lets define:
+          # v_i = gamma_{i+1} - gamma_i
+          # sv_i = softplus(k v_i) / k
+          # penalty = monotonous * sum_i(sv_i^2)
 
-              approximation <- private$get_approximation(gamma, delta, M)
+          # dpenalty/dgamma_m = monotonous * d/dgamma_m sum_i(sv_i^2)
+          #                   = monotonous * d/dgamma_m (sv_1^2 + sv_2^2 ..)
+          #                   = 2 * monotonous * (sv_1 * dsv_1/dgamma_m + sv_2 * dsv_2/dgamma_m ...)
+          # Where the derivative of the softplus function is the logistic function
 
-              # Finds diff from approximation and target function
-              integrand <- \(t) (approximation(t) - self$model[[model_id]](t))^2
+          violation <- diff(gamma) # v
+          soft_violation <- p_0inf(monotonicity_sharpness * violation) / monotonicity_sharpness # sv
+          violation_gradient <- 2 * monotonous * soft_violation * stats::plogis(monotonicity_sharpness * violation)
 
-              # Numerically integrate the differences
-              value <- tryCatch(
-                stats::integrate(
-                  integrand,
-                  lower = 0,
-                  upper = Inf,
-                  subdivisions = 10000L,
-                  rel.tol = .Machine$double.eps^0.6
-                ) |>
-                  purrr::pluck("value", sqrt),
-                error = function(e) {
-                  1 / (min(delta) + .Machine$double.eps) # If any delta is too small, the integral looks divergent
-                  # (since we too approach the asymptote too slowly).
-                  # We use the 1 / delta to create a wall in the optimisation
-                }
-              )
+          gradient[-length(gamma)] <- gradient[-length(gamma)] - violation_gradient
+          gradient[-1] <- gradient[-1] + violation_gradient
 
-
-              ## Penalise non-monotone solutions
-              penalty <- monotonous * sum(purrr::keep(diff(gamma), ~ . > 0))
-
-              ## Penalise spread of gamma and delta
-
-              # Compute sd of equidistant gamma
-              gamma_eq <- seq(from = self$model[[model_id]](0), to = gamma[M], length.out = M)
-
-              # Compute penalty spread of gamma and delta
-              gamma_penalty <- ifelse(length(gamma) > 1, sd(gamma - gamma_eq), 0)
-              delta_penalty <- ifelse(length(delta) > 1, sd(delta), 0)
-
-              penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)
-
-              return(list("value" = value, "penalty" = penalty))
-            }
-          }) |>
-            purrr::list_transpose() |>
-            purrr::map_dbl(sum)
-
-          return(metrics)
+          return(
+            list(
+              "value" = monotonous * sum(soft_violation^2),
+              "gradient" = gradient
+            )
+          )
         }
 
+
+        # The objective function contains an integral over t in (0, inf) but will
+        # in most cases contain a internal time scale.
+        time_scale <- purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+
+        # We first transform the objective function via the transformation
+        # t = scale * u / (1 - u)
+        # which maps u in (0, 1) to t in (0, Inf).
+        # The integral is then solved as a Gauss–Legendre quadrature.
+        quadrature <- pracma::gaussLegendre(n = 64L, 0, 1)
+        integration_time <- time_scale * quadrature$x / (1 - quadrature$x)
+        integration_weight <- time_scale * quadrature$w / (1 - quadrature$x)^2
+        target_values <- purrr::map(self$model, \(model) model(integration_time))
+
+        # Construct the infinitesimal generator for the sequential
+        # M-compartment process. The final compartment is absorbing.
+        transition_generator <- function(delta) {
+          generator <- matrix(0, nrow = M, ncol = M)
+          if (M == 1) return(generator)
+
+          transition_indices <- seq_len(M - 1)
+          generator[cbind(transition_indices, transition_indices)] <- -delta
+          generator[cbind(transition_indices, transition_indices + 1)] <- delta
+
+          return(generator)
+        }
+
+        # Compute all compartment occupancies from one M-state matrix
+        # exponential per quadrature point.
+        occupancy_from_generator <- function(delta) {
+          generator <- transition_generator(delta)
+
+          occupancy <- vapply(
+            integration_time,
+            \(time) drop(expm::expm(time * generator)[1, ]),
+            FUN.VALUE = numeric(M),
+            USE.NAMES = FALSE
+          )
+
+          # `vapply()` drops the matrix dimension when M = 1, so explicitly
+          # restore the M x time structure before transposing.
+          occupancy <- matrix(
+            occupancy,
+            nrow = M,
+            ncol = length(integration_time)
+          )
+
+          return(t(occupancy))
+        }
+
+        # Evaluate the objective and retain the quantities needed by the
+        # analytical gradient. This is deliberately separated from the
+        # optimiser-facing functions so fn(par) and gr(par) can share the same
+        # occupancies and residuals through the one-entry cache below.
+        evaluate_objective <- function(par) {
+
+          # Map optimiser parameters to our optimisation domain x(p)
+          delta_mapping <- map_delta(par)
+          gamma_mapping <- purrr::map(seq_along(self$model), \(model_id) map_gamma(par, model_id))
+
+          delta <- delta_mapping$value
+          gamma <- purrr::map(gamma_mapping, "value")
+
+          # Compute the occupancy based on the current delta paramters
+          occupancy <- occupancy_from_generator(delta)
+
+          # Evaluate the model and compute the value of the objective function
+          # for the current parameter set
+          target_contributions <- purrr::map(
+            seq_along(self$model),
+            \(model_id) {
+
+              model_gamma <- gamma[[model_id]]
+
+              # Compute the approximation:
+              # a(t) = sum_{m=1}^M gamma_m * q_m(t; delta)
+              # where q_m are the occupancy functions dependant on delta
+              approximation <- drop(occupancy %*% model_gamma)
+
+              # Contribution from residuals
+              residual <- approximation - target_values[[model_id]]
+              squared_error <- sum(integration_weight * residual^2)
+              value <- sqrt(max(0, squared_error))
+
+              # Smoothly penalise non-monotone solutions.
+              monotonicity <- monotonicity_penalty(model_gamma)
+              penalty <- monotonicity$value
+
+              # Penalise spread of gamma and delta.
+              gamma_eq <- seq(from = self$model[[model_id]](0), to = model_gamma[M], length.out = M)
+              gamma_difference <- model_gamma - gamma_eq
+              gamma_penalty <- ifelse(length(model_gamma) > 1, stats::sd(gamma_difference), 0)
+              delta_penalty <- ifelse(length(delta) > 1, stats::sd(delta), 0)
+              penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)
+
+              return(
+                list(
+                  "value" = value,
+                  "penalty" = penalty,
+                  "gamma" = model_gamma,
+                  "gamma_difference" = gamma_difference,
+                  "monotonicity_gradient" = monotonicity$gradient,
+                  "residual" = residual
+                )
+              )
+            }
+          )
+
+          # Summarise main metrics over target functions
+          metrics <- c(
+            "value" = sum(purrr::map_dbl(target_contributions, "value")),
+            "penalty" = sum(purrr::map_dbl(target_contributions, "penalty"))
+          )
+
+          return(
+            list(
+              "metrics" = metrics,
+              "delta" = delta,
+              "delta_mapping" = delta_mapping,
+              "gamma_mapping" = gamma_mapping,
+              "occupancy" = occupancy,
+              "model" = target_contributions
+            )
+          )
+        }
+
+        # Cache the most recent evaluation. Optimisers commonly call fn(par)
+        # immediately followed by gr(par), so the gradient can reuse the exact
+        # occupancies and residuals computed for the objective.
+        evaluation_cache <- new.env(parent = emptyenv())
+        evaluation_cache$par <- NULL
+        evaluation_cache$result <- NULL
+
+        get_evaluation <- function(par) {
+          if (!is.null(evaluation_cache$par) && identical(unname(par), unname(evaluation_cache$par))) {
+            return(evaluation_cache$result)
+          }
+
+          result <- evaluate_objective(par)
+          evaluation_cache$par <- par
+          evaluation_cache$result <- result
+
+          return(result)
+        }
+
+        # We construct a small helper now which gets the metrics from the
+        # evaluation
+        get_metrics <- function(par) {
+          return(get_evaluation(par)$metrics)
+        }
+
+        # And a second helper which reduces these metrics to a single sum
+        # that can be passed to the optimisers
+        objective_function <- function(par) {
+          return(sum(get_metrics(par)))
+        }
+
+
+        # Now we also need to define the gradient function to be passed to
+        # the optimisers. The gradients with respect to the gamma parameters
+        # is simple, since the objective function is largely linear with the
+        # gamma parameters. However, the gradient with respect to delta parameters
+        # is more complex.
+
+        # Compute the derivative of the summed fit error with respect to the
+        # delta rates using the adjoint Frechet derivative.
+        delta_gradient_frechet <- function(evaluation) {
+
+          # The gradients we want to compute are da(t)/ddelta_i
+          # where a is the approximation:
+          # a(t) = sum_{m=1}^M q_m(t; delta) gamma_m
+          # and x is our optimisation domain and q_m(t) is the occupancy function
+          # for the m'th compartment
+
+          # da(t)/ddelta_i = d/ddelta_i sum_{m=1}^M q_m(t; delta) * gamma_m
+          #            = sum_{m=1}^M gamma_m * dq_m/ddelta_i(t; delta)
+          # Only some of dq_m/ddelta_i will be non-zero
+
+          if (M == 1) {
+            return(numeric(0))
+          }
+
+          generator <- transition_generator(evaluation$delta)
+          generator_gradient <- matrix(0, nrow = M, ncol = M)
+
+          # The process always starts in compartment 1.
+          initial_state <- c(1, rep(0, M - 1))
+
+          for (time_id in seq_along(integration_time)) {
+
+            # Combine the contribution from all target models at this time point.
+            gamma_weight <- numeric(M)
+
+            for (model_id in seq_along(self$model)) {
+
+              model_evaluation <- evaluation$model[[model_id]]
+
+              # L = sqrt(sum(w * r^2)) has a singular derivative at L = 0.
+              if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
+                next
+              }
+
+              gamma_weight <- gamma_weight +
+                integration_weight[[time_id]] *
+                  model_evaluation$residual[[time_id]] /
+                  model_evaluation$value *
+                  model_evaluation$gamma
+            }
+
+            if (all(gamma_weight == 0)) {
+              next
+            }
+
+            time <- integration_time[[time_id]]
+
+            # For a(t) = e_1^T exp(t Q) gamma
+            # the adjoint Frechet derivative gives the gradient with respect
+            # to the whole generator Q in one operation.
+            output_direction <- tcrossprod(
+              initial_state,
+              gamma_weight
+            )
+
+            frechet_adjoint <- expm::expmFrechet(
+              A = time * t(generator),
+              E = output_direction,
+              expm = FALSE
+            )$Lexpm
+
+            # A = t Q, hence dA / dQ = t.
+            generator_gradient <- generator_gradient +
+              time * frechet_adjoint
+          }
+
+          transition_indices <- seq_len(M - 1)
+
+          # delta_i occurs in Q as:
+          #   Q[i, i]     = -delta_i
+          #   Q[i, i + 1] =  delta_i
+          #
+          # therefore dL/ddelta_i = dL/dQ[i, i + 1] - dL/dQ[i, i]
+          delta_gradient <-
+            generator_gradient[cbind(transition_indices, transition_indices + 1)] -
+            generator_gradient[cbind(transition_indices, transition_indices)]
+
+          return(delta_gradient)
+        }
+
+
+        # With the helper function for the delta parameter gradient, we can construct
+        # the full gradient function
+        gradient_function <- function(par) {
+
+          evaluation <- get_evaluation(par)
+          gradient <- numeric(n_free_parameters)
+
+          if (is.null(evaluation$model)) return(gradient)
+
+          # Each model-specific mapping Jacobian then applies the chain rule
+          # back to the complete optimiser parameter vector.
+
+          for (model_id in seq_along(self$model)) {
+
+            model_evaluation <- evaluation$model[[model_id]]
+
+            # Starting with analytical derivatives with respect to the gamma values.
+
+            # Objective function (in quadrature form)
+            # L = sqrt(sum(w_t * r(t)^2))
+            # Where w_t is the intregration weight from the Gauss-Legendre quadrature
+
+            # dL/dgamma_m = sum(w_t * r(t) * dr(t)/dgamma_m) / L
+            # (Derived in the delta parameter gradient helper above)
+
+            # Only the approximation changes with gamma
+            # dr(t)/dgamma_m = da(t)/dgamma_m
+            #                = d/dgamma_m sum_{m=1}^M gamma_m * q_m(t; delta)
+            #                = q_m(t; delta)
+
+            # In total:
+            # dL/dgamma_m = sum(w_t * r(t) * dr(t)/dgamma_m) / L
+            #             = sum(w_t * r(t) * q_m(t; delta)) / L
+            gamma_jacobian <- evaluation$gamma_mapping[[model_id]]$jacobian
+
+            if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
+              # Gradient is divergent near zero
+              gamma_value_gradient <- numeric(M)
+            } else {
+              gamma_value_gradient <- drop(
+                crossprod( # sum
+                  evaluation$occupancy, # q_m(t)
+                  integration_weight * model_evaluation$residual # w_t * r(t)
+                )
+              ) / model_evaluation$value # L
+            }
+
+            # Then we continue with the gradient of the individual-level gamma penalty
+            # d sd(x) / d gamma_m for the individual-level gamma penalty.
+            gamma_penalty_gradient <- numeric(M)
+
+            gamma_sd <- stats::sd(model_evaluation$gamma_difference)
+
+            # At non-zero spread the derivative is defined
+            if (M > 1 && is.finite(gamma_sd) && gamma_sd > sqrt(.Machine$double.eps)) {
+              # sd(x) = sqrt((sum(gamma_difference - mean(gamma_difference))^2 / (M - 1)))
+              # dsd(x)/dgamma_m = d/dgamma_m sqrt((sum(gamma_difference - mean(gamma_difference))^2 / (M - 1)))
+              #                 = 1 / (2 * sqrt((sum(gamma_difference - mean(gamma_difference))^2 / (M - 1)))) *
+              #                   d/dgamma_m (sum(gamma_difference - mean(gamma_difference))^2 / (M - 1))
+              #                 = 1 / (2 * sd(x)) *
+              #                   d/dgamma_m (sum(gamma_difference - mean(gamma_difference))^2 / (M - 1))
+              #                 = 1 / sd(x) * d/dgamma_m (sum(gamma_difference - mean(gamma_difference)) / (M - 1))
+              #                 = (gamma_difference - mean(gamma_difference) / ((M - 1) * sd(x))
+              centred_gamma <- model_evaluation$gamma_difference - mean(model_evaluation$gamma_difference)
+              gamma_penalty_gradient <- centred_gamma / ((M - 1) * gamma_sd)
+            }
+
+            # Combine gradient contributes related to change in gamma
+            gamma_rate_gradient <- gamma_value_gradient +
+              model_evaluation$monotonicity_gradient +
+              individual_level * gamma_penalty_gradient
+
+            # Convert changes in gamma to changes in optimisation parameter (p domain)
+            # via the jacobian
+            gradient <- gradient + drop(crossprod(gamma_jacobian, gamma_rate_gradient))
+          }
+
+          # Our helper function provides the gradients with respect to delta
+          delta_rate_gradient <- delta_gradient_frechet(evaluation) # dL/ddelta
+
+          # Convert changes in delta to changes in optimisation parameter (p domain)
+          # via the jacobian
+          gradient <- gradient + drop(crossprod(evaluation$delta_mapping$jacobian, delta_rate_gradient))
+
+          # Analytically differentiate the delta spread penalty.
+          # This follows the same steps as we did above for the gamma spread panalty
+          if (length(evaluation$delta) > 1) {
+
+            delta_sd <- stats::sd(evaluation$delta)
+
+            if (individual_level != 0 && is.finite(delta_sd) && delta_sd > sqrt(.Machine$double.eps)) {
+              centred_delta <- evaluation$delta - mean(evaluation$delta)
+              delta_penalty_rate_gradient <- centred_delta / ((length(evaluation$delta) - 1) * delta_sd)
+              gradient <- gradient +
+                length(self$model) *
+                  individual_level *
+                  drop(
+                    crossprod(
+                      evaluation$delta_mapping$jacobian,
+                      delta_penalty_rate_gradient
+                    )
+                  )
+            }
+          }
+
+          return(gradient)
+        }
 
 
         # If we have no free parameters we return the default rates
         if (n_free_parameters == 0) {
-          gamma <- stats::setNames(f_inf, names(self$model))
-          delta <- numeric(0)
+          par <- numeric(0)
 
-          # Get the metrics for the solution
-          if (method == "free_delta") {
-            par <- c(inv_p_0inf(delta))
-          } else if (method %in% c("free_gamma", "all_free")) {
-            par <- c(inv_p_01(purrr::reduce(gamma, c)), inv_p_0inf(delta))
-          }
+          gamma <- purrr::map2(
+            private$.model,
+            seq_along(private$.model),
+            ~ map_gamma(par, .y)$value
+          ) |>
+            stats::setNames(names(private$.model))
 
-          metrics <- obj_function(par)
-          res <- list("value" = sum(metrics), "message" = "No free parameters to optimise")
+          delta <- map_delta(par)$value
+
+          metrics <- get_metrics(par)
+
+          res <- list(
+            "value" = sum(metrics),
+            "message" = "No free parameters to optimise"
+          )
 
         } else {
           # We provide a starting guess for the rates
@@ -930,7 +1333,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             res <- stats::optim(
               par = c(p_gamma_0, p_delta_0),
-              fn = \(p) sum(obj_function(p)),
+              fn = objective_function,
+              gr = gradient_function,
               method = optim_control$optim_method,
               control = purrr::discard_at(optim_control, "optim_method"),
               ...
@@ -943,7 +1347,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
               getExportedValue("stats", optim_control %.% optim_method),
               !!!purrr::discard_at(optim_control, "optim_method")
             )(
-              f = \(p) sum(obj_function(p)),
+              f = function(p, ...) {
+                value <- objective_function(p)
+                attr(value, "gradient") <- gradient_function(p)
+                return(value)
+              },
               p = c(p_gamma_0, p_delta_0),
               ...
             )
@@ -957,7 +1365,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             res <- getExportedValue("stats", optim_control %.% optim_method)(
               start = c(p_gamma_0, p_delta_0),
-              objective = \(p) sum(obj_function(p)),
+              objective = objective_function,
+              gradient = gradient_function,
               control = purrr::discard_at(optim_control, "optim_method"),
               ...
             )
@@ -966,31 +1375,63 @@ DiseasyImmunity <- R6::R6Class(                                                 
             # Optimiser is `nloptr::<method>`
 
             optimiser <- getExportedValue("nloptr", optim_control %.% optim_method)
+            optimiser_supports_gradient <- "gr" %in% names(formals(optimiser))
 
-            # `nloptr::auglag` has two local args that need individual passing
+            # `nloptr::auglag` has two local args that need individual passing.
+            # A derivative-free local solver should not be switched to the
+            # gradient variant merely because we can provide a gradient.
             if (optim_control %.% optim_method == "auglag") {
+              local_solver <- purrr::pluck(optim_control, "localsolver", .default = "COBYLA")
+              optimiser_supports_gradient <- optimiser_supports_gradient && toupper(local_solver) != "COBYLA"
               optimiser <- purrr::partial(optimiser, !!!purrr::keep_at(optim_control, c("localsolver", "localtol")))
               optim_control <- purrr::discard_at(optim_control, c("localsolver", "localtol"))
             }
 
-            res <- optimiser(
-              x0 = c(p_gamma_0, p_delta_0),
-              fn = \(p) sum(obj_function(p)),
-              control = purrr::discard_at(optim_control, "optim_method"),
-              ...
-            )
-
-          } else if (optim_control %.% optim_method %in% optimx_methods) {
-            # Optimiser is `optimx::optimr`
-
-            capture.output( # Suppress output from optimx
-              res <- optimx::optimr(                                                                                    # nolint: implicit_assignment_linter
-                par = c(p_gamma_0, p_delta_0),
-                fn = \(p) sum(obj_function(p)),
-                method = optim_control %.% optim_method,
+            if (optimiser_supports_gradient) {
+              res <- optimiser(
+                x0 = c(p_gamma_0, p_delta_0),
+                fn = objective_function,
+                gr = gradient_function,
                 control = purrr::discard_at(optim_control, "optim_method"),
                 ...
               )
+            } else {
+              res <- optimiser(
+                x0 = c(p_gamma_0, p_delta_0),
+                fn = objective_function,
+                control = purrr::discard_at(optim_control, "optim_method"),
+                ...
+              )
+            }
+
+          } else if (optim_control %.% optim_method %in% optimx_methods) {
+            # Optimiser is `optimx::optimr`.
+            optimx_gradient_methods <- c(
+              "BFGS", "CG", "L-BFGS-B", "nlm", "nlminb", "lbfgsb3c",
+              "Rcgmin", "Rtnmin", "Rvmmin", "spg",
+              "ucminf", "lbfgs", "ncg", "nvm", "mla", "slsqp", "tnewt"
+            )
+            optimx_supports_gradient <- optim_control %.% optim_method %in% optimx_gradient_methods
+
+            capture.output( # Suppress output from optimx
+              if (optimx_supports_gradient) {
+                res <- optimx::optimr(                                                                                  # nolint: implicit_assignment_linter
+                  par = c(p_gamma_0, p_delta_0),
+                  fn = objective_function,
+                  gr = gradient_function,
+                  method = optim_control %.% optim_method,
+                  control = purrr::discard_at(optim_control, "optim_method"),
+                  ...
+                )
+              } else {
+                res <- optimx::optimr(                                                                                  # nolint: implicit_assignment_linter
+                  par = c(p_gamma_0, p_delta_0),
+                  fn = objective_function,
+                  method = optim_control %.% optim_method,
+                  control = purrr::discard_at(optim_control, "optim_method"),
+                  ...
+                )
+              }
             )
 
           } else {
@@ -1004,14 +1445,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
           }
 
           # Get the full metrics for the best solution
-          metrics <- obj_function(res$par)
+          metrics <- get_metrics(res$par)
 
           # Map optimised parameters to rates
           gamma <- purrr::map2(private$.model, seq_along(private$.model), ~ {
-            par_to_gamma(res$par, .y)
+            map_gamma(res$par, .y)$value
           }) |> stats::setNames(names(private$.model))
 
-          delta <- par_to_delta(res$par)
+          delta <- map_delta(res$par)$value
         }
 
 
@@ -1137,9 +1578,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
         gamma <- approximation$gamma
         delta <- approximation$delta
 
-        purrr::walk2(gamma, seq_along(private$.model), ~ {
-          lines(t, private$get_approximation(.x, delta, M)(t), col = colours[1 + .y], lty = "dashed", lwd = 2)
-        })
+        purrr::walk2(
+          gamma,
+          seq_along(private$.model),
+          \(model_gamma, model_id) {
+            approximation <- \(t) drop(do.call(cbind, private$occupancy_probability(delta, M, t)) %*% model_gamma)
+            lines(t, approximation(t), col = colours[1 + model_id], lty = "dashed", lwd = 2)
+          }
+        )
       }
 
 
@@ -1212,10 +1658,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
     get_time_scale = function() {
       # Returns a list of all time scales with their model target
       return(purrr::map(self$model, ~ purrr::pluck(.x, rlang::fn_env, as.list, "time_scale", .default = NULL)))
-    },
-
-    get_approximation = function(gamma, delta, M) {                                                                     # nolint: object_name_linter
-      return(\(t) do.call(cbind, private$occupancy_probability(delta, M, t)) %*% gamma)
     },
 
     # Check that dots contain only allowed parameters
