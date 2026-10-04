@@ -856,19 +856,60 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # and x is our optimisation domain and q_m(t) is the occupancy function
           # for the m'th compartment
 
-          # da(t)/ddelta_i = d/ddelta_i sum_{m=1}^M q_m(t; delta) * gamma_m
-          #            = sum_{m=1}^M gamma_m * dq_m/ddelta_i(t; delta)
-          # Only some of dq_m/ddelta_i will be non-zero
+          # Another way of writing our approximation is:
+          # a(t) = t(e_1) exp(t Q) * gamma
+          # Where e_1 is a vector of length M with 1 at the first index and 0 in the rest
+          # Q is a generating matrix with -delta on the diagonal and +delta on the lower
+          # off diagonal.
+
+          # If we define:
+          # L_exp as the Fréchet derivative of the matrix exponential
+          # A = t Q
+
+          # The infinitesimal derivative can then be expressed in terms of
+          # the Fréchet derivative
+          # da(t) = t(e_1) L_exp(t Q,t dQ) gamma
+
+          # We can also express our equations in the Frobenius inner-product form <A, B>_F:
+          # da(t) = <G, dA>_F = Tr(t(G) dA)
+
+          # Which in our case becomes:
+          # da(t) = <e_1 t(gamma), L_exp(t Q, t dQ)>
+          # To see why that works out, consider:
+          # <e_1 t(gamma), L_exp(t Q, t dQ)>
+          # = Tr(t(e_1) gamma L_exp(t Q, t dQ)) # But the trace is cyclical so we can reorder
+          # = Tr(t(e_1) L_exp(t Q, t dQ) gamma) # The internals are a scalar, so trace drops out
+          # = t(e_1) L_exp(t Q, t dQ) gamma
+
+          # The Frechet derivative has the following idenitity:
+          # <C, L_exp(A, E)>_F = <L_exp(t(A), C), E>_F
+
+          # Which in our case means:
+          # da(t) = <e_1 t(gamma), L_exp(t Q, t dQ)> =
+          #       = <L_exp(t(t Q), e_1 t(gamma)), t dQ>_F
+          #       = <G_A, dA>_F
+          # with G_A = L_exp(t(t Q), e_1 t(gamma)), and dA = t dQ
+
+          # Remember that the Fréchet derivative was a way of taking the
+          # derivative of a matrix:
+          # d exp(A) = L_exp(A, dA)
+          # Which, since we have A = t Q, means that L_exp(A, dA) the gradient of
+          # exp(t Q) with respect to each element in A.
+
+          # In other words, the Fréchet derivative here contains all
+          # derivatives d/dQ_ij which we will use the get the derivatives
+          # with respect to each delta value (since Q is a matrix containing
+          # only deltas)
 
           if (M == 1) {
             return(numeric(0))
           }
 
-          generator <- transition_generator(evaluation$delta)
+          generator <- transition_generator(evaluation$delta) # Q
           generator_gradient <- matrix(0, nrow = M, ncol = M)
 
           # The process always starts in compartment 1.
-          initial_state <- c(1, rep(0, M - 1))
+          initial_state <- c(1, rep(0, M - 1)) # e_1
 
           for (time_id in seq_along(integration_time)) {
 
