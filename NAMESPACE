@@ -37,6 +37,10 @@ importFrom(Matrix,Matrix)
 importFrom(R6,R6Class)
 importFrom(cachem,cache_disk)
 importFrom(diseasystore,"%.%")
+importFrom(expm,
+  expm,
+  expmFrechet
+)
 importFrom(lgr,without_logging)
 importFrom(pracma,logseq)
 importFrom(rlang,.data)
