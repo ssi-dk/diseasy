@@ -696,40 +696,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
         integration_weight <- time_scale * quadrature$w / (1 - quadrature$x)^2
         target_values <- purrr::map(self$model, \(model) model(integration_time))
 
-        # Construct the infinitesimal generator for the sequential
-        # M-compartment process. The final compartment is absorbing.
-        transition_generator <- function(delta) {
-          generator <- matrix(0, nrow = M, ncol = M)
-          if (M == 1) return(generator)
-
-          transition_indices <- seq_len(M - 1)
-          generator[cbind(transition_indices, transition_indices)] <- -delta
-          generator[cbind(transition_indices, transition_indices + 1)] <- delta
-
-          return(generator)
-        }
 
         # Compute all compartment occupancies from one M-state matrix
         # exponential per quadrature point.
-        occupancy_from_generator <- function(delta) {
-          generator <- transition_generator(delta)
-
-          occupancy <- vapply(
-            integration_time,
-            \(time) drop(expm::expm(time * generator)[1, ]),
-            FUN.VALUE = numeric(M),
-            USE.NAMES = FALSE
-          )
-
-          # `vapply()` drops the matrix dimension when M = 1, so explicitly
-          # restore the M x time structure before transposing.
-          occupancy <- matrix(
-            occupancy,
-            nrow = M,
-            ncol = length(integration_time)
-          )
-
-          return(t(occupancy))
+        occupancy_probability <- if (method == "free_gamma") {
+          private$occupancy_probability_erlang
+        } else {
+          private$occupancy_probability_hypoexponential
         }
 
         # Evaluate the objective and retain the quantities needed by the
@@ -746,7 +719,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           gamma <- purrr::map(gamma_mapping, "value")
 
           # Compute the occupancy based on the current delta paramters
-          occupancy <- occupancy_from_generator(delta)
+          occupancy <- occupancy_probability(delta, M, integration_time)
 
           # Evaluate the model and compute the value of the objective function
           # for the current parameter set
@@ -905,8 +878,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
             return(numeric(0))
           }
 
-          generator <- transition_generator(evaluation$delta) # Q
-          generator_gradient <- matrix(0, nrow = M, ncol = M)
+          generator <- private$occupancy_transition_generator(evaluation$delta, M) # Q
+          generator_gradient <- matrix(0, nrow = M, ncol = M) # Pre-allocate
 
           # The process always starts in compartment 1.
           initial_state <- c(1, rep(0, M - 1)) # e_1
@@ -941,14 +914,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
             # For a(t) = e_1^T exp(t Q) gamma
             # the adjoint Frechet derivative gives the gradient with respect
             # to the whole generator Q in one operation.
-            output_direction <- tcrossprod(
-              initial_state,
-              gamma_weight
-            )
-
             frechet_adjoint <- expm::expmFrechet(
               A = time * t(generator),
-              E = output_direction,
+              E = tcrossprod(initial_state, gamma_weight),
               expm = FALSE
             )$Lexpm
 
@@ -1623,7 +1591,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           gamma,
           seq_along(private$.model),
           \(model_gamma, model_id) {
-            approximation <- \(t) drop(do.call(cbind, private$occupancy_probability(delta, M, t)) %*% model_gamma)
+            approximation <- \(t) private$occupancy_probability(delta, M, t) %*% model_gamma
             lines(t, approximation(t), col = colours[1 + model_id], lty = "dashed", lwd = 2)
           }
         )
@@ -1716,7 +1684,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     },
 
     # Compute the probability of occupying each of M sequential compartments
-    # @param rate (`numeric(1)` or `numeric(M - 1)`)\cr
+    # @param delta (`numeric(1)` or `numeric(M - 1)`)\cr
     #   The rate of transfer between each of the M compartments.
     #   If scalar, the rate is identical across all compartments.
     # @param M (`integer(1)`)\cr
@@ -1728,48 +1696,89 @@ DiseasyImmunity <- R6::R6Class(                                                 
     # @examples
     #  occupancy_probability(0.1, 3, seq(0, 50))                                                                        # nolint: commented_code_linter
     #  occupancy_probability(c(0.1, 0.2), 3, seq(0, 50))                                                                # nolint: commented_code_linter
-    occupancy_probability = function(rate, M, t) {                                                                      # nolint: object_name_linter
+    occupancy_probability = function(delta, M, t) {                                                                     # nolint: object_name_linter
       coll <- checkmate::makeAssertCollection()
       checkmate::assert(
-        checkmate::check_number(rate, lower = 0, finite = TRUE),
-        checkmate::check_numeric(rate, lower = 0, finite = TRUE, any.missing = FALSE, len = M - 1),
+        checkmate::check_number(delta, lower = 0, finite = TRUE),
+        checkmate::check_numeric(delta, lower = 0, finite = TRUE, any.missing = FALSE, len = M - 1),
         add = coll
       )
       checkmate::assert_integerish(M, lower = 1, add = coll)
       checkmate::assert_numeric(t, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
 
-      # Compute the probability of less than M events over time
-      if (length(rate) == 1) {
-
-        # If a scalar rate is given, the problem reduces to the Erlang-distribution
-        prob_lt_m <- purrr::map(seq_len(M - 1), \(m) pgamma(t, shape = m, rate = rate, lower.tail = FALSE))
-
+      if (length(delta) < 1) {
+        return(matrix(1, nrow = length(t))) # Only 1 compartment
+      } else if (length(delta) == 1 || all(delta == delta[[1]])) {
+        private$occupancy_probability_erlang(delta, M, t)
       } else {
-        # We can compute the waiting time distributions (hypoexponential distributions)
-        # https://en.wikipedia.org/wiki/Hypoexponential_distribution
+        private$occupancy_probability_hypoexponential(delta, M, t)
+      }
+    },
 
-        # Retrieve each of the hypoexponential distributions
-        prob_lt_m <- purrr::map(seq_len(M - 1), \(m) phypo(t, shape = m, rate = rate[seq_len(m)], lower.tail = FALSE))
 
+    # For free_gamma we need a erlang implementation
+    occupancy_probability_erlang = function(delta, M, t) {                                                              # nolint: object_name_linter
+
+      if (M == 1L) {
+        return(matrix(1, nrow = length(t), ncol = 1L))
       }
 
-      # Add the absorbing state
-      prob_lt_m <- c(prob_lt_m, list(rep(1, length(t))))
+      lambda <- delta[[1]] * t
 
+      occupancy <- matrix(0, nrow = length(t), ncol = M)
 
-      # Compute the probability of occupying states m over time from the waiting time distributions
-      # i.e. the difference of the cumulative distribution function for between states
-      if (M == 1) {
-        prob_m <- prob_lt_m
-      } else {
-        prob_m <- purrr::map(seq(from = 2, to = M), \(m) {
-          prob_lt_m[[m]] - prob_lt_m[[m - 1]]
-        })
-        prob_m <- c(prob_lt_m[1], prob_m)
+      # q_1(t) = P(N(t) = 0)
+      occupancy[, 1L] <- exp(-lambda)
+
+      # q_m(t) = q_{m - 1}(t) * lambda / (m - 1)
+      if (M > 2L) {
+        for (m in 2L:(M - 1L)) {
+          occupancy[, m] <- occupancy[, m - 1L] * lambda / (m - 1L)
+        }
       }
 
-      return(prob_m)
+      # Final compartment is absorbing.
+      occupancy[, M] <- stats::ppois(
+        M - 2L,
+        lambda = lambda,
+        lower.tail = FALSE
+      )
+
+      return(occupancy)
+    },
+
+
+    occupancy_transition_generator = function(delta, M) {                                                               # nolint: object_name_linter
+      generator <- matrix(0, nrow = M, ncol = M)
+      if (M == 1) return(generator)
+
+      transition_indices <- seq_len(M - 1)
+      generator[cbind(transition_indices, transition_indices)] <- -delta
+      generator[cbind(transition_indices, transition_indices + 1)] <- delta
+
+      return(generator)
+    },
+
+
+    # For free_delta and all_free, we need a hypoexponential implementation
+    occupancy_probability_hypoexponential = function(delta, M, t) {                                                     # nolint: object_name_linter
+      generator <- private$occupancy_transition_generator(delta, M)
+
+      occupancy <- vapply(
+        t,
+        \(time) drop(expm::expm(time * generator)[1, ]),
+        FUN.VALUE = numeric(M),
+        USE.NAMES = FALSE
+      )
+
+      occupancy <- matrix(
+        occupancy,
+        nrow = M,
+        ncol = length(t)
+      )
+
+      return(t(occupancy))
     }
   )
 )

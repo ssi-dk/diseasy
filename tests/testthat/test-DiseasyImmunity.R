@@ -776,11 +776,13 @@ for (M in c(1, 2, 5)) { # Number of compartments
       occupancy_probability_mc <- purrr::map(
         seq_len(M),
         \(m) purrr::map_dbl(occupancy_mc_long, \(occupancy) sum(occupancy == m) / n_samples)
-      )
+      ) |>
+        purrr::map(~ matrix(., ncol = 1)) |>
+        purrr::reduce(cbind)
 
       # Account for the edge-case with 1 compartment
       if (length(r) == 0) {
-        occupancy_probability_mc <- list(rep(1, length(t)))
+        occupancy_probability_mc <- matrix(1, nrow = length(t))
       }
 
       # Check the implementation against the Monte Carlo expectation
