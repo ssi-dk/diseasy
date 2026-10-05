@@ -801,7 +801,7 @@ for (M in c(1, 2, 5)) { # Number of compartments
 rm(im)
 
 
-test_that("$describe() does not produce errror", {
+test_that("$describe() does not produce error", {
 
   im <- DiseasyImmunity$new()
   expect_no_error(im$describe())

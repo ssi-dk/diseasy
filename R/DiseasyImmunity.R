@@ -653,7 +653,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             return(list("value" = 0, "gradient" = gradient))
           }
 
-          # The monotonous penalty function:
+          # The monotonous penalty function:                                                                            # nolint start: commented_code_linter
           # penalty = monotonous * sum_i((softplus(k * (gamma_{i+1} - gamma_i)) / k)^2)
           # where softplus (= p_0inf) is pmax(p, 0) + log1p(exp(-abs(p)))
 
@@ -665,7 +665,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # dpenalty/dgamma_m = monotonous * d/dgamma_m sum_i(sv_i^2)
           #                   = monotonous * d/dgamma_m (sv_1^2 + sv_2^2 ..)
           #                   = 2 * monotonous * (sv_1 * dsv_1/dgamma_m + sv_2 * dsv_2/dgamma_m ...)
-          # Where the derivative of the softplus function is the logistic function
+          # Where the derivative of the softplus function is the logistic function                                      # nolint end: commented_code_linter
 
           violation <- diff(gamma) # v
           soft_violation <- p_0inf(monotonicity_sharpness * violation) / monotonicity_sharpness # sv
@@ -688,9 +688,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
         time_scale <- purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
 
         # We first transform the objective function via the transformation
-        # t = scale * u / (1 - u)
+        # t = scale * u / (1 - u)                                                                                       # nolint: commented_code_linter
         # which maps u in (0, 1) to t in (0, Inf).
-        # The integral is then solved as a Gauss–Legendre quadrature.
+        # The integral is then solved as a Gauss-Legendre quadrature.
         quadrature <- pracma::gaussLegendre(n = 64L, 0, 1)
         integration_time <- time_scale * quadrature$x / (1 - quadrature$x)
         integration_weight <- time_scale * quadrature$w / (1 - quadrature$x)^2
@@ -836,11 +836,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # off diagonal.
 
           # If we define:
-          # L_exp as the Fréchet derivative of the matrix exponential
+          # L_exp as the Frechet derivative of the matrix exponential
           # A = t Q
 
           # The infinitesimal derivative can then be expressed in terms of
-          # the Fréchet derivative
+          # the Frechet derivative
           # da(t) = t(e_1) L_exp(t Q,t dQ) gamma
 
           # We can also express our equations in the Frobenius inner-product form <A, B>_F:
@@ -863,13 +863,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
           #       = <G_A, dA>_F
           # with G_A = L_exp(t(t Q), e_1 t(gamma)), and dA = t dQ
 
-          # Remember that the Fréchet derivative was a way of taking the
+          # Remember that the Frechet derivative was a way of taking the
           # derivative of a matrix:
           # d exp(A) = L_exp(A, dA)
           # Which, since we have A = t Q, means that L_exp(A, dA) the gradient of
           # exp(t Q) with respect to each element in A.
 
-          # In other words, the Fréchet derivative here contains all
+          # In other words, the Frechet derivative here contains all
           # derivatives d/dQ_ij which we will use the get the derivatives
           # with respect to each delta value (since Q is a matrix containing
           # only deltas)
@@ -927,11 +927,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           transition_indices <- seq_len(M - 1)
 
-          # delta_i occurs in Q as:
+          # delta_i occurs in Q as:                                                                                     # nolint start: commented_code_linter
           #   Q[i, i]     = -delta_i
           #   Q[i, i + 1] =  delta_i
           #
-          # therefore dL/ddelta_i = dL/dQ[i, i + 1] - dL/dQ[i, i]
+          # therefore dL/ddelta_i = dL/dQ[i, i + 1] - dL/dQ[i, i]                                                       # nolint end: commented_code_linter
           delta_gradient <-
             generator_gradient[cbind(transition_indices, transition_indices + 1)] -
             generator_gradient[cbind(transition_indices, transition_indices)]
@@ -956,7 +956,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             model_evaluation <- evaluation$model[[model_id]]
 
-            # Starting with analytical derivatives with respect to the gamma values.
+            # Starting with analytical derivatives with respect to the gamma values.                                    # nolint start: commented_code_linter
 
             # Objective function (in quadrature form)
             # L = sqrt(sum(w_t * r(t)^2))
@@ -972,7 +972,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             # In total:
             # dL/dgamma_m = sum(w_t * r(t) * dr(t)/dgamma_m) / L
-            #             = sum(w_t * r(t) * q_m(t; delta)) / L
+            #             = sum(w_t * r(t) * q_m(t; delta)) / L                                                         # nolint end: commented_code_linter
             gamma_jacobian <- evaluation$gamma_mapping[[model_id]]$jacobian
 
             if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
@@ -981,8 +981,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
             } else {
               gamma_value_gradient <- drop(
                 crossprod( # sum
-                  evaluation$occupancy, # q_m(t)
-                  integration_weight * model_evaluation$residual # w_t * r(t)
+                  evaluation$occupancy, # q_m(t)                                                                        # nolint: commented_code_linter
+                  integration_weight * model_evaluation$residual # w_t * r(t)                                           # nolint: commented_code_linter
                 )
               ) / model_evaluation$value # L
             }
@@ -995,14 +995,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
             # At non-zero spread the derivative is defined
             if (M > 1 && is.finite(gamma_sd) && gamma_sd > sqrt(.Machine$double.eps)) {
-              # sd(x) = sqrt((sum(gamma_difference - mean(gamma_difference))^2 / (M - 1)))
+              # sd(x) = sqrt((sum(gamma_difference - mean(gamma_difference))^2 / (M - 1)))                              # nolint start: commented_code_linter
               # dsd(x)/dgamma_m = d/dgamma_m sqrt((sum(gamma_difference - mean(gamma_difference))^2 / (M - 1)))
               #                 = 1 / (2 * sqrt((sum(gamma_difference - mean(gamma_difference))^2 / (M - 1)))) *
               #                   d/dgamma_m (sum(gamma_difference - mean(gamma_difference))^2 / (M - 1))
               #                 = 1 / (2 * sd(x)) *
               #                   d/dgamma_m (sum(gamma_difference - mean(gamma_difference))^2 / (M - 1))
               #                 = 1 / sd(x) * d/dgamma_m (sum(gamma_difference - mean(gamma_difference)) / (M - 1))
-              #                 = (gamma_difference - mean(gamma_difference) / ((M - 1) * sd(x))
+              #                 = (gamma_difference - mean(gamma_difference) / ((M - 1) * sd(x))                        # nolint end: commented_code_linter
               centred_gamma <- model_evaluation$gamma_difference - mean(model_evaluation$gamma_difference)
               gamma_penalty_gradient <- centred_gamma / ((M - 1) * gamma_sd)
             }
@@ -1018,7 +1018,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           }
 
           # Our helper function provides the gradients with respect to delta
-          delta_rate_gradient <- delta_gradient_frechet(evaluation) # dL/ddelta
+          delta_rate_gradient <- delta_gradient_frechet(evaluation) # dL/ddelta                                         # nolint: commented_code_linter
 
           # Convert changes in delta to changes in optimisation parameter (p domain)
           # via the jacobian
