@@ -472,26 +472,27 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # implicitly, will match the same hash and utilise the cache.
 
       # Set default optimisation controls
-      defaults <- dplyr::case_when(
-        method == "free_delta" && individual_level > 0 ~
-          list("strategy" = "recursive", "optim_control" = list("optim_method" = "nlminb")),
-        method == "free_delta" ~
-          list("strategy" = "naive", "optim_control" = list("optim_method" = "ucminf")),
-        method == "free_gamma" ~
-          list("strategy" = "recursive", "optim_control" = list("optim_method" = "subplex")),
-        method == "all_free" && individual_level > 0 ~
-          list("strategy" = "recursive", "optim_control" = list("optim_method" = "ucminf")),
-        method == "all_free" && monotonous > 0 ~
-          list("strategy" = "naive", "optim_control" = list("optim_method" = "lbfgs")),
-        method == "all_free" ~
-          list("strategy" = "recursive", "optim_control" = list("optim_method" = "neldermead"))
-      )
+      defaults <- if (method == "free_delta" && individual_level > 0) {
+        list("strategy" = "recursive", "optim_control" = list("optim_method" = "nlminb"))
+      } else if (method == "free_delta") {
+        list("strategy" = "naive", "optim_control" = list("optim_method" = "ucminf"))
+      } else if (method == "free_gamma") {
+        list("strategy" = "recursive", "optim_control" = list("optim_method" = "subplex"))
+      } else if (method == "all_free" && individual_level > 0) {
+        list("strategy" = "recursive", "optim_control" = list("optim_method" = "ucminf"))
+      } else if (method == "all_free" && monotonous > 0) {
+        list("strategy" = "naive", "optim_control" = list("optim_method" = "lbfgs"))
+      } else if (method == "all_free") {
+        list("strategy" = "recursive", "optim_control" = list("optim_method" = "neldermead"))
+      } else {
+        list("strategy" = NULL, "optim_control" = NULL)
+      }
 
       # Use user settings but impute defaults if missing
       optim_control <- purrr::pluck(optim_control, .default = defaults$optim_control)
       strategy <- purrr::pluck(strategy, .default = defaults$strategy)
 
-      stopifnot("Defaults not defined!" = !purrr::some(list(optim_control, strategy), ~ is.na(.) || is.null(.)))
+      stopifnot("Defaults not defined!" = !purrr::some(list(optim_control, strategy), is.null))
 
       # Convert M to integer (integer and numeric have different hash values)
       M <- as.integer(M)                                                                                                # nolint: object_name_linter
