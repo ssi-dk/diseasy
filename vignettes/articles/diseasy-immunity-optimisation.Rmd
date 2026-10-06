@@ -87,8 +87,8 @@ The results of the optimisation round are stored in the `?diseasy_immunity_optim
 ```{r}
 results <- diseasy_immunity_optimiser_results |>
   dplyr::mutate(
-    "monotonous" = dplyr::if_else(.data$monotonous, "yes", "no"),
-    "individual_level" = dplyr::if_else(.data$individual_level, "yes", "no")
+    "monotonous" = dplyr::if_else(.data$monotonous == 1, "yes", "no"),
+    "individual_level" = dplyr::if_else(.data$individual_level == 1, "yes", "no")
   )
 
 results
@@ -421,6 +421,10 @@ total_results_for_plotting <- total_results |>
   dplyr::left_join(
     total_results,
     by = c("monotonous", "individual_level", "method")
+  ) |>
+  dplyr::left_join(
+    dplyr::mutate(chosen_defaults, "default" = TRUE),
+    by = c("method", "monotonous", "individual_level", "strategy", "optim_method")
   )
 
 visualise_methods <- function(method, total_results = total_results_for_plotting) {
@@ -434,10 +438,7 @@ visualise_methods <- function(method, total_results = total_results_for_plotting
       with_ties = FALSE,
       by = c("monotonous", "individual_level", "method")
     ) |>
-    dplyr::left_join(
-      dplyr::mutate(chosen_defaults, "default" = TRUE),
-      by = c("method", "monotonous", "individual_level", "strategy", "optim_method")
-    ) |>
+    dplyr::union(dplyr::filter(total_results, .data$default)) |>
     dplyr::mutate(
       "default" = dplyr::if_else(!is.na(.data$default), "Yes", "No")
     ) |>
@@ -465,7 +466,7 @@ visualise_methods <- function(method, total_results = total_results_for_plotting
         color = .data$optim_strategy,
         shape = .data$default
       ),
-      size = 4
+      size = 6
     ) +
     ggplot2::geom_hline(
       data = dplyr::summarise(
@@ -489,7 +490,7 @@ visualise_methods <- function(method, total_results = total_results_for_plotting
       shape = "Chosen as default?"
     ) +
     ggplot2::guides(
-      color = ggplot2::guide_legend(order  = 1, ncol = 2),
+      color = ggplot2::guide_legend(order = 1, ncol = 2),
       shape = ggplot2::guide_legend(order = 2)
     ) +
     ggplot2::theme(legend.text = ggplot2::element_text(size = 8)) +
