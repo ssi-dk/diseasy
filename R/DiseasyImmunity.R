@@ -1438,10 +1438,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           } else {
             stop(
-              glue::glue(
-                "`optim_control` format ({dput(optim_control)}) ",
-                "matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::optimr`!"
-              ),
+              "`optim_control` format (",
+              capture.output(dput(optim_control)),
+              ") matches neither `stats::optim`, `nloptr::nloptr` nor `optimx::optimr`!",
               call. = FALSE
             )
           }
