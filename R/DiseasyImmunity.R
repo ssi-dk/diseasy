@@ -874,10 +874,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # with respect to each delta value (since Q is a matrix containing
           # only deltas)
 
-          if (M == 1) {
-            return(numeric(0))
-          }
-
           generator <- private$occupancy_transition_generator(evaluation$delta, M) # Q
           generator_gradient <- matrix(0, nrow = M, ncol = M) # Pre-allocate
 
@@ -945,8 +941,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           evaluation <- get_evaluation(par)
           gradient <- numeric(n_free_parameters)
-
-          if (is.null(evaluation$model)) return(gradient)
 
           # Each model-specific mapping Jacobian then applies the chain rule
           # back to the complete optimiser parameter vector.
