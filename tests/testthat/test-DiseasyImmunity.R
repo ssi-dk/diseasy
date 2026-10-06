@@ -659,7 +659,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
     )
   )
 
-  # ... nloptr
+  # ... nloptr (without gradient)
   expect_no_condition(
     im$approximate_compartmental(
       M = 3,
@@ -669,13 +669,33 @@ test_that("`$approximate_compartmental()` works with custom controls", {
     )
   )
 
-  # ... optimx
+  # ... nloptr (with gradient)
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "lbfgs")
+    )
+  )
+
+  # ... optimx (without gradient)
   expect_no_condition(
     im$approximate_compartmental(
       M = 3,
       method = "free_gamma",
       strategy = "naive",
       optim_control = list("optim_method" = "ucminf")
+    )
+  )
+
+  # ... optimx (with gradient)
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "Rcgmin")
     )
   )
 
