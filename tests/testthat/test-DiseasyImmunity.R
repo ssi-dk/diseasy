@@ -685,7 +685,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
       M = 3,
       method = "free_gamma",
       strategy = "naive",
-      optim_control = list("optim_method" = "ucminf")
+      optim_control = list("optim_method" = "newuoa")
     )
   )
 
@@ -695,7 +695,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
       M = 3,
       method = "free_gamma",
       strategy = "naive",
-      optim_control = list("optim_method" = "Rcgmin")
+      optim_control = list("optim_method" = "ucminf")
     )
   )
 
