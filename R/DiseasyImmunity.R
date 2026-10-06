@@ -370,19 +370,24 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The minimisation is performed using the either `stats::optim`, `stats::nlm`, `stats::nlminb`,
     #'   `nloptr::<optimiser>` or `optimx::optimr` optimisers.
     #'
-    #'   By default, the optimisation algorithm is determined on a per-method basis dependent.
+    #'   By default, the optimisation algorithm is determined from the method and penalties.
     #'   Our analysis show that the chosen algorithms in general were the most most efficient but performance
     #'   may be better in any specific case when using a different algorithm
     #'   (see `vignette("diseasy-immunity-optimisation")`).
     #'
     #'   The default configuration depends on the method used and whether or not a penalty was imposed on the
-    #'   objective function (`monotonous` and `individual_level`):
+    #'   objective function (`monotonous` and `individual_level`) in the following order:
     #'
-    #'   | method      | penalty  | strategy    | optimiser |
-    #'   |-------------|----------|-------------|-----------|
-    #'   | free_delta  | No/Yes   | recursive   | ucminf    |
-    #'   | free_gamma  | No/Yes   | recursive   | nmkb      |
-    #'   | all_free    | No/Yes   | naive       | ucminf    |
+    #'   | method     | penalty              | strategy  | optimiser  |
+    #'   |------------|----------------------|-----------|------------|
+    #'   | free_delta | individual_level > 0 | recursive | nlminb     |
+    #'   | free_delta | Otherwise            | naive     | ucminf     |
+    #'   |------------|----------------------|-----------|------------|
+    #'   | free_gamma | All cases            | recursive | subplex    |
+    #'   |------------|----------------------|-----------|------------|
+    #'   | all_free   | individual_level > 0 | recursive | ucminf     |
+    #'   | all_free   | monotonous > 0       | naive     | lbfgs      |
+    #'   | all_free   | Otherwise            | recursive | neldermead |
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
@@ -467,26 +472,26 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # implicitly, will match the same hash and utilise the cache.
 
       # Set default optimisation controls
-      default_optim_controls <- list(
-        "free_delta" = list("optim_method" = "ucminf"),
-        "free_gamma" = list("optim_method" = "nmkb"),
-        "all_free"   = list("optim_method" = "ucminf")
+      defaults <- dplyr::case_when(
+        method == "free_delta" && individual_level > 0 ~
+          list("strategy" = "recursive", "optim_control" = list("optim_method" = "nlminb")),
+        method == "free_delta" ~
+          list("strategy" = "naive", "optim_control" = list("optim_method" = "ucminf")),
+        method == "free_gamma" ~
+          list("strategy" = "recursive", "optim_control" = list("optim_method" = "subplex")),
+        method == "all_free" && individual_level > 0 ~
+          list("strategy" = "recursive", "optim_control" = list("optim_method" = "ucminf")),
+        method == "all_free" && monotonous > 0 ~
+          list("strategy" = "naive", "optim_control" = list("optim_method" = "lbfgs")),
+        method == "all_free" ~
+          list("strategy" = "recursive", "optim_control" = list("optim_method" = "neldermead"))
       )
 
-      # Choose optimiser controls if not set
-      if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
+      # Use user settings but impute defaults if missing
+      optim_control <- purrr::pluck(optim_control, .default = defaults$optim_control)
+      strategy <- purrr::pluck(strategy, .default = defaults$strategy)
 
-
-      # Set default strategy
-      default_optim_strategy <- list(
-        "free_delta" = "recursive",
-        "free_gamma" = "recursive",
-        "all_free"   = "naive"
-      )
-
-      # Choose strategy if not set
-      if (is.null(strategy)) strategy <- purrr::pluck(default_optim_strategy, method)
-
+      stopifnot("Defaults not defined!" = {!purrr::some(list(optim_control, strategy), ~ is.na(.) || is.null(.))})
 
       # Convert M to integer (integer and numeric have different hash values)
       M <- as.integer(M)                                                                                                # nolint: object_name_linter

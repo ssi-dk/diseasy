@@ -64,7 +64,7 @@ We then construct more target functions from this family of functions:
 
 # The optimisation
 As stated above, the optimisation algorithms vary wildly in the time it takes to complete the optimisation.
-To conduct this test in a reasonable time frame (and to determine algorithms that are reasonably efficient), we setup
+To conduct this test in a reasonable time frame (and to determine algorithms that are reasonably efficient), we use
 a testing schema consisting of a number of "rounds" where we incrementally increase the number of compartments in the
 problem (and thereby the number of degrees of freedom to optimise).
 
@@ -344,20 +344,20 @@ chosen_defaults <- chosen_defaults |>
     "monotonous" = "no",
     "individual_level" = "no",
     "strategy" = "recursive",
-    "optim_method" = "ucminf"
+    "optim_method" = "nlminb"
   ) |>
   tibble::add_row(
     "method" = "free_delta",
     "monotonous" = "yes",
     "individual_level" = "no",
     "strategy" = "recursive",
-    "optim_method" = "ucminf"
+    "optim_method" = "nlminb"
   ) |>
   tibble::add_row(
     "method" = "free_delta",
     "monotonous" = "yes",
     "individual_level" = "yes",
-    "strategy" = "recursive",
+    "strategy" = "naive",
     "optim_method" = "ucminf"
   )
 
@@ -368,21 +368,21 @@ chosen_defaults <- chosen_defaults |>
     "monotonous" = "no",
     "individual_level" = "no",
     "strategy" = "recursive",
-    "optim_method" = "nmkb"
+    "optim_method" = "subplex"
   ) |>
   tibble::add_row(
     "method" = "free_gamma",
     "monotonous" = "yes",
     "individual_level" = "no",
     "strategy" = "recursive",
-    "optim_method" = "nmkb"
+    "optim_method" = "subplex"
   ) |>
   tibble::add_row(
     "method" = "free_gamma",
     "monotonous" = "yes",
     "individual_level" = "yes",
     "strategy" = "recursive",
-    "optim_method" = "nmkb"
+    "optim_method" = "subplex"
   )
 
 # All free
@@ -391,21 +391,21 @@ chosen_defaults <- chosen_defaults |>
     "method" = "all_free",
     "monotonous" = "no",
     "individual_level" = "no",
-    "strategy" = "naive",
-    "optim_method" = "ucminf"
+    "strategy" = "recursive",
+    "optim_method" = "neldermead"
   ) |>
   tibble::add_row(
     "method" = "all_free",
     "monotonous" = "yes",
     "individual_level" = "no",
     "strategy" = "naive",
-    "optim_method" = "ucminf"
+    "optim_method" = "lbfgs"
   ) |>
   tibble::add_row(
     "method" = "all_free",
     "monotonous" = "yes",
     "individual_level" = "yes",
-    "strategy" = "naive",
+    "strategy" = "recursive",
     "optim_method" = "ucminf"
   )
 ```
