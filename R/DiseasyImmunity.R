@@ -914,15 +914,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
             # For a(t) = e_1^T exp(t Q) gamma
             # the adjoint Frechet derivative gives the gradient with respect
             # to the whole generator Q in one operation.
-            frechet_adjoint <- expm::expmFrechet(
+            frechet_adjoint <- expm::expmFrechet(                                                                       # nolint: namespace_linter. R CMD Check and namespace_linter are in conflict here
               A = time * t(generator),
               E = tcrossprod(initial_state, gamma_weight),
               expm = FALSE
             )$Lexpm
 
             # A = t Q, hence dA / dQ = t.
-            generator_gradient <- generator_gradient +
-              time * frechet_adjoint
+            generator_gradient <- generator_gradient + time * frechet_adjoint
           }
 
           transition_indices <- seq_len(M - 1)
@@ -1767,7 +1766,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       occupancy <- vapply(
         t,
-        \(time) drop(expm::expm(time * generator)[1, ]),
+        \(time) drop(expm::expm(time * generator)[1, ]),                                                                # nolint: namespace_linter. R CMD Check and namespace_linter are in conflict here
         FUN.VALUE = numeric(M),
         USE.NAMES = FALSE
       )
