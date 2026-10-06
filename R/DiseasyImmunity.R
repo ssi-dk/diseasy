@@ -491,7 +491,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       optim_control <- purrr::pluck(optim_control, .default = defaults$optim_control)
       strategy <- purrr::pluck(strategy, .default = defaults$strategy)
 
-      stopifnot("Defaults not defined!" = {!purrr::some(list(optim_control, strategy), ~ is.na(.) || is.null(.))})
+      stopifnot("Defaults not defined!" = !purrr::some(list(optim_control, strategy), ~ is.na(.) || is.null(.)))
 
       # Convert M to integer (integer and numeric have different hash values)
       M <- as.integer(M)                                                                                                # nolint: object_name_linter
