@@ -425,17 +425,22 @@ compartments.
 The minimisation is performed using the either \code{stats::optim}, \code{stats::nlm}, \code{stats::nlminb},
 \verb{nloptr::<optimiser>} or \code{optimx::optimr} optimisers.
 
-By default, the optimisation algorithm is determined on a per-method basis dependent.
+By default, the optimisation algorithm is determined from the method and penalties.
 Our analysis show that the chosen algorithms in general were the most most efficient but performance
 may be better in any specific case when using a different algorithm
 (see \code{vignette("diseasy-immunity-optimisation")}).
 
 The default configuration depends on the method used and whether or not a penalty was imposed on the
-objective function (\code{monotonous} and \code{individual_level}):\tabular{llll}{
+objective function (\code{monotonous} and \code{individual_level}) in the following order:\tabular{llll}{
    method \tab penalty \tab strategy \tab optimiser \cr
-   free_delta \tab No/Yes \tab recursive \tab ucminf \cr
-   free_gamma \tab No/Yes \tab recursive \tab nmkb \cr
-   all_free \tab No/Yes \tab naive \tab ucminf \cr
+   free_delta \tab individual_level > 0 \tab recursive \tab nlminb \cr
+   free_delta \tab Otherwise \tab naive \tab ucminf \cr
+   ------------ \tab ---------------------- \tab ----------- \tab ------------ \cr
+   free_gamma \tab All cases \tab recursive \tab subplex \cr
+   ------------ \tab ---------------------- \tab ----------- \tab ------------ \cr
+   all_free \tab individual_level > 0 \tab recursive \tab ucminf \cr
+   all_free \tab monotonous > 0 \tab naive \tab lbfgs \cr
+   all_free \tab Otherwise \tab recursive \tab neldermead \cr
 }
 
 
