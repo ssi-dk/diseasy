@@ -29,7 +29,7 @@ checkmate::reportAssertions(coll)
 # See vignette("DiseasyImmunity-optimisation") for full context
 
 # Set the time limit
-time_limit <- 2 # seconds per degree of freedom squared
+time_limit <- 5 # seconds per degree of freedom squared
 
 add_walltime <- function(.data) {
   dplyr::mutate(
@@ -41,7 +41,7 @@ add_walltime <- function(.data) {
       .data$method == "all_free" ~ 2 * (.data$M - 1),
       TRUE ~ NA
     ),
-    "walltime" = time_limit * .data$n_dof^2
+    "walltime" = time_limit * .data$n_dof^2 + 2 # Add constant time to allow R to start
   )
 }
 
@@ -428,7 +428,7 @@ if (!cachem::is.key_missing(existing_time_limit) && existing_time_limit < time_l
     .f = \(file) {
       approx <- readRDS(file.path(path, file))
 
-      if (isTRUE(approx$timed_out)) {
+      if (isTRUE(purrr::pluck(approx, "timed_out"))) {
         file.remove(file.path(path, file))
       }
     }
@@ -658,10 +658,11 @@ if (nrow(should_not_have_been_eliminated) > 0) {
 
 # Check the number of optimisers run for each case
 cat("Number of remaining optimisers (ascending order)")
-results |>
+remaining_optimisers <- results |>
   dplyr::count(.data$target, .data$method, .data$strategy, .data$M) |>
-  dplyr::arrange(-dplyr::desc(.data$n)) |>
-  print()
+  dplyr::arrange(-dplyr::desc(.data$n))
+
+print(dplyr::slice_max(remaining_optimisers, .data$M, by = c("method", "strategy")), n = 10000)
 
 # Re-arrange the columns
 results <- results |>
