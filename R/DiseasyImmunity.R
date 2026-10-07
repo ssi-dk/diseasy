@@ -378,16 +378,16 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The default configuration depends on the method used and whether or not a penalty was imposed on the
     #'   objective function (`monotonous` and `individual_level`) in the following order:
     #'
-    #'   | method     | penalty              | strategy  | optimiser  |
-    #'   |------------|----------------------|-----------|------------|
-    #'   | free_delta | individual_level > 0 | recursive | nlminb     |
-    #'   | free_delta | Otherwise            | naive     | ucminf     |
-    #'   |------------|----------------------|-----------|------------|
-    #'   | free_gamma | All cases            | recursive | subplex    |
-    #'   |------------|----------------------|-----------|------------|
-    #'   | all_free   | individual_level > 0 | recursive | ucminf     |
-    #'   | all_free   | monotonous > 0       | naive     | lbfgs      |
-    #'   | all_free   | Otherwise            | recursive | neldermead |
+    #'   | method     | penalty              | strategy    | optimiser |
+    #'   |------------|----------------------|-------------|-----------|
+    #'   | free_delta | individual_level > 0 | recursive   | nlminb    |
+    #'   | free_delta | Otherwise            | naive       | ucminf    |
+    #'   |------------|----------------------|-------------|-----------|
+    #'   | free_gamma | All cases            | recursive   | subplex   |
+    #'   |------------|----------------------|-------------|-----------|
+    #'   | all_free   | individual_level > 0 | recursive   | ucminf    |
+    #'   | all_free   | monotonous > 0       | combination | Rtnmin    |
+    #'   | all_free   | Otherwise            | combination | nlminb    |
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
@@ -481,9 +481,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
       } else if (method == "all_free" && individual_level > 0) {
         list("strategy" = "recursive", "optim_control" = list("optim_method" = "ucminf"))
       } else if (method == "all_free" && monotonous > 0) {
-        list("strategy" = "naive", "optim_control" = list("optim_method" = "lbfgs"))
+        list("strategy" = "combination", "optim_control" = list("optim_method" = "Rtnmin"))
       } else if (method == "all_free") {
-        list("strategy" = "recursive", "optim_control" = list("optim_method" = "neldermead"))
+        list("strategy" = "combination", "optim_control" = list("optim_method" = "nlminb"))
       } else {
         list("strategy" = NULL, "optim_control" = NULL)
       }
