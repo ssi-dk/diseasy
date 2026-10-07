@@ -435,12 +435,12 @@ objective function (\code{monotonous} and \code{individual_level}) in the follow
    method \tab penalty \tab strategy \tab optimiser \cr
    free_delta \tab individual_level > 0 \tab recursive \tab nlminb \cr
    free_delta \tab Otherwise \tab naive \tab ucminf \cr
-   ------------ \tab ---------------------- \tab ----------- \tab ------------ \cr
+   ------------ \tab ---------------------- \tab ------------- \tab ----------- \cr
    free_gamma \tab All cases \tab recursive \tab subplex \cr
-   ------------ \tab ---------------------- \tab ----------- \tab ------------ \cr
+   ------------ \tab ---------------------- \tab ------------- \tab ----------- \cr
    all_free \tab individual_level > 0 \tab recursive \tab ucminf \cr
-   all_free \tab monotonous > 0 \tab naive \tab lbfgs \cr
-   all_free \tab Otherwise \tab recursive \tab neldermead \cr
+   all_free \tab monotonous > 0 \tab combination \tab Rtnmin \cr
+   all_free \tab Otherwise \tab combination \tab nlminb \cr
 }
 
 

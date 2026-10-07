@@ -398,15 +398,15 @@ chosen_defaults <- chosen_defaults |>
     "method" = "all_free",
     "monotonous" = "yes",
     "individual_level" = "no",
-    "strategy" = "naive",
-    "optim_method" = "lbfgs"
+    "strategy" = "combination",
+    "optim_method" = "rtnmin"
   ) |>
   tibble::add_row(
     "method" = "all_free",
     "monotonous" = "yes",
     "individual_level" = "yes",
-    "strategy" = "recursive",
-    "optim_method" = "ucminf"
+    "strategy" = "combination",
+    "optim_method" = "nlminb"
   )
 ```
 
@@ -434,7 +434,7 @@ visualise_methods <- function(method, total_results = total_results_for_plotting
     dplyr::slice_min(
       .data$value - .data$min_value +
         .data$execution_time - .data$min_execution_time,
-      n = 10,
+      n = 8,
       with_ties = FALSE,
       by = c("monotonous", "individual_level", "method")
     ) |>
