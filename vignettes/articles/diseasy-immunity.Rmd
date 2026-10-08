@@ -342,7 +342,7 @@ results <- tidyr::expand_grid(
   tibble::as_tibble()
 
 # Plot
-ggplot2::ggplot(results, ggplot2::aes(x = M, y = value, color = method)) +
+ggplot2::ggplot(results, ggplot2::aes(x = M, y = error, color = method)) +
   ggplot2::geom_line(linewidth = 1) +
   ggplot2::labs(x = "M", y = "Error") +
   ggplot2::coord_cartesian(
