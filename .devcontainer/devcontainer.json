@@ -1,19 +1,22 @@
 {
-  "name": "diseasy",
-  "image": "ghcr.io/ssi-dk/diseasy:main",
+  "name": "diseasy-ci",
+  "image": "ghcr.io/ssi-dk/diseasy:feature-more-optimiser-script-changes",
   "overrideCommand": false,
   "remoteUser": "rstudio",
+  "postCreateCommand": "if [ ! -d /home/rstudio/.bash_it ]; then git clone --depth=1 --branch v3.2.0 https://github.com/Bash-it/bash-it.git /home/rstudio/.bash_it; fi && /home/rstudio/.bash_it/install.sh --no-modify-config && grep -qxF 'source /home/rstudio/.bash_it/bash_it.sh' /home/rstudio/.bashrc || echo 'source /home/rstudio/.bash_it/bash_it.sh' >> /home/rstudio/.bashrc && git config --global core.editor 'code --wait'",
   "containerEnv": {
-    "ROOT": "true"
+    "ROOT": "true",
+    "GIT_EDITOR": "code --wait"
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "REditorSupport.r"
+        "REditorSupport.r",
+        "mhutchie.git-graph"
       ],
       "settings": {
-        "r.rpath.linux": "/usr/local/bin/R",
-        "r.rterm.linux": "/usr/local/bin/arf",
+        "r.executablePath: "/usr/local/bin/R",
+        "r.consolePath": "/usr/local/bin/arf",
         "r.bracketedPaste": true,
         "r.alwaysUseActiveTerminal": true
       }

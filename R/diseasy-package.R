@@ -11,4 +11,5 @@ NULL
 #' @importFrom Matrix Matrix
 #' @importFrom pracma logseq
 #' @importFrom R6 R6Class
+#' @importFrom expm expm expmFrechet
 NULL
