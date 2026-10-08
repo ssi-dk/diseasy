@@ -1511,14 +1511,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
+        # Remove attributes added by optimisers
+        res_no_attributes <- list() |>
+          utils::modifyList(res) |>
+          utils::modifyList(list("value" = as.numeric(res$value)))
+
         # Store in cache
         private$cache(
           hash,
           utils::modifyList(
-            res,
+            res_no_attributes,
             list(
               "gamma" = gamma,
-              "delta" = delta,
+              "delta" = as.numeric(delta), # Remove attributes added by optimisers
               "method" = method,
               "strategy" = strategy,
               "M" = M,
