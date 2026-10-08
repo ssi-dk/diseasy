@@ -724,6 +724,20 @@ DiseasyImmunity <- R6::R6Class(                                                 
           delta <- delta_mapping$value
           gamma <- purrr::map(gamma_mapping, "value")
 
+          # Guard against malformed parameters
+          if (!all(is.finite(delta)) || purrr::some(gamma, \(x) !all(is.finite(x)))) {
+            return(
+              list(
+                "metrics" = c("value" = 1 / .Machine$double.eps, "penalty" = 0),
+                "delta" = delta,
+                "delta_mapping" = delta_mapping,
+                "gamma_mapping" = gamma_mapping,
+                "occupancy" = NULL,
+                "model" = NULL
+              )
+            )
+          }
+
           # Compute the occupancy based on the current delta paramters
           occupancy <- occupancy_probability(delta, M, integration_time)
 
