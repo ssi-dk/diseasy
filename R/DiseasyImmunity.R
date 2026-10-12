@@ -722,7 +722,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           if (!all(is.finite(delta)) || purrr::some(gamma, \(x) !all(is.finite(x)))) {
             return(
               list(
-                "metrics" = c("value" = 1 / .Machine$double.eps, "penalty" = 0),
+                "metrics" = c("error" = 1 / .Machine$double.eps),
                 "delta" = delta,
                 "delta_mapping" = delta_mapping,
                 "gamma_mapping" = gamma_mapping,
@@ -751,22 +751,26 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Contribution from residuals
               residual <- approximation - target_values[[model_id]]
               squared_error <- sum(integration_weight * residual^2)
-              value <- sqrt(max(0, squared_error))
+              error <- sqrt(max(0, squared_error))
 
               # Smoothly penalise non-monotone solutions.
               monotonicity <- monotonicity_penalty(model_gamma)
-              penalty <- monotonicity$value
 
-              # Penalise spread of gamma and delta.
+              # Penalise spread of gamma
               gamma_eq <- seq(from = self$model[[model_id]](0), to = model_gamma[M], length.out = M)
               gamma_difference <- model_gamma - gamma_eq
               gamma_penalty <- ifelse(length(model_gamma) > 1, stats::sd(gamma_difference), 0)
-              delta_penalty <- ifelse(length(delta) > 1, stats::sd(delta), 0)
-              penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)
+
+
+              # Name source of penalties
+              penalty <- stats::setNames(
+                c(monotonicity$value, individual_level * gamma_penalty),
+                paste(names(self$model), c("monotonicity", "gamma"), sep = "/")
+              )
 
               return(
                 list(
-                  "value" = value,
+                  "error" = error,
                   "penalty" = penalty,
                   "gamma" = model_gamma,
                   "gamma_difference" = gamma_difference,
@@ -777,10 +781,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
             }
           )
 
+          # Compute the delta penalty
+          delta_penalty <- ifelse(length(delta) > 1, individual_level * stats::sd(delta), 0)
+
           # Summarise main metrics over target functions
           metrics <- c(
-            "value" = sum(purrr::map_dbl(target_contributions, "value")),
-            "penalty" = sum(purrr::map_dbl(target_contributions, "penalty"))
+            "error" = stats::setNames(
+              purrr::map_dbl(target_contributions, "error"),
+              self$model
+            ),
+            "penalty" = c(
+              "delta" = delta_penalty,
+              purrr::reduce(purrr::map(target_contributions, "penalty"), c)
+            )
           )
 
           return(
@@ -904,14 +917,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
               model_evaluation <- evaluation$model[[model_id]]
 
               # L = sqrt(sum(w * r^2)) has a singular derivative at L = 0.
-              if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
+              if (model_evaluation$error <= sqrt(.Machine$double.eps)) {
                 next
               }
 
               gamma_weight <- gamma_weight +
                 integration_weight[[time_id]] *
                   model_evaluation$residual[[time_id]] /
-                  model_evaluation$value *
+                  model_evaluation$error *
                   model_evaluation$gamma
             }
 
@@ -982,7 +995,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             #             = sum(w_t * r(t) * q_m(t; delta)) / L                                                         # nolint end: commented_code_linter
             gamma_jacobian <- evaluation$gamma_mapping[[model_id]]$jacobian
 
-            if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
+            if (model_evaluation$error <= sqrt(.Machine$double.eps)) {
               # Gradient is divergent near zero
               gamma_value_gradient <- numeric(M)
             } else {
@@ -991,7 +1004,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   evaluation$occupancy, # q_m(t)                                                                        # nolint: commented_code_linter
                   integration_weight * model_evaluation$residual # w_t * r(t)                                           # nolint: commented_code_linter
                 )
-              ) / model_evaluation$value # L
+              ) / model_evaluation$error # L
             }
 
             # Then we continue with the gradient of the individual-level gamma penalty
@@ -1471,6 +1484,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
+
         # For the recursive and combination strategies, we need to add the execution time from the previous
         # optimisations
         if (M == 1) {
@@ -1527,7 +1541,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
-              "error" = purrr::pluck(metrics, "value"),
+              "error" = purrr::pluck(metrics, "error"),
               "penalty" = purrr::pluck(metrics, "penalty"),
               "execution_time" = lubridate::as.period(Sys.time() - tic) + lubridate::seconds(execution_time_offset)
             )
