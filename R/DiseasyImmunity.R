@@ -1085,7 +1085,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           metrics <- get_metrics(par)
 
           res <- list(
-            "value" = sum(metrics),
+            "value" = sum(unlist(metrics)),
             "error" = metrics %.% error,
             "message" = "No free parameters to optimise"
           )
