@@ -722,7 +722,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           if (!all(is.finite(delta)) || purrr::some(gamma, \(x) !all(is.finite(x)))) {
             return(
               list(
-                "metrics" = c("error" = 1 / .Machine$double.eps),
+                "metrics" = c("error" = 1 / .Machine$double.eps, "penalty" = 0),
                 "delta" = delta,
                 "delta_mapping" = delta_mapping,
                 "gamma_mapping" = gamma_mapping,
@@ -785,10 +785,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
           delta_penalty <- ifelse(length(delta) > 1, individual_level * stats::sd(delta), 0)
 
           # Summarise main metrics over target functions
-          metrics <- c(
+          metrics <- list(
             "error" = stats::setNames(
               purrr::map_dbl(target_contributions, "error"),
-              self$model
+              names(self$model)
             ),
             "penalty" = c(
               "delta" = delta_penalty,
@@ -836,7 +836,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # And a second helper which reduces these metrics to a single sum
         # that can be passed to the optimisers
         objective_function <- function(par) {
-          return(sum(get_metrics(par)))
+          return(sum(unlist(get_metrics(par))))
         }
 
 
@@ -1086,7 +1086,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           res <- list(
             "value" = sum(metrics),
-            "error" = purrr::pluck(metrics, "error"),
+            "error" = metrics %.% error,
             "message" = "No free parameters to optimise"
           )
 
@@ -1529,7 +1529,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Remove attributes added by optimisers
         res_no_attributes <- list() |>
           utils::modifyList(res) |>
-          utils::modifyList(list("value" = as.numeric(res$value)))
+          utils::modifyList(
+            list(
+              "value" = as.numeric(res$value),
+              "par" = as.numeric(res$par)
+            )
+          )
 
         # Store in cache
         private$cache(
@@ -1542,10 +1547,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
-              "error" = purrr::pluck(metrics, "error"),
-              "penalty" = purrr::pluck(metrics, "penalty"),
+              "error" = metrics %.% error,
+              "penalty" = metrics %.% penalty,
               "execution_time" = lubridate::as.period(Sys.time() - tic) + lubridate::seconds(execution_time_offset)
-            )
+            ),
+            keep.null = TRUE
           )
         )
       }
