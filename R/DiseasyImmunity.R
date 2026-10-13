@@ -765,7 +765,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Name source of penalties
               penalty <- stats::setNames(
                 c(monotonicity$value, individual_level * gamma_penalty),
-                paste(names(self$model), c("monotonicity", "gamma"), sep = "/")
+                paste(names(self$model), c("monotonicity", "gamma"), sep = "/")                                         # nolint: paste_linter
               )
 
               return(
