@@ -1086,6 +1086,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           res <- list(
             "value" = sum(metrics),
+            "error" = purrr::pluck(metrics, "error"),
             "message" = "No free parameters to optimise"
           )
 
