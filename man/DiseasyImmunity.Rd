@@ -42,6 +42,9 @@ The waning models implemented in \code{DiseasyImmunity}. Read only.}
 
     \item{\code{model}}{(\verb{list(function())})\cr
 The list of models currently being used in the module. Read-only.}
+
+    \item{\code{optimsier_defaults}}{(\code{data.frame(1)})\cr
+The priorities list of default optimisers (for \code{?DiseasyImmunity$approximate_compartmental()}). Read-only.}
   }
   \if{html}{\out{</div>}}
 }
