@@ -992,13 +992,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
-        if (method == "free_gamma") {
-          delta_gradient <- delta_gradient_erlang
-        } else {
-          delta_gradient <- delta_gradient_frechet
-        }
-
-
         # With the helper function for the delta parameter gradient, we can construct
         # the full gradient function
         gradient_function <- function(par) {
