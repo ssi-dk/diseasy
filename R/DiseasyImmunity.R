@@ -975,7 +975,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             model_evaluation <- evaluation$model[[model_id]]
 
             # L = sqrt(sum(w * r^2)) has a singular derivative at L = 0.
-            if (model_evaluation$error <= sqrt(.Machine$double.eps)) {
+            if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
               next
             }
 
@@ -985,7 +985,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               drop(evaluation$occupancy[, seq_len(M - 1), drop = FALSE] %*% gamma_difference)
 
             delta_gradient <- delta_gradient +
-              sum(integration_weight * model_evaluation$residual * approximation_gradient) / model_evaluation$error
+              sum(integration_weight * model_evaluation$residual * approximation_gradient) / model_evaluation$value
           }
 
           return(delta_gradient)
