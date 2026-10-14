@@ -331,7 +331,7 @@ best matches the waning immunity curves set in the module.
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$approximate_compartmental(
   M,
-  method = c("free_gamma", "free_delta", "all_free"),
+  method = c("all_free", "free_gamma", "free_delta"),
   strategy = NULL,
   monotonous = FALSE,
   individual_level = FALSE,
@@ -431,18 +431,7 @@ may be better in any specific case when using a different algorithm
 (see \code{vignette("diseasy-immunity-optimisation")}).
 
 The default configuration depends on the method used and whether or not a penalty was imposed on the
-objective function (\code{monotonous} and \code{individual_level}) in the following order:\tabular{llll}{
-   method \tab penalty \tab strategy \tab optimiser \cr
-   free_delta \tab individual_level > 0 \tab recursive \tab nlminb \cr
-   free_delta \tab Otherwise \tab naive \tab ucminf \cr
-   ------------ \tab ---------------------- \tab ------------- \tab ----------- \cr
-   free_gamma \tab All cases \tab recursive \tab subplex \cr
-   ------------ \tab ---------------------- \tab ------------- \tab ----------- \cr
-   all_free \tab individual_level > 0 \tab recursive \tab ucminf \cr
-   all_free \tab monotonous > 0 \tab combination \tab Rtnmin \cr
-   all_free \tab Otherwise \tab combination \tab nlminb \cr
-}
-
+objective function (\code{monotonous} and \code{individual_level}).
 
 Optimiser defaults can be changed via the \code{optim_control} argument.
 NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
