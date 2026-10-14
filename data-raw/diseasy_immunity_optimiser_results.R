@@ -688,3 +688,31 @@ results <- dplyr::left_join(results, optim_configs, by = "optim_method")
 # Store results
 diseasy_immunity_optimiser_results <- results
 usethis::use_data(diseasy_immunity_optimiser_results, overwrite = TRUE)
+
+# Determine "best" optimisers
+best_diseasy_immunity_optimiser <- diseasy_immunity_optimiser_results |>
+  dplyr::mutate(
+    "min_value" = min(.data$value),
+    .by = c("method", "strategy", "monotonous", "individual_level", "target_label", "M")
+  ) |>
+  dplyr::group_by(.data$method, .data$strategy, .data$monotonous, .data$individual_level, .data$optim_method) |>
+  dplyr::summarise(
+    "value" = sum(.data$value),
+    "min_value" = sum(.data$min_value),
+    "execution_time" = sum(.data$execution_time) / 3600,
+    "n_targets" = dplyr::n(),
+    .groups = "drop_last"
+  ) |>
+  dplyr::slice_max(.data$n_targets) |>
+  dplyr::mutate("fuzzy_dist" = round((.data$value - .data$min_value) / 1e-2) * 1e-2) |> # Fuzzy rounding
+  dplyr::slice_min(.data$fuzzy_dist) |>
+  dplyr::slice_min(.data$execution_time, with_ties = FALSE) |>
+  dplyr::ungroup()
+
+diseasy_immunity_optimiser_defaults <- best_diseasy_immunity_optimiser |>
+  dplyr::arrange(.data$value) |> # Arrange best to worst
+  dplyr::select(c("method", "strategy", "monotonous", "individual_level", "optim_method")) |>
+  dplyr::mutate("priority" = dplyr::row_number()) |>
+  dplyr::left_join(optim_configs, by = "optim_method")
+
+usethis::use_data(diseasy_immunity_optimiser_defaults, overwrite = TRUE, internal = TRUE)
