@@ -461,7 +461,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # implicitly, will match the same hash and utilise the cache.
 
       # Set default optimisation
-      defaults <- diseasy_immunity_optimiser_defaults |>
+      defaults <- self %.% optimsier_defaults |>
         dplyr::filter(
           .data$method == !!method,
           .data$monotonous == !!monotonous > 0,
@@ -1737,6 +1737,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
       .f = active_binding,
       name = "model",
       expr = return(private %.% .model)
+    ),
+
+    #' @field optimsier_defaults (`data.frame(1)`)\cr
+    #'   The priorities list of default optimisers (for `?DiseasyImmunity$approximate_compartmental()`). Read-only.
+    optimsier_defaults = purrr::partial(
+      .f = active_binding,
+      name = "optimsier_defaults",
+      expr = return(diseasy_immunity_optimiser_defaults)
     )
   ),
 
