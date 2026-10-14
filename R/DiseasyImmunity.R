@@ -376,18 +376,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   (see `vignette("diseasy-immunity-optimisation")`).
     #'
     #'   The default configuration depends on the method used and whether or not a penalty was imposed on the
-    #'   objective function (`monotonous` and `individual_level`) in the following order:
-    #'
-    #'   | method     | penalty              | strategy    | optimiser |
-    #'   |------------|----------------------|-------------|-----------|
-    #'   | free_delta | individual_level > 0 | recursive   | nlminb    |
-    #'   | free_delta | Otherwise            | naive       | ucminf    |
-    #'   |------------|----------------------|-------------|-----------|
-    #'   | free_gamma | All cases            | recursive   | subplex   |
-    #'   |------------|----------------------|-------------|-----------|
-    #'   | all_free   | individual_level > 0 | recursive   | ucminf    |
-    #'   | all_free   | monotonous > 0       | combination | Rtnmin    |
-    #'   | all_free   | Otherwise            | combination | nlminb    |
+    #'   objective function (`monotonous` and `individual_level`).
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
@@ -437,7 +426,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @seealso `vignette("diseasy-immunity")`
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
-      method = c("free_gamma", "free_delta", "all_free"),
+      method = c("all_free", "free_gamma", "free_delta"),
       strategy = NULL,
       monotonous = FALSE,
       individual_level = FALSE,
@@ -471,26 +460,27 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # we evaluate the defaults before computing the hash. Then calling with the default strategy directly or
       # implicitly, will match the same hash and utilise the cache.
 
-      # Set default optimisation controls
-      defaults <- if (method == "free_delta" && individual_level > 0) {
-        list("strategy" = "recursive", "optim_control" = list("optim_method" = "nlminb"))
-      } else if (method == "free_delta") {
-        list("strategy" = "naive", "optim_control" = list("optim_method" = "ucminf"))
-      } else if (method == "free_gamma") {
-        list("strategy" = "recursive", "optim_control" = list("optim_method" = "subplex"))
-      } else if (method == "all_free" && individual_level > 0) {
-        list("strategy" = "recursive", "optim_control" = list("optim_method" = "ucminf"))
-      } else if (method == "all_free" && monotonous > 0) {
-        list("strategy" = "combination", "optim_control" = list("optim_method" = "Rtnmin"))
-      } else if (method == "all_free") {
-        list("strategy" = "combination", "optim_control" = list("optim_method" = "nlminb"))
-      } else {
-        list("strategy" = NULL, "optim_control" = NULL)
+      # Set default optimisation
+      defaults <- diseasy_immunity_optimiser_defaults |>
+        dplyr::filter(
+          .data$method == !!method,
+          .data$monotonous == !!monotonous > 0,
+          .data$individual_level == !!individual_level > 0
+        )
+
+      if (!is.null(strategy)) {
+        defaults <- dplyr::filter(defaults, .data$strategy == !!strategy)
       }
 
+      defaults <- dplyr::slice_min(defaults, .data$priority)
+
       # Use user settings but impute defaults if missing
-      optim_control <- purrr::pluck(optim_control, .default = defaults$optim_control)
-      strategy <- purrr::pluck(strategy, .default = defaults$strategy)
+      optim_control <- optim_control |>
+        purrr::pluck(.default = defaults$optim_control) |>
+        purrr::pluck(.default = list("$optim_method" = "ucminf")) # Add fallback
+      strategy <- strategy |>
+        purrr::pluck(.default = defaults$strategy) |>
+        purrr::pluck(.default = "recursive") # Add fallback
 
       stopifnot("Defaults not defined!" = !purrr::some(list(optim_control, strategy), is.null))
 
@@ -1398,7 +1388,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Run the optimisation
-          missing_packages <- c("nloptr", "ucminf") |>
+          missing_packages <- c("nloptr") |>
             purrr::discard(rlang::is_installed) |>
             toString()
 
