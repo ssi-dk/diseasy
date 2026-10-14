@@ -54,7 +54,6 @@ reference:
     contents:
     - DiseasyBaseModule
     - has_keyword("model-template-builder")
-    - hypoexponential
     - hash_environment
 
 articles:

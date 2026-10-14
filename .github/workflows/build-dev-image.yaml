@@ -2,6 +2,12 @@ name: Build development container
 
 on:
   workflow_dispatch:
+    inputs:
+      r_packages:
+        description: "Optional extra R packages (comma-separated pak refs)"
+        required: false
+        default: "furrr"
+        type: string
 
 jobs:
   build:
@@ -39,12 +45,12 @@ jobs:
               -u "${{ github.actor }}" \
               --password-stdin
 
-      # 4. Try the branch image.
+      # 4. Try the branch CI image.
       #    Fall back to :main only if the tag does not exist.
       - name: Select base image
         run: |
-          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
-          MAIN_IMAGE="ghcr.io/ssi-dk/diseasy:main"
+          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-ci"
+          MAIN_IMAGE="ghcr.io/ssi-dk/diseasy:main-ci"
 
           echo "Checking for ${BRANCH_IMAGE}"
 
@@ -100,7 +106,13 @@ jobs:
           echo "Base container user: ${BASE_USER:-root}"
           echo "BASE_USER=$BASE_USER" >> "$GITHUB_ENV"
 
-      # 6. Generate a small Dockerfile.
+      # 6. Encode the commit SHA into the development package.
+      - name: Set development package version
+        run: |
+          SHA_HEX="${GITHUB_SHA:0:8}"
+          echo "GitSHA: ${GITHUB_SHA}" >> DESCRIPTION
+
+      # 7. Generate a small Dockerfile.
       #    The dependencies come from BASE_IMAGE.
       #    The diseasy package itself comes from the CURRENT checkout.
       - name: Create development Dockerfile
@@ -112,15 +124,21 @@ jobs:
           ARG R_LIB
           ARG SOURCE_SHA
           ARG SOURCE_REF
+          ARG EXTRA_R_PACKAGES=""
 
           USER root
 
-          COPY . /tmp/diseasy
+          RUN if [ -n "$EXTRA_R_PACKAGES" ]; then \
+              Rscript -e 'pkgs <- trimws(strsplit(Sys.getenv("EXTRA_R_PACKAGES"), ",", fixed = TRUE)[[1]]); pak::pkg_install(pkgs, lib = Sys.getenv("R_LIB"))'; \
+            fi
+
+          COPY . /app
+          WORKDIR /app
 
           RUN R CMD INSTALL \
                 --library="${R_LIB}" \
-                /tmp/diseasy \
-              && rm -rf /tmp/diseasy
+                /app
+
 
           ENV DISEASY_SOURCE_SHA="${SOURCE_SHA}"
           ENV DISEASY_SOURCE_REF="${SOURCE_REF}"
@@ -136,7 +154,7 @@ jobs:
 
           cat Dockerfile.dev
 
-      # 7. Build updated image
+      # 8. Build updated image
       - name: Build updated container
         run: |
           DERIVED_IMAGE="diseasy-dev:${IMAGE_TAG}-${SHORT_SHA}"
@@ -147,13 +165,14 @@ jobs:
             --build-arg R_LIB="$R_LIB" \
             --build-arg SOURCE_SHA="$GITHUB_SHA" \
             --build-arg SOURCE_REF="$GITHUB_REF_NAME" \
+            --build-arg EXTRA_R_PACKAGES="${{ inputs.r_packages }}" \
             -f Dockerfile.dev \
             -t "$DERIVED_IMAGE" \
             .
 
           echo "DERIVED_IMAGE=$DERIVED_IMAGE" >> "$GITHUB_ENV"
 
-      # 8. Verify that R sees the newly-installed package
+      # 9. Verify that R sees the newly-installed package
       - name: Verify R package
         run: |
           docker run --rm \
@@ -162,6 +181,10 @@ jobs:
             -e '
               cat("diseasy version: ",
                   as.character(packageVersion("diseasy")),
+                  "\n",
+                  sep = "")
+              cat("GitSHA for diseasy: ",
+                  as.character(packageDescription("diseasy", fields = "GitSHA")),
                   "\n",
                   sep = "")
               cat("Library: ",
@@ -176,15 +199,8 @@ jobs:
 
       - name: Push development image
         run: |
-          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-dev"
-          SHA_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}-${SHORT_SHA}-dev"
-
+          BRANCH_IMAGE="ghcr.io/ssi-dk/diseasy:${IMAGE_TAG}"
           docker tag "$DERIVED_IMAGE" "$BRANCH_IMAGE"
-          docker tag "$DERIVED_IMAGE" "$SHA_IMAGE"
-
           docker push "$BRANCH_IMAGE"
-          docker push "$SHA_IMAGE"
-
           echo "Published:"
           echo "  $BRANCH_IMAGE"
-          echo "  $SHA_IMAGE"

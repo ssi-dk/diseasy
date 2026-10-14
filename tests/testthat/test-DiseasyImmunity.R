@@ -612,7 +612,6 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
 test_that("`$approximate_compartmental()` works with custom controls", {
   skip_if_not_installed("optimx")
   skip_if_not_installed("nloptr")
-  skip_if_not_installed("neldermead")
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
@@ -660,7 +659,7 @@ test_that("`$approximate_compartmental()` works with custom controls", {
     )
   )
 
-  # ... nloptr
+  # ... nloptr (without gradient)
   expect_no_condition(
     im$approximate_compartmental(
       M = 3,
@@ -670,7 +669,27 @@ test_that("`$approximate_compartmental()` works with custom controls", {
     )
   )
 
-  # ... optimx
+  # ... nloptr (with gradient)
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "lbfgs")
+    )
+  )
+
+  # ... optimx (without gradient)
+  expect_no_condition(
+    im$approximate_compartmental(
+      M = 3,
+      method = "free_gamma",
+      strategy = "naive",
+      optim_control = list("optim_method" = "nmkb")
+    )
+  )
+
+  # ... optimx (with gradient)
   expect_no_condition(
     im$approximate_compartmental(
       M = 3,
@@ -776,11 +795,13 @@ for (M in c(1, 2, 5)) { # Number of compartments
       occupancy_probability_mc <- purrr::map(
         seq_len(M),
         \(m) purrr::map_dbl(occupancy_mc_long, \(occupancy) sum(occupancy == m) / n_samples)
-      )
+      ) |>
+        purrr::map(~ matrix(., ncol = 1)) |>
+        purrr::reduce(cbind)
 
       # Account for the edge-case with 1 compartment
       if (length(r) == 0) {
-        occupancy_probability_mc <- list(rep(1, length(t)))
+        occupancy_probability_mc <- matrix(1, nrow = length(t))
       }
 
       # Check the implementation against the Monte Carlo expectation
@@ -799,7 +820,7 @@ for (M in c(1, 2, 5)) { # Number of compartments
 rm(im)
 
 
-test_that("$describe() does not produce errror", {
+test_that("$describe() does not produce error", {
 
   im <- DiseasyImmunity$new()
   expect_no_error(im$describe())
