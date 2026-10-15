@@ -594,10 +594,18 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
     M = seq(2, 3),
     method_label = c("free_delta-recursive", "free_gamma-recursive", "all_free-recursive", "all_free-combination")
   ) |>
-    tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
+    tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy")) |>
+    dplyr::arrange(M)
+
+  # Use the defaults for "free_gammma" in the tests to ensure consistent cache generation
+  optim_control <- im$optimsier_defaults |>
+    dplyr::filter(.data$method == "free_gamma", .data$monotonous == 0, .data$individual_level == 0) |>
+    dplyr::slice_min(.data$priority) |>
+    dplyr::pull("config") |>
+    purrr::pluck(1)
 
   purrr::pwalk(test_combinations, \(M, method, strategy) {                                                              # nolint: object_name_linter
-    im$approximate_compartmental(M = M, method = method, strategy = strategy)
+    im$approximate_compartmental(M = M, method = method, strategy = strategy, optim_control = optim_control)
   })
 
   # "free_delta-recursive": generates 2 items in the cache (M = 2 and M = 3)
