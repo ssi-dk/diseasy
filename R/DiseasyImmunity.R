@@ -765,7 +765,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Name source of penalties
               penalty <- stats::setNames(
                 c(monotonicity$value, individual_level * gamma_penalty),
-                paste(names(self$model)[[model_id]], c("monotonicity", "gamma"), sep = "/")                             # nolint: paste_linter
+                paste(names(self$model)[[model_id]], c("gamma monotonicity", "gamma spread"), sep = "/")                # nolint: paste_linter
               )
 
               return(
@@ -791,7 +791,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               names(self$model)
             ),
             "penalty" = c(
-              "delta" = delta_penalty,
+              "delta spread" = delta_penalty,
               purrr::reduce(purrr::map(target_contributions, "penalty"), c)
             )
           )
