@@ -41,6 +41,11 @@
       "_row": "BB"
     },
     {
+      "package": "bibtex",
+      "version": "0.5.2",
+      "_row": "bibtex"
+    },
+    {
       "package": "bigD",
       "version": "0.3.1",
       "_row": "bigD"
@@ -516,6 +521,11 @@
       "_row": "ids"
     },
     {
+      "package": "igraph",
+      "version": "2.3.4",
+      "_row": "igraph"
+    },
+    {
       "package": "ini",
       "version": "0.3.1",
       "_row": "ini"
@@ -924,6 +934,11 @@
       "package": "readxl",
       "version": "1.5.0.1",
       "_row": "readxl"
+    },
+    {
+      "package": "RefManageR",
+      "version": "1.4.0",
+      "_row": "RefManageR"
     },
     {
       "package": "regions",
