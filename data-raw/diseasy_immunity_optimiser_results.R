@@ -512,7 +512,10 @@ for (M in seq(from = 2, to = 10)) {
       delim = "-",
       names = c("method", "strategy")
     ) |>
-    dplyr::inner_join(candidates_needing_compute, by = c("optim_method", "target_label", "method", "strategy", "monotonous", "individual_level")) |>
+    dplyr::inner_join(
+      candidates_needing_compute,
+      by = c("optim_method", "target_label", "method", "strategy", "monotonous", "individual_level")
+    ) |>
     dplyr::left_join(optim_configs, by = "optim_method") |>
     add_walltime()
 
