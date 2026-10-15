@@ -476,8 +476,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
       # Use user settings but impute defaults if missing
       optim_control <- optim_control |>
-        purrr::pluck(.default = defaults$optim_control) |>
-        purrr::pluck(.default = list("$optim_method" = "ucminf")) # Add fallback
+        purrr::pluck(.default = defaults$config[[1]]) |>
+        purrr::pluck(.default = list("optim_method" = "ucminf")) # Add fallback
       strategy <- strategy |>
         purrr::pluck(.default = defaults$strategy) |>
         purrr::pluck(.default = "recursive") # Add fallback
