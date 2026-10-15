@@ -1,14 +1,13 @@
 {
-  "name": "diseasy-ci",
   "image": "ghcr.io/ssi-dk/diseasy:main",
   "overrideCommand": false,
   "remoteUser": "rstudio",
 
-  "workspaceMount": "source=,target=/workspaces/diseasy,type=bind",
-  "workspaceFolder": "/workspaces/diseasy",
+  "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces/diseasy,type=bind",
+  "workspaceFolder": "/workspaces/diseasy/diseasy",
 
   "mounts": [
-    "source=/.gitconfig,target=/home/rstudio/.gitconfig-host,type=bind,readonly"
+    "source=${localEnv:HOME}/.gitconfig,target=/home/rstudio/.gitconfig-host,type=bind,readonly"
   ],
 
   "remoteEnv": {
@@ -34,7 +33,6 @@
         "r.bracketedPaste": true,
         "r.alwaysUseActiveTerminal": true,
         "r.plot.backend": "httpgd",
-
         "[r]": {
           "editor.inlayHints.enabled": "off"
         }
