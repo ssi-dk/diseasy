@@ -339,7 +339,8 @@ results <- tidyr::expand_grid(
     .progress = interactive()
   ) |>
   purrr::list_transpose() |>
-  tibble::as_tibble()
+  tibble::as_tibble() |>
+  dplyr::mutate("error" = purrr::map_dbl(.data$error, sum))
 
 # Plot
 ggplot2::ggplot(results, ggplot2::aes(x = M, y = error, color = method)) +
