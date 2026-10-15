@@ -482,11 +482,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
         purrr::pluck(.default = defaults$strategy) |>
         purrr::pluck(.default = "recursive") # Add fallback
 
+      rm(defaults) # Remove to keep out of the hash generation
       stopifnot("Defaults not defined!" = !purrr::some(list(optim_control, strategy), is.null))
 
       # Convert M to integer (integer and numeric have different hash values)
       M <- as.integer(M)                                                                                                # nolint: object_name_linter
 
+      # Convert "recursive" strategy to "naive" when M <= 2 to increase cache hits
+      strategy <- ifelse(M <= 2L, "naive", strategy)
 
       # Look in the cache for data
       hash <- private$get_hash()
