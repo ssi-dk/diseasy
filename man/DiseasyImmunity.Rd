@@ -42,6 +42,9 @@ The waning models implemented in \code{DiseasyImmunity}. Read only.}
 
     \item{\code{model}}{(\verb{list(function())})\cr
 The list of models currently being used in the module. Read-only.}
+
+    \item{\code{optimsier_defaults}}{(\code{data.frame(1)})\cr
+The priorities list of default optimisers (for \code{?DiseasyImmunity$approximate_compartmental()}). Read-only.}
   }
   \if{html}{\out{</div>}}
 }
@@ -331,7 +334,7 @@ best matches the waning immunity curves set in the module.
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$approximate_compartmental(
   M,
-  method = c("free_gamma", "free_delta", "all_free"),
+  method = c("all_free", "free_gamma", "free_delta"),
   strategy = NULL,
   monotonous = FALSE,
   individual_level = FALSE,
@@ -425,19 +428,13 @@ compartments.
 The minimisation is performed using the either \code{stats::optim}, \code{stats::nlm}, \code{stats::nlminb},
 \verb{nloptr::<optimiser>} or \code{optimx::optimr} optimisers.
 
-By default, the optimisation algorithm is determined on a per-method basis dependent.
+By default, the optimisation algorithm is determined from the method and penalties.
 Our analysis show that the chosen algorithms in general were the most most efficient but performance
 may be better in any specific case when using a different algorithm
 (see \code{vignette("diseasy-immunity-optimisation")}).
 
 The default configuration depends on the method used and whether or not a penalty was imposed on the
-objective function (\code{monotonous} and \code{individual_level}):\tabular{llll}{
-   method \tab penalty \tab strategy \tab optimiser \cr
-   free_delta \tab No/Yes \tab naive \tab ucminf \cr
-   free_gamma \tab No/Yes \tab naive \tab ucminf \cr
-   all_free \tab No/Yes \tab naive \tab ucminf \cr
-}
-
+objective function (\code{monotonous} and \code{individual_level}).
 
 Optimiser defaults can be changed via the \code{optim_control} argument.
 NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point

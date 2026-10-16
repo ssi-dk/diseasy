@@ -370,19 +370,13 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   The minimisation is performed using the either `stats::optim`, `stats::nlm`, `stats::nlminb`,
     #'   `nloptr::<optimiser>` or `optimx::optimr` optimisers.
     #'
-    #'   By default, the optimisation algorithm is determined on a per-method basis dependent.
+    #'   By default, the optimisation algorithm is determined from the method and penalties.
     #'   Our analysis show that the chosen algorithms in general were the most most efficient but performance
     #'   may be better in any specific case when using a different algorithm
     #'   (see `vignette("diseasy-immunity-optimisation")`).
     #'
     #'   The default configuration depends on the method used and whether or not a penalty was imposed on the
-    #'   objective function (`monotonous` and `individual_level`):
-    #'
-    #'   | method      | penalty  | strategy    | optimiser |
-    #'   |-------------|----------|-------------|-----------|
-    #'   | free_delta  | No/Yes   | naive       | ucminf    |
-    #'   | free_gamma  | No/Yes   | naive       | ucminf    |
-    #'   | all_free    | No/Yes   | naive       | ucminf    |
+    #'   objective function (`monotonous` and `individual_level`).
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
@@ -432,7 +426,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @seealso `vignette("diseasy-immunity")`
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
-      method = c("free_gamma", "free_delta", "all_free"),
+      method = c("all_free", "free_gamma", "free_delta"),
       strategy = NULL,
       monotonous = FALSE,
       individual_level = FALSE,
@@ -466,31 +460,36 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # we evaluate the defaults before computing the hash. Then calling with the default strategy directly or
       # implicitly, will match the same hash and utilise the cache.
 
-      # Set default optimisation controls
-      default_optim_controls <- list(
-        "free_delta" = list("optim_method" = "ucminf"),
-        "free_gamma" = list("optim_method" = "ucminf"),
-        "all_free"   = list("optim_method" = "ucminf")
-      )
+      # Set default optimisation
+      defaults <- self %.% optimsier_defaults |>
+        dplyr::filter(
+          .data$method == !!method,
+          .data$monotonous == !!monotonous > 0,
+          .data$individual_level == !!individual_level > 0
+        )
 
-      # Choose optimiser controls if not set
-      if (is.null(optim_control)) optim_control <- purrr::pluck(default_optim_controls, method)
+      if (!is.null(strategy)) {
+        defaults <- dplyr::filter(defaults, .data$strategy == !!strategy)
+      }
 
+      defaults <- dplyr::slice_min(defaults, .data$priority)
 
-      # Set default strategy
-      default_optim_strategy <- list(
-        "free_delta" = "naive",
-        "free_gamma" = "naive",
-        "all_free"   = "naive"
-      )
+      # Use user settings but impute defaults if missing
+      optim_control <- optim_control |>
+        purrr::pluck(.default = purrr::pluck(defaults$config, 1)) |>
+        purrr::pluck(.default = list("optim_method" = "ucminf")) # Add fallback
+      strategy <- strategy |>
+        purrr::pluck(.default = defaults$strategy) |>
+        purrr::pluck(.default = "recursive") # Add fallback
 
-      # Choose strategy if not set
-      if (is.null(strategy)) strategy <- purrr::pluck(default_optim_strategy, method)
-
+      rm(defaults) # Remove to keep out of the hash generation
+      stopifnot("Defaults not defined!" = !purrr::some(list(optim_control, strategy), is.null))
 
       # Convert M to integer (integer and numeric have different hash values)
       M <- as.integer(M)                                                                                                # nolint: object_name_linter
 
+      # Convert "recursive" strategy to "naive" when M <= 2 to increase cache hits
+      strategy <- ifelse(M <= 2L, "naive", strategy)
 
       # Look in the cache for data
       hash <- private$get_hash()
@@ -1392,7 +1391,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
           # Run the optimisation
-          missing_packages <- c("nloptr", "ucminf") |>
+          missing_packages <- "nloptr" |>
             purrr::discard(rlang::is_installed) |>
             toString()
 
@@ -1599,6 +1598,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
+              "monotonous" = monotonous,
+              "individual_level" = individual_level,
               "error" = metrics %.% error,
               "penalty" = metrics %.% penalty,
               "execution_time" = lubridate::as.period(Sys.time() - tic) + lubridate::seconds(execution_time_offset)
@@ -1741,6 +1742,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
       .f = active_binding,
       name = "model",
       expr = return(private %.% .model)
+    ),
+
+    #' @field optimsier_defaults (`data.frame(1)`)\cr
+    #'   The priorities list of default optimisers (for `?DiseasyImmunity$approximate_compartmental()`). Read-only.
+    optimsier_defaults = purrr::partial(
+      .f = active_binding,
+      name = "optimsier_defaults",
+      expr = return(diseasy_immunity_optimiser_defaults)
     )
   ),
 

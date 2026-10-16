@@ -367,7 +367,7 @@
     },
     {
       "package": "future",
-      "version": "1.76.0",
+      "version": "1.80.0",
       "_row": "future"
     },
     {
@@ -452,7 +452,7 @@
     },
     {
       "package": "gt",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "_row": "gt"
     },
     {
@@ -519,11 +519,6 @@
       "package": "ids",
       "version": "1.0.1",
       "_row": "ids"
-    },
-    {
-      "package": "igraph",
-      "version": "2.3.4",
-      "_row": "igraph"
     },
     {
       "package": "ini",
