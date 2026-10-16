@@ -1598,6 +1598,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
+              "monotonous" = monotonous,
+              "individual_level" = individual_level,
               "error" = metrics %.% error,
               "penalty" = metrics %.% penalty,
               "execution_time" = lubridate::as.period(Sys.time() - tic) + lubridate::seconds(execution_time_offset)
