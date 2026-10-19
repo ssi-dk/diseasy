@@ -33,6 +33,7 @@ reference:
   - title: Creating ensembles
     desc: Functions related to creating ensembles of models.
     contents:
+    - has_keyword("ensemble-module")
     - combineasy
     - DiseasyEnsemble-generics
 
