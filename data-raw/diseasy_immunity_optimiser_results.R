@@ -338,6 +338,7 @@ optimiser <- function(
               list(
                 "target_label" = model_name,
                 "optim_method" = optim_label,
+                "strategy" = strategy,
                 "monotonous" = monotonous,
                 "individual_level" = individual_level
               )
@@ -451,7 +452,7 @@ if (interactive()) {
     "cli.progress_enable" = TRUE,
     "progressr.enable" = TRUE
   )
-  workers <- unname(future::availableCores(omit = 1))
+  workers <- unname(future::availableCores(omit = 10))
   future::plan("multisession", gc = TRUE, workers = workers)
 }
 
@@ -459,8 +460,8 @@ candidates <- tidyr::expand_grid(
   "optim_method" = optim_labels,
   "target_label" = model_names,
   "method_label" = c(
-    "free_delta-naive", "free_gamma-naive",
-    "free_delta-recursive", "free_gamma-recursive",
+    "free_delta-naive", "free_delta-recursive",
+    "free_gamma-naive", "free_gamma-recursive",
     "all_free-naive", "all_free-recursive", "all_free-combination"
   ),
   "monotonous" = c(0, 1),
@@ -490,7 +491,10 @@ for (M in seq(from = 2, to = 10)) {
   candidates_needing_compute <- dplyr::setdiff(candidates, existing_results(M))
 
   if (nrow(candidates_needing_compute) > 0) {
-    print(candidates_needing_compute)
+    candidates_needing_compute |>
+      dplyr::distinct(.data$method, .data$strategy, .data$monotonous, .data$individual_level, .data$optim_method) |>
+      dplyr::count(.data$method, .data$strategy, .data$monotonous, .data$individual_level) |>
+      print(n = 100)
   }
 
   # Compute new/missing runs
