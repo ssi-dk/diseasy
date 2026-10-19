@@ -598,7 +598,7 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
     dplyr::arrange(M)
 
   # Use the defaults for "free_gammma" in the tests to ensure consistent cache generation
-  optim_control <- im$optimsier_defaults |>
+  optim_control <- im$optimiser_defaults |>
     dplyr::filter(.data$method == "free_gamma", .data$monotonous == 0, .data$individual_level == 0) |>
     dplyr::slice_min(.data$priority) |>
     dplyr::pull("config") |>

@@ -43,7 +43,7 @@ The waning models implemented in \code{DiseasyImmunity}. Read only.}
     \item{\code{model}}{(\verb{list(function())})\cr
 The list of models currently being used in the module. Read-only.}
 
-    \item{\code{optimsier_defaults}}{(\code{data.frame(1)})\cr
+    \item{\code{optimiser_defaults}}{(\code{data.frame(1)})\cr
 The priorities list of default optimisers (for \code{?DiseasyImmunity$approximate_compartmental()}). Read-only.}
   }
   \if{html}{\out{</div>}}
@@ -435,6 +435,7 @@ may be better in any specific case when using a different algorithm
 
 The default configuration depends on the method used and whether or not a penalty was imposed on the
 objective function (\code{monotonous} and \code{individual_level}).
+See \code{?DiseasyImmunity$optimiser_defaults} for the (ranked) list of optimisers.
 
 Optimiser defaults can be changed via the \code{optim_control} argument.
 NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
