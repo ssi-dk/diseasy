@@ -377,6 +377,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'
     #'   The default configuration depends on the method used and whether or not a penalty was imposed on the
     #'   objective function (`monotonous` and `individual_level`).
+    #'   See `?DiseasyImmunity$optimiser_defaults` for the (ranked) list of optimisers.
     #'
     #'   Optimiser defaults can be changed via the `optim_control` argument.
     #'   NOTE: for the "combination" strategy, changing the optimiser controls does not influence the starting point
@@ -461,7 +462,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # implicitly, will match the same hash and utilise the cache.
 
       # Set default optimisation
-      defaults <- self %.% optimsier_defaults |>
+      defaults <- self %.% optimiser_defaults |>
         dplyr::filter(
           .data$method == !!method,
           .data$monotonous == !!monotonous > 0,
@@ -1744,11 +1745,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
       expr = return(private %.% .model)
     ),
 
-    #' @field optimsier_defaults (`data.frame(1)`)\cr
+    #' @field optimiser_defaults (`data.frame(1)`)\cr
     #'   The priorities list of default optimisers (for `?DiseasyImmunity$approximate_compartmental()`). Read-only.
-    optimsier_defaults = purrr::partial(
+    optimiser_defaults = purrr::partial(
       .f = active_binding,
-      name = "optimsier_defaults",
+      name = "optimiser_defaults",
       expr = return(diseasy_immunity_optimiser_defaults)
     )
   ),

@@ -328,7 +328,7 @@ methods are. For that purpose, we have also measured the time to run the optimis
 
 ```{r}
 # Define the defaults for DiseasyImmunity
-chosen_defaults <- im$optimsier_defaults |>
+chosen_defaults <- im$optimiser_defaults |>
   dplyr::mutate(
     "monotonous" = dplyr::if_else(.data$monotonous == 1, "yes", "no"),
     "individual_level" = dplyr::if_else(.data$individual_level == 1, "yes", "no")
