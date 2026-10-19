@@ -482,7 +482,7 @@ DiseasyRegions <- R6::R6Class(                                                  
         missing_packages <- purrr::discard(c("rnaturalearth", "rnaturalearthdata"), rlang::is_installed)
         coll$push(
           glue::glue(
-            "Package{ifelse(length(missing_packages) > 1, 's', '')} {toString(missing_packages)} ",
+            'Package{ifelse(length(missing_packages) > 1, "s", "")} {toString(paste0("`", missing_packages, "`"))} ',
             "must be installed if no shape files are provided."
           )
         )
