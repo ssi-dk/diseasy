@@ -61,6 +61,7 @@ The local copy of an DiseasyObservables module. Read-only.}
 \section{Methods}{
 \subsection{Public methods}{
   \itemize{
+    \item \href{#method-DiseasyScoring-initialize}{\code{DiseasyScoring$new()}}
     \item \href{#method-DiseasyScoring-set_noise_model}{\code{DiseasyScoring$set_noise_model()}}
     \item \href{#method-DiseasyScoring-compute_likelihood}{\code{DiseasyScoring$compute_likelihood()}}
     \item \href{#method-DiseasyScoring-describe}{\code{DiseasyScoring$describe()}}
@@ -69,11 +70,29 @@ The local copy of an DiseasyObservables module. Read-only.}
 }
 \if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="initialize"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-initialize'><code>DiseasyBaseModule$initialize()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
 </ul>
 </details>}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyScoring-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyScoring-initialize}{}}}
+\subsection{\code{DiseasyScoring$new()}}{
+  Creates a new instance of the \code{DiseasyScoring} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyScoring$new(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasyScoring-set_noise_model"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyScoring-set_noise_model}{}}}
@@ -82,7 +101,7 @@ The local copy of an DiseasyObservables module. Read-only.}
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyScoring$set_noise_model(
-  observation_noise = c("negative binomial", "poisson"),
+  observation_noise = c("poisson", "negative binomial"),
   overdispersion = NULL
 )}
     \if{html}{\out{</div>}}

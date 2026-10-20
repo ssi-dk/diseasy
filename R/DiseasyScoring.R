@@ -43,6 +43,21 @@ DiseasyScoring <- R6::R6Class(                                                  
   public = list(
 
     #' @description
+    #'   Creates a new instance of the `DiseasyScoring` [R6][R6::R6Class] class.
+    #' @param ...
+    #'   parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
+    initialize = function(...) {
+
+      # Pass further arguments to the DiseasyBaseModule initializer
+      super$initialize(...)
+
+      # Use default noise model
+      self$set_noise_model()
+
+    },
+
+
+    #' @description
     #'   Sets the `DiseasyScoring` module to use the specified noise model for the observations.
     #' @param observation_noise (`character(1)`)\cr
     #'   The assumed distribution of the observation noise.
@@ -50,7 +65,7 @@ DiseasyScoring <- R6::R6Class(                                                  
     #'   The assumed overdispersion the observation noise (only for "negative binomial").
     #' @return `r rd_side_effects`
     set_noise_model = function(
-      observation_noise = c("negative binomial", "poisson"),
+      observation_noise = c("poisson", "negative binomial"),
       overdispersion = NULL
     ) {
       observation_noise <- match.arg(observation_noise)
