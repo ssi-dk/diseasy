@@ -173,6 +173,18 @@ DiseasyModel <- R6::R6Class(                                                    
         keep.null = TRUE
       )
 
+      # Set the scale of the season if needed or backpropagate the default value to the model parameters
+      if (!is.null(self %.% season) && "season.scale" %in% names(updated_parameters)) {
+        if (is.null(updated_parameters %.% season.scale)) { # Store default scale in model if not given
+          updated_parameters <- utils::modifyList(
+            updated_parameters,
+            list("season.scale" = purrr::pluck(self, "season", "model_t", attributes, "dots", "scale"))
+          )
+        } else { # Apply model parameter if given
+          self$season$set_scale(updated_parameters %.% season.scale)
+        }
+      }
+
       # Store the updated parameters
       private$.parameters <- updated_parameters
       private %.% validate_parameters()

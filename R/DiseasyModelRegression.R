@@ -71,18 +71,6 @@ DiseasyModelRegression <- R6::R6Class(                                          
 
       # Pass arguments to the DiseasyModel initializer
       super$initialize(parameters = parameters, ...)
-
-      # Set the scale of the season
-      if (!is.null(self %.% season)) {
-        if (is.null(self %.% parameters %.% season.scale)) { # Store default scale in model if not given
-          private$.parameters <- utils::modifyList(
-            self$parameters,
-            list("season.scale" = purrr::pluck(self, "season", "model_t", attributes, "dots", "scale"))
-          )
-        } else { # Apply model parameter if given
-          self$season$set_scale(self %.% parameters %.% season.scale)
-        }
-      }
     },
 
 
