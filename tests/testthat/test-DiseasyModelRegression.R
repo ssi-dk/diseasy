@@ -143,6 +143,34 @@ test_that("update_formula gives error", {
 })
 
 
+test_that("`DiseasyModelG*/B*` can control the scale of `DiseasySeason`", {
+  skip_if_not_installed("RSQLite")
+
+  # Configure a season module
+  season <- DiseasySeason$new()
+  season$set_reference_date(as.Date("2020-01-01"))
+  season$use_cosine_season()
+  default_season_scale <- purrr::pluck(season, "model_t", attributes, "dots", "scale")
+
+  # Create two models that only differ in last_queryable_date
+  model <- DiseasyModelG0$new(
+    season = season,
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    ),
+    parameters = list("season.scale" = default_season_scale / 2)
+  )
+
+  expect_identical(
+    purrr::pluck(model, "season", "model_t", attributes, "dots", "scale"),
+    default_season_scale / 2
+  )
+
+  rm(model, season)
+})
+
+
 test_that("active binding: formula works", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",

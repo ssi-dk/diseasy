@@ -73,7 +73,7 @@ This module is typically not constructed directly but rather through \verb{Disea
 such as \link{DiseasyModelG0}.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelRegression$new(formula, family, ...)}
+    \preformatted{DiseasyModelRegression$new(formula, family, parameters = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -83,11 +83,18 @@ such as \link{DiseasyModelG0}.
 A \code{character} string that is passed to \code{stats::as.formula} via \code{glue} (see details).}
       \item{\code{family}}{(\code{family})\cr
 \code{stats::family} object passed to the regression call.}
-      \item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
       \item{\code{parameters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.
+\itemize{
+\item \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. ,
+If \code{NULL} (default), the default value of the season module is used.
+}
+
+Additional parameters are:
 \itemize{
 \item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
 }}
+      \item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
     }
     \if{html}{\out{</div>}}
   }

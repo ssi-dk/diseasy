@@ -98,12 +98,13 @@ examples of how this can be done.
 \subsection{\code{DiseasyModelG0$new()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelG0$new(...)}
+    \preformatted{DiseasyModelG0$new(parameters = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
+      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Parameters controlling the dynamics of the model:\cr * \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If \code{NULL} (default), the default value of the season module is used.\cr\cr Additional parameters are: * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
       \item{\code{...}}{parameters sent to \code{DiseasyModelG_} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}
@@ -158,12 +159,13 @@ examples of how this can be done.
 \subsection{\code{DiseasyModelG1$new()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelG1$new(...)}
+    \preformatted{DiseasyModelG1$new(parameters = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
+      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Parameters controlling the dynamics of the model:\cr * \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If \code{NULL} (default), the default value of the season module is used.\cr\cr Additional parameters are: * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
       \item{\code{...}}{parameters sent to \code{DiseasyModelG_} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}

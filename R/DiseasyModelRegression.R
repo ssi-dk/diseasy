@@ -17,7 +17,6 @@
 #'   The `$update_formula()` method should update the formula based on the stratifications.
 #'   If the model should flexibly adapt to different stratifications, this method should be implemented.
 #'   See `?DiseasyModelGLM` and `?DiseasyModelBRM` for examples of how this can be done.
-#'
 #' @examples
 #'   # This module cannot be constructed directly but should instead be used to
 #'   # inherit from when creating a new model class.
@@ -40,6 +39,12 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #' @param family (`family`)\cr
     #'   `stats::family` object passed to the regression call.
     #' @param parameters (`named list()`)\cr
+    #'   List of parameters to set for the model during initialization.
+    #'
+    #'   * `season.scale` `r rd_scale()`,
+    #'     If `NULL` (default), the default value of the season module is used.
+    #'
+    #'   Additional parameters are:
     #'   `r rd_diseasymodel_parameters`
     #' @param ...
     #'   parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
@@ -53,7 +58,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #'   `update_formula(stratification)` function that accounts for changes in stratification.
     #' @seealso
     #'   [stats::family], [stats::as.formula], [DiseasyModelG0], [DiseasyModelG1], [DiseasyModelB0], [DiseasyModelG1]
-    initialize = function(formula, family, ...) {
+    initialize = function(formula, family, parameters = NULL, ...) {
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(formula, pattern = r"{\{observable\}\s*~.*}", add = coll)
@@ -65,7 +70,12 @@ DiseasyModelRegression <- R6::R6Class(                                          
       private$.family  <- family
 
       # Pass arguments to the DiseasyModel initializer
-      super$initialize(...)
+      super$initialize(parameters = parameters, ...)
+
+      # Set the scale of the season
+      if (!is.null(self %.% season) && !is.null(self %.% parameters %.% season.scale)) {
+        self$season$set_scale(self %.% parameters %.% season.scale)
+      }
     },
 
 
@@ -359,6 +369,30 @@ DiseasyModelRegression <- R6::R6Class(                                          
   private = list(
     .formula = NULL,
     .family = NULL,
+
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list("season.scale" = NULL), # Use default values from season module
+        keep.null = TRUE
+      )
+    },
+
+    # @description
+    #   Assert parameters conform to the expected format
+    # @details
+    #   Sub-classes implement additional validation checks
+    # @return `r rd_side_effects()`
+    validate_parameters = function() {
+      coll <- checkmate::makeAssertCollection()
+
+      checkmate::assert_numeric(self %.% parameters %.% season.scale, lower = 0, upper = 1, null.ok = TRUE, add = coll)
+
+      checkmate::reportAssertions(coll)
+
+      super$validate_parameters() # Validate inherited parameters
+    },
 
     fit_regression = function(data, formula) {
       private$not_implemented_error("`$fit_regression` must be implemented in inheriting class")
