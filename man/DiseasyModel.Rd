@@ -16,12 +16,13 @@ Most notably, the model module facilitates:
 The module contains the functional modules via its active bindings:
 \itemize{
 \item \verb{$observables}: \code{DiseasyObservables}
-\item \verb{$population} : \code{DiseasyPopulation}
+\item \verb{$population}: \code{DiseasyPopulation}
 \item \verb{$activity}: \code{DiseasyActivity}
 \item \verb{$regions}: \code{DiseasyRegions}
 \item \verb{$season}: \code{DiseasySeason}
-\item \verb{$variant} : \code{DiseasyVariant}
-\item \verb{$immunity} : \code{DiseasyImmunity}
+\item \verb{$variant}: \code{DiseasyVariant}
+\item \verb{$immunity}: \code{DiseasyImmunity}
+\item \verb{$scoring}: \code{DiseasyScoring}
 }
 
 Configured instances of these modules can be provided during initialisation.
@@ -53,6 +54,8 @@ These functions define the "API" of the models and ensure the models can take pa
 \link{DiseasyVariant}
 
 \link{DiseasyImmunity}
+
+\link{DiseasyScoring}
 }
 \keyword{model-template-builder}
 \section{Super class}{
@@ -81,6 +84,9 @@ The local copy of a DiseasyVariant module. Read-only.}
 
     \item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
 The local copy of a DiseasyImmunity module. Read-only.}
+
+    \item{\code{scoring}}{(\code{diseasy::DiseasyScoring})\cr
+The local copy of a DiseasyScoring module. Read-only.}
 
     \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
@@ -127,6 +133,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   season = FALSE,
   variant = FALSE,
   immunity = FALSE,
+  scoring = TRUE,
   parameters = NULL,
   label = NULL,
   ...
@@ -136,7 +143,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{observables, population, activity, regions, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{observables, population, activity, regions, season, variant, immunity, scoring}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
       \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
