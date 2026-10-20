@@ -152,8 +152,30 @@ test_that("`DiseasyModelG*/B*` can control the scale of `DiseasySeason`", {
   season$use_cosine_season()
   default_season_scale <- purrr::pluck(season, "model_t", attributes, "dots", "scale")
 
-  # Create two models that only differ in last_queryable_date
-  model <- DiseasyModelG0$new(
+  # Create a model with no season
+  model_no_season <- DiseasyModelG0$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    )
+  )
+  expect_null(model_no_season %.% parameters %.% season.scale)
+
+  # .. and a model with season and default scale
+  model_default <- DiseasyModelG0$new(
+    season = season,
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    )
+  )
+  expect_identical(
+    model_default %.% parameters %.% season.scale,
+    default_season_scale
+  )
+
+  # .. and a model with user defined scale
+  model_modified <- DiseasyModelG0$new(
     season = season,
     observables = DiseasyObservables$new(
       conn = \() DBI::dbConnect(RSQLite::SQLite()),
@@ -163,11 +185,11 @@ test_that("`DiseasyModelG*/B*` can control the scale of `DiseasySeason`", {
   )
 
   expect_identical(
-    purrr::pluck(model, "season", "model_t", attributes, "dots", "scale"),
+    purrr::pluck(model_modified, "season", "model_t", attributes, "dots", "scale"),
     default_season_scale / 2
   )
 
-  rm(model, season)
+  rm(model_no_season, model_default, model_modified, season)
 })
 
 
