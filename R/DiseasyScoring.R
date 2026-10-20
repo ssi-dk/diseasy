@@ -179,11 +179,11 @@ DiseasyScoring <- R6::R6Class(                                                  
       } else {
         printr(
           "Observation noise model: ",
-          attr(noise_model, "observation_noise"),
+          attr(self %.% noise_model, "observation_noise"),
           ifelse(
-            is.null(attr(noise_model, "overdispersion")),
+            is.null(attr(self %.% noise_model, "overdispersion")),
             "",
-            paste(" with overdispersion", attr(noise_model, "overdispersion"))
+            paste(" with overdispersion", attr(self %.% noise_model, "overdispersion"))
           )
         )
       }
