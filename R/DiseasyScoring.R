@@ -100,7 +100,7 @@ DiseasyScoring <- R6::R6Class(                                                  
 
       # Determine observable to score
       candidate_columns <- setdiff(colnames(model_trajectories), c("date", "realisation_id", "weight"))
-      observable <- candidate_columns[[1]] # observable is always first
+      observable <- purrr::pluck(candidate_columns, 1) # observable is always first
 
       # Determine statifications
       if (candidate_columns == observable) {
