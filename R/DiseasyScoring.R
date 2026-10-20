@@ -112,14 +112,15 @@ DiseasyScoring <- R6::R6Class(                                                  
         dplyr::rename("model_expectation" = !!observable) |>
         dplyr::left_join(
           self %.% observables %.% get_observation(
-            observable = observables,
+            observable = observable,
             stratification = stratification,
             start_date = min(model_trajectories$date),
             end_date   = max(model_trajectories$date),
             respect_last_queryable_date = FALSE
           ),
-          by = c("date", observables, stratifications)
-        )
+          by = c("date", stratification)
+        ) |>
+        dplyr::relocate(!!observable, .before = "model_expectation")
 
       # Score each realisation within each strata
       stratified_negative_log_likelihood <- data |>
@@ -129,8 +130,8 @@ DiseasyScoring <- R6::R6Class(                                                  
             data.frame(
               "negative_log_likelihood" = - sum(
                 noise_model(
-                  observations = observations,
-                  model_expectation = tibble::deframe(trajectory)
+                  observations = dplyr::pull(trajectory, observable),
+                  model_expectation = dplyr::pull(trajectory, "model_expectation")
                 )
               )
             )
