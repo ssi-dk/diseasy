@@ -489,9 +489,6 @@ DiseasyImmunity <- R6::R6Class(                                                 
       # Convert M to integer (integer and numeric have different hash values)
       M <- as.integer(M)                                                                                                # nolint: object_name_linter
 
-      # Convert "recursive" strategy to "naive" when M <= 2 to increase cache hits
-      strategy <- ifelse(M <= 2L, "naive", strategy)
-
       # Look in the cache for data
       hash <- private$get_hash()
       if (!private$is_cached(hash)) {
