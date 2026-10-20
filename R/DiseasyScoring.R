@@ -67,6 +67,8 @@ DiseasyScoring <- R6::R6Class(                                                  
           )
         }
       } else if (distribution == "poisson") {
+        checkmate::assert_null(overdispersion)
+
         noise_model <- \(observations, model_expectation) {
           stats::dpois(
             x = observations,
