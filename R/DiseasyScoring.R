@@ -44,18 +44,18 @@ DiseasyScoring <- R6::R6Class(                                                  
 
     #' @description
     #'   Sets the `DiseasyScoring` module to use the specified noise model for the observations.
-    #' @param distribution (`character(1)`)\cr
+    #' @param observation_noise (`character(1)`)\cr
     #'   The assumed distribution of the observation noise.
     #' @param overdispersion (`numeric(1)`)\cr
     #'   The assumed overdispersion the observation noise (only for "negative binomial").
     #' @return `r rd_side_effects`
     set_noise_model = function(
-      distribution = c("negative binomial", "poisson"),
+      observation_noise = c("negative binomial", "poisson"),
       overdispersion = NULL
     ) {
-      distribution <- match.arg(distribution)
+      observation_noise <- match.arg(observation_noise)
 
-      if (distribution == "negative binomial") {
+      if (observation_noise == "negative binomial") {
         checkmate::assert_number(overdispersion)
 
         noise_model <- \(observations, model_expectation) {
@@ -66,7 +66,7 @@ DiseasyScoring <- R6::R6Class(                                                  
             log = TRUE
           )
         }
-      } else if (distribution == "poisson") {
+      } else if (observation_noise == "poisson") {
         checkmate::assert_null(overdispersion)
 
         noise_model <- \(observations, model_expectation) {
@@ -79,7 +79,7 @@ DiseasyScoring <- R6::R6Class(                                                  
       }
 
       # Add meta-data to the noise model
-      attr(noise_model, "distribution") <- distribution
+      attr(noise_model, "observation_noise") <- observation_noise
       if (!is.null(overdispersion)) {
         attr(noise_model, "overdispersion") <- overdispersion
       }
@@ -164,7 +164,7 @@ DiseasyScoring <- R6::R6Class(                                                  
       } else {
         printr(
           "Observation noise model: ",
-          attr(noise_model, "distribution"),
+          attr(noise_model, "observation_noise"),
           ifelse(
             is.null(attr(noise_model, "overdispersion")),
             "",

@@ -82,7 +82,7 @@ The local copy of an DiseasyObservables module. Read-only.}
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyScoring$set_noise_model(
-  distribution = c("negative binomial", "poisson"),
+  observation_noise = c("negative binomial", "poisson"),
   overdispersion = NULL
 )}
     \if{html}{\out{</div>}}
@@ -90,7 +90,7 @@ The local copy of an DiseasyObservables module. Read-only.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{distribution}}{(\code{character(1)})\cr
+      \item{\code{observation_noise}}{(\code{character(1)})\cr
 The assumed distribution of the observation noise.}
       \item{\code{overdispersion}}{(\code{numeric(1)})\cr
 The assumed overdispersion the observation noise (only for "negative binomial").}

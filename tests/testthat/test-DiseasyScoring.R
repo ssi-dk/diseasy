@@ -18,7 +18,7 @@ test_that("$set_noise_model() works", {
 
 
   # Add a negative binomial noise model
-  scoring$set_noise_model(distribution = "negative binomial", overdispersion = 1)
+  scoring$set_noise_model(observation_noise = "negative binomial", overdispersion = 1)
   checkmate::expect_function(
     scoring %.% noise_model,
     args = c("observations", "model_expectation")
@@ -29,7 +29,7 @@ test_that("$set_noise_model() works", {
 
 
   # Add a poisson noise model
-  scoring$set_noise_model(distribution = "poisson")
+  scoring$set_noise_model(observation_noise = "poisson")
   checkmate::expect_function(
     scoring %.% noise_model,
     args = c("observations", "model_expectation")
@@ -45,11 +45,11 @@ test_that("$set_noise_model() works", {
     pattern = "Must be of type 'number'"
   )
   expect_error(
-    checkmate_err_msg(scoring$set_noise_model(distribution = "negative binomial")),
+    checkmate_err_msg(scoring$set_noise_model(observation_noise = "negative binomial")),
     pattern = "Must be of type 'number'"
   )
   expect_error(
-    checkmate_err_msg(scoring$set_noise_model(distribution = "poisson", overdispersion = 1)),
+    checkmate_err_msg(scoring$set_noise_model(observation_noise = "poisson", overdispersion = 1)),
     pattern = "Must be NULL"
   )
 
@@ -77,11 +77,11 @@ test_that("$describe() works", {
   scoring <- DiseasyScoring$new()
   expect_no_error(withr::with_output_sink(nullfile(), scoring$describe()))
 
-  scoring$set_noise_model(distribution = "poisson")
+  scoring$set_noise_model(observation_noise = "poisson")
   expect_no_error(withr::with_output_sink(nullfile(), scoring$describe()))
 
   scoring$set_noise_model(
-    distribution = "negative binomial",
+    observation_noise = "negative binomial",
     overdispersion = 2
   )
   expect_no_error(withr::with_output_sink(nullfile(), scoring$describe()))
