@@ -11,6 +11,7 @@ The \code{DiseasyScoring} module is responsible for defining the scoring rules (
 with model trajectories.
 }
 \examples{
+\dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
   # Create a scoring module
   scoring <- DiseasyScoring$new()
 
@@ -39,6 +40,7 @@ with model trajectories.
 
   DBI::dbDisconnect(conn)
   rm(scoring, conn)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link{DiseasyObservables}

@@ -3,7 +3,7 @@
 #' @description
 #'   The `DiseasyScoring` module is responsible for defining the scoring rules (metrics) for comparing observations
 #'   with model trajectories.
-#' @examples
+#' @examplesIf rlang::is_installed("duckdb")
 #'   # Create a scoring module
 #'   scoring <- DiseasyScoring$new()
 #'
