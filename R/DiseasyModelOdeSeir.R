@@ -123,7 +123,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'     Arguments passed to `?DiseasyImmunity$approximate_compartmental()`
     #'
     #'   Additional parameters are:
-    #'   `r rd_diseasymodel_parameters`
+    #'   `r rd_diseasymodel_common_parameters`
     #'   `r rd_diseasymodelode_parameters`
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.

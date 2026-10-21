@@ -42,13 +42,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
     #' @param observables,population,activity,regions,season,variant,immunity,scoring `r rd_diseasy_module`
-    #' @param parameters (`named list()`)\cr
-    #'   List of parameters to set for the model during initialization.
-    #'
-    #'   Each model has their own parameters.
-    #'
-    #'   Common parameters are:
-    #'   `r rd_diseasymodel_parameters`
+    #' @param parameters `r rd_diseasymodel_parameters`
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance.
     #' @param ...
@@ -178,10 +172,27 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(scoring)
       }
 
+      # Update parameters based on input
+      self$update_parameters(parameters = parameters)
 
-      # Update the existing private$parameters with the new parameters
+      # Set the label for the model
+      private$label <- label
+    },
+
+
+    #' @description
+    #'   Update the parameters of the model.
+    #' @param parameters `r rd_diseasymodel_parameters`
+    #' @param validate (`logical(1)`)\cr
+    #'   Should the parameters be validated after updating?
+    #' @return `r rd_side_effects`
+    update_parameters = function(parameters, validate = TRUE) {
+
+      # Update the existing parameters with the new parameters
+      default_parameters <- private %.% default_parameters()
+
       updated_parameters <- modifyList(
-        private %.% default_parameters(),
+        default_parameters,
         purrr::pluck(parameters, .default = list()),
         keep.null = TRUE
       )
@@ -224,10 +235,8 @@ DiseasyModel <- R6::R6Class(                                                    
 
       # Store the updated parameters
       private$.parameters <- updated_parameters
-      private %.% validate_parameters()
 
-      # Set the label for the model
-      private$label <- label
+      if (validate) private %.% validate_parameters()
     },
 
 
