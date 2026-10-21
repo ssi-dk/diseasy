@@ -102,6 +102,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   * `overall_infection_risk` (`numeric(1)`)\cr
     #'     A scalar that scales contact rates to infection rates.
     #'   * `disease_progression_rates` `r rd_disease_progression_rates()`
+    #'   * `season.scale` `r rd_season_scale()`
+    #'     If `NULL` (default), the default value of the season module is used.
+    #'   * `season.peak` `r rd_season_peak()`
+    #'     If `NULL` (default), the default value of the season module is used.
     #'
     #'   Parameters controlling initialisation routines
     #'   * `incidence_polynomial_order` (`integer(1)`)\cr
@@ -1506,6 +1510,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # Models determinable by initialisation routines
           "overall_infection_risk" = 1,
           "disease_progression_rates" = c("E" = 1, "I" = 1),
+          "season.scale" = NULL, # Use default values from season module
+          "season.peak" = NULL, # Use default values from season module
 
           # Parameters for fitting polynomials to the incidence curves
           "incidence_polynomial_order" = 3,
@@ -1545,6 +1551,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         names(self %.% parameters %.% disease_progression_rates),
         subset.of = c("E", "I"),
         must.include = "I",
+        add = coll
+      )
+
+      checkmate::assert_number(
+        self %.% parameters %.% season.scale,
+        lower = 0,
+        upper = 1,
+        null.ok = TRUE, # Can use default value from module
+        add = coll
+      )
+
+      checkmate::assert_number(
+        self %.% parameters %.% season.peak,
+        null.ok = TRUE, # Can use default value from module
         add = coll
       )
 

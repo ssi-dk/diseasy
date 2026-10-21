@@ -169,6 +169,10 @@ Parameters controlling the dynamics of the model:
 \item \code{overall_infection_risk} (\code{numeric(1)})\cr
 A scalar that scales contact rates to infection rates.
 \item \code{disease_progression_rates} (\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.
+\item \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.
+If \code{NULL} (default), the default value of the season module is used.
+\item \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).
+If \code{NULL} (default), the default value of the season module is used.
 }
 
 Parameters controlling initialisation routines
