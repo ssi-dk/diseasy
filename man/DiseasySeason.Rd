@@ -227,9 +227,7 @@ Named list of arguments that will be passed at dot-ellipsis to the season model.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{peak}}{(\code{numeric})\cr
-Sets the period of maximal activity (days past new-year).
-By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.}
+      \item{\code{peak}}{(\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).}
       \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
     }
     \if{html}{\out{</div>}}

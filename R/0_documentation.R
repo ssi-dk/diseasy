@@ -66,12 +66,25 @@ rd_quantiles <- function(type = "param") {
 }
 
 
-rd_scale <- function(type = "param") {
+rd_season_scale <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`numeric(1)`)\\cr",
-        "Sets the scale of the season model.",
-        "The scale is the percent wise difference between most active and least active period.",
-        ifelse(type == "field", "Read only.", ""))
+  paste(
+    "(`numeric(1)`)\\cr",
+    "Sets the scale of the season model.",
+    "The scale is the percent wise difference between most active and least active period.",
+    ifelse(type == "field", "Read only.", "")
+  )
+}
+
+rd_season_peak <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`numeric(1)`)\\cr",
+    "Sets the period of maximal activity (days past new-year).",
+    "By default, risk of infection is in antiphase with the DMI climate normal of",
+    "the maximum daily temperature (for Denmark).",
+    ifelse(type == "field", "Read only.", "")
+  )
 }
 
 rd_target <- function(type = "param") {
@@ -374,7 +387,7 @@ rd_diseasymodelregression_parameters <- paste(
   "(`named list()`)\\cr",
   "List of parameters to set for the model during initialization.\\cr\\cr",
   "Parameters controlling the dynamics of the model:\\cr",
-  "* `season.scale`", rd_scale(),
+  "* `season.scale`", rd_season_scale(),
   "  If `NULL` (default), the default value of the season module is used.\\cr\\cr",
   "Additional parameters are:",
   rd_diseasymodel_parameters

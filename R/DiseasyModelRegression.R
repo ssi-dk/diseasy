@@ -41,7 +41,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
-    #'   * `season.scale` `r rd_scale()`,
+    #'   * `season.scale` `r rd_season_scale()`,
     #'     If `NULL` (default), the default value of the season module is used.
     #'
     #'   Additional parameters are:
