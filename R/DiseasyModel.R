@@ -108,15 +108,6 @@ DiseasyModel <- R6::R6Class(                                                    
         checkmate::check_class(scoring, "DiseasyScoring", null.ok = TRUE),
         add = coll
       )
-      checkmate::assert_list(parameters, null.ok = TRUE, add = coll)
-      if (!is.null(parameters)) {
-        checkmate::assert_names(
-          names(parameters),
-          subset.of = names(private %.% default_parameters()),
-          type = "unique",
-          add = coll
-        )
-      }
       checkmate::assert_character(label, len = 1, any.missing = FALSE, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -187,6 +178,16 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   Should the parameters be validated after updating?
     #' @return `r rd_side_effects`
     update_parameters = function(parameters, validate = TRUE) {
+
+      if (validate) {
+        checkmate::assert_list(parameters, null.ok = TRUE)
+        if (!is.null(parameters)) {
+          checkmate::assert_names(names(parameters),
+            subset.of = names(private %.% default_parameters()),
+            type = "unique"
+          )
+        }
+      }
 
       # Update the existing parameters with the new parameters
       default_parameters <- private %.% default_parameters()
