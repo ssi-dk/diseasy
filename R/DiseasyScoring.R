@@ -146,7 +146,7 @@ DiseasyScoring <- R6::R6Class(                                                  
           .f = \(trajectory, group) {
             data.frame(
               "negative_log_likelihood" = - sum(
-                noise_model(
+                self %.% noise_model(
                   observations = dplyr::pull(trajectory, observable),
                   model_expectation = dplyr::pull(trajectory, "model_expectation")
                 )
