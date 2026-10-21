@@ -247,16 +247,17 @@ DiseasyModel <- R6::R6Class(                                                    
       private$.parameters <- updated_parameters
 
       # Apply (newly-updated) model parameters to the model
-      if (is.null(self %.% season)) {
+      if (!is.null(self %.% season)) {
+        dots <- purrr::compact(
+          list(
+            "scale" = updated_parameters$season.scale,
+            "peak"  = updated_parameters$season.peak
+          )
+        )
+
         self$season$use_season_model(
           model_name = purrr::pluck(self, "season", "model_t", attributes, "name"),
-          dots = purrr::discard(
-            .x = list(
-              "scale" = updated_parameters %.% season.scale,
-              "peak"  = updated_parameters %.% season.peak
-            ),
-            .p = is.null
-          )
+          dots = if (length(dots) == 0) NULL else dots
         )
       }
     },
