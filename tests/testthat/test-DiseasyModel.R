@@ -186,6 +186,44 @@ test_that("`$update_parameters` works", {
 })
 
 
+test_that("`$update_parameters` works with NA parameters", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("a" = 1, "b" = 2),
+          keep.null = TRUE
+        )
+      }
+    )
+  )
+
+  # Test that parameters use the default value
+  model <- DiseasyModelParameterTest$new()
+  expect_identical(model %.% parameters %.% a, 1)
+  expect_identical(model %.% parameters %.% b, 2)
+  rm(model)
+
+
+  # Check defaults are copied as attributes if overwritten with NA
+  model <- DiseasyModelParameterTest$new(
+    parameters = list("a" = NA, "b" = NA)
+  )
+  expect_identical(as.numeric(model %.% parameters %.% a), NA_real_) # use as.numeric
+  expect_identical(as.numeric(model %.% parameters %.% b), NA_real_) # to strip attributes
+
+  expect_identical(attr(model %.% parameters %.% a, "default"), 1)
+  expect_identical(attr(model %.% parameters %.% b, "default"), 2)
+  rm(model)
+})
+
+
 test_that("`$update_parameters` works with season parameters", {
   skip_if_not_installed("RSQLite")
 
