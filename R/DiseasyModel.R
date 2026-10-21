@@ -186,7 +186,7 @@ DiseasyModel <- R6::R6Class(                                                    
         }
 
         # Store default peak in model if not given
-        if (is.null(updated_parameters %.% season.peak) && is.null(updated_parameters %.% season.peak)) {
+        if ("season.peak" %in% names(updated_parameters) && is.null(updated_parameters %.% season.peak)) {
           updated_parameters <- utils::modifyList(
             updated_parameters,
             list("season.peak" = purrr::pluck(self, "season", "model_t", attributes, "dots", "peak")),
