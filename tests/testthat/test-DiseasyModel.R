@@ -71,19 +71,19 @@ test_that("initialize works with model parameters", {
           keep.null = TRUE
         )
       },
-      validate_parameters = function() {
+      validate_parameters = function(parameters) {
         coll <- checkmate::makeAssertCollection()
         checkmate::assert_integerish(
-          self %.% parameters %.% a,
+          parameters %.% a,
           add = coll
         )
         checkmate::assert_integerish(
-          self %.% parameters %.% b,
+          parameters %.% b,
           add = coll
         )
         checkmate::reportAssertions(coll)
 
-        super$validate_parameters()
+        super$validate_parameters(parameters)
       }
     )
   )
@@ -137,19 +137,19 @@ test_that("`$update_parameters` works", {
           keep.null = TRUE
         )
       },
-      validate_parameters = function() {
+      validate_parameters = function(parameters) {
         coll <- checkmate::makeAssertCollection()
         checkmate::assert_integerish(
-          self %.% parameters %.% a,
+          parameters %.% a,
           add = coll
         )
         checkmate::assert_integerish(
-          self %.% parameters %.% b,
+          parameters %.% b,
           add = coll
         )
         checkmate::reportAssertions(coll)
 
-        super$validate_parameters()
+        super$validate_parameters(parameters)
       }
     )
   )

@@ -234,10 +234,10 @@ DiseasyModel <- R6::R6Class(                                                    
         )
       }
 
+      if (validate) private %.% validate_parameters(updated_parameters)
+
       # Store the updated parameters
       private$.parameters <- updated_parameters
-
-      if (validate) private %.% validate_parameters()
     },
 
 
@@ -559,18 +559,20 @@ DiseasyModel <- R6::R6Class(                                                    
 
     # @description
     #   Assert parameters conform to the expected format
+    # @param parameters (`named list()`)\cr
+    #   The complete set of parameters to validate.
     # @details
     #   Sub-classes implement additional validation checks
     # @return `NULL` (called for side-effects)
-    validate_parameters = function() {
+    validate_parameters = function(parameters) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(
-        self %.% parameters %.% training_length,
+        parameters %.% training_length,
         lower = 0,
         add = coll
       )
       checkmate::assert_names(
-        names(self %.% parameters %.% training_length),
+        names(parameters %.% training_length),
         subset.of = c("training", "testing", "validation"),
         add = coll
       )

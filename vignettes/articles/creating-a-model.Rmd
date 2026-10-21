@@ -157,13 +157,13 @@ Note that some parameters may be set inherited from superclasses, so the impleme
 method should also call the parent validation method (`super$validate_parameters()`).
 
 ```{r parameter_validation_implementation, eval = FALSE}
-validate_parameters = function() {
-  checkmate::assert_number(self$parameters$model_specific_param_1)
+validate_parameters = function(parameters) {
+  checkmate::assert_number(parameters$model_specific_param_1)
   checkmate::assert_choice(
-    self$parameters$model_specific_param_2,
+    parameters$model_specific_param_2,
     c("method_1", "method_2")
   )
-  super$validate_parameters()
+  super$validate_parameters(parameters)
 }
 ```
 
