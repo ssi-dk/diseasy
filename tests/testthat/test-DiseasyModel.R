@@ -186,6 +186,69 @@ test_that("`$update_parameters` works", {
 })
 
 
+test_that("`$update_parameters` works with season parameters", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("season.scale" = NULL, "season.peak" = NULL),
+          keep.null = TRUE
+        )
+      }
+    )
+  )
+
+  # With no season module, both parameters should remain NULL after initialisation
+  model <- DiseasyModelParameterTest$new()
+  expect_null(model %.% parameters %.% season.scale)
+  expect_null(model %.% parameters %.% season.peak)
+  rm(model)
+
+  # With a "contant_season" model both parameters should remain NULL after initialisation
+  # since the contant_season model has no parameters
+  season <- DiseasySeason$new(reference_date = Sys.Date())
+  season$use_constant_season()
+  model <- DiseasyModelParameterTest$new(season = season)
+  expect_null(model %.% parameters %.% season.scale)
+  expect_null(model %.% parameters %.% season.peak)
+  rm(model)
+
+  # With a "covid_season_v1" model peak parameter should remain NULL but scale should carry the default value
+  # since the covid_season_v1 model has a "scale" parameter but no "peak" parameter
+  season <- DiseasySeason$new(reference_date = Sys.Date())
+  season$use_covid_season_v1()
+  model <- DiseasyModelParameterTest$new(season = season)
+  expect_identical(
+    model %.% parameters %.% season.scale,
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_null(model %.% parameters %.% season.peak)
+  rm(model)
+
+  # With a "cosine_season" model both peak and scale should carry the default value
+  # since the cosine_season model has both a "scale" parameter and a "peak" parameter
+  season <- DiseasySeason$new(reference_date = Sys.Date())
+  season$use_covid_season_v1()
+  model <- DiseasyModelParameterTest$new(season = season)
+  expect_identical(
+    model %.% parameters %.% season.scale,
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_identical(
+    model %.% parameters %.% season.peak,
+    purrr::pluck(season, "model_t", attributes, "dots", "peak")
+  )
+
+  rm(model, season)
+})
+
+
 test_that("$load_module() works", {
   skip_if_not_installed("RSQLite")
 
