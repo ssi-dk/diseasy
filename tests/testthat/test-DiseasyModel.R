@@ -155,33 +155,33 @@ test_that("`$update_parameters` works", {
   )
 
   # Test that parameters use the default value
-  m <- DiseasyModelParameterTest$new()
-  expect_identical(m %.% parameters %.% a, 1)
-  expect_identical(m %.% parameters %.% b, 2)
+  model <- DiseasyModelParameterTest$new()
+  expect_identical(model %.% parameters %.% a, 1)
+  expect_identical(model %.% parameters %.% b, 2)
 
   # Test that parameters can be set during initialization
-  m$update_parameters(parameters = list("a" = 3, "b" = 4))
-  expect_identical(m %.% parameters %.% a, 3)
-  expect_identical(m %.% parameters %.% b, 4)
+  model$update_parameters(parameters = list("a" = 3, "b" = 4))
+  expect_identical(model %.% parameters %.% a, 3)
+  expect_identical(model %.% parameters %.% b, 4)
 
   # Check that setting non-existing parameters will give an error
   expect_error(
-    checkmate_err_msg(m$update_parameters(parameters = list("d" = 3))),
+    checkmate_err_msg(model$update_parameters(parameters = list("d" = 3))),
     class = "simpleError",
     regex = r"{but has additional elements \{'d'\}}"
   )
   expect_no_error( # ... unless we disable validation
-    m$update_parameters(parameters = list("d" = 3), validate = FALSE)
+    model$update_parameters(parameters = list("d" = 3), validate = FALSE)
   )
 
   # Check that parameter validation catches malformed parameters
   expect_error( # Model specific parameters are validated
-    checkmate_err_msg(m$update_parameters(parameters = list("a" = "a"))),
+    checkmate_err_msg(model$update_parameters(parameters = list("a" = "a"))),
     class = "simpleError",
     regex = "Must be of type 'integerish'"
   )
   expect_no_error( # ... unless we disable validation
-    checkmate_err_msg(m$update_parameters(parameters = list("a" = "a"), validate  = FALSE))
+    checkmate_err_msg(model$update_parameters(parameters = list("a" = "a"), validate  = FALSE))
   )
 })
 
