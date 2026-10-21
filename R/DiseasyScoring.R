@@ -174,19 +174,15 @@ DiseasyScoring <- R6::R6Class(                                                  
     #' @description `r rd_describe`
     describe = function() {
       printr("# DiseasyScoring #############################################")
-      if (is.null(self %.% noise_model)) {
-        printr("No observation noise model has been configured")
-      } else {
-        printr(
-          "Observation noise model: ",
-          attr(self %.% noise_model, "observation_noise"),
-          ifelse(
-            is.null(attr(self %.% noise_model, "overdispersion")),
-            "",
-            paste(" with overdispersion", attr(self %.% noise_model, "overdispersion"))
-          )
+      printr(
+        "Observation noise model: ",
+        attr(self %.% noise_model, "observation_noise"),
+        ifelse(
+          is.null(attr(self %.% noise_model, "overdispersion")),
+          "",
+          paste(" with overdispersion", attr(self %.% noise_model, "overdispersion"))
         )
-      }
+      )
     }
   ),
 
