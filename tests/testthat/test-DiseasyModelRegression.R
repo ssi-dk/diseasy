@@ -143,7 +143,7 @@ test_that("update_formula gives error", {
 })
 
 
-test_that("`DiseasyModelG*/B*` can control the scale of `DiseasySeason`", {
+test_that("`DiseasyModelG0` can control `DiseasySeason`", {
   skip_if_not_installed("RSQLite")
 
   # Configure a season module
@@ -151,6 +151,7 @@ test_that("`DiseasyModelG*/B*` can control the scale of `DiseasySeason`", {
   season$set_reference_date(as.Date("2020-01-01"))
   season$use_cosine_season()
   default_season_scale <- purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  default_season_peak  <- purrr::pluck(season, "model_t", attributes, "dots", "peak")
 
   # Create a model with no season
   model_no_season <- DiseasyModelG0$new(
@@ -169,9 +170,14 @@ test_that("`DiseasyModelG*/B*` can control the scale of `DiseasySeason`", {
       last_queryable_date = as.Date("2020-01-01")
     )
   )
+  # Parameters from DiseasySeaon should be backpropagated to the model
   expect_identical(
     model_default %.% parameters %.% season.scale,
     default_season_scale
+  )
+  expect_identical(
+    model_default %.% parameters %.% season.peak,
+    default_season_peak
   )
 
   # .. and a model with user defined scale
@@ -183,13 +189,40 @@ test_that("`DiseasyModelG*/B*` can control the scale of `DiseasySeason`", {
     ),
     parameters = list("season.scale" = default_season_scale / 2)
   )
-
+  # Parameters from DiseasyModelG0 should be propagated to DiseasySeason
   expect_identical(
     purrr::pluck(model_modified, "season", "model_t", attributes, "dots", "scale"),
     default_season_scale / 2
   )
+  # Parameters from DiseasySeaon should be backpropagated to the model
+  expect_identical(
+    model_modified %.% parameters %.% season.peak,
+    default_season_peak
+  )
 
-  rm(model_no_season, model_default, model_modified, season)
+  # .. and a model with user defined peak
+  model_doubly_modified <- DiseasyModelG0$new(
+    season = season,
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = as.Date("2020-01-01")
+    ),
+    parameters = list(
+      "season.scale" = default_season_scale / 2,
+      "season.peak"  = default_season_peak * 2
+    )
+  )
+  # Parameters from DiseasyModelG0 should be propagated to DiseasySeason
+  expect_identical(
+    purrr::pluck(model_doubly_modified, "season", "model_t", attributes, "dots", "scale"),
+    default_season_scale / 2
+  )
+  expect_identical(
+    purrr::pluck(model_doubly_modified, "season", "model_t", attributes, "dots", "peak"),
+    default_season_peak * 2
+  )
+
+  rm(model_no_season, model_default, model_modified, model_doubly_modified, season)
 })
 
 

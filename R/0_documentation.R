@@ -389,6 +389,8 @@ rd_diseasymodelregression_parameters <- paste(
   "Parameters controlling the dynamics of the model:\\cr",
   "* `season.scale`", rd_season_scale(),
   "  If `NULL` (default), the default value of the season module is used.\\cr\\cr",
+  "* `season.peak`", rd_season_peak(),
+  "  If `NULL` (default), the default value of the season module is used.\\cr\\cr",
   "Additional parameters are:",
   rd_diseasymodel_parameters
 )

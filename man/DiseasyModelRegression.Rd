@@ -88,6 +88,8 @@ List of parameters to set for the model during initialization.
 \itemize{
 \item \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. ,
 If \code{NULL} (default), the default value of the season module is used.
+\item \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark). ,
+If \code{NULL} (default), the default value of the season module is used.
 }
 
 Additional parameters are:
