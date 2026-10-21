@@ -122,6 +122,70 @@ test_that("initialize works with model parameters", {
 })
 
 
+test_that("`$update_parameters` works", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("a" = 1, "b" = 2),
+          keep.null = TRUE
+        )
+      },
+      validate_parameters = function() {
+        coll <- checkmate::makeAssertCollection()
+        checkmate::assert_integerish(
+          self %.% parameters %.% a,
+          add = coll
+        )
+        checkmate::assert_integerish(
+          self %.% parameters %.% b,
+          add = coll
+        )
+        checkmate::reportAssertions(coll)
+
+        super$validate_parameters()
+      }
+    )
+  )
+
+  # Test that parameters use the default value
+  m <- DiseasyModelParameterTest$new()
+  expect_identical(m %.% parameters %.% a, 1)
+  expect_identical(m %.% parameters %.% b, 2)
+
+  # Test that parameters can be set during initialization
+  m$update_parameters(parameters = list("a" = 3, "b" = 4))
+  expect_identical(m %.% parameters %.% a, 3)
+  expect_identical(m %.% parameters %.% b, 4)
+
+  # Check that setting non-existing parameters will give an error
+  expect_error(
+    checkmate_err_msg(m$update_parameters(parameters = list("d" = 3))),
+    class = "simpleError",
+    regex = r"{but has additional elements \{'d'\}}"
+  )
+  expect_no_error( # ... unless we disable validation
+    m$update_parameters(parameters = list("d" = 3), validate = FALSE)
+  )
+
+  # Check that parameter validation catches malformed parameters
+  expect_error( # Model specific parameters are validated
+    checkmate_err_msg(m$update_parameters(parameters = list("a" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'integerish'"
+  )
+  expect_no_error( # ... unless we disable validation
+    checkmate_err_msg(m$update_parameters(parameters = list("a" = "a"), validate  = FALSE))
+  )
+})
+
+
 test_that("$load_module() works", {
   skip_if_not_installed("RSQLite")
 
