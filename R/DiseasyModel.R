@@ -198,46 +198,67 @@ DiseasyModel <- R6::R6Class(                                                    
         keep.null = TRUE
       )
 
+      # For parameters marked for optimisation (NA), we store the default parameter value as attributes
+      parameters_to_fit <- names(purrr::keep(parameters, anyNA))
+      for (parameter_id in seq_along(parameters_to_fit)) {
+        parameter <- parameters_to_fit[parameter_id]
+        default <- default_parameters[[parameter]]
+        attr(updated_parameters[[parameter]], "default") <- default
+      }
+
       # Set the scale of the season if needed or backpropagate the default value to the model parameters
       if (!is.null(self %.% season)) {
 
         # Store default scale in model if not given
-        if ("season.scale" %in% names(updated_parameters) && is.null(updated_parameters %.% season.scale)) {
-          updated_parameters <- utils::modifyList(
-            updated_parameters,
-            list("season.scale" = purrr::pluck(self, "season", "model_t", attributes, "dots", "scale")),
-            keep.null = TRUE
-          )
+        if ("season.scale" %in% names(updated_parameters)) {
+          default <- purrr::pluck(self, "season", "model_t", attributes, "dots", "scale")
+
+          if (is.null(updated_parameters %.% season.scale)) { # Backpropagate default value to model
+            updated_parameters <- utils::modifyList(
+              updated_parameters,
+              list("season.scale" = default),
+              keep.null = TRUE
+            )
+          } else if (is.na(updated_parameters %.% season.scale)) { # Store defaults as attribute for optimiser
+            attr(updated_parameters[["season.scale"]], "default") <- default
+          }
+
         }
 
         # Store default peak in model if not given
-        if ("season.peak" %in% names(updated_parameters) && is.null(updated_parameters %.% season.peak)) {
-          updated_parameters <- utils::modifyList(
-            updated_parameters,
-            list("season.peak" = purrr::pluck(self, "season", "model_t", attributes, "dots", "peak")),
-            keep.null = TRUE
-          )
+        if ("season.peak" %in% names(updated_parameters)) {
+          default <- purrr::pluck(self, "season", "model_t", attributes, "dots", "peak")
+
+          if (is.null(updated_parameters %.% season.peak)) { # Backpropagate default value to model
+            updated_parameters <- utils::modifyList(
+              updated_parameters,
+              list("season.peak" = default),
+              keep.null = TRUE
+            )
+          } else if (is.na(updated_parameters %.% season.peak)) { # Store defaults as attribute for optimiser
+            attr(updated_parameters[["season.peak"]], "default") <- default
+          }
         }
-
-
-        # Apply (newly-updated) model parameters to the model
-        dots <- purrr::compact(
-          list(
-            "scale" = updated_parameters$season.scale,
-            "peak"  = updated_parameters$season.peak
-          )
-        )
-
-        self$season$use_season_model(
-          model_name = purrr::pluck(self, "season", "model_t", attributes, "name"),
-          dots = if (length(dots) == 0) NULL else dots
-        )
       }
 
       if (validate) private %.% validate_parameters(updated_parameters)
 
-      # Store the updated parameters
+      # Store and apply the updated parameters
       private$.parameters <- updated_parameters
+
+      # Apply (newly-updated) model parameters to the model
+      if (is.null(self %.% season)) {
+        self$season$use_season_model(
+          model_name = purrr::pluck(self, "season", "model_t", attributes, "name"),
+          dots = purrr::discard(
+            .x = list(
+              "scale" = updated_parameters %.% season.scale,
+              "peak"  = updated_parameters %.% season.peak
+            ),
+            .p = is.null
+          )
+        )
+      }
     },
 
 
