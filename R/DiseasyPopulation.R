@@ -219,7 +219,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       c_matrices_age <- purrr::map(m_matrices_age, ~ . / outer(rep(1, length(N_age)), N_age))
 
       # Retrieve the regional mixing matrices
-      theta <- self %.% regions %.% infection_flow_matrix
+      theta <- self %.% regions %.% infection_flow_scenario[[1]] # TODO: Use only first entry to check test still work
 
       # Count population in regions
       N_regions <- full_population |>                                                                                   # nolint: object_name_linter
