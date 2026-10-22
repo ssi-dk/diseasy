@@ -108,21 +108,15 @@ DiseasyScoring <- R6::R6Class(                                                  
     #'   Compute the likelihood for a given set of model trajectories
     #' @param model_trajectories (`data.frame(1)`)\cr
     #'   Model trajectories returned by `$get_results()` from a model.
+    #' @param stratification `r rd_stratification()`
     #' @return (`data.frame(1)`)\cr
     #'   The likelihood of each realisation in `model_trajectories`
-    compute_likelihood = function(model_trajectories) {
+    compute_likelihood = function(model_trajectories, stratification = NULL) {
       checkmate::assert_class(self %.% observables, "DiseasyObservables")
 
       # Determine observable to score
       candidate_columns <- setdiff(colnames(model_trajectories), c("date", "realisation_id", "weight"))
-      observable <- purrr::pluck(candidate_columns, 1) # observable is always first
-
-      # Determine statifications
-      if (candidate_columns == observable) {
-        stratification <- NULL
-      } else {
-        stratification <- setdiff(candidate_columns, observable)
-      }
+      observable <- purrr::pluck(candidate_columns, -1) # observable is always last
 
       # Construct a combined data object
       data <- model_trajectories |>
@@ -135,13 +129,19 @@ DiseasyScoring <- R6::R6Class(                                                  
             end_date   = max(model_trajectories$date),
             respect_last_queryable_date = FALSE
           ),
-          by = c("date", stratification)
+          by = c("date", private %.% stratification_to_string(stratification))
         ) |>
         dplyr::relocate(!!observable, .before = "model_expectation")
 
       # Score each realisation within each strata
       stratified_negative_log_likelihood <- data |>
-        dplyr::group_by(dplyr::across(dplyr::all_of(c("realisation_id", "weight", stratification)))) |>
+        dplyr::group_by(
+          dplyr::across(
+            dplyr::all_of(
+              c("realisation_id", "weight", private %.% stratification_to_string(stratification))
+            )
+          )
+        ) |>
         dplyr::group_modify(
           .f = \(trajectory, group) {
             data.frame(

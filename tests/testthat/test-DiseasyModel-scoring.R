@@ -35,7 +35,7 @@ for (noise_model in c("poisson", "negative binomial")) {
         )
 
         # The scoring of the model trajectories are done with the "$compute_likelihood()" method:
-        output <- expect_no_error(model$scoring$compute_likelihood(trajectories))
+        output <- expect_no_error(model$scoring$compute_likelihood(trajectories, stratification = stratification))
 
         checkmate::expect_data_frame(output, nrows = model %.% parameters %.% n_realizations)
         checkmate::expect_names(
