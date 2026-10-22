@@ -215,8 +215,8 @@ test_that("`$update_parameters` works with NA parameters", {
   model <- DiseasyModelParameterTest$new(
     parameters = list("a" = NA, "b" = NA)
   )
-  expect_identical(as.numeric(model %.% parameters %.% a), NA_real_) # use as.numeric
-  expect_identical(as.numeric(model %.% parameters %.% b), NA_real_) # to strip attributes
+  checkmate::expect_scalar_na(model %.% parameters %.% a)
+  checkmate::expect_scalar_na(model %.% parameters %.% b)
 
   expect_identical(attr(model %.% parameters %.% a, "default"), 1)
   expect_identical(attr(model %.% parameters %.% b, "default"), 2)
@@ -259,7 +259,6 @@ test_that("`$update_parameters` works with season parameters", {
 
   # With a "covid_season_v1" model peak parameter should remain NULL but scale should carry the default value
   # since the covid_season_v1 model has a "scale" parameter but no "peak" parameter
-  season <- DiseasySeason$new(reference_date = Sys.Date())
   season$use_covid_season_v1()
   model <- DiseasyModelParameterTest$new(season = season)
   expect_identical(
@@ -271,8 +270,7 @@ test_that("`$update_parameters` works with season parameters", {
 
   # With a "cosine_season" model both peak and scale should carry the default value
   # since the cosine_season model has both a "scale" parameter and a "peak" parameter
-  season <- DiseasySeason$new(reference_date = Sys.Date())
-  season$use_covid_season_v1()
+  season$use_cosine_season()
   model <- DiseasyModelParameterTest$new(season = season)
   expect_identical(
     model %.% parameters %.% season.scale,
@@ -281,6 +279,41 @@ test_that("`$update_parameters` works with season parameters", {
   expect_identical(
     model %.% parameters %.% season.peak,
     purrr::pluck(season, "model_t", attributes, "dots", "peak")
+  )
+
+  # With a "cosine_season" model both peak and scale should carry the default value
+  # as attributes if set as NA
+  season$use_cosine_season()
+  model <- DiseasyModelParameterTest$new(
+    season = season,
+    parameters = list("season.scale" = NA, "season.peak" = NA)
+  )
+  checkmate::expect_scalar_na(model %.% parameters %.% season.scale)
+  checkmate::expect_scalar_na(model %.% parameters %.% season.peak)
+  expect_identical(
+    attr(model %.% parameters %.% season.scale, "default"),
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_identical(
+    attr(model %.% parameters %.% season.peak, "default"),
+    purrr::pluck(season, "model_t", attributes, "dots", "peak")
+  )
+
+  # With a "covid_season_v1" model "scale" should be converted from NA to NULL
+  # since the argument is not supported and "peak" should carry default as attributes
+  season$use_covid_season_v1()
+  model <- DiseasyModelParameterTest$new(
+    season = season,
+    parameters = list("season.scale" = NA, "season.peak" = NA)
+  )
+  checkmate::expect_scalar_na(model %.% parameters %.% season.scale)
+  expect_null(model %.% parameters %.% season.peak)
+  expect_identical(
+    attr(model %.% parameters %.% season.scale, "default"),
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_null(
+    attr(model %.% parameters %.% season.peak, "default")
   )
 
   rm(model, season)
