@@ -439,14 +439,39 @@ DiseasyModel <- R6::R6Class(                                                    
         return(loss)
       }
 
+      p0 <- c("overall_infection_risk" = 0.025, "season.scale" = 0.5726693)
+      objective_function(p0)
+      self$update_parameters(parameters = as.list(p0))
+      self$plot(observable, prediction_length = 0)
+
+
+      p0 <- c("overall_infection_risk" = 0.02, "season.scale" = 0.5726693)
+      objective_function(p0)
+      self$update_parameters(parameters = as.list(p0))
+      self$plot(observable, prediction_length = 0)
+
+
+      p0 <- c("overall_infection_risk" = 0.022, "season.scale" = 0.5726693)
+      objective_function(p0)
+      self$update_parameters(parameters = as.list(p0))
+      self$plot(observable, prediction_length = 0)
+
       # Run optimisation
       res <- ucminf::ucminf(
         par = p0,
         fn = objective_function
       )
 
+      res <- optimx::optimr(
+        par = p0,
+        fn = objective_function,
+        method = "pracmanm"
+      )
+
       # Apply optimised parameters to the model
       self %.% update_parameters(parameters = as.list(res$par))
+
+      print(res)
 
       return(invisible(NULL))
     }

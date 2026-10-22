@@ -1526,7 +1526,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           "malthusian_matching" = TRUE,
 
           # Models determinable by initialisation routines
-          "overall_infection_risk" = 1,
+          "overall_infection_risk" = 0.025,
           "disease_progression_rates" = c("E" = 1, "I" = 1),
           "season.scale" = NULL, # Use default values from season module
           "season.peak" = NULL, # Use default values from season module
