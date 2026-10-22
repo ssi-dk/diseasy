@@ -130,7 +130,7 @@ The assumed overdispersion the observation noise (only for "negative binomial").
   Compute the likelihood for a given set of model trajectories
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyScoring$compute_likelihood(model_trajectories)}
+    \preformatted{DiseasyScoring$compute_likelihood(model_trajectories, stratification = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -138,6 +138,7 @@ The assumed overdispersion the observation noise (only for "negative binomial").
     \describe{
       \item{\code{model_trajectories}}{(\code{data.frame(1)})\cr
 Model trajectories returned by \verb{$get_results()} from a model.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
     }
     \if{html}{\out{</div>}}
   }
