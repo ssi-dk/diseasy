@@ -365,12 +365,15 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #   A comma separated character string of the different stratification levels
     stratification_to_string = function(stratification) {
       if (is.null(stratification)) {
-        stratification_chr <- NA_character_
-      } else {
-        stratification_chr <- purrr::imap(purrr::map(stratification, dplyr::as_label),
-                                          ~ ifelse(.y == "", .x, glue::glue_collapse(c(.y, .x), sep = " = "))) |>
-          toString()
+        return(NULL)
       }
+
+      stratification_chr <- purrr::imap(
+        purrr::map(stratification, dplyr::as_label),
+        ~ ifelse(.y == "", .x, glue::glue_collapse(c(.y, .x), sep = " = "))
+      ) |>
+        toString()
+
       return(stratification_chr)
     }
   )
