@@ -6,11 +6,6 @@
       "_row": "abind"
     },
     {
-      "package": "arrow",
-      "version": "25.0.1",
-      "_row": "arrow"
-    },
-    {
       "package": "askpass",
       "version": "1.2.1",
       "_row": "askpass"
@@ -44,11 +39,6 @@
       "package": "bigD",
       "version": "0.3.1",
       "_row": "bigD"
-    },
-    {
-      "package": "BiocManager",
-      "version": "1.30.27",
-      "_row": "BiocManager"
     },
     {
       "package": "bit",
@@ -96,11 +86,6 @@
       "_row": "Brobdingnag"
     },
     {
-      "package": "broom",
-      "version": "1.0.13",
-      "_row": "broom"
-    },
-    {
       "package": "bslib",
       "version": "0.12.0",
       "_row": "bslib"
@@ -146,19 +131,9 @@
       "_row": "coda"
     },
     {
-      "package": "collections",
-      "version": "0.3.12",
-      "_row": "collections"
-    },
-    {
       "package": "commonmark",
       "version": "2.0.0",
       "_row": "commonmark"
-    },
-    {
-      "package": "conflicted",
-      "version": "1.2.0",
-      "_row": "conflicted"
     },
     {
       "package": "contactdata",
@@ -174,11 +149,6 @@
       "package": "covr",
       "version": "3.6.5",
       "_row": "covr"
-    },
-    {
-      "package": "cpp11",
-      "version": "0.5.5",
-      "_row": "cpp11"
     },
     {
       "package": "crayon",
@@ -261,11 +231,6 @@
       "_row": "distributional"
     },
     {
-      "package": "docopt",
-      "version": "0.7.2",
-      "_row": "docopt"
-    },
-    {
       "package": "doParallel",
       "version": "1.0.17",
       "_row": "doParallel"
@@ -279,11 +244,6 @@
       "package": "dplyr",
       "version": "1.2.1",
       "_row": "dplyr"
-    },
-    {
-      "package": "dtplyr",
-      "version": "1.3.3",
-      "_row": "dtplyr"
     },
     {
       "package": "duckdb",
@@ -336,11 +296,6 @@
       "_row": "fontawesome"
     },
     {
-      "package": "forcats",
-      "version": "1.0.1",
-      "_row": "forcats"
-    },
-    {
       "package": "foreach",
       "version": "1.5.2",
       "_row": "foreach"
@@ -351,16 +306,6 @@
       "_row": "fs"
     },
     {
-      "package": "fst",
-      "version": "0.9.8",
-      "_row": "fst"
-    },
-    {
-      "package": "fstcore",
-      "version": "0.10.0",
-      "_row": "fstcore"
-    },
-    {
       "package": "future",
       "version": "1.80.0",
       "_row": "future"
@@ -369,11 +314,6 @@
       "package": "future.apply",
       "version": "1.21.0",
       "_row": "future.apply"
-    },
-    {
-      "package": "gargle",
-      "version": "1.6.1",
-      "_row": "gargle"
     },
     {
       "package": "generics",
@@ -431,16 +371,6 @@
       "_row": "glue"
     },
     {
-      "package": "googledrive",
-      "version": "2.1.2",
-      "_row": "googledrive"
-    },
-    {
-      "package": "googlesheets4",
-      "version": "1.1.2",
-      "_row": "googlesheets4"
-    },
-    {
       "package": "gridExtra",
       "version": "2.3.1",
       "_row": "gridExtra"
@@ -454,11 +384,6 @@
       "package": "gtable",
       "version": "0.3.6",
       "_row": "gtable"
-    },
-    {
-      "package": "haven",
-      "version": "2.5.5",
-      "_row": "haven"
     },
     {
       "package": "here",
@@ -486,11 +411,6 @@
       "_row": "htmlwidgets"
     },
     {
-      "package": "httpgd",
-      "version": "2.1.4",
-      "_row": "httpgd"
-    },
-    {
       "package": "httpuv",
       "version": "1.6.17",
       "_row": "httpuv"
@@ -511,9 +431,9 @@
       "_row": "hunspell"
     },
     {
-      "package": "ids",
-      "version": "1.0.1",
-      "_row": "ids"
+      "package": "igraph",
+      "version": "2.3.4",
+      "_row": "igraph"
     },
     {
       "package": "ini",
@@ -566,16 +486,6 @@
       "_row": "labeling"
     },
     {
-      "package": "Lahman",
-      "version": "14.0-0",
-      "_row": "Lahman"
-    },
-    {
-      "package": "languageserver",
-      "version": "0.3.20",
-      "_row": "languageserver"
-    },
-    {
       "package": "later",
       "version": "1.4.8",
       "_row": "later"
@@ -614,11 +524,6 @@
       "package": "litedown",
       "version": "0.11",
       "_row": "litedown"
-    },
-    {
-      "package": "littler",
-      "version": "0.3.23",
-      "_row": "littler"
     },
     {
       "package": "loo",
@@ -681,11 +586,6 @@
       "_row": "minqa"
     },
     {
-      "package": "modelr",
-      "version": "0.1.11",
-      "_row": "modelr"
-    },
-    {
       "package": "mvtnorm",
       "version": "1.4-2",
       "_row": "mvtnorm"
@@ -706,11 +606,6 @@
       "_row": "numDeriv"
     },
     {
-      "package": "nycflights13",
-      "version": "1.0.2",
-      "_row": "nycflights13"
-    },
-    {
       "package": "openssl",
       "version": "2.4.2",
       "_row": "openssl"
@@ -729,6 +624,11 @@
       "package": "pak",
       "version": "0.11.1",
       "_row": "pak"
+    },
+    {
+      "package": "pak",
+      "version": "0.11.1",
+      "_row": "pak.1"
     },
     {
       "package": "parallelly",
@@ -936,16 +836,6 @@
       "_row": "rematch"
     },
     {
-      "package": "rematch2",
-      "version": "2.1.2",
-      "_row": "rematch2"
-    },
-    {
-      "package": "reprex",
-      "version": "2.1.1",
-      "_row": "reprex"
-    },
-    {
       "package": "reshape2",
       "version": "1.4.5",
       "_row": "reshape2"
@@ -959,11 +849,6 @@
       "package": "rlang",
       "version": "1.3.0",
       "_row": "rlang"
-    },
-    {
-      "package": "RMariaDB",
-      "version": "1.3.5",
-      "_row": "RMariaDB"
     },
     {
       "package": "rmarkdown",
@@ -984,11 +869,6 @@
       "package": "roxygen2",
       "version": "8.1.1",
       "_row": "roxygen2"
-    },
-    {
-      "package": "RPostgres",
-      "version": "1.4.10",
-      "_row": "RPostgres"
     },
     {
       "package": "rprojroot",
@@ -1021,11 +901,6 @@
       "_row": "rversions"
     },
     {
-      "package": "rvest",
-      "version": "1.0.5",
-      "_row": "rvest"
-    },
-    {
       "package": "s2",
       "version": "1.1.13",
       "_row": "s2"
@@ -1049,11 +924,6 @@
       "package": "SCDB",
       "version": "0.6.2",
       "_row": "SCDB"
-    },
-    {
-      "package": "selectr",
-      "version": "0.8-0",
-      "_row": "selectr"
     },
     {
       "package": "sessioninfo",
@@ -1151,11 +1021,6 @@
       "_row": "tidyselect"
     },
     {
-      "package": "tidyverse",
-      "version": "2.0.0",
-      "_row": "tidyverse"
-    },
-    {
       "package": "timechange",
       "version": "0.4.0",
       "_row": "timechange"
@@ -1176,11 +1041,6 @@
       "_row": "ucminf"
     },
     {
-      "package": "unigd",
-      "version": "0.2.0",
-      "_row": "unigd"
-    },
-    {
       "package": "units",
       "version": "1.0-1",
       "_row": "units"
@@ -1199,11 +1059,6 @@
       "package": "utf8",
       "version": "1.2.6",
       "_row": "utf8"
-    },
-    {
-      "package": "uuid",
-      "version": "1.2-2",
-      "_row": "uuid"
     },
     {
       "package": "V8",
