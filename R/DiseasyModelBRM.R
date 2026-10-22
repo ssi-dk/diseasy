@@ -194,21 +194,28 @@ DiseasyModelB0 <- R6::R6Class(                                                  
   public = list(
     #' @param ...
     #'   parameters sent to `DiseasyModelB_` [R6][R6::R6Class] constructor
+    #' @param parameters `r rd_diseasymodelregression_parameters`
     #' @return
     #'   A new instance of the `DiseasyModelB0` [R6][R6::R6Class] class.
-    initialize = function(...) {
+    initialize = function(parameters = NULL, ...) {
       super$initialize(
         label = "b0",
-        parameters = list(
-          "training_length" = c("training" = 7, "testing" = 0, "validation" = 0)
-        ),
+        parameters = parameters,
         ...
       )
     }
   ),
 
   private = list(
-    .formula = "{observable} ~ 1"   # "{observable}" will be replaced by the observable at runtime
+    .formula = "{observable} ~ 1",   # "{observable}" will be replaced by the observable at runtime
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list("training_length" = c("training" = 7, "testing" = 0, "validation" = 0)),
+        keep.null = TRUE
+      )
+    }
   )
 )
 
@@ -221,20 +228,27 @@ DiseasyModelB1 <- R6::R6Class(                                                  
   public = list(
     #' @param ...
     #'   parameters sent to `DiseasyModelB_` [R6][R6::R6Class] constructor
+    #' @param parameters `r rd_diseasymodelregression_parameters`
     #' @return
     #'   A new instance of the `DiseasyModelB1` [R6][R6::R6Class] class.
-    initialize = function(...) {
+    initialize = function(parameters = NULL, ...) {
       super$initialize(
         label = "b1",
-        parameters = list(
-          "training_length" = c("training" = 7, "testing" = 0, "validation" = 0)
-        ),
+        parameters = parameters,
         ...
       )
     }
   ),
 
   private = list(
-    .formula = "{observable} ~ t"   # "{observable}" will be replaced by the observable at runtime
+    .formula = "{observable} ~ t",   # "{observable}" will be replaced by the observable at runtime
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list("training_length" = c("training" = 21, "testing" = 0, "validation" = 0)),
+        keep.null = TRUE
+      )
+    }
   )
 )

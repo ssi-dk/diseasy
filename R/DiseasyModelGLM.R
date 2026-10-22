@@ -19,7 +19,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
       modifyList(
         super$default_parameters(), # Obtain parameters from the superclasses
         # Overwrite with model-specific parameters
-        list("seed" = 0, "n_realizations" = 100),
+        list("seed" = 0, "n_realisations" = 100),
         keep.null = TRUE
       )
     },
@@ -58,7 +58,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
       checkmate::assert_tibble(new_data, add = coll)
       checkmate::assert_true(nrow(new_data) > 0, add = coll)
       checkmate::assert_number(quantiles, null.ok = TRUE, add = coll)
-      checkmate::assert_number(self$parameters$n_realizations, add = coll)
+      checkmate::assert_number(self$parameters$n_realisations, add = coll)
       checkmate::reportAssertions(coll)
 
       glm_predict <- stats::predict(regression_fit, newdata = new_data, type = "link", se.fit = TRUE)
@@ -66,7 +66,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
       # Draw samples if quantiles is not given
       if (is.null(quantiles)) {
         withr::local_seed(seed = self$parameters$seed)
-        glm_samples <- seq(self$parameters$n_realizations) |>
+        glm_samples <- seq(self$parameters$n_realisations) |>
           purrr::map(
             ~ {
               new_data |>
@@ -151,21 +151,28 @@ DiseasyModelG0 <- R6::R6Class(                                                  
   public = list(
     #' @param ...
     #'   parameters sent to `DiseasyModelG_` [R6][R6::R6Class] constructor
+    #' @param parameters `r rd_diseasymodelregression_parameters`
     #' @return
     #'   A new instance of the `DiseasyModelG1` [R6][R6::R6Class] class.
-    initialize = function(...) {
+    initialize = function(parameters = NULL, ...) {
       super$initialize(
         label = "g0",
-        parameters = list(
-          "training_length" = c("training" = 7, "testing" = 0, "validation" = 0)
-        ),
+        parameters = parameters,
         ...
       )
     }
   ),
 
   private = list(
-    .formula = "{observable} ~ 1"   # "{observable}" will be replaced by the observable at runtime
+    .formula = "{observable} ~ 1",   # "{observable}" will be replaced by the observable at runtime
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list("training_length" = c("training" = 7, "testing" = 0, "validation" = 0)),
+        keep.null = TRUE
+      )
+    }
   )
 )
 
@@ -178,20 +185,27 @@ DiseasyModelG1 <- R6::R6Class(                                                  
   public = list(
     #' @param ...
     #'   parameters sent to `DiseasyModelG_` [R6][R6::R6Class] constructor
+    #' @param parameters `r rd_diseasymodelregression_parameters`
     #' @return
     #'   A new instance of the `DiseasyModelG1` [R6][R6::R6Class] class.
-    initialize = function(...) {
+    initialize = function(parameters = NULL, ...) {
       super$initialize(
         label = "g1",
-        parameters = list(
-          "training_length" = c("training" = 21, "testing" = 0, "validation" = 0)
-        ),
+        parameters = parameters,
         ...
       )
     }
   ),
 
   private = list(
-    .formula = "{observable} ~ t"   # "{observable}" will be replaced by the observable at runtime
+    .formula = "{observable} ~ t",   # "{observable}" will be replaced by the observable at runtime
+    default_parameters = function() {
+      modifyList(
+        super$default_parameters(), # Obtain parameters from the superclasses
+        # Overwrite with model-specific parameters
+        list("training_length" = c("training" = 21, "testing" = 0, "validation" = 0)),
+        keep.null = TRUE
+      )
+    }
   )
 )

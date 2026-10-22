@@ -169,6 +169,10 @@ Parameters controlling the dynamics of the model:
 \item \code{overall_infection_risk} (\code{numeric(1)})\cr
 A scalar that scales contact rates to infection rates.
 \item \code{disease_progression_rates} (\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.
+\item \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.
+If \code{NULL} (default), the default value of the season module is used.
+\item \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).
+If \code{NULL} (default), the default value of the season module is used.
 }
 
 Parameters controlling initialisation routines
@@ -193,7 +197,7 @@ Arguments passed to \code{?DiseasyImmunity$approximate_compartmental()}
 Additional parameters are:
 \itemize{
 \item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
-\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.  * \code{model_rate_to_observable} (\verb{named list}(\verb{named list}(\code{function}(2))))\cr   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a \code{map} and \code{reduce} function contained in a list (the first nested list).   The \code{map} function is applied in a \code{dplyr::group_map()} call and should take two arguments:   - The first argument contains the model \code{rate} and information about group size: \code{proportion} and \code{population}.   - The second argument contains the groups (stratification).   The \code{reduce} function is applied in a \code{dplyr::summarise()} call to summarise across stratification levels.   By default, the \code{sum} function is used and will work for all counting observables.
+\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.\cr * \code{model_rate_to_observable} (\verb{named list}(\verb{named list}(\code{function}(2))))\cr   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a \code{map} and \code{reduce} function contained in a list (the first nested list).   The \code{map} function is applied in a \code{dplyr::group_map()} call and should take two arguments:   - The first argument contains the model \code{rate} and information about group size: \code{proportion} and \code{population}.   - The second argument contains the groups (stratification).   The \code{reduce} function is applied in a \code{dplyr::summarise()} call to summarise across stratification levels.   By default, the \code{sum} function is used and will work for all counting observables.
 }}
       \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
     }
