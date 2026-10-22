@@ -1,9 +1,9 @@
 for (noise_model in c("poisson", "negative binomial")) {
-  for (stratification in list(NULL, rlang::quo(sex))) {
+  for (stratification in list(NULL, rlang::quos(sex))) {
     test_that(
       glue::glue(
         "`$compute_likelihood()` works with {noise_model} noise model ",
-        "for stratification = {rlang::quo_text(rlang::quo(sex))}"
+        "for stratification = {rlang::as_label(stratification[[1]])}"
       ),
       {
         skip_if_not_installed("duckdb")
@@ -28,7 +28,11 @@ for (noise_model in c("poisson", "negative binomial")) {
           scoring = scoring
         )
 
-        trajectories <- model$get_results(observable = "n_admission", prediction_length = 10)
+        trajectories <- model$get_results(
+          observable = "n_admission",
+          stratification = stratification,
+          prediction_length = 10
+        )
 
         # The scoring of the model trajectories are done with the "$compute_likelihood()" method:
         output <- expect_no_error(model$scoring$compute_likelihood(trajectories))
