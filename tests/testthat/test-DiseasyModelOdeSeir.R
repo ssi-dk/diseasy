@@ -133,6 +133,38 @@ test_that("$hash works", {
 })
 
 
+test_that("NA parameters (marked for optimisation) allowed", {
+  skip_if_not_installed("RSQLite")
+
+  # We should be able to create a model with NA parameters
+  model <- expect_no_error(
+    DiseasyModelOdeSeir$new(
+      observables = DiseasyObservables$new(
+        conn = \() DBI::dbConnect(RSQLite::SQLite()),
+        last_queryable_date = as.Date("2020-01-01")
+      ),
+      parameters = list(
+        "disease_progression_rates" = c("E" = NA, "I" = 1)
+      )
+    )
+  )
+
+  # Parameters should be NA after initialisation
+  expect_identical(
+    model %.% parameters %.% disease_progression_rates %.% E,
+    NA_real_
+  )
+
+  # ... but we should not be able to prepare the right hand side
+  expect_error(
+    model$prepare_rhs(),
+    regex = "The following parameters are marked for optimisation but not initaliased"
+  )
+
+  rm(model)
+})
+
+
 test_that("active binding: malthusian_scaling_factor works", {
   skip_if_not_installed("RSQLite")
 
