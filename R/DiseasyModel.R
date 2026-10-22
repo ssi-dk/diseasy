@@ -178,23 +178,24 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @param validate (`logical(1)`)\cr
     #'   Should the parameters be validated after updating?
     #' @return `r rd_side_effects`
-    update_parameters = function(parameters, validate = TRUE) {
+    update_parameters = function(parameters, current_parameters = self$parameters, validate = TRUE) {
+
+      # Use default parameters if missing
+      current_parameters <- purrr::pluck(current_parameters, .default = private %.% default_parameters())
 
       if (validate) {
         checkmate::assert_list(parameters, null.ok = TRUE)
         if (!is.null(parameters)) {
           checkmate::assert_names(names(parameters),
-            subset.of = names(private %.% default_parameters()),
+            subset.of = names(current_parameters),
             type = "unique"
           )
         }
       }
 
       # Update the existing parameters with the new parameters
-      default_parameters <- private %.% default_parameters()
-
       updated_parameters <- modifyList(
-        default_parameters,
+        current_parameters,
         purrr::pluck(parameters, .default = list()),
         keep.null = TRUE
       )
@@ -203,7 +204,7 @@ DiseasyModel <- R6::R6Class(                                                    
       parameters_to_fit <- names(purrr::keep(parameters, anyNA))
       for (parameter_id in seq_along(parameters_to_fit)) {
         parameter <- parameters_to_fit[parameter_id]
-        default <- default_parameters[[parameter]]
+        default <- current_parameters[[parameter]]
         attr(updated_parameters[[parameter]], "default") <- default
       }
 
@@ -353,6 +354,101 @@ DiseasyModel <- R6::R6Class(                                                    
         )
 
       return(data)
+    },
+
+
+    #' @description
+    #'   Estimate free parameters (`NA`) for `diseasy` models.
+    #' @param observable `r rd_observable()`
+    #' @param stratification `r rd_stratification()`
+    #' @examplesIf rlang::is_installed("duckdb")
+    #'   # Generate model to fit
+    #'   observables <- DiseasyObservables$new(
+    #'       diseasystore = DiseasystoreSeirExample,
+    #'       conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+    #'   )
+    #'   observables$set_last_queryable_date(as.Date("2020-03-01"))
+    #'
+    #'   observables$define_synthetic_observable(
+    #'     "incidence",
+    #'     \(n_infected, n_population) n_infected / n_population
+    #'   )
+    #'
+    #'   season <- DiseasySeason$new(reference_date = Sys.Date())
+    #'   season$use_covid_season_v1()
+    #'
+    #'   model <- generate_example_seir_model(
+    #'     module_overrides = list(
+    #'       "observables" = observables,
+    #'       "season" = season
+    #'     ),
+    #'     parameter_overrides = list(
+    #'       "season.scale" = NA, # Mark for optimisation,
+    #'       "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    #'     )
+    #'   )
+    #'
+    #'
+    #'   # Estimate free parameters
+    #'   model$fit(observable = "n_infected")
+    #'
+    #'   # Show estimated parameters
+    #'   model$parameters$season.scale
+    #' @return `r rd_side_effects`
+    fit = function(observable, stratification = NULL, ...) {
+      checkmate::assert_number(self %.% parameters %.% training_length %.% testing, lower = 1)
+
+      # Determine parameters that need fitting
+      parameters_to_fit <- purrr::keep(self %.% parameters, anyNA)
+
+      # Extract initial guess
+      p0 <- purrr::map_dbl(parameters_to_fit, ~ attr(., "default"))
+
+      if (length(p0) == 0) {
+        message("No free parameters to optimise!")
+        return(invisible(NULL))
+      }
+
+      # Define the objective function
+      objective_function <- \(p) {
+
+        # Update parameters
+        tryCatch(
+          self$update_parameters(as.list(p)),
+          error = function(e) {
+            return(1e4)
+          }
+        )
+
+        # Compute new trajectories
+        trajectories <- self$get_results(
+          observable = observable,
+          stratification = stratification,
+          prediction_length = self %.% parameters %.% training_length %.% testing
+        )
+
+        # Score by likelihood
+        scored_trajectories <- self$scoring$compute_likelihood(trajectories)
+
+        # Take (weighted) average across realisations (if any)
+        loss <- stats::weighted.mean(
+          x = scored_trajectories$negative_log_likelihood,
+          w = scored_trajectories$weight
+        )
+
+        return(loss)
+      }
+
+      # Run optimisation
+      res <- ucminf::ucminf(
+        par = p0,
+        fn = objective_function
+      )
+
+      # Apply optimised parameters to the model
+      self %.% update_parameters(parameters = as.list(res$par))
+
+      return(invisible(NULL))
     }
   ),
 

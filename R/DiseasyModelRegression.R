@@ -87,7 +87,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_true(!is.null(self %.% observables), add = coll)
       checkmate::assert_choice(observable, self %.% observables %.% available_observables, add = coll)
-      checkmate::assert_number(prediction_length, add = coll)
+      checkmate::assert_number(prediction_length, lower = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Cast prediction_length to integer
@@ -392,18 +392,18 @@ DiseasyModelRegression <- R6::R6Class(                                          
     # @details
     #   Sub-classes implement additional validation checks
     # @return `r rd_side_effects()`
-    validate_parameters = function() {
+    validate_parameters = function(parameters) {
       coll <- checkmate::makeAssertCollection()
 
-      checkmate::assert_numeric(self %.% parameters %.% season.scale, lower = 0, upper = 1, null.ok = TRUE, add = coll)
-      checkmate::assert_numeric(self %.% parameters %.% season.peak, null.ok = TRUE, add = coll)
-      if (!is.null(self %.% parameters %.% season.scale)) {
+      checkmate::assert_numeric(parameters %.% season.scale, lower = 0, upper = 1, null.ok = TRUE, add = coll)
+      checkmate::assert_numeric(parameters %.% season.peak, null.ok = TRUE, add = coll)
+      if (!is.null(parameters %.% season.scale)) {
         checkmate::assert_class(self %.% season, "DiseasySeason", add = coll)
       }
 
       checkmate::reportAssertions(coll)
 
-      super$validate_parameters() # Validate inherited parameters
+      super$validate_parameters(parameters) # Validate inherited parameters
     },
 
     fit_regression = function(data, formula) {

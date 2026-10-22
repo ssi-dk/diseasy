@@ -86,8 +86,8 @@ DiseasyScoring <- R6::R6Class(                                                  
 
         noise_model <- \(observations, model_expectation) {
           stats::dpois(
-            x = observations,
-            lambda = model_expectation,
+            x = round(observations),
+            lambda = round(model_expectation),
             log = TRUE
           )
         }

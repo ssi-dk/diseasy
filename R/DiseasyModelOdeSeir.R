@@ -1555,7 +1555,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       coll <- checkmate::makeAssertCollection()
       # Validate the structural parameters
       checkmate::assert_integer(
-        self %.% parameters %.% compartment_structure,
+        parameters %.% compartment_structure,
         lower = 0,
         any.missing = FALSE, # Fixed
         add = coll
@@ -1571,14 +1571,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Validate the dynamical parameters
       checkmate::assert_number(
-        self %.% parameters %.% overall_infection_risk,
+        parameters %.% overall_infection_risk,
         lower = 0,
         na.ok = TRUE, # Optimisable
         add = coll
       )
 
       checkmate::assert_numeric(
-        self %.% parameters %.% disease_progression_rates,
+        parameters %.% disease_progression_rates,
         lower = 0,
         any.missing = TRUE, # Optimisable
         add = coll
@@ -1591,15 +1591,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       checkmate::assert_number(
-        self %.% parameters %.% season.scale,
+        parameters %.% season.scale,
         lower = 0,
         upper = 1,
+        na.ok = TRUE, # Can be optimised
         null.ok = TRUE, # Can use default value from module
         add = coll
       )
 
       checkmate::assert_number(
-        self %.% parameters %.% season.peak,
+        parameters %.% season.peak,
+        na.ok = TRUE, # Can be optimised
         null.ok = TRUE, # Can use default value from module
         add = coll
       )
