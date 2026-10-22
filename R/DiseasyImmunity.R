@@ -722,7 +722,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           if (!all(is.finite(delta)) || purrr::some(gamma, \(x) !all(is.finite(x)))) {
             return(
               list(
-                "metrics" = c("value" = 1 / .Machine$double.eps, "penalty" = 0),
+                "metrics" = c("error" = 1 / .Machine$double.eps, "penalty" = 0),
                 "delta" = delta,
                 "delta_mapping" = delta_mapping,
                 "gamma_mapping" = gamma_mapping,
@@ -751,22 +751,26 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Contribution from residuals
               residual <- approximation - target_values[[model_id]]
               squared_error <- sum(integration_weight * residual^2)
-              value <- sqrt(max(0, squared_error))
+              error <- sqrt(max(0, squared_error))
 
               # Smoothly penalise non-monotone solutions.
               monotonicity <- monotonicity_penalty(model_gamma)
-              penalty <- monotonicity$value
 
-              # Penalise spread of gamma and delta.
+              # Penalise spread of gamma
               gamma_eq <- seq(from = self$model[[model_id]](0), to = model_gamma[M], length.out = M)
               gamma_difference <- model_gamma - gamma_eq
               gamma_penalty <- ifelse(length(model_gamma) > 1, stats::sd(gamma_difference), 0)
-              delta_penalty <- ifelse(length(delta) > 1, stats::sd(delta), 0)
-              penalty <- penalty + individual_level * (gamma_penalty + delta_penalty)
+
+
+              # Name source of penalties
+              penalty <- stats::setNames(
+                c(monotonicity$value, individual_level * gamma_penalty),
+                paste(names(self$model)[[model_id]], c("gamma monotonicity", "gamma spread"), sep = "/")                # nolint: paste_linter
+              )
 
               return(
                 list(
-                  "value" = value,
+                  "error" = error,
                   "penalty" = penalty,
                   "gamma" = model_gamma,
                   "gamma_difference" = gamma_difference,
@@ -777,10 +781,19 @@ DiseasyImmunity <- R6::R6Class(                                                 
             }
           )
 
+          # Compute the delta penalty
+          delta_penalty <- ifelse(length(delta) > 1, individual_level * stats::sd(delta), 0)
+
           # Summarise main metrics over target functions
-          metrics <- c(
-            "value" = sum(purrr::map_dbl(target_contributions, "value")),
-            "penalty" = sum(purrr::map_dbl(target_contributions, "penalty"))
+          metrics <- list(
+            "error" = stats::setNames(
+              purrr::map_dbl(target_contributions, "error"),
+              names(self$model)
+            ),
+            "penalty" = c(
+              "delta spread" = delta_penalty,
+              purrr::reduce(purrr::map(target_contributions, "penalty"), c)
+            )
           )
 
           return(
@@ -823,7 +836,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # And a second helper which reduces these metrics to a single sum
         # that can be passed to the optimisers
         objective_function <- function(par) {
-          return(sum(get_metrics(par)))
+          return(sum(unlist(get_metrics(par))))
         }
 
 
@@ -831,10 +844,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # the optimisers. The gradients with respect to the gamma parameters
         # is simple, since the objective function is largely linear with the
         # gamma parameters. However, the gradient with respect to delta parameters
-        # is more complex.
+        # is more complex and depends on the chosen method.
+        # For "free_gamma", we can use a simple implementation which assumes
+        # Erlang distribution, while for "free_delta" and "all_free" we need a
+        # more complex Frechet derivative approach to solve the Hypoexponential distribution
 
-        # Compute the derivative of the summed fit error with respect to the
-        # delta rates using the adjoint Frechet derivative.
+        # Compute the gradient with respect to the delta rates using the adjoint Frechet derivative
         delta_gradient_frechet <- function(evaluation) {
 
           # The gradients we want to compute are da(t)/ddelta_i
@@ -904,14 +919,14 @@ DiseasyImmunity <- R6::R6Class(                                                 
               model_evaluation <- evaluation$model[[model_id]]
 
               # L = sqrt(sum(w * r^2)) has a singular derivative at L = 0.
-              if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
+              if (model_evaluation$error <= sqrt(.Machine$double.eps)) {
                 next
               }
 
               gamma_weight <- gamma_weight +
                 integration_weight[[time_id]] *
                   model_evaluation$residual[[time_id]] /
-                  model_evaluation$value *
+                  model_evaluation$error *
                   model_evaluation$gamma
             }
 
@@ -944,6 +959,47 @@ DiseasyImmunity <- R6::R6Class(                                                 
           delta_gradient <-
             generator_gradient[cbind(transition_indices, transition_indices + 1)] -
             generator_gradient[cbind(transition_indices, transition_indices)]
+
+          return(delta_gradient)
+        }
+
+        # Compute the derivative with respect to delta rates assuming Erlang distirbution
+        delta_gradient_erlang <- function(evaluation) {
+
+          # The gradients we want to compute are da(t)/ddelta_i
+          # where a is the approximation:
+          # a(t) = sum_{m=1}^M q_m(t; delta) gamma_m
+          # and x is our optimisation domain and q_m(t) is the occupancy function
+          # for the m'th compartment
+
+          # In the Erlang assumption, the occupancy proabilities are:
+          # q_1(t; delta) = exp(-delta * t)
+          # q_m(t; delta) = q_{m-1}(t; delta) * (t * delta) ^ (m - 1) / (m - 1) (for m < M)
+          # q_M(t; delta) = 1 - sum_m^(M-1) q_m(t; delta)
+
+          # Which means the gradient of a(t) with respect to delta can be expressed as:
+          # da(t)/ddelta = t * sum_{m=1}^{M-1} q_m(t; delta) * (gamma_{m+1} - gamma_m)
+
+          delta_gradient <- 0
+
+          # Get the contribution from each model
+          for (model_id in seq_along(self$model)) {
+
+            model_evaluation <- evaluation$model[[model_id]]
+
+            # L = sqrt(sum(w * r^2)) has a singular derivative at L = 0.
+            if (model_evaluation$error <= sqrt(.Machine$double.eps)) {
+              next
+            }
+
+            gamma_difference <- diff(model_evaluation$gamma)
+
+            approximation_gradient <- integration_time * # t
+              drop(evaluation$occupancy[, seq_len(M - 1), drop = FALSE] %*% gamma_difference)
+
+            delta_gradient <- delta_gradient +
+              sum(integration_weight * model_evaluation$residual * approximation_gradient) / model_evaluation$error
+          }
 
           return(delta_gradient)
         }
@@ -982,7 +1038,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             #             = sum(w_t * r(t) * q_m(t; delta)) / L                                                         # nolint end: commented_code_linter
             gamma_jacobian <- evaluation$gamma_mapping[[model_id]]$jacobian
 
-            if (model_evaluation$value <= sqrt(.Machine$double.eps)) {
+            if (model_evaluation$error <= sqrt(.Machine$double.eps)) {
               # Gradient is divergent near zero
               gamma_value_gradient <- numeric(M)
             } else {
@@ -991,7 +1047,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                   evaluation$occupancy, # q_m(t)                                                                        # nolint: commented_code_linter
                   integration_weight * model_evaluation$residual # w_t * r(t)                                           # nolint: commented_code_linter
                 )
-              ) / model_evaluation$value # L
+              ) / model_evaluation$error # L
             }
 
             # Then we continue with the gradient of the individual-level gamma penalty
@@ -1024,12 +1080,22 @@ DiseasyImmunity <- R6::R6Class(                                                 
             gradient <- gradient + drop(crossprod(gamma_jacobian, gamma_rate_gradient))
           }
 
-          # Our helper function provides the gradients with respect to delta
-          delta_rate_gradient <- delta_gradient_frechet(evaluation) # dL/ddelta                                         # nolint: commented_code_linter
 
-          # Convert changes in delta to changes in optimisation parameter (p domain)
-          # via the jacobian
-          gradient <- gradient + drop(crossprod(evaluation$delta_mapping$jacobian, delta_rate_gradient))
+          # The gradient with respect to delta depends on the chosen method.
+          if (method == "free_gamma") {
+
+            gradient[[n_free_parameters]] <- gradient[[n_free_parameters]] +
+              dp_0inf(par[[n_free_parameters]]) * delta_gradient_erlang(evaluation)
+
+          } else {
+
+            delta_rate_gradient <- delta_gradient_frechet(evaluation) # dL/ddelta                                       # nolint: commented_code_linter
+
+            # Convert changes in delta to changes in optimisation parameter (p domain) via the jacobian
+            gradient <- gradient + drop(crossprod(evaluation$delta_mapping$jacobian, delta_rate_gradient))
+
+          }
+
 
           # Analytically differentiate the delta spread penalty.
           # This follows the same steps as we did above for the gamma spread panalty
@@ -1041,8 +1107,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               centred_delta <- evaluation$delta - mean(evaluation$delta)
               delta_penalty_rate_gradient <- centred_delta / ((length(evaluation$delta) - 1) * delta_sd)
               gradient <- gradient +
-                length(self$model) *
-                  individual_level *
+                individual_level *
                   drop(
                     crossprod(
                       evaluation$delta_mapping$jacobian,
@@ -1072,7 +1137,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
           metrics <- get_metrics(par)
 
           res <- list(
-            "value" = sum(metrics),
+            "value" = sum(unlist(metrics)),
+            "error" = metrics %.% error,
             "message" = "No free parameters to optimise"
           )
 
@@ -1471,6 +1537,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         }
 
 
+
         # For the recursive and combination strategies, we need to add the execution time from the previous
         # optimisations
         if (M == 1) {
@@ -1514,7 +1581,12 @@ DiseasyImmunity <- R6::R6Class(                                                 
         # Remove attributes added by optimisers
         res_no_attributes <- list() |>
           utils::modifyList(res) |>
-          utils::modifyList(list("value" = as.numeric(res$value)))
+          utils::modifyList(
+            list(
+              "value" = as.numeric(res$value),
+              "par" = as.numeric(res$par)
+            )
+          )
 
         # Store in cache
         private$cache(
@@ -1527,10 +1599,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
               "method" = method,
               "strategy" = strategy,
               "M" = M,
-              "error" = purrr::pluck(metrics, "value"),
-              "penalty" = purrr::pluck(metrics, "penalty"),
+              "error" = metrics %.% error,
+              "penalty" = metrics %.% penalty,
               "execution_time" = lubridate::as.period(Sys.time() - tic) + lubridate::seconds(execution_time_offset)
-            )
+            ),
+            keep.null = TRUE
           )
         )
       }
