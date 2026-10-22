@@ -209,11 +209,15 @@ DiseasyModel <- R6::R6Class(                                                    
       # Set the scale of the season if needed or backpropagate the default value to the model parameters
       if (!is.null(self %.% season)) {
 
+        # Get parameters from the season model
+        dots <- purrr::pluck(self, "season", "model_t", attributes, "dots")
+
         # Store default scale in model if not given
         if ("season.scale" %in% names(updated_parameters)) {
-          default <- purrr::pluck(self, "season", "model_t", attributes, "dots", "scale")
+          default <- purrr::pluck(dots, "scale")
 
-          if (is.null(updated_parameters %.% season.scale)) { # Backpropagate default value to model
+          # Backpropagate default value to model or convert NA to NULL if argument is not in season model
+          if (is.null(updated_parameters %.% season.scale) || !("scale" %in% names(dots))) {
             updated_parameters <- utils::modifyList(
               updated_parameters,
               list("season.scale" = default),
@@ -227,9 +231,10 @@ DiseasyModel <- R6::R6Class(                                                    
 
         # Store default peak in model if not given
         if ("season.peak" %in% names(updated_parameters)) {
-          default <- purrr::pluck(self, "season", "model_t", attributes, "dots", "peak")
+          default <- purrr::pluck(dots, "peak")
 
-          if (is.null(updated_parameters %.% season.peak)) { # Backpropagate default value to model
+          # Backpropagate default value to model or convert NA to NULL if argument is not in season model
+          if (is.null(updated_parameters %.% season.peak) || !("peak" %in% names(dots))) {
             updated_parameters <- utils::modifyList(
               updated_parameters,
               list("season.peak" = default),
@@ -255,10 +260,13 @@ DiseasyModel <- R6::R6Class(                                                    
           )
         )
 
-        self$season$use_season_model(
-          model_name = purrr::pluck(self, "season", "model_t", attributes, "name"),
-          dots = if (length(dots) == 0) NULL else dots
-        )
+        # All variables should be initialiased before sending to season module
+        if (!anyNA(dots)) {
+          self$season$use_season_model(
+            model_name = purrr::pluck(self, "season", "model_t", attributes, "name"),
+            dots = if (length(dots) == 0) NULL else dots
+          )
+        }
       }
     },
 
