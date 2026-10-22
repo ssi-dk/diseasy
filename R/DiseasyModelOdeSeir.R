@@ -123,7 +123,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'     Arguments passed to `?DiseasyImmunity$approximate_compartmental()`
     #'
     #'   Additional parameters are:
-    #'   `r rd_diseasymodel_parameters`
+    #'   `r rd_diseasymodel_common_parameters`
     #'   `r rd_diseasymodelode_parameters`
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
@@ -1546,10 +1546,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # @description
     #   Assert parameters conform to the expected format
+    # @param parameters (`named list()`)\cr
+    #   The complete set of parameters to validate.
     # @details
     #   Sub-classes implement additional validation checks
-    # @return `r rd_side_effects()`
-    validate_parameters = function() {
+    # @return `NULL` (called for side-effects)
+    validate_parameters = function(parameters) {
       coll <- checkmate::makeAssertCollection()
       # Validate the structural parameters
       checkmate::assert_integer(
@@ -1559,13 +1561,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
       checkmate::assert_names(
-        names(self %.% parameters %.% compartment_structure),
+        names(parameters %.% compartment_structure),
         subset.of = c("E", "I", "R"),
         must.include = c("I", "R"),
         add = coll
       )
 
-      checkmate::assert_logical(self %.% parameters %.% malthusian_matching, add = coll)
+      checkmate::assert_logical(parameters %.% malthusian_matching, add = coll)
 
       # Validate the dynamical parameters
       checkmate::assert_number(
@@ -1582,7 +1584,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         add = coll
       )
       checkmate::assert_names(
-        names(self %.% parameters %.% disease_progression_rates),
+        names(parameters %.% disease_progression_rates),
         subset.of = c("E", "I"),
         must.include = "I",
         add = coll
@@ -1603,17 +1605,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Validate the incidence polynomial parameters
-      checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_order, lower = 0, add = coll)
-      checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_training_length, lower = 0, add = coll)
-      checkmate::assert_integerish(self %.% parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_polynomial_order, lower = 0, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_polynomial_training_length, lower = 0, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
 
       # Validate the functional modules parameters
-      checkmate::assert_numeric(self %.% parameters %.% activity.weights, lower = 0, len = 4, add = coll)
+      checkmate::assert_numeric(parameters %.% activity.weights, lower = 0, len = 4, add = coll)
 
 
       checkmate::reportAssertions(coll)
 
-      super$validate_parameters() # Validate inherited parameters
+      super$validate_parameters(parameters) # Validate inherited parameters
     },
 
     progression_flow_rates = NULL,

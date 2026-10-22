@@ -48,6 +48,7 @@ examples of how this can be done.
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>DiseasyModelRegression$get_results()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="initialize"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-initialize'><code>DiseasyModelRegression$initialize()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-plot'><code>DiseasyModelRegression$plot()</code></a></span></li>
@@ -83,11 +84,12 @@ examples of how this can be done.
     \item \href{#method-DiseasyModelG0-clone}{\code{DiseasyModelG0$clone()}}
   }
 }
-\if{html}{\out{<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>DiseasyModelRegression$get_results()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-plot'><code>DiseasyModelRegression$plot()</code></a></span></li>
 </ul>
@@ -104,7 +106,7 @@ examples of how this can be done.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Parameters controlling the dynamics of the model:\cr * \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If \code{NULL} (default), the default value of the season module is used.\cr\cr * \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).    If \code{NULL} (default), the default value of the season module is used.\cr\cr Additional parameters are: * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
+      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Parameters controlling the dynamics of the model:\cr * \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If \code{NULL} (default), the default value of the season module is used.\cr\cr * \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).    If \code{NULL} (default), the default value of the season module is used.\cr\cr Additional parameters are: (\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Each model has their own parameters.\cr\cr Common parameters are:\cr * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
       \item{\code{...}}{parameters sent to \code{DiseasyModelG_} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}
@@ -144,11 +146,12 @@ examples of how this can be done.
     \item \href{#method-DiseasyModelG1-clone}{\code{DiseasyModelG1$clone()}}
   }
 }
-\if{html}{\out{<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>DiseasyModelRegression$get_results()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="plot"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-plot'><code>DiseasyModelRegression$plot()</code></a></span></li>
 </ul>
@@ -165,7 +168,7 @@ examples of how this can be done.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Parameters controlling the dynamics of the model:\cr * \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If \code{NULL} (default), the default value of the season module is used.\cr\cr * \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).    If \code{NULL} (default), the default value of the season module is used.\cr\cr Additional parameters are: * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
+      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Parameters controlling the dynamics of the model:\cr * \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If \code{NULL} (default), the default value of the season module is used.\cr\cr * \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).    If \code{NULL} (default), the default value of the season module is used.\cr\cr Additional parameters are: (\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Each model has their own parameters.\cr\cr Common parameters are:\cr * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
       \item{\code{...}}{parameters sent to \code{DiseasyModelG_} \link[R6:R6Class]{R6} constructor}
     }
     \if{html}{\out{</div>}}

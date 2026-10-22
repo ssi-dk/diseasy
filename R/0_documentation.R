@@ -152,13 +152,6 @@ rd_target_schema <- function(type = "param") {
 }
 
 
-rd_diseasymodel_parameters <- paste(
-  "* `training_length` (`named numeric(3)`)\\cr",
-  "  The number of days that should be included in the training splits of the data for the model.",
-  "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
-)
-
-
 rd_start_date <- function(type = "param", minimum = FALSE) {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date`)\\cr",
@@ -326,6 +319,21 @@ rd_module <- paste(
   "(`R6::R6Class instance`)\\cr",
   "This instance is cloned to the field with the same name as the class of the module"
 )
+
+rd_diseasymodel_common_parameters <- paste(
+  "* `training_length` (`named numeric(3)`)\\cr",
+  "  The number of days that should be included in the training splits of the data for the model.",
+  "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
+)
+
+rd_diseasymodel_parameters <- paste(
+  "(`named list()`)\\cr",
+  "List of parameters to set for the model during initialization.\\cr\\cr",
+  "Each model has their own parameters.\\cr\\cr",
+  "Common parameters are:\\cr",
+  rd_diseasymodel_common_parameters
+)
+
 
 ## Templates for DiseasyModelOde
 rd_initialise_state_vector_description <- paste(
