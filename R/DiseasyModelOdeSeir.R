@@ -80,7 +80,7 @@
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template
 #' @export
-DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+DiseasyModelOdeSeir <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelOdeSeir",
   inherit = DiseasyModelOde,
 
@@ -231,21 +231,21 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # of the right-hand-side function in the ODE.
 
       # Store a short hand for the number of groups
-      private$n_age_groups <- length(self %.% population %.% age_cuts_lower)
+      private$n_population_groups <- nrow(self %.% population %.% groups)
       private$n_variants   <- max(length(self %.% variant %.% variants), 1)
       private$n_EIR_states <- sum(self %.% parameters %.% compartment_structure)
-      private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
+      private$n_states     <- private %.% n_population_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
       # We retrieve normalised matrices
       private$set_contact_matrix(
-        per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
+        mean_contact_rates = self %.% population %.% mean_contact_rates(
           weights = self %.% parameters %.% activity.weights
         )
       )
 
 
       # Store the indices of the first compartments for later RHS computation
-      private$e1_state_indices <- (seq_len(private %.% n_variants * private %.% n_age_groups) - 1) *
+      private$e1_state_indices <- (seq_len(private %.% n_variants * private %.% n_population_groups) - 1) *
         sum(compartment_structure) + 1
 
       # Then we store the indices for just the first infected compartment
@@ -262,8 +262,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # Store the indices of the susceptible states
-      private$s_state_indices <- seq_len(private %.% n_age_groups) +
-        sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
+      private$s_state_indices <- seq_len(private %.% n_population_groups) +
+        sum(compartment_structure) * private %.% n_population_groups * private %.% n_variants
 
 
       # Store the indices of the Recovered and susceptible compartments
@@ -275,7 +275,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # In RHS, we need a mapping from i_state_indices to the relative infection risk of the corresponding variant.
       private$indexed_variant_infection_risk <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
         purrr::map(
-          \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_age_groups)
+          \(variant) {
+            rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_population_groups)
+          }
         ) |>
         purrr::reduce(c)
 
@@ -287,10 +289,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # that element in the state_vector corresponds to.
       # The state vector is assumed to be ordered as follows:
       # [ [E, I, R]_age_group_1_variant_1, [E, I, R]_age_group_2_variant_1, ..., S ]
-      private$rs_age_group <- seq_len(private %.% n_age_groups) |> # Starting with the number of age groups
+      private$rs_age_group <- seq_len(private %.% n_population_groups) |> # Starting with the number of age groups
         purrr::map(~ rep(., purrr::pluck(compartment_structure, "R"))) |> # We repeat for each R state
         rep(private %.% n_variants) |> # And since we have multiple variants, this is repeated
-        purrr::reduce(c, .init = seq_len(private %.% n_age_groups), .dir = "backward") # Collapse and add the S states
+        purrr::reduce( # Collapse and add the S states
+          c,
+          .init = seq_len(private %.% n_population_groups),
+          .dir = "backward"
+        )
 
       # We now expand the previous map to also include an id for variant.
       # This map is used later in the RHS where we have a n x v matrix called BI_av, where n is the length of the
@@ -302,7 +308,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # age_group/variant combination.
       private$infection_matrix_to_rs_indices <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
         seq_along() |>
-        purrr::map(\(variant) (variant - 1) * private %.% n_age_groups + private %.% rs_age_group) |>
+        purrr::map(\(variant) (variant - 1) * private %.% n_population_groups + private %.% rs_age_group) |>
         purrr::reduce(c) |> # And collapse to 1d
         (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
 
@@ -364,7 +370,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           risks <- purrr::pluck(
             self %.% immunity, "model", output, attributes, "dots", "risks",
             .default = stats::setNames(
-              rep(1, private %.% n_age_groups),
+              rep(1, private %.% n_population_groups),
               diseasystore::age_labels(self %.% population %.% age_cuts_lower)
             )
           )
@@ -381,20 +387,20 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # DiseasyImmunity to line up with the corresponding part of the state_vector
           # and modify the gammas with the age-group-specific risks
           weights_infection_matrix <- purrr::map2(
-            .x = seq(from = 0, to = (private %.% n_age_groups) - 1),
+            .x = seq(from = 0, to = (private %.% n_population_groups) - 1),
             .y = risks,
             .f = \(offset, risk) {
               c(
                 rep(0, compartment_structure %.% R * offset),
                 rep(1, compartment_structure %.% R),
-                rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
+                rep(0, compartment_structure %.% R * ((private %.% n_population_groups - 1) - offset))
               ) * gammas * risk
             }
           ) |>
             purrr::map(~ rep(., private$n_variants)) |>
             purrr::map2(
-              .y = seq(from = 0, to = private %.% n_age_groups - 1),
-              ~ c(.x, risks * (.y == seq(from = 0, to = private %.% n_age_groups - 1)))
+              .y = seq(from = 0, to = private %.% n_population_groups - 1),
+              ~ c(.x, risks * (.y == seq(from = 0, to = private %.% n_population_groups - 1)))
             ) |>
             purrr::reduce(rbind)
 
@@ -440,8 +446,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # We now repeat for each track in the model to construct the full vector
       # and add rates for the S states at the end.
       private$progression_flow_rates <- c(
-        rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
-        rep(0, private %.% n_age_groups), # Add a zero for the S compartments
+        rep(progression_flow_rates, private %.% n_population_groups * private %.% n_variants),
+        rep(0, private %.% n_population_groups), # Add a zero for the S compartments
         rep(0, sum(length(self %.% model_outputs)))  # Zero-pad for each observable
       )
 
@@ -456,12 +462,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Account for cross-immunity
       immunity_matrix <- self %.% variant %.% cross_immunity |>
-        purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_age_groups)) |>
+        purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_population_groups)) |>
         purrr::reduce(c) |>
         matrix(ncol = private$n_variants) |>
         rbind(
           matrix(
-            rep(1, private %.% n_age_groups * private %.% n_variants),
+            rep(1, private %.% n_population_groups * private %.% n_variants),
             ncol = private %.% n_variants
           )
         )
@@ -486,7 +492,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       if (self %.% parameters %.% malthusian_matching) {
         private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
         private$set_contact_matrix(
-          per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
+          mean_contact_rates = self %.% population %.% mean_contact_rates(
             weights = self %.% parameters %.% activity.weights
           ),
           scaling_factor = self$malthusian_scaling_factor
@@ -665,8 +671,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Rescale to the number of infections relative to the full population
       incidence_data <- incidence_data |>
-        dplyr::left_join(
-          self %.% population %.% population,
+        dplyr::full_join(
+          self %.% population %.% model_population,
           by = names(self %.% population %.% groups)
         ) |>
         dplyr::mutate(
@@ -695,7 +701,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
         pkgcond::pkg_error(
           glue::glue(
-            "Missing `incidence_data` or `population_proportion` for {groups_w_missing_data}!"
+            "Missing `incidence_data` or `model_population` for {groups_w_missing_data}!"
           )
         )
       }
@@ -792,7 +798,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           E_k <- rev(as.numeric(M %*% ss) / (ri * cumprod(rep(re, K))))                                                 # nolint: object_name_linter
 
           # Compute I states from polynomial fit
-          I_star <- stats::predict(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+          I_star <- stats::predict(                                                                                     # nolint: object_name_linter, namespace_linter. We need to suppress namespace_linter until R-CMD-Check works with R6 fully
             incidence_poly_fits[[group_id]],
             newdata = data.frame(t = -(seq_len(L) - 1) / ri)
           )
@@ -896,6 +902,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         observables = self %.% observables,
         population = self %.% population,
         activity = self %.% activity,
+        regions = self %.% regions,
         variant = self %.% variant,
         season = self %.% season,
         immunity = self %.% immunity,
@@ -986,24 +993,24 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We also need some state index helpers for the forcing model
       # (Taken from $initialize())
-      i1_state_indices <- (seq_len(private %.% n_variants * private %.% n_age_groups) - 1) *
+      i1_state_indices <- (seq_len(private %.% n_variants * private %.% n_population_groups) - 1) *
         sum(compartment_structure) + 1
 
       r1_state_indices <- i1_state_indices + purrr::pluck(compartment_structure, "I")
 
-      s_state_indices <- seq_len(private %.% n_age_groups) +
-        sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
+      s_state_indices <- seq_len(private %.% n_population_groups) +
+        sum(compartment_structure) * private %.% n_population_groups * private %.% n_variants
 
       rs_state_indices <- r1_state_indices |>
         purrr::map(~ . + seq_len(purrr::pluck(compartment_structure, "R")) - 1) |>
         purrr::reduce(c, .init = s_state_indices, .dir = "backward")
 
       surveillance_indices <- unlist(private$surveillance_indices) -
-        private %.% n_age_groups * private %.% n_variants
+        private %.% n_population_groups * private %.% n_variants
 
 
-      c_state_vector_indicies <- private$surveillance_indices$state_vector -
-        private %.% n_age_groups * private %.% n_variants
+      c_state_vector_indices <- private$surveillance_indices$state_vector -
+        private %.% n_population_groups * private %.% n_variants
 
 
       # Use the interpolated signal as a forcing function for I1
@@ -1043,7 +1050,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
           # If the user has configured custom outputs, we need to add the forcing to these states as well
           if (!is.null(private$output_mapping$state_vector))  {
-            dy_dt[c_state_vector_indicies] <- dy_dt[c_state_vector_indicies] +
+            dy_dt[c_state_vector_indices] <- dy_dt[c_state_vector_indices] +
               rowSums(private$output_mapping$state_vector[, private$i1_state_indices, drop = FALSE] * s) / ri
           }
 
@@ -1054,8 +1061,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Run the simulation forward to estimate the R and S states
       y0 <- c(
-        rep(0, sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants), # EIR states
-        self %.% population %.% population_proportion, # S states
+        rep(0, sum(compartment_structure) * private %.% n_population_groups * private %.% n_variants), # EIR states
+        self %.% population %.% model_population %.% proportion, # S states
         rep(0, length(initialisation_submodel %.% model_outputs)) # Surveillance states
       )
 
@@ -1189,7 +1196,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         # Pull the full solution from the initialisation submodel for the surveillance_states
         # (These are located at the end of the state_vector)
         surveillance_indices <- private %.% n_states -
-          private %.% n_age_groups * private %.% n_variants + # Remember, we have 1 less I state in the submodel
+          private %.% n_population_groups * private %.% n_variants + # Remember, we have 1 less I state in the submodel
           seq_along(self %.% model_outputs)
 
         s <- sol[, c(1, surveillance_indices + 1)] # Extract solution for surveillance states
@@ -1253,7 +1260,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       infected <- private$infected_forcing(t, infected)
 
       # Reshape the infected vector to a matrix for later computation
-      infected <- matrix(infected, nrow = private$n_age_groups)
+      infected <- matrix(infected, nrow = private$n_population_groups)
 
 
       ## Step 2, determine their contacts with other age groups (beta * I)
@@ -1612,7 +1619,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     progression_flow_rates = NULL,
 
     # State counters
-    n_age_groups = NULL,
+    n_population_groups = NULL,
     n_variants   = NULL,
     n_EIR_states = NULL,
     n_states     = NULL,
@@ -1641,24 +1648,51 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # @description
     #  Configure the contact matrix helper in the model.
-    # @param per_capita_contact_matrices (`list`(`list`(`matrix`)))\cr
+    # @param mean_contact_rates (`list`(`list`(`matrix`)))\cr
     #   A `list` (named with dates signifying when contact matrix takes effect
     #   of `lists` of per-arena ("home", "school", "work", "other") contact matrices (`matrix`).
     # @param scaling_factor (`numeric(1)`)\cr
     #   The scaling factor to apply to the contact matrices.
     # @return `r rd_side_effects()`
-    set_contact_matrix = function(per_capita_contact_matrices, scaling_factor = 1) {
+    set_contact_matrix = function(mean_contact_rates, scaling_factor = 1) {
 
-      # Apply the scaling factor to the contact matrices
-      scaled_per_capita_contact_matrices <- purrr::map(per_capita_contact_matrices, ~ .x * scaling_factor)
+      # When converting the per-capita contact matrices to the ODE formulation,
+      # there is an important subtlety that we need to account for.
+      # The ODE equations in this model are made scale-free by expressing as
+      # proportions of the _total_ population. E.g. I = \tilde{I} / N where
+      # \tilde{I} are the total number of infectious individuals.
+
+      # This works well until we introduce regions to the model.
+      # In the dynamics, the force of infection contributed by source region x
+      # should be proportional to the regional prevalence: \tilde{I} / N_x.
+
+      # Since the model equations are expressed in terms of the total population
+      # we to scale contacts originating in region x by a scaling factor
+      # of N / N_x to account for this difference.
+      N_model <- self %.% population %.% model_population |>                                                            # nolint: object_name_linter
+        tidyr::unite("label", dplyr::all_of(colnames(self %.% population %.% groups)), sep = "/") |>
+        dplyr::select("label", "population") |>
+        tibble::deframe()
+
+      contact_matrices <- purrr::map(
+        mean_contact_rates,
+        \(matrix) {
+          sweep(
+            matrix * scaling_factor,
+            MARGIN = 2,
+            STATS = sum(N_model) / N_model,
+            FUN = "*"
+          )
+        }
+      )
 
       # The contact matrices are by date, so we need to convert so it is days relative to a specific date
       # (here: the end of the training period)
-      activity_matrix_changes <- as.Date(names(scaled_per_capita_contact_matrices)) -
+      activity_matrix_changes <- as.Date(names(contact_matrices)) -
         self %.% training_period %.% end
 
       # We can then create a switch that selects the correct contact matrix at the given point in time
-      contact_matrix_switch <- purrr::partial(switch, !!!scaled_per_capita_contact_matrices)
+      contact_matrix_switch <- purrr::partial(switch, !!!contact_matrices)
       private$contact_matrix <- \(t) contact_matrix_switch(sum(activity_matrix_changes <= t))
     },
 
@@ -1680,8 +1714,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       t = 0,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
       RS_states = c(                                                                                                    # nolint: object_name_linter
-        rep(0, private %.% n_age_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R),
-        self %.% population %.% population_proportion
+        rep(
+          0,
+          private %.% n_population_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R
+        ),
+        self %.% population %.% model_population %.% proportion
       )
     ) {
 
@@ -1708,8 +1745,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         rep(L * purrr::pluck(self %.% parameters %.% disease_progression_rates, "I", .default = 0), L)
       )
       transition_matrix <- diag(
-        - rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
-        nrow = private %.% n_age_groups * private %.% n_variants * (K + L)
+        - rep(progression_flow_rates, private %.% n_population_groups * private %.% n_variants),
+        nrow = private %.% n_population_groups * private %.% n_variants * (K + L)
       )
 
 
@@ -1718,7 +1755,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # which requires a little more attention when computing
       offdiagonal_elements <- rep(
         c(head(progression_flow_rates, -1), 0),
-        private %.% n_age_groups * private %.% n_variants
+        private %.% n_population_groups * private %.% n_variants
       ) |>
         head(-1)
 
@@ -1753,7 +1790,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # However, we need to ensure the RS_states sums to 1
       rho <- private %.% immunity_matrix * (RS_states / sum(RS_states))
       rho <- purrr::map_dbl(private %.% infection_matrix_to_rs_indices, ~ sum(rho[.])) |>
-        matrix(nrow = private %.% n_age_groups, ncol = private %.% n_variants)
+        matrix(nrow = private %.% n_population_groups, ncol = private %.% n_variants)
 
       # Compute the scaling of the contact rates
       beta_0 <- overall_infection_risk * self %.% season %.% model_t(t)
@@ -1770,12 +1807,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # Then fill in with beta elements
       for (a in seq_len(private %.% n_variants)) { # This has to be a nested for loop for the referencing to work
-        for (i in seq_len(private %.% n_age_groups)) {
-          for (j in seq_len(private %.% n_age_groups)) {
+        for (i in seq_len(private %.% n_population_groups)) {
+          for (j in seq_len(private %.% n_population_groups)) {
             transmission_matrix[
               #                                   Block offset
-              1 + (i - 1) * (K + L)               + (a - 1) * (K + L) * private %.% n_age_groups,
-              (K + 1):(K + L) + (j - 1) * (K + L) + (a - 1) * (K + L) * private %.% n_age_groups
+              1 + (i - 1) * (K + L)               + (a - 1) * (K + L) * private %.% n_population_groups,
+              (K + 1):(K + L) + (j - 1) * (K + L) + (a - 1) * (K + L) * private %.% n_population_groups
             ] <- transmission_matrix_components[[a]][i, j]
           }
         }
@@ -1790,8 +1827,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         purrr::map(~ purrr::pluck(.x, "introduction_date", .default = as.Date("1970-01-01"))) |>
         purrr::map_lgl(~ .x - (self %.% training_period %.% end + t) <= 0)
 
-      inactive_idx <- seq_len((K + L) * private %.% n_age_groups) +
-        (K + L) * private %.% n_age_groups * (which(!active_variants) - 1)
+      inactive_idx <- seq_len((K + L) * private %.% n_population_groups) +
+        (K + L) * private %.% n_population_groups * (which(!active_variants) - 1)
 
       generator_matrix[inactive_idx, ] <- 0
       generator_matrix[, inactive_idx] <- 0
@@ -1814,24 +1851,40 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
+
+      # Define a modified list of model parameters
+      parameters <- modifyList(
+        self %.% parameters,
+        list(
+          "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+          "disease_progression_rates" = purrr::discard_at(
+            self %.% parameters %.% disease_progression_rates,
+            ~ . == "E"
+          ),
+          "malthusian_matching" = FALSE
+        ),
+        keep.null = TRUE
+      )
+
+      # Remove the outputs generated from `$configure_output()`
+      parameters[["model_output_to_observable"]] <- purrr::pluck(
+        private %.% default_parameters(),
+        "model_output_to_observable"
+      )
+
       reference_model <- DiseasyModelOdeSeir$new(
-        activity = self %.% activity,
         observables = self %.% observables,
+        population = self %.% population,
+        activity = self %.% activity,
+        regions = self %.% regions,
         season = self %.% season,
         variant = self %.% variant,
-        parameters = modifyList(
-          self %.% parameters,
-          list(
-            "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
-            "disease_progression_rates" = purrr::discard_at(
-              self %.% parameters %.% disease_progression_rates,
-              ~ . == "E"
-            ),
-            "malthusian_matching" = FALSE
-          ),
-          keep.null = TRUE
-        )
+        immunity = self %.% immunity,
+        parameters = parameters
       )
+
+      # Ensure RHS is initialised
+      reference_model %.% prepare_rhs()
 
       reference_growth_rate <- reference_model$malthusian_growth_rate(...)
 
