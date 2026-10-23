@@ -81,6 +81,44 @@ print(model_4$parameters) # "peak" value is still copied
 print(attr(model_4$season$model_t, "dots"))
 ```
 
+# Marking parameters for optimisation
+
+Any parameter set to `NA` is considered to be "marked for optimisation" meaning
+that the fitting routine will attempt to estimate the parameter under the scoring
+metric.
+
+The default value for the parameter is stored as an attribute on any `NA` parameter
+and will be used as the starting point for the optimisation.
+
+```{r DiseasyModelG0 - parameters marked for optimisation}
+model_5 <- DiseasyModelG0$new(
+  season = season,
+  parameters = list("season.scale" = NA) # Mark for optimisation
+)
+print(model_5$parameters[["season.scale"]])
+```
+
+# Updating parameters
+
+The parameters can either be set during the initialisation of the model as we
+have seen above:
+
+```{r DiseasyModelG0 - parameters in initialize}
+model_6 <- DiseasyModelG0$new(
+  season = season,
+  parameters = list("season.scale" = 0.25)
+)
+print(model_6$parameters["season.scale"])
+```
+
+But the parameters can also be modified after initialisation via the
+`?DiseasyModel$update_parameters()` method:
+
+```{r DiseasyModelG0 - parameters in update_parameters}
+model_6$update_parameters(list("season.scale" = 0.7))
+print(model_6$parameters["season.scale"])
+```
+
 
 # The scoring metric
 The principal metric used in `diseasy` is the likelihood which compares the
