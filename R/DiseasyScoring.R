@@ -134,7 +134,7 @@ DiseasyScoring <- R6::R6Class(                                                  
         dplyr::relocate(!!observable, .before = "model_expectation")
 
       # Score each realisation within each strata
-      stratified_negative_log_likelihood <- data |>
+      realisation_log_likelihood <- data |>
         dplyr::group_by(
           dplyr::across(
             dplyr::all_of(
@@ -154,18 +154,11 @@ DiseasyScoring <- R6::R6Class(                                                  
             )
           }
         ) |>
-        dplyr::ungroup()
-
-      # Collapse strata if multiple are defined
-      if (is.null(stratification)) {
-        realisation_log_likelihood <- stratified_negative_log_likelihood # Already collapesd
-      } else {
-        realisation_log_likelihood <- stratified_negative_log_likelihood |>
-          dplyr::summarise(
-            "negative_log_likelihood" = mean(.data$negative_log_likelihood),
-            .by = c("realisation_id", "weight")
-          )
-      }
+        dplyr::ungroup() |>
+        dplyr::summarise( # Collapse strata if multiple are defined
+          "negative_log_likelihood" = sum(.data$negative_log_likelihood),
+          .by = c("realisation_id", "weight")
+        )
 
       return(realisation_log_likelihood)
     },
