@@ -245,6 +245,76 @@ be applied to the module.</p>
 <span><span class="co">#&gt; $peak</span></span>
 <span><span class="co">#&gt; [1] 20.09946</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="the-scoring-metric">The scoring metric<a class="anchor" aria-label="anchor" href="#the-scoring-metric"></a>
+</h2>
+<p>The principal metric used in <code>diseasy</code> is the likelihood
+which compares the model forecast with observations for each time-point
+at each strata and computes the mean likelihood across the strata for
+the given time-point.</p>
+<p>Different observation have different distributions and therefore
+<code>diseasy</code> supports multiple methods for computing the
+likelihood given the underlying (assumed) distribution.</p>
+<p>The scoring of the forecasts are controlled by the
+<code><a href="../reference/DiseasyScoring.html">?DiseasyScoring</a></code> module, where users can define the scoring
+metric and which includes a method to compute the likelihood for a given
+set of model trajectories (i.e. the output from
+<code>$get_results()</code>).</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scoring</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyScoring.html">DiseasyScoring</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">scoring</span></span>
+<span><span class="co">#&gt; # DiseasyScoring #############################################</span></span>
+<span><span class="co">#&gt; Observation noise model: poisson</span></span></code></pre></div>
+<p>The scoring metric can be controlled with the
+<code><a href=".{2}/reference/DiseasyScoring.html#method-DiseasyScoring-set_noise_model">$set_noise_model()</a></code> method:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scoring</span><span class="op">$</span><span class="fu">set_noise_model</span><span class="op">(</span><span class="st">"negative binomial"</span>, overdispersion <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">scoring</span></span>
+<span><span class="co">#&gt; # DiseasyScoring #############################################</span></span>
+<span><span class="co">#&gt; Observation noise model: negative binomial with overdispersion 2</span></span></code></pre></div>
+<p>With the scoring metric defined, we can compute the likelihood for a
+set of model trajectories with
+<code><a href=".{2}/reference/DiseasyScoring.html#method-DiseasyScoring-compute_likelihood">$compute_likelihood()</a></code>:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">observables</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  diseasystore <span class="op">=</span> <span class="st">"simulist"</span>,</span>
+<span>  conn <span class="op">=</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; duckdb keeps downloaded extensions and secrets in a temporary directory:</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/RtmpV0g8z1/duckdb</span></span>
+<span><span class="co">#&gt; This is removed when the R session ends.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Secrets are lost.</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Run duckdb(shared_home = TRUE) (or create ~/.duckdb) to keep them (suitable for most users).</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Run duckdb(shared_home = FALSE) to accept the temporary directory (and silence this message).</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> See ?duckdb_storage for details and alternatives.</span></span>
+<span></span>
+<span><span class="va">observables</span><span class="op">$</span><span class="fu">set_last_queryable_date</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  observables <span class="op">=</span> <span class="va">observables</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">trajectories</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_admission"</span>, prediction_length <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span><span class="op">$</span><span class="va">scoring</span><span class="op">$</span><span class="fu">compute_likelihood</span><span class="op">(</span><span class="va">trajectories</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 100 × 3</span></span></span>
+<span><span class="co">#&gt;    realisation_id weight negative_log_likelihood</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1                   1                    32.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 10                  1                    32.7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 100                 1                    34.0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 11                  1                    34.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 12                  1                    34.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 13                  1                    35.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 14                  1                    34.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 15                  1                    32.0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 16                  1                    32.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 17                  1                    34.1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
