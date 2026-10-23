@@ -1409,8 +1409,8 @@ DiseasyRegions <- R6::R6Class(                                                  
       name = "movement_scenario",
       expr = {
 
-        # We require a fully configured module
-        if (any(is.null(self %.% area), is.null(self %.% demography), is.null(self %.% adjacency))) {
+        # We require a partially configured module
+        if (any(is.null(self %.% area), is.null(self %.% adjacency))) {
           return(NULL)
         }
 
