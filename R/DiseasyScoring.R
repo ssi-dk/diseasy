@@ -75,7 +75,7 @@ DiseasyScoring <- R6::R6Class(                                                  
 
         noise_model <- \(observations, model_expectation) {
           stats::dnbinom(
-            x = round(observations),
+            x = round(observations), # Round to ensure integer
             mu = model_expectation,
             size = 1 / overdispersion,
             log = TRUE
@@ -86,7 +86,7 @@ DiseasyScoring <- R6::R6Class(                                                  
 
         noise_model <- \(observations, model_expectation) {
           stats::dpois(
-            x = round(observations),
+            x = round(observations), # Round to ensure integer
             lambda = model_expectation,
             log = TRUE
           )
