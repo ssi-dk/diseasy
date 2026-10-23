@@ -280,10 +280,23 @@ DiseasyRegions <- R6::R6Class(                                                  
         symmetric_input <- dplyr::filter_out(symmetric_input, .data$from == .data$to)
       }
 
+      # Ensure a fully defined scenario (all regions should have values)
+      regions <- sort(unique(self %.% adjacency %.% from))
+
+      full_movement_scenario <- dplyr::cross_join(
+        dplyr::distinct(symmetric_input, .data$date),
+        tidyr::expand_grid(
+          "from" = regions,
+          "to" = regions,
+          "relative_movement" = 1
+        )
+      ) |>
+        dplyr::rows_upsert(symmetric_input, by = c("date", "from", "to"))
+
       # Merge with existing scenario
       updated_scenario <- dplyr::rows_upsert(
         x = self %.% movement_scenario,
-        y = symmetric_input,
+        y = full_movement_scenario,
         by = c("date", "from", "to")
       ) |>
         dplyr::arrange(.data$date, .data$from, .data$to) # Ensure consistent ordering
