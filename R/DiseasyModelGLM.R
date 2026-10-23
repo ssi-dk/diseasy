@@ -153,7 +153,7 @@ DiseasyModelG0 <- R6::R6Class(                                                  
     #'   parameters sent to `DiseasyModelG_` [R6][R6::R6Class] constructor
     #' @param parameters `r rd_diseasymodelregression_parameters`
     #' @return
-    #'   A new instance of the `DiseasyModelG1` [R6][R6::R6Class] class.
+    #'   A new instance of the `DiseasyModelG0` [R6][R6::R6Class] class.
     initialize = function(parameters = NULL, ...) {
       super$initialize(
         label = "g0",

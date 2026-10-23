@@ -110,7 +110,7 @@ examples of how this can be done.
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    A new instance of the \code{DiseasyModelG1} \link[R6:R6Class]{R6} class.
+    A new instance of the \code{DiseasyModelG0} \link[R6:R6Class]{R6} class.
   }
 }
 
