@@ -1522,7 +1522,7 @@ DiseasyRegions <- R6::R6Class(                                                  
                 dplyr::left_join(.x, by = c("x" = "from", "z" = "to")) |>
                 dplyr::left_join(.x, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy")) |>
                 dplyr::summarise(
-                  "restriction_modifier" = sum(.data$relative_movement_zx * .data$relative_movement_zy),
+                  "restriction_modifier" = mean(.data$relative_movement_zx * .data$relative_movement_zy),
                   .by = c("x", "y")
                 )
 
@@ -1545,8 +1545,7 @@ DiseasyRegions <- R6::R6Class(                                                  
               return(modifier_matrix)
             }
           ) |>
-          dplyr::ungroup() |>
-          stats::setNames(movement_scenario$date)
+          stats::setNames(unique(movement_scenario$date))
 
         return(purrr::map(restriction_modifiers, ~ .x * theta_baseline))
       }
