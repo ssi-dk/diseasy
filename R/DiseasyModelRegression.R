@@ -247,6 +247,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
           plot(
             data$date, data$q50,
             type = "l",
+            lwd = 4,
             col = colour,
             xlim = range(obs$date),
             ylim = c(0, max(c(obs[[observable]], preds[[observable]])) * 1.1),
@@ -310,14 +311,6 @@ DiseasyModelRegression <- R6::R6Class(                                          
             )
           }
 
-          # Plot the predictions
-          lines(
-            preds[["date"]],
-            preds[[observable]],
-            col = colour,
-            lwd = 4
-          )
-
           # Ensure axis is visible
           box()
 
@@ -327,16 +320,34 @@ DiseasyModelRegression <- R6::R6Class(                                          
             TRUE,
             purrr::pluck(self %.% parameters %.% training_length, "testing", .default = 0) > 0,
             purrr::pluck(self %.% parameters %.% training_length, "validation", .default = 0) > 0,
+            TRUE,
+            TRUE,
             TRUE
           )
 
           legend(
             "topleft",
-            legend = c("Observations", "Training cut-off", "Testing cut-off", "Validation cut-off", "Model")[mask],
-            col = c("grey20", "grey20", "grey20", "grey20", colour)[mask],
-            lty = c(NA, "dashed", "dotdash", "dotted", "solid")[mask],
-            pch = c(16, NA, NA, NA, NA)[mask],
-            lwd = c(NA, 2, 2, 2, 4)[mask],
+            legend = c(
+              "Observations",
+              "Training cut-off",
+              "Testing cut-off",
+              "Validation cut-off",
+              "Model median",
+              "Model 25%-75% band",
+              "Model 05%-95% band"
+            )[mask],
+            col = c(
+              "grey20",
+              "grey20",
+              "grey20",
+              "grey20",
+              colour,
+              adjustcolor(colour, alpha.f = 0.25 + 0.35),
+              adjustcolor(colour, alpha.f = 0.35)
+            )[mask],
+            lty = c(NA, "dashed", "dotdash", "dotted", "solid", "solid", "solid")[mask],
+            pch = c(16, NA, NA, NA, NA, NA, NA)[mask],
+            lwd = c(NA, 2, 2, 2, 4, 10, 10)[mask],
             inset = c(0, 0),
             xpd = TRUE,
             bg = "white"
