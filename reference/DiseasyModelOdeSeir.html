@@ -44,6 +44,7 @@ See vignette(diseasy-model-ode-seir) for a detailed examples of how to use this 
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Creating ensembles</h6></li>
     <li><a class="dropdown-item" href="../articles/creating-ensembles.html">Creating ensembles</a></li>
+    <li><a class="dropdown-item" href="../articles/scoring-and-fitting-models-and-ensembles.html">Scoring and fitting models and ensembles</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Functional modules</h6></li>
     <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
@@ -177,6 +178,10 @@ Should the model be scaled such the Malthusian growth rate matches the correspon
 </ul><p>Parameters controlling the dynamics of the model:</p><ul><li><p><code>overall_infection_risk</code> (<code>numeric(1)</code>)<br>
 A scalar that scales contact rates to infection rates.</p></li>
 <li><p><code>disease_progression_rates</code> (<code>named numeric()</code>)<br> The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.</p></li>
+<li><p><code>season.scale</code> (<code>numeric(1)</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.
+If <code>NULL</code> (default), the default value of the season module is used.</p></li>
+<li><p><code>season.peak</code> (<code>numeric(1)</code>)<br> Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).
+If <code>NULL</code> (default), the default value of the season module is used.</p></li>
 </ul><p>Parameters controlling initialisation routines</p><ul><li><p><code>incidence_polynomial_order</code> (<code>integer(1)</code>)<br>
 The degree of the polynomial to fit to the incidence curves.</p></li>
 <li><p><code>incidence_polynomial_training_length</code> (<code>integer(1)</code>)<br>
@@ -189,7 +194,7 @@ Passed to <code>?DiseasyActivity$get_scenario_contacts(..., weights = activity.w
 <li><p><code>immunity.approximate_compartmental_args</code> (<code>named list()</code>)<br>
 Arguments passed to <code><a href=".{2}/reference/DiseasyImmunity.html#method-DiseasyImmunity-approximate_compartmental">$approximate_compartmental()</a></code></p></li>
 </ul><p>Additional parameters are:</p><ul><li><p><code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></li>
-<li><p><code>incidence_feature_name</code> (<code>character(1)</code>)<br>   The name of the observable that contains the incidence data to initialise from.  * <code>model_rate_to_observable</code> (<code>named list</code>(<code>named list</code>(<code>function</code>(2))))<br>   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a <code>map</code> and <code>reduce</code> function contained in a list (the first nested list).   The <code>map</code> function is applied in a <code><a href="https://dplyr.tidyverse.org/reference/group_map.html" class="external-link">dplyr::group_map()</a></code> call and should take two arguments:   - The first argument contains the model <code>rate</code> and information about group size: <code>proportion</code> and <code>population</code>.   - The second argument contains the groups (stratification).   The <code>reduce</code> function is applied in a <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">dplyr::summarise()</a></code> call to summarise across stratification levels.   By default, the <code>sum</code> function is used and will work for all counting observables.</p></li>
+<li><p><code>incidence_feature_name</code> (<code>character(1)</code>)<br>   The name of the observable that contains the incidence data to initialise from.<br> * <code>model_rate_to_observable</code> (<code>named list</code>(<code>named list</code>(<code>function</code>(2))))<br>   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a <code>map</code> and <code>reduce</code> function contained in a list (the first nested list).   The <code>map</code> function is applied in a <code><a href="https://dplyr.tidyverse.org/reference/group_map.html" class="external-link">dplyr::group_map()</a></code> call and should take two arguments:   - The first argument contains the model <code>rate</code> and information about group size: <code>proportion</code> and <code>population</code>.   - The second argument contains the groups (stratification).   The <code>reduce</code> function is applied in a <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">dplyr::summarise()</a></code> call to summarise across stratification levels.   By default, the <code>sum</code> function is used and will work for all counting observables.</p></li>
 </ul></dd>
 
       <dt><code>...</code></dt>
@@ -476,7 +481,7 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 <span class="r-in"><span>  <span class="co"># with the package.</span></span></span>
 <span class="r-in"><span>  <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> duckdb keeps downloaded extensions and secrets in a temporary directory:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> /tmp/RtmponcBkN/duckdb</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> /tmp/RtmpoO89rU/duckdb</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> This is removed when the R session ends.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Secrets are lost.</span>

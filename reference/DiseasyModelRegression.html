@@ -44,6 +44,7 @@ See ?DiseasyModelGLM and ?DiseasyModelBRM for examples of how this can be done."
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Creating ensembles</h6></li>
     <li><a class="dropdown-item" href="../articles/creating-ensembles.html">Creating ensembles</a></li>
+    <li><a class="dropdown-item" href="../articles/scoring-and-fitting-models-and-ensembles.html">Scoring and fitting models and ensembles</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Functional modules</h6></li>
     <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
@@ -150,7 +151,7 @@ The family used in the regression fit (see <code>glm</code> or <code>brms</code>
 This module is typically not constructed directly but rather through <code>DiseasyModel*</code> classes,
 such as <a href="Diseasy-GLM-models.html">DiseasyModelG0</a>.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyModelRegression.html">DiseasyModelRegression</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">formula</span>, <span class="va">family</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DiseasyModelRegression.html">DiseasyModelRegression</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">formula</span>, <span class="va">family</span>, parameters <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>formula</code></dt>
@@ -160,12 +161,17 @@ A <code>character</code> string that is passed to <code><a href="https://rdrr.io
       <dt><code>family</code></dt>
 <dd><p>(<code>family</code>)<br><code><a href="https://rdrr.io/r/stats/family.html" class="external-link">stats::family</a></code> object passed to the regression call.</p></dd>
 
+      <dt><code>parameters</code></dt>
+<dd><p>(<code>named list()</code>)<br>
+List of parameters to set for the model during initialization.</p><ul><li><p><code>season.scale</code> (<code>numeric(1)</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. ,
+If <code>NULL</code> (default), the default value of the season module is used.</p></li>
+<li><p><code>season.peak</code> (<code>numeric(1)</code>)<br> Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark). ,
+If <code>NULL</code> (default), the default value of the season module is used.</p></li>
+</ul><p>Additional parameters are:</p><ul><li><p><code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></li>
+</ul></dd>
+
       <dt><code>...</code></dt>
 <dd><p>parameters sent to <code>DiseasyModel</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor.</p></dd>
-
-      <dt><code>parameters</code></dt>
-<dd><p>(<code>named list()</code>)<br></p><ul><li><p><code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></li>
-</ul></dd>
 
 
 </dl><p></p></div>

@@ -46,6 +46,7 @@ examples of how this can be done."><meta property="og:image" content="https://ss
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Creating ensembles</h6></li>
     <li><a class="dropdown-item" href="../articles/creating-ensembles.html">Creating ensembles</a></li>
+    <li><a class="dropdown-item" href="../articles/scoring-and-fitting-models-and-ensembles.html">Scoring and fitting models and ensembles</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Functional modules</h6></li>
     <li><a class="dropdown-item" href="../articles/diseasy-activity.html">DiseasyActivity</a></li>
@@ -167,17 +168,20 @@ examples of how this can be done.</p>
 <h3 id="diseasymodelg-new-"><code>DiseasyModelG0$new()</code><a class="anchor" aria-label="anchor" href="#diseasymodelg-new-"></a></h3>
 <p></p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>parameters <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<p></p><div class="arguments"><dl><dt><code>parameters</code></dt>
+<dd><p>(<code>named list()</code>)<br> List of parameters to set for the model during initialization.<br><br> Parameters controlling the dynamics of the model:<br> * <code>season.scale</code> (<code>numeric(1)</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If <code>NULL</code> (default), the default value of the season module is used.<br><br> * <code>season.peak</code> (<code>numeric(1)</code>)<br> Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).    If <code>NULL</code> (default), the default value of the season module is used.<br><br> Additional parameters are: * <code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></dd>
+
+      <dt><code>...</code></dt>
 <dd><p>parameters sent to <code>DiseasyModelG_</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor</p></dd>
 
 
 </dl><p></p></div>
 </div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>A new instance of the <code>DiseasyModelG1</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
+<p>A new instance of the <code>DiseasyModelG0</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
 </div>
@@ -220,10 +224,13 @@ examples of how this can be done.</p>
 <h3 id="diseasymodelg-new--1"><code>DiseasyModelG1$new()</code><a class="anchor" aria-label="anchor" href="#diseasymodelg-new--1"></a></h3>
 <p></p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG1</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG1</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>parameters <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<p></p><div class="arguments"><dl><dt><code>parameters</code></dt>
+<dd><p>(<code>named list()</code>)<br> List of parameters to set for the model during initialization.<br><br> Parameters controlling the dynamics of the model:<br> * <code>season.scale</code> (<code>numeric(1)</code>)<br> Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.    If <code>NULL</code> (default), the default value of the season module is used.<br><br> * <code>season.peak</code> (<code>numeric(1)</code>)<br> Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).    If <code>NULL</code> (default), the default value of the season module is used.<br><br> Additional parameters are: * <code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></dd>
+
+      <dt><code>...</code></dt>
 <dd><p>parameters sent to <code>DiseasyModelG_</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> constructor</p></dd>
 
 
