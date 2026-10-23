@@ -303,7 +303,7 @@ DiseasyRegions <- R6::R6Class(                                                  
 
       private$.movement_scenario <- updated_scenario
 
-      return(NULL)
+      return(invisible(NULL))
     },
 
 
