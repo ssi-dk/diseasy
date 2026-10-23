@@ -81,6 +81,23 @@ print(model_4$parameters) # "peak" value is still copied
 print(attr(model_4$season$model_t, "dots"))
 ```
 
+# Marking parameters for optimisation
+
+Any parameter set to `NA` is considered to be "marked for optimisation" meaning
+that the fitting routine will attempt to estimate the parameter under the scoring
+metric.
+
+The default value for the parameter is stored as an attribute on any `NA` parameter
+and will be used as the starting point for the optimisation.
+
+```{r DiseasyModelG0 - parameters marked for optimisation}
+model_5 <- DiseasyModelG0$new(
+  season = season,
+  parameters = list("season.scale" = NA) # Mark for optimisation
+)
+print(model_5$parameters[["season.scale"]])
+```
+
 
 # The scoring metric
 The principal metric used in `diseasy` is the likelihood which compares the
