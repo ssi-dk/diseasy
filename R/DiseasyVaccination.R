@@ -8,33 +8,60 @@ DiseasyVaccination <- R6::R6Class(
   classname = "DiseasyVaccination",
   inherit = DiseasyBaseModule,
   public = list(
-    scenarios = NULL,
-    initialize = function(...) {
-      super$initialize(...)
-      self$scenarios <- list()
+
+    #' @description
+    #'   Add or replace a vaccination scenario.
+    #' @param vaccination_rate (`numeric(1)`) \cr
+    #'   Daily rate of vaccination for the group.
+    #' @param vaccine_effectiveness (`numeric(1)`) \cr
+    #'   Protection against infection.
+    #' @param age_group (`character(1)`)\cr
+    #'   The age group the intervention applies to.
+    #'   Must be formatted in the style of `diseasystore::age_labels()`.
+    #' @param start,end (`Date(1)`)\cr
+    #'   Optional inclusive intervention dates.
+    #' @return `r rd_side_effects`
+    set_scenario = function(
+      vaccination_rate = 0,
+      vaccine_effectiveness = 1,
+      age_group = NULL,
+      start = NULL,
+      end = NULL
+    ) {
+
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_number(vaccination_rate, lower = 0, finite = TRUE, add = coll)
+      checkmate::assert_number(vaccine_effectiveness, lower = 0, upper = 1, finite = TRUE, add = coll)
+      checkmate::assert_character(age_group, pattern = r"{(\d+)[\+-](\d+)?}" null.ok = TRUE, add = coll)
+      checkmate::assert_date(start, len = 1, upper = end, add = coll)
+      checkmate::assert_date(end, len = 1, lower = start, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Cast to data.frame format
+      input <- tibble::tibble(
+        "vaccination_rate" = vaccination_rate,
+        "vaccine_effectiveness" = vaccine_effectiveness,
+        "age_group" = age_group,
+        "start" = start,
+        "end" = end
+      )
+
+      # Split age group
+      input <- input |>
+        tidyr::separate_wider_regex(
+          cols = "age_group",
+          patterns = c("age_lower" = r"{^\d+}", "age_upper" = r"{\d+$}"),
+          too_few = "align_start"
+        )
+
+      # Merge with existing scenario
+
+      private$.vaccination_scenario <-
+
+      return(invisible(NULL))
     },
-    #' @description Add or replace a vaccination scenario.
-    #' @param name Unique scenario name.
-    #' @param rate Baseline daily vaccination hazard (non-negative).
-    #' @param start,end Optional inclusive intervention dates.
-    #' @param efficacy Protection against infection, from 0 to 1.
-    #' @param multiplier Intervention intensity multiplier (non-negative).
-    #' @return Invisibly returns self.
-    set_scenario = function(name, rate = 0, start = NULL, end = NULL,
-                            efficacy = 1, multiplier = 1) {
-      checkmate::assert_string(name, min.chars = 1)
-      checkmate::assert_number(rate, lower = 0, finite = TRUE)
-      checkmate::assert_number(efficacy, lower = 0, upper = 1, finite = TRUE)
-      checkmate::assert_number(multiplier, lower = 0, finite = TRUE)
-      if (!is.null(start)) checkmate::assert_date(start, len = 1)
-      if (!is.null(end)) checkmate::assert_date(end, len = 1)
-      if (!is.null(start) && !is.null(end) && end < start) {
-        stop("end must not precede start", call. = FALSE)
-      }
-      self$scenarios[[name]] <- list(rate = rate, start = start, end = end,
-                                     efficacy = efficacy, multiplier = multiplier)
-      invisible(self)
-    },
+
+
     #' @description Evaluate the per-capita vaccination hazard on given dates.
     #' @param dates Vector of dates.
     #' @param scenario Name of the scenario.
@@ -48,6 +75,8 @@ DiseasyVaccination <- R6::R6Class(
       if (!is.null(s$end)) active <- active & dates <= s$end
       as.numeric(active) * s$rate * s$multiplier
     },
+
+
     #' @description Return vaccine protection against infection.
     #' @param scenario Name of the scenario.
     #' @param time_since_vaccination Days since vaccination.
@@ -65,6 +94,8 @@ DiseasyVaccination <- R6::R6Class(
       stop("Pass vaccination waning through the model's immunity adapter; direct evaluation is not yet implemented.",
            call. = FALSE)
     },
+
+
     #' @description Daily vaccination flow from an eligible compartment.
     #' @param eligible Eligible population counts.
     #' @param dates Dates corresponding to counts.
@@ -75,5 +106,56 @@ DiseasyVaccination <- R6::R6Class(
       if (length(eligible) != length(dates)) stop("eligible and dates must have equal length")
       eligible * (-expm1(-self$get_rates(dates, scenario)))
     }
+  ),
+
+  active = list(
+    #' @field vaccination_scenario (`data.frame(1)`)\cr
+    #'  The restriction on movement between regions over time.
+    vaccination_scenario = purrr::partial(
+      .f = active_binding,
+      name = "vaccination_scenario",
+      expr = {
+
+        # We require a partially configured module
+        if (any(is.null(self %.% area), is.null(self %.% adjacency))) {
+          return(NULL)
+        }
+
+        vaccination_scenario <- private %.% .vaccination_scenario
+        regions <- sort(unique(self %.% adjacency %.% from))
+
+        basis <- tidyr::expand_grid(
+          "date" = as.Date("1970-01-01"),
+          "from" = regions,
+          "to" = regions,
+          "relative_movement" = 1
+        ) |>
+          dplyr::arrange(.data$date, .data$from, .data$to) # Ensure consistent ordering
+
+        # If no scenario is defined, we return the basis
+        if (is.null(vaccination_scenario)) {
+          return(basis)
+        }
+
+        # If a scenario is defined, we impute using the basis
+        vaccination_scenario <- vaccination_scenario |>
+          dplyr::group_by(.data$date) |>
+          dplyr::group_modify(
+            ~ dplyr::rows_update(
+              x = dplyr::select(basis, !"date"),
+              y = .x,
+              by = c("from", "to")
+            )
+          ) |>
+          dplyr::ungroup() |>
+          dplyr::arrange(.data$date, .data$from, .data$to) # Ensure consistent ordering
+
+        return(vaccination_scenario)
+      }
+    )
+  ),
+
+  private = list(
+    .vaccination_scenario = NULL
   )
 )

@@ -1,0 +1,85 @@
+---
+title: "DiseasyVaccination"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyVaccination}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+# Introduction
+
+`DiseasyVaccination` configures seasonal vaccination interventions as daily per-capita hazards. The proposed SEIR vaccination track represents **recent vaccination and transient protection**, not cumulative vaccination coverage or lifetime vaccination history. Individuals may leave the track through waning or infection; ordinary infection tracks need not be duplicated.
+
+This vignette illustrates the **currently implemented scenario API**. Integration with `DiseasyModelOdeSeir`, `DiseasyModelG0`, `DiseasyModelG1`, and vaccination-specific waning in `DiseasyImmunity` is not yet implemented. These examples do not simulate infection outcomes.
+
+# Define vaccination campaigns
+
+```{r campaigns}
+vaccination <- DiseasyVaccination$new()
+vaccination$set_scenario(
+  name = "baseline",
+  rate = 0.004,
+  start = as.Date("2026-10-01"), end = as.Date("2026-12-31"),
+  efficacy = 0.65
+)
+
+dates <- seq(as.Date("2026-09-01"), as.Date("2027-02-28"), by="day")
+baseline <- vaccination$get_rates(dates, "baseline")
+intensified <- vaccination$get_rates(dates, "intensified")
+head(data.frame(date=dates, baseline, intensified))
+```
+
+The start and end dates are inclusive. The multiplier scales the daily vaccination hazard, not efficacy.
+
+```{r plot-rates, fig.alt="Vaccination hazards for two autumn campaigns"}
+plot(dates, baseline, type="l", lwd=2, xlab="Date",
+     ylab="Daily vaccination hazard", ylim=range(c(baseline, intensified)))
+lines(dates, intensified, lwd=2, lty=2)
+legend("topright", c("Baseline", "Intensified"), lty=c(1,2), lwd=2, bty="n")
+```
+
+# Convert hazards to vaccination flows
+
+Given eligible population $N$ and constant daily hazard $\lambda$, expected vaccinations over a day equal $N(1-\exp(-\lambda))$.
+
+```{r flows}
+eligible <- rep(10000, length(dates))
+flow_baseline <- vaccination$vaccination_flow(eligible, dates, "baseline")
+flow_intensified <- vaccination$vaccination_flow(eligible, dates, "intensified")
+c(baseline_events=sum(flow_baseline), intensified_events=sum(flow_intensified))
+```
+
+Here eligibility is held constant every day. Summed flows are therefore **not** unique individuals vaccinated or modelled coverage. A population model must update eligible counts and conserve mass when people enter the vaccination track.
+
+# Vaccine protection and waning
+
+```{r protection}
+vaccination$protection("baseline", time_since_vaccination=c(0, 30, 90))
+```
+
+The current module returns constant efficacy when no immunity module is supplied. Passing a `DiseasyImmunity` object to `protection()` currently raises an error: vaccination-specific waning is not yet connected. The intended first implementation shares waning deltas with infection-derived immunity.
+
+# Interpretation and planned model integration
+
+In `DiseasyModelOdeSeir`, vaccination should move eligible people to a non-infectious, recovered-like vaccination track, with zero infection risk *for that artificial track*. Protection against real infection variants should be handled through immunity modifiers and waning. Seasonal revaccination should be possible from eligible previously infected or waned states without duplicating infection compartments.
+
+**Do not interpret vaccination-track occupancy as cumulative vaccine uptake.** It measures a transient model state. Report administered doses, vaccination events, and current vaccine-associated protection separately. The `G0` and `G1` model interfaces remain prospective, not demonstrated functionality.
+
+
+# Summarising the scenario
+As with other `diseasy` modules, the `$describe()` method can be used to get a human readable summary of the scenario.
+```{r inspect_describe}
+variant$describe()
+```
