@@ -279,3 +279,357 @@ test_that("$describe() works", {
   rm(regions)
   rm(population)
 })
+
+
+test_that("`map_population` works with 1-year age groups in demography", {
+
+  # Generate test demography
+  demography_1yr <- data.frame(
+    age = seq(from = 0, to = 100),
+    region = "All",
+    population = seq(from = 100, to = 0, by = -1)
+  )
+
+  population <- DiseasyPopulation$new()
+
+  # We should be able to map the population as long as demography has
+  # all the age cuts requested by age_cuts_lower and included in age_groups_reference
+
+  # So for 1-year age group demography, we should almost never fail
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = c(2, 4, 6),
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = c(2, 4, 6),
+      age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+      demography = demography_1yr
+    )
+  )
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
+      demography = demography_1yr
+    )
+  )
+
+  # .. but if we go outside the range of demography, we should get errors
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 200,
+        age_groups_reference = diseasystore::age_labels(demography_1yr$age),
+        demography = demography_1yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  rm(population)
+})
+
+
+test_that("`map_population` works with 5-year age groups in demography", {
+
+  # Generate test demography
+  demography_5yr <- data.frame(
+    age_group = diseasystore::age_labels(seq(from = 0, to = 100, by = 5)),
+    region = "All",
+    population = seq(from = 100, to = 0, by = -5)
+  )
+
+  population <- DiseasyPopulation$new()
+
+  # For stratified demographies we are more restricted since the age cuts must be a subset of the demography groups
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = demography_5yr$age_group,
+      demography = demography_5yr
+    )
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = c(2, 4, 6),
+        age_groups_reference = demography_5yr$age_group,
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 5,
+        age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  expect_no_error(
+    population$map_population(
+      age_cuts_lower = 5,
+      age_groups_reference = demography_5yr$age_group,
+      demography = demography_5yr
+    )
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = c(2, 4, 6),
+        age_groups_reference = demography_5yr$age_group,
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 5,
+        age_groups_reference = diseasystore::age_labels(c(2, 4, 6)),
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  # .. and if we go outside the range of demography, we should still errors
+  expect_error(
+    checkmate_err_msg(
+      population$map_population(
+        age_cuts_lower = 200,
+        age_groups_reference = demography_5yr$age_group,
+        demography = demography_5yr
+      )
+    ),
+    regexp = "`demography` is missing age group splits to facilitate splits at"
+  )
+
+  rm(population)
+})
+
+
+test_that("`mean_contact_rates()` preserves the total number of contacts", {
+
+  regions <- DiseasyRegions$new(
+    area = c("DK", "SE"),
+    demography = demography_nordic
+  )
+
+  activity <- DiseasyActivity$new()
+
+  population_no_stratification <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions
+  )
+
+  population_age_stratified <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions,
+    age_cuts_lower = c(20, 40, 60)
+  )
+
+  population_region_stratified <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions,
+    regional_stratification = "region"
+  )
+
+  population_fully_stratified <- DiseasyPopulation$new(
+    activity = activity,
+    regions = regions,
+    regional_stratification = "region",
+    age_cuts_lower = c(20, 40, 60)
+  )
+
+  number_of_contacts <- list(
+    population_no_stratification,
+    population_age_stratified,
+    population_region_stratified,
+    population_fully_stratified
+  ) |>
+    purrr::map_dbl(\(population) {
+      N <- population %.% model_population |>                                                                           # nolint: object_name_linter
+        dplyr::select(dplyr::all_of(c(colnames(population %.% groups), "population"))) |>
+        tidyr::unite("label", !"population", sep = "/") |>
+        tibble::deframe()
+
+      m_matrix <- population %.% mean_contact_rates()[[1]]
+
+      t_matrix <- m_matrix * outer(N, rep(1, length(N)))
+
+      sum(t_matrix)
+    })
+
+  expect_equal(
+    sd(number_of_contacts) / mean(number_of_contacts),
+    0,
+    tolerance = 5e-3
+  )
+
+})
+
+
+test_that("`mean_contact_rates()` works with activity scenarios", {
+
+  # Define an activity scenario
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = diseasy::contact_basis_nordic$DK)
+  activity$set_activity_units(diseasy::dk_activity_units)
+  activity$change_activity(
+    date = as.Date("2020-01-01"),
+    opening = "baseline"
+  )
+  activity$change_risk(date = as.Date("2020-03-01"), type = "work", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "school", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "home", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "other", risk = 0.1)
+
+
+  # Define a population module
+  population <- DiseasyPopulation$new(regions = DiseasyRegions$new(), activity = activity)
+
+  # Determine what the mean contact rate should be
+  model_population <- population %.% map_population(
+    age_groups_reference = purrr::pluck(activity %.% contact_basis, "mean_contacts_per_person", 1, colnames)
+  ) |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "age_group_reference"
+    )
+
+  N <- dplyr::pull(model_population, "population")                                                                      # nolint: object_name_linter
+  N_i <- outer(N, rep(1, length(N)))                                                                                    # nolint: object_name_linter
+
+  mean_contact_rate <- sum((purrr::reduce(contact_basis_nordic %.% DK %.% mean_contacts_per_person, `+`) * N_i))
+
+  expect_equal(
+    population$mean_contact_rates(),
+    list(
+      "2020-01-01" = matrix(data = mean_contact_rate,       dimnames = list("0+/All", "0+/All")),
+      "2020-03-01" = matrix(data = mean_contact_rate * 0.1, dimnames = list("0+/All", "0+/All"))
+    ),
+    tolerance = 1e-10
+  )
+
+})
+
+
+test_that("`mean_contact_rates()` works with movement scenarios", {
+
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # We now define a movement scenario
+  regions$change_movement(
+    date = as.Date("2020-02-01"),
+    from = c("A", "B"),
+    to = c("B", "A"),
+    relative_movement = 0.1
+  )
+
+  # Define a population module
+  population <- DiseasyPopulation$new(regions = regions, activity = DiseasyActivity$new())
+
+  expect_identical(
+    names(population$mean_contact_rates()),
+    c("1970-01-01", "2020-02-01")
+  )
+
+})
+
+
+test_that("`mean_contact_rates()` works with activity and movement scenarios simultaneously", {
+
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # We now define a movement scenario
+  regions$change_movement(
+    date = as.Date("2020-02-01"),
+    from = c("A", "B"),
+    to = c("B", "A"),
+    relative_movement = 0.1
+  )
+
+  # Define an activity scenario
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = diseasy::contact_basis_nordic$DK)
+  activity$set_activity_units(diseasy::dk_activity_units)
+  activity$change_activity(
+    date = as.Date("2020-01-01"),
+    opening = "baseline"
+  )
+  activity$change_risk(date = as.Date("2020-03-01"), type = "work", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "school", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "home", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "other", risk = 0.1)
+
+
+  # Define a population module
+  population <- DiseasyPopulation$new(regions = regions, activity = activity)
+
+  # Determine what the mean contact rate should be
+  model_population <- population %.% map_population(
+    age_groups_reference = purrr::pluck(activity %.% contact_basis, "mean_contacts_per_person", 1, colnames)
+  ) |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "age_group_reference"
+    )
+
+  N <- dplyr::pull(model_population, "population")                                                                      # nolint: object_name_linter
+  N_i <- outer(N, rep(1, length(N)))                                                                                    # nolint: object_name_linter
+
+  mean_contact_rate <- sum((purrr::reduce(contact_basis_nordic %.% DK %.% mean_contacts_per_person, `+`) * N_i))
+
+  expect_identical(
+    names(population$mean_contact_rates()),
+    c("2020-01-01", "2020-02-01", "2020-03-01")
+  )
+
+})

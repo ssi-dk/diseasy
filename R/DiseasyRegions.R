@@ -215,6 +215,99 @@ DiseasyRegions <- R6::R6Class(                                                  
 
 
     #' @description
+    #'   Adds the specified movement restrictions to the scenario
+    #' @param date (`Date()` | `data.frame(1)`)\cr
+    #'   Either a vector of dates when activity changes or a `data.frame`.
+    #'
+    #'   The `data.frame` must include the following columns:
+    #'   - `from` (`character`): Region identifier
+    #'   - `to`   (`character`): Region identifier
+    #'   - `relative_movement` (`numeric`): Percentage of movement allowed between regions
+    #' @param from,to (`character`)\cr
+    #'   Region identifier (ignored if `data.frame` is provided to `date`).
+    #' @param relative_movement (`character()`)\cr
+    #'   Percentage of movement allowed between regions (ignored if `data.frame` is provided to `date`).
+    #' @return `r rd_side_effects`
+    change_movement = function(
+      date,
+      from = NULL,
+      to = NULL,
+      relative_movement = NULL
+    ) {
+
+      # Unify input formats
+      if (is.data.frame(date)) {
+        input <- date
+        ignored_args <- c("from" = from, "to" = to, "relative_movement" = relative_movement)
+        if (length(ignored_args) > 0) {
+          warning(
+            "The following arguments were provided but ignored since `date` is a `data.frame`: ",
+            toString(names(ignored_args))
+          )
+        }
+      } else {
+        input <- data.frame("date" = date, "from" = from, "to" = to, "relative_movement" = relative_movement)
+      }
+
+      # Input checks
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_names(
+        colnames(input),
+        permutation.of = c("date", "from", "to", "relative_movement"),
+        add = coll
+      )
+      checkmate::assert_date(input$date, add = coll)
+      checkmate::assert_subset(input$from, self %.% area, add = coll)
+      checkmate::assert_subset(input$to, self %.% area, add = coll)
+      checkmate::assert_numeric(input$relative_movement, lower = 0, upper = 1, add = coll)
+      checkmate::reportAssertions(coll)
+
+      # Enforce symmetry in movement restrictions
+      symmetric_input <- input |>
+        dplyr::union_all(dplyr::rename(input, "from" = "to", "to" = "from")) |>
+        dplyr::summarise(
+          "relative_movement" = mean(.data$relative_movement),
+          .by = c("date", "from", "to")
+        )
+
+      if (nrow(dplyr::setdiff(symmetric_input, input)) > 0) {
+        warning("The provided restrictions are either asymetric or incomplete - forcing symmetry")
+      }
+
+      # Enforce unit diagonal
+      if (nrow(dplyr::filter(symmetric_input, .data$from == .data$to) > 0)) {
+        warning("The provided restrictions modify intra-region movement - forcing unit diagnoals")
+        symmetric_input <- dplyr::filter_out(symmetric_input, .data$from == .data$to)
+      }
+
+      # Ensure a fully defined scenario (all regions should have values)
+      regions <- sort(unique(self %.% adjacency %.% from))
+
+      full_movement_scenario <- dplyr::cross_join(
+        dplyr::distinct(symmetric_input, .data$date),
+        tidyr::expand_grid(
+          "from" = regions,
+          "to" = regions,
+          "relative_movement" = 1
+        )
+      ) |>
+        dplyr::rows_upsert(symmetric_input, by = c("date", "from", "to"))
+
+      # Merge with existing scenario
+      updated_scenario <- dplyr::rows_upsert(
+        x = self %.% movement_scenario,
+        y = full_movement_scenario,
+        by = c("date", "from", "to")
+      ) |>
+        dplyr::arrange(.data$date, .data$from, .data$to) # Ensure consistent ordering
+
+      private$.movement_scenario <- updated_scenario
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
     #'   Check whether `area`, `adjacency`, and `demography` are mutually consistent.
     #' @param area `r rd_area()`
     #' @param adjacency `r rd_adjacency()`
@@ -482,7 +575,7 @@ DiseasyRegions <- R6::R6Class(                                                  
         missing_packages <- purrr::discard(c("rnaturalearth", "rnaturalearthdata"), rlang::is_installed)
         coll$push(
           glue::glue(
-            "Package{ifelse(length(missing_packages) > 1, 's', '')} {toString(missing_packages)} ",
+            'Package{ifelse(length(missing_packages) > 1, "s", "")} {toString(paste0("`", missing_packages, "`"))} ',
             "must be installed if no shape files are provided."
           )
         )
@@ -1258,57 +1351,6 @@ DiseasyRegions <- R6::R6Class(                                                  
     ),
 
 
-    #' @field infection_flow_matrix (`matrix`)\cr
-    #'  The "Theta" matrix (see `vignette("diseasy-regions")`) that describes flow of infections between regions.
-    infection_flow_matrix = purrr::partial(
-      .f = active_binding,
-      name = "infection_flow_matrix",
-      expr = {
-        adjacency <- self %.% adjacency
-        regional_risks <- self %.% regional_risks
-
-        if (is.null(adjacency)) {
-
-          infection_flow_matrix <- matrix(
-            data = 1 / sqrt(length(self %.% area)),
-            nrow = length(self %.% area),
-            ncol = length(self %.% area),
-            dimnames = list(self %.% area, self %.% area)
-          )
-
-          if (attr(regional_risks, "type") == "behaviour") {
-            infection_flow_matrix <- infection_flow_matrix *
-              sqrt(
-                outer(
-                  X = self %.% regional_risks,
-                  Y = self %.% regional_risks
-                )
-              )
-          } else {
-            pkgcond::pkg_error(
-              paste(
-                "The interpretation of regional modifiers (`regional_risks_type`) must be",
-                '"behaviour" if no adjacency data is provided.'
-              )
-            )
-          }
-
-        } else {
-
-          infection_flow_matrix <- self$adjacency_to_theta(
-            adjacency = adjacency,
-            adjacency_type = attr(adjacency, "type"),
-            regional_risks = regional_risks,
-            regional_risks_type = attr(regional_risks, "type")
-          )
-
-        }
-
-        return(infection_flow_matrix)
-      }
-    ),
-
-
     #' @field demography `r rd_demography(type = "field")`
     demography = purrr::partial(
       .f = active_binding,
@@ -1357,6 +1399,169 @@ DiseasyRegions <- R6::R6Class(                                                  
 
         return(regional_risks)
       }
+    ),
+
+
+    #' @field movement_scenario (`data.frame(1)`)\cr
+    #'  The restriction on movement between regions over time.
+    movement_scenario = purrr::partial(
+      .f = active_binding,
+      name = "movement_scenario",
+      expr = {
+
+        # We require a partially configured module
+        if (any(is.null(self %.% area), is.null(self %.% adjacency))) {
+          return(NULL)
+        }
+
+        movement_scenario <- private %.% .movement_scenario
+        regions <- sort(unique(self %.% adjacency %.% from))
+
+        basis <- tidyr::expand_grid(
+          "date" = as.Date("1970-01-01"),
+          "from" = regions,
+          "to" = regions,
+          "relative_movement" = 1
+        ) |>
+          dplyr::arrange(.data$date, .data$from, .data$to) # Ensure consistent ordering
+
+        # If no scenario is defined, we return the basis
+        if (is.null(movement_scenario)) {
+          return(basis)
+        }
+
+        # If a scenario is defined, we impute using the basis
+        movement_scenario <- movement_scenario |>
+          dplyr::group_by(.data$date) |>
+          dplyr::group_modify(
+            ~ dplyr::rows_update(
+              x = dplyr::select(basis, !"date"),
+              y = .x,
+              by = c("from", "to")
+            )
+          ) |>
+          dplyr::ungroup() |>
+          dplyr::arrange(.data$date, .data$from, .data$to) # Ensure consistent ordering
+
+        return(movement_scenario)
+      }
+    ),
+
+
+    #' @field infection_flow_matrix (`matrix(1)`)\cr
+    #'  The baseline "Theta" matrix (see `vignette("diseasy-regions")`) that
+    #'  describes flow of infections between regions.
+    infection_flow_matrix = purrr::partial(
+      .f = active_binding,
+      name = "infection_flow_matrix",
+      expr = {
+        adjacency <- self %.% adjacency
+        regional_risks <- self %.% regional_risks
+
+        if (is.null(adjacency)) {
+
+          labels <- purrr::pluck(self %.% area, .default = "All")
+          n <- purrr::pluck(labels, length, .default = 1)
+
+          infection_flow_matrix <- matrix(
+            data = 1 / sqrt(n),
+            nrow = n,
+            ncol = n,
+            dimnames = list(labels, labels)
+          )
+
+          if (!is.null(regional_risks)) {
+            if (attr(regional_risks, "type") == "behaviour") {
+              infection_flow_matrix <- infection_flow_matrix *
+                sqrt(
+                  outer(
+                    X = self %.% regional_risks,
+                    Y = self %.% regional_risks
+                  )
+                )
+            } else {
+              pkgcond::pkg_error(
+                paste(
+                  "The interpretation of regional modifiers (`regional_risks_type`) must be",
+                  '"behaviour" if no adjacency data is provided.'
+                )
+              )
+            }
+          }
+
+        } else {
+
+          infection_flow_matrix <- self$adjacency_to_theta(
+            adjacency = adjacency,
+            adjacency_type = attr(adjacency, "type"),
+            regional_risks = regional_risks,
+            regional_risks_type = attr(regional_risks, "type")
+          )
+
+        }
+
+        return(infection_flow_matrix)
+      }
+    ),
+
+
+    #' @field infection_flow_scenario (`list`(`matrix(1))`)\cr
+    #'   The "Theta" infection flow matrices (see `vignette("diseasy-regions")`) on all dates.
+    infection_flow_scenario = purrr::partial(
+      .f = active_binding,
+      name = "infection_flow_scenario",
+      expr = {
+
+        # Grab the baseline mixing
+        theta_baseline <- self %.% infection_flow_matrix
+
+        # Grab the movement scenario
+        movement_scenario <- self %.% movement_scenario
+
+        # If module is not fully configured, return the base line
+        if (is.null(movement_scenario)) {
+          return(list("1970-01-01" = theta_baseline))
+        }
+
+        # Get regions of interest
+        regions <- sort(unique(self %.% adjacency %.% from))
+
+        # Generate the interactions
+        restriction_modifiers <- movement_scenario |>
+          dplyr::group_by(.data$date) |>
+          dplyr::group_map(
+            ~ {
+              modifiers_on_date_long <- tidyr::expand_grid("x" = regions, "y" = regions, "z" = regions) |>
+                dplyr::left_join(.x, by = c("x" = "from", "z" = "to")) |>
+                dplyr::left_join(.x, by = c("y" = "from", "z" = "to"), suffix = c("_zx", "_zy")) |>
+                dplyr::summarise(
+                  "restriction_modifier" = mean(.data$relative_movement_zx * .data$relative_movement_zy),
+                  .by = c("x", "y")
+                )
+
+              # Cast to matrix
+              modifier_matrix <- matrix(
+                NA_real_,
+                nrow = length(regions),
+                ncol = length(regions),
+                dimnames = list(regions, regions)
+              )
+
+              # Fill with existing values
+              modifier_matrix[
+                cbind(
+                  match(modifiers_on_date_long %.% x, regions),
+                  match(modifiers_on_date_long %.% y, regions)
+                )
+              ] <- modifiers_on_date_long %.% restriction_modifier
+
+              return(modifier_matrix)
+            }
+          ) |>
+          stats::setNames(unique(movement_scenario$date))
+
+        return(purrr::map(restriction_modifiers, ~ .x * theta_baseline))
+      }
     )
   ),
 
@@ -1365,7 +1570,8 @@ DiseasyRegions <- R6::R6Class(                                                  
     .area = NULL,
     .adjacency = NULL,
     .demography = NULL,
-    .regional_risks = NULL
+    .regional_risks = NULL,
+    .movement_scenario = NULL
   )
 )
 

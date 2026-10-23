@@ -72,12 +72,19 @@ The available levels of stratification supported. Read only.}
 
     \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr Read only.}
 
-    \item{\code{infection_flow_matrix}}{(\code{matrix})\cr
-The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow of infections between regions.}
-
     \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group. Read only.}
 
     \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr Read only.}
+
+    \item{\code{movement_scenario}}{(\code{data.frame(1)})\cr
+The restriction on movement between regions over time.}
+
+    \item{\code{infection_flow_matrix}}{(\code{matrix(1)})\cr
+The baseline "Theta" matrix (see \code{vignette("diseasy-regions")}) that
+describes flow of infections between regions.}
+
+    \item{\code{infection_flow_scenario}}{(\code{list}(\verb{matrix(1))})\cr
+The "Theta" infection flow matrices (see \code{vignette("diseasy-regions")}) on all dates.}
   }
   \if{html}{\out{</div>}}
 }
@@ -89,6 +96,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
     \item \href{#method-DiseasyRegions-set_adjacency}{\code{DiseasyRegions$set_adjacency()}}
     \item \href{#method-DiseasyRegions-set_demography}{\code{DiseasyRegions$set_demography()}}
     \item \href{#method-DiseasyRegions-set_regional_risks}{\code{DiseasyRegions$set_regional_risks()}}
+    \item \href{#method-DiseasyRegions-change_movement}{\code{DiseasyRegions$change_movement()}}
     \item \href{#method-DiseasyRegions-validate_configuration}{\code{DiseasyRegions$validate_configuration()}}
     \item \href{#method-DiseasyRegions-region_filter}{\code{DiseasyRegions$region_filter()}}
     \item \href{#method-DiseasyRegions-regions_at_stratification}{\code{DiseasyRegions$regions_at_stratification()}}
@@ -259,6 +267,45 @@ relation is:
 
 If the infection-flow matrix is specified directly, the location
 interpretation cannot be computed and results in an error.
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyRegions-change_movement"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyRegions-change_movement}{}}}
+\subsection{\code{DiseasyRegions$change_movement()}}{
+  Adds the specified movement restrictions to the scenario
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyRegions$change_movement(
+  date,
+  from = NULL,
+  to = NULL,
+  relative_movement = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{date}}{(\code{Date()} | \code{data.frame(1)})\cr
+Either a vector of dates when activity changes or a \code{data.frame}.
+
+The \code{data.frame} must include the following columns:
+\itemize{
+\item \code{from} (\code{character}): Region identifier
+\item \code{to}   (\code{character}): Region identifier
+\item \code{relative_movement} (\code{numeric}): Percentage of movement allowed between regions
+}}
+      \item{\code{from, to}}{(\code{character})\cr
+Region identifier (ignored if \code{data.frame} is provided to \code{date}).}
+      \item{\code{relative_movement}}{(\code{character()})\cr
+Percentage of movement allowed between regions (ignored if \code{data.frame} is provided to \code{date}).}
+    }
+    \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
     \code{NULL} (called for side effects)
@@ -469,6 +516,7 @@ The available levels of stratification supported. Read only.}
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="adjacency_to_theta"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-adjacency_to_theta'><code>DiseasyRegions$adjacency_to_theta()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="change_movement"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-change_movement'><code>DiseasyRegions$change_movement()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="describe"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-describe'><code>DiseasyRegions$describe()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="initialize"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-initialize'><code>DiseasyRegions$initialize()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyRegions" data-id="set_adjacency"><a href='../../diseasy/html/DiseasyRegions.html#method-DiseasyRegions-set_adjacency'><code>DiseasyRegions$set_adjacency()</code></a></span></li>
