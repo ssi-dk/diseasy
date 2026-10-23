@@ -3,8 +3,8 @@
   "overrideCommand": false,
   "remoteUser": "rstudio",
 
-  "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces/diseasy,type=bind",
-  "workspaceFolder": "/workspaces/diseasy/diseasy",
+  "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces/diseasyverse,type=bind",
+  "workspaceFolder": "/workspaces/diseasyverse/diseasy",
 
   "mounts": [
     "source=${localEnv:HOME}/.gitconfig,target=/home/rstudio/.gitconfig-host,type=bind,readonly"
