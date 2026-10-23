@@ -1,0 +1,86 @@
+---
+title: "Scoring and fitting models and ensembles"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Scoring and fitting models and ensembles}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include = FALSE}
+library(diseasy)
+```
+
+# Introduction
+
+Every model in `diseasy` contains some parameterisation of its forecasts.
+These parameters can then be optimised to align model forecasts with the
+real-world observations.
+
+This operation requires only two components:
+1) A metric for the optimiser to optimise
+2) Free parameters for the optimiser to control
+
+# Model parameterisation
+Models `diseasy` will contain parameters that are either specific to the model
+(e.g. the compartment structure in `?DiseasyModelOdeSeir`) or parameters meant
+to control the functional modules passed to the model (e.g. `?DiseasySeason`).
+
+For example, lets consider the parameters of `?DiseasyModelG0`:
+```{r DiseasyModelG0 - parameters}
+model <- DiseasyModelG0$new()
+model$parameters
+```
+
+This model has parameters inherent to the model and parameters related to the
+season module. This latter type of parameters, parameters that should modify
+the internal modules are treated specially:
+If these parameters are `NULL` they will inherit the defaults (if any) from the
+module. If they are different from `NULL` they will be applied to the module.
+
+A couple of examples:
+```{r DiseasyModelG0 - controlling season}
+# We create a default season module which includes a "no seasonality" scenario
+# with no parameters
+season <- DiseasySeason$new(reference_date = Sys.Date())
+
+model_1 <- DiseasyModelG0$new(season = season)
+print(model_1$parameters)
+
+
+# If we change to the "covid_season_v1" season model, we have a single "scale"
+# parameter in the season model
+season$use_covid_season_v1()
+
+model_2 <- DiseasyModelG0$new(season = season)
+print(model_2$parameters) # ... and this scale is copied to the model
+
+
+# If we change to the "cosine_Season" season model, we have both a "scale"
+# parameter and a "peak" parameter in the season model
+season$use_cosine_season()
+
+model_3 <- DiseasyModelG0$new(season = season)
+print(model_3$parameters) # ... and these are copied to the model
+
+
+# If we provide specific values to the model, then these values are
+# passed to the season module.
+model_4 <- DiseasyModelG0$new(
+  season = season,
+  parameters = list("season.scale" = 0.5)
+)
+print(model_4$parameters) # "peak" value is still copied
+print(attr(model_4$season$model_t, "dots"))
+```
+
+```{r cleanup, include = FALSE}
+gc()
+```
