@@ -62,6 +62,7 @@ articles:
   navbar: Creating ensembles
   contents:
   - articles/creating-ensembles
+  - articles/scoring-and-fitting-models-and-ensembles
 
 - title: Functional modules
   navbar: Functional modules
