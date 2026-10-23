@@ -208,6 +208,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         return(invisible(NULL))
       }
 
+      # Check for non-initialised parameters
+      na_parameters <- purrr::keep(self %.% parameters, ~ anyNA(unlist(.)))
+      if (length(na_parameters) > 0) {
+        stop(
+          glue::glue(
+            "The following parameters are marked for optimisation but not initaliased: {toString(names(na_parameters))}"
+          )
+        )
+      }
+
       compartment_structure <- self %.% parameters %.% compartment_structure
       disease_progression_rates <- self %.% parameters %.% disease_progression_rates
 
@@ -226,7 +236,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           weights = self %.% parameters %.% activity.weights
         )
       )
-
 
 
       # Store the indices of the first compartments for later RHS computation
@@ -1528,7 +1537,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     validate_parameters = function() {
       coll <- checkmate::makeAssertCollection()
       # Validate the structural parameters
-      checkmate::assert_integer(self %.% parameters %.% compartment_structure, lower = 0, add = coll)
+      checkmate::assert_integer(
+        self %.% parameters %.% compartment_structure,
+        lower = 0,
+        any.missing = FALSE, # Fixed
+        add = coll
+      )
       checkmate::assert_names(
         names(self %.% parameters %.% compartment_structure),
         subset.of = c("E", "I", "R"),
@@ -1539,8 +1553,19 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_logical(self %.% parameters %.% malthusian_matching, add = coll)
 
       # Validate the dynamical parameters
-      checkmate::assert_number(self %.% parameters %.% overall_infection_risk, lower = 0, add = coll)
-      checkmate::assert_numeric(self %.% parameters %.% disease_progression_rates, lower = 0, add = coll)
+      checkmate::assert_number(
+        self %.% parameters %.% overall_infection_risk,
+        lower = 0,
+        na.ok = TRUE, # Optimisable
+        add = coll
+      )
+
+      checkmate::assert_numeric(
+        self %.% parameters %.% disease_progression_rates,
+        lower = 0,
+        any.missing = TRUE, # Optimisable
+        add = coll
+      )
       checkmate::assert_names(
         names(self %.% parameters %.% disease_progression_rates),
         subset.of = c("E", "I"),
