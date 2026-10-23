@@ -47,7 +47,7 @@ test_that("Empty initialize works", {
 })
 
 
-test_that("`$set_area()`` works", {
+test_that("`$set_area()` works", {
 
   region_1 <- DiseasyRegions$new()
   region_1$set_area(c("north", "south"))
@@ -87,7 +87,7 @@ test_that("`$set_adjacency()` works", {
 })
 
 
-test_that("`$set_demography()`` works", {
+test_that("`$set_demography()` works", {
 
   region_1 <- DiseasyRegions$new()
   region_1$set_demography(test_demography)
@@ -309,7 +309,7 @@ test_that("Setters are commutative", {
 })
 
 
-test_that("$region_filter() works", {
+test_that("`$region_filter()` works", {
 
   regions <- DiseasyRegions$new(
     area = "north",
@@ -425,7 +425,7 @@ test_that("`demography_nuts3` data set works with `DiseasyRegions`", {
 })
 
 
-test_that("$regions_at_stratification() tries to guess regions even if `regions` are not configured", {
+test_that("`$regions_at_stratification()` tries to guess regions even if `regions` are not configured", {
 
   # No information
   regions <- DiseasyRegions$new()
@@ -872,7 +872,7 @@ test_that("active binding: regional_risks works", {
 })
 
 
-test_that("$describe() works", {
+test_that("`$describe()` works", {
 
   regions <- DiseasyRegions$new()
   expect_no_error(withr::with_output_sink(nullfile(), regions$describe()))
