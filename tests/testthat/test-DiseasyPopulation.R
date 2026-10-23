@@ -492,3 +492,159 @@ test_that("`mean_contact_rates()` preserves the total number of contacts", {
   )
 
 })
+
+
+test_that("`mean_contact_rates()` works with activity scenarios", {
+
+  # Define an activity scenario
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = diseasy::contact_basis_nordic$DK)
+  activity$set_activity_units(diseasy::dk_activity_units)
+  activity$change_activity(
+    date = as.Date("2020-01-01"),
+    opening = "baseline"
+  )
+  activity$change_risk(date = as.Date("2020-03-01"), type = "work", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "school", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "home", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "other", risk = 0.1)
+
+
+  # Define a population module
+  population <- DiseasyPopulation$new(regions = DiseasyRegions$new(), activity = activity)
+
+  # Determine what the mean contact rate should be
+  model_population <- population %.% map_population(
+    age_groups_reference = purrr::pluck(activity %.% contact_basis, "mean_contacts_per_person", 1, colnames)
+  ) |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "age_group_reference"
+    )
+
+  N <- dplyr::pull(model_population, "population")                                                                      # nolint: object_name_linter
+  N_i <- outer(N, rep(1, length(N)))                                                                                    # nolint: object_name_linter
+
+  mean_contact_rate <- sum((purrr::reduce(contact_basis_nordic %.% DK %.% mean_contacts_per_person, `+`) * N_i))
+
+  expect_identical(
+    population$mean_contact_rates(),
+    list(
+      "2020-01-01" = matrix(data = mean_contact_rate,       dimnames = list("0+/All", "0+/All")),
+      "2020-03-01" = matrix(data = mean_contact_rate * 0.1, dimnames = list("0+/All", "0+/All"))
+    )
+  )
+
+})
+
+
+test_that("`mean_contact_rates()` works with movement scenarios", {
+
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # We now define a movement scenario
+  regions$change_movement(
+    date = as.Date("2020-02-01"),
+    from = c("A", "B"),
+    to = c("B", "A"),
+    relative_movement = 0.1
+  )
+
+  # Define a population module
+  population <- DiseasyPopulation$new(regions = regions, activity = DiseasyActivity$new())
+
+  expect_identical(
+    population$mean_contact_rates(),
+    list(
+      "2020-01-01" = matrix(data = 1, dimnames = list("0+/All", "0+/All")),
+      "2020-02-01" = matrix(data = 0.5 * (1 + 0.1 * 0.1), dimnames = list("0+/All", "0+/All"))
+    )
+  )
+
+})
+
+
+test_that("`mean_contact_rates()` works with activity and movement scenarios simultaneously", {
+
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # We now define a movement scenario
+  regions$change_movement(
+    date = as.Date("2020-02-01"),
+    from = c("A", "B"),
+    to = c("B", "A"),
+    relative_movement = 0.1
+  )
+
+  # Define an activity scenario
+  activity <- DiseasyActivity$new()
+  activity$set_contact_basis(contact_basis = diseasy::contact_basis_nordic$DK)
+  activity$set_activity_units(diseasy::dk_activity_units)
+  activity$change_activity(
+    date = as.Date("2020-01-01"),
+    opening = "baseline"
+  )
+  activity$change_risk(date = as.Date("2020-03-01"), type = "work", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "school", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "home", risk = 0.1)
+  activity$change_risk(date = as.Date("2020-03-01"), type = "other", risk = 0.1)
+
+
+  # Define a population module
+  population <- DiseasyPopulation$new(regions = regions, activity = activity)
+
+  # Determine what the mean contact rate should be
+  model_population <- population %.% map_population(
+    age_groups_reference = purrr::pluck(activity %.% contact_basis, "mean_contacts_per_person", 1, colnames)
+  ) |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = "age_group_reference"
+    )
+
+  N <- dplyr::pull(model_population, "population")                                                                      # nolint: object_name_linter
+  N_i <- outer(N, rep(1, length(N)))                                                                                    # nolint: object_name_linter
+
+  mean_contact_rate <- sum((purrr::reduce(contact_basis_nordic %.% DK %.% mean_contacts_per_person, `+`) * N_i))
+
+  expect_identical(
+    population$mean_contact_rates(),
+    list(
+      "2020-01-01" = matrix(
+        data = mean_contact_rate,
+        dimnames = list("0+/All", "0+/All")
+      ),
+      "2020-02-01" = matrix(
+        data = mean_contact_rate * 0.5 * (1 + 0.1 * 0.1),
+        dimnames = list("0+/All", "0+/All")
+      ),
+      "2020-03-01" = matrix(
+        data = mean_contact_rate * 0.5 * (1 + 0.1 * 0.1) * 0.1,
+        dimnames = list("0+/All", "0+/All")
+      )
+    )
+  )
+
+})
