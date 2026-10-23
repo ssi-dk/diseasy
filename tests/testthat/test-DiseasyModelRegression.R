@@ -143,6 +143,23 @@ test_that("update_formula gives error", {
 })
 
 
+test_that("`plot()` produces no errors", {
+  skip_if_not_installed("duckdb")
+
+  conn <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
+  observables <- DiseasyObservables$new(
+    diseasystore = "Simulist",
+    conn = conn
+  )
+  observables$set_last_queryable_date(as.Date("2020-03-01"))
+  model <- DiseasyModelG0$new(observables = observables)
+  expect_no_error(model$plot(observable = "n_admission", prediction_length = 10))
+
+  DBI::dbDisconnect(conn)
+  rm(model, conn)
+})
+
+
 test_that("active binding: formula works", {
   m <- DiseasyModelRegression$new(
     formula = "{observable} ~ 0",
