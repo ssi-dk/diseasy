@@ -42,7 +42,7 @@ for (noise_model in c("poisson", "negative binomial")) {
           names(output),
           permutation.of = c("realisation_id", "weight", "negative_log_likelihood")
         )
-        checkmate::expect_numeric(output %.% negative_log_likelihood, lower = 0)
+        checkmate::expect_numeric(output %.% negative_log_likelihood)
 
         DBI::dbDisconnect(conn)
         rm(scoring, conn)

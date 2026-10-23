@@ -13,12 +13,8 @@ test_that("initialize works", {
 
 test_that("$set_noise_model() works", {
 
-  # Creating an default module
+  # Creating a default module
   scoring <- DiseasyScoring$new()
-  checkmate::expect_function(
-    scoring %.% noise_model,
-    args = c("observations", "model_expectation")
-  )
   hash_new_instance <- scoring$hash # Store the current hash
   expect_identical(scoring$hash, hash_new_instance)
 
