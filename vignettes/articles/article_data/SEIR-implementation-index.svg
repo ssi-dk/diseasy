@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="85.566055mm"
+   height="34.171524mm"
+   viewBox="0 0 85.566055 34.171525"
+   version="1.1"
+   id="svg1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="SEIR-implementation-index.svg"
+   inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\article_data\SEIR-implementation-index.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
+  <metadata
+     id="metadata5010">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="4.0668163"
+     inkscape:cx="109.59436"
+     inkscape:cy="53.313399"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showgrid="false" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-50.159357,-85.494228)">
+    <rect
+       y="92.055199"
+       x="78.136772"
+       height="20.178848"
+       width="20.178848"
+       id="rect4212"
+       style="fill:#ececec;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       id="text4216"
+       y="105.63267"
+       x="80.322868"
+       style="font-style:normal;font-weight:normal;font-size:3.175px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"><tspan
+         style="font-size:10.5833px;line-height:1.25;font-family:sans-serif;stroke-width:0.264583"
+         y="105.63267"
+         x="80.322868"
+         id="tspan4218"
+         sodipodi:role="line">E<tspan
+   id="tspan4606"
+   style="font-size:6.87926px;baseline-shift:super;stroke-width:0.264583">2</tspan></tspan></text>
+    <text
+       id="text4222"
+       y="105.7627"
+       x="87.184624"
+       style="font-size:10.58329964px;font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       sodipodi:linespacing="0%"><tspan
+         style="font-size:65.00091553%;line-height:10;letter-spacing:0px;baseline-shift:sub;fill:#000000;fill-opacity:1;font-family:sans-serif"
+         y="105.7627"
+         x="87.184624"
+         id="tspan4224"
+         sodipodi:role="line">1,2</tspan></text>
+    <rect
+       y="102.51419"
+       x="87.43969"
+       height="5.8823915"
+       width="3.6510429"
+       id="rect4226"
+       style="fill:none;stroke:#b51412;stroke-width:0.26458299;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       id="text4228"
+       y="118.26875"
+       x="61.105061"
+       style="font-style:normal;font-weight:normal;font-size:3.175px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#b51412;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"><tspan
+         style="font-size:5.82083px;line-height:1.25;font-family:sans-serif;fill:#b51412;fill-opacity:1;stroke-width:0.264583"
+         y="118.26875"
+         x="61.105061"
+         id="tspan4230"
+         sodipodi:role="line">demography-index</tspan></text>
+    <g
+       id="g4803"
+       style="fill:#b51412;fill-opacity:1;stroke:none"
+       transform="matrix(0.26458333,0,0,0.26458333,-262.35217,-500.16383)"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#b51412;fill-opacity:1;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+         d="m 1319.0312,2299.2188 c 0,0 -17.2636,7.0349 -16.7187,25.5624 l 1,-0.031 c -0.5265,-17.901 16.0937,-24.625 16.0937,-24.625 l -0.375,-0.9062 z"
+         id="path4232"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#b51412;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         d="m 1316.9002,2300.6375 -1.1016,2.605 5.735,-4.4844 -7.2385,0.7777 z"
+         id="path4809" />
+    </g>
+    <rect
+       style="fill:none;stroke:#da7b27;stroke-width:0.28508425;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect4811"
+       width="6.2625465"
+       height="8.2808599"
+       x="80.821548"
+       y="97.69487"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.175px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#da7b27;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="49.862492"
+       y="96.526115"
+       id="text4813"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"><tspan
+         sodipodi:role="line"
+         id="tspan4815"
+         x="49.862492"
+         y="96.526115"
+         style="font-size:5.82083px;line-height:1.25;font-family:sans-serif;fill:#da7b27;fill-opacity:1;stroke-width:0.264583">state-type</tspan></text>
+    <g
+       id="g4827"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="matrix(0.26458333,0,0,0.26458333,-262.79252,-500.34784)">
+      <path
+         id="path4821"
+         d="m 1293.6118,2275.9073 -1.963,2.0362 6.9623,-2.1277 -7.0355,-1.8716 z"
+         style="fill:#da7b27;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="cc"
+         transform="translate(-300.57297,2109.4012)"
+         inkscape:connector-curvature="0"
+         id="path4825"
+         d="m 1571.0397,148.80799 c 0,11.99556 6.1872,17.55139 23.6123,17.67766"
+         style="fill:none;stroke:#da7b27;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <rect
+       style="fill:none;stroke:#367f68;stroke-width:0.26458299;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect4831"
+       width="4.2577982"
+       height="5.858634"
+       x="92.551964"
+       y="102.52608"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <g
+       id="g4839"
+       transform="matrix(-0.26458333,0,0,0.26458333,440.57062,-496.42634)"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#367f68;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         d="m 1293.6118,2275.9073 -1.963,2.0362 6.9623,-2.1277 -7.0355,-1.8716 z"
+         id="path4841" />
+      <path
+         style="fill:none;stroke:#367f68;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 1571.0397,148.80799 c 0,11.99556 6.1872,17.55139 23.6123,17.67766"
+         id="path4843"
+         inkscape:connector-curvature="0"
+         transform="translate(-300.57297,2109.4012)"
+         sodipodi:nodetypes="cc" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.175px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#367f68;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="99.938957"
+       y="100.63368"
+       id="text5455"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"><tspan
+         sodipodi:role="line"
+         id="tspan5457"
+         x="99.938957"
+         y="100.63368"
+         style="font-size:5.82083px;line-height:1.25;font-family:sans-serif;fill:#367f68;fill-opacity:1;stroke-width:0.264583">variant-index</tspan></text>
+    <rect
+       y="95.961426"
+       x="87.420135"
+       height="5.8765254"
+       width="3.6901581"
+       id="rect5459"
+       style="fill:none;stroke:#8092c6;stroke-width:0.26458299;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <g
+       transform="matrix(-0.26458333,0,0,-0.26458333,441.221,705.40552)"
+       style="fill:#8092c6;fill-opacity:1;stroke:none"
+       id="g5461"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5463"
+         d="m 1319.0312,2299.2188 c 0,0 -17.2636,7.0349 -16.7187,25.5624 l 1,-0.031 c -0.5265,-17.901 16.0937,-24.625 16.0937,-24.625 l -0.375,-0.9062 z"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#8092c6;fill-opacity:1;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+      <path
+         id="path5465"
+         d="m 1317.6379,2300.3916 -1.1016,2.605 5.735,-4.4844 -7.2385,0.7777 z"
+         style="fill:#8092c6;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         inkscape:connector-curvature="0" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.175px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#b51412;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="78.111504"
+       y="89.91806"
+       id="text5467"
+       inkscape:export-filename="C:\Users\B246705\Documents\Kode\R\diseasy\diseasy\vignettes\articles\SEIR-implementation-index.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"><tspan
+         sodipodi:role="line"
+         id="tspan5469"
+         x="78.111504"
+         y="89.91806"
+         style="font-size:5.82083px;line-height:1.25;font-family:sans-serif;fill:#8092c6;fill-opacity:1;stroke-width:0.264583">state-index</tspan></text>
+  </g>
+</svg>
