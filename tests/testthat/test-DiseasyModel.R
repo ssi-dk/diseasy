@@ -252,32 +252,34 @@ test_that("$hash works", {
   m$load_module(act_alt)
   expect_false(m$hash == hash_5)
   m$load_module(act) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
   expect_identical(m$hash, hash_5)
   m$load_module(s_alt)
   expect_false(m$hash == hash_5)
   m$load_module(s) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
-  expect_identical(m$hash, hash_5)
   m$load_module(obs_alt)
   expect_false(m$hash == hash_5)
   m$load_module(obs) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   var_alt <- DiseasyVariant$new()
   var_alt$add_variant(name = "WT")
-  expect_identical(m$hash, hash_5)
   m$load_module(var_alt)
   expect_false(m$hash == hash_5)
   m$load_module(var) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   immunity_alt <- DiseasyImmunity$new()
   immunity_alt$set_linear_waning()
-  expect_identical(m$hash, hash_5)
   m$load_module(immunity_alt)
   expect_false(m$hash == hash_5)
   m$load_module(immunity) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   rm(m, s, act, obs, var, immunity, s_alt, act_alt, obs_alt, var_alt, immunity_alt)
   invisible(gc())
@@ -349,29 +351,38 @@ test_that("cloning works", {
   # Create a simple clone
   m_c <- m$clone()
   expect_identical(m_c$hash, hash_loaded) # Hash should be the same
+  expect_identical(m_c$hash, m$hash) # Hash should be the same
 
 
 
   # If we load a new module into the clone, we want new hashes in the clone
+
+  # Load new activity scenario and check hashes
   act_alt <- DiseasyActivity$new()
   act_alt$set_activity_units(dk_activity_units)
   act_alt$change_activity(head(scenario_1, 3))
   m_c$load_module(act_alt)
-  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash, hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
-  s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
+  # Reset to original clone
   m_c$load_module(act)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
+
+  # Load new season scenario and check hashes
+  s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
   m_c$load_module(s_alt)
-  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash, hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
-  obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
+  # Reset to original clone
   m_c$load_module(s)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
+
+  # Load new observables module and check hashes
+  obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
   m_c$load_module(obs_alt)
-  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash, hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
 
@@ -383,7 +394,7 @@ test_that("cloning works", {
 
   # - activity
   m_c$activity$reset_scenario()
-  expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(act$hash == m_c$activity$hash) # module hashes should also be different
 
@@ -391,7 +402,7 @@ test_that("cloning works", {
   m_c$load_module(act)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$season$set_reference_date(as.Date("2020-03-01"))
-  expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(s$hash == m_c$season$hash) # module hashes should also be different
 
@@ -399,7 +410,7 @@ test_that("cloning works", {
   m_c$load_module(s)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$observables$set_last_queryable_date(as.Date("2020-03-01"))
-  expect_identical(m$hash,  hash_loaded)   # Hash "202should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded) # Hash "202should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(obs$hash == m_c$observables$hash) # module hashes should also be different
 

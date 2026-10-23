@@ -81,6 +81,55 @@ print(model_4$parameters) # "peak" value is still copied
 print(attr(model_4$season$model_t, "dots"))
 ```
 
+
+# The scoring metric
+The principal metric used in `diseasy` is the likelihood which compares the
+model forecast with observations for each time-point at each strata and computes
+the mean likelihood across the strata for the given time-point.
+
+Different observation have different distributions and therefore `diseasy`
+supports multiple methods for computing the likelihood given the underlying
+(assumed) distribution.
+
+The scoring of the forecasts are controlled by the `?DiseasyScoring` module,
+where users can define the scoring metric and which includes a method to
+compute the likelihood for a given set of model trajectories
+(i.e. the output from `$get_results()`).
+
+```{r DiseasyScoring}
+scoring <- DiseasyScoring$new()
+
+scoring
+```
+
+The scoring metric can be controlled with the `?DiseasyScoring$set_noise_model()`
+method:
+```{r DiseasyScoring - negative binomial}
+scoring$set_noise_model("negative binomial", overdispersion = 2)
+
+scoring
+```
+
+With the scoring metric defined, we can compute the likelihood for a set of
+model trajectories with `?DiseasyScoring$compute_likelihood()`:
+
+```{r DiseasyScoring - compute_likelihood, eval = rlang::is_installed("duckdb")}
+observables <- DiseasyObservables$new(
+  diseasystore = "simulist",
+  conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+)
+
+observables$set_last_queryable_date(as.Date("2020-03-01"))
+
+model <- DiseasyModelG0$new(
+  observables = observables
+)
+
+trajectories <- model$get_results(observable = "n_admission", prediction_length = 7)
+
+model$scoring$compute_likelihood(trajectories)
+```
+
 ```{r cleanup, include = FALSE}
 gc()
 ```

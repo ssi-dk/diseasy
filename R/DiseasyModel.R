@@ -8,12 +8,13 @@
 #'   * Module interfaces:
 #'     The module contains the functional modules via its active bindings:
 #'     * `$observables`: `DiseasyObservables`
-#'     * `$population` : `DiseasyPopulation`
+#'     * `$population`: `DiseasyPopulation`
 #'     * `$activity`: `DiseasyActivity`
 #'     * `$regions`: `DiseasyRegions`
 #'     * `$season`: `DiseasySeason`
-#'     * `$variant` : `DiseasyVariant`
-#'     * `$immunity` : `DiseasyImmunity`
+#'     * `$variant`: `DiseasyVariant`
+#'     * `$immunity`: `DiseasyImmunity`
+#'     * `$scoring`: `DiseasyScoring`
 #'
 #'     Configured instances of these modules can be provided during initialisation.
 #'     Alternatively, default instances of these modules can optionally be created.
@@ -40,7 +41,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param observables,population,activity,regions,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,regions,season,variant,immunity,scoring `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -66,6 +67,7 @@ DiseasyModel <- R6::R6Class(                                                    
       season      = FALSE,
       variant     = FALSE,
       immunity    = FALSE,
+      scoring     = TRUE,
       parameters  = NULL,
       label       = NULL,
       ...
@@ -105,6 +107,11 @@ DiseasyModel <- R6::R6Class(                                                    
       checkmate::assert(
         checkmate::check_logical(immunity, null.ok = TRUE),
         checkmate::check_class(immunity, "DiseasyImmunity", null.ok = TRUE),
+        add = coll
+      )
+      checkmate::assert(
+        checkmate::check_logical(scoring, null.ok = TRUE),
+        checkmate::check_class(scoring, "DiseasyScoring", null.ok = TRUE),
         add = coll
       )
       checkmate::assert_list(parameters, null.ok = TRUE, add = coll)
@@ -163,6 +170,12 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(DiseasyImmunity$new())
       } else if (inherits(immunity, "DiseasyImmunity")) {
         self$load_module(immunity)
+      }
+
+      if (isTRUE(scoring)) {
+        self$load_module(DiseasyScoring$new())
+      } else if (inherits(scoring, "DiseasyScoring")) {
+        self$load_module(scoring)
       }
 
 
@@ -375,6 +388,16 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
+    #' @field scoring (`diseasy::DiseasyScoring`)\cr
+    #'   The local copy of a DiseasyScoring module. Read-only.
+    #' @seealso [diseasy::DiseasyScoring]
+    scoring = purrr::partial(
+      .f = active_binding,
+      name = "Scoring",
+      expr = return(private %.% .DiseasyScoring)
+    ),
+
+
     #' @field parameters (`list()`)\cr
     #'   The parameters used in the model. Read-only.
     parameters = purrr::partial(
@@ -502,6 +525,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
     .DiseasyImmunity    = NULL,
+    .DiseasyScoring     = NULL,
     .parameters = NULL,
 
     # @field default_parameters (`list`)\cr

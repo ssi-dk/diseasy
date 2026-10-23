@@ -144,6 +144,7 @@ Names of the user-configured model outputs. Read only.}
   season = TRUE,
   variant = TRUE,
   immunity = TRUE,
+  scoring = TRUE,
   parameters = NULL,
   ...
 )}
@@ -152,7 +153,7 @@ Names of the user-configured model outputs. Read only.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{observables, population, activity, regions, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{observables, population, activity, regions, season, variant, immunity, scoring}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
       \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
