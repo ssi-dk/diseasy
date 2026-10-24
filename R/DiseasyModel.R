@@ -202,10 +202,12 @@ DiseasyModel <- R6::R6Class(                                                    
 
       # For parameters marked for optimisation (NA), we store the default parameter value as attributes
       parameters_to_fit <- names(purrr::keep(parameters, anyNA))
-      for (parameter_id in seq_along(parameters_to_fit)) {
-        parameter <- parameters_to_fit[parameter_id]
-        default <- current_parameters[[parameter]]
-        attr(updated_parameters[[parameter]], "default") <- default
+
+      for (parameter in parameters_to_fit) {
+        updated_parameters[[parameter]] <- set_attributes(
+          updated_parameters[[parameter]],
+          list("default" = default_parameters[[parameter]])
+        )
       }
 
       # Set the scale of the season if needed or backpropagate the default value to the model parameters
@@ -226,7 +228,10 @@ DiseasyModel <- R6::R6Class(                                                    
               keep.null = TRUE
             )
           } else if (is.na(updated_parameters %.% season.scale)) { # Store defaults as attribute for optimiser
-            attr(updated_parameters[["season.scale"]], "default") <- default
+            updated_parameters[["season.scale"]] <- set_attributes(
+              updated_parameters[["season.scale"]],
+              list("default" = default)
+            )
           }
 
         }
@@ -243,7 +248,10 @@ DiseasyModel <- R6::R6Class(                                                    
               keep.null = TRUE
             )
           } else if (is.na(updated_parameters %.% season.peak)) { # Store defaults as attribute for optimiser
-            attr(updated_parameters[["season.peak"]], "default") <- default
+            updated_parameters[["season.peak"]] <- set_attributes(
+              updated_parameters[["season.peak"]],
+              list("default" = default)
+            )
           }
         }
       }
@@ -401,60 +409,57 @@ DiseasyModel <- R6::R6Class(                                                    
       # Determine parameters that need fitting
       parameters_to_fit <- purrr::keep(self %.% parameters, anyNA)
 
-      # Extract initial guess
-      p0 <- purrr::map_dbl(parameters_to_fit, ~ attr(., "default"))
-
-      if (length(p0) == 0) {
+      if (length(parameters_to_fit) == 0L) {
         message("No free parameters to optimise!")
         return(invisible(NULL))
       }
 
-      # Define the objective function
-      objective_function <- \(p) {
+      # Extract initial guess and ranges
+      x0 <- purrr::map_dbl(parameters_to_fit, ~ attr(., "default"))
 
-        # Update parameters
-        tryCatch(
-          self$update_parameters(as.list(p)),
-          error = function(e) {
+      ranges <- purrr::map(parameters_to_fit, ~ attr(.x, "range") %||% c(NA_real_, NA_real_))
+
+      # Map model parameters to unconstrained coordinates
+      p0 <- purrr::map2_dbl(x0, ranges, parameter_inverse)
+
+      # Convert unconstrained coordinates to model parameters
+      transform_parameters <- \(p) purrr::map2_dbl(p, ranges, parameter_forward)
+
+      # Objective function operating in unconstrained coordinates
+      objective_function <- function(p) {
+
+        x <- transform_parameters(p)
+
+        tryCatch({
+
+          # Update model parameters
+          self$update_parameters(parameters = as.list(p))
+
+          # Compute trajectories
+          trajectories <- self$get_results(
+            observable = observable,
+            stratification = stratification,
+            prediction_length = self %.% parameters %.% training_length %.% testing
+          )
+
+          # Score by likelihood
+          scored_trajectories <- self$scoring$compute_likelihood(trajectories)
+
+          # Take (weighted) average across realisations (if any)
+          loss <- stats::weighted.mean(
+            x = scored_trajectories$negative_log_likelihood,
+            w = scored_trajectories$weight
+          )
+
+          if (!is.finite(loss)) {
             return(1e4)
           }
-        )
 
-        # Compute new trajectories
-        trajectories <- self$get_results(
-          observable = observable,
-          stratification = stratification,
-          prediction_length = self %.% parameters %.% training_length %.% testing
-        )
-
-        # Score by likelihood
-        scored_trajectories <- self$scoring$compute_likelihood(trajectories)
-
-        # Take (weighted) average across realisations (if any)
-        loss <- stats::weighted.mean(
-          x = scored_trajectories$negative_log_likelihood,
-          w = scored_trajectories$weight
-        )
-
-        return(loss)
+          return(loss)
+        }, error = function(e) {
+          return(1e4)
+        })
       }
-
-      p0 <- c("overall_infection_risk" = 0.025, "season.scale" = 0.5726693)
-      objective_function(p0)
-      self$update_parameters(parameters = as.list(p0))
-      self$plot(observable, prediction_length = 0)
-
-
-      p0 <- c("overall_infection_risk" = 0.02, "season.scale" = 0.5726693)
-      objective_function(p0)
-      self$update_parameters(parameters = as.list(p0))
-      self$plot(observable, prediction_length = 0)
-
-
-      p0 <- c("overall_infection_risk" = 0.022, "season.scale" = 0.5726693)
-      objective_function(p0)
-      self$update_parameters(parameters = as.list(p0))
-      self$plot(observable, prediction_length = 0)
 
       # Run optimisation
       res <- ucminf::ucminf(
@@ -462,18 +467,19 @@ DiseasyModel <- R6::R6Class(                                                    
         fn = objective_function
       )
 
-      res <- optimx::optimr(
-        par = p0,
-        fn = objective_function,
-        method = "pracmanm"
+      # Transform estimates back to model coordinates
+      estimates <- transform_parameters(res$par)
+
+      # Apply fitted parameters to th model
+      self$update_parameters(
+        parameters = as.list(estimates)
       )
 
-      # Apply optimised parameters to the model
-      self %.% update_parameters(parameters = as.list(res$par))
+      # Preserve estimates on both scales
+      res$par_unconstrained <- res$par
+      res$par <- estimates
 
-      print(res)
-
-      return(invisible(NULL))
+      return(invisible(res))
     }
   ),
 

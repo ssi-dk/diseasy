@@ -207,3 +207,98 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   # Catch all other cases
   stop(glue::glue("`{type}` could not be parsed!"), call. = FALSE)
 }
+
+
+#' Set attributes on an object
+#'
+#' @description
+#'   Add attributes to an object, optionally overwriting
+#'   attributes that already exist.
+#'
+#' @param x An R object.
+#' @param attributes A named list of attributes to set.
+#' @param overwrite (`logical(1)`)\cr
+#'   Should be existing attributes overwritten?
+#'
+#' @return The object with updated attributes.
+#' @export
+set_attributes <- function(x, attributes, overwrite = FALSE) {
+
+  checkmate::assert_list(attributes, names = "unique")
+  checkmate::assert_flag(overwrite)
+
+  if (length(attributes) == 0L) {
+    return(x)
+  }
+
+  if (is.null(names(attributes)) ||
+      any(!nzchar(names(attributes)))) {
+    stop("`attributes` must be a named list.", call. = FALSE)
+  }
+
+  existing <- base::attributes(x)
+
+  if (is.null(existing)) {
+    existing <- list()
+  }
+
+  for (name in names(attributes)) {
+    if (overwrite || !(name %in% names(existing))) {
+      attr(x, name) <- attributes[[name]]
+    }
+  }
+
+  return(x)
+}
+
+
+parameter_forward <- function(z, range = c(NA_real_, NA_real_)) {
+  lower <- range[1]
+  upper <- range[2]
+
+  softplus <- function(x) {
+    pmax(x, 0) + log1p(exp(-abs(x)))
+  }
+
+  if (is.na(lower) && is.na(upper)) {
+    return(z)
+  }
+
+  if (is.na(upper)) {
+    return(lower + softplus(z))
+  }
+
+  if (is.na(lower)) {
+    return(upper - softplus(z))
+  }
+
+  lower + (upper - lower) * stats::plogis(z)
+}
+
+parameter_inverse <- function(x, range = c(NA_real_, NA_real_)) {
+  lower <- range[1]
+  upper <- range[2]
+
+  inverse_softplus <- function(y) {
+    y <- pmax(y, .Machine$double.eps)
+    y + log(-expm1(-y))
+  }
+
+  if (is.na(lower) && is.na(upper)) {
+    return(x)
+  }
+
+  if (is.na(upper)) {
+    return(inverse_softplus(x - lower))
+  }
+
+  if (is.na(lower)) {
+    return(inverse_softplus(upper - x))
+  }
+
+  p <- (x - lower) / (upper - lower)
+  p <- pmin(pmax(p, .Machine$double.eps),
+            1 - .Machine$double.eps)
+
+  stats::qlogis(p)
+}
