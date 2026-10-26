@@ -247,3 +247,85 @@ set_attributes <- function(x, attributes, overwrite = FALSE) {
 
   return(x)
 }
+
+#' @title
+#'   "Forward" and "backward" mapping from unconstrained parameter space to a
+#'   constrained sub-domain.
+#'
+#' @name parameter_mapping
+#'
+#' @description
+#'   Two helper functions to map to and from an unconstrained parameter space P,
+#'   where optimisers run, to a constrained domain X where the model parameters
+#'   are well-defined.
+#'
+#' @param x (`object`)\cr
+#'   An R object.
+#' @param attributes (`named list`)\cr
+#'   A named list of attributes to set.
+#' @param overwrite (`logical(1)`)\cr
+#'   Should be existing attributes overwritten?
+#'
+#' @return The object with updated attributes.
+#' @noRd
+parameter_forward <- function(p, range = c(NA_real_, NA_real_)) {
+  lower <- range[1]
+  upper <- range[2]
+
+  # If no constraints are given, do a direct mapping
+  if (is.na(lower) && is.na(upper)) {
+    return(p)
+  }
+
+  # If lower or upper constrained only, use softplus to map to constrained space
+  if (is.na(upper)) {
+    return(lower + softplus(p))
+  }
+
+  if (is.na(lower)) {
+    return(upper - softplus(p))
+  }
+
+  # If both upper and lower constrained, map using a sigmoid function
+  return(lower + (upper - lower) * stats::plogis(p))
+}
+
+#' @rdname parameter_mapping
+#' @noRd
+parameter_inverse <- function(x, range = c(NA_real_, NA_real_)) {
+  lower <- range[1]
+  upper <- range[2]
+
+  # If no constraints are given, do a direct mapping
+  if (is.na(lower) && is.na(upper)) {
+    return(x)
+  }
+
+  # If lower or upper constrained only, use inverse softplus to map to unconstrained space
+  if (is.na(upper)) {
+    return(inverse_softplus(x - lower))
+  }
+
+  if (is.na(lower)) {
+    return(inverse_softplus(upper - x))
+  }
+
+  # If both upper and lower constrained, map using a sigmoid function
+  p <- (x - lower) / (upper - lower)
+  p <- pmin(pmax(p, .Machine$double.eps), 1 - .Machine$double.eps)
+
+  return(stats::qlogis(p))
+}
+
+#' @rdname parameter_mapping
+#' @noRd
+softplus <- function(z) {
+  return(pmax(z, 0) + log1p(exp(-abs(z))))
+}
+
+#' @rdname parameter_mapping
+#' @noRd
+inverse_softplus <- function(z) {
+  z <- pmax(z, .Machine$double.eps)
+  z + log(-expm1(-z))
+}
