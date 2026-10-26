@@ -758,3 +758,19 @@ DiseasyModel <- R6::R6Class(                                                    
     }
   )
 )
+
+
+#' @name fit
+#' @title
+#'   Fitting method for `diseasy` models
+#' @description
+#'   Estimates parameters for a given model from a given observable.
+#' @param object (`Diseasy*`)\cr
+#'   The model to estimate parameters for.
+#' @param observable `r rd_observable()`
+#' @param ...
+#'   Other arguments passed to methods
+#' @export
+fit.DiseasyModel <- function(object, observable, ...) {
+  x$fit(...)
+}
