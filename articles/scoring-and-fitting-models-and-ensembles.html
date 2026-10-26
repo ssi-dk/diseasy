@@ -246,6 +246,46 @@ be applied to the module.</p>
 <span><span class="co">#&gt; [1] 20.09946</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="marking-parameters-for-optimisation">Marking parameters for optimisation<a class="anchor" aria-label="anchor" href="#marking-parameters-for-optimisation"></a>
+</h2>
+<p>Any parameter set to <code>NA</code> is considered to be “marked for
+optimisation” meaning that the fitting routine will attempt to estimate
+the parameter under the scoring metric.</p>
+<p>The default value for the parameter is stored as an attribute on any
+<code>NA</code> parameter and will be used as the starting point for the
+optimisation.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model_5</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  season <span class="op">=</span> <span class="va">season</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"season.scale"</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="co"># Mark for optimisation</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model_5</span><span class="op">$</span><span class="va">parameters</span><span class="op">[[</span><span class="st">"season.scale"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] NA</span></span>
+<span><span class="co">#&gt; attr(,"default")</span></span>
+<span><span class="co">#&gt; [1] 0.5726693</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="updating-parameters">Updating parameters<a class="anchor" aria-label="anchor" href="#updating-parameters"></a>
+</h2>
+<p>The parameters can either be set during the initialisation of the
+model as we have seen above:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model_6</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  season <span class="op">=</span> <span class="va">season</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"season.scale"</span> <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model_6</span><span class="op">$</span><span class="va">parameters</span><span class="op">[</span><span class="st">"season.scale"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $season.scale</span></span>
+<span><span class="co">#&gt; [1] 0.25</span></span></code></pre></div>
+<p>But the parameters can also be modified after initialisation via the
+<code><a href=".{2}/reference/DiseasyModel.html#method-DiseasyModel-update_parameters">$update_parameters()</a></code> method:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model_6</span><span class="op">$</span><span class="fu">update_parameters</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"season.scale"</span> <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model_6</span><span class="op">$</span><span class="va">parameters</span><span class="op">[</span><span class="st">"season.scale"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $season.scale</span></span>
+<span><span class="co">#&gt; [1] 0.7</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="the-scoring-metric">The scoring metric<a class="anchor" aria-label="anchor" href="#the-scoring-metric"></a>
 </h2>
 <p>The principal metric used in <code>diseasy</code> is the likelihood
@@ -260,7 +300,7 @@ likelihood given the underlying (assumed) distribution.</p>
 metric and which includes a method to compute the likelihood for a given
 set of model trajectories (i.e. the output from
 <code>$get_results()</code>).</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scoring</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyScoring.html">DiseasyScoring</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">scoring</span></span>
@@ -268,7 +308,7 @@ set of model trajectories (i.e. the output from
 <span><span class="co">#&gt; Observation noise model: poisson</span></span></code></pre></div>
 <p>The scoring metric can be controlled with the
 <code><a href=".{2}/reference/DiseasyScoring.html#method-DiseasyScoring-set_noise_model">$set_noise_model()</a></code> method:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scoring</span><span class="op">$</span><span class="fu">set_noise_model</span><span class="op">(</span><span class="st">"negative binomial"</span>, overdispersion <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">scoring</span></span>
@@ -277,13 +317,13 @@ set of model trajectories (i.e. the output from
 <p>With the scoring metric defined, we can compute the likelihood for a
 set of model trajectories with
 <code><a href=".{2}/reference/DiseasyScoring.html#method-DiseasyScoring-compute_likelihood">$compute_likelihood()</a></code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observables</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  diseasystore <span class="op">=</span> <span class="st">"simulist"</span>,</span>
 <span>  conn <span class="op">=</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; duckdb keeps downloaded extensions and secrets in a temporary directory:</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/RtmpV0g8z1/duckdb</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/Rtmp8oR6m2/duckdb</span></span>
 <span><span class="co">#&gt; This is removed when the R session ends.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Secrets are lost.</span></span>

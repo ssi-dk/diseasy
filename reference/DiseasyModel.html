@@ -220,6 +220,7 @@ The start and end dates of the validation period. Read-only.</p></dd>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 <p></p><ul><li><p><a href="#method-DiseasyModel-initialize"><code>DiseasyModel$new()</code></a></p></li>
+<li><p><a href="#method-DiseasyModel-update_parameters"><code>DiseasyModel$update_parameters()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-get_results"><code>DiseasyModel$get_results()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-get_data"><code>DiseasyModel$get_data()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-clone"><code>DiseasyModel$clone()</code></a></p></li>
@@ -249,11 +250,7 @@ This module is typically not constructed directly but rather through <code>Disea
 <dd><p>(<code>boolean</code> or <code>R6::R6Class instance</code>)<br> If a boolean is given, it dictates whether to load a new instance module of this class.<br> If an instance of the module is provided instead, a copy of this instance is added to the <code>DiseasyModel</code> instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to <code>DiseasyModel</code>.</p></dd>
 
       <dt><code>parameters</code></dt>
-<dd><p>(<code>named list()</code>)<br>
-List of parameters to set for the model during initialization.</p>
-<p>Each model has their own parameters.</p>
-<p>Common parameters are:</p><ul><li><p><code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></li>
-</ul></dd>
+<dd><p>(<code>named list()</code>)<br> List of parameters to set for the model during initialization.<br><br> Each model has their own parameters.<br><br> Common parameters are:<br> * <code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></dd>
 
       <dt><code>label</code></dt>
 <dd><p>(<code>character</code>)<br>
@@ -276,10 +273,33 @@ the other modules of the framework.</p>
 
 </div>
 
+<p></p><hr><a id="method-DiseasyModel-update_parameters"></a><div class="section">
+<h3 id="diseasymodel-update-parameters-"><code>DiseasyModel$update_parameters()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-update-parameters-"></a></h3>
+<p>Update the parameters of the model.</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">update_parameters</span><span class="op">(</span><span class="va">parameters</span>, validate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>parameters</code></dt>
+<dd><p>(<code>named list()</code>)<br> List of parameters to set for the model during initialization.<br><br> Each model has their own parameters.<br><br> Common parameters are:<br> * <code>training_length</code> (<code>named numeric(3)</code>)<br>   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".</p></dd>
+
+      <dt><code>validate</code></dt>
+<dd><p>(<code>logical(1)</code>)<br>
+Should the parameters be validated after updating?</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p><code>NULL</code> (called for side effects)</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-DiseasyModel-get_results"></a><div class="section">
 <h3 id="diseasymodel-get-results-"><code>DiseasyModel$get_results()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-get-results-"></a></h3>
 <p>The primary method used to request model results of a given observable at a given stratification</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">get_results</span><span class="op">(</span></span>
 <span>  <span class="va">observable</span>,</span>
 <span>  <span class="va">prediction_length</span>,</span>
@@ -287,7 +307,7 @@ the other modules of the framework.</p>
 <span>  stratification <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
 <dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
@@ -303,7 +323,7 @@ the other modules of the framework.</p>
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p>A <code>tibble</code> <a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble::tibble</a> with predictions at the level specified by stratification level. In addition to stratification columns, the output has the columns:<br><br>  - date (<code>Date</code>) specifying the date of the prediction.<br>  - realisation_id (<code>character</code>) giving a unique id for each realization in the ensemble.<br>  - weight (<code>numeric</code>) giving the weight of the realization in the ensemble.</p>
 </div>
 
@@ -313,7 +333,7 @@ the other modules of the framework.</p>
 <h3 id="diseasymodel-get-data-"><code>DiseasyModel$get_data()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-get-data-"></a></h3>
 <p>A method that returns training data for the models based on the model value of <code>training_length</code> and
 the <code>last_queryable_date</code> of the <code>DiseasyObservables</code> module.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span></span>
 <span>  <span class="va">observable</span>,</span>
 <span>  stratification <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -321,7 +341,7 @@ the <code>last_queryable_date</code> of the <code>DiseasyObservables</code> modu
 <span>  prediction_length <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
 <dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
@@ -338,7 +358,7 @@ The period to return data for. That is, the training, testing, validation or plo
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p>The output of <code>DiseasyObservables$get_observation</code> constrained to the training period.</p>
 </div>
 
@@ -347,10 +367,10 @@ The period to return data for. That is, the training, testing, validation or plo
 <p></p><hr><a id="method-DiseasyModel-clone"></a><div class="section">
 <h3 id="diseasymodel-clone-"><code>DiseasyModel$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
