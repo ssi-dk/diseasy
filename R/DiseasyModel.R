@@ -364,6 +364,126 @@ DiseasyModel <- R6::R6Class(                                                    
         )
 
       return(data)
+    },
+
+
+    #' @description
+    #'   Estimate free parameters (`NA`) for `diseasy` models.
+    #' @param observable `r rd_observable()`
+    #' @param stratification `r rd_stratification()`
+    #' @param ... Additional parameters passed to the optimiser.
+    #' @examplesIf rlang::is_installed("duckdb")
+    #'   # Generate model to fit
+    #'   observables <- DiseasyObservables$new(
+    #'       diseasystore = DiseasystoreSeirExample,
+    #'       conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+    #'   )
+    #'   observables$set_last_queryable_date(as.Date("2020-03-01"))
+    #'
+    #'   observables$define_synthetic_observable(
+    #'     "incidence",
+    #'     \(n_infected, n_population) n_infected / n_population
+    #'   )
+    #'
+    #'   season <- DiseasySeason$new(reference_date = Sys.Date())
+    #'   season$use_covid_season_v1()
+    #'
+    #'   model <- generate_example_seir_model(
+    #'     module_overrides = list(
+    #'       "observables" = observables,
+    #'       "season" = season
+    #'     ),
+    #'     parameter_overrides = list(
+    #'       "season.scale" = NA, # Mark for optimisation,
+    #'       "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    #'     )
+    #'   )
+    #'
+    #'
+    #'   # Estimate free parameters
+    #'   model$fit(observable = "n_infected")
+    #'
+    #'   # Show estimated parameters
+    #'   model$parameters$season.scale
+    #' @return `r rd_side_effects`
+    fit = function(observable, stratification = NULL, ...) {
+      checkmate::assert_number(self %.% parameters %.% training_length %.% testing, lower = 1)
+
+      # Determine parameters that need fitting
+      parameters_to_fit <- purrr::keep(self %.% parameters, anyNA)
+
+      if (length(parameters_to_fit) == 0L) {
+        message("No free parameters to optimise!")
+        return(invisible(NULL))
+      }
+
+      # Extract initial guess and ranges
+      x0 <- purrr::map_dbl(parameters_to_fit, ~ attr(., "default"))
+
+      ranges <- purrr::map(parameters_to_fit, ~ attr(.x, "range") %||% c(NA_real_, NA_real_))
+
+      # Map model parameters to unconstrained coordinates
+      p0 <- purrr::map2_dbl(x0, ranges, parameter_inverse)
+
+      # Convert unconstrained coordinates to model parameters
+      transform_parameters <- \(p) purrr::map2_dbl(p, ranges, parameter_forward)
+
+      # Objective function operating in unconstrained coordinates
+      objective_function <- function(p) {
+
+        tryCatch({
+          # Map to model domain
+          x <- transform_parameters(p)
+
+          # Update model parameters
+          self$update_parameters(parameters = as.list(x))
+
+          # Compute trajectories
+          trajectories <- self$get_results(
+            observable = observable,
+            stratification = stratification,
+            prediction_length = 0
+          )
+
+          # Score by likelihood
+          scored_trajectories <- self$scoring$compute_likelihood(trajectories)
+
+          # Take (weighted) average across realisations (if any)
+          loss <- stats::weighted.mean(
+            x = scored_trajectories$negative_log_likelihood,
+            w = scored_trajectories$weight
+          )
+
+          if (!is.finite(loss)) {
+            return(.Machine$double.xmax)
+          }
+
+          return(loss)
+        }, error = function(e) {
+          return(.Machine$double.xmax)
+        })
+      }
+
+      # Run optimisation
+      res <- ucminf::ucminf(
+        par = p0,
+        fn = objective_function,
+        ...
+      )
+
+      # Transform estimates back to model coordinates
+      estimates <- transform_parameters(res$par)
+
+      # Apply fitted parameters to th model
+      self$update_parameters(
+        parameters = as.list(estimates)
+      )
+
+      # Preserve estimates on both scales
+      res$par_unconstrained <- res$par
+      res$par <- estimates
+
+      return(invisible(res))
     }
   ),
 

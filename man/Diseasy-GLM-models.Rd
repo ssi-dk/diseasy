@@ -47,6 +47,7 @@ examples of how this can be done.
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="fit"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-fit'><code>DiseasyModel$fit()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>DiseasyModelRegression$get_results()</code></a></span></li>
@@ -88,6 +89,7 @@ examples of how this can be done.
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="fit"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-fit'><code>DiseasyModel$fit()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>DiseasyModelRegression$get_results()</code></a></span></li>
@@ -150,6 +152,7 @@ examples of how this can be done.
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="fit"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-fit'><code>DiseasyModel$fit()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelRegression" data-id="get_results"><a href='../../diseasy/html/DiseasyModelRegression.html#method-DiseasyModelRegression-get_results'><code>DiseasyModelRegression$get_results()</code></a></span></li>

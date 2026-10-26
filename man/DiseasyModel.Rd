@@ -37,6 +37,40 @@ These functions define the "API" of the models and ensure the models can take pa
   m <- DiseasyModel$new()
 
   rm(m)
+\dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
+  # Generate model to fit
+  observables <- DiseasyObservables$new(
+      diseasystore = DiseasystoreSeirExample,
+      conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+  )
+  observables$set_last_queryable_date(as.Date("2020-03-01"))
+
+  observables$define_synthetic_observable(
+    "incidence",
+    \(n_infected, n_population) n_infected / n_population
+  )
+
+  season <- DiseasySeason$new(reference_date = Sys.Date())
+  season$use_covid_season_v1()
+
+  model <- generate_example_seir_model(
+    module_overrides = list(
+      "observables" = observables,
+      "season" = season
+    ),
+    parameter_overrides = list(
+      "season.scale" = NA, # Mark for optimisation,
+      "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    )
+  )
+
+
+  # Estimate free parameters
+  model$fit(observable = "n_infected")
+
+  # Show estimated parameters
+  model$parameters$season.scale
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link[lgr:lgr]{lgr}
@@ -109,6 +143,7 @@ The start and end dates of the validation period. Read-only.}
     \item \href{#method-DiseasyModel-update_parameters}{\code{DiseasyModel$update_parameters()}}
     \item \href{#method-DiseasyModel-get_results}{\code{DiseasyModel$get_results()}}
     \item \href{#method-DiseasyModel-get_data}{\code{DiseasyModel$get_data()}}
+    \item \href{#method-DiseasyModel-fit}{\code{DiseasyModel$fit()}}
     \item \href{#method-DiseasyModel-clone}{\code{DiseasyModel$clone()}}
   }
 }
@@ -245,6 +280,30 @@ The period to return data for. That is, the training, testing, validation or plo
   }
   \subsection{Returns}{
     The output of \code{DiseasyObservables$get_observation} constrained to the training period.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModel-fit"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModel-fit}{}}}
+\subsection{\code{DiseasyModel$fit()}}{
+  Estimate free parameters (\code{NA}) for \code{diseasy} models.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModel$fit(observable, stratification = NULL, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+      \item{\code{...}}{Additional parameters passed to the optimiser.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
   }
 }
 
