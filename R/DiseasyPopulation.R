@@ -218,7 +218,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Convert to per-capita contacts ("C" domain) (and u
       c_matrices_age <- purrr::map(m_matrices_age, ~ . / outer(rep(1, length(N_age)), N_age))
 
-      # Retrieve the regional mixing matrices
+      # Retrieve the (unmodified) regional mixing matrices
       theta <- self %.% regions %.% infection_flow_matrix
 
       # Count population in regions
@@ -236,10 +236,39 @@ DiseasyPopulation <- R6::R6Class(                                               
       )
 
       # Construct the population-pair normalised mixing matrices
-      theta_norm <- theta * sum(N_regions)^2 / drop(t(N_regions) %*% theta %*% N_regions)
+      theta_norm <- sum(N_regions)^2 / drop(t(N_regions) %*% theta %*% N_regions)
+
+      # Extract the time-dependent movement scenarios
+      thetas <- self %.% regions %.% infection_flow_scenario
+
+      # Normalise the movement scenarios
+      thetas_normalised <- purrr::map(thetas, ~ . * theta_norm)
+
+      # Combine time-dependent activity scenario (c_matrices_age) and time-dependent movement scenarios (thetas)
+      dates_w_changes <- sort(unique(c(names(c_matrices_age), names(thetas))))
+
+      # Truncate to common starting point
+      dates_w_changes <- dates_w_changes[dates_w_changes >= min(names(c_matrices_age))]
+      dates_w_changes <- dates_w_changes[dates_w_changes >= min(names(thetas))]
+
+      c_matrices_age_combined <- purrr::map(
+        dates_w_changes,
+        \(date) purrr::pluck(purrr::keep_at(c_matrices_age, at = ~ . <= date), -1) # Get latest valid
+      ) |>
+        stats::setNames(dates_w_changes)
+
+      thetas_normalised_combined <- purrr::map(
+        dates_w_changes,
+        \(date) purrr::pluck(purrr::keep_at(thetas_normalised, at = ~ . <= date), -1) # Get latest valid
+      ) |>
+        stats::setNames(dates_w_changes)
 
       # Use normalised mixing matrices to "fold" age-specific contact matrices to the full contact matrices
-      c_matrices_full <- purrr::map(c_matrices_age, ~ kronecker(theta_norm, .))
+      c_matrices_full <- purrr::map2(
+        .x = c_matrices_age_combined,
+        .y = thetas_normalised_combined,
+        .f = \(c, theta) kronecker(theta, c)
+      )
 
       # Grab the model population
       N_full <- full_population |>                                                                                      # nolint: object_name_linter

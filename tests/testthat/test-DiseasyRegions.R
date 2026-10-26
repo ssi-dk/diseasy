@@ -47,7 +47,7 @@ test_that("Empty initialize works", {
 })
 
 
-test_that("`$set_area()`` works", {
+test_that("`$set_area()` works", {
 
   region_1 <- DiseasyRegions$new()
   region_1$set_area(c("north", "south"))
@@ -87,7 +87,7 @@ test_that("`$set_adjacency()` works", {
 })
 
 
-test_that("`$set_demography()`` works", {
+test_that("`$set_demography()` works", {
 
   region_1 <- DiseasyRegions$new()
   region_1$set_demography(test_demography)
@@ -309,7 +309,7 @@ test_that("Setters are commutative", {
 })
 
 
-test_that("$region_filter() works", {
+test_that("`$region_filter()` works", {
 
   regions <- DiseasyRegions$new(
     area = "north",
@@ -425,7 +425,7 @@ test_that("`demography_nuts3` data set works with `DiseasyRegions`", {
 })
 
 
-test_that("$regions_at_stratification() tries to guess regions even if `regions` are not configured", {
+test_that("`$regions_at_stratification()` tries to guess regions even if `regions` are not configured", {
 
   # No information
   regions <- DiseasyRegions$new()
@@ -742,6 +742,105 @@ test_that("`regional_risks` (location) produces error with adjacency (infection-
 })
 
 
+test_that("Movement scenarios work", {
+  regions <- DiseasyRegions$new()
+  regions$set_area(c("A", "B"))
+
+  # Equal movement probability
+  regions$set_adjacency(
+    adjacency = data.frame(
+      "from"      = c("A", "A", "B", "B"),
+      "to"        = c("A", "B", "A", "B"),
+      "adjacency" = c(0.5, 0.5, 0.5, 0.5)
+    ),
+    adjacency_type = "movement"
+  )
+
+  # Without a scenario, we should just get a single unmodified infection flow matrix
+  expect_identical(
+    regions$infection_flow_scenario,
+    list("1970-01-01" = regions$infection_flow_matrix)
+  )
+
+  # We now define a movement scenario
+  # ... using arguments
+  regions_1 <- regions$clone()
+  regions_1$change_movement(
+    date = as.Date("2020-02-01"),
+    from = c("A", "B"),
+    to = c("B", "A"),
+    relative_movement = 0.1
+  )
+  expect_identical(
+    names(regions_1$infection_flow_scenario),
+    c("1970-01-01", "2020-02-01")
+  )
+
+  # ... or using a data.frame
+  regions_2 <- regions$clone()
+  regions_2$change_movement(
+    data.frame(
+      "date" = as.Date("2020-02-01"),
+      "from" = c("A", "B"),
+      "to" = c("B", "A"),
+      "relative_movement" = 0.1
+    )
+  )
+  expect_identical(
+    names(regions_2$infection_flow_scenario),
+    c("1970-01-01", "2020-02-01")
+  )
+
+  # ... malformed inputs should still work but give warnings
+  regions_3 <- regions$clone()
+  expect_warning(
+    regions_3$change_movement( # Incomplete data
+      date = as.Date("2020-02-01"),
+      from = "A",
+      to = "B",
+      relative_movement = 0.1
+    ),
+    regexp = "The provided restrictions are either asymetric or incomplete"
+  )
+  expect_identical(
+    names(regions_3$infection_flow_scenario),
+    c("1970-01-01", "2020-02-01")
+  )
+
+  regions_4 <- regions$clone()
+  expect_warning(
+    regions_4$change_movement( # Incomplete data
+      date = as.Date("2020-02-01"),
+      "from" = c("A", "B"),
+      "to" = c("B", "A"),
+      "relative_movement" = c(0.1, 0.2)
+    ),
+    regexp = "The provided restrictions are either asymetric or incomplete"
+  )
+  expect_identical(
+    names(regions_4$infection_flow_scenario),
+    c("1970-01-01", "2020-02-01")
+  )
+
+  regions_5 <- regions$clone()
+  expect_warning(
+    regions_5$change_movement( # Incomplete data
+      date = as.Date("2020-02-01"),
+      "from" = c("A", "B"),
+      "to" = c("A", "A"),
+      "relative_movement" = c(0.5, 0.1)
+    ),
+    regexp = "The provided restrictions modify intra-region movement"
+  )
+  expect_identical(
+    names(regions_5$infection_flow_scenario),
+    c("1970-01-01", "2020-02-01")
+  )
+
+  rm(regions, regions_1, regions_2, regions_3, regions_4, regions_5)
+})
+
+
 test_that("`plot()` produces no errors with defaults", {
   skip_if_not_installed("giscoR")
   skip_if_not_installed("lwgeom")
@@ -872,7 +971,7 @@ test_that("active binding: regional_risks works", {
 })
 
 
-test_that("$describe() works", {
+test_that("`$describe()` works", {
 
   regions <- DiseasyRegions$new()
   expect_no_error(withr::with_output_sink(nullfile(), regions$describe()))
