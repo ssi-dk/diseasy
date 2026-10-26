@@ -108,7 +108,7 @@ The range can either be :
 - bounded from a single direction `c(min_value, NA)` or `c(NA, max_value)`
 - bounded from both directions `c(min_value, max_value)`
 
-```{r DiseasyModelG0 - parameters marked for optimisation}
+```{r DiseasyModelG0 - parameters marked for optimisation with overrides}
 model <- DiseasyModelG0$new(
   season = season,
   parameters = list(
@@ -198,7 +198,7 @@ With the free parameters identified and the scoring metric defined, we can
 use the `?DiseasyModel$fit()` method to optimise the free parameters using
 the "testing" data window.
 
-```{r fitting}
+```{r generate model to fit}
 # Generate model to fit
 observables <- DiseasyObservables$new(
   diseasystore = DiseasystoreSeirExample,
