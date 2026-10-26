@@ -192,6 +192,9 @@ test_that("parse_diseasyconn works", {
 test_that("`set_attributes()` works", {
   x <- NA
 
+  # Calling without attributes does not modify the object
+  expect_identical(x, set_attributes(x, list()))
+
   # Setting attributes works on new objects
   x <- set_attributes(x, list("a" = 1, "b" = 2))
   expect_identical(attr(x, "a"), 1)
