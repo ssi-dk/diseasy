@@ -784,7 +784,7 @@ test_that("fitting routine seems to work", {
 
   # Do a few optimisation steps
   model$update_parameters(list("overall_infection_risk" = set_attributes(NA, list("default" = 0.025))))
-  expect_no_error(model$fit(observable = "n_infected", control = list("maxeval" = 4)))
+  expect_no_error(fit(model, observable = "n_infected", control = list("maxeval" = 4)))
 
   # Compute loss after
   loss_after <- model$get_results(observable = "n_infected", prediction_length = 0) |>
