@@ -43,6 +43,7 @@ reference:
     - plot
     - print
     - diseasyoption
+    - set_attributes
 
   - title: Data sets
     desc: Data for the functional modules and model templates.

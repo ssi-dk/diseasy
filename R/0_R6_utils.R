@@ -207,3 +207,43 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   # Catch all other cases
   stop(glue::glue("`{type}` could not be parsed!"), call. = FALSE)
 }
+
+
+#' Set attributes on an object
+#'
+#' @description
+#'   Add attributes to an object, optionally overwriting attributes that already exist.
+#'
+#' @param x (`object`)\cr
+#'   An R object.
+#' @param attributes (`named list`)\cr
+#'   A named list of attributes to set.
+#' @param overwrite (`logical(1)`)\cr
+#'   Should be existing attributes overwritten?
+#'
+#' @return The object with updated attributes.
+#' @export
+set_attributes <- function(x, attributes, overwrite = FALSE) {
+
+  checkmate::assert_list(attributes, names = "unique")
+  checkmate::assert_names(names(attributes))
+  checkmate::assert_flag(overwrite)
+
+  if (length(attributes) == 0L) {
+    return(x)
+  }
+
+  existing_attributes <- attributes(x)
+
+  if (is.null(existing_attributes)) {
+    existing_attributes <- list()
+  }
+
+  for (name in names(attributes)) {
+    if (overwrite || !(name %in% names(existing_attributes))) {
+      attr(x, name) <- attributes[[name]]
+    }
+  }
+
+  return(x)
+}
