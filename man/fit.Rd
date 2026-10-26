@@ -15,6 +15,47 @@ The model to estimate parameters for.}
 
 \item{...}{Other arguments passed to methods}
 }
+\value{
+\code{NULL} (called for side effects).
+Output of optimiser returned invisibly.
+}
 \description{
 Estimates parameters for a given model from a given observable.
+}
+\examples{
+\dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
+  # Generate model to fit
+  observables <- DiseasyObservables$new(
+      diseasystore = DiseasystoreSeirExample,
+      conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+  )
+  observables$set_last_queryable_date(as.Date("2020-03-01"))
+
+  observables$define_synthetic_observable(
+    "incidence",
+    \(n_infected, n_population) n_infected / n_population
+  )
+
+  season <- DiseasySeason$new(reference_date = Sys.Date())
+  season$use_covid_season_v1()
+
+  model <- generate_example_seir_model(
+    module_overrides = list(
+      "observables" = observables,
+      "season" = season
+    ),
+    parameter_overrides = list(
+      "season.scale" = NA, # Mark for optimisation,
+      "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    )
+  )
+
+  # Estimate free parameters
+  \dontrun{
+  model$fit(observable = "n_infected")
+  }
+
+  # Show estimated parameters
+  model$parameters$season.scale
+\dontshow{\}) # examplesIf}
 }

@@ -64,9 +64,9 @@ These functions define the "API" of the models and ensure the models can take pa
     )
   )
 
-
-  # Estimate free parameters
+  \dontrun{
   model$fit(observable = "n_infected")
+  }
 
   # Show estimated parameters
   model$parameters$season.scale
