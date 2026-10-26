@@ -18,10 +18,14 @@ Should be existing attributes overwritten?}
 }
 \value{
 The object with updated attributes.
+
+\code{x} with the given attributes attached.
 }
 \description{
 Add attributes to an object, optionally overwriting attributes that already exist.
 }
 \examples{
    set_attributes(NA, list("attribute 1" = 1))
+   set_attributes(NA, list("attribute 1" = 2))
+   set_attributes(NA, list("attribute 1" = 2, overwrite = TRUE))
 }

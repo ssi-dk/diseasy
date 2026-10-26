@@ -224,6 +224,10 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #' @return The object with updated attributes.
 #' @examples
 #'    set_attributes(NA, list("attribute 1" = 1))
+#'    set_attributes(NA, list("attribute 1" = 2))
+#'    set_attributes(NA, list("attribute 1" = 2, overwrite = TRUE))
+#' @return
+#'   `x` with the given attributes attached.
 #' @export
 set_attributes <- function(x, attributes, overwrite = FALSE) {
 
