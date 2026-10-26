@@ -222,6 +222,8 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #'   Should be existing attributes overwritten?
 #'
 #' @return The object with updated attributes.
+#' @examples
+#'    set_attributes(NA, list("attribute 1" = 1))
 #' @export
 set_attributes <- function(x, attributes, overwrite = FALSE) {
 

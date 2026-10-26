@@ -22,3 +22,6 @@ The object with updated attributes.
 \description{
 Add attributes to an object, optionally overwriting attributes that already exist.
 }
+\examples{
+   set_attributes(NA, list("attribute 1" = 1))
+}
