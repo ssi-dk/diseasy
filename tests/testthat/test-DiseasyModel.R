@@ -791,7 +791,7 @@ test_that("fitting routine seems to work", {
     model$scoring$compute_likelihood() |>
     dplyr::pull("negative_log_likelihood")
 
-  expect_true(loss_after < loss_before)
+  expect_lt(loss_after, loss_before)
 })
 
 
