@@ -192,6 +192,60 @@ trajectories <- model$get_results(observable = "n_admission", prediction_length 
 model$scoring$compute_likelihood(trajectories)
 ```
 
+# Fitting parameters
+
+With the free parameters identified and the scoring metric defined, we can
+use the `?DiseasyModel$fit()` method to optimise the free parameters using
+the "testing" data window.
+
+```{r fitting}
+# Generate model to fit
+observables <- DiseasyObservables$new(
+  diseasystore = DiseasystoreSeirExample,
+  conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+)
+observables$set_last_queryable_date(as.Date("2020-03-01"))
+
+# Define the incidence from the example data
+mapping <- \(n_infected, n_population) n_infected / n_population
+observables$define_synthetic_observable("incidence", mapping)
+
+# Generate a modified model of the "true" generating model
+# with a specified "testing" window
+model <- generate_example_seir_model(
+  module_overrides = list(
+    "observables" = observables
+  ),
+  parameter_overrides = list(
+    "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+  )
+)
+```
+
+We can see the prediction using the default parameters
+```{r plot before fitting}
+model$plot(observable = "n_infected", prediction_length = 14)
+```
+
+```{r fitting}
+# The default model does not currently include the scoring module, so we
+# manually load
+model$load_module(scoring)
+
+# Mark the overall infection risk for fitting
+model$update_parameters(list("overall_infection_risk" = NA))
+
+# Estimate free parameters
+model$fit(observable = "n_infected")
+
+# Show estimated parameters
+model$parameters["overall_infection_risk"]
+```
+
+```{r plot after fitting}
+model$plot(observable = "n_infected", prediction_length = 14)
+```
+
 ```{r cleanup, include = FALSE}
 gc()
 ```
