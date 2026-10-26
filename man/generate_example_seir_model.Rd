@@ -10,12 +10,24 @@ generate_example_seir_model(
 )
 }
 \arguments{
+\item{module_overrides}{(\verb{named list})\cr
+A named list of diseasy modules to override the configuration in the example model.}
+
 \item{parameter_overrides}{(\verb{named list})\cr
 A named list of parameters to override the parameters in the example model.}
-
-\item{modules_overrides}{(\verb{named list})\cr
-A named list of diseasy modules to override the configuration in the example model.}
+}
+\value{
+A configured \code{DiseasyModelOdeSeir}.
 }
 \description{
 Generate variants of the example model (used to create data for \code{?DiseasystoreSeirExample})
+}
+\examples{
+\dontshow{if (rlang::is_installed("RSQLite")) withAutoprint(\{ # examplesIf}
+  model <- generate_example_seir_model()
+
+  model_modified <- generate_example_seir_model(
+    parameter_overrides = list("season.scale" = 0.25)
+  )
+\dontshow{\}) # examplesIf}
 }
