@@ -1587,12 +1587,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         parameters %.% season.scale,
         lower = 0,
         upper = 1,
+        na.ok = TRUE, # Can be optimised
         null.ok = TRUE, # Can use default value from module
         add = coll
       )
 
       checkmate::assert_number(
         parameters %.% season.peak,
+        na.ok = TRUE, # Can be optimised
         null.ok = TRUE, # Can use default value from module
         add = coll
       )
