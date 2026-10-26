@@ -51,6 +51,7 @@ reference:
     contents:
     - has_keyword("data")
     - has_keyword("data-generators")
+    - generate_example_seir_model
 
   - title: Developer functions
     desc: Functions to create model templates and functional modules.
