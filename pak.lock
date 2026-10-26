@@ -521,11 +521,6 @@
       "_row": "ids"
     },
     {
-      "package": "igraph",
-      "version": "2.3.4",
-      "_row": "igraph"
-    },
-    {
       "package": "ini",
       "version": "0.3.1",
       "_row": "ini"
