@@ -177,33 +177,39 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @param validate (`logical(1)`)\cr
     #'   Should the parameters be validated after updating?
     #' @return `r rd_side_effects`
-    update_parameters = function(parameters, validate = TRUE) {
+    update_parameters = function(
+      parameters,
+      validate = TRUE
+    ) {
+
+      # Use current parameters if set, otherwise use defaults
+      current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters())
 
       if (validate) {
         checkmate::assert_list(parameters, null.ok = TRUE)
         if (!is.null(parameters)) {
           checkmate::assert_names(names(parameters),
-            subset.of = names(private %.% default_parameters()),
+            subset.of = names(current_parameters),
             type = "unique"
           )
         }
       }
 
       # Update the existing parameters with the new parameters
-      default_parameters <- private %.% default_parameters()
-
       updated_parameters <- modifyList(
-        default_parameters,
+        current_parameters,
         purrr::pluck(parameters, .default = list()),
         keep.null = TRUE
       )
 
       # For parameters marked for optimisation (NA), we store the default parameter value as attributes
       parameters_to_fit <- names(purrr::keep(parameters, anyNA))
-      for (parameter_id in seq_along(parameters_to_fit)) {
-        parameter <- parameters_to_fit[parameter_id]
-        default <- default_parameters[[parameter]]
-        attr(updated_parameters[[parameter]], "default") <- default
+
+      for (parameter in parameters_to_fit) {
+        updated_parameters[[parameter]] <- set_attributes(
+          updated_parameters[[parameter]],
+          list("default" = current_parameters[[parameter]])
+        )
       }
 
       # Set the scale of the season if needed or backpropagate the default value to the model parameters
@@ -224,7 +230,10 @@ DiseasyModel <- R6::R6Class(                                                    
               keep.null = TRUE
             )
           } else if (is.na(updated_parameters %.% season.scale)) { # Store defaults as attribute for optimiser
-            attr(updated_parameters[["season.scale"]], "default") <- default
+            updated_parameters[["season.scale"]] <- set_attributes(
+              updated_parameters[["season.scale"]],
+              list("default" = default)
+            )
           }
 
         }
@@ -241,7 +250,10 @@ DiseasyModel <- R6::R6Class(                                                    
               keep.null = TRUE
             )
           } else if (is.na(updated_parameters %.% season.peak)) { # Store defaults as attribute for optimiser
-            attr(updated_parameters[["season.peak"]], "default") <- default
+            updated_parameters[["season.peak"]] <- set_attributes(
+              updated_parameters[["season.peak"]],
+              list("default" = default)
+            )
           }
         }
       }
