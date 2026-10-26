@@ -189,6 +189,29 @@ test_that("parse_diseasyconn works", {
 })
 
 
+test_that("`set_attributes()` works", {
+  x <- NA
+
+  # Setting attributes works on new objects
+  x <- set_attributes(x, list("a" = 1, "b" = 2))
+  expect_identical(attr(x, "a"), 1)
+  expect_identical(attr(x, "b"), 2)
+
+  # We can add new attributes on objects with attributes
+  x <- set_attributes(x, list("c" = 3))
+  expect_identical(attr(x, "a"), 1)
+  expect_identical(attr(x, "b"), 2)
+  expect_identical(attr(x, "c"), 3)
+
+  # Without overwrite, existing attributes should remain unchanged
+  x <- set_attributes(x, list("a" = 3))
+  expect_identical(attr(x, "a"), 1)
+
+  x <- set_attributes(x, list("a" = 3), overwrite = TRUE)
+  expect_identical(attr(x, "a"), 3)
+})
+
+
 test_that("parameter mapping without constraints is identity", {
   values <- c(-100, -1, 0, 1, 100)
 
