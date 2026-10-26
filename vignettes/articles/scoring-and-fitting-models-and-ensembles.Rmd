@@ -99,6 +99,28 @@ model <- DiseasyModelG0$new(
 print(model$parameters[["season.scale"]])
 ```
 
+The starting point for optimisation and the parameter range of optimisation can
+be set by modifying the "default" and "range" attributes.
+For this purpose, we provide the helper function `set_attributes` to modify the attributes inline.
+
+The range can either be :
+- unbounded `c(NA, NA)` (the default)
+- bounded from a single direction `c(min_value, NA)` or `c(NA, max_value)`
+- bounded from both directions `c(min_value, max_value)`
+
+```{r DiseasyModelG0 - parameters marked for optimisation}
+model <- DiseasyModelG0$new(
+  season = season,
+  parameters = list(
+    "season.scale" = set_attributes(
+      NA, # Mark for optimisation
+      list("default" = 0.25, "range" = c(0, 0.5)) # Control the optimisation
+    )
+  )
+)
+print(model$parameters[["season.scale"]])
+```
+
 # Updating parameters
 
 The parameters can either be set during the initialisation of the model as we
