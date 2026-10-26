@@ -771,6 +771,6 @@ DiseasyModel <- R6::R6Class(                                                    
 #' @param ...
 #'   Other arguments passed to methods
 #' @export
-fit.DiseasyModel <- function(object, observable, ...) {
-  x$fit(...)
+fit.DiseasyModel <- function(object, observable, ...) {                                                                 # nolint: object_name_linter
+  object$fit(...)
 }
