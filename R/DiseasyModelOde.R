@@ -56,7 +56,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
         self %.% observables %.% available_observables,
         add = coll
       )
-      checkmate::assert_number(prediction_length, add = coll)
+      checkmate::assert_number(prediction_length, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
 
       # Cast prediction_length to integer

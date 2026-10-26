@@ -326,7 +326,7 @@ DiseasyModel <- R6::R6Class(                                                    
         if (is.null(prediction_length)) {
           coll$push("Prediction length must be provided when requesting plotting data.")
         } else {
-          checkmate::assert_number(prediction_length, lower = 1, add = coll)
+          checkmate::assert_number(prediction_length, lower = 0, add = coll)
         }
       }
 
