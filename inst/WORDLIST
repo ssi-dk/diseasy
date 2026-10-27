@@ -4,6 +4,7 @@ alt
 antiphase
 AR
 ARI
+ast
 
 birthdate
 birthdates
@@ -155,6 +156,7 @@ magrittr
 Margy
 malthusian
 mathcal
+mathbb
 md
 medrxiv
 Mielke
@@ -182,6 +184,7 @@ optimx
 OO
 ORCID
 org
+otimes
 
 param
 parameterise
@@ -226,6 +229,7 @@ seir
 SEIR
 SHA
 sigmoidal
+siloed
 sim
 simulist
 Skytte

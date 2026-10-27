@@ -38,7 +38,7 @@ test_that("`$rhs()` is commutative under time-shifts when using `DiseasySeason`"
   private <- m1$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
