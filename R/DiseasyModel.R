@@ -14,6 +14,7 @@
 #'     * `$season`: `DiseasySeason`
 #'     * `$variant`: `DiseasyVariant`
 #'     * `$immunity`: `DiseasyImmunity`
+#'     * `$vaccination`: `DiseasyVaccination`
 #'     * `$scoring`: `DiseasyScoring`
 #'
 #'     Configured instances of these modules can be provided during initialisation.
@@ -41,7 +42,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param observables,population,activity,regions,season,variant,immunity,scoring `r rd_diseasy_module`
+    #' @param observables,population,activity,regions,season,variant,immunity,vaccination,scoring `r rd_diseasy_module`
     #' @param parameters `r rd_diseasymodel_parameters`
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance.
@@ -61,7 +62,8 @@ DiseasyModel <- R6::R6Class(                                                    
       season      = FALSE,
       variant     = FALSE,
       immunity    = FALSE,
-      scoring     = TRUE,
+      vaccination = FALSE,
+      scoring     = FALSE,
       parameters  = NULL,
       label       = NULL,
       ...
@@ -101,6 +103,11 @@ DiseasyModel <- R6::R6Class(                                                    
       checkmate::assert(
         checkmate::check_logical(immunity, null.ok = TRUE),
         checkmate::check_class(immunity, "DiseasyImmunity", null.ok = TRUE),
+        add = coll
+      )
+      checkmate::assert(
+        checkmate::check_logical(vaccination, null.ok = TRUE),
+        checkmate::check_class(vaccination, "DiseasyVaccination", null.ok = TRUE),
         add = coll
       )
       checkmate::assert(
@@ -155,6 +162,12 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(DiseasyImmunity$new())
       } else if (inherits(immunity, "DiseasyImmunity")) {
         self$load_module(immunity)
+      }
+
+      if (isTRUE(vaccination)) {
+        self$load_module(DiseasyVaccination$new())
+      } else if (inherits(vaccination, "DiseasyVaccination")) {
+        self$load_module(vaccination)
       }
 
       if (isTRUE(scoring)) {
@@ -560,6 +573,16 @@ DiseasyModel <- R6::R6Class(                                                    
     ),
 
 
+    #' @field vaccination (`diseasy::DiseasyVaccination`)\cr
+    #'   The vaccination intervention schedule, if loaded. Read-only.
+    #' @seealso [diseasy::DiseasyVaccination]
+    vaccination = purrr::partial(
+      .f = active_binding,
+      name = "vaccination",
+      expr = return(private %.% .DiseasyVaccination)
+    ),
+
+
     #' @field scoring (`diseasy::DiseasyScoring`)\cr
     #'   The local copy of a DiseasyScoring module. Read-only.
     #' @seealso [diseasy::DiseasyScoring]
@@ -697,6 +720,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
     .DiseasyImmunity    = NULL,
+    .DiseasyVaccination = NULL,
     .DiseasyScoring     = NULL,
     .parameters = NULL,
 
