@@ -41,11 +41,6 @@
       "_row": "BB"
     },
     {
-      "package": "bibtex",
-      "version": "0.5.2",
-      "_row": "bibtex"
-    },
-    {
       "package": "bigD",
       "version": "0.3.1",
       "_row": "bigD"
@@ -936,11 +931,6 @@
       "_row": "readxl"
     },
     {
-      "package": "RefManageR",
-      "version": "1.4.0",
-      "_row": "RefManageR"
-    },
-    {
       "package": "regions",
       "version": "0.1.8",
       "_row": "regions"
@@ -1067,7 +1057,7 @@
     },
     {
       "package": "selectr",
-      "version": "0.6-0",
+      "version": "0.8-0",
       "_row": "selectr"
     },
     {
