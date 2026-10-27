@@ -37,8 +37,7 @@ See the \code{vignette("diseasy-immunity")} for examples of use.
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
-    \item{\code{available_waning_models}}{(\code{character()})\cr
-The waning models implemented in \code{DiseasyImmunity}. Read only.}
+    \item{\code{available_waning_models}}{(\code{character()})\cr The waning models implemented in \code{DiseasyImmunity}. Read only.}
 
     \item{\code{model}}{(\verb{list(function())})\cr
 The list of models currently being used in the module. Read-only.}

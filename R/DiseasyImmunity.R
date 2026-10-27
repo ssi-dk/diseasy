@@ -1722,8 +1722,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
   # Make active bindings to the private variables
   active  = list(
-    #' @field available_waning_models (`character()`)\cr
-    #'   The waning models implemented in `DiseasyImmunity`. Read only.
+    #' @field available_waning_models `r rd_available_waning_models("field")`
     available_waning_models = purrr::partial(
       .f = active_binding,
       name = "available_waning_models",
