@@ -223,6 +223,7 @@ The start and end dates of the validation period. Read-only.</p></dd>
 <li><p><a href="#method-DiseasyModel-update_parameters"><code>DiseasyModel$update_parameters()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-get_results"><code>DiseasyModel$get_results()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-get_data"><code>DiseasyModel$get_data()</code></a></p></li>
+<li><p><a href="#method-DiseasyModel-fit"><code>DiseasyModel$fit()</code></a></p></li>
 <li><p><a href="#method-DiseasyModel-clone"><code>DiseasyModel$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href="DiseasyBaseModule.html#method-load_module"><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href="DiseasyBaseModule.html#method-set_moduleowner"><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
@@ -364,13 +365,38 @@ The period to return data for. That is, the training, testing, validation or plo
 
 </div>
 
+<p></p><hr><a id="method-DiseasyModel-fit"></a><div class="section">
+<h3 id="diseasymodel-fit-"><code>DiseasyModel$fit()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-fit-"></a></h3>
+<p>Estimate free parameters (<code>NA</code>) for <code>diseasy</code> models.</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">fit</span><span class="op">(</span><span class="va">observable</span>, stratification <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>observable</code></dt>
+<dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
+
+      <dt><code>stratification</code></dt>
+<dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
+
+      <dt><code>...</code></dt>
+<dd><p>Additional parameters passed to the optimiser.</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
+<p><code>NULL</code> (called for side effects)</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-DiseasyModel-clone"></a><div class="section">
 <h3 id="diseasymodel-clone-"><code>DiseasyModel$clone()</code><a class="anchor" aria-label="anchor" href="#diseasymodel-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -389,6 +415,49 @@ The period to return data for. That is, the training, testing, validation or plo
 <span class="r-in"><span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="va">DiseasyModel</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Generate model to fit</span></span></span>
+<span class="r-in"><span>  <span class="va">observables</span> <span class="op">&lt;-</span> <span class="va"><a href="DiseasyObservables.html">DiseasyObservables</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span></span>
+<span class="r-in"><span>      diseasystore <span class="op">=</span> <span class="va">DiseasystoreSeirExample</span>,</span></span>
+<span class="r-in"><span>      conn <span class="op">=</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> duckdb keeps downloaded extensions and secrets in a temporary directory:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> /tmp/Rtmp3L2qcp/duckdb</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> This is removed when the R session ends.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Secrets are lost.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Run duckdb(shared_home = TRUE) (or create ~/.duckdb) to keep them (suitable for most users).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Run duckdb(shared_home = FALSE) to accept the temporary directory (and silence this message).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> See ?duckdb_storage for details and alternatives.</span>
+<span class="r-in"><span>  <span class="va">observables</span><span class="op">$</span><span class="fu">set_last_queryable_date</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-01"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">observables</span><span class="op">$</span><span class="fu">define_synthetic_observable</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"incidence"</span>,</span></span>
+<span class="r-in"><span>    \<span class="op">(</span><span class="va">n_infected</span>, <span class="va">n_population</span><span class="op">)</span> <span class="va">n_infected</span> <span class="op">/</span> <span class="va">n_population</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">season</span> <span class="op">&lt;-</span> <span class="va"><a href="DiseasySeason.html">DiseasySeason</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>reference_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">season</span><span class="op">$</span><span class="fu">use_covid_season_v1</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_example_seir_model.html">generate_example_seir_model</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    module_overrides <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"observables"</span> <span class="op">=</span> <span class="va">observables</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"season"</span> <span class="op">=</span> <span class="va">season</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    parameter_overrides <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"season.scale"</span> <span class="op">=</span> <span class="cn">NA</span>, <span class="co"># Mark for optimisation,</span></span></span>
+<span class="r-in"><span>      <span class="st">"training_length"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"training"</span> <span class="op">=</span> <span class="fl">21</span>, <span class="st">"testing"</span> <span class="op">=</span> <span class="fl">7</span>, <span class="st">"validation"</span> <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span>  <span class="va">model</span><span class="op">$</span><span class="fu">fit</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Show estimated parameters</span></span></span>
+<span class="r-in"><span>  <span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">season.scale</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"default")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4825524</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
