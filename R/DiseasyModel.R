@@ -806,7 +806,7 @@ DiseasyModel <- R6::R6Class(                                                    
 #'   model$parameters$season.scale
 #' @return `r rd_side_effects`.
 #'   Output of optimiser returned invisibly.
-#' @export
+#' @exportS3Method generics::fit
 fit.DiseasyModel <- function(object, observable, ...) {                                                                 # nolint: object_name_linter
   object$fit(...)
 }

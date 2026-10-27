@@ -5,7 +5,7 @@
 \alias{fit.DiseasyModel}
 \title{Fitting method for \code{diseasy} models}
 \usage{
-fit.DiseasyModel(object, observable, ...)
+\method{fit}{DiseasyModel}(object, observable, ...)
 }
 \arguments{
 \item{object}{(\verb{Diseasy*})\cr
