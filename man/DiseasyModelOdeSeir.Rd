@@ -125,6 +125,7 @@ Names of the user-configured model outputs. Read only.}
 \if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="fit"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-fit'><code>DiseasyModel$fit()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>DiseasyModelOde$plot()</code></a></span></li>

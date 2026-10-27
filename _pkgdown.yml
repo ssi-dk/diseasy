@@ -43,12 +43,14 @@ reference:
     - plot
     - print
     - diseasyoption
+    - set_attributes
 
   - title: Data sets
     desc: Data for the functional modules and model templates.
     contents:
     - has_keyword("data")
     - has_keyword("data-generators")
+    - generate_example_seir_model
 
   - title: Developer functions
     desc: Functions to create model templates and functional modules.

@@ -187,3 +187,95 @@ test_that("parse_diseasyconn works", {
   # Test clean up
   DBI::dbDisconnect(valid_dbi_conn)
 })
+
+
+test_that("`set_attributes()` works", {
+  x <- NA
+
+  # Calling without attributes does not modify the object
+  expect_identical(x, set_attributes(x, list()))
+
+  # Setting attributes works on new objects
+  x <- set_attributes(x, list("a" = 1, "b" = 2))
+  expect_identical(attr(x, "a"), 1)
+  expect_identical(attr(x, "b"), 2)
+
+  # We can add new attributes on objects with attributes
+  x <- set_attributes(x, list("c" = 3))
+  expect_identical(attr(x, "a"), 1)
+  expect_identical(attr(x, "b"), 2)
+  expect_identical(attr(x, "c"), 3)
+
+  # Without overwrite, existing attributes should remain unchanged
+  x <- set_attributes(x, list("a" = 3))
+  expect_identical(attr(x, "a"), 1)
+
+  x <- set_attributes(x, list("a" = 3), overwrite = TRUE)
+  expect_identical(attr(x, "a"), 3)
+})
+
+
+test_that("parameter mapping without constraints is identity", {
+  values <- c(-100, -1, 0, 1, 100)
+
+  expect_identical(parameter_forward(values), values)
+  expect_identical(parameter_inverse(values), values)
+})
+
+test_that("parameter mapping with lower bound works", {
+  range <- c(2, NA_real_)
+  values <- c(-10, -1, 0, 1, 10)
+
+  mapped <- parameter_forward(values, range = range)
+
+  expect_true(all(mapped > range[1]))
+  expect_identical(parameter_forward(0, range = range), 2 + log(2))
+  expect_equal(parameter_inverse(mapped, range = range), values, tolerance = 1e-10)
+})
+
+test_that("parameter mapping with upper bound works", {
+  range <- c(NA_real_, 5)
+  values <- c(-10, -1, 0, 1, 10)
+
+  mapped <- parameter_forward(values, range = range)
+
+  expect_true(all(mapped < range[2]))
+  expect_identical(parameter_forward(0, range = range), 5 - log(2))
+  expect_equal(parameter_inverse(mapped, range = range), values, tolerance = 1e-10)
+})
+
+test_that("parameter mapping with two-sided bounds works", {
+  range <- c(2, 5)
+  values <- c(-10, -1, 0, 1, 10)
+
+  mapped <- parameter_forward(values, range = range)
+
+  expect_true(all(mapped > range[1] & mapped < range[2]))
+  expect_identical(parameter_forward(0, range = range), mean(range))
+  expect_equal(parameter_inverse(mapped, range = range), values, tolerance = 1e-10)
+})
+
+test_that("softplus and inverse_softplus are numerically stable", {
+  values <- c(-20, -5, 0, 5, 20, 1000)
+
+  expect_identical(softplus(0), log(2))
+  expect_identical(softplus(-1000), 0)
+  expect_identical(softplus(1000), 1000)
+
+  expect_equal(inverse_softplus(softplus(values)), values, tolerance = 1e-10)
+})
+
+test_that("parameter_inverse handles values at and outside boundaries", {
+  # Two-sided constraints
+  values <- c(-1, 0, 0.5, 1, 2)
+  mapped <- parameter_inverse(values, range = c(0, 1))
+
+  expect_true(all(is.finite(mapped)))
+  expect_identical(mapped[1], mapped[2])
+  expect_identical(mapped[4], mapped[5])
+  expect_identical(mapped[3], 0)
+
+  # One-sided constraints
+  expect_true(is.finite(parameter_inverse(0, range = c(0, NA_real_))))
+  expect_true(is.finite(parameter_inverse(1, range = c(NA_real_, 1))))
+})

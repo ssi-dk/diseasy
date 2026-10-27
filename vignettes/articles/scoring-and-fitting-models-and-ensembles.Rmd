@@ -29,6 +29,7 @@ This operation requires only two components:
 2) Free parameters for the optimiser to control
 
 # Model parameterisation
+
 Models `diseasy` will contain parameters that are either specific to the model
 (e.g. the compartment structure in `?DiseasyModelOdeSeir`) or parameters meant
 to control the functional modules passed to the model (e.g. `?DiseasySeason`).
@@ -51,34 +52,34 @@ A couple of examples:
 # with no parameters
 season <- DiseasySeason$new(reference_date = Sys.Date())
 
-model_1 <- DiseasyModelG0$new(season = season)
-print(model_1$parameters)
+model <- DiseasyModelG0$new(season = season)
+print(model$parameters)
 
 
 # If we change to the "covid_season_v1" season model, we have a single "scale"
 # parameter in the season model
 season$use_covid_season_v1()
 
-model_2 <- DiseasyModelG0$new(season = season)
-print(model_2$parameters) # ... and this scale is copied to the model
+model <- DiseasyModelG0$new(season = season)
+print(model$parameters) # ... and this scale is copied to the model
 
 
 # If we change to the "cosine_Season" season model, we have both a "scale"
 # parameter and a "peak" parameter in the season model
 season$use_cosine_season()
 
-model_3 <- DiseasyModelG0$new(season = season)
-print(model_3$parameters) # ... and these are copied to the model
+model <- DiseasyModelG0$new(season = season)
+print(model$parameters) # ... and these are copied to the model
 
 
 # If we provide specific values to the model, then these values are
 # passed to the season module.
-model_4 <- DiseasyModelG0$new(
+model <- DiseasyModelG0$new(
   season = season,
   parameters = list("season.scale" = 0.5)
 )
-print(model_4$parameters) # "peak" value is still copied
-print(attr(model_4$season$model_t, "dots"))
+print(model$parameters) # "peak" value is still copied
+print(attr(model$season$model, "dots"))
 ```
 
 # Marking parameters for optimisation
@@ -91,11 +92,33 @@ The default value for the parameter is stored as an attribute on any `NA` parame
 and will be used as the starting point for the optimisation.
 
 ```{r DiseasyModelG0 - parameters marked for optimisation}
-model_5 <- DiseasyModelG0$new(
+model <- DiseasyModelG0$new(
   season = season,
   parameters = list("season.scale" = NA) # Mark for optimisation
 )
-print(model_5$parameters[["season.scale"]])
+print(model$parameters[["season.scale"]])
+```
+
+The starting point for optimisation and the parameter range of optimisation can
+be set by modifying the "default" and "range" attributes.
+For this purpose, we provide the helper function `set_attributes` to modify the attributes inline.
+
+The range can either be :
+- unbounded `c(NA, NA)` (the default)
+- bounded from a single direction `c(min_value, NA)` or `c(NA, max_value)`
+- bounded from both directions `c(min_value, max_value)`
+
+```{r DiseasyModelG0 - parameters marked for optimisation with overrides}
+model <- DiseasyModelG0$new(
+  season = season,
+  parameters = list(
+    "season.scale" = set_attributes(
+      NA, # Mark for optimisation
+      list("default" = 0.25, "range" = c(0, 0.5)) # Control the optimisation
+    )
+  )
+)
+print(model$parameters[["season.scale"]])
 ```
 
 # Updating parameters
@@ -104,23 +127,24 @@ The parameters can either be set during the initialisation of the model as we
 have seen above:
 
 ```{r DiseasyModelG0 - parameters in initialize}
-model_6 <- DiseasyModelG0$new(
+model <- DiseasyModelG0$new(
   season = season,
   parameters = list("season.scale" = 0.25)
 )
-print(model_6$parameters["season.scale"])
+print(model$parameters["season.scale"])
 ```
 
 But the parameters can also be modified after initialisation via the
 `?DiseasyModel$update_parameters()` method:
 
 ```{r DiseasyModelG0 - parameters in update_parameters}
-model_6$update_parameters(list("season.scale" = 0.7))
-print(model_6$parameters["season.scale"])
+model$update_parameters(list("season.scale" = 0.7))
+print(model$parameters["season.scale"])
 ```
 
 
 # The scoring metric
+
 The principal metric used in `diseasy` is the likelihood which compares the
 model forecast with observations for each time-point at each strata and computes
 the mean likelihood across the strata for the given time-point.
@@ -166,6 +190,60 @@ model <- DiseasyModelG0$new(
 trajectories <- model$get_results(observable = "n_admission", prediction_length = 7)
 
 model$scoring$compute_likelihood(trajectories)
+```
+
+# Fitting parameters
+
+With the free parameters identified and the scoring metric defined, we can
+use the `?DiseasyModel$fit()` method to optimise the free parameters using
+the "testing" data window.
+
+```{r generate model to fit}
+# Generate model to fit
+observables <- DiseasyObservables$new(
+  diseasystore = DiseasystoreSeirExample,
+  conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+)
+observables$set_last_queryable_date(as.Date("2020-03-01"))
+
+# Define the incidence from the example data
+mapping <- \(n_infected, n_population) n_infected / n_population
+observables$define_synthetic_observable("incidence", mapping)
+
+# Generate a modified model of the "true" generating model
+# with a specified "testing" window
+model <- generate_example_seir_model(
+  module_overrides = list(
+    "observables" = observables
+  ),
+  parameter_overrides = list(
+    "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+  )
+)
+```
+
+We can see the prediction using the default parameters
+```{r plot before fitting}
+model$plot(observable = "n_infected", prediction_length = 14)
+```
+
+```{r fitting}
+# The default model does not currently include the scoring module, so we
+# manually load
+model$load_module(scoring)
+
+# Mark the overall infection risk for fitting
+model$update_parameters(list("overall_infection_risk" = NA))
+
+# Estimate free parameters
+model$fit(observable = "n_infected")
+
+# Show estimated parameters
+model$parameters["overall_infection_risk"]
+```
+
+```{r plot after fitting}
+model$plot(observable = "n_infected", prediction_length = 14)
 ```
 
 ```{r cleanup, include = FALSE}

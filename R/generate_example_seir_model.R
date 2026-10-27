@@ -1,10 +1,17 @@
 #' Generate variants of the example model (used to create data for `?DiseasystoreSeirExample`)
-#' @param modules_overrides (`named list`)\cr
+#' @param module_overrides (`named list`)\cr
 #'   A named list of diseasy modules to override the configuration in the example model.
 #' @param parameter_overrides (`named list`)\cr
 #'   A named list of parameters to override the parameters in the example model.
-#' @keywords internal
-#' @noRd
+#' @return
+#'   A configured `DiseasyModelOdeSeir`.
+#' @examplesIf rlang::is_installed("RSQLite")
+#'   model <- generate_example_seir_model()
+#'
+#'   model_modified <- generate_example_seir_model(
+#'     parameter_overrides = list("season.scale" = 0.25)
+#'   )
+#' @export
 generate_example_seir_model <- function(
   module_overrides = list(),
   parameter_overrides = list()

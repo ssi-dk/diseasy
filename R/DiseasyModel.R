@@ -177,33 +177,39 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @param validate (`logical(1)`)\cr
     #'   Should the parameters be validated after updating?
     #' @return `r rd_side_effects`
-    update_parameters = function(parameters, validate = TRUE) {
+    update_parameters = function(
+      parameters,
+      validate = TRUE
+    ) {
+
+      # Use current parameters if set, otherwise use defaults
+      current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters())
 
       if (validate) {
         checkmate::assert_list(parameters, null.ok = TRUE)
         if (!is.null(parameters)) {
           checkmate::assert_names(names(parameters),
-            subset.of = names(private %.% default_parameters()),
+            subset.of = names(current_parameters),
             type = "unique"
           )
         }
       }
 
       # Update the existing parameters with the new parameters
-      default_parameters <- private %.% default_parameters()
-
       updated_parameters <- modifyList(
-        default_parameters,
+        current_parameters,
         purrr::pluck(parameters, .default = list()),
         keep.null = TRUE
       )
 
       # For parameters marked for optimisation (NA), we store the default parameter value as attributes
       parameters_to_fit <- names(purrr::keep(parameters, anyNA))
-      for (parameter_id in seq_along(parameters_to_fit)) {
-        parameter <- parameters_to_fit[parameter_id]
-        default <- default_parameters[[parameter]]
-        attr(updated_parameters[[parameter]], "default") <- default
+
+      for (parameter in parameters_to_fit) {
+        updated_parameters[[parameter]] <- set_attributes(
+          updated_parameters[[parameter]],
+          list("default" = current_parameters[[parameter]])
+        )
       }
 
       # Set the scale of the season if needed or backpropagate the default value to the model parameters
@@ -224,7 +230,10 @@ DiseasyModel <- R6::R6Class(                                                    
               keep.null = TRUE
             )
           } else if (is.na(updated_parameters %.% season.scale)) { # Store defaults as attribute for optimiser
-            attr(updated_parameters[["season.scale"]], "default") <- default
+            updated_parameters[["season.scale"]] <- set_attributes(
+              updated_parameters[["season.scale"]],
+              list("default" = default)
+            )
           }
 
         }
@@ -241,7 +250,10 @@ DiseasyModel <- R6::R6Class(                                                    
               keep.null = TRUE
             )
           } else if (is.na(updated_parameters %.% season.peak)) { # Store defaults as attribute for optimiser
-            attr(updated_parameters[["season.peak"]], "default") <- default
+            updated_parameters[["season.peak"]] <- set_attributes(
+              updated_parameters[["season.peak"]],
+              list("default" = default)
+            )
           }
         }
       }
@@ -314,7 +326,7 @@ DiseasyModel <- R6::R6Class(                                                    
         if (is.null(prediction_length)) {
           coll$push("Prediction length must be provided when requesting plotting data.")
         } else {
-          checkmate::assert_number(prediction_length, lower = 1, add = coll)
+          checkmate::assert_number(prediction_length, lower = 0, add = coll)
         }
       }
 
@@ -352,6 +364,126 @@ DiseasyModel <- R6::R6Class(                                                    
         )
 
       return(data)
+    },
+
+
+    #' @description
+    #'   Estimate free parameters (`NA`) for `diseasy` models.
+    #' @param observable `r rd_observable()`
+    #' @param stratification `r rd_stratification()`
+    #' @param ... Additional parameters passed to the optimiser.
+    #' @examplesIf rlang::is_installed("duckdb")
+    #'   # Generate model to fit
+    #'   observables <- DiseasyObservables$new(
+    #'       diseasystore = DiseasystoreSeirExample,
+    #'       conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+    #'   )
+    #'   observables$set_last_queryable_date(as.Date("2020-03-01"))
+    #'
+    #'   observables$define_synthetic_observable(
+    #'     "incidence",
+    #'     \(n_infected, n_population) n_infected / n_population
+    #'   )
+    #'
+    #'   season <- DiseasySeason$new(reference_date = Sys.Date())
+    #'   season$use_covid_season_v1()
+    #'
+    #'   model <- generate_example_seir_model(
+    #'     module_overrides = list(
+    #'       "observables" = observables,
+    #'       "season" = season
+    #'     ),
+    #'     parameter_overrides = list(
+    #'       "season.scale" = NA, # Mark for optimisation,
+    #'       "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    #'     )
+    #'   )
+    #'
+    #'   \dontrun{
+    #'   model$fit(observable = "n_infected")
+    #'   }
+    #'
+    #'   # Show estimated parameters
+    #'   model$parameters$season.scale
+    #' @return `r rd_side_effects`
+    fit = function(observable, stratification = NULL, ...) {
+      checkmate::assert_number(self %.% parameters %.% training_length %.% testing, lower = 1)
+
+      # Determine parameters that need fitting
+      parameters_to_fit <- purrr::keep(self %.% parameters, anyNA)
+
+      if (length(parameters_to_fit) == 0L) {
+        message("No free parameters to optimise!")
+        return(invisible(NULL))
+      }
+
+      # Extract initial guess and ranges
+      x0 <- purrr::map_dbl(parameters_to_fit, ~ attr(., "default"))
+
+      ranges <- purrr::map(parameters_to_fit, ~ attr(.x, "range") %||% c(NA_real_, NA_real_))
+
+      # Map model parameters to unconstrained coordinates
+      p0 <- purrr::map2_dbl(x0, ranges, parameter_inverse)
+
+      # Convert unconstrained coordinates to model parameters
+      transform_parameters <- \(p) purrr::map2_dbl(p, ranges, parameter_forward)
+
+      # Objective function operating in unconstrained coordinates
+      objective_function <- function(p) {
+
+        tryCatch({
+          # Map to model domain
+          x <- transform_parameters(p)
+
+          # Update model parameters
+          self$update_parameters(parameters = as.list(x))
+
+          # Compute trajectories
+          trajectories <- self$get_results(
+            observable = observable,
+            stratification = stratification,
+            prediction_length = 0
+          )
+
+          # Score by likelihood
+          scored_trajectories <- self$scoring$compute_likelihood(trajectories)
+
+          # Take (weighted) average across realisations (if any)
+          loss <- stats::weighted.mean(
+            x = scored_trajectories$negative_log_likelihood,
+            w = scored_trajectories$weight
+          )
+
+          if (!is.finite(loss)) {
+            return(.Machine$double.xmax)
+          }
+
+          return(loss)
+        }, error = function(e) {
+          return(.Machine$double.xmax)
+        })
+      }
+
+      # Run optimisation
+      res <- ucminf::ucminf(
+        par = p0,
+        fn = objective_function,
+        ...
+      )
+
+      # Transform estimates back to model coordinates
+      estimates <- transform_parameters(res$par)
+
+      # Apply fitted parameters to th model
+      self$update_parameters(
+        parameters = as.list(estimates)
+      )
+
+      # Preserve estimates on both scales
+      res$par_unconstrained <- res$par
+      res$par <- estimates
+
+      return(invisible(res))
     }
   ),
 
