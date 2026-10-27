@@ -40,7 +40,6 @@ reference:
   - title: Helper functions
     desc: Functions that help with the construction of models.
     contents:
-    - fit
     - plot
     - print
     - diseasyoption
