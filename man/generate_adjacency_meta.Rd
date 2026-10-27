@@ -4,10 +4,17 @@
 \alias{generate_adjacency_meta}
 \title{Generate adjacency data with Meta Social Connectedness}
 \usage{
-generate_adjacency_meta(area = NULL)
+generate_adjacency_meta(
+  area = NULL,
+  url = paste0("https://data.humdata.org/dataset/e9988552-74e4-4ff4-943f-c782ac8bca87/",
+    "resource/b691d1d1-b286-456d-9a23-16e2f2d463cc/download/nuts_2024.zip")
+)
 }
 \arguments{
 \item{area}{(\code{character()})\cr The geographic area (list of regions) of interest. If \code{NULL}, all regions are returned.}
+
+\item{url}{(\code{character(1)})\cr
+The location of the Meta Social Connectedness Index dataset (zip file).}
 }
 \value{
 (\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr
@@ -15,6 +22,19 @@ generate_adjacency_meta(area = NULL)
 \description{
 Generate adjacency data between NUTS 3 regions from Meta Social Connectedness
 Index.
+}
+\details{
+The Social Connectedness Index is a relative (symmetric) measure related to
+the likelihood of being friends on Facebook.
+We first normalise per region to determine the geographical distributions
+of Facebook friends for each region (identified by the "from" column)
+If the only activity in the world was visiting (Facebook) friends, which
+would be nice, these probabilities could be interpreted as movement
+adjacency. However, since work and school are still a thing (boo!), we
+will instead impose a infection-flow adjacency by computing
+the quantity: adjacency * t(adjacency). This can be interpreted roughly
+as the probability that a randomly selected friend will also select you back
+in a game of dice.
 }
 \examples{
 \dontrun{
