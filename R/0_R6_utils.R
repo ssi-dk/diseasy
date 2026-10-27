@@ -232,12 +232,13 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 set_attributes <- function(x, attributes, overwrite = FALSE) {
 
   checkmate::assert_list(attributes, names = "unique")
-  checkmate::assert_names(names(attributes))
   checkmate::assert_flag(overwrite)
 
   if (length(attributes) == 0L) {
     return(x)
   }
+
+  checkmate::assert_names(names(attributes))
 
   existing_attributes <- attributes(x)
 
