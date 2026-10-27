@@ -506,7 +506,9 @@ test_that("`$set_time_scales()` works for each waning model", {
 
 test_that("`$approximate_compartmental()` works for exponential_waning", {
   skip_if_not_installed("optimx")
+  skip_if_not_installed("nloptr")
   skip_if_not_installed("ucminf")
+  skip_if_not_installed("subplex")
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
@@ -563,7 +565,9 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
 
 test_that("`$approximate_compartmental()` uses cache optimally", {
   skip_if_not_installed("optimx")
+  skip_if_not_installed("nloptr")
   skip_if_not_installed("ucminf")
+  skip_if_not_installed("subplex")
 
   # In this test, we check that the "recursive" and "combination" strategies
   # uses the cache optimally by checking that we have the cache hits we expect.
@@ -590,20 +594,27 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
     M = seq(2, 3),
     method_label = c("free_delta-recursive", "free_gamma-recursive", "all_free-recursive", "all_free-combination")
   ) |>
-    tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy"))
+    tidyr::separate_wider_delim("method_label", delim = "-", names = c("method", "strategy")) |>
+    dplyr::arrange(M)
+
+  # Use the defaults for "free_gammma" in the tests to ensure consistent cache generation
+  optim_control <- im$optimiser_defaults |>
+    dplyr::filter(.data$method == "free_gamma", .data$monotonous == 0, .data$individual_level == 0) |>
+    dplyr::slice_min(.data$priority) |>
+    dplyr::pull("config") |>
+    purrr::pluck(1)
 
   purrr::pwalk(test_combinations, \(M, method, strategy) {                                                              # nolint: object_name_linter
-    im$approximate_compartmental(M = M, method = method, strategy = strategy)
+    im$approximate_compartmental(M = M, method = method, strategy = strategy, optim_control = optim_control)
   })
 
   # "free_delta-recursive": generates 2 items in the cache (M = 2 and M = 3)
   # "free_gamma-recursive": generates 2 items in the cache (M = 2 and M = 3)
   # "all_free-recursive":   generates 2 items in the cache (M = 2 and M = 3)
-  # "all_free-combination": generates 2 items in the cache (M = 2 and M = 3) and generates two
-  #                         corresponding free_gamma items in the cache with the "naive" strategy ("free_gamma" default)
-  # In total, we expect 10 items in the cache
+  # "all_free-combination": generates 2 items in the cache (M = 2 and M = 3)
+  # In total, we expect 8 items in the cache
   # If we have more, a cache have been missed
-  expect_length(cache$keys(), 10)
+  expect_length(cache$keys(), 8)
 
   rm(im)
 })
@@ -612,21 +623,13 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
 test_that("`$approximate_compartmental()` works with custom controls", {
   skip_if_not_installed("optimx")
   skip_if_not_installed("nloptr")
+  skip_if_not_installed("ucminf")
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
 
   # Set the exponential waning model
   im$set_exponential_waning()
-
-  expect_no_condition(
-    im$approximate_compartmental(
-      M = 3,
-      method = "free_gamma",
-      strategy = "recursive",
-      optim_control = list("optim_method" = "neldermead", "xtol_rel" = 1e-2)
-    )
-  )
 
   # Test all supported providers of optimiers
   # ... stats::optim()
@@ -715,8 +718,6 @@ test_that("`$approximate_compartmental()` works with custom controls", {
 
 
 test_that("Waning models must not be divergent in `$approximate_compartmental()`", {
-  skip_if_not_installed("optimx")
-  skip_if_not_installed("nloptr")
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
