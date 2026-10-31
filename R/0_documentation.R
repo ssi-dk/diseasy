@@ -66,25 +66,12 @@ rd_quantiles <- function(type = "param") {
 }
 
 
-rd_season_scale <- function(type = "param") {
+rd_scale <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste(
-    "(`numeric(1)`)\\cr",
-    "Sets the scale of the season model.",
-    "The scale is the percent wise difference between most active and least active period.",
-    ifelse(type == "field", "Read only.", "")
-  )
-}
-
-rd_season_peak <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
-  paste(
-    "(`numeric(1)`)\\cr",
-    "Sets the period of maximal activity (days past new-year).",
-    "By default, risk of infection is in antiphase with the DMI climate normal of",
-    "the maximum daily temperature (for Denmark).",
-    ifelse(type == "field", "Read only.", "")
-  )
+  paste("(`numeric`)\\cr",
+        "Sets the scale of the season model.",
+        "The scale is the percent wise difference between most active and least active period.",
+        ifelse(type == "field", "Read only.", ""))
 }
 
 rd_target <- function(type = "param") {
@@ -93,11 +80,6 @@ rd_target <- function(type = "param") {
         "The target of the waning model (e.g. \"infection\", \"hospitalisation\", \"death\").",
         ifelse(type == "field", " Read only.", ""))
 }
-
-rd_diseasy_immunity_dots <- paste(
-  "Optional attributes supplied to the waning function.",
-  "Must be one or both of `delay` and `risk`."
-)
 
 rd_time_scale <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
@@ -150,6 +132,13 @@ rd_target_schema <- function(type = "param") {
         ifelse(type == "field", "Read only.", ""),
         "If the database backend does not support schema, the tables will be prefixed with `<target_schema>.`.")
 }
+
+
+rd_diseasymodel_parameters <- paste(
+  "* `training_length` (`named numeric(3)`)\\cr",
+  "  The number of days that should be included in the training splits of the data for the model.",
+  "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
+)
 
 
 rd_start_date <- function(type = "param", minimum = FALSE) {
@@ -233,11 +222,11 @@ rd_regional_stratification <- function(type = "param") {
 
 
 ## Templates for DiseasyRegions
-rd_area <- function(type = "param") {
+rd_regions <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field", "generators"))
   paste(
     "(`character()`)\\cr",
-    "The geographic area (list of regions) of interest.",
+    "The geographic regions of interest.",
 
     switch(
       type,
@@ -294,18 +283,6 @@ rd_demography <- function(type = "param") {
   )
 }
 
-rd_regional_risks <- function(type = "param") {
-  checkmate::assert_choice(type, c("param", "field"))
-
-  paste(
-    "(`named numeric()`)\\cr",
-    "Modifiers tied to each region (identified by vector names).\\cr",
-
-    switch(type == "field", "Read only.")
-  )
-}
-
-
 ## Templates for DiseasyModel
 rd_diseasy_module <- paste(
   "(`boolean` or `R6::R6Class instance`)\\cr",
@@ -319,21 +296,6 @@ rd_module <- paste(
   "(`R6::R6Class instance`)\\cr",
   "This instance is cloned to the field with the same name as the class of the module"
 )
-
-rd_diseasymodel_common_parameters <- paste(
-  "* `training_length` (`named numeric(3)`)\\cr",
-  "  The number of days that should be included in the training splits of the data for the model.",
-  "  Allowed splits are: \"training\", \"testing\", and \"validation\"."
-)
-
-rd_diseasymodel_parameters <- paste(
-  "(`named list()`)\\cr",
-  "List of parameters to set for the model during initialization.\\cr\\cr",
-  "Each model has their own parameters.\\cr\\cr",
-  "Common parameters are:\\cr",
-  rd_diseasymodel_common_parameters
-)
-
 
 ## Templates for DiseasyModelOde
 rd_initialise_state_vector_description <- paste(
@@ -379,7 +341,8 @@ rd_disease_progression_rates <- function(type = "param") {
 
 rd_diseasymodelode_parameters <- paste(
   "* `incidence_feature_name` (`character(1)`)\\cr",
-  "  The name of the observable that contains the incidence data to initialise from.\\cr",
+  "  The name of the observable that contains the incidence data to initialise from.",
+  "",
   "* `model_rate_to_observable` (`named list`(`named list`(`function`(2))))\\cr",
   "  A named list of functions that maps the model rates to the observable in question (name).",
   "  Each observable needs a `map` and `reduce` function contained in a list (the first nested list).",
@@ -391,19 +354,6 @@ rd_diseasymodelode_parameters <- paste(
 )
 
 ## Templates for DiseasyModel Regression templates
-rd_diseasymodelregression_parameters <- paste(
-  "(`named list()`)\\cr",
-  "List of parameters to set for the model during initialization.\\cr\\cr",
-  "Parameters controlling the dynamics of the model:\\cr",
-  "* `season.scale`", rd_season_scale(),
-  "  If `NULL` (default), the default value of the season module is used.\\cr\\cr",
-  "* `season.peak`", rd_season_peak(),
-  "  If `NULL` (default), the default value of the season module is used.\\cr\\cr",
-  "Additional parameters are:",
-  rd_diseasymodel_parameters
-)
-
-
 rd_diseasymodel_glm_brm_description <- function(regression_class) {
   glue::glue(
     .sep = "\n",
