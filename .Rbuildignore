@@ -1,6 +1,7 @@
 ^docs$
 ^pkgdown$
 ^data-raw$
+^installations$
 ^vignettes/articles$
 ^pkg-build$
 
