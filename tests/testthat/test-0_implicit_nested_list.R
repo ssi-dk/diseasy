@@ -239,7 +239,7 @@ test_that("NULL input gives NULL output", {
 
 test_that("Names must be unique", {
   expect_error(
-    implicit_nested_list(list("a" = 2, "a" = 3)),
+    implicit_nested_list(list("a" = 2, "a" = 3)),                                                                       # nolint: duplicate_argument_linter
     "Elements must have unique, nonempty names"
   )
 })
