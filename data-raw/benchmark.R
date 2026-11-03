@@ -208,7 +208,6 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
 
           prefix <- paste0("fit_", combination_label, "_", backend, "_", version)
           rprof_file <- file.path(output_dir, paste0(prefix, ".Rprof"))
-          html_file <- file.path(output_dir, paste0(prefix, ".html"))
 
           utils::Rprof(filename = rprof_file, interval = 0.01)
           model$fit(observable = "n_infected")
