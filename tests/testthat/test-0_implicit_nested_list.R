@@ -148,12 +148,27 @@ test_that("attributes prevent simplification", {
 
 test_that("read-modify-write preserves metadata on unchanged leaves", {
   fitted <- structure(NA_real_, "default" = 0.5, "range" = c(0, NA_real_))
-  implicit <- implicit_nested_list(list("rates" = list("E" = fitted, "I" = 0.25)))
+  implicit <- implicit_nested_list(list("rates" = list("E" = fitted, "I" = 0.25, "R" = 0.5)))
 
   implicit$rates[["I"]] <- 0.3
+  implicit$rates["R"] <- c("R" = 0.4)
 
   expect_identical(implicit[["rates.E"]], fitted)
   expect_identical(implicit[["rates.I"]], 0.3)
+  expect_identical(implicit[["rates.R"]], 0.4)
+  expect_identical(implicit[[1]], fitted)
+  expect_identical(implicit[[2]], 0.3)
+  expect_identical(implicit[[3]], 0.4)
+
+
+  implicit$rates[c("I", "R")] <- c("I" = 0.05, "R" = 0.6)
+
+  expect_identical(implicit[["rates.E"]], fitted)
+  expect_identical(implicit[["rates.I"]], 0.05)
+  expect_identical(implicit[["rates.R"]], 0.6)
+  expect_identical(implicit[[1]], fitted)
+  expect_identical(implicit[[2]], 0.05)
+  expect_identical(implicit[[3]], 0.6)
 })
 
 
@@ -214,6 +229,30 @@ test_that("implicit_nested_list is updatable with utils::modifyList", {
   q <- utils::modifyList(z, list("new_element" = c("E" = 3L, "I" = 1L)))
   expect_identical(q$new_element[["E"]], 3L)
   expect_identical(q$new_element[["I"]], 1L)
+})
+
+
+test_that("NULL input gives NULL output", {
+  expect_null(implicit_nested_list(NULL))
+})
+
+
+test_that("Names must be unique", {
+  expect_error(
+    implicit_nested_list(list("a" = 2, "a" = 3)),
+    "Elements must have unique, nonempty names"
+  )
+})
+
+
+test_that("print does not produce error", {
+
+  implicit <- implicit_nested_list(list(
+    "compartments" = c("E" = 2L, "I" = 3L, "R" = 1L),
+    "rates" = c("E" = 0.5, "I" = 0.25)
+  ))
+
+  expect_no_error(capture.output(print(implicit)))
 })
 
 
