@@ -1,0 +1,11 @@
+on:
+  workflow_dispatch
+
+name: Benchmark
+
+jobs:
+  document:
+    uses: ssi-dk/AEF-DDF/.github/workflows/benchmark.yaml@main
+    secrets: inherit
+    with:
+      backend_exclude: ""
