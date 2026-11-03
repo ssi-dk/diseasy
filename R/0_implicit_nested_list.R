@@ -172,7 +172,7 @@ explicit_nested_list <- function(flat) {
 }
 
 #' @export
-`$.implicit_nested_list` <- function(x, name, materialise = TRUE) {
+`$.implicit_nested_list` <- function(x, name) {
   flat <- unclass(x)
   flat_names <- names(flat) %||% character(0)
 
@@ -186,11 +186,7 @@ explicit_nested_list <- function(flat) {
 
   names(children) <- substring(names(children), nchar(prefix) + 1L)
 
-  if (materialise) {
-    return(explicit_nested_list(children))
-  } else {
-    return(children)
-  }
+  return(explicit_nested_list(children))
 }
 
 #' @export
@@ -242,9 +238,9 @@ explicit_nested_list <- function(flat) {
 }
 
 #' @export
-`[[.implicit_nested_list` <- function(x, i, ..., exact = TRUE, materialise = TRUE) {
+`[[.implicit_nested_list` <- function(x, i, ..., exact = TRUE) {
   if (is.character(i) && length(i) == 1L && length(list(...)) == 0L) {
-    return(`$.implicit_nested_list`(x, i, materialise = materialise))
+    return(`$.implicit_nested_list`(x, i))
   }
 
   return(base::`[[`(unclass(x), i, ..., exact = exact))
