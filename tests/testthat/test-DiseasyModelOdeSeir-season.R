@@ -75,7 +75,7 @@ test_that("`DiseasyModelOdeSeir` can control `DiseasySeason`", {
       last_queryable_date = as.Date("2020-01-01")
     )
   )
-  expect_null(model_no_season %.% parameters %.% season.scale)
+  expect_null(model_no_season %.% parameters %.% season %.% scale)
 
   # .. and a model with season and default scale
   model_default <- DiseasyModelOdeSeir$new(
@@ -87,11 +87,11 @@ test_that("`DiseasyModelOdeSeir` can control `DiseasySeason`", {
   )
   # Parameters from DiseasySeaon should be backpropagated to the model
   expect_identical(
-    model_default %.% parameters %.% season.scale,
+    model_default %.% parameters %.% season %.% scale,
     default_season_scale
   )
   expect_identical(
-    model_default %.% parameters %.% season.peak,
+    model_default %.% parameters %.% season %.% peak,
     default_season_peak
   )
 
@@ -111,7 +111,7 @@ test_that("`DiseasyModelOdeSeir` can control `DiseasySeason`", {
   )
   # Parameters from DiseasySeaon should be backpropagated to the model
   expect_identical(
-    model_modified %.% parameters %.% season.peak,
+    model_modified %.% parameters %.% season %.% peak,
     default_season_peak
   )
 

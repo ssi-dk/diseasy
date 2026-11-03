@@ -183,29 +183,36 @@ DiseasyModel <- R6::R6Class(                                                    
     ) {
 
       # Use current parameters if set, otherwise use defaults
-      current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters())
+      current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters()) |>
+        implicit_nested_list()
+
+      # Ensure incomming parameters are an implicit nested list
+      parameters <- implicit_nested_list(parameters)
 
       if (validate) {
         checkmate::assert_list(parameters, null.ok = TRUE)
         if (!is.null(parameters)) {
-          checkmate::assert_names(names(parameters),
-            subset.of = names(current_parameters),
-            type = "unique"
+          checkmate::assert_names( # Parameters must be nested in the variables defined in the existing parameters
+            stringr::str_extract(names(parameters), r"{^\w+}"),
+            subset.of = stringr::str_extract(names(current_parameters), r"{^\w+}")
           )
         }
       }
 
       # Update the existing parameters with the new parameters
+      # in the explcit domain, then store as implicit nested list
       updated_parameters <- modifyList(
-        current_parameters,
-        purrr::pluck(parameters, .default = list()),
+        explicit_nested_list(current_parameters),
+        purrr::pluck(explicit_nested_list(parameters), .default = list()),
         keep.null = TRUE
-      )
+      ) |>
+        implicit_nested_list() |> # Flatten to 1d
+        unclass() # Keep as a fully flat representation without virtual groups
 
       # For parameters marked for optimisation (NA), we store the default parameter value as attributes
-      parameters_to_fit <- names(purrr::keep(parameters, anyNA))
+      parameters_to_fit <- purrr::keep(parameters, ~ (is.atomic(.x) || is.list(.x)) && anyNA(.x))
 
-      for (parameter in parameters_to_fit) {
+      for (parameter in names(parameters_to_fit)) {
         updated_parameters[[parameter]] <- set_attributes(
           updated_parameters[[parameter]],
           list("default" = current_parameters[[parameter]])
@@ -224,11 +231,7 @@ DiseasyModel <- R6::R6Class(                                                    
 
           # Backpropagate default value to model or convert NA to NULL if argument is not in season model
           if (is.null(updated_parameters %.% season.scale) || !("scale" %in% names(dots))) {
-            updated_parameters <- utils::modifyList(
-              updated_parameters,
-              list("season.scale" = default),
-              keep.null = TRUE
-            )
+            updated_parameters["season.scale"] <- list(default)
           } else if (is.na(updated_parameters %.% season.scale)) { # Store defaults as attribute for optimiser
             updated_parameters[["season.scale"]] <- set_attributes(
               updated_parameters[["season.scale"]],
@@ -244,11 +247,7 @@ DiseasyModel <- R6::R6Class(                                                    
 
           # Backpropagate default value to model or convert NA to NULL if argument is not in season model
           if (is.null(updated_parameters %.% season.peak) || !("peak" %in% names(dots))) {
-            updated_parameters <- utils::modifyList(
-              updated_parameters,
-              list("season.peak" = default),
-              keep.null = TRUE
-            )
+            updated_parameters["season.peak"] <- list(default)
           } else if (is.na(updated_parameters %.% season.peak)) { # Store defaults as attribute for optimiser
             updated_parameters[["season.peak"]] <- set_attributes(
               updated_parameters[["season.peak"]],
@@ -258,10 +257,11 @@ DiseasyModel <- R6::R6Class(                                                    
         }
       }
 
-      if (validate) private %.% validate_parameters(updated_parameters)
+      if (validate) private %.% validate_parameters(explicit_nested_list(updated_parameters))
 
-      # Store and apply the updated parameters
-      private$.parameters <- updated_parameters
+      # Store and apply the updated parameters as an implicit nested list
+      updated_parameters <- updated_parameters[order(names(updated_parameters))] # Sort uniquely
+      private$.parameters <- implicit_nested_list(updated_parameters)
 
       # Apply (newly-updated) model parameters to the model
       if (!is.null(self %.% season)) {
@@ -410,7 +410,7 @@ DiseasyModel <- R6::R6Class(                                                    
       checkmate::assert_number(self %.% parameters %.% training_length %.% testing, lower = 1)
 
       # Determine parameters that need fitting
-      parameters_to_fit <- purrr::keep(self %.% parameters, anyNA)
+      parameters_to_fit <- purrr::keep(private %.% .parameters, ~ (is.atomic(.x) || is.list(.x)) && anyNA(.x))
 
       if (length(parameters_to_fit) == 0L) {
         message("No free parameters to optimise!")
@@ -436,7 +436,13 @@ DiseasyModel <- R6::R6Class(                                                    
           x <- transform_parameters(p)
 
           # Update model parameters
-          self$update_parameters(parameters = as.list(x))
+          self$update_parameters(
+            parameters = explicit_nested_list(
+              utils::modifyList(
+                unclass(private$.parameters), as.list(x)
+              )
+            )
+          )
 
           # Compute trajectories
           trajectories <- self$get_results(
@@ -474,9 +480,13 @@ DiseasyModel <- R6::R6Class(                                                    
       # Transform estimates back to model coordinates
       estimates <- transform_parameters(res$par)
 
-      # Apply fitted parameters to th model
+      # Apply fitted parameters to the model
       self$update_parameters(
-        parameters = as.list(estimates)
+        parameters = explicit_nested_list(
+          utils::modifyList(
+            unclass(private$.parameters), as.list(estimates)
+          )
+        )
       )
 
       # Preserve estimates on both scales
@@ -575,7 +585,13 @@ DiseasyModel <- R6::R6Class(                                                    
     parameters = purrr::partial(
       .f = active_binding,
       name = "parameters",
-      expr = return(private %.% .parameters)
+      expr = {
+        if (is.null(private %.% .parameters)) {
+          return(NULL)
+        } else {
+          return(explicit_nested_list(private %.% .parameters))
+        }
+      }
     ),
 
 
