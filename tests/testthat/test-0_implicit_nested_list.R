@@ -159,16 +159,38 @@ test_that("read-modify-write preserves metadata on unchanged leaves", {
   expect_identical(implicit[[1]], fitted)
   expect_identical(implicit[[2]], 0.3)
   expect_identical(implicit[[3]], 0.4)
+})
 
 
-  implicit$rates[c("I", "R")] <- c("I" = 0.05, "R" = 0.6)
+test_that("implicit_nested_list supports list subassignment", {
 
-  expect_identical(implicit[["rates.E"]], fitted)
-  expect_identical(implicit[["rates.I"]], 0.05)
-  expect_identical(implicit[["rates.R"]], 0.6)
-  expect_identical(implicit[[1]], fitted)
-  expect_identical(implicit[[2]], 0.05)
-  expect_identical(implicit[[3]], 0.6)
+  x <- implicit_nested_list(list(
+    "rates.E" = 0.5,
+    "rates.I" = 0.25,
+    "risk" = 0.024
+  ))
+
+  # Replace an existing element using character indexing
+  x["rates.E"] <- list(0.6)
+
+  expect_s3_class(x, "implicit_nested_list")
+  expect_identical(x[["rates.E"]], 0.6)
+
+  # Replace multiple elements simultaneously
+  x[c("rates.E", "rates.I")] <- list(0.7, 0.3)
+
+  expect_identical(x$rates, c(E = 0.7, I = 0.3))
+
+  # Replace an element using numeric indexing
+  x[3L] <- list(0.05)
+
+  expect_identical(x[["risk"]], 0.05)
+
+  # Store NULL without deleting the element
+  x["risk"] <- list(NULL)
+
+  expect_true("risk" %in% names(x))
+  expect_null(x[["risk"]])
 })
 
 
