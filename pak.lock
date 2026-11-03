@@ -367,7 +367,7 @@
     },
     {
       "package": "future",
-      "version": "1.80.0",
+      "version": "1.82.0",
       "_row": "future"
     },
     {
@@ -521,6 +521,11 @@
       "_row": "ids"
     },
     {
+      "package": "igraph",
+      "version": "2.3.4",
+      "_row": "igraph"
+    },
+    {
       "package": "ini",
       "version": "0.3.1",
       "_row": "ini"
@@ -577,7 +582,7 @@
     },
     {
       "package": "languageserver",
-      "version": "0.3.20",
+      "version": "0.3.21",
       "_row": "languageserver"
     },
     {
@@ -617,7 +622,7 @@
     },
     {
       "package": "litedown",
-      "version": "0.11",
+      "version": "1.0",
       "_row": "litedown"
     },
     {
@@ -647,7 +652,7 @@
     },
     {
       "package": "markdown",
-      "version": "2.0",
+      "version": "2.1",
       "_row": "markdown"
     },
     {
@@ -717,7 +722,7 @@
     },
     {
       "package": "openssl",
-      "version": "2.4.2",
+      "version": "2.5.0",
       "_row": "openssl"
     },
     {
@@ -737,7 +742,7 @@
     },
     {
       "package": "parallelly",
-      "version": "1.48.0",
+      "version": "1.50.0",
       "_row": "parallelly"
     },
     {
