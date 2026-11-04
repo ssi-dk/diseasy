@@ -180,12 +180,15 @@ DiseasyObservables <- R6::R6Class(                                              
 
 
     #' @description
-    #'   Adds a synthetic feature computed from existing features.
+    #'   Adds a synthetic feature computed from existing features or generated without dependencies.
     #' @param name (`character`)\cr
     #'   The name of the new feature.
     #' @param mapping (`function`)\cr
     #'   The mapping to compute the new feature from existing features.
-    #'   Existing features should be included as formal arguments to the function.
+    #'   Existing features should be included as formal arguments to the function.\cr
+    #'   A mapping without observable inputs must return a `data.frame` with `date`, the requested
+    #'   stratification columns and a column named `name`. It may accept a single `.context` argument
+    #'   containing `regions`, `observable`, `stratification`, `stratification_names`, `start_date` and `end_date`.
     define_synthetic_observable = function(name, mapping) {
 
       if (is.null(self %.% ds)) {
@@ -198,15 +201,49 @@ DiseasyObservables <- R6::R6Class(                                              
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_disjunct(
         name,
-        c(self %.% available_observables, self %.% available_stratifications),
+        c("date", self %.% available_observables, self %.% available_stratifications),
         add = coll
       )
       checkmate::assert_function(mapping, add = coll)
-      checkmate::assert_subset(names(formals(mapping)), self %.% available_observables, empty.ok = FALSE, add = coll)
+      mapping_arguments <- names(formals(mapping))
+      if (is.null(mapping_arguments)) mapping_arguments <- character()
+      checkmate::assert_subset(
+        mapping_arguments, c(self %.% available_observables, ".context"), empty.ok = TRUE, add = coll
+      )
+      if (".context" %in% mapping_arguments && length(mapping_arguments) > 1L) {
+        coll$push("`.context` must be the only argument of a mapping without observable dependencies.")
+      }
       checkmate::reportAssertions(coll)
 
       # Add the synthetic feature
       private$.synthetic_observables[[name]] <- mapping
+
+      return(invisible(NULL))
+    },
+
+
+    #' @description
+    #'   Register regional demography as a synthetic population observable.
+    #' @param name (`character(1)`)\cr
+    #'   Name for the synthetic population observable. Must not collide with an existing observable or stratification.
+    #' @param age_cuts_lower (`integer()` or `NULL`)\cr
+    #'   Optional lower age limits for converting single-year `age` demography to `age_group` labels.
+    #'   Use the same age cuts as the diseasystore when deriving incidence by age group.
+    #'   Not needed when demography already contains `age_group`.
+    #' @return `r rd_side_effects`
+    use_demography_from_regions = function(name = "n_population", age_cuts_lower = NULL) {
+      checkmate::assert_string(name, min.chars = 1)
+      checkmate::assert_integerish(
+        age_cuts_lower, lower = 0, any.missing = FALSE,
+        sorted = TRUE, unique = TRUE, null.ok = TRUE
+      )
+
+      self$define_synthetic_observable(
+        name = name,
+        mapping = regional_demography_mapping(age_cuts_lower)
+      )
+
+      return(invisible(NULL))
     },
 
 
@@ -243,7 +280,6 @@ DiseasyObservables <- R6::R6Class(                                              
         coll$push("start_date/end_date not set. call `$set_study_period()` before getting observations")
         coll$push("Alternatively, specify dates manually in the call")
       }
-      checkmate::assert_character(observable, len = 1, add = coll)
       checkmate::assert_date(
         start_date,
         any.missing = FALSE,
@@ -274,18 +310,43 @@ DiseasyObservables <- R6::R6Class(                                              
           # Determine the name of the columns created by the stratifications
           stratification_names <- self %.% stratification_names(stratification)
 
-          # Extract the required observables at the stratification level and combine
-          data <- mapping_arguments |>
-            purrr::map(\(observable) {
-              self$get_observation(observable, stratification, start_date, end_date, respect_last_queryable_date)
-            }) |>
-            purrr::reduce(dplyr::full_join, by = c("date", stratification_names))
+          if (length(mapping_arguments) == 0L || identical(mapping_arguments, ".context")) {
 
-          # Compute the synthetic feature
-          data <- data |>
-            dplyr::mutate(!!observable := mapping(!!!rlang::quos(!!!rlang::fn_fmls_syms(mapping))))
+            # Mappings without observable dependencies generate their own data.
+            if (identical(mapping_arguments, ".context")) {
+              data <- mapping(.context = list(
+                regions = self %.% regions,
+                observable = observable,
+                stratification = stratification,
+                stratification_names = stratification_names,
+                start_date = start_date,
+                end_date = end_date
+              ))
+            } else {
+              data <- mapping()
+            }
 
-          # Remove the intermediary observables
+            checkmate::assert_data_frame(data)
+            checkmate::assert_names(
+              names(data), must.include = c("date", stratification_names, observable)
+            )
+            checkmate::assert_date(data$date, any.missing = FALSE)
+
+          } else {
+
+            # Extract the required observables at the stratification level and combine.
+            data <- mapping_arguments |>
+              purrr::map(\(observable) {
+                self$get_observation(observable, stratification, start_date, end_date, respect_last_queryable_date)
+              }) |>
+              purrr::reduce(dplyr::full_join, by = c("date", stratification_names))
+
+            # Compute the synthetic feature.
+            data <- data |>
+              dplyr::mutate(!!observable := mapping(!!!rlang::quos(!!!rlang::fn_fmls_syms(mapping))))
+          }
+
+          # Remove intermediary columns in either case.
           data <- data |>
             dplyr::select(dplyr::all_of(c("date", stratification_names, observable)))
 
@@ -514,6 +575,93 @@ DiseasyObservables <- R6::R6Class(                                              
     }
   )
 )
+
+
+# Register an independent mapping, without capturing its owning R6 module.
+regional_demography_mapping <- function(age_cuts_lower = NULL) {
+  mapping <- function(.context) {
+    return(regional_demography_observation(.context, age_cuts_lower))
+  }
+
+  # Function environments are not hashed by hash_environment(); include the age cuts explicitly.
+  attr(mapping, "age_cuts_lower") <- age_cuts_lower
+
+  return(mapping)
+}
+
+
+# Convert static regional demography to the standard observation format.
+regional_demography_observation <- function(.context, age_cuts_lower = NULL) {
+  regions <- .context$regions
+
+  if (!inherits(regions, "DiseasyRegions")) {
+    stop("A `DiseasyRegions` module must be loaded to retrieve regional demography.", call. = FALSE)
+  }
+
+  demography <- regions$demography
+  if (is.null(demography)) {
+    stop("`DiseasyRegions` has no demography configured.", call. = FALSE)
+  }
+
+  if (.context$start_date > .context$end_date) {
+    stop("`start_date` must not be after `end_date`.", call. = FALSE)
+  }
+
+  # Construct age-group labels when the regional demography is supplied as single-year ages.
+  if (!is.null(age_cuts_lower) && "age" %in% names(demography) && !"age_group" %in% names(demography)) {
+    checkmate::assert_integerish(demography$age, lower = 0, any.missing = FALSE)
+    age_cuts_lower <- sort(unique(c(0L, age_cuts_lower)))
+    demography <- demography |>
+      dplyr::mutate(
+        "age_group" = cut(
+          .data$age,
+          breaks = c(age_cuts_lower, Inf),
+          labels = diseasystore::age_labels(age_cuts_lower),
+          right = FALSE
+        )
+      )
+  }
+
+  # Diseasystores commonly use region_id, whereas the regional module uses region.
+  if (!"region_id" %in% names(demography)) {
+    demography$region_id <- demography$region
+  }
+
+  # An age-group label cannot be inferred from single-year ages without knowing the cuts.
+  if (!"age_group" %in% names(demography)) {
+    needs_age_group <- any(purrr::map_lgl(
+      .context$stratification,
+      ~ "age_group" %in% all.vars(rlang::get_expr(.x))
+    ))
+    if (needs_age_group) {
+      stop(
+        "Regional demography has no `age_group` column. Supply `age_cuts_lower` when registering the observable",
+        " (if the demography has single-year `age` data).",
+        call. = FALSE
+      )
+    }
+  }
+
+  # Evaluate the same stratification expressions as other observations.
+  stratification_names <- .context$stratification_names
+  if (length(stratification_names) > 0L) {
+    demography <- dplyr::mutate(demography, !!!.context$stratification)
+  }
+
+  data <- demography |>
+    dplyr::ungroup() |>
+    dplyr::summarise(
+      "population" = sum(.data$population),
+      .by = dplyr::all_of(stratification_names)
+    ) |>
+    dplyr::rename(!!.context$observable := "population")
+
+  # Demography is time-invariant: repeat the same denominator for each requested date.
+  dates <- data.frame("date" = seq.Date(.context$start_date, .context$end_date, by = "day"))
+  data <- dplyr::cross_join(dates, data)
+
+  return(data)
+}
 
 
 # Set default options for the package related to DiseasyObservables

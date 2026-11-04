@@ -183,6 +183,39 @@ obs$get_observation(
 )
 ```
 
+# Using regional demography as a population denominator
+
+The `DiseasyRegions` module may supply the population when a `diseasystore` does not provide an appropriate
+population denominator. Register this demography under a distinct name, without replacing the diseasystore's
+`n_population` observable. The regional module must be loaded before querying the synthetic observable, but it
+can be loaded after registration.
+
+When regional demography has single-year `age` data, provide `age_cuts_lower` matching the age groups in the
+diseasystore. When it already contains `age_group`, the extra argument is unnecessary.
+
+```{r regional_population, eval = suggests_available}
+regions <- DiseasyRegions$new(area = "DK", demography = demography_nordic)
+obs$load_module(regions)
+obs$use_demography_from_regions(name = "regional_population", age_cuts_lower = c(0, 30, 60))
+
+obs$define_synthetic_observable(
+  name = "incidence_regional",
+  mapping = \(n_positive, regional_population) n_positive / regional_population
+)
+
+obs$get_observation(
+  observable = "incidence_regional",
+  stratification = rlang::quos(age_group),
+  start_date = as.Date("2020-03-01"),
+  end_date = as.Date("2020-03-03")
+)
+```
+
+The denominator is computed from the selected regional area and is constant across the requested dates. It
+is aggregated over the requested stratifications using the same expressions as ordinary observations; for
+example, a `region_id` stratification uses the regional `region` identifier. For incidence, both case counts
+and denominators must describe compatible geographic areas and age groups.
+
 ```{r cleanup, include = FALSE}
 if (exists("obs")) rm(obs)
 if (DBI::dbIsValid(conn)) DBI::dbDisconnect(conn)

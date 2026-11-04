@@ -233,7 +233,7 @@ DiseasyObservables module will not return data after this date.}
 \if{html}{\out{<a id="method-DiseasyObservables-define_synthetic_observable"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasyObservables-define_synthetic_observable}{}}}
 \subsection{\code{DiseasyObservables$define_synthetic_observable()}}{
-  Adds a synthetic feature computed from existing features.
+  Adds a synthetic feature computed from existing features or generated without dependencies.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyObservables$define_synthetic_observable(name, mapping)}
@@ -246,9 +246,42 @@ DiseasyObservables module will not return data after this date.}
 The name of the new feature.}
       \item{\code{mapping}}{(\code{function})\cr
 The mapping to compute the new feature from existing features.
-Existing features should be included as formal arguments to the function.}
+Existing features should be included as formal arguments to the function.\cr
+A mapping without observable inputs must return a \code{data.frame} with \code{date}, the requested
+stratification columns and a column named \code{name}. It may accept a single \code{.context} argument
+containing \code{regions}, \code{observable}, \code{stratification}, \code{stratification_names}, \code{start_date} and \code{end_date}.}
     }
     \if{html}{\out{</div>}}
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyObservables-use_demography_from_regions"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyObservables-use_demography_from_regions}{}}}
+\subsection{\code{DiseasyObservables$use_demography_from_regions()}}{
+  Register regional demography as a synthetic population observable.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyObservables$use_demography_from_regions(
+  name = "n_population",
+  age_cuts_lower = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{name}}{(\code{character(1)})\cr
+Name for the synthetic population observable. Must not collide with an existing observable or stratification.}
+      \item{\code{age_cuts_lower}}{(\code{integer()} or \code{NULL})\cr
+Optional lower age limits for converting single-year \code{age} demography to \code{age_group} labels.
+Use the same age cuts as the diseasystore when deriving incidence by age group.
+Not needed when demography already contains \code{age_group}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
   }
 }
 
