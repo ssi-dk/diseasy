@@ -65,11 +65,13 @@ hash_environment <- function(environment) {
       # If a element is function, we hash the formals, source and attributes
       # but remove the srcref which carries an environment.
       # (Environments give different hashes despite the functions they are attached to being identical)
+      obj <- rlang::zap_srcref(obj)
+
       out <- list(
         "function_formals" = rlang::fn_fmls(obj),
-        "function_source" = paste(stringr::str_remove_all(deparse(rlang::fn_body(obj)), r"{[\s\"]}"), collapse = ""),
-        "function_attributes" = attributes(rlang::zap_srcref(obj)) |>
-          purrr::discard_at("body") # Partialised functions have the source repeated as "body"
+        "function_body" = rlang::fn_body(obj),
+        "function_attributes" = attributes(obj) |>
+          purrr::discard_at("body")
       )
 
     } else if (checkmate::test_formula(obj)) {
