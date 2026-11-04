@@ -711,7 +711,8 @@ if (simple_rendering) {
   cat(
     "The results of the benchmark are shown graphically below",
     "(mean and standard deviation), where we compare the",
-    "current development version of `DiseasyModelOdeSeir$fit()` with the current CRAN version."
+    "current development version of `DiseasyModelOdeSeir$fit()`",
+    "with the current CRAN version."
   )
 }
 ```
@@ -730,7 +731,10 @@ benchmarks <- readRDS(benchmark_location) |>
 # Determine if the SHA is on main
 sha <- benchmarks |>
   dplyr::distinct(.data$version) |>
-  dplyr::filter(!startsWith(.data$version, "DiseasyModelOdeSeir"), .data$version != "main") |>
+  dplyr::filter(
+    !startsWith(.data$version, "DiseasyModelOdeSeir"),
+    .data$version != "main"
+  ) |>
   dplyr::pull("version")
 
 # Check local git history
@@ -745,7 +749,7 @@ on_main <- tryCatch({
 })
 
 # In the simple context we use the newest benchmark (version = sha)
-# This benchmark is then labelled with the newest version number of DiseasyModelOdeSeir
+# This benchmark is labelled with the newest version number of DiseasyModelOdeSeir
 if (simple_rendering) {
   benchmarks <- benchmarks |>
     dplyr::filter(.data$version == !!sha) |>

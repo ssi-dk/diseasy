@@ -173,7 +173,7 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
             message("Benchmarking ", version_label, ": ", combination_label)
 
             timing <- microbenchmark::microbenchmark(
-              res <- model$fit(observable = "n_infected"),
+              res <- model$fit(observable = "n_infected"),                                                              # nolint: implicit_assignment_linter
               times = 5,
               setup = {
                 model <- make_model(combination)
