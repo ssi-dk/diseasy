@@ -1,5 +1,8 @@
 ^docs$
 ^pkgdown$
+^\.devcontainer$
+^\.github$
+
 ^data-raw$
 ^installations$
 ^vignettes/articles$
