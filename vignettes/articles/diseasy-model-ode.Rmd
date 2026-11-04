@@ -719,7 +719,7 @@ if (simple_rendering) {
 
 ```{r benchmark_preprocessing, echo = FALSE, eval = requireNamespace("here")}
 benchmark_location <- c(
-  system.file("extdata", "benchmarks.rds", package = "DiseasyModelOdeSeir"),
+  system.file("extdata", "benchmarks.rds", package = "diseasy"),
   here::here("inst", "extdata", "benchmarks.rds")
 ) |>
   purrr::discard(~ identical(., "")) |>
