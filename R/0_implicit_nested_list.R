@@ -186,7 +186,7 @@ explicit_nested_list <- function(flat) {
 
   names(children) <- substring(names(children), nchar(prefix) + 1L)
 
-  return(explicit_nested_list(children))
+  return(.explicitly_nest_list(children, level = 1)) # Level > 0 to prevent casting to list
 }
 
 #' @export
