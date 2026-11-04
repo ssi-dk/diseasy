@@ -6,6 +6,7 @@ S3method(predict,DiseasyEnsemble)
 S3method(print,DiseasyBaseModule)
 S3method(print,DiseasyEnsemble)
 S3method(summary,DiseasyEnsemble)
+export("%.%")
 export(DiseasyActivity)
 export(DiseasyBaseModule)
 export(DiseasyImmunity)
@@ -39,7 +40,6 @@ export(set_attributes)
 importFrom(Matrix,Matrix)
 importFrom(R6,R6Class)
 importFrom(cachem,cache_disk)
-importFrom(diseasystore,"%.%")
 importFrom(expm,
   expm,
   expmFrechet
