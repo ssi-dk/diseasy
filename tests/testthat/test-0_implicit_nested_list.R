@@ -18,6 +18,18 @@ test_that("constructor flattens named vectors and lists", {
 })
 
 
+test_that("single groups lists are not simplified", {
+  implicit <- implicit_nested_list(list("compartments" = 2))
+
+  # Test internal representation
+  expect_named(implicit, c("compartments"))
+
+  # Check representation after re-nesting
+  explicit <- explicit_nested_list(implicit)
+  expect_identical(explicit, list("compartments" = 2))
+})
+
+
 test_that("new named vector assignment creates dotted entries", {
   implicit <- implicit_nested_list()
 
@@ -179,12 +191,17 @@ test_that("implicit_nested_list supports list subassignment", {
   # Replace multiple elements simultaneously
   x[c("rates.E", "rates.I")] <- list(0.7, 0.3)
 
-  expect_identical(x$rates, c(E = 0.7, I = 0.3))
+  expect_identical(x$rates, c("E" = 0.7, "I" = 0.3))
 
   # Replace an element using numeric indexing
   x[3L] <- list(0.05)
 
   expect_identical(x[["risk"]], 0.05)
+
+  # Replace multiple element using numeric indexing
+  x[[c(1L, 1L)]] <- 0.2
+
+  expect_identical(x$rates, c("E" = 0.2, "I" = 0.3))
 
   # Store NULL without deleting the element
   x["risk"] <- list(NULL)
