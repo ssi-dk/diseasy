@@ -61,6 +61,9 @@ The set diseasystore to get DiseasyObservables for. Read-only.}
     \item{\code{last_queryable_date}}{(\code{Date})\cr
 The latest date that can be queried. Read-only.}
 
+    \item{\code{regions}}{(\code{DiseasyRegions} or \code{NULL})\cr
+The regional module supplying optional demographic data. Read-only.}
+
     \item{\code{ds}}{(\verb{Diseasystore*})\cr
 The currently loaded diseasystore which provides the features. Read-only.}
 
@@ -88,6 +91,7 @@ The synthetic features defined in the module. Read-only.}
     \item \href{#method-DiseasyObservables-set_study_period}{\code{DiseasyObservables$set_study_period()}}
     \item \href{#method-DiseasyObservables-set_slice_ts}{\code{DiseasyObservables$set_slice_ts()}}
     \item \href{#method-DiseasyObservables-define_synthetic_observable}{\code{DiseasyObservables$define_synthetic_observable()}}
+    \item \href{#method-DiseasyObservables-use_demography_from_regions}{\code{DiseasyObservables$use_demography_from_regions()}}
     \item \href{#method-DiseasyObservables-get_observation}{\code{DiseasyObservables$get_observation()}}
     \item \href{#method-DiseasyObservables-stratification_names}{\code{DiseasyObservables$stratification_names()}}
     \item \href{#method-DiseasyObservables-describe}{\code{DiseasyObservables$describe()}}
@@ -114,6 +118,7 @@ The synthetic features defined in the module. Read-only.}
   last_queryable_date = NULL,
   conn = diseasyoption("conn", class = "DiseasyObservables"),
   slice_ts = NULL,
+  regions = NULL,
   ...
 )}
     \if{html}{\out{</div>}}
@@ -131,6 +136,8 @@ Used as default values for \verb{$get_observation()}.}
 Enforce a limit on data that can be pulled (not after this date).}
       \item{\code{conn}}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection.}
       \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+      \item{\code{regions}}{(\code{DiseasyRegions} or \code{NULL})\cr
+Optional regional module supplying demography for synthetic observables.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
     }
     \if{html}{\out{</div>}}

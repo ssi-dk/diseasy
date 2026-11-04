@@ -51,6 +51,8 @@ DiseasyObservables <- R6::R6Class(                                              
     #'   Enforce a limit on data that can be pulled (not after this date).
     #' @param conn `r rd_conn()`
     #' @param slice_ts `r rd_slice_ts()`
+    #' @param regions (`DiseasyRegions` or `NULL`)\cr
+    #'   Optional regional module supplying demography for synthetic observables.
     #' @param ...
     #'   Parameters sent to `DiseasyBaseModule` [R6][R6::R6Class] constructor.
     #' @return
@@ -62,11 +64,16 @@ DiseasyObservables <- R6::R6Class(                                              
       last_queryable_date = NULL,
       conn = diseasyoption("conn", class = "DiseasyObservables"),
       slice_ts = NULL,
+      regions = NULL,
       ...
     ) {
 
+      checkmate::assert_class(regions, "DiseasyRegions", null.ok = TRUE)
+
       # Pass further arguments to the DiseasyBaseModule initializer
       super$initialize(...)
+
+      if (!is.null(regions)) self$load_module(regions)
 
       # Set the db connection
       private$.conn <- parse_diseasyconn(conn, type = "target_conn") # Open a new connection to the DB
@@ -392,6 +399,15 @@ DiseasyObservables <- R6::R6Class(                                              
     ),
 
 
+    #' @field regions (`DiseasyRegions` or `NULL`)\cr
+    #'   The regional module supplying optional demographic data. Read-only.
+    regions = purrr::partial(
+      .f = active_binding,
+      name = "regions",
+      expr = return(private %.% .DiseasyRegions)
+    ),
+
+
     #' @field ds (`Diseasystore*`)\cr
     #'   The currently loaded diseasystore which provides the features. Read-only.
     ds = purrr::partial(
@@ -463,6 +479,7 @@ DiseasyObservables <- R6::R6Class(                                              
   ),
 
   private = list(
+    .DiseasyRegions      = NULL,
     .diseasystore        = NULL,
     .start_date          = NULL,
     .end_date            = NULL,
