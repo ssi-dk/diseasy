@@ -198,10 +198,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
       checkmate::reportAssertions(coll)
 
-      if (!identical(private$ready, self %.% hash)) {
-        self$prepare_rhs()
-      }
-
+      self$prepare_rhs()
       super$get_results(observable, prediction_length, quantiles, stratification)
     },
 
