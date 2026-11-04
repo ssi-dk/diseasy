@@ -22,7 +22,7 @@ test_that("single groups lists are not simplified", {
   implicit <- implicit_nested_list(list("compartments" = 2))
 
   # Test internal representation
-  expect_named(implicit, c("compartments"))
+  expect_named(implicit, "compartments")
 
   # Check representation after re-nesting
   explicit <- explicit_nested_list(implicit)
