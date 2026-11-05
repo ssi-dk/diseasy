@@ -709,7 +709,7 @@ if (verbose_rendering) {
     "with the current CRAN version."
   )
 } else {
-   cat(
+  cat(
     "The results of the benchmark are shown graphically below",
     "(mean and standard deviation), where measure the",
     "performance of `DiseasyModelOdeSeir$fit()`."
@@ -849,8 +849,8 @@ if (verbose_rendering) {
           # A test needs at least two observations per version
           if (
             length(branch_times) < 2L ||
-            length(reference_times) < 2L ||
-            mean(reference_times) <= 0
+              length(reference_times) < 2L ||
+              mean(reference_times) <= 0
           ) {
             return(tibble::tibble(
               "comparison" = character(),
