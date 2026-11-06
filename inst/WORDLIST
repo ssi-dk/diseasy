@@ -64,6 +64,7 @@ diseasy
 Diseasy's
 diseasystore
 DiseasystoreBase
+DiseasystoreEcdcRespiratoryViruses
 DiseasystoreGoogleCovid
 diseasystores
 DiseasyActivity
@@ -76,7 +77,6 @@ DiseasyModelRegression
 DiseasyObservables
 DiseasyPopulation
 DiseasyRegions
-DiseasyScoring
 DiseasySeason
 DiseasyVariant
 dk
@@ -169,7 +169,6 @@ neq
 nlm
 nlminb
 nloptr
-nmkb
 nolint
 normalise
 notin
