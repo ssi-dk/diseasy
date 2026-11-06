@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![CRAN
-status](https://www.r-pkg.org/badges/version/diseasy)](https://CRAN.R-project.org/package=diseasy)
+status](https://www.r-pkg.org/badges/version/diseasy)](https://cran.r-project.org/web/packages/diseasy/index.html)
 [![CI
 tests](https://github.com/ssi-dk/diseasy/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/diseasy/actions/workflows/all-workflows.yaml)
 [![codecov](https://codecov.io/gh/ssi-dk/diseasy/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ssi-dk/diseasy)
