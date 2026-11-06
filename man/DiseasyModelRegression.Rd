@@ -88,14 +88,14 @@ A \code{character} string that is passed to \code{stats::as.formula} via \code{g
       \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 \itemize{
-\item \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. ,
+\item \code{season.scale} \verb{r rd_season_scale()},
 If \code{NULL} (default), the default value of the season module is used.
-\item \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark). ,
+\item \code{season.peak} \verb{r rd_season_peak()},
 If \code{NULL} (default), the default value of the season module is used.
 }
 
 Additional parameters are:
-(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Each model has their own parameters.\cr\cr Common parameters are:\cr * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
+\verb{r rd_diseasymodel_parameters}}
       \item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
     }
     \if{html}{\out{</div>}}

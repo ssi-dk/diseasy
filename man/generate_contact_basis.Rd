@@ -7,7 +7,7 @@
 generate_contact_basis(area = NULL)
 }
 \arguments{
-\item{area}{(\code{character()})\cr The geographic area (list of regions) of interest. If \code{NULL}, all regions are returned.}
+\item{area}{\verb{r rd_area("generators")}}
 }
 \value{
 A named list of contact-basis objects, using the current package data

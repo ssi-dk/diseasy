@@ -65,7 +65,7 @@ See the vignette("diseasy-regions") for examples of use.
 \section{Active bindings}{
   \if{html}{\out{<div class="r6-active-bindings">}}
   \describe{
-    \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. Read only.}
+    \item{\code{area}}{\verb{r rd_area(type = "field")}}
 
     \item{\code{available_stratifications}}{(\code{character()})\cr
 The available levels of stratification supported. Read only.}
@@ -77,7 +77,7 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
 
     \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group. Read only.}
 
-    \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr Read only.}
+    \item{\code{regional_risks}}{\verb{r rd_regional_risks(type = "field")}}
   }
   \if{html}{\out{</div>}}
 }
@@ -123,10 +123,10 @@ The "Theta" matrix (see \code{vignette("diseasy-regions")}) that describes flow 
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{\verb{r rd_area()}}
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
-      \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
+      \item{\code{regional_risks}}{\verb{r rd_regional_risks()}}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
     }
     \if{html}{\out{</div>}}
@@ -151,7 +151,7 @@ may be set on the objects before passing to this constructor to control the inte
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{\verb{r rd_area()}}
     }
     \if{html}{\out{</div>}}
   }
@@ -225,7 +225,7 @@ Defaults to "movement" if not provided.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
+      \item{\code{regional_risks}}{\verb{r rd_regional_risks()}}
       \item{\code{regional_risks_type}}{(\code{character(1)})\cr
 The interpretation of the risk modifiers (see details).
 Must be either \code{"location"} or \code{"behaviour"} (default).}
@@ -283,10 +283,10 @@ interpretation cannot be computed and results in an error.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{\verb{r rd_area()}}
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
-      \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
+      \item{\code{regional_risks}}{\verb{r rd_regional_risks()}}
     }
     \if{html}{\out{</div>}}
   }
@@ -363,7 +363,7 @@ area. If \code{NULL}, all values are matched.}
     \describe{
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{adjacency_type}}{(\code{character})\cr The type of adjacency provided ("movement" versus "infection-flow"). See \code{vignette("diseasy-regions")} for details.}
-      \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
+      \item{\code{regional_risks}}{\verb{r rd_regional_risks()}}
       \item{\code{regional_risks_type}}{(\code{character(1)})\cr
 The interpretation of the risk modifiers.
 Must be either "location" or "behaviour".}
@@ -496,10 +496,10 @@ and complete under NUTS hierarchy semantics.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{area}}{(\code{character()})\cr The geographic area (list of regions) of interest. The specified regions must be available in the \code{demography} and \code{adjacency} data.}
+      \item{\code{area}}{\verb{r rd_area()}}
       \item{\code{adjacency}}{(\code{data.frame(1)})\cr The adjacency (connectedness) of the regions. Effectively, the \code{adjacency} is a long-form of the adjacency-matrix\cr The \code{data.frame} must include the following columns:\cr - \code{from} (\code{character}): Region identifier.\cr - \code{to}   (\code{character}): Region identifier.\cr - \code{adjacency} (\code{numeric}): Strength of the connectedness.\cr The \code{from} and \code{to} columns must contain the same set of regions. For "movement" inputs, rows are normalised before deriving the Theta matrix. For "infection-flow" inputs, values are interpreted directly as the Theta matrix.}
       \item{\code{demography}}{(\code{data.frame(1)})\cr The demography of the population per region.\cr The \code{data.frame} must include the following columns:\cr * \code{region} (\code{character}) Region identifier.\cr * \code{...} Optional additional stratification columns (e.g. sex, ethnicity).\cr * \code{population} (\code{numeric}) Number of individuals in the group.}
-      \item{\code{regional_risks}}{(\verb{named numeric()})\cr Modifiers tied to each region (identified by vector names).\cr}
+      \item{\code{regional_risks}}{\verb{r rd_regional_risks()}}
     }
     \if{html}{\out{</div>}}
   }
