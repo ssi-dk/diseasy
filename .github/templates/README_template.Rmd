@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version/{{ repo_name }})](https://CRAN.R-project.org/package={{ repo_name }})
+[![CRAN status](https://www.r-pkg.org/badges/version/{{ repo_name }})](https://cran.r-project.org/web/packages/{{ repo_name }}/index.html)
 [![CI tests](https://github.com/ssi-dk/{{ repo_name }}/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/{{ repo_name }}/actions/workflows/all-workflows.yaml)
 [![codecov](https://codecov.io/gh/ssi-dk/{{ repo_name }}/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ssi-dk/{{ repo_name }})
 
