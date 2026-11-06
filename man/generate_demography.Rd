@@ -11,7 +11,7 @@ generate_demography(
 )
 }
 \arguments{
-\item{area}{(\code{character()})\cr The geographic area (list of regions) of interest. If \code{NULL}, all regions are returned.}
+\item{area}{\verb{r rd_area("generators")}}
 
 \item{year}{(\code{integer(1)})\cr
 The year to keep from the source data.}

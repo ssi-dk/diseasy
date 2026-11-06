@@ -167,7 +167,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
-      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
+      \item{\code{...}}{\verb{r rd_diseasy_immunity_dots}}
     }
     \if{html}{\out{</div>}}
   }
@@ -195,7 +195,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
     \describe{
       \item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
-      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
+      \item{\code{...}}{\verb{r rd_diseasy_immunity_dots}}
     }
     \if{html}{\out{</div>}}
   }
@@ -227,7 +227,7 @@ If a \code{function} is given, it is treated as a custom waning function and is 
 Determines the steepness of the waning curve in the sigmoidal waning model.
 Higher values of \code{shape} result in a steeper curve, leading to a more rapid decline in immunity.}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
-      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
+      \item{\code{...}}{\verb{r rd_diseasy_immunity_dots}}
     }
     \if{html}{\out{</div>}}
   }
@@ -251,7 +251,7 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
     \describe{
       \item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
-      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
+      \item{\code{...}}{\verb{r rd_diseasy_immunity_dots}}
     }
     \if{html}{\out{</div>}}
   }
@@ -279,7 +279,7 @@ Higher values of \code{shape} result in a steeper curve, leading to a more rapid
     \describe{
       \item{\code{time_scale}}{(\code{numeric(1)})\cr Sets the time_scale of the waning (immunity) model. The time_scale is the characteristic time scale, which defines the period until when the immunity is significantly waning}
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
-      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
+      \item{\code{...}}{\verb{r rd_diseasy_immunity_dots}}
     }
     \if{html}{\out{</div>}}
   }
@@ -314,7 +314,7 @@ If the function has a time scale, it should be included in the function as \code
       \item{\code{target}}{(\code{character(1)})\cr The target of the waning model (e.g. "infection", "hospitalisation", "death").}
       \item{\code{name}}{(\code{character(1)})\cr
 Set the name of the custom waning function.}
-      \item{\code{...}}{Optional attributes supplied to the waning function. Must be one or both of \code{delay} and \code{risk}.}
+      \item{\code{...}}{\verb{r rd_diseasy_immunity_dots}}
     }
     \if{html}{\out{</div>}}
   }

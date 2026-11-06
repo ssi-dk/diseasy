@@ -7,7 +7,7 @@
 generate_demography_nuts3(area = NULL, cache = FALSE, output_nuts = FALSE)
 }
 \arguments{
-\item{area}{(\code{character()})\cr The geographic area (list of regions) of interest. If \code{NULL}, all regions are returned.}
+\item{area}{\verb{r rd_area("generators")}}
 
 \item{cache}{(\code{logical(1)})\cr
 Passed to \code{\link[eurostat:get_eurostat]{eurostat::get_eurostat()}}.}
