@@ -7,7 +7,7 @@
     },
     {
       "package": "arrow",
-      "version": "25.0.1",
+      "version": "26.0.0",
       "_row": "arrow"
     },
     {
@@ -252,7 +252,7 @@
     },
     {
       "package": "diseasystore",
-      "version": "0.4.0",
+      "version": "0.4.0.9000",
       "_row": "diseasystore"
     },
     {
@@ -372,7 +372,7 @@
     },
     {
       "package": "gargle",
-      "version": "1.6.1",
+      "version": "1.7.0",
       "_row": "gargle"
     },
     {
@@ -514,11 +514,6 @@
       "package": "ids",
       "version": "1.0.1",
       "_row": "ids"
-    },
-    {
-      "package": "igraph",
-      "version": "2.3.4",
-      "_row": "igraph"
     },
     {
       "package": "ini",
@@ -1057,7 +1052,7 @@
     },
     {
       "package": "selectr",
-      "version": "0.6-0",
+      "version": "0.8-0",
       "_row": "selectr"
     },
     {
