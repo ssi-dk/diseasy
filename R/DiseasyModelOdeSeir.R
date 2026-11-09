@@ -972,14 +972,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           by = c("date", names(self %.% population %.% groups), "variant")
         ) |>
         dplyr::group_by(dplyr::across(c("variant", names(self %.% population %.% groups)))) |>
-        dplyr::group_map(~ {
-          stats::approxfun(
-            x = as.numeric(.x$date - max(.x$date), unit = "days"),
-            y = .x$incidence,
-            method = "constant",
-            rule = 2
-          )
-        })
+        dplyr::group_map(~ private$smooth_incidence_signal(
+          date = .x$date,
+          incidence = .x$incidence,
+          smoothing_window = self %.% parameters %.% incidence_forcing_smoothing_window
+        ))
 
       # Collapse to a single vector for the model
       signal <- \(t) purrr::map_dbl(signal_approximations, ~ .(t))
@@ -1067,11 +1064,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         by = 1
       )
 
-      sol <- deSolve::ode(
-        y = y0,
-        times = times,
-        func = initialisation_submodel %.% rhs
-      )
+      sol <- tryCatch({
+        out <- deSolve::ode(
+          y = y0,
+          times = times,
+          func = initialisation_submodel %.% rhs
+        )
+
+        if (attr(out, "istate")[1L] < 0L) stop("ODE solver failed in `$initialise_state_vector()`.")
+        out
+
+      }, error = function(e) {
+        stop(
+          conditionMessage(e),
+          "\nTry increasing the `incidence_forcing_smoothing_window` parameter.",
+          call. = FALSE
+        )
+      })
 
       # Get R and S states from the last row
       estimated_recovered_susceptible_states <- tidyr::expand_grid(
@@ -1525,9 +1534,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           "season.peak" = NULL, # Use default values from season module
 
           # Parameters for fitting polynomials to the incidence curves
-          "incidence_polynomial_order" = 3,
-          "incidence_polynomial_training_length" = 21,
-          "incidence_max_order_derivatives" = 2,
+          "incidence_polynomial_order" = 3L,
+          "incidence_polynomial_training_length" = 21L,
+          "incidence_max_order_derivatives" = 2L,
+          "incidence_forcing_smoothing_window" = 1L,
 
           # Defaults for functional modules
           "activity.weights" = c(1, 1, 1, 1),
@@ -1600,9 +1610,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Validate the incidence polynomial parameters
-      checkmate::assert_integerish(parameters %.% incidence_polynomial_order, lower = 0, add = coll)
-      checkmate::assert_integerish(parameters %.% incidence_polynomial_training_length, lower = 0, add = coll)
-      checkmate::assert_integerish(parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_polynomial_order, lower = 0, len = 1, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_polynomial_training_length, lower = 0, len = 1, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_max_order_derivatives, lower = 0, len = 1, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_forcing_smoothing_window, lower = 1, len = 1, add = coll)
 
       # Validate the functional modules parameters
       checkmate::assert_numeric(parameters %.% activity.weights, lower = 0, len = 4, add = coll)
@@ -1857,6 +1868,69 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       return(uniroot(f, c(0, upper))$root)
+    },
+
+
+    # @description
+    #   This function smooths the incidence singal for `$initialise_state_vector()`
+    smooth_incidence_signal = function(date, incidence, smoothing_window = 1L) {
+      checkmate::assert_date(date, any.missing = FALSE)
+      checkmate::assert_numeric(incidence, lower = 0, len = length(date), any.missing = TRUE)
+      checkmate::assert_integerish(smoothing_window, lower = 1, len = 1)
+
+      order_id <- order(date)
+      date <- date[order_id]
+      incidence <- incidence[order_id]
+      t <- as.numeric(date - max(date), units = "days")
+
+      if (smoothing_window == 1L) { # Window of size 1 is just piecewise linear segments between observations
+        return(stats::approxfun(x = t, y = incidence, method = "constant", rule = 2))
+      }
+
+      # Missing observations are interpolated before smoothing
+      observed <- !is.na(incidence)
+      if (!any(observed)) {
+        stop("No observed daily incidence available for smoothing.", call. = FALSE)
+      }
+
+      if (sum(observed) == 1L) {
+        incidence <- rep(incidence[observed], length(date))
+      } else if (any(!observed)) {
+        incidence <- stats::approx(
+          x = t[observed],
+          y = incidence[observed],
+          xout = t,
+          method = "linear",
+          rule = 2
+        )$y
+      }
+
+      # Centred moving average with shorter windows at the boundaries
+      half_before <- (smoothing_window - 1L) %/% 2L
+      half_after <- smoothing_window %/% 2L
+
+      smoothed <- vapply(
+        seq_along(incidence),
+        function(index) {
+          first <- max(1L, index - half_before)
+          last <- min(length(incidence), index + half_after)
+
+          return(mean(incidence[first:last]))
+        },
+        numeric(1)
+      )
+
+      # Preserve cumulative daily incidence after interpolation
+      if (sum(smoothed) > 0) {
+        smoothed <- smoothed * sum(incidence) / sum(smoothed)
+      }
+
+      return(stats::approxfun(
+        x = t,
+        y = smoothed,
+        method = "linear",
+        rule = 2
+      ))
     }
   )
 )
