@@ -782,6 +782,17 @@ model.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="Model prediction for the number of hospital admissions - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-17-2.png" class="r-plt" alt="Model prediction for the number of hospital admissions - stratified by age group." width="700"><img src="diseasy-model-ode_files/figure-html/unnamed-chunk-17-3.png" class="r-plt" alt="Model prediction for the number of hospital admissions - stratified by age group." width="700"></p>
 </div>
+<div class="section level2">
+<h2 id="benchmarks">Benchmarks<a class="anchor" aria-label="anchor" href="#benchmarks"></a>
+</h2>
+<p>To showcase the performance of <code>DiseasyModelOdeSeir</code> on
+different database backends, we include this vignette that summarises a
+simple benchmark:</p>
+<p>The benchmark tests <code>DiseasyModelOdeSeir$fit()</code> with
+different free parameters. The performance of this benchmark function is
+timed with the <a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a> on the same machine.</p>
+<p><img src="diseasy-model-ode_files/figure-html/benchmark-1.png" class="r-plt" alt="" width="700"></p>
+</div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
