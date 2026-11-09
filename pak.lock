@@ -7,7 +7,7 @@
     },
     {
       "package": "arrow",
-      "version": "26.0.0",
+      "version": "25.0.1",
       "_row": "arrow"
     },
     {
@@ -39,6 +39,11 @@
       "package": "BB",
       "version": "2026.1.0",
       "_row": "BB"
+    },
+    {
+      "package": "bibtex",
+      "version": "0.5.2",
+      "_row": "bibtex"
     },
     {
       "package": "bigD",
@@ -372,7 +377,7 @@
     },
     {
       "package": "gargle",
-      "version": "1.7.0",
+      "version": "1.6.1",
       "_row": "gargle"
     },
     {
@@ -514,6 +519,11 @@
       "package": "ids",
       "version": "1.0.1",
       "_row": "ids"
+    },
+    {
+      "package": "igraph",
+      "version": "2.3.4",
+      "_row": "igraph"
     },
     {
       "package": "ini",
@@ -926,6 +936,11 @@
       "_row": "readxl"
     },
     {
+      "package": "RefManageR",
+      "version": "1.4.0",
+      "_row": "RefManageR"
+    },
+    {
       "package": "regions",
       "version": "0.1.8",
       "_row": "regions"
@@ -1052,7 +1067,7 @@
     },
     {
       "package": "selectr",
-      "version": "0.8-0",
+      "version": "0.6-0",
       "_row": "selectr"
     },
     {
