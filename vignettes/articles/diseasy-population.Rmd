@@ -281,7 +281,7 @@ one_way_links <- tidyr::expand_grid(
   tidyr::uncount(.data$n_contacts) |>
   dplyr::select(!"n_contacts")
 
-# Randomly draw i indicies (from nodes)
+# Randomly draw i indices (from nodes)
 one_way_links <- one_way_links |>
   dplyr::group_by(.data$i_age_group) |>
   dplyr::group_modify(
@@ -396,15 +396,15 @@ mixing_sw <- matrix(
 print(mixing_sw)
 ```
 
-Notice that we now have a population stratfied by age in age groups $i$ and $j$,
+Notice that we now have a population stratified by age in age groups $i$ and $j$,
 and a regional mixing matrix connecting regions $x$ and $y$.
-The population is therefore currently identified by the simultaneous indicies ($i, x$),
+The population is therefore currently identified by the simultaneous indices ($i, x$),
 which we combine to form a linear "demography group" index connecting individuals
 from demographic groups $q$ and $p$.
 
 The models population is expressed in this linear index and, therefore, we aim to
-combine the regional mixing and age-specific matricies into a single representation
-in the linear demography group indcies. A "full" rather than "marginal" contact
+combine the regional mixing and age-specific matrices into a single representation
+in the linear demography group indices. A "full" rather than "marginal" contact
 matrix.
 
 We can compute the "full" per-capita contact matrix, $\overline{\overline{C}}$,
@@ -412,7 +412,7 @@ from the age-specific contact matrix, $\overline{\overline{C}}_{i, j}$,
 the mixing matrix, $\overline{\overline{\Theta}}_{x, y}$,
 and the population vector, $\overline{N}_{p = (i, x)}$: via the relation:
 $$
-\overline{\overline{C}}^{\textrm{full}}_{p = (i, x), q = (j, y)} = k \overline{\overline{\Theta^\ast}}_{x, y} \overline{\overline{C}}_{i, j}
+\overline{\overline{C}}^{\textrm{full}}_{p = (i, x), q = (j, y)} = k_{i, j} \overline{\overline{\Theta^\ast}}_{x, y} \overline{\overline{C}}_{i, j}
 $$
 
 Where $\overline{\overline{\Theta^\ast}}$ is a normalised mixing matrix:
@@ -454,27 +454,24 @@ means that contacts between mixing groups p and q are multiplied by 1.4, relativ
 Note that the normalization preserves the population-pair-weighted regional mixing intensity.
 Consequently, the total number of contacts is invariant only when regional age compositions are identical.
 
-This is where the additional normalisation constant $k$ comes in:
+This is where the additional normalisation constants $k_{i, j}$ comes in.
 
-If we define the total contact volumne $W_{x,y}$ between regions $x$ and $y$
-in the well-mixed case as:
+We first define mixing-weighted population-pair volume $D_{i,j}$ as:
 
 $$
-W_{x,y}=\sum_{i,j} C_{ij} N_{i,x} N_{j,y}.
+D_{x,y} = \sum_{x,y} \Theta^\ast_{x,y} N_{i,x} N_{j,y}.
 $$
 
-Then the total contact volume in the well-mixed case is:
-$T_{\textrm{well mixed}} = \sum_{x,y} W_{x,y}$
+That is, the number of potential population pairs between age groups $i$ and $j$
+when accounting for the mixing between regions.
 
-and in the case with the given regional mixing matrix:
-$T_{\textrm{mixing matrix}} = \sum_{x,y} \Theta^\ast_{x,y} W_{x,y}$
-
-If we then define the normalisation factor of:
+The additional normalisation then becomes:
 $$
-k = \frac{\sum_{x,y} W_{x,y}}{\sum_{x,y} \Theta^\ast_{x,y} W_{x,y}}
+k_{i, j} = \frac{ \sum_x N_{i,x} \sum_x N_{j,x}}{D_{i,j}}
 $$
 
-the toral contact volume can be preserved.
+which preserves the age-specific contact volume when aggregating across the regions.
+
 
 Let's see that computation in practice:
 ```{r}
@@ -508,10 +505,9 @@ tm <- mixing_sw
 cm <- c_matrix
 
 tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
-w <- t(N_age_region) %*% cm %*% N_age_region
-k <- sum(w) / sum(tm_norm * w)
+k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
 
-c_matrix_full_sw <- k * kronecker(tm_norm, cm)
+c_matrix_full_sw <- kronecker(tm_norm, cm * k)
 dimnames(c_matrix_full_sw) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_sw, digits = 1))
 ```
@@ -558,7 +554,7 @@ one_way_links <- tidyr::expand_grid(
   tidyr::uncount(.data$n_contacts) |>
   dplyr::select(!"n_contacts")
 
-# Randomly draw i indicies (from nodes)
+# Randomly draw i indices (from nodes)
 # verify they connect to j nodes in the region
 # -- else re-draw from accepted samples
 one_way_links <- one_way_links |>
@@ -618,7 +614,7 @@ one_way_links <- one_way_links |>
     }
   )
 
-# Randomly draw j indicies (to nodes) within the same region
+# Randomly draw j indices (to nodes) within the same region
 one_way_links <- one_way_links |>
   dplyr::group_by(.data$i, .data$j_age_group, .data$i_region) |>
   dplyr::group_modify(
@@ -726,10 +722,9 @@ tm <- mixing_silo
 cm <- c_matrix
 
 tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
-w <- t(N_age_region) %*% cm %*% N_age_region
-k <- sum(w) / sum(tm_norm * w)
+k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
 
-c_matrix_full_silo <- k * kronecker(tm_norm, cm)
+c_matrix_full_silo <- kronecker(tm_norm, cm * k)
 dimnames(c_matrix_full_silo) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_silo, digits = 1))
 ```
@@ -779,10 +774,9 @@ tm <- mixing_mix
 cm <- c_matrix
 
 tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
-w <- t(N_age_region) %*% cm %*% N_age_region
-k <- sum(w) / sum(tm_norm * w)
+k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
 
-c_matrix_full_mix <- k * kronecker(tm_norm, cm)
+c_matrix_full_mix <- kronecker(tm_norm, cm * k)
 dimnames(c_matrix_full_mix) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_mix, digits = 1))
 ```
