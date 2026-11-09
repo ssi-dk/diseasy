@@ -84,7 +84,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Sets the scale for the active season model.
-    #' @param scale `r rd_scale("field")`
+    #' @param scale `r rd_season_scale("field")`
     set_scale = function(scale) {
       checkmate::assert_number(scale)
 
@@ -188,10 +188,8 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Retrieves the season model with a cosine relationship.
-    #' @param peak (`numeric`)\cr
-    #'   Sets the period of maximal activity (days past new-year).
-    #'   By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.
-    #' @param scale `r rd_scale()`
+    #' @param peak `r rd_season_peak()`
+    #' @param scale `r rd_season_scale()`
     get_cosine_season = function(peak = 20.09946, scale = 0.5726693) {
 
       # Check parameters
@@ -235,7 +233,7 @@ DiseasySeason <- R6::R6Class(                                                   
     #' @param peak (`numeric`)\cr
     #'   Sets the period of maximal activity (days past new-year).
     #'   By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.
-    #' @param scale `r rd_scale()`
+    #' @param scale `r rd_season_scale()`
     use_cosine_season = function(peak = 20.09946, scale = 0.5726693) {
 
       # Set the models
@@ -252,7 +250,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Retrieves the first version of the COVID-19 season model.
-    #' @param scale `r rd_scale()`
+    #' @param scale `r rd_season_scale()`
     get_covid_season_v1 = function(scale = 0.4825524) {
 
       # Determine what the max_scale can be
@@ -313,7 +311,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Sets the `DiseasySeason` module to use the first version of the covid 19 season model
-    #' @param scale `r rd_scale()`
+    #' @param scale `r rd_season_scale()`
     use_covid_season_v1 = function(scale = 0.4825524) {
 
       # Set the models
@@ -330,7 +328,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Retrieves the second version of the COVID-19 season model.
-    #' @param scale `r rd_scale()`
+    #' @param scale `r rd_season_scale()`
     get_covid_season_v2 = function(scale = 0.5042782) {
 
       # Determine what the max_scale can be
@@ -444,7 +442,7 @@ DiseasySeason <- R6::R6Class(                                                   
 
     #' @description
     #'   Sets the `DiseasySeason` module to use the second version of the COVID-19 season model
-    #' @param scale `r rd_scale()`
+    #' @param scale `r rd_season_scale()`
     use_covid_season_v2 = function(scale = 0.5042782) {
 
       # Set the models

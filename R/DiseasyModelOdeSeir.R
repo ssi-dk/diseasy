@@ -88,7 +88,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'   Creates a new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
-    #' @param observables,population,activity,regions,season,variant,immunity `r rd_diseasy_module`
+    #' @param observables,population,activity,regions,season,variant,immunity,scoring `r rd_diseasy_module`
     #' @param parameters (`named list()`)\cr
     #'   List of parameters to set for the model during initialization.
     #'
@@ -102,6 +102,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'   * `overall_infection_risk` (`numeric(1)`)\cr
     #'     A scalar that scales contact rates to infection rates.
     #'   * `disease_progression_rates` `r rd_disease_progression_rates()`
+    #'   * `season.scale` `r rd_season_scale()`
+    #'     If `NULL` (default), the default value of the season module is used.
+    #'   * `season.peak` `r rd_season_peak()`
+    #'     If `NULL` (default), the default value of the season module is used.
     #'
     #'   Parameters controlling initialisation routines
     #'   * `incidence_polynomial_order` (`integer(1)`)\cr
@@ -119,7 +123,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #'     Arguments passed to `?DiseasyImmunity$approximate_compartmental()`
     #'
     #'   Additional parameters are:
-    #'   `r rd_diseasymodel_parameters`
+    #'   `r rd_diseasymodel_common_parameters`
     #'   `r rd_diseasymodelode_parameters`
     #' @param ...
     #'   Parameters sent to `DiseasyModel` [R6][R6::R6Class] constructor.
@@ -131,6 +135,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       season = TRUE,
       variant = TRUE,
       immunity = TRUE,
+      scoring = TRUE,
       parameters = NULL,
       ...
     ) {
@@ -144,6 +149,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         season = season,
         variant = variant,
         immunity = immunity,
+        scoring = scoring,
         parameters = parameters,
         ...
       )
@@ -1522,6 +1528,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # Models determinable by initialisation routines
           "overall_infection_risk" = 1,
           "disease_progression_rates" = c("E" = 1, "I" = 1),
+          "season.scale" = NULL, # Use default values from season module
+          "season.peak" = NULL, # Use default values from season module
 
           # Parameters for fitting polynomials to the incidence curves
           "incidence_polynomial_order" = 3,
@@ -1538,60 +1546,78 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # @description
     #   Assert parameters conform to the expected format
+    # @param parameters (`named list()`)\cr
+    #   The complete set of parameters to validate.
     # @details
     #   Sub-classes implement additional validation checks
-    # @return `r rd_side_effects()`
-    validate_parameters = function() {
+    # @return `NULL` (called for side-effects)
+    validate_parameters = function(parameters) {
       coll <- checkmate::makeAssertCollection()
       # Validate the structural parameters
       checkmate::assert_integer(
-        self %.% parameters %.% compartment_structure,
+        parameters %.% compartment_structure,
         lower = 0,
         any.missing = FALSE, # Fixed
         add = coll
       )
       checkmate::assert_names(
-        names(self %.% parameters %.% compartment_structure),
+        names(parameters %.% compartment_structure),
         subset.of = c("E", "I", "R"),
         must.include = c("I", "R"),
         add = coll
       )
 
-      checkmate::assert_logical(self %.% parameters %.% malthusian_matching, add = coll)
+      checkmate::assert_logical(parameters %.% malthusian_matching, add = coll)
 
       # Validate the dynamical parameters
       checkmate::assert_number(
-        self %.% parameters %.% overall_infection_risk,
+        parameters %.% overall_infection_risk,
         lower = 0,
         na.ok = TRUE, # Optimisable
         add = coll
       )
 
       checkmate::assert_numeric(
-        self %.% parameters %.% disease_progression_rates,
+        parameters %.% disease_progression_rates,
         lower = 0,
         any.missing = TRUE, # Optimisable
         add = coll
       )
       checkmate::assert_names(
-        names(self %.% parameters %.% disease_progression_rates),
+        names(parameters %.% disease_progression_rates),
         subset.of = c("E", "I"),
         must.include = "I",
         add = coll
       )
 
+      checkmate::assert_number(
+        parameters %.% season.scale,
+        lower = 0,
+        upper = 1,
+        na.ok = TRUE, # Can be optimised
+        null.ok = TRUE, # Can use default value from module
+        add = coll
+      )
+
+      checkmate::assert_number(
+        parameters %.% season.peak,
+        na.ok = TRUE, # Can be optimised
+        null.ok = TRUE, # Can use default value from module
+        add = coll
+      )
+
       # Validate the incidence polynomial parameters
-      checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_order, lower = 0, add = coll)
-      checkmate::assert_integerish(self %.% parameters %.% incidence_polynomial_training_length, lower = 0, add = coll)
-      checkmate::assert_integerish(self %.% parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_polynomial_order, lower = 0, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_polynomial_training_length, lower = 0, add = coll)
+      checkmate::assert_integerish(parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
 
       # Validate the functional modules parameters
-      checkmate::assert_numeric(self %.% parameters %.% activity.weights, lower = 0, len = 4, add = coll)
+      checkmate::assert_numeric(parameters %.% activity.weights, lower = 0, len = 4, add = coll)
 
 
       checkmate::reportAssertions(coll)
 
-      super$validate_parameters() # Validate inherited parameters
+      super$validate_parameters(parameters) # Validate inherited parameters
     },
 
     progression_flow_rates = NULL,

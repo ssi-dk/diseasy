@@ -125,7 +125,9 @@ Names of the user-configured model outputs. Read only.}
 \if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="fit"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-fit'><code>DiseasyModel$fit()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModelOde" data-id="plot"><a href='../../diseasy/html/DiseasyModelOde.html#method-DiseasyModelOde-plot'><code>DiseasyModelOde$plot()</code></a></span></li>
 </ul>
 </details>}}
@@ -144,6 +146,7 @@ Names of the user-configured model outputs. Read only.}
   season = TRUE,
   variant = TRUE,
   immunity = TRUE,
+  scoring = TRUE,
   parameters = NULL,
   ...
 )}
@@ -152,7 +155,7 @@ Names of the user-configured model outputs. Read only.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{observables, population, activity, regions, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{observables, population, activity, regions, season, variant, immunity, scoring}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
       \item{\code{parameters}}{(\verb{named list()})\cr
 List of parameters to set for the model during initialization.
 
@@ -169,6 +172,10 @@ Parameters controlling the dynamics of the model:
 \item \code{overall_infection_risk} (\code{numeric(1)})\cr
 A scalar that scales contact rates to infection rates.
 \item \code{disease_progression_rates} (\verb{named numeric()})\cr The overall progression rates for the disease states. The reciprocal of each rate is the average time spent in the all of the corresponding compartments. The exposed compartments can optionally be omitted.
+\item \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.
+If \code{NULL} (default), the default value of the season module is used.
+\item \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).
+If \code{NULL} (default), the default value of the season module is used.
 }
 
 Parameters controlling initialisation routines
@@ -193,7 +200,7 @@ Arguments passed to \code{?DiseasyImmunity$approximate_compartmental()}
 Additional parameters are:
 \itemize{
 \item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
-\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.  * \code{model_rate_to_observable} (\verb{named list}(\verb{named list}(\code{function}(2))))\cr   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a \code{map} and \code{reduce} function contained in a list (the first nested list).   The \code{map} function is applied in a \code{dplyr::group_map()} call and should take two arguments:   - The first argument contains the model \code{rate} and information about group size: \code{proportion} and \code{population}.   - The second argument contains the groups (stratification).   The \code{reduce} function is applied in a \code{dplyr::summarise()} call to summarise across stratification levels.   By default, the \code{sum} function is used and will work for all counting observables.
+\item \code{incidence_feature_name} (\code{character(1)})\cr   The name of the observable that contains the incidence data to initialise from.\cr * \code{model_rate_to_observable} (\verb{named list}(\verb{named list}(\code{function}(2))))\cr   A named list of functions that maps the model rates to the observable in question (name).   Each observable needs a \code{map} and \code{reduce} function contained in a list (the first nested list).   The \code{map} function is applied in a \code{dplyr::group_map()} call and should take two arguments:   - The first argument contains the model \code{rate} and information about group size: \code{proportion} and \code{population}.   - The second argument contains the groups (stratification).   The \code{reduce} function is applied in a \code{dplyr::summarise()} call to summarise across stratification levels.   By default, the \code{sum} function is used and will work for all counting observables.
 }}
       \item{\code{...}}{Parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
     }

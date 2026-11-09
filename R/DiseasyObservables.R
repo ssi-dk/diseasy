@@ -236,6 +236,7 @@ DiseasyObservables <- R6::R6Class(                                              
         coll$push("start_date/end_date not set. call `$set_study_period()` before getting observations")
         coll$push("Alternatively, specify dates manually in the call")
       }
+      checkmate::assert_character(observable, len = 1, add = coll)
       checkmate::assert_date(
         start_date,
         any.missing = FALSE,

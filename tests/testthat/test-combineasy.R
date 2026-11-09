@@ -7,7 +7,7 @@ DiseasyModelDummy1 <- R6::R6Class(                                              
     default_parameters = function() {
       list("number" = 1, "string" = "hello", "logical" = TRUE)
     },
-    validate_parameters = function() {} # Disable parameter validation
+    validate_parameters = function(parameters) {} # Disable parameter validation
   )
 )
 
@@ -19,7 +19,7 @@ DiseasyModelDummy2 <- R6::R6Class(                                              
     default_parameters = function() {
       list("number" = 1, "string" = "hello") # Compared to above, this does not have the logical parameter
     },
-    validate_parameters = function() {} # Disable parameter validation
+    validate_parameters = function(parameters) {} # Disable parameter validation
   )
 )
 

@@ -135,7 +135,7 @@ test_that("$stratification_to_string() works", {
   private <- m$.__enclos_env__$private
 
   # Test the stratification_to_string with empty input
-  expect_identical(private$stratification_to_string(NULL), NA_character_)
+  expect_null(private$stratification_to_string(NULL))
 
   # Test the stratification_to_string with a couple of permutations
   expect_identical(

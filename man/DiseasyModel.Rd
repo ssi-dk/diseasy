@@ -16,12 +16,13 @@ Most notably, the model module facilitates:
 The module contains the functional modules via its active bindings:
 \itemize{
 \item \verb{$observables}: \code{DiseasyObservables}
-\item \verb{$population} : \code{DiseasyPopulation}
+\item \verb{$population}: \code{DiseasyPopulation}
 \item \verb{$activity}: \code{DiseasyActivity}
 \item \verb{$regions}: \code{DiseasyRegions}
 \item \verb{$season}: \code{DiseasySeason}
-\item \verb{$variant} : \code{DiseasyVariant}
-\item \verb{$immunity} : \code{DiseasyImmunity}
+\item \verb{$variant}: \code{DiseasyVariant}
+\item \verb{$immunity}: \code{DiseasyImmunity}
+\item \verb{$scoring}: \code{DiseasyScoring}
 }
 
 Configured instances of these modules can be provided during initialisation.
@@ -36,6 +37,40 @@ These functions define the "API" of the models and ensure the models can take pa
   m <- DiseasyModel$new()
 
   rm(m)
+\dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
+  # Generate model to fit
+  observables <- DiseasyObservables$new(
+      diseasystore = DiseasystoreSeirExample,
+      conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+  )
+  observables$set_last_queryable_date(as.Date("2020-03-01"))
+
+  observables$define_synthetic_observable(
+    "incidence",
+    \(n_infected, n_population) n_infected / n_population
+  )
+
+  season <- DiseasySeason$new(reference_date = Sys.Date())
+  season$use_covid_season_v1()
+
+  model <- generate_example_seir_model(
+    module_overrides = list(
+      "observables" = observables,
+      "season" = season
+    ),
+    parameter_overrides = list(
+      "season.scale" = NA, # Mark for optimisation,
+      "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    )
+  )
+
+  \dontrun{
+  model$fit(observable = "n_infected")
+  }
+
+  # Show estimated parameters
+  model$parameters$season.scale
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link[lgr:lgr]{lgr}
@@ -53,6 +88,8 @@ These functions define the "API" of the models and ensure the models can take pa
 \link{DiseasyVariant}
 
 \link{DiseasyImmunity}
+
+\link{DiseasyScoring}
 }
 \keyword{model-template-builder}
 \section{Super class}{
@@ -82,6 +119,9 @@ The local copy of a DiseasyVariant module. Read-only.}
     \item{\code{immunity}}{(\code{diseasy::DiseasyImmunity})\cr
 The local copy of a DiseasyImmunity module. Read-only.}
 
+    \item{\code{scoring}}{(\code{diseasy::DiseasyScoring})\cr
+The local copy of a DiseasyScoring module. Read-only.}
+
     \item{\code{parameters}}{(\code{list()})\cr
 The parameters used in the model. Read-only.}
 
@@ -100,8 +140,10 @@ The start and end dates of the validation period. Read-only.}
 \subsection{Public methods}{
   \itemize{
     \item \href{#method-DiseasyModel-initialize}{\code{DiseasyModel$new()}}
+    \item \href{#method-DiseasyModel-update_parameters}{\code{DiseasyModel$update_parameters()}}
     \item \href{#method-DiseasyModel-get_results}{\code{DiseasyModel$get_results()}}
     \item \href{#method-DiseasyModel-get_data}{\code{DiseasyModel$get_data()}}
+    \item \href{#method-DiseasyModel-fit}{\code{DiseasyModel$fit()}}
     \item \href{#method-DiseasyModel-clone}{\code{DiseasyModel$clone()}}
   }
 }
@@ -127,6 +169,7 @@ This module is typically not constructed directly but rather through \verb{Disea
   season = FALSE,
   variant = FALSE,
   immunity = FALSE,
+  scoring = TRUE,
   parameters = NULL,
   label = NULL,
   ...
@@ -136,16 +179,8 @@ This module is typically not constructed directly but rather through \verb{Disea
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{observables, population, activity, regions, season, variant, immunity}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
-      \item{\code{parameters}}{(\verb{named list()})\cr
-List of parameters to set for the model during initialization.
-
-Each model has their own parameters.
-
-Common parameters are:
-\itemize{
-\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
-}}
+      \item{\code{observables, population, activity, regions, season, variant, immunity, scoring}}{(\code{boolean} or \verb{R6::R6Class instance})\cr If a boolean is given, it dictates whether to load a new instance module of this class.\cr If an instance of the module is provided instead, a copy of this instance is added to the \code{DiseasyModel} instance. This copy is a "clone" of the instance at the time it is added and any subsequent changes to the instance will not reflect in the copy that is added to \code{DiseasyModel}.}
+      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Each model has their own parameters.\cr\cr Common parameters are:\cr * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
       \item{\code{label}}{(\code{character})\cr
 A human readable label for the model instance.}
       \item{\code{...}}{Parameters sent to \code{DiseasyBaseModule} \link[R6:R6Class]{R6} constructor.}
@@ -159,6 +194,30 @@ the other modules of the framework.
   }
   \subsection{Returns}{
     A new instance of the \code{DiseasyModel} \link[R6:R6Class]{R6} class.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModel-update_parameters"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModel-update_parameters}{}}}
+\subsection{\code{DiseasyModel$update_parameters()}}{
+  Update the parameters of the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModel$update_parameters(parameters, validate = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{parameters}}{(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Each model has their own parameters.\cr\cr Common parameters are:\cr * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
+      \item{\code{validate}}{(\code{logical(1)})\cr
+Should the parameters be validated after updating?}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
   }
 }
 
@@ -221,6 +280,30 @@ The period to return data for. That is, the training, testing, validation or plo
   }
   \subsection{Returns}{
     The output of \code{DiseasyObservables$get_observation} constrained to the training period.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasyModel-fit"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasyModel-fit}{}}}
+\subsection{\code{DiseasyModel$fit()}}{
+  Estimate free parameters (\code{NA}) for \code{diseasy} models.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasyModel$fit(observable, stratification = NULL, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+      \item{\code{...}}{Additional parameters passed to the optimiser.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} (called for side effects)
   }
 }
 

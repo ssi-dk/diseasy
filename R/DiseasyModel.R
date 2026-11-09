@@ -8,12 +8,13 @@
 #'   * Module interfaces:
 #'     The module contains the functional modules via its active bindings:
 #'     * `$observables`: `DiseasyObservables`
-#'     * `$population` : `DiseasyPopulation`
+#'     * `$population`: `DiseasyPopulation`
 #'     * `$activity`: `DiseasyActivity`
 #'     * `$regions`: `DiseasyRegions`
 #'     * `$season`: `DiseasySeason`
-#'     * `$variant` : `DiseasyVariant`
-#'     * `$immunity` : `DiseasyImmunity`
+#'     * `$variant`: `DiseasyVariant`
+#'     * `$immunity`: `DiseasyImmunity`
+#'     * `$scoring`: `DiseasyScoring`
 #'
 #'     Configured instances of these modules can be provided during initialisation.
 #'     Alternatively, default instances of these modules can optionally be created.
@@ -40,14 +41,8 @@ DiseasyModel <- R6::R6Class(                                                    
     #' @description
     #'   Creates a new instance of the `DiseasyModel` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModel*` classes.
-    #' @param observables,population,activity,regions,season,variant,immunity `r rd_diseasy_module`
-    #' @param parameters (`named list()`)\cr
-    #'   List of parameters to set for the model during initialization.
-    #'
-    #'   Each model has their own parameters.
-    #'
-    #'   Common parameters are:
-    #'   `r rd_diseasymodel_parameters`
+    #' @param observables,population,activity,regions,season,variant,immunity,scoring `r rd_diseasy_module`
+    #' @param parameters `r rd_diseasymodel_parameters`
     #' @param label (`character`)\cr
     #'   A human readable label for the model instance.
     #' @param ...
@@ -66,6 +61,7 @@ DiseasyModel <- R6::R6Class(                                                    
       season      = FALSE,
       variant     = FALSE,
       immunity    = FALSE,
+      scoring     = TRUE,
       parameters  = NULL,
       label       = NULL,
       ...
@@ -107,15 +103,11 @@ DiseasyModel <- R6::R6Class(                                                    
         checkmate::check_class(immunity, "DiseasyImmunity", null.ok = TRUE),
         add = coll
       )
-      checkmate::assert_list(parameters, null.ok = TRUE, add = coll)
-      if (!is.null(parameters)) {
-        checkmate::assert_names(
-          names(parameters),
-          subset.of = names(private %.% default_parameters()),
-          type = "unique",
-          add = coll
-        )
-      }
+      checkmate::assert(
+        checkmate::check_logical(scoring, null.ok = TRUE),
+        checkmate::check_class(scoring, "DiseasyScoring", null.ok = TRUE),
+        add = coll
+      )
       checkmate::assert_character(label, len = 1, any.missing = FALSE, null.ok = TRUE, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -165,20 +157,129 @@ DiseasyModel <- R6::R6Class(                                                    
         self$load_module(immunity)
       }
 
+      if (isTRUE(scoring)) {
+        self$load_module(DiseasyScoring$new())
+      } else if (inherits(scoring, "DiseasyScoring")) {
+        self$load_module(scoring)
+      }
 
-      # Update the existing private$parameters with the new parameters
+      # Update parameters based on input
+      self$update_parameters(parameters = parameters)
+
+      # Set the label for the model
+      private$label <- label
+    },
+
+
+    #' @description
+    #'   Update the parameters of the model.
+    #' @param parameters `r rd_diseasymodel_parameters`
+    #' @param validate (`logical(1)`)\cr
+    #'   Should the parameters be validated after updating?
+    #' @return `r rd_side_effects`
+    update_parameters = function(
+      parameters,
+      validate = TRUE
+    ) {
+
+      # Use current parameters if set, otherwise use defaults
+      current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters())
+
+      if (validate) {
+        checkmate::assert_list(parameters, null.ok = TRUE)
+        if (!is.null(parameters)) {
+          checkmate::assert_names(names(parameters),
+            subset.of = names(current_parameters),
+            type = "unique"
+          )
+        }
+      }
+
+      # Update the existing parameters with the new parameters
       updated_parameters <- modifyList(
-        private %.% default_parameters(),
+        current_parameters,
         purrr::pluck(parameters, .default = list()),
         keep.null = TRUE
       )
 
-      # Store the updated parameters
-      private$.parameters <- updated_parameters
-      private %.% validate_parameters()
+      # For parameters marked for optimisation (NA), we store the default parameter value as attributes
+      parameters_to_fit <- names(purrr::keep(parameters, anyNA))
 
-      # Set the label for the model
-      private$label <- label
+      for (parameter in parameters_to_fit) {
+        updated_parameters[[parameter]] <- set_attributes(
+          updated_parameters[[parameter]],
+          list("default" = current_parameters[[parameter]])
+        )
+      }
+
+      # Set the scale of the season if needed or backpropagate the default value to the model parameters
+      if (!is.null(self %.% season)) {
+
+        # Get parameters from the season model
+        dots <- purrr::pluck(self, "season", "model_t", attributes, "dots")
+
+        # Store default scale in model if not given
+        if ("season.scale" %in% names(updated_parameters)) {
+          default <- purrr::pluck(dots, "scale")
+
+          # Backpropagate default value to model or convert NA to NULL if argument is not in season model
+          if (is.null(updated_parameters %.% season.scale) || !("scale" %in% names(dots))) {
+            updated_parameters <- utils::modifyList(
+              updated_parameters,
+              list("season.scale" = default),
+              keep.null = TRUE
+            )
+          } else if (is.na(updated_parameters %.% season.scale)) { # Store defaults as attribute for optimiser
+            updated_parameters[["season.scale"]] <- set_attributes(
+              updated_parameters[["season.scale"]],
+              list("default" = default)
+            )
+          }
+
+        }
+
+        # Store default peak in model if not given
+        if ("season.peak" %in% names(updated_parameters)) {
+          default <- purrr::pluck(dots, "peak")
+
+          # Backpropagate default value to model or convert NA to NULL if argument is not in season model
+          if (is.null(updated_parameters %.% season.peak) || !("peak" %in% names(dots))) {
+            updated_parameters <- utils::modifyList(
+              updated_parameters,
+              list("season.peak" = default),
+              keep.null = TRUE
+            )
+          } else if (is.na(updated_parameters %.% season.peak)) { # Store defaults as attribute for optimiser
+            updated_parameters[["season.peak"]] <- set_attributes(
+              updated_parameters[["season.peak"]],
+              list("default" = default)
+            )
+          }
+        }
+      }
+
+      if (validate) private %.% validate_parameters(updated_parameters)
+
+      # Store and apply the updated parameters
+      private$.parameters <- updated_parameters
+
+      # Apply (newly-updated) model parameters to the model
+      if (!is.null(self %.% season)) {
+        dots <- purrr::compact(
+          list(
+            "scale" = updated_parameters$season.scale,
+            "peak"  = updated_parameters$season.peak
+          )
+        )
+
+        # All variables should be initialiased before sending to season module
+        if (!anyNA(dots)) {
+          self$season$use_season_model(
+            model_name = purrr::pluck(self, "season", "model_t", attributes, "name"),
+            dots = if (length(dots) == 0) NULL else dots
+          )
+        }
+      }
     },
 
 
@@ -225,7 +326,7 @@ DiseasyModel <- R6::R6Class(                                                    
         if (is.null(prediction_length)) {
           coll$push("Prediction length must be provided when requesting plotting data.")
         } else {
-          checkmate::assert_number(prediction_length, lower = 1, add = coll)
+          checkmate::assert_number(prediction_length, lower = 0, add = coll)
         }
       }
 
@@ -263,6 +364,126 @@ DiseasyModel <- R6::R6Class(                                                    
         )
 
       return(data)
+    },
+
+
+    #' @description
+    #'   Estimate free parameters (`NA`) for `diseasy` models.
+    #' @param observable `r rd_observable()`
+    #' @param stratification `r rd_stratification()`
+    #' @param ... Additional parameters passed to the optimiser.
+    #' @examplesIf rlang::is_installed("duckdb")
+    #'   # Generate model to fit
+    #'   observables <- DiseasyObservables$new(
+    #'       diseasystore = DiseasystoreSeirExample,
+    #'       conn = \() DBI::dbConnect(duckdb::duckdb(), ":memory:")
+    #'   )
+    #'   observables$set_last_queryable_date(as.Date("2020-03-01"))
+    #'
+    #'   observables$define_synthetic_observable(
+    #'     "incidence",
+    #'     \(n_infected, n_population) n_infected / n_population
+    #'   )
+    #'
+    #'   season <- DiseasySeason$new(reference_date = Sys.Date())
+    #'   season$use_covid_season_v1()
+    #'
+    #'   model <- generate_example_seir_model(
+    #'     module_overrides = list(
+    #'       "observables" = observables,
+    #'       "season" = season
+    #'     ),
+    #'     parameter_overrides = list(
+    #'       "season.scale" = NA, # Mark for optimisation,
+    #'       "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    #'     )
+    #'   )
+    #'
+    #'   \dontrun{
+    #'   model$fit(observable = "n_infected")
+    #'   }
+    #'
+    #'   # Show estimated parameters
+    #'   model$parameters$season.scale
+    #' @return `r rd_side_effects`
+    fit = function(observable, stratification = NULL, ...) {
+      checkmate::assert_number(self %.% parameters %.% training_length %.% testing, lower = 1)
+
+      # Determine parameters that need fitting
+      parameters_to_fit <- purrr::keep(self %.% parameters, anyNA)
+
+      if (length(parameters_to_fit) == 0L) {
+        message("No free parameters to optimise!")
+        return(invisible(NULL))
+      }
+
+      # Extract initial guess and ranges
+      x0 <- purrr::map_dbl(parameters_to_fit, ~ attr(., "default"))
+
+      ranges <- purrr::map(parameters_to_fit, ~ attr(.x, "range") %||% c(NA_real_, NA_real_))
+
+      # Map model parameters to unconstrained coordinates
+      p0 <- purrr::map2_dbl(x0, ranges, parameter_inverse)
+
+      # Convert unconstrained coordinates to model parameters
+      transform_parameters <- \(p) purrr::map2_dbl(p, ranges, parameter_forward)
+
+      # Objective function operating in unconstrained coordinates
+      objective_function <- function(p) {
+
+        tryCatch({
+          # Map to model domain
+          x <- transform_parameters(p)
+
+          # Update model parameters
+          self$update_parameters(parameters = as.list(x))
+
+          # Compute trajectories
+          trajectories <- self$get_results(
+            observable = observable,
+            stratification = stratification,
+            prediction_length = 0
+          )
+
+          # Score by likelihood
+          scored_trajectories <- self$scoring$compute_likelihood(trajectories)
+
+          # Take (weighted) average across realisations (if any)
+          loss <- stats::weighted.mean(
+            x = scored_trajectories$negative_log_likelihood,
+            w = scored_trajectories$weight
+          )
+
+          if (!is.finite(loss)) {
+            return(.Machine$double.xmax)
+          }
+
+          return(loss)
+        }, error = function(e) {
+          return(.Machine$double.xmax)
+        })
+      }
+
+      # Run optimisation
+      res <- ucminf::ucminf(
+        par = p0,
+        fn = objective_function,
+        ...
+      )
+
+      # Transform estimates back to model coordinates
+      estimates <- transform_parameters(res$par)
+
+      # Apply fitted parameters to th model
+      self$update_parameters(
+        parameters = as.list(estimates)
+      )
+
+      # Preserve estimates on both scales
+      res$par_unconstrained <- res$par
+      res$par <- estimates
+
+      return(invisible(res))
     }
   ),
 
@@ -336,6 +557,16 @@ DiseasyModel <- R6::R6Class(                                                    
       .f = active_binding,
       name = "Immunity",
       expr = return(private %.% .DiseasyImmunity)
+    ),
+
+
+    #' @field scoring (`diseasy::DiseasyScoring`)\cr
+    #'   The local copy of a DiseasyScoring module. Read-only.
+    #' @seealso [diseasy::DiseasyScoring]
+    scoring = purrr::partial(
+      .f = active_binding,
+      name = "Scoring",
+      expr = return(private %.% .DiseasyScoring)
     ),
 
 
@@ -466,6 +697,7 @@ DiseasyModel <- R6::R6Class(                                                    
     .DiseasySeason      = NULL,
     .DiseasyVariant     = NULL,
     .DiseasyImmunity    = NULL,
+    .DiseasyScoring     = NULL,
     .parameters = NULL,
 
     # @field default_parameters (`list`)\cr
@@ -489,18 +721,20 @@ DiseasyModel <- R6::R6Class(                                                    
 
     # @description
     #   Assert parameters conform to the expected format
+    # @param parameters (`named list()`)\cr
+    #   The complete set of parameters to validate.
     # @details
     #   Sub-classes implement additional validation checks
     # @return `NULL` (called for side-effects)
-    validate_parameters = function() {
+    validate_parameters = function(parameters) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_numeric(
-        self %.% parameters %.% training_length,
+        parameters %.% training_length,
         lower = 0,
         add = coll
       )
       checkmate::assert_names(
-        names(self %.% parameters %.% training_length),
+        names(parameters %.% training_length),
         subset.of = c("training", "testing", "validation"),
         add = coll
       )

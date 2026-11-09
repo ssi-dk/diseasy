@@ -140,7 +140,7 @@ Date the season modifier is computed relatively to.}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. Read only.}
+      \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. Read only.}
     }
     \if{html}{\out{</div>}}
   }
@@ -227,10 +227,8 @@ Named list of arguments that will be passed at dot-ellipsis to the season model.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{peak}}{(\code{numeric})\cr
-Sets the period of maximal activity (days past new-year).
-By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.}
-      \item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
+      \item{\code{peak}}{(\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark).}
+      \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
     }
     \if{html}{\out{</div>}}
   }
@@ -252,7 +250,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
       \item{\code{peak}}{(\code{numeric})\cr
 Sets the period of maximal activity (days past new-year).
 By default, risk of infection is antiphase with the DMI climate normal of the maximum daily temperature.}
-      \item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
+      \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
     }
     \if{html}{\out{</div>}}
   }
@@ -271,7 +269,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
+      \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
     }
     \if{html}{\out{</div>}}
   }
@@ -290,7 +288,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
+      \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
     }
     \if{html}{\out{</div>}}
   }
@@ -309,7 +307,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
+      \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
     }
     \if{html}{\out{</div>}}
   }
@@ -328,7 +326,7 @@ By default, risk of infection is antiphase with the DMI climate normal of the ma
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{scale}}{(\code{numeric})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
+      \item{\code{scale}}{(\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period.}
     }
     \if{html}{\out{</div>}}
   }

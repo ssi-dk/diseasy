@@ -71,19 +71,19 @@ test_that("initialize works with model parameters", {
           keep.null = TRUE
         )
       },
-      validate_parameters = function() {
+      validate_parameters = function(parameters) {
         coll <- checkmate::makeAssertCollection()
         checkmate::assert_integerish(
-          self %.% parameters %.% a,
+          parameters %.% a,
           add = coll
         )
         checkmate::assert_integerish(
-          self %.% parameters %.% b,
+          parameters %.% b,
           add = coll
         )
         checkmate::reportAssertions(coll)
 
-        super$validate_parameters()
+        super$validate_parameters(parameters)
       }
     )
   )
@@ -119,6 +119,204 @@ test_that("initialize works with model parameters", {
     class = "simpleError",
     regex = "Must be of type 'numeric'"
   )
+})
+
+
+test_that("`$update_parameters` works", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("a" = 1, "b" = 2),
+          keep.null = TRUE
+        )
+      },
+      validate_parameters = function(parameters) {
+        coll <- checkmate::makeAssertCollection()
+        checkmate::assert_integerish(
+          parameters %.% a,
+          add = coll
+        )
+        checkmate::assert_integerish(
+          parameters %.% b,
+          add = coll
+        )
+        checkmate::reportAssertions(coll)
+
+        super$validate_parameters(parameters)
+      }
+    )
+  )
+
+  # Test that parameters use the default value
+  model <- DiseasyModelParameterTest$new()
+  expect_identical(model %.% parameters %.% a, 1)
+  expect_identical(model %.% parameters %.% b, 2)
+
+  # Test that parameters can be set during initialization
+  model$update_parameters(parameters = list("a" = 3, "b" = 4))
+  expect_identical(model %.% parameters %.% a, 3)
+  expect_identical(model %.% parameters %.% b, 4)
+
+  # Check that setting non-existing parameters will give an error
+  expect_error(
+    checkmate_err_msg(model$update_parameters(parameters = list("d" = 3))),
+    class = "simpleError",
+    regex = r"{but has additional elements \{'d'\}}"
+  )
+  expect_no_error( # ... unless we disable validation
+    model$update_parameters(parameters = list("d" = 3), validate = FALSE)
+  )
+
+  # Check that parameter validation catches malformed parameters
+  expect_error( # Model specific parameters are validated
+    checkmate_err_msg(model$update_parameters(parameters = list("a" = "a"))),
+    class = "simpleError",
+    regex = "Must be of type 'integerish'"
+  )
+  expect_no_error( # ... unless we disable validation
+    checkmate_err_msg(model$update_parameters(parameters = list("a" = "a"), validate  = FALSE))
+  )
+})
+
+
+test_that("`$update_parameters` works with NA parameters", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("a" = 1, "b" = 2),
+          keep.null = TRUE
+        )
+      }
+    )
+  )
+
+  # Test that parameters use the default value
+  model <- DiseasyModelParameterTest$new()
+  expect_identical(model %.% parameters %.% a, 1)
+  expect_identical(model %.% parameters %.% b, 2)
+  rm(model)
+
+
+  # Check defaults are copied as attributes if overwritten with NA
+  model <- DiseasyModelParameterTest$new(
+    parameters = list("a" = NA, "b" = NA)
+  )
+  checkmate::expect_scalar_na(model %.% parameters %.% a)
+  checkmate::expect_scalar_na(model %.% parameters %.% b)
+
+  expect_identical(attr(model %.% parameters %.% a, "default"), 1)
+  expect_identical(attr(model %.% parameters %.% b, "default"), 2)
+  rm(model)
+})
+
+
+test_that("`$update_parameters` works with season parameters", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a simple model that takes parameters
+  DiseasyModelParameterTest <- R6::R6Class(                                                                             # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+    classname = "DiseasyModelParameterTest",
+    inherit = DiseasyModel,
+    private = list(
+      default_parameters = function() {
+        modifyList(
+          super$default_parameters(),
+          list("season.scale" = NULL, "season.peak" = NULL),
+          keep.null = TRUE
+        )
+      }
+    )
+  )
+
+  # With no season module, both parameters should remain NULL after initialisation
+  model <- DiseasyModelParameterTest$new()
+  expect_null(model %.% parameters %.% season.scale)
+  expect_null(model %.% parameters %.% season.peak)
+  rm(model)
+
+  # With a "contant_season" model both parameters should remain NULL after initialisation
+  # since the contant_season model has no parameters
+  season <- DiseasySeason$new(reference_date = Sys.Date())
+  season$use_constant_season()
+  model <- DiseasyModelParameterTest$new(season = season)
+  expect_null(model %.% parameters %.% season.scale)
+  expect_null(model %.% parameters %.% season.peak)
+  rm(model)
+
+  # With a "covid_season_v1" model peak parameter should remain NULL but scale should carry the default value
+  # since the covid_season_v1 model has a "scale" parameter but no "peak" parameter
+  season$use_covid_season_v1()
+  model <- DiseasyModelParameterTest$new(season = season)
+  expect_identical(
+    model %.% parameters %.% season.scale,
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_null(model %.% parameters %.% season.peak)
+  rm(model)
+
+  # With a "cosine_season" model both peak and scale should carry the default value
+  # since the cosine_season model has both a "scale" parameter and a "peak" parameter
+  season$use_cosine_season()
+  model <- DiseasyModelParameterTest$new(season = season)
+  expect_identical(
+    model %.% parameters %.% season.scale,
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_identical(
+    model %.% parameters %.% season.peak,
+    purrr::pluck(season, "model_t", attributes, "dots", "peak")
+  )
+
+  # With a "cosine_season" model both peak and scale should carry the default value
+  # as attributes if set as NA
+  season$use_cosine_season()
+  model <- DiseasyModelParameterTest$new(
+    season = season,
+    parameters = list("season.scale" = NA, "season.peak" = NA)
+  )
+  checkmate::expect_scalar_na(model %.% parameters %.% season.scale)
+  checkmate::expect_scalar_na(model %.% parameters %.% season.peak)
+  expect_identical(
+    attr(model %.% parameters %.% season.scale, "default"),
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_identical(
+    attr(model %.% parameters %.% season.peak, "default"),
+    purrr::pluck(season, "model_t", attributes, "dots", "peak")
+  )
+
+  # With a "covid_season_v1" model "scale" should be converted from NA to NULL
+  # since the argument is not supported and "peak" should carry default as attributes
+  season$use_covid_season_v1()
+  model <- DiseasyModelParameterTest$new(
+    season = season,
+    parameters = list("season.scale" = NA, "season.peak" = NA)
+  )
+  checkmate::expect_scalar_na(model %.% parameters %.% season.scale)
+  expect_null(model %.% parameters %.% season.peak)
+  expect_identical(
+    attr(model %.% parameters %.% season.scale, "default"),
+    purrr::pluck(season, "model_t", attributes, "dots", "scale")
+  )
+  expect_null(
+    attr(model %.% parameters %.% season.peak, "default")
+  )
+
+  rm(model, season)
 })
 
 
@@ -252,32 +450,34 @@ test_that("$hash works", {
   m$load_module(act_alt)
   expect_false(m$hash == hash_5)
   m$load_module(act) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
   expect_identical(m$hash, hash_5)
   m$load_module(s_alt)
   expect_false(m$hash == hash_5)
   m$load_module(s) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
-  expect_identical(m$hash, hash_5)
   m$load_module(obs_alt)
   expect_false(m$hash == hash_5)
   m$load_module(obs) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   var_alt <- DiseasyVariant$new()
   var_alt$add_variant(name = "WT")
-  expect_identical(m$hash, hash_5)
   m$load_module(var_alt)
   expect_false(m$hash == hash_5)
   m$load_module(var) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   immunity_alt <- DiseasyImmunity$new()
   immunity_alt$set_linear_waning()
-  expect_identical(m$hash, hash_5)
   m$load_module(immunity_alt)
   expect_false(m$hash == hash_5)
   m$load_module(immunity) # Reset to original
+  expect_identical(m$hash, hash_5) # .. Verify
 
   rm(m, s, act, obs, var, immunity, s_alt, act_alt, obs_alt, var_alt, immunity_alt)
   invisible(gc())
@@ -349,29 +549,38 @@ test_that("cloning works", {
   # Create a simple clone
   m_c <- m$clone()
   expect_identical(m_c$hash, hash_loaded) # Hash should be the same
+  expect_identical(m_c$hash, m$hash) # Hash should be the same
 
 
 
   # If we load a new module into the clone, we want new hashes in the clone
+
+  # Load new activity scenario and check hashes
   act_alt <- DiseasyActivity$new()
   act_alt$set_activity_units(dk_activity_units)
   act_alt$change_activity(head(scenario_1, 3))
   m_c$load_module(act_alt)
-  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash, hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
-  s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
+  # Reset to original clone
   m_c$load_module(act)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
+
+  # Load new season scenario and check hashes
+  s_alt <- DiseasySeason$new(reference_date = as.Date("2020-03-01"))
   m_c$load_module(s_alt)
-  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash, hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
-  obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
+  # Reset to original clone
   m_c$load_module(s)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
+
+  # Load new observables module and check hashes
+  obs_alt <- DiseasyObservables$new(last_queryable_date = as.Date("2020-03-01"))
   m_c$load_module(obs_alt)
-  expect_identical(m$hash,  hash_loaded)    # Hash should be the same for the original instance
+  expect_identical(m$hash, hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded) # Hash should be changed for the clone instance
 
 
@@ -383,7 +592,7 @@ test_that("cloning works", {
 
   # - activity
   m_c$activity$reset_scenario()
-  expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(act$hash == m_c$activity$hash) # module hashes should also be different
 
@@ -391,7 +600,7 @@ test_that("cloning works", {
   m_c$load_module(act)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$season$set_reference_date(as.Date("2020-03-01"))
-  expect_identical(m$hash,  hash_loaded)   # Hash should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded) # Hash should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(s$hash == m_c$season$hash) # module hashes should also be different
 
@@ -399,7 +608,7 @@ test_that("cloning works", {
   m_c$load_module(s)
   expect_identical(m_c$hash, hash_loaded) # Hash should now be reset
   m_c$observables$set_last_queryable_date(as.Date("2020-03-01"))
-  expect_identical(m$hash,  hash_loaded)   # Hash "202should be the same for the original instance
+  expect_identical(m$hash,  hash_loaded) # Hash "202should be the same for the original instance
   expect_false(m_c$hash == hash_loaded)# Hash should be changed for the clone instance
   expect_false(obs$hash == m_c$observables$hash) # module hashes should also be different
 

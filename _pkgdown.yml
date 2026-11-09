@@ -33,6 +33,7 @@ reference:
   - title: Creating ensembles
     desc: Functions related to creating ensembles of models.
     contents:
+    - has_keyword("ensemble-module")
     - combineasy
     - DiseasyEnsemble-generics
 
@@ -42,12 +43,14 @@ reference:
     - plot
     - print
     - diseasyoption
+    - set_attributes
 
   - title: Data sets
     desc: Data for the functional modules and model templates.
     contents:
     - has_keyword("data")
     - has_keyword("data-generators")
+    - generate_example_seir_model
 
   - title: Developer functions
     desc: Functions to create model templates and functional modules.
@@ -61,6 +64,7 @@ articles:
   navbar: Creating ensembles
   contents:
   - articles/creating-ensembles
+  - articles/scoring-and-fitting-models-and-ensembles
 
 - title: Functional modules
   navbar: Functional modules

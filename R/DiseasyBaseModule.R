@@ -124,13 +124,23 @@ DiseasyBaseModule <- R6::R6Class(                                               
       nested_diseasy_modules <- as.list(private, all.names = TRUE) |>
         purrr::keep(~ inherits(., "DiseasyBaseModule"))
 
+      # If a child module has a occupied slot for the module being loaded,
+      # the child module needs to be replaced with a clone
+      children_with_slots <- nested_diseasy_modules |>
+        purrr::keep(~ (paste0(".", base_class) %in% names(.x$.__enclos_env__$private)))
+
+      children_with_loaded_slots <- children_with_slots |>
+        purrr::discard(~ purrr::pluck(.x, ".__enclos_env__", "private", paste0(".", base_class), is.null))
+
+      purrr::walk(children_with_loaded_slots, ~ try(self$load_module(.x, clone = TRUE), silent = TRUE))
+
 
       # Use already loaded instances to populate the module being loaded
-      purrr::walk(nested_diseasy_modules, ~ try(module$load_module(., clone = FALSE), silent = TRUE))
+      purrr::walk(nested_diseasy_modules, ~ try(module$load_module(.x, clone = FALSE), silent = TRUE))
 
 
       # Load the module into currently nested modules
-      purrr::walk(nested_diseasy_modules, ~ try(.$load_module(module, clone = FALSE), silent = TRUE))
+      purrr::walk(names(children_with_slots), ~ private[[.x]]$load_module(module, clone = FALSE))
 
 
       # Finally, store the module
@@ -355,12 +365,15 @@ DiseasyBaseModule <- R6::R6Class(                                               
     #   A comma separated character string of the different stratification levels
     stratification_to_string = function(stratification) {
       if (is.null(stratification)) {
-        stratification_chr <- NA_character_
-      } else {
-        stratification_chr <- purrr::imap(purrr::map(stratification, dplyr::as_label),
-                                          ~ ifelse(.y == "", .x, glue::glue_collapse(c(.y, .x), sep = " = "))) |>
-          toString()
+        return(NULL)
       }
+
+      stratification_chr <- purrr::imap(
+        purrr::map(stratification, dplyr::as_label),
+        ~ ifelse(.y == "", .x, glue::glue_collapse(c(.y, .x), sep = " = "))
+      ) |>
+        toString()
+
       return(stratification_chr)
     }
   )

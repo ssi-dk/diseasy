@@ -61,7 +61,9 @@ The family used in the regression fit (see \code{glm} or \code{brms}). Read-only
 <ul>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="load_module"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-load_module'><code>DiseasyBaseModule$load_module()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyBaseModule" data-id="set_moduleowner"><a href='../../diseasy/html/DiseasyBaseModule.html#method-DiseasyBaseModule-set_moduleowner'><code>DiseasyBaseModule$set_moduleowner()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="fit"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-fit'><code>DiseasyModel$fit()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="get_data"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-get_data'><code>DiseasyModel$get_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasy" data-topic="DiseasyModel" data-id="update_parameters"><a href='../../diseasy/html/DiseasyModel.html#method-DiseasyModel-update_parameters'><code>DiseasyModel$update_parameters()</code></a></span></li>
 </ul>
 </details>}}
 \if{html}{\out{<hr>}}
@@ -73,7 +75,7 @@ This module is typically not constructed directly but rather through \verb{Disea
 such as \link{DiseasyModelG0}.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelRegression$new(formula, family, ...)}
+    \preformatted{DiseasyModelRegression$new(formula, family, parameters = NULL, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -83,11 +85,18 @@ such as \link{DiseasyModelG0}.
 A \code{character} string that is passed to \code{stats::as.formula} via \code{glue} (see details).}
       \item{\code{family}}{(\code{family})\cr
 \code{stats::family} object passed to the regression call.}
-      \item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
       \item{\code{parameters}}{(\verb{named list()})\cr
+List of parameters to set for the model during initialization.
 \itemize{
-\item \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".
-}}
+\item \code{season.scale} (\code{numeric(1)})\cr Sets the scale of the season model. The scale is the percent wise difference between most active and least active period. ,
+If \code{NULL} (default), the default value of the season module is used.
+\item \code{season.peak} (\code{numeric(1)})\cr Sets the period of maximal activity (days past new-year). By default, risk of infection is in antiphase with the DMI climate normal of the maximum daily temperature (for Denmark). ,
+If \code{NULL} (default), the default value of the season module is used.
+}
+
+Additional parameters are:
+(\verb{named list()})\cr List of parameters to set for the model during initialization.\cr\cr Each model has their own parameters.\cr\cr Common parameters are:\cr * \code{training_length} (\verb{named numeric(3)})\cr   The number of days that should be included in the training splits of the data for the model.   Allowed splits are: "training", "testing", and "validation".}
+      \item{\code{...}}{parameters sent to \code{DiseasyModel} \link[R6:R6Class]{R6} constructor.}
     }
     \if{html}{\out{</div>}}
   }
