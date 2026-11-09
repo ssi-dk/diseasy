@@ -58,6 +58,7 @@ reference:
     - DiseasyBaseModule
     - has_keyword("model-template-builder")
     - hash_environment
+    - implicit_nested_list
 
 articles:
 - title: Creating ensembles

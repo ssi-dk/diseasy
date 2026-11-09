@@ -4,6 +4,7 @@
 ^\.github$
 
 ^data-raw$
+^installations$
 ^vignettes/articles$
 ^pkg-build$
 
