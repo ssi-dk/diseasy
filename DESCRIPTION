@@ -93,4 +93,4 @@ BugReports: https://github.com/ssi-dk/diseasy/issues
 Config/roxygen2/version: 8.1.1
 LazyDataCompression: xz
 Remotes:
-    github::ssi-dk/diseasystore@fix/remove-na
+    github::ssi-dk/diseasystore
