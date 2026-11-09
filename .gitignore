@@ -4,6 +4,7 @@
 .httr-oauth
 .DS_Store
 inst/doc
+installations
 docs
 .vscode
 .positai
