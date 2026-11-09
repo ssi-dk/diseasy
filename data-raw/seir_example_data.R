@@ -110,20 +110,67 @@ if (rlang::is_installed(c("deSolve", "usethis", "withr"))) {
   # merge data
   seir_example_data <- dplyr::left_join(seir_example_data, seir_example_data_hosp, by = c("date", "age_group"))
 
+  # Add reporting noise (using quenched noise - i.e. the same "shock" for each observation across noise levels)
+  add_count_noise <- function(mu, dispersion, quantile) {
+
+    checkmate::assert_number(dispersion, lower = 1)
+
+    if (dispersion == 1) {
+      return(stats::qpois(quantile, lambda = mu))
+    }
+
+    size <- ifelse(mu > 0, mu / (dispersion - 1), 1)
+
+    return(stats::qnbinom(
+      quantile,
+      mu = mu,
+      size = size
+    ))
+  }
+
+  # Generate common random shocks
+  reporting_quantile <- stats::runif(nrow(seir_example_data))
+
+  # Generate observables with increasing noise
+  seir_example_data <- seir_example_data |>
+    dplyr::mutate(
+      "n_positive_noise_low" = add_count_noise(
+        .data$n_positive, 2^2, reporting_quantile
+      ),
+      "n_positive_noise_medium" = add_count_noise(
+        .data$n_positive, 2^4, reporting_quantile
+      ),
+      "n_positive_noise_high" = add_count_noise(
+        .data$n_positive, 2^10, reporting_quantile
+      )
+    )
+
   # Visualise the example data
   ggplot2::ggplot(seir_example_data) +
     ggplot2::geom_line(ggplot2::aes(x = date, y = n_infected, color = "Infected"), linewidth = 1) +
     ggplot2::geom_line(ggplot2::aes(x = date, y = n_positive_simple, color = "Test positive (simple)"), linewidth = 1) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")) +
+    ggplot2::geom_point(
+      ggplot2::aes(x = date, y = n_positive_noise_low, color = "Test positive (realistic + low noise)")
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(x = date, y = n_positive_noise_medium, color = "Test positive (realistic + medium noise)")
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(x = date, y = n_positive_noise_high, color = "Test positive (realistic + high noise)")
+    ) +
     ggplot2::geom_point(ggplot2::aes(x = date, y = 10 * n_admission, color = "Admissions * 10")) +
     ggplot2::facet_wrap(~ age_group) +
     ggplot2::ylab("Test positive / Infected / Admissions") +
     ggplot2::scale_color_manual(
       values = c(
         "Infected" = "black",
-        "Test positive (simple)" = "blue",
-        "Test positive (realistic)" = "red",
-        "Admissions * 10" = "darkgreen"
+        "Test positive (simple)" = "darkcyan",
+        "Test positive (realistic)" = "blue",
+        "Test positive (realistic + low noise)" = "darkgreen",
+        "Test positive (realistic + medium noise)" = "orange",
+        "Test positive (realistic + high noise)" = "red",
+        "Admissions * 10" = "purple"
       )
     )
 

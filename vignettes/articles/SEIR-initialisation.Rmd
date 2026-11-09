@@ -295,10 +295,16 @@ The data are:
 - "n_positive":
   A realisation of the number of test-positives in the model - using a overall 65 % probability of
   testing in conjunction with a reduced probability of testing during weekends.
-
+- "n_positive_noise_(low/medium/high)":
+  Three realisations of the "n_positive" data set with added noise.
 
 ```{r, eval = rlang::is_installed("duckdb")}
-model_data <- c("n_infected", "n_positive_simple", "n_positive") |>
+model_data <- c(
+  "n_infected",
+  "n_positive_simple",
+  "n_positive",
+  "n_positive_noise_high"
+) |>
   purrr::map(\(observable) {
     obs$get_observation(
       observable = observable,
@@ -319,7 +325,16 @@ ggplot2::ggplot(model_data) +
     linewidth = 1
   ) +
   ggplot2::geom_point(
-    ggplot2::aes(x = date, y = n_positive, color = "Test positive (realistic)")
+    ggplot2::aes(
+      x = date, y = n_positive_noise_high,
+      color = "Test positive (realistic + high noise)"
+    ),
+    linewidth = 1
+  ) +
+  ggplot2::geom_point(
+    ggplot2::aes(
+      x = date, y = n_positive,
+      color = "Test positive (realistic)")
   ) +
   ggplot2::geom_line(
     ggplot2::aes(
@@ -332,9 +347,10 @@ ggplot2::ggplot(model_data) +
   ggplot2::ylab("Test positive / Infected") +
   ggplot2::scale_color_manual(
     values = c(
-      "Infected"                  = "deepskyblue3",
-      "Test positive (simple)"    = "orange",
-      "Test positive (realistic)" = "seagreen"
+      "Infected" = "deepskyblue3",
+      "Test positive (simple)" = "seagreen",
+      "Test positive (realistic)" = "orange",
+      "Test positive (realistic + high noise)" = "darkred"
     )
   ) +
   ggplot2::labs(colour = "Model output")
@@ -354,13 +370,21 @@ source <- "n_positive"
 
 
 if (source == "n_infected") {
-  mapping <- \(n_infected, n_population) n_infected / (n_population)
+  mapping <- \(n_infected, n_population) {
+    n_infected / (n_population)
+  }
 } else if (source == "n_positive_simple") {
   mapping <- \(n_positive_simple, n_population) {
     n_positive_simple / (n_population * 0.65)
   }
 } else if (source == "n_positive") {
-  mapping <- \(n_positive, n_population) n_positive / (n_population * 0.65)
+  mapping <- \(n_positive, n_population) {
+    n_positive / (n_population * 0.65)
+  }
+} else if (source == "n_positive_noise_high") {
+  mapping <- \(n_positive_noise_high, n_population) {
+    n_positive_noise_high / (n_population * 0.65)
+  }
 }
 
 obs$define_synthetic_observable("incidence", mapping)

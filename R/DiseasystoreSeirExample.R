@@ -39,12 +39,15 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
 
   private = list(
     .ds_map = list(
-      "n_population"      = "seir_example_population",
-      "n_infected"        = "seir_example_infected",
-      "n_positive_simple" = "seir_example_infected",
-      "n_positive"        = "seir_example_infected",
-      "n_admission"       = "seir_example_infected",
-      "age_group"         = "seir_example_age_group"
+      "n_population"            = "seir_example_population",
+      "n_infected"              = "seir_example_infected",
+      "n_positive_simple"       = "seir_example_infected",
+      "n_positive"              = "seir_example_infected",
+      "n_positive_noise_low"    = "seir_example_infected",
+      "n_positive_noise_medium" = "seir_example_infected",
+      "n_positive_noise_high"   = "seir_example_infected",
+      "n_admission"             = "seir_example_infected",
+      "age_group"               = "seir_example_age_group"
     ),
     .label = "SEIR example season",
 
@@ -89,6 +92,9 @@ DiseasystoreSeirExample <- R6::R6Class(                                         
             "n_infected" = .data$n_infected,
             "n_positive_simple" = .data$n_positive_simple,
             "n_positive" = .data$n_positive,
+            "n_positive_noise_low" = .data$n_positive_noise_low,
+            "n_positive_noise_medium" = .data$n_positive_noise_medium,
+            "n_positive_noise_high" = .data$n_positive_noise_high,
             "n_admission" = .data$n_admission,
             "valid_from" = .data$date,
             "valid_until" = .data$date + lubridate::days(1)
