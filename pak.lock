@@ -252,7 +252,7 @@
     },
     {
       "package": "diseasystore",
-      "version": "0.3.3",
+      "version": "0.4.0",
       "_row": "diseasystore"
     },
     {
@@ -577,7 +577,7 @@
     },
     {
       "package": "languageserver",
-      "version": "0.3.21",
+      "version": "0.3.20",
       "_row": "languageserver"
     },
     {
@@ -727,12 +727,12 @@
     },
     {
       "package": "otel",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "_row": "otel"
     },
     {
       "package": "pak",
-      "version": "0.11.1",
+      "version": "0.11.2",
       "_row": "pak"
     },
     {
