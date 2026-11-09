@@ -242,7 +242,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Population by age group and region
       N_age_region <- stats::xtabs(formula = population ~ age_group + region, data = full_population)                   # nolint: object_name_linter
 
-      N_age_region <- N_age_region[rownames(c_matrix_age), rownames(theta_norm), drop = FALSE]                          # nolint: object_name_linter
+      N_age_region <- N_age_region[unique(self %.% groups %.% age_group), rownames(theta_norm), drop = FALSE]           # nolint: object_name_linter
       N_age <- rowSums(N_age_region)                                                                                    # nolint: object_name_linter
 
       # Additional scaling to conserve total contact volume
