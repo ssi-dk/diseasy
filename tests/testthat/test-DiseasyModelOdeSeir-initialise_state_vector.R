@@ -22,14 +22,78 @@ observables <- DiseasyObservables$new(
   conn = \() DBI::dbConnect(RSQLite::SQLite())
 )
 
-# Get incidence data to infer initial state vector from
+# Define data to infer initial state vector from
 observables$define_synthetic_observable(
   name = "incidence",
   mapping = \(n_infected, n_population) n_infected / n_population
 )
 
+observables$define_synthetic_observable(
+  name = "incidence_from_noisy_data",
+  mapping = \(n_positive_noise_high, n_population) n_positive_noise_high / (n_population * 0.65)
+)
+
 # Lock the observation data to a simulation start date
 observables$set_last_queryable_date(observables %.% ds %.% min_start_date + 30)
+
+
+# Noise data does not work without smooothing
+for (smoothing in c(FALSE, TRUE)) {
+  test_label <- glue::glue(
+    "can{switch(!smoothing, 'not')} fit noisy data with{switch(!smoothing, 'out')} smoothing"
+  )
+
+  test_that(paste("$initialise_state_vector()", test_label),
+    {
+      # Modify the example model with different compartments and no age groups
+      model <- generate_example_seir_model(
+        module_overrides = list(
+          "observables" = observables,
+          "population" = DiseasyPopulation$new(age_cuts_lower = 0)
+        ),
+        parameter_overrides = list(
+          "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+          "incidence_feature_name" = "incidence_from_noisy_data",
+          "incidence_forcing_smoothing_window" = if (smoothing) 21L else 1L
+        )
+      )
+
+      # Get a reference to the private environment
+      private <- model$.__enclos_env__$private
+
+      # Retrieve incidence data
+      incidence_data <- model$get_data(
+        observable = model %.% parameters %.% incidence_feature_name,
+        stratification = private$model_stratification(),
+        period = "training"
+      ) |>
+        dplyr::rename("incidence" = model %.% parameters %.% incidence_feature_name)
+
+      # Attempt to estimate the initial state vector and capture warnings and errors
+      if (smoothing) {
+        expect_no_error(model$initialise_state_vector(incidence_data))
+      } else {
+        warnings <- character()
+
+        expect_error(
+          withCallingHandlers(
+            capture.output(model$initialise_state_vector(incidence_data)),
+            warning = function(w) {
+              warnings <<- c(warnings, conditionMessage(w))
+              invokeRestart("muffleWarning")
+            }
+          ),
+          r"{ODE solver failed in `\$initialise_state_vector\(\)`}"
+        )
+
+        expect_true(any(grepl("Excessive precision", warnings)))
+        expect_true(any(grepl("Returning early", warnings)))
+      }
+
+      rm(model)
+    }
+  )
+}
 
 
 # Test initialisation of the state vector for different models
