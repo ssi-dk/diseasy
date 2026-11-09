@@ -215,7 +215,7 @@ DiseasyPopulation <- R6::R6Class(                                               
         )
       }
 
-      # Convert to per-capita contacts ("C" domain) (and u
+      # Convert to per-capita contacts ("C" domain)
       c_matrices_age <- purrr::map(m_matrices_age, ~ . / outer(rep(1, length(N_age)), N_age))
 
       # Retrieve the regional mixing matrices
