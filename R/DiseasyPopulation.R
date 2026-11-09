@@ -238,8 +238,20 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Construct the population-pair normalised mixing matrices
       theta_norm <- theta * sum(N_regions)^2 / drop(t(N_regions) %*% theta %*% N_regions)
 
+      # Additionally normalise total contact volume between age groups
+      # Population by age group and region
+      N_age_region <- xtabs(population ~ age_group + region, data = full_population)                                    # nolint: object_name_linter
+
+      N_age_region <- N_age_region[rownames(c_matrix_age), rownames(theta_norm), drop = FALSE]                          # nolint: object_name_linter
+
+      # Contact volume between regional population pairs
+      W <- t(N_age_region) %*% c_matrix_age %*% N_age_region                                                            # nolint: object_name_linter
+
+      # Additional scaling to conserve total contact volume
+      k <- sum(W) / sum(theta_norm * W)
+
       # Use normalised mixing matrices to "fold" age-specific contact matrices to the full contact matrices
-      c_matrices_full <- purrr::map(c_matrices_age, ~ kronecker(theta_norm, .))
+      c_matrices_full <- purrr::map(c_matrices_age, ~ k * kronecker(theta_norm, .))
 
       # Grab the model population
       N_full <- full_population |>                                                                                      # nolint: object_name_linter

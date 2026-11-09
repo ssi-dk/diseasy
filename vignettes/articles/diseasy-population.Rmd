@@ -412,7 +412,7 @@ from the age-specific contact matrix, $\overline{\overline{C}}_{i, j}$,
 the mixing matrix, $\overline{\overline{\Theta}}_{x, y}$,
 and the population vector, $\overline{N}_{p = (i, x)}$: via the relation:
 $$
-\overline{\overline{C}}^{\textrm{full}}_{p = (i, x), q = (j, y)} = \overline{\overline{\Theta^\ast}}_{x, y} \overline{\overline{C}}_{i, j}
+\overline{\overline{C}}^{\textrm{full}}_{p = (i, x), q = (j, y)} = k \overline{\overline{\Theta^\ast}}_{x, y} \overline{\overline{C}}_{i, j}
 $$
 
 Where $\overline{\overline{\Theta^\ast}}$ is a normalised mixing matrix:
@@ -454,9 +454,41 @@ means that contacts between mixing groups p and q are multiplied by 1.4, relativ
 Note that the normalization preserves the population-pair-weighted regional mixing intensity.
 Consequently, the total number of contacts is invariant only when regional age compositions are identical.
 
+This is where the additional normalisation constant $k$ comes in:
+
+If we define the total contact volumne $W_{x,y}$ between regions $x$ and $y$
+in the well-mixed case as:
+
+$$
+W_{x,y}=\sum_{i,j} C_{ij} N_{i,x} N_{j,y}.
+$$
+
+Then the total contact volume in the well-mixed case is:
+$T_{\textrm{well mixed}} = \sum_{x,y} W_{x,y}$
+
+and in the case with the given regional mixing matrix:
+$T_{\textrm{mixing matrix}} = \sum_{x,y} \Theta^\ast_{x,y} W_{x,y}$
+
+If we then define the normalisation factor of:
+$$
+k = \frac{\sum_{x,y} W_{x,y}}{\sum_{x,y} \Theta^\ast_{x,y} W_{x,y}}
+$$
+
+the toral contact volume can be preserved.
+
 Let's see that computation in practice:
 ```{r}
-N_regions <- matrix(
+N_age_region <- matrix(
+  lengths(split(population, factor(population)))[unique(population)],
+  ncol = length(regions),
+  dimnames = list(unique(stringr::str_replace(population, "[a-z]", "*")), regions)
+)
+
+print(N_age_region)
+```
+
+```{r}
+N_region <- matrix(
   lengths(
     split(
       stringr::str_replace(population, "[A-Z]", "*"),
@@ -466,18 +498,20 @@ N_regions <- matrix(
   ncol = 1,
   dimnames = list(regions, "n")
 )
-n_regions <- N_regions / sum(N_regions)
+n_region <- N_region / sum(N_region)
 
-print(n_regions)
+print(n_region)
 ```
 
 ```{r}
 tm <- mixing_sw
 cm <- c_matrix
 
-tm_norm <- tm / drop(t(n_regions) %*% tm %*% n_regions)
+tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
+w <- t(N_age_region) %*% cm %*% N_age_region
+k <- sum(w) / sum(tm_norm * w)
 
-c_matrix_full_sw <- kronecker(tm_norm, cm)
+c_matrix_full_sw <- k * kronecker(tm_norm, cm)
 dimnames(c_matrix_full_sw) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_sw, digits = 1))
 ```
@@ -691,9 +725,11 @@ print(mixing_silo)
 tm <- mixing_silo
 cm <- c_matrix
 
-tm_norm <- tm / drop(t(n_regions) %*% tm %*% n_regions)
+tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
+w <- t(N_age_region) %*% cm %*% N_age_region
+k <- sum(w) / sum(tm_norm * w)
 
-c_matrix_full_silo <- kronecker(tm_norm, cm)
+c_matrix_full_silo <- k * kronecker(tm_norm, cm)
 dimnames(c_matrix_full_silo) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_silo, digits = 1))
 ```
@@ -742,9 +778,11 @@ print(mixing_mix)
 tm <- mixing_mix
 cm <- c_matrix
 
-tm_norm <- tm / drop(t(n_regions) %*% tm %*% n_regions)
+tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
+w <- t(N_age_region) %*% cm %*% N_age_region
+k <- sum(w) / sum(tm_norm * w)
 
-c_matrix_full_mix <- kronecker(tm_norm, cm)
+c_matrix_full_mix <- k * kronecker(tm_norm, cm)
 dimnames(c_matrix_full_mix) <- list(unique(population), unique(population))
 print_truncated(round(c_matrix_full_mix, digits = 1))
 ```
