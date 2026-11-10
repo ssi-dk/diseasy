@@ -860,11 +860,11 @@ demographic groups and one variant.</p>
 <span>  check <span class="op">=</span> <span class="st">"equal"</span>, times <span class="op">=</span> <span class="fl">1000L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;                expr    min      lq      mean  median      uq      max neval</span></span>
-<span><span class="co">#&gt;      purrr::map_dbl 21.340 22.2965 23.467128 22.6210 23.2245  141.079  1000</span></span>
-<span><span class="co">#&gt;              sapply 10.913 11.4725 12.282870 11.8115 12.3445   39.642  1000</span></span>
-<span><span class="co">#&gt;  sapply - USE.NAMES 10.976 11.4620 12.194640 11.8035 12.3135   45.834  1000</span></span>
-<span><span class="co">#&gt;              vapply  4.270  4.5460  7.297764  4.6840  4.9200 2368.032  1000</span></span></code></pre></div>
+<span><span class="co">#&gt;                expr    min     lq      mean  median      uq      max neval</span></span>
+<span><span class="co">#&gt;      purrr::map_dbl 21.190 22.416 28.214916 23.1665 30.3015  355.503  1000</span></span>
+<span><span class="co">#&gt;              sapply 11.005 11.735 15.042629 12.3420 15.9270   54.732  1000</span></span>
+<span><span class="co">#&gt;  sapply - USE.NAMES 11.044 11.765 15.059141 12.4040 15.3765  108.994  1000</span></span>
+<span><span class="co">#&gt;              vapply  4.277  4.634  8.113414  4.8540  5.6790 2326.826  1000</span></span></code></pre></div>
 <p>Note, that the best performing function in this case is
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply()</a></code>.</p>
 </div>
