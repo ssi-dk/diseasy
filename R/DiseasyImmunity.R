@@ -1128,12 +1128,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
         if (n_free_parameters == 0) {
           par <- numeric(0)
 
-          gamma <- purrr::map2(
-            private$.model,
-            seq_along(private$.model),
-            ~ map_gamma(par, .y)$value
-          ) |>
-            stats::setNames(names(private$.model))
+          gamma <- purrr::map2(models, seq_along(models), ~ map_gamma(par, .y)$value) |>
+            stats::setNames(names(models))
 
           delta <- map_delta(par)$value
 
@@ -1170,6 +1166,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Get the M - 1 solution for delta
                 delta_0 <- self$approximate_compartmental(
+                  models = models,
                   method = method,
                   strategy = strategy,
                   M = M - 1,                                                                                            # nolint: object_name_linter
@@ -1225,7 +1222,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 delta_0 <- (M - 1) / purrr::pluck(private$get_time_scale(models), unlist, stats::median, .default = 1)
 
                 # Use linearly distributed gamma values as starting guess
-                gamma_0 <- private$.model |>
+                gamma_0 <- models |>
                   purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = M), M - 1)) |>
                   purrr::reduce(c)
 
@@ -1233,6 +1230,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Get the M - 1 solution for delta
                 delta_0 <- self$approximate_compartmental(
+                  models = models,
                   method = method,
                   strategy = strategy,
                   M = M - 1,                                                                                            # nolint: object_name_linter
@@ -1246,6 +1244,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Get the M - 1 solution for gamma
                 gamma_0 <- self$approximate_compartmental(
+                  models = models,
                   method = method,
                   strategy = strategy,
                   M = M - 1,                                                                                            # nolint: object_name_linter
@@ -1287,7 +1286,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
                 )
 
                 # Use linearly distributed gamma values as starting guess
-                gamma_0 <- private$.model |>
+                gamma_0 <- models |>
                   purrr::map(~ utils::head(seq(from = .x(0), to = .x(Inf), length.out = M), M - 1)) |>
                   purrr::reduce(c)
 
@@ -1295,6 +1294,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Get the M - 1 solution for delta
                 delta_0 <- self$approximate_compartmental(
+                  models = models,
                   method = method,
                   strategy = strategy,
                   M = M - 1,                                                                                            # nolint: object_name_linter
@@ -1307,6 +1307,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Get the M - 1 solution for gamma
                 gamma_0 <- self$approximate_compartmental(
+                  models = models,
                   method = method,
                   strategy = strategy,
                   M = M - 1,                                                                                            # nolint: object_name_linter
@@ -1362,6 +1363,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Use free_gamma solution as starting point
                 delta_0 <- self$approximate_compartmental(
+                  models = models,
                   method = "free_gamma",
                   M = M,                                                                                                # nolint: object_name_linter
                   monotonous = monotonous,
@@ -1373,6 +1375,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Use free_gamma solution as starting point
                 gamma_0 <- self$approximate_compartmental(
+                  models = models,
                   method = "free_gamma",
                   M = M,                                                                                                # nolint: object_name_linter
                   monotonous = monotonous,
@@ -1535,9 +1538,8 @@ DiseasyImmunity <- R6::R6Class(                                                 
           metrics <- get_metrics(res$par)
 
           # Map optimised parameters to rates
-          gamma <- purrr::map2(private$.model, seq_along(private$.model), ~ {
-            map_gamma(res$par, .y)$value
-          }) |> stats::setNames(names(private$.model))
+          gamma <- purrr::map2(models, seq_along(models), ~ map_gamma(res$par, .y)$value) |>
+            stats::setNames(names(models))
 
           delta <- map_delta(res$par)$value
         }
@@ -1555,6 +1557,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           execution_time_offset <- seq(from = 2, to = M - 1, by = 1) |>
             purrr::map_dbl(\(M) {                                                                                       # nolint: object_name_linter
               self$approximate_compartmental(
+                models = models,
                 method = method,
                 strategy = strategy,
                 M = M,                                                                                                  # nolint: object_name_linter
@@ -1571,6 +1574,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         } else if (strategy == "combination") {
 
           execution_time_offset <- self$approximate_compartmental(
+            models = models,
             method = "free_gamma",
             M = M,                                                                                                      # nolint: object_name_linter
             monotonous = monotonous,
