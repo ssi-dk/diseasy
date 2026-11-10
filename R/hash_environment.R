@@ -66,7 +66,7 @@ hash_environment <- function(environment) {
       # but remove the srcref which carries an environment.
       # (Environments give different hashes despite the functions they are attached to being identical)
       obj <- rlang::zap_srcref(obj)
-      function_environment <- as.list(rlang::fn_env(obj))
+      function_environment <- purrr::keep(as.list(rlang::fn_env(obj)), is.atomic)
 
       out <- list(
         "function_formals" = rlang::fn_fmls(obj),
