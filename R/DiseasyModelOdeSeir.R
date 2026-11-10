@@ -1521,8 +1521,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # Models determinable by initialisation routines
           "overall_infection_risk" = 1,
           "disease_progression_rates" = c("E" = 1, "I" = 1),
-          "season.scale" = NULL, # Use default values from season module
-          "season.peak" = NULL, # Use default values from season module
+          "season" = list("scale" = NULL, "peak" = NULL), # Use default values from season module
 
           # Parameters for fitting polynomials to the incidence curves
           "incidence_polynomial_order" = 3,

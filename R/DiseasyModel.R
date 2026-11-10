@@ -183,11 +183,23 @@ DiseasyModel <- R6::R6Class(                                                    
     ) {
 
       # Use current parameters if set, otherwise use defaults
-      current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters()) |>
-        implicit_nested_list()
+      current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters())
 
-      # Ensure incomming parameters are an implicit nested list
-      parameters <- implicit_nested_list(parameters)
+      # If the incomming parameters are partial, impute with all parameters at given levels
+      imputed_parameters <- current_parameters |>
+        purrr::keep_at(stringr::str_remove(names(parameters), r"{[.]\w+$}")) |>  # Get current parameters at given level
+        implicit_nested_list() |> # Convert to 1D representation
+        unclass() |> # Unclass to remove virtualisation temporarily
+        utils::modifyList(
+          purrr::pluck(
+            unclass(implicit_nested_list(parameters)), # Insert new values
+            .default = list() # Default to list() if no parameters are given
+          )
+        )
+
+      # Ensure parameters are an implicit nested list
+      current_parameters <- implicit_nested_list(current_parameters)
+      parameters <- implicit_nested_list(imputed_parameters)
 
       if (validate) {
         checkmate::assert_list(parameters, null.ok = TRUE)
