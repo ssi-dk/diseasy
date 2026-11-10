@@ -845,8 +845,8 @@ test_that("the cache agrees with a fresh calculation for stable models", {
   fresh_immunity <- DiseasyImmunity$new(cache = cachem::cache_mem())
   fresh <- approximate_once(fresh_immunity, models)
 
-  expect_equal(zap_execution_time(first), zap_execution_time(cached))
-  expect_equal(zap_execution_time(cached), zap_execution_time(fresh))
+  expect_identical(zap_execution_time(first), zap_execution_time(cached))
+  expect_identical(zap_execution_time(cached), zap_execution_time(fresh))
 })
 
 

@@ -327,7 +327,7 @@ DiseasyBaseModule <- R6::R6Class(                                               
 
       if (pure) {
         if ("self" %in% names(hash_list)) {
-          stop("`self` found in `function_environment` despite `pure = TRUE`!")
+          stop("`self` found in `function_environment` despite `pure = TRUE`!", call. = FALSE)
         }
       } else {
         hash_list <- c(
