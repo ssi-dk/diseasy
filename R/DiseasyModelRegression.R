@@ -382,7 +382,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
       modifyList(
         super$default_parameters(), # Obtain parameters from the superclasses
         # Overwrite with model-specific parameters
-        list("season.scale" = NULL, "season.peak" = NULL), # Use default values from season module
+        list("season" = list("scale" = NULL, "peak" = NULL)), # Use default values from season module
         keep.null = TRUE
       )
     },

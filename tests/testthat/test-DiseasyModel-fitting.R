@@ -126,13 +126,7 @@ for (fit_parameter in c("overall_infection_risk", "disease_progression_rates.E",
       dplyr::pull("negative_log_likelihood")
 
     # Do a few optimisation steps
-    model$update_parameters(
-      utils::modifyList(
-        unclass(implicit_nested_list(model %.% parameters)), # Unclass to allow element-wise insertion
-        unclass(implicit_nested_list(tibble::lst(!!fit_parameter := NA_real_))),
-        keep.null = TRUE
-      )
-    )
+    model$update_parameters(tibble::lst(!!fit_parameter := NA_real_))
     expect_no_error(model$fit(observable = "n_infected", control = list("maxeval" = 2)))
 
     # Compute loss after
