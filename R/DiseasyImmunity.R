@@ -389,6 +389,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #'   Specifies the optimisation strategy ("naive", "recursive" or "combination"). See details.
     #' @param M (`integer(1)`)\cr
     #'   Number of compartments to be used in the model.
+    #' @param models (`list(function())`)\cr
+    #'   A named list of functions to approximate.
+    #'   The functions must be of a single variable `t` that returns the immunity at time `t`.
+    #'   Optionally, if the function has a time scale, it should be included in the function as `time_scale`.
     #' @param monotonous (`logical(1)` or `numeric(1)`)\cr
     #'   Should non-monotonous approximations be penalised?
     #'   If a numeric value supplied, it is used as a penalty factor.
@@ -427,6 +431,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
     #' @seealso `vignette("diseasy-immunity")`
     approximate_compartmental = function(
       M,                                                                                                                # nolint: object_name_linter
+      models = self$model,
       method = c("all_free", "free_gamma", "free_delta"),
       strategy = NULL,
       monotonous = FALSE,
@@ -490,7 +495,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
       M <- as.integer(M)                                                                                                # nolint: object_name_linter
 
       # Look in the cache for data
-      hash <- private$get_hash()
+      hash <- private$get_hash(pure = TRUE)
       if (!private$is_cached(hash)) {
 
         tic <- Sys.time()
@@ -535,10 +540,10 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
         # We need to know the number of models the gamma's belong to
-        n_models <- length(self$model)
+        n_models <- length(models)
 
         # We pre-compute the value for the last gamma values
-        f_inf <- purrr::map(self$model, \(model) model(Inf))
+        f_inf <- purrr::map(models, \(model) model(Inf))
         stopifnot("The waning function(s) must have finite values at infinity." = purrr::every(f_inf, is.finite))
 
 
@@ -549,7 +554,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # All parameters are delta rates and the gamma rates are fixed linearly between 1 and f_inf.
           n_free_parameters <- M - 1
 
-          f_0 <- purrr::map(self$model, \(model) model(0))
+          f_0 <- purrr::map(models, \(model) model(0))
 
           map_delta <- function(par) {
             delta <- p_0inf(par)
@@ -682,7 +687,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         # The objective function contains an integral over t in (0, inf) but will
         # in most cases contain a internal time scale.
-        time_scale <- purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+        time_scale <- purrr::pluck(private$get_time_scale(models), unlist, stats::median, .default = 1)
 
         # We first transform the objective function via the transformation
         # t = scale * u / (1 - u)                                                                                       # nolint: commented_code_linter
@@ -691,7 +696,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         quadrature <- pracma::gaussLegendre(n = 64L, 0, 1)
         integration_time <- time_scale * quadrature$x / (1 - quadrature$x)
         integration_weight <- time_scale * quadrature$w / (1 - quadrature$x)^2
-        target_values <- purrr::map(self$model, \(model) model(integration_time))
+        target_values <- purrr::map(models, \(model) model(integration_time))
 
 
         # Compute all compartment occupancies from one M-state matrix
@@ -710,7 +715,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
           # Map optimiser parameters to our optimisation domain x(p)
           delta_mapping <- map_delta(par)
-          gamma_mapping <- purrr::map(seq_along(self$model), \(model_id) map_gamma(par, model_id))
+          gamma_mapping <- purrr::map(seq_along(models), \(model_id) map_gamma(par, model_id))
 
           delta <- delta_mapping$value
           gamma <- purrr::map(gamma_mapping, "value")
@@ -735,7 +740,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # Evaluate the model and compute the value of the objective function
           # for the current parameter set
           target_contributions <- purrr::map(
-            seq_along(self$model),
+            seq_along(models),
             \(model_id) {
 
               model_gamma <- gamma[[model_id]]
@@ -754,7 +759,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               monotonicity <- monotonicity_penalty(model_gamma)
 
               # Penalise spread of gamma
-              gamma_eq <- seq(from = self$model[[model_id]](0), to = model_gamma[M], length.out = M)
+              gamma_eq <- seq(from = models[[model_id]](0), to = model_gamma[M], length.out = M)
               gamma_difference <- model_gamma - gamma_eq
               gamma_penalty <- ifelse(length(model_gamma) > 1, stats::sd(gamma_difference), 0)
 
@@ -762,7 +767,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               # Name source of penalties
               penalty <- stats::setNames(
                 c(monotonicity$value, individual_level * gamma_penalty),
-                paste(names(self$model)[[model_id]], c("gamma monotonicity", "gamma spread"), sep = "/")                # nolint: paste_linter
+                paste(names(models)[[model_id]], c("gamma monotonicity", "gamma spread"), sep = "/")                    # nolint: paste_linter
               )
 
               return(
@@ -785,7 +790,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           metrics <- list(
             "error" = stats::setNames(
               purrr::map_dbl(target_contributions, "error"),
-              names(self$model)
+              names(models)
             ),
             "penalty" = c(
               "delta spread" = delta_penalty,
@@ -911,7 +916,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
             # Combine the contribution from all target models at this time point.
             gamma_weight <- numeric(M)
 
-            for (model_id in seq_along(self$model)) {
+            for (model_id in seq_along(models)) {
 
               model_evaluation <- evaluation$model[[model_id]]
 
@@ -980,7 +985,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           delta_gradient <- 0
 
           # Get the contribution from each model
-          for (model_id in seq_along(self$model)) {
+          for (model_id in seq_along(models)) {
 
             model_evaluation <- evaluation$model[[model_id]]
 
@@ -1012,7 +1017,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
           # Each model-specific mapping Jacobian then applies the chain rule
           # back to the complete optimiser parameter vector.
 
-          for (model_id in seq_along(self$model)) {
+          for (model_id in seq_along(models)) {
 
             model_evaluation <- evaluation$model[[model_id]]
 
@@ -1156,7 +1161,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
                 # Uniform delta using time scale as (M - 1) / delta
                 delta_0 <- rep(
-                  (M - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1),
+                  (M - 1) / purrr::pluck(private$get_time_scale(models), unlist, stats::median, .default = 1),
                   M - 1
                 )
 
@@ -1216,7 +1221,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
               if (strategy == "naive" || (strategy == "recursive" && M == 2)) {
 
                 # Uniform delta using time scale as M / delta
-                delta_0 <- (M - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1)
+                delta_0 <- (M - 1) / purrr::pluck(private$get_time_scale(models), unlist, stats::median, .default = 1)
 
                 # Use linearly distributed gamma values as starting guess
                 gamma_0 <- private$.model |>
@@ -1274,8 +1279,11 @@ DiseasyImmunity <- R6::R6Class(                                                 
               if (strategy == "naive" || (strategy == "recursive" && M == 2)) {                                         # nolint: if_switch_linter
 
                 # Uniform delta using time scale as M / delta
-                delta_0 <- (M - 1) / purrr::pluck(private$get_time_scale(), unlist, stats::median, .default = 1) |>
-                  rep(M - 1)
+                delta_0 <- rep(
+                  (M - 1) /
+                    purrr::pluck(private$get_time_scale(models), unlist, stats::median, .default = 1),
+                  M - 1
+                )
 
                 # Use linearly distributed gamma values as starting guess
                 gamma_0 <- private$.model |>
@@ -1755,9 +1763,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
     .model = NULL,
 
-    get_time_scale = function() {
+    get_time_scale = function(models = self$model) {
       # Returns a list of all time scales with their model target
-      return(purrr::map(self$model, ~ purrr::pluck(.x, rlang::fn_env, as.list, "time_scale", .default = NULL)))
+      return(purrr::map(models, ~ purrr::pluck(.x, rlang::fn_env, as.list, "time_scale", .default = NULL)))
     },
 
     # Check that dots contain only allowed parameters

@@ -334,6 +334,7 @@ best matches the waning immunity curves set in the module.
     \if{html}{\out{<div class="r">}}
     \preformatted{DiseasyImmunity$approximate_compartmental(
   M,
+  models = self$model,
   method = c("all_free", "free_gamma", "free_delta"),
   strategy = NULL,
   monotonous = FALSE,
@@ -348,6 +349,10 @@ best matches the waning immunity curves set in the module.
     \describe{
       \item{\code{M}}{(\code{integer(1)})\cr
 Number of compartments to be used in the model.}
+      \item{\code{models}}{(\verb{list(function())})\cr
+A named list of functions to approximate.
+The functions must be of a single variable \code{t} that returns the immunity at time \code{t}.
+Optionally, if the function has a time scale, it should be included in the function as \code{time_scale}.}
       \item{\code{method}}{(\code{character(1)})\cr
 Specifies the parametrisation method to be used from the available methods. See details.}
       \item{\code{strategy}}{(\code{character(1)})\cr
