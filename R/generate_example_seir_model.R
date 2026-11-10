@@ -84,11 +84,16 @@ generate_example_seir_model <- function(
       "disease_progression_rates" = c(
         "E" = 1 / 2.1,
         "I" = 1 / 4.5
-      )
+      ),
+      "season.scale" = NULL,
+      "season.peak" = NULL
     )
   ) |>
     unclass() |>
-    utils::modifyList(unclass(implicit_nested_list(parameter_overrides)))
+    utils::modifyList(
+      unclass(implicit_nested_list(parameter_overrides)),
+      keep.null = TRUE
+    )
 
   model <- DiseasyModelOdeSeir$new(
     activity = modules$activity,
