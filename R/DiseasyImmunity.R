@@ -460,6 +460,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
         checkmate::assert_names(names(optim_control), must.include = "optim_method", add = coll)
       }
       checkmate::reportAssertions(coll)
+      rm(coll)
 
       # For a small optimisation, we want to match the function call as often as possible so that we can
       # utilise the cache as much as possible. Therefore, if the approximate_compartmental call uses the defaults,
