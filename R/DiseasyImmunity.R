@@ -47,31 +47,31 @@ DiseasyImmunity <- R6::R6Class(                                                 
     set_time_scales = function(time_scales = NULL) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_list(time_scales, add = coll)
-      checkmate::assert_names(names(time_scales), subset.of = names(private$.model), add = coll)
+      checkmate::assert_names(names(time_scales), subset.of = names(self %.% model), add = coll)
       checkmate::reportAssertions(coll)
 
       # Set the new time_scale
       purrr::iwalk(time_scales, ~ {
 
         # Check if the model has a time_scale attribute
-        dots <- attr(private$.model[[.y]], "dots")
+        dots <- attr(self %.% model[[.y]], "dots")
         if (!("time_scale" %in% names(dots))) {
           stop(
-            "Model for ", .y, " (\"", attr(private$.model[[.y]], "name"), "\") does not use time_scale argument!",
+            "Model for ", .y, " (\"", attr(self %.% model[[.y]], "name"), "\") does not use time_scale argument!",
             call. = FALSE
           )
         }
 
         # Update the time_scale for the model
-        rlang::fn_env(private$.model[[.y]])$time_scale <- .x
-        attr(private$.model[[.y]], "dots") <- modifyList(dots, list("time_scale" = .x))
+        rlang::fn_env(self %.% model[[.y]])$time_scale <- .x
+        attr(self %.% model[[.y]], "dots") <- modifyList(dots, list("time_scale" = .x))
 
       })
 
       # Logging
       private$lg$info("Changing time_scale in {paste(names(time_scales), collapse = ', ')} model(s)")
 
-      return(invisible(private$.model))
+      return(invisible(self %.% model))
     },
 
     #' @description
@@ -1668,7 +1668,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
       # Plot lines for each model
-      purrr::walk2(private$.model, seq_along(private$.model), ~ {
+      purrr::walk2(self %.% model, seq_along(self %.% model), ~ {
         lines(t, purrr::map_dbl(t, .x), col = colours[1 + .y], lwd = 1)
       })
 
@@ -1681,7 +1681,7 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
         purrr::walk2(
           gamma,
-          seq_along(private$.model),
+          seq_along(self %.% model),
           \(model_gamma, model_id) {
             approximation <- \(t) private$occupancy_probability(delta, M, t) %*% model_gamma
             lines(t, approximation(t), col = colours[1 + model_id], lty = "dashed", lwd = 2)
@@ -1691,9 +1691,9 @@ DiseasyImmunity <- R6::R6Class(                                                 
 
 
       # Get legend labels, colors and line type for models and approximation (if M is given)
-      legend_names <- c(names(private$.model), switch(!is.null(M), paste("app.", names(private$.model))))
-      legend_colors <- rep(purrr::map_chr(seq_along(private$.model), ~ colours[1 + .x]), 1 + !is.null(M))
-      legend_lty <- c(rep("solid", length(private$.model)), rep("dashed", !is.null(M) * length(private$.model)))
+      legend_names <- c(names(self %.% model), switch(!is.null(M), paste("app.", names(self %.% model))))
+      legend_colors <- rep(purrr::map_chr(seq_along(self %.% model), ~ colours[1 + .x]), 1 + !is.null(M))
+      legend_lty <- c(rep("solid", length(self %.% model)), rep("dashed", !is.null(M) * length(self %.% model)))
 
       # Render legend
       legend(
