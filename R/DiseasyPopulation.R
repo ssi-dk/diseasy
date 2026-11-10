@@ -240,10 +240,9 @@ DiseasyPopulation <- R6::R6Class(                                               
 
       # Additionally normalise total contact volume between age groups
       # Population by age group and region
-      N_age_region <- stats::xtabs(formula = population ~ age_group + region, data = full_population)                   # nolint: object_name_linter
-
-      N_age_region <- N_age_region[unique(self %.% groups %.% age_group), rownames(theta_norm), drop = FALSE]           # nolint: object_name_linter
-      N_age <- rowSums(N_age_region)                                                                                    # nolint: object_name_linter
+      N_age_region <- stats::xtabs(formula = population ~ age_group + region, data = full_population)                   # nolint start: object_name_linter
+      N_age_region <- N_age_region[rownames(c_matrices_age[[1]]), rownames(theta_norm), drop = FALSE]
+      N_age <- rowSums(N_age_region)                                                                                    # nolint end: object_name_linter
 
       # Additional scaling to conserve total contact volume
       k <- tcrossprod(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
