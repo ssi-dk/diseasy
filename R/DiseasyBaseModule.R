@@ -325,7 +325,11 @@ DiseasyBaseModule <- R6::R6Class(                                               
       # Find all relevant hashes
       hash_list <- hash_environment(function_environment) # hash everything in the function environment
 
-      if (!pure) {
+      if (pure) {
+        if ("self" %in% names(hash_list)) {
+          stop("`self` found in `function_environment` despite `pure = TRUE`!")
+        }
+      } else {
         hash_list <- c(
           hash_list,
           "module_hash" = self$hash, # Hash of the module (state of public fields)
