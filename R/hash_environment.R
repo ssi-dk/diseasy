@@ -66,12 +66,13 @@ hash_environment <- function(environment) {
       # but remove the srcref which carries an environment.
       # (Environments give different hashes despite the functions they are attached to being identical)
       obj <- rlang::zap_srcref(obj)
+      function_environment <- as.list(rlang::fn_env(obj))
 
       out <- list(
         "function_formals" = rlang::fn_fmls(obj),
         "function_body" = rlang::fn_body(obj),
-        "function_attributes" = attributes(obj) |>
-          purrr::discard_at("body")
+        "function_environment" = function_environment[order(names(function_environment))],
+        "function_attributes" = purrr::discard_at(attributes(obj), "body")
       )
 
     } else if (checkmate::test_formula(obj)) {
