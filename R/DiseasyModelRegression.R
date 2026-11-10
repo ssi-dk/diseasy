@@ -89,6 +89,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
       checkmate::assert_choice(observable, self %.% observables %.% available_observables, add = coll)
       checkmate::assert_number(prediction_length, lower = 0, add = coll)
       checkmate::reportAssertions(coll)
+      rm(coll)
 
       # Cast prediction_length to integer
       prediction_length <- as.integer(prediction_length)

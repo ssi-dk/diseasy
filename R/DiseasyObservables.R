@@ -250,6 +250,7 @@ DiseasyObservables <- R6::R6Class(                                              
         add = coll
       )
       checkmate::reportAssertions(coll)
+      rm(coll)
 
       # Look in the cache for data
       hash <- private$get_hash()
