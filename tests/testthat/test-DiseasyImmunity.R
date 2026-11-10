@@ -821,6 +821,69 @@ for (M in c(1, 2, 5)) { # Number of compartments
 rm(im)
 
 
+approximate_once <- function(immunity, models) {
+  return(immunity$approximate_compartmental(
+    M = 3L,
+    models = models,
+    method = "free_delta",
+    strategy = "naive"
+  ))
+}
+
+zap_execution_time <- function(result) {
+  result$execution_time <- NULL
+  return(result)
+}
+
+test_that("the cache agrees with a fresh calculation for stable models", {
+  models <- list("infection" = function(t) exp(-t / 20))
+
+  immunity <- DiseasyImmunity$new(cache = cachem::cache_mem())
+  first <- approximate_once(immunity, models)
+  cached <- approximate_once(immunity, models)
+
+  fresh_immunity <- DiseasyImmunity$new(cache = cachem::cache_mem())
+  fresh <- approximate_once(fresh_immunity, models)
+
+  expect_equal(zap_execution_time(first), zap_execution_time(cached))
+  expect_equal(zap_execution_time(cached), zap_execution_time(fresh))
+})
+
+
+test_that("different model parameters produce distinct cached results", {
+
+  # Construct models with fixed parameters
+  make_model <- function(asymptote) {
+    force(asymptote)
+    return(function(t) (1 - asymptote) * exp(-t) + asymptote)
+  }
+
+  models_10 <- list("infection" = make_model(0.1))
+  models_30 <- list("infection" = make_model(0.3))
+
+  immunity <- DiseasyImmunity$new(cache = cachem::cache_mem())
+
+  # Evaluate both models using the same cache
+  first <- approximate_once(immunity, models_10)
+  second <- approximate_once(immunity, models_30)
+
+  # Independently evaluate the second model
+  fresh_immunity <- DiseasyImmunity$new(cache = cachem::cache_mem())
+  fresh <- approximate_once(fresh_immunity, models_30)
+
+  # Different inputs should produce different numerical results
+  expect_false(isTRUE(all.equal(first$value, fresh$value)))
+
+  # The shared cache must not return results for the wrong model
+  expect_equal(
+    zap_execution_time(second),
+    zap_execution_time(fresh),
+    tolerance = 1e-10
+  )
+})
+
+
+
 test_that("$describe() does not produce error", {
 
   im <- DiseasyImmunity$new()
