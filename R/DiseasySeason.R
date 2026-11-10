@@ -614,7 +614,7 @@ DiseasySeason <- R6::R6Class(                                                   
     scale_helper_glf = function(f, k, climate_normal, max_scale) {
 
       # Look in the cache for data
-      hash <- private$get_hash()
+      hash <- private$get_hash(pure = TRUE)
       if (!private$is_cached(hash)) {
 
         # Create the approximater that maps a scale to an a value
