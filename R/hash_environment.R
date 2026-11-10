@@ -71,7 +71,7 @@ hash_environment <- function(environment) {
       out <- list(
         "function_formals" = rlang::fn_fmls(obj),
         "function_body" = rlang::fn_body(obj),
-        "function_environment" = function_environment[order(names(function_environment))],
+        "function_environment" = function_environment[sort(names(function_environment))],
         "function_attributes" = purrr::discard_at(attributes(obj), "body")
       )
 
