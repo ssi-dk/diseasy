@@ -215,7 +215,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       # Check for non-initialised parameters
-      na_parameters <- purrr::keep(self %.% parameters, ~ anyNA(unlist(.)))
+      na_parameters <- purrr::keep(self %.% parameters, ~ (is.atomic(.x) || is.list(.x)) && anyNA(.x))
       if (length(na_parameters) > 0) {
         stop(
           glue::glue(
@@ -233,13 +233,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Store a short hand for the number of groups
       private$n_age_groups <- length(self %.% population %.% age_cuts_lower)
       private$n_variants   <- max(length(self %.% variant %.% variants), 1)
-      private$n_EIR_states <- sum(self %.% parameters %.% compartment_structure)
+      private$n_EIR_states <- sum(compartment_structure)
       private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
       # We retrieve normalised matrices
       private$set_contact_matrix(
         per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
-          weights = self %.% parameters %.% activity.weights
+          weights = self %.% parameters %.% activity %.% weights
         )
       )
 
@@ -312,7 +312,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       immunity_approx <- do.call(
         what = self %.% immunity %.% approximate_compartmental,
         args = modifyList(
-          self %.% parameters %.% immunity.approximate_compartmental_args,
+          self %.% parameters %.% immunity %.% approximate_compartmental_args,
           list(M = compartment_structure[["R"]])
         )
       )
@@ -487,7 +487,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
         private$set_contact_matrix(
           per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
-            weights = self %.% parameters %.% activity.weights
+            weights = self %.% parameters %.% activity %.% weights
           ),
           scaling_factor = self$malthusian_scaling_factor
         )
@@ -1571,7 +1571,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       checkmate::assert_numeric(
-        parameters %.% disease_progression_rates,
+        unlist(parameters %.% disease_progression_rates),
         lower = 0,
         any.missing = TRUE, # Optimisable
         add = coll
@@ -1584,7 +1584,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       checkmate::assert_number(
-        parameters %.% season.scale,
+        parameters %.% season %.% scale,
         lower = 0,
         upper = 1,
         na.ok = TRUE, # Can be optimised
@@ -1593,7 +1593,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       checkmate::assert_number(
-        parameters %.% season.peak,
+        parameters %.% season %.% peak,
         na.ok = TRUE, # Can be optimised
         null.ok = TRUE, # Can use default value from module
         add = coll
@@ -1605,7 +1605,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_integerish(parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
 
       # Validate the functional modules parameters
-      checkmate::assert_numeric(parameters %.% activity.weights, lower = 0, len = 4, add = coll)
+      checkmate::assert_numeric(parameters %.% activity %.% weights, lower = 0, len = 4, add = coll)
 
 
       checkmate::reportAssertions(coll)
