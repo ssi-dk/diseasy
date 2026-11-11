@@ -154,6 +154,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         ...
       )
 
+      # Set the default forcing functions (no forcing)
+      self %.% set_forcing_functions(
+        infected_forcing = \(t, infected) infected,
+        state_vector_forcing = \(t, dy_dt, loss_due_to_infections, new_infections) dy_dt
+      )
+
       # Attempt to initialise helpers with the current inputs
       tryCatch(self$prepare_rhs(.context = "initialize"), error = function(e) {})
     },
@@ -215,19 +221,16 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         .start <- proc.time()[["elapsed"]]
         .outcome <- "error"
         .immunity_seconds <- NA_real_
-        .hash_seconds <- NA_real_
         .malthusian_seconds <- NA_real_
-        .final_hash_seconds <- NA_real_
+
 
         on.exit({
           .prof$records[[length(.prof$records) + 1L]] <- tibble::tibble(
             "context" = .context,
             "outcome" = .outcome,
             "seconds" = proc.time()[["elapsed"]] - .start,
-            "hash_seconds" = .hash_seconds,
             "immunity_seconds" = .immunity_seconds,
             "malthusian_seconds" = .malthusian_seconds,
-            "final_hash_seconds" = .final_hash_seconds,
             "model_id" = rlang::env_label(self)
           )
         }, add = TRUE)
@@ -237,13 +240,39 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         .hash_start <- proc.time()[["elapsed"]]
       }
 
-      .current_hash <- self %.% hash
+      # Detect changed parameters
+      changed_parameters <- changed_list_elements(
+        self$parameters,
+        private$prepared_parameters
+      )
 
-      if (!is.null(.prof)) {
-        .hash_seconds <- proc.time()[["elapsed"]] - .hash_start
-      }
+      # Detect changed dependencies
+      public_env <- ls(self) |> # public (fields and functions)
+        setdiff("hash") |> # avoid recursion
+        purrr::map(~ {
+          # Some of the active bindings return informative errors when a module is
+          # not fully configured. This should not stop the hashing process, so we capture the
+          # errors and hash these instead
+          tryCatch(purrr::pluck(self, .), error = function(e) e)
+        })
 
-      if (identical(private %.% ready, .current_hash)) {
+      dependencies <- purrr::keep(public_env, checkmate::test_r6)
+      names(dependencies) <- purrr::map_chr(dependencies, ~ class(.)[[1]])
+
+      dependency_hashes <- purrr::map_chr(dependencies, ~ .$hash)
+      prepared_dependencies <- purrr::pluck(
+        private$prepared_dependencies,
+        .default = purrr::map_chr(dependencies, ~ "")
+      )
+      changed_dependencies <- changed_list_elements(dependency_hashes, prepared_dependencies)
+
+
+      # Determine whether the structure needs rebuilding
+      structure_changed <- any("compartment_structure" %in% changed_parameters) ||
+        any(c("DiseasyImmunity", "DiseasyVariant") %in% names(changed_dependencies))
+
+
+      if (length(changed_parameters) == 0 && length(changed_dependencies) == 0) {
         if (!is.null(.prof)) .outcome <- "cache_hit"
         return(invisible(NULL))
       }
@@ -258,17 +287,225 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         )
       }
 
+
+      # Store the compartment structure
       compartment_structure <- self %.% parameters %.% compartment_structure
+
+      if (structure_changed) {
+
+        ### During the initialization of the model, we setup a number of intermediate vectors to speed up the computation
+        # of the right-hand-side function in the ODE.
+
+        # Store a short hand for the number of groups
+        private$n_age_groups <- length(self %.% population %.% age_cuts_lower)
+        private$n_variants   <- max(length(self %.% variant %.% variants), 1)
+        private$n_EIR_states <- sum(compartment_structure)
+        private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
+
+
+        # Store the indices of the first compartments for later RHS computation
+        private$e1_state_indices <- (seq_len(private %.% n_variants * private %.% n_age_groups) - 1) *
+          sum(compartment_structure) + 1
+
+        # Then we store the indices for just the first infected compartment
+        private$i1_state_indices <- private %.% e1_state_indices + purrr::pluck(compartment_structure, "E", .default = 0)
+
+        # Store the indices of the first recovered compartments
+        private$r1_state_indices <- private %.% i1_state_indices + purrr::pluck(compartment_structure, "I")
+
+
+        # Store the indices of the infectious compartments for later RHS computation
+        # We create a list of indices for each variant.
+        # First, we determine all I indices
+        private$i_state_indices <- purrr::map(private$i1_state_indices, ~ . + seq_len(compartment_structure[["I"]]) - 1)
+
+
+        # Store the indices of the susceptible states
+        private$s_state_indices <- seq_len(private %.% n_age_groups) +
+          sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
+
+
+        # Store the indices of the Recovered and susceptible compartments
+        private$rs_state_indices <- private$r1_state_indices |>
+          purrr::map(~ . + seq_len(purrr::pluck(compartment_structure, "R")) - 1) |>
+          purrr::reduce(c, .init = private$s_state_indices, .dir = "backward")
+
+
+        # In RHS, we need a mapping from i_state_indices to the relative infection risk of the corresponding variant.
+        private$indexed_variant_infection_risk <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
+          purrr::map(
+            \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_age_groups)
+          ) |>
+          purrr::reduce(c)
+
+
+        # During the evaluation of the RHS function, we need to map the state_vector to the elements of an
+        # infection matrix.
+
+        # First we need a vector the same length as the state_vector, where each element maps the the age group
+        # that element in the state_vector corresponds to.
+        # The state vector is assumed to be ordered as follows:
+        # [ [E, I, R]_age_group_1_variant_1, [E, I, R]_age_group_2_variant_1, ..., S ]
+        private$rs_age_group <- seq_len(private %.% n_age_groups) |> # Starting with the number of age groups
+          purrr::map(~ rep(., purrr::pluck(compartment_structure, "R"))) |> # We repeat for each R state
+          rep(private %.% n_variants) |> # And since we have multiple variants, this is repeated
+          purrr::reduce(c, .init = seq_len(private %.% n_age_groups), .dir = "backward") # Collapse and add the S states
+
+        # We now expand the previous map to also include an id for variant.
+        # This map is used later in the RHS where we have a n x v matrix called BI_av, where n is the length of the
+        # state_vector. This matrix is used as a step during the calculation of the infections.
+        # The goal here, is to make a mapping from the indices of this matrix to the state_vector.
+        # That is, we want to determine the indices that the infections should flow to in the RHS equation.
+        # This is achieved by replicating the map from before for each variant, and incrementing the ids so that
+        # each age_group/variant has a unique id. Then, we reverse the map, to determine which indices correspond to which
+        # age_group/variant combination.
+        private$infection_matrix_to_rs_indices <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
+          seq_along() |>
+          purrr::map(\(variant) (variant - 1) * private %.% n_age_groups + private %.% rs_age_group) |>
+          purrr::reduce(c) |> # And collapse to 1d
+          (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
+
+
+        if (!is.null(.prof)) {
+          .immunity_start <- proc.time()[["elapsed"]]
+        }
+
+        immunity_approx <- do.call(
+          what = self %.% immunity %.% approximate_compartmental,
+          args = modifyList(
+            self %.% parameters %.% immunity %.% approximate_compartmental_args,
+            list(M = compartment_structure[["R"]])
+          )
+        )
+
+        if (!is.null(.prof)) {
+          .immunity_seconds <- proc.time()[["elapsed"]] - .immunity_start
+        }
+
+
+        immunity_risks <- 1 - immunity_approx %.% gamma %.% infection
+        immunity_rates <- immunity_approx %.% delta
+        # Store in a private field to make available if structure_changed = FALSE
+        private$immunity_rates <- immunity_rates
+
+
+        # Outcomes from DiseasyImmunity can configure outputs for the model
+        # When we prepare the RHS for the ODE, we first need to clear any existing
+        # configured outputs for immunity targets but leave user configured outputs as is
+
+        # Which outputs are presently configured derived from the infection_matrix?
+        infection_matrix_outputs <- rownames(private %.% output_mapping %.% infection_matrix)
+
+        # Which are a configured automatically from DiseasyImmunity (i.e. which should we delete)
+        immunity_outputs <- purrr::discard_at(names(immunity_approx %.% gamma), "infection")
+        idx_to_delete <- purrr::map_lgl(infection_matrix_outputs, ~ . %in% immunity_outputs)
+
+        # Clearing immunity outputs reduces the length of the state vector, so state_vector mappings must also be adjusted
+        # (e.g. if we remove two outputs, the length of the state_vector will be reduced by two, and we should therefore
+        # reduce the state_vector output mapping matrix by two in the corresponding direction)
+        if (!is.null(private$output_mapping$state_vector) && sum(idx_to_delete) > 0) {
+          private$output_mapping$state_vector <- private %.% output_mapping %.% state_vector[
+            ,
+            seq_len(ncol(private %.% output_mapping %.% state_vector) - sum(idx_to_delete)),
+            drop = FALSE
+          ]
+        }
+
+        # .. and now we can clear the immunity outputs from the immunity_matrix mappings
+        if (sum(idx_to_delete) > 0) {
+          private$output_mapping$infection_matrix <- private %.% output_mapping %.% infection_matrix[
+            !purrr::map_lgl(infection_matrix_outputs, ~ . %in% immunity_outputs),
+            ,
+            drop = FALSE
+          ]
+        }
+
+
+        # Now that we are sure we have removed existing outputs from the configuration,
+        # we can re-configure outputs for immunity targets using the (potentially) new parameters.
+        immunity_approx %.% gamma |>
+          purrr::discard_at("infection") |> # "infection" outcome is treated specially
+          purrr::iwalk(\(gammas, output) {
+
+            # Compute the weights for the output
+            # Here, we need to combine the temporal evolution described by the gammas
+            # with the age-specific risks
+            risks <- purrr::pluck(
+              self %.% immunity, "model", output, attributes, "dots", "risks",
+              .default = stats::setNames(
+                rep(1, private %.% n_age_groups),
+                diseasystore::age_labels(self %.% population %.% age_cuts_lower)
+              )
+            )
+
+            risks <- risks[order(names(risks))]
+
+            # Ensure the model age groups are represented in the risks vector
+            checkmate::assert_set_equal(
+              names(risks),
+              diseasystore::age_labels(self %.% population %.% age_cuts_lower)
+            )
+
+            # For each age_group in the model, we need the gammas from
+            # DiseasyImmunity to line up with the corresponding part of the state_vector
+            # and modify the gammas with the age-group-specific risks
+            weights_infection_matrix <- purrr::map2(
+              .x = seq(from = 0, to = (private %.% n_age_groups) - 1),
+              .y = risks,
+              .f = \(offset, risk) {
+                c(
+                  rep(0, compartment_structure %.% R * offset),
+                  rep(1, compartment_structure %.% R),
+                  rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
+                ) * gammas * risk
+              }
+            ) |>
+              purrr::map(~ rep(., private$n_variants)) |>
+              purrr::map2(
+                .y = seq(from = 0, to = private %.% n_age_groups - 1),
+                ~ c(.x, risks * (.y == seq(from = 0, to = private %.% n_age_groups - 1)))
+              ) |>
+              purrr::reduce(rbind)
+
+            # Configure the output
+            self$configure_output(
+              weights = weights_infection_matrix,
+              name = glue::glue("n_{output}"),
+              derived_from = "infection_matrix",
+              delay = purrr::pluck(
+                self %.% immunity, "model", output, attributes, "dots", "delay",
+                .default = 0
+              )
+            )
+          })
+
+        # Configure the risk matrix
+        # This matrix accounts for the immunity associated with the RS compartments and the cross-immunity between
+        # the variants. It is a A * ( V * M + 1) X V matrix where element n,b contains risk modifier for
+        # compartment n being infected by variant b, given the immunity status of compartment n
+        # (thereby also accounting for cross-immunity)
+
+        # Account for cross-immunity
+        immunity_matrix <- self %.% variant %.% cross_immunity |>
+          purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_age_groups)) |>
+          purrr::reduce(c) |>
+          matrix(ncol = private$n_variants) |>
+          rbind(
+            matrix(
+              rep(1, private %.% n_age_groups * private %.% n_variants),
+              ncol = private %.% n_variants
+            )
+          )
+
+        # R cannot handle 1x1 matrices, so we need to convert to a vector
+        if (length(immunity_matrix) == 1) immunity_matrix <- immunity_matrix[[1]]
+
+        private$immunity_matrix <- immunity_matrix
+
+      }
+
+
       disease_progression_rates <- self %.% parameters %.% disease_progression_rates
-
-      ### During the initialization of the model, we setup a number of intermediate vectors to speed up the computation
-      # of the right-hand-side function in the ODE.
-
-      # Store a short hand for the number of groups
-      private$n_age_groups <- length(self %.% population %.% age_cuts_lower)
-      private$n_variants   <- max(length(self %.% variant %.% variants), 1)
-      private$n_EIR_states <- sum(compartment_structure)
-      private$n_states     <- private %.% n_age_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
       # We retrieve normalised matrices
       private$set_contact_matrix(
@@ -276,181 +513,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           weights = self %.% parameters %.% activity %.% weights
         )
       )
-
-
-      # Store the indices of the first compartments for later RHS computation
-      private$e1_state_indices <- (seq_len(private %.% n_variants * private %.% n_age_groups) - 1) *
-        sum(compartment_structure) + 1
-
-      # Then we store the indices for just the first infected compartment
-      private$i1_state_indices <- private %.% e1_state_indices + purrr::pluck(compartment_structure, "E", .default = 0)
-
-      # Store the indices of the first recovered compartments
-      private$r1_state_indices <- private %.% i1_state_indices + purrr::pluck(compartment_structure, "I")
-
-
-      # Store the indices of the infectious compartments for later RHS computation
-      # We create a list of indices for each variant.
-      # First, we determine all I indices
-      private$i_state_indices <- purrr::map(private$i1_state_indices, ~ . + seq_len(compartment_structure[["I"]]) - 1)
-
-
-      # Store the indices of the susceptible states
-      private$s_state_indices <- seq_len(private %.% n_age_groups) +
-        sum(compartment_structure) * private %.% n_age_groups * private %.% n_variants
-
-
-      # Store the indices of the Recovered and susceptible compartments
-      private$rs_state_indices <- private$r1_state_indices |>
-        purrr::map(~ . + seq_len(purrr::pluck(compartment_structure, "R")) - 1) |>
-        purrr::reduce(c, .init = private$s_state_indices, .dir = "backward")
-
-
-      # In RHS, we need a mapping from i_state_indices to the relative infection risk of the corresponding variant.
-      private$indexed_variant_infection_risk <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
-        purrr::map(
-          \(variant) rep(purrr::pluck(variant, "relative_infection_risk", .default = 1), private %.% n_age_groups)
-        ) |>
-        purrr::reduce(c)
-
-
-      # During the evaluation of the RHS function, we need to map the state_vector to the elements of an
-      # infection matrix.
-
-      # First we need a vector the same length as the state_vector, where each element maps the the age group
-      # that element in the state_vector corresponds to.
-      # The state vector is assumed to be ordered as follows:
-      # [ [E, I, R]_age_group_1_variant_1, [E, I, R]_age_group_2_variant_1, ..., S ]
-      private$rs_age_group <- seq_len(private %.% n_age_groups) |> # Starting with the number of age groups
-        purrr::map(~ rep(., purrr::pluck(compartment_structure, "R"))) |> # We repeat for each R state
-        rep(private %.% n_variants) |> # And since we have multiple variants, this is repeated
-        purrr::reduce(c, .init = seq_len(private %.% n_age_groups), .dir = "backward") # Collapse and add the S states
-
-      # We now expand the previous map to also include an id for variant.
-      # This map is used later in the RHS where we have a n x v matrix called BI_av, where n is the length of the
-      # state_vector. This matrix is used as a step during the calculation of the infections.
-      # The goal here, is to make a mapping from the indices of this matrix to the state_vector.
-      # That is, we want to determine the indices that the infections should flow to in the RHS equation.
-      # This is achieved by replicating the map from before for each variant, and incrementing the ids so that
-      # each age_group/variant has a unique id. Then, we reverse the map, to determine which indices correspond to which
-      # age_group/variant combination.
-      private$infection_matrix_to_rs_indices <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
-        seq_along() |>
-        purrr::map(\(variant) (variant - 1) * private %.% n_age_groups + private %.% rs_age_group) |>
-        purrr::reduce(c) |> # And collapse to 1d
-        (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
-
-
-      if (!is.null(.prof)) {
-        .immunity_start <- proc.time()[["elapsed"]]
-      }
-
-      immunity_approx <- do.call(
-        what = self %.% immunity %.% approximate_compartmental,
-        args = modifyList(
-          self %.% parameters %.% immunity %.% approximate_compartmental_args,
-          list(M = compartment_structure[["R"]])
-        )
-      )
-
-      if (!is.null(.prof)) {
-        .immunity_seconds <- proc.time()[["elapsed"]] - .immunity_start
-      }
-
-
-      immunity_risks <- 1 - immunity_approx %.% gamma %.% infection
-      immunity_rates <- immunity_approx %.% delta
-
-
-      # Outcomes from DiseasyImmunity can configure outputs for the model
-      # When we prepare the RHS for the ODE, we first need to clear any existing
-      # configured outputs for immunity targets but leave user configured outputs as is
-
-      # Which outputs are presently configured derived from the infection_matrix?
-      infection_matrix_outputs <- rownames(private %.% output_mapping %.% infection_matrix)
-
-      # Which are a configured automatically from DiseasyImmunity (i.e. which should we delete)
-      immunity_outputs <- purrr::discard_at(names(immunity_approx %.% gamma), "infection")
-      idx_to_delete <- purrr::map_lgl(infection_matrix_outputs, ~ . %in% immunity_outputs)
-
-      # Clearing immunity outputs reduces the length of the state vector, so state_vector mappings must also be adjusted
-      # (e.g. if we remove two outputs, the length of the state_vector will be reduced by two, and we should therefore
-      # reduce the state_vector output mapping matrix by two in the corresponding direction)
-      if (!is.null(private$output_mapping$state_vector) && sum(idx_to_delete) > 0) {
-        private$output_mapping$state_vector <- private %.% output_mapping %.% state_vector[
-          ,
-          seq_len(ncol(private %.% output_mapping %.% state_vector) - sum(idx_to_delete)),
-          drop = FALSE
-        ]
-      }
-
-      # .. and now we can clear the immunity outputs from the immunity_matrix mappings
-      if (sum(idx_to_delete) > 0) {
-        private$output_mapping$infection_matrix <- private %.% output_mapping %.% infection_matrix[
-          !purrr::map_lgl(infection_matrix_outputs, ~ . %in% immunity_outputs),
-          ,
-          drop = FALSE
-        ]
-      }
-
-
-      # Now that we are sure we have removed existing outputs from the configuration,
-      # we can re-configure outputs for immunity targets using the (potentially) new parameters.
-      immunity_approx %.% gamma |>
-        purrr::discard_at("infection") |> # "infection" outcome is treated specially
-        purrr::iwalk(\(gammas, output) {
-
-          # Compute the weights for the output
-          # Here, we need to combine the temporal evolution described by the gammas
-          # with the age-specific risks
-          risks <- purrr::pluck(
-            self %.% immunity, "model", output, attributes, "dots", "risks",
-            .default = stats::setNames(
-              rep(1, private %.% n_age_groups),
-              diseasystore::age_labels(self %.% population %.% age_cuts_lower)
-            )
-          )
-
-          risks <- risks[order(names(risks))]
-
-          # Ensure the model age groups are represented in the risks vector
-          checkmate::assert_set_equal(
-            names(risks),
-            diseasystore::age_labels(self %.% population %.% age_cuts_lower)
-          )
-
-          # For each age_group in the model, we need the gammas from
-          # DiseasyImmunity to line up with the corresponding part of the state_vector
-          # and modify the gammas with the age-group-specific risks
-          weights_infection_matrix <- purrr::map2(
-            .x = seq(from = 0, to = (private %.% n_age_groups) - 1),
-            .y = risks,
-            .f = \(offset, risk) {
-              c(
-                rep(0, compartment_structure %.% R * offset),
-                rep(1, compartment_structure %.% R),
-                rep(0, compartment_structure %.% R * ((private %.% n_age_groups - 1) - offset))
-              ) * gammas * risk
-            }
-          ) |>
-            purrr::map(~ rep(., private$n_variants)) |>
-            purrr::map2(
-              .y = seq(from = 0, to = private %.% n_age_groups - 1),
-              ~ c(.x, risks * (.y == seq(from = 0, to = private %.% n_age_groups - 1)))
-            ) |>
-            purrr::reduce(rbind)
-
-          # Configure the output
-          self$configure_output(
-            weights = weights_infection_matrix,
-            name = glue::glue("n_{output}"),
-            derived_from = "infection_matrix",
-            delay = purrr::pluck(
-              self %.% immunity, "model", output, attributes, "dots", "delay",
-              .default = 0
-            )
-          )
-        })
 
 
       # Configure the passive inflow/outflow to/from the compartments
@@ -485,38 +547,6 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         rep(progression_flow_rates, private %.% n_age_groups * private %.% n_variants),
         rep(0, private %.% n_age_groups), # Add a zero for the S compartments
         rep(0, sum(length(self %.% model_outputs)))  # Zero-pad for each observable
-      )
-
-
-
-
-      # Configure the risk matrix
-      # This matrix accounts for the immunity associated with the RS compartments and the cross-immunity between
-      # the variants. It is a A * ( V * M + 1) X V matrix where element n,b contains risk modifier for
-      # compartment n being infected by variant b, given the immunity status of compartment n
-      # (thereby also accounting for cross-immunity)
-
-      # Account for cross-immunity
-      immunity_matrix <- self %.% variant %.% cross_immunity |>
-        purrr::map(\(chi) rep(1 - chi * (1 - immunity_risks), private %.% n_age_groups)) |>
-        purrr::reduce(c) |>
-        matrix(ncol = private$n_variants) |>
-        rbind(
-          matrix(
-            rep(1, private %.% n_age_groups * private %.% n_variants),
-            ncol = private %.% n_variants
-          )
-        )
-
-      # R cannot handle 1x1 matrices, so we need to convert to a vector
-      if (length(immunity_matrix) == 1) immunity_matrix <- immunity_matrix[[1]]
-
-      private$immunity_matrix <- immunity_matrix
-
-      # Set the default forcing functions (no forcing)
-      self %.% set_forcing_functions(
-        infected_forcing = \(t, infected) infected,
-        state_vector_forcing = \(t, dy_dt, loss_due_to_infections, new_infections) dy_dt
       )
 
 
@@ -558,16 +588,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         null.ok = TRUE
       )
 
-      if (!is.null(.prof)) {
-        .final_hash_start <- proc.time()[["elapsed"]]
-      }
 
-      private$ready <- self %.% hash
-
-      if (!is.null(.prof)) {
-        .final_hash_seconds <- proc.time()[["elapsed"]] - .final_hash_start
-        .outcome <- "rebuilt"
-      }
+      # Store identifiers of the prepared configuration
+      private$prepared_parameters <- self$parameters
+      private$prepared_dependencies <- dependency_hashes
 
       if (!is.null(.prof)) .outcome <- "rebuilt"
     },
@@ -1567,9 +1591,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
 
-    # Store the configuration seen by `prepare_rhs()`
+    # Store the configuration in `prepare_rhs()`
     prepared_parameters = NULL,
-    prepared_dependencies = NULL
+    prepared_dependencies = NULL,
+    immunity_rates = NULL,
+
 
     # Configurations for observables (model outputs)
     output_mapping = list("infection_matrix" = NULL, "state_vector" = NULL),
@@ -1924,3 +1950,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     }
   )
 )
+
+
+changed_list_elements <- function(previous, current) {
+
+  if (is.null(previous)) previous <- list()
+  if (is.null(current)) current <- list()
+
+  keys <- union(names(previous), names(current))
+
+  changed <- purrr::map_lgl(keys, \(key) {
+
+    if ((key %in% names(previous)) != (key %in% names(current))) {
+      return(TRUE)
+    }
+
+    return(!identical(previous[[key]], current[[key]]))
+  })
+
+  return(keys[changed])
+}
