@@ -115,7 +115,7 @@ test_that("initialize works with model parameters", {
   )
 
   expect_error( # Inherited parameters are validated
-    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("training_length" = "a"))),
+    checkmate_err_msg(DiseasyModelParameterTest$new(parameters = list("training_length" = c("training" = "a")))),
     class = "simpleError",
     regex = "Must be of type 'numeric'"
   )
@@ -244,8 +244,8 @@ test_that("`$update_parameters` works with season parameters", {
 
   # With no season module, both parameters should remain NULL after initialisation
   model <- DiseasyModelParameterTest$new()
-  expect_null(model %.% parameters %.% season.scale)
-  expect_null(model %.% parameters %.% season.peak)
+  expect_null(model %.% parameters %.% season %.% scale)
+  expect_null(model %.% parameters %.% season %.% peak)
   rm(model)
 
   # With a "contant_season" model both parameters should remain NULL after initialisation
@@ -253,8 +253,8 @@ test_that("`$update_parameters` works with season parameters", {
   season <- DiseasySeason$new(reference_date = Sys.Date())
   season$use_constant_season()
   model <- DiseasyModelParameterTest$new(season = season)
-  expect_null(model %.% parameters %.% season.scale)
-  expect_null(model %.% parameters %.% season.peak)
+  expect_null(model %.% parameters %.% season %.% scale)
+  expect_null(model %.% parameters %.% season %.% peak)
   rm(model)
 
   # With a "covid_season_v1" model peak parameter should remain NULL but scale should carry the default value
@@ -262,10 +262,10 @@ test_that("`$update_parameters` works with season parameters", {
   season$use_covid_season_v1()
   model <- DiseasyModelParameterTest$new(season = season)
   expect_identical(
-    model %.% parameters %.% season.scale,
+    model %.% parameters %.% season %.% scale,
     purrr::pluck(season, "model_t", attributes, "dots", "scale")
   )
-  expect_null(model %.% parameters %.% season.peak)
+  expect_null(model %.% parameters %.% season %.% peak)
   rm(model)
 
   # With a "cosine_season" model both peak and scale should carry the default value
@@ -273,11 +273,11 @@ test_that("`$update_parameters` works with season parameters", {
   season$use_cosine_season()
   model <- DiseasyModelParameterTest$new(season = season)
   expect_identical(
-    model %.% parameters %.% season.scale,
+    model %.% parameters %.% season %.% scale,
     purrr::pluck(season, "model_t", attributes, "dots", "scale")
   )
   expect_identical(
-    model %.% parameters %.% season.peak,
+    model %.% parameters %.% season %.% peak,
     purrr::pluck(season, "model_t", attributes, "dots", "peak")
   )
 
@@ -288,14 +288,14 @@ test_that("`$update_parameters` works with season parameters", {
     season = season,
     parameters = list("season.scale" = NA, "season.peak" = NA)
   )
-  checkmate::expect_scalar_na(model %.% parameters %.% season.scale)
-  checkmate::expect_scalar_na(model %.% parameters %.% season.peak)
+  checkmate::expect_scalar_na(model %.% parameters %.% season %.% scale)
+  checkmate::expect_scalar_na(model %.% parameters %.% season %.% peak)
   expect_identical(
-    attr(model %.% parameters %.% season.scale, "default"),
+    attr(model %.% parameters %.% season %.% scale, "default"),
     purrr::pluck(season, "model_t", attributes, "dots", "scale")
   )
   expect_identical(
-    attr(model %.% parameters %.% season.peak, "default"),
+    attr(model %.% parameters %.% season %.% peak, "default"),
     purrr::pluck(season, "model_t", attributes, "dots", "peak")
   )
 
@@ -306,14 +306,14 @@ test_that("`$update_parameters` works with season parameters", {
     season = season,
     parameters = list("season.scale" = NA, "season.peak" = NA)
   )
-  checkmate::expect_scalar_na(model %.% parameters %.% season.scale)
-  expect_null(model %.% parameters %.% season.peak)
+  checkmate::expect_scalar_na(model %.% parameters %.% season %.% scale)
+  expect_null(model %.% parameters %.% season %.% peak)
   expect_identical(
-    attr(model %.% parameters %.% season.scale, "default"),
+    attr(model %.% parameters %.% season %.% scale, "default"),
     purrr::pluck(season, "model_t", attributes, "dots", "scale")
   )
   expect_null(
-    attr(model %.% parameters %.% season.peak, "default")
+    attr(model %.% parameters %.% season %.% peak, "default")
   )
 
   rm(model, season)
