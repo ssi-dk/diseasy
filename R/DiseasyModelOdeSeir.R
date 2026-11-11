@@ -247,29 +247,17 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Detect changed dependencies
-      public_env <- ls(self) |> # public (fields and functions)
-        setdiff("hash") |> # avoid recursion
-        purrr::map(~ {
-          # Some of the active bindings return informative errors when a module is
-          # not fully configured. This should not stop the hashing process, so we capture the
-          # errors and hash these instead
-          tryCatch(purrr::pluck(self, .), error = function(e) e)
-        })
-
-      dependencies <- purrr::keep(public_env, checkmate::test_r6)
-      names(dependencies) <- purrr::map_chr(dependencies, ~ class(.)[[1]])
-
-      dependency_hashes <- purrr::map_chr(dependencies, ~ .$hash)
-      prepared_dependencies <- purrr::pluck(
-        private$prepared_dependencies,
-        .default = purrr::map_chr(dependencies, ~ "")
+      dependency_hashes <- purrr::map_chr(private$get_loaded_modules(), ~ .x$hash)
+      changed_dependencies <- changed_list_elements(
+        previous = private$prepared_dependencies,
+        current = as.list(dependency_hashes)
       )
       changed_dependencies <- changed_list_elements(dependency_hashes, prepared_dependencies)
 
 
       # Determine whether the structure needs rebuilding
       structure_changed <- any("compartment_structure" %in% changed_parameters) ||
-        any(c("DiseasyImmunity", "DiseasyVariant") %in% names(changed_dependencies))
+        any(c("DiseasyImmunity", "DiseasyVariant") %in% changed_dependencies)
 
 
       if (length(changed_parameters) == 0 && length(changed_dependencies) == 0) {

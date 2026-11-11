@@ -253,6 +253,36 @@ DiseasyBaseModule <- R6::R6Class(                                               
       private$lg$set_propagate(FALSE)
     },
 
+
+    # @description
+    #   Retrieve the modules loaded into the current instance.
+    # @return (`named list()`)\cr
+    #   A named list of loaded DiseasyBaseModule instances.
+    get_loaded_modules = function() {
+
+      # Find private slots reserved for diseasy modules
+      module_slots <- ls(private, all.names = TRUE) |>
+        purrr::keep(~ startsWith(.x, ".Diseasy"))
+
+      # Retrieve only those slots, avoiding public active bindings
+      modules <- purrr::map(
+        module_slots,
+        ~ get(.x, envir = private, inherits = FALSE)
+      )
+
+      # Name modules by their base class
+      names(modules) <- stringr::str_remove(module_slots, "^\\.")
+
+      # Exclude unloaded slots and anything that is not a diseasy module
+      modules <- purrr::keep(
+        modules,
+        ~ inherits(.x, "DiseasyBaseModule")
+      )
+
+      return(modules)
+    },
+
+
     # @field .cache (`list()`)\cr
     #   A named list of cached elements (name is the hash)
     .cache = NULL,
