@@ -155,7 +155,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       # Attempt to initialise helpers with the current inputs
-      tryCatch(self$prepare_rhs(), error = function(e) {})
+      tryCatch(self$prepare_rhs(.context = "initialize"), error = function(e) {})
     },
 
 
@@ -198,9 +198,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_class(self %.% immunity, "DiseasyImmunity", add = coll)
       checkmate::reportAssertions(coll)
 
-      if (!identical(private$ready, self %.% hash)) {
-        self$prepare_rhs()
-      }
+      self$prepare_rhs(.context = "get_results")
 
       super$get_results(observable, prediction_length, quantiles, stratification)
     },
@@ -208,9 +206,45 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     #' @description
     #'  Allocate the helpers for the rhs method
-    prepare_rhs = function() {
+    prepare_rhs = function(.context = "unknown") {
 
-      if (identical(private %.% ready, self %.% hash)) {
+      # Optional profiling
+      .prof <- getOption("diseasy.prepare_rhs.profile")
+
+      if (!is.null(.prof)) {
+        .start <- proc.time()[["elapsed"]]
+        .outcome <- "error"
+        .immunity_seconds <- NA_real_
+        .hash_seconds <- NA_real_
+        .malthusian_seconds <- NA_real_
+        .final_hash_seconds <- NA_real_
+
+        on.exit({
+          .prof$records[[length(.prof$records) + 1L]] <- tibble::tibble(
+            "context" = .context,
+            "outcome" = .outcome,
+            "seconds" = proc.time()[["elapsed"]] - .start,
+            "hash_seconds" = .hash_seconds,
+            "immunity_seconds" = .immunity_seconds,
+            "malthusian_seconds" = .malthusian_seconds,
+            "final_hash_seconds" = .final_hash_seconds,
+            "model_id" = rlang::env_label(self)
+          )
+        }, add = TRUE)
+      }
+
+      if (!is.null(.prof)) {
+        .hash_start <- proc.time()[["elapsed"]]
+      }
+
+      .current_hash <- self %.% hash
+
+      if (!is.null(.prof)) {
+        .hash_seconds <- proc.time()[["elapsed"]] - .hash_start
+      }
+
+      if (identical(private %.% ready, .current_hash)) {
+        if (!is.null(.prof)) .outcome <- "cache_hit"
         return(invisible(NULL))
       }
 
@@ -307,8 +341,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         (\(idx) purrr::map(unique(idx), ~ which(idx == .)))() # Compute the corresponding age_group/variant combination
 
 
+      if (!is.null(.prof)) {
+        .immunity_start <- proc.time()[["elapsed"]]
+      }
 
-      # Get risks and accompanying rates from DiseasyImmunity
       immunity_approx <- do.call(
         what = self %.% immunity %.% approximate_compartmental,
         args = modifyList(
@@ -316,6 +352,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           list(M = compartment_structure[["R"]])
         )
       )
+
+      if (!is.null(.prof)) {
+        .immunity_seconds <- proc.time()[["elapsed"]] - .immunity_start
+      }
+
+
       immunity_risks <- 1 - immunity_approx %.% gamma %.% infection
       immunity_rates <- immunity_approx %.% delta
 
@@ -484,13 +526,23 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # To optimise, we perform the scaling here onto the contact matrices directly, since we then
       # have to do it only once.
       if (self %.% parameters %.% malthusian_matching) {
+
+        if (!is.null(.prof)) {
+          .malthusian_start <- proc.time()[["elapsed"]]
+        }
+
         private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
+
         private$set_contact_matrix(
           per_capita_contact_matrices = self %.% population %.% per_capita_contact_matrices(
             weights = self %.% parameters %.% activity.weights
           ),
           scaling_factor = self$malthusian_scaling_factor
         )
+
+        if (!is.null(.prof)) {
+          .malthusian_seconds <- proc.time()[["elapsed"]] - .malthusian_start
+        }
       }
 
       # Verify observable configurations match model configuration
@@ -506,8 +558,18 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         null.ok = TRUE
       )
 
-      # Store the hash of the prepared model
+      if (!is.null(.prof)) {
+        .final_hash_start <- proc.time()[["elapsed"]]
+      }
+
       private$ready <- self %.% hash
+
+      if (!is.null(.prof)) {
+        .final_hash_seconds <- proc.time()[["elapsed"]] - .final_hash_start
+        .outcome <- "rebuilt"
+      }
+
+      if (!is.null(.prof)) .outcome <- "rebuilt"
     },
 
 
@@ -950,7 +1012,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       # Ensure RHS is initialised
-      initialisation_submodel %.% prepare_rhs()
+      initialisation_submodel %.% prepare_rhs(.context = "get_results")
 
       # Approximate the signal within each group
       # .. and ensure we have a signal for each group in the model

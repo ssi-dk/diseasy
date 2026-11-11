@@ -265,7 +265,7 @@ Additional parameters are:
   Allocate the helpers for the rhs method
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyModelOdeSeir$prepare_rhs()}
+    \preformatted{DiseasyModelOdeSeir$prepare_rhs(.context = "unknown")}
     \if{html}{\out{</div>}}
   }
 }
