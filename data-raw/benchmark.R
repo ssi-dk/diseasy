@@ -167,6 +167,10 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
             )
           }
 
+
+          output_dir <- file.path(root, "inst", "extdata")
+          dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
           for (combination in combinations) {
             combination_label <- paste(combination, collapse = "+")
 
@@ -185,9 +189,6 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
                 optimiser_output = res
               )
 
-            output_dir <- file.path(root, "inst", "extdata")
-            dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-
             saveRDS(
               timing,
               file.path(
@@ -201,10 +202,11 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
           }
 
           # Profiling is done for the max number of free parameters
-          message("Profiling ", version_label, ": ", combination_label)
+          combination <- combinations[[which.max(lengths(combinations))]]
+          message("Profiling ", version_label, ": ", paste(combination, collapse = "+"))
           conns <- suppressMessages(get_test_conns())
           conn <- conns[[1]]
-          model <- make_model(combinations[[which.max(lengths(combinations))]])
+          model <- make_model(combination)
 
           prefix <- paste0("fit_", combination_label, "_", backend, "_", version)
           rprof_file <- file.path(output_dir, paste0(prefix, ".Rprof"))
@@ -212,6 +214,33 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
           utils::Rprof(filename = rprof_file, interval = 0.01)
           model$fit(observable = "n_infected")
           utils::Rprof(NULL)
+
+          # Also do detailed profiling of time spent.
+          model <- make_model(combination)
+          prof <- new.env(parent = emptyenv())
+          prof$records <- list()
+
+          options(diseasy.prepare_rhs.profile = prof)
+
+          # Run the benchmark
+          model$fit(observable = "n_infected")
+
+          model$prepare_rhs(.context = "repeat_check")
+          model$prepare_rhs(.context = "repeat_check")
+
+          # Disable instrumentation
+          options(diseasy.prepare_rhs.profile = NULL)
+
+          dplyr::bind_rows(prof$records) |>
+            print(width = Inf) |>
+            dplyr::summarise(
+              "calls" = dplyr::n(),
+              "total_seconds" = sum(.data$seconds),
+              "mean_seconds" = mean(.data$seconds),
+              .by = c("context", "outcome")
+            ) |>
+            dplyr::arrange(dplyr::desc(.data$total_seconds)) |>
+            print()
 
           DBI::dbDisconnect(conn)
         }
