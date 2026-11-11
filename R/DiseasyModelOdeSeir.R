@@ -1566,7 +1566,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     .parameters = NULL,
     .malthusian_scaling_factor = 1, # By default, no additional scaling occurs
-    ready = NULL,
+
+    # Store the configuration seen by `prepare_rhs()`
+    prepared_parameters = NULL,
+    prepared_dependencies = NULL
 
     # Configurations for observables (model outputs)
     output_mapping = list("infection_matrix" = NULL, "state_vector" = NULL),
