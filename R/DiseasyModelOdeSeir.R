@@ -1638,8 +1638,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # We need special handling of disease_progression_rates where rates should
       # be dropped the compartment_structure is configured to have zero elements
-      # Basic imputing will insert values for "E" or "I" even if
-      # `compartment_structure = c("E" = 0L, "I" = 0L)`
+      # Basic imputing will insert values for "E" or "I" even
+      # if `compartment_structure = c("E" = 0L, "I" = 0L)`
       # so we remove progression rates that can never be reached.
       if ("disease_progression_rates" %in% names(parameters)) {
         non_zero_compartments <- imputed_parameters$compartment_structure |>
