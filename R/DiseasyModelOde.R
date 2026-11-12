@@ -347,8 +347,8 @@ DiseasyModelOde <- R6::R6Class(                                                 
           )
 
         # Infer the initial state vector
-        psi <- self$initialise_state_vector(incidence_data) |>
-          dplyr::filter(.data$time == 0) # psi also contains history for the output states
+        initial_state_vector <- self$initialise_state_vector(incidence_data)
+        psi <- dplyr::filter(initial_state_vector, .data$time == 0) # omit history for the output states
 
         # The model has a configured right-hand-side function that
         # can be used to simulate the model in conjunction with `deSolve`.
@@ -392,11 +392,7 @@ DiseasyModelOde <- R6::R6Class(                                                 
           )
 
         # Add the history for the output states
-        sol_long <- rbind(
-          sol_long,
-          self$initialise_state_vector(incidence_data) |>
-            dplyr::filter(.data$time < 0)
-        )
+        sol_long <- rbind(sol_long, dplyr::filter(initial_state_vector, .data$time < 0))
 
         # Extract rates for the I1-exit (= n_infected) and each configured
         # observable.
