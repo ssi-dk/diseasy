@@ -824,13 +824,13 @@ rm(im)
 test_that("$describe() does not produce error", {
 
   im <- DiseasyImmunity$new()
-  expect_no_error(im$describe())
+  expect_no_error(capture.output(im$describe()))
 
   im$set_exponential_waning()
-  expect_no_error(im$describe())
+  expect_no_error(capture.output(im$describe()))
 
   im$set_sigmoidal_waning(target = "hospitalisation")
-  expect_no_error(im$describe())
+  expect_no_error(capture.output(im$describe()))
 
   custom_function <- \(t) exp(-(t / time_scale)^2)
   im$set_custom_waning(
@@ -839,7 +839,7 @@ test_that("$describe() does not produce error", {
     target = "death",
     name = "gaussian_waning"
   )
-  expect_no_error(im$describe())
+  expect_no_error(capture.output(im$describe()))
 
   rm(im)
 
