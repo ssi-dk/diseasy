@@ -231,6 +231,15 @@ rd_regional_stratification <- function(type = "param") {
 }
 
 
+## Templates for DiseasyImmunity
+rd_available_waning_models <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`character()`)\\cr",
+    "The waning models implemented in `DiseasyImmunity`.",
+    switch(type == "field", "Read only.")
+  )
+}
 
 ## Templates for DiseasyRegions
 rd_area <- function(type = "param") {

@@ -1,0 +1,143 @@
+---
+title: "DiseasyVaccination"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DiseasyVaccination}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasy)
+```
+
+```{r options, include = FALSE}
+withr::local_options("tibble.print_min" = 10)
+```
+
+# Introduction
+
+The `DiseasyVaccination` module defines vaccination interventions over time by age group.
+It separates two aspects of a vaccination scenario:
+
+- **Vaccine-induced immunity** describes the protection immediately after
+  vaccination and how that protection wanes over time.
+- **Vaccination schedules** describe when vaccination is offered, to whom,
+  and at what per-capita rate.
+
+Rates in this module are **instantaneous vaccination rates per eligible person
+per day**, not percentages of the population already vaccinated or target
+coverage levels. Outside the specified intervention intervals, the vaccination
+rate is zero.
+
+# Configuring the module
+
+The module can be initialised without providing any parameters:
+
+```{r initialization}
+vaccination <- DiseasyVaccination$new()
+```
+
+By default, the vaccine-immunity scenario assumes complete protection
+immediately after vaccination and no waning. The vaccination schedule is empty:
+
+```{r default-scenario}
+vaccination
+```
+
+## Vaccine-induced immunity
+
+Use `$set_vaccination_scenario()` to define the effectiveness of vaccination
+and its subsequent waning. For example, the following scenario assumes an
+immediate 80% reduction in susceptibility to infection in vaccinated individuals
+and an exponential waning protection with a characteristic time scale of 180 days:
+
+```{r vaccine-immunity}
+vaccination$set_vaccination_scenario(
+  vaccine_effectiveness = 0.8,
+  waning_model = "exponential_waning",
+  waning_time_scale = 180
+)
+
+vaccination
+```
+
+The available waning models are defined by `DiseasyImmunity` (see
+`vignette("diseasy-immunity")`) but custom waning functions are also supported.
+
+
+# Defining vaccination schedules
+
+Use `$add_vaccination_schedule()` to define the vaccination rates for given
+age groups at different periods over the year.
+
+In this example, we define a seasonal campaign between 1 October and
+31 December 2026. The general rate is 0.001 per person per day:
+
+```{r autumn-campaign}
+vaccination$add_vaccination_schedule(
+  vaccination_rate = 0.001,
+  age_group = "0+",
+  start = as.Date("2026-10-01"),
+  end = as.Date("2026-12-31")
+)
+
+vaccination
+```
+
+An `age_group` is written in the same style as `diseasystore::age_labels()`,
+for example `"00-17"`, `"60-79"`, or `"80+"`. An open-ended group such as
+`"80+"` has no upper age boundary.
+
+Passing `NULL` for `start` or `end` means that the schedule has no restriction
+at that end of the date interval.
+
+## Overlapping age groups
+
+We may want a higher rate of vaccination amongst older individuals. We can
+add interventions for people aged 60 or older, followed by another for people
+aged 80 or older:
+
+```{r targeted-campaigns}
+vaccination$add_vaccination_schedule(
+  vaccination_rate = 0.005,
+  age_group = "60+",
+  start = as.Date("2026-10-01"),
+  end = as.Date("2026-12-31")
+)
+
+vaccination$add_vaccination_schedule(
+  vaccination_rate = 0.01,
+  age_group = "80+",
+  start = as.Date("2026-10-01"),
+  end = as.Date("2026-12-31")
+)
+
+vaccination
+```
+
+Notice that consecutive calls to `?DiseasyVaccination$add_vaccination_schedule()`
+overwrites the information of previous calls if there is overlap between them.
+
+The schedule is stored in a compact form, so a change to the `"80+"` group
+need not create one row for every age. For example, applying a `"60-89"`
+intervention after an existing `"80+"` intervention should retain the original
+rate at ages 90 and above.
+
+
+## Plotting a vaccination scenario
+
+The configured vaccination schedule can be visualised using the
+`$plot()` method. The plot shows the daily vaccination hazard for
+selected ages across the intervention period.
+
+```{r plot-rates, fig.width = 7, fig.height = 4}
+vaccination$plot()
+```
