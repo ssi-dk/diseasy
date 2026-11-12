@@ -407,7 +407,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   }
     #'
     #'   # Show estimated parameters
-    #'   model$parameters$season.scale
+    #'   model$parameters$season
     #' @return `r rd_side_effects`
     fit = function(observable, stratification = NULL, ...) {
       checkmate::assert_number(self %.% parameters %.% training_length %.% testing, lower = 1)
