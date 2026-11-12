@@ -1632,9 +1632,14 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # We need special handling of disease_progression_rates where rates should
       # be dropped the compartment_structure is configured to have zero elements
       if ("disease_progression_rates" %in% names(parameters)) {
+        non_zero_compartments <- imputed_parameters$compartment_structure |>
+          purrr::pluck(.default = current_parameters %.% compartment_structure) |>
+          purrr::keep(~ . > 0L) |>
+          names()
+
         imputed_parameters$disease_progression_rates <- purrr::keep_at(
           imputed_parameters %.% disease_progression_rates,
-          names(purrr::keep(imputed_parameters %.% compartment_structure, ~ . > 0L)) # Names of non-zero compartments
+          non_zero_compartments
         )
       }
 
