@@ -768,6 +768,14 @@ DiseasyModel <- R6::R6Class(                                                    
     # @param current_parameters (`named list()`)\cr
     #   The complete set of current parameters
     impute_inpute_parameters = function(parameters, current_parameters) {
+
+      # Say a model takes a vectorised parameter "season" = list("scale" = 1, "peak" = 1)
+      # then the user may end up providing a parameter update for "season.scale" which
+      # should modify "scale" but keep "peak" untouched.
+      # Therefore we need to "impute" the given parameters to contain the existing "peak"
+      # value before updating the parameters.
+      # Otherwise we end up deleting the "peak" argument
+
       imputed_parameters <- current_parameters |>
         purrr::keep_at(stringr::str_remove(names(parameters), r"{[.]\w+$}")) |>  # Get current parameters at given level
         implicit_nested_list() |> # Convert to 1D representation

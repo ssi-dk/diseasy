@@ -1617,20 +1617,30 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #   The complete set of current parameters
     impute_inpute_parameters = function(parameters, current_parameters) {
 
+      # First, we do basic parameter imputing
       imputed_parameters <- super$impute_inpute_parameters(parameters, current_parameters) |>
         explicit_nested_list()
 
-      # For the rest of this method, cast parameterst to explicit nested list
+      # For `DiseasyModelOdeSeir` we need special handling of some parameters when imputing
+
+      # First we cast the input parameters as a nested list
       parameters <- explicit_nested_list(parameters)
 
       # We need special handling of the compartment structure to just copy the user input
-      # instead of imputing
+      # instead of imputing.
+      # If the user specifies `compartment_structure = c("I" = I, "R" = R)`, then
+      # we need to make sure we DO NOT impute the default value for "E" = 1.
+      # Basic parameter imputing has given us: `compartment_structure = c("E" = 1, "I" = I, "R" = R)`
+      # so we overwrite the current impute with the user supplied values
       if ("compartment_structure" %in% names(parameters)) {
         imputed_parameters$compartment_structure <- parameters %.% compartment_structure
       }
 
       # We need special handling of disease_progression_rates where rates should
       # be dropped the compartment_structure is configured to have zero elements
+      # Basic imputing will insert values for "E" or "I" even if
+      # `compartment_structure = c("E" = 0L, "I" = 0L)`
+      # so we remove progression rates that can never be reached.
       if ("disease_progression_rates" %in% names(parameters)) {
         non_zero_compartments <- imputed_parameters$compartment_structure |>
           purrr::pluck(.default = current_parameters %.% compartment_structure) |>
