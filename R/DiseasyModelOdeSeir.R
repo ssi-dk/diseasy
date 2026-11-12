@@ -1575,7 +1575,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_names(
         names(parameters %.% disease_progression_rates),
         subset.of = c("E", "I"),
-        must.include = "I",
+        must.include = names(purrr::keep(purrr::keep_at(parameters %.% compartment_structure, c("E", "I")), ~ . > 0L)),
         add = coll
       )
 
@@ -1607,6 +1607,38 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::reportAssertions(coll)
 
       super$validate_parameters(parameters) # Validate inherited parameters
+    },
+
+    # @description
+    #  Impute partial input parameters with the current parameters where needed
+    # @param parameters (`named list()`)\cr
+    #   The (potential) partial set of parameters to impute.
+    # @param current_parameters (`named list()`)\cr
+    #   The complete set of current parameters
+    impute_inpute_parameters = function(parameters, current_parameters) {
+
+      imputed_parameters <- super$impute_inpute_parameters(parameters, current_parameters) |>
+        explicit_nested_list()
+
+      # For the rest of this method, cast parameterst to explicit nested list
+      parameters <- explicit_nested_list(parameters)
+
+      # We need special handling of the compartment structure to just copy the user input
+      # instead of imputing
+      if ("compartment_structure" %in% names(parameters)) {
+        imputed_parameters$compartment_structure <- parameters %.% compartment_structure
+      }
+
+      # We need special handling of disease_progression_rates where rates should
+      # be dropped the compartment_structure is configured to have zero elements
+      if ("disease_progression_rates" %in% names(parameters)) {
+        imputed_parameters$disease_progression_rates <- purrr::keep_at(
+          imputed_parameters %.% disease_progression_rates,
+          names(purrr::keep(imputed_parameters %.% compartment_structure, ~ . > 0L)) # Names of non-zero compartments
+        )
+      }
+
+      return(imputed_parameters)
     },
 
     progression_flow_rates = NULL,
