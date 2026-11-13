@@ -784,7 +784,8 @@ DiseasyModel <- R6::R6Class(                                                    
           purrr::pluck(
             unclass(implicit_nested_list(parameters)), # Insert new values
             .default = list() # Default to list() if no parameters are given
-          )
+          ),
+          keep.null = TRUE
         )
 
       return(imputed_parameters)
