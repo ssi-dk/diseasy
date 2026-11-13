@@ -143,6 +143,8 @@ DiseasyActivity <- R6::R6Class(                                                 
         unique() |>
         purrr::keep(~ . > 1)
 
+      if (length(n_age_groups) == 0) n_age_groups <- 0
+
       # There should be one unique number of age groups
       checkmate::assert_number(n_age_groups, add = coll)
 
