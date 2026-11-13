@@ -250,7 +250,10 @@ Assuming age-specific total contacts ("T" domain - see `vignette("diseasy-activi
 N_age <- stats::xtabs(~ age_group, data = population)
 
 t_matrix <- round(
- outer(1.5 / seq_along(age_groups), 1.5 / seq_along(age_groups))^1.25 * N_age %*% t(N_age)
+  outer(
+    1.5 / seq_along(age_groups),
+    1.5 / seq_along(age_groups)
+  )^1.25 * N_age %*% t(N_age)
 )
 
 print(t_matrix)
@@ -277,76 +280,76 @@ We can draw a realisation of such a network from our contact matrices
 <details>
   <summary>See implementation</summary>
 
-  ```{r}
-  # Convert T-matrix to long-form data.frame
-  one_way_links <- tidyr::expand_grid(
-    i_age_group = age_groups,
-    j_age_group = age_groups
+```{r}
+# Convert T-matrix to long-form data.frame
+one_way_links <- tidyr::expand_grid(
+  i_age_group = age_groups,
+  j_age_group = age_groups
+) |>
+  dplyr::mutate(
+    "n_contacts" = as.vector(t_matrix)
   ) |>
-    dplyr::mutate(
-      "n_contacts" = as.vector(t_matrix)
-    ) |>
-    tidyr::uncount(.data$n_contacts) |>
-    dplyr::select(!"n_contacts")
+  tidyr::uncount(.data$n_contacts) |>
+  dplyr::select(!"n_contacts")
 
-  # Randomly draw i indices (from nodes)
-  one_way_links <- one_way_links |>
-    dplyr::group_by(.data$i_age_group) |>
-    dplyr::group_modify(
-      ~ .x |>
-        dplyr::mutate(
-          "i" = sample(
-            x = which(
-              stringr::str_starts(population$group, .y$i_age_group)
-            ),
-            size = dplyr::n(),
-            replace = TRUE
-          )
+# Randomly draw i indices (from nodes)
+one_way_links <- one_way_links |>
+  dplyr::group_by(.data$i_age_group) |>
+  dplyr::group_modify(
+    ~ .x |>
+      dplyr::mutate(
+        "i" = sample(
+          x = which(
+            stringr::str_starts(population$group, .y$i_age_group)
+          ),
+          size = dplyr::n(),
+          replace = TRUE
         )
-    )
-
-  # Randomly draw j indices (to nodes)
-  one_way_links <- one_way_links |>
-    dplyr::group_by(.data$i, .data$j_age_group) |>
-    dplyr::group_modify(
-      ~ .x |>
-        dplyr::mutate(
-          "j" = sample(
-            x = which(
-              stringr::str_starts(population$group, .y$j_age_group) &
-                seq_along(population$group) != .y$i
-            ),
-            size = dplyr::n(),
-            replace = TRUE
-          )
-        )
-    )
-
-  # Finalise
-  one_way_links <- one_way_links |>
-    dplyr::mutate( # Make lower
-      "i_u" = pmax(.data$i, .data$j),
-      "j_u" = pmin(.data$i, .data$j)
-    ) |>
-    dplyr::group_by(.data$i_u, .data$j_u) |>
-    dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections
-
-  # Convert to adjacency matrix with 2-way interactions
-  adjacency_sw <- as.matrix(
-    Matrix::sparseMatrix(
-      i = one_way_links$i_u,
-      j = one_way_links$j_u,
-      x = one_way_links$n,
-      dims = c(nrow(population), nrow(population)),
-      dimnames = list(population$group, population$group)
-    )
+      )
   )
 
-  # Make symmetric
-  adjacency_sw <- (adjacency_sw + t(adjacency_sw)) / 2
+# Randomly draw j indices (to nodes)
+one_way_links <- one_way_links |>
+  dplyr::group_by(.data$i, .data$j_age_group) |>
+  dplyr::group_modify(
+    ~ .x |>
+      dplyr::mutate(
+        "j" = sample(
+          x = which(
+            stringr::str_starts(population$group, .y$j_age_group) &
+              seq_along(population$group) != .y$i
+          ),
+          size = dplyr::n(),
+          replace = TRUE
+        )
+      )
+  )
 
-  print_truncated(adjacency_sw)
-  ```
+# Finalise
+one_way_links <- one_way_links |>
+  dplyr::mutate( # Make lower
+    "i_u" = pmax(.data$i, .data$j),
+    "j_u" = pmin(.data$i, .data$j)
+  ) |>
+  dplyr::group_by(.data$i_u, .data$j_u) |>
+  dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections
+
+# Convert to adjacency matrix with 2-way interactions
+adjacency_sw <- as.matrix(
+  Matrix::sparseMatrix(
+    i = one_way_links$i_u,
+    j = one_way_links$j_u,
+    x = one_way_links$n,
+    dims = c(nrow(population), nrow(population)),
+    dimnames = list(population$group, population$group)
+  )
+)
+
+# Make symmetric
+adjacency_sw <- (adjacency_sw + t(adjacency_sw)) / 2
+
+print_truncated(adjacency_sw)
+```
 </details>
 
 ```{r, eval = rlang::is_installed("igraph")}
@@ -496,7 +499,10 @@ theta_norm <- theta / drop(t(n_region) %*% theta %*% n_region)
 k <- N_age %*% t(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
 c_matrix_full_sw <- kronecker(theta_norm, c_matrix * k)
-dimnames(c_matrix_full_sw) <- list(unique(population$group), unique(population$group))
+dimnames(c_matrix_full_sw) <- list(
+  unique(population$group),
+  unique(population$group)
+)
 print_truncated(round(c_matrix_full_sw, digits = 1))
 ```
 
@@ -531,124 +537,129 @@ spatial locations are well-mixed only within their spatial region (an extremely 
 We can draw a realisation of such a network from our contact matrices
 <details>
   <summary>See implementation</summary>
-  ```{r}
-  # Convert T matrix to long-form data.frame
-  one_way_links <- tidyr::expand_grid(
-    i_age_group = age_groups,
-    j_age_group = age_groups
+
+```{r}
+# Convert T matrix to long-form data.frame
+one_way_links <- tidyr::expand_grid(
+  i_age_group = age_groups,
+  j_age_group = age_groups
+) |>
+  dplyr::mutate(
+    "n_contacts" = as.vector(t_matrix)
   ) |>
-    dplyr::mutate(
-      "n_contacts" = as.vector(t_matrix)
-    ) |>
-    tidyr::uncount(.data$n_contacts) |>
-    dplyr::select(!"n_contacts")
+  tidyr::uncount(.data$n_contacts) |>
+  dplyr::select(!"n_contacts")
 
-  # Randomly draw i indices (from nodes)
-  # verify they connect to j nodes in the region
-  # -- else re-draw from accepted samples
-  one_way_links <- one_way_links |>
-    dplyr::group_by(.data$i_age_group) |>
-    dplyr::group_modify(
-      ~ {
-        i_sampled <- .x |>
-          dplyr::mutate(
-            "i_age_group" = .y$i_age_group,
-            "i" = sample(
-              x = which(
-                stringr::str_detect(population$group, .y$i_age_group)
-              ),
-              size = dplyr::n(),
-              replace = TRUE
-            ),
-            "i_lab" = population$group[.data$i],
-            "i_region" = stringr::str_extract(.data$i_lab, "[a-z]")
-          )
-
-        # Determine reachable connections
-        i_sampled <- i_sampled |>
-          dplyr::mutate(
-            "any_j_reachable" = purrr::pmap_lgl(
-              dplyr::select(i_sampled, "j_age_group", "i_region", "i"),
-              \(j_age_group, i_region, i) {
-                any(
-                  stringr::str_detect(
-                    population$group,
-                    stringr::str_replace(j_age_group, stringr::fixed("*"), i_region)
-                  ) & seq_along(population$group) != i
-                )
-              }
-            )
-          )
-
-        # Determine reachable connections
-        i_accepted <- i_sampled |>
-          dplyr::filter(.data$any_j_reachable)
-
-        # Re-sample unreachable from reachable
-        i_resampled <- i_sampled |>
-          dplyr::filter(!.data$any_j_reachable) |>
-          dplyr::count(.data$i_age_group, .data$j_age_group) |>
-          purrr::pmap(
-            \(i_age_group, j_age_group, n) {
-              i_accepted |>
-                dplyr::filter(
-                  .data$i_age_group == {{ i_age_group }},
-                  .data$j_age_group == {{ j_age_group }}
-                ) |>
-                dplyr::slice_sample(n = {{ n }})
-            }
-          ) |>
-          purrr::list_rbind()
-
-        return(dplyr::select(rbind(i_accepted, i_resampled), !"i_age_group"))
-      }
-    )
-
-  # Randomly draw j indices (to nodes) within the same region
-  one_way_links <- one_way_links |>
-    dplyr::group_by(.data$i, .data$j_age_group, .data$i_region) |>
-    dplyr::group_modify(
-      ~ .x |>
+# Randomly draw i indices (from nodes)
+# verify they connect to j nodes in the region
+# -- else re-draw from accepted samples
+one_way_links <- one_way_links |>
+  dplyr::group_by(.data$i_age_group) |>
+  dplyr::group_modify(
+    ~ {
+      i_sampled <- .x |>
         dplyr::mutate(
-          "j" = sample(
+          "i_age_group" = .y$i_age_group,
+          "i" = sample(
             x = which(
-              stringr::str_detect(
-                population$group,
-                stringr::str_replace(.y$j_age_group, stringr::fixed("*"), .y$i_region)
-              ) & seq_along(population$group) != .y$i
+              stringr::str_detect(population$group, .y$i_age_group)
             ),
             size = dplyr::n(),
             replace = TRUE
           ),
-          "j_lab" = population$group[.data$j],
-          "j_region" = stringr::str_extract(.data$j_lab, "[a-z]")
+          "i_lab" = population$group[.data$i],
+          "i_region" = stringr::str_extract(.data$i_lab, "[a-z]")
         )
-    )
 
-  # Finalise
-  one_way_links <- one_way_links |>
-    dplyr::mutate( # Make lower
-      "i_u" = pmax(.data$i, .data$j),
-      "j_u" = pmin(.data$i, .data$j)
-    ) |>
-    dplyr::group_by(.data$i_u, .data$j_u) |>
-    dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections
+      # Determine reachable connections
+      i_sampled <- i_sampled |>
+        dplyr::mutate(
+          "any_j_reachable" = purrr::pmap_lgl(
+            dplyr::select(i_sampled, "j_age_group", "i_region", "i"),
+            \(j_age_group, i_region, i) {
+              any(
+                stringr::str_detect(
+                  population$group,
+                  stringr::str_replace(j_age_group, stringr::fixed("*"), i_region)
+                ) & seq_along(population$group) != i
+              )
+            }
+          )
+        )
 
-  # Convert to adjacency matrix with 2-way interactions
-  adjacency_silo <- as.matrix(
-    Matrix::sparseMatrix(
-      i = one_way_links$i_u,
-      j = one_way_links$j_u,
-      x = one_way_links$n,
-      dims = c(nrow(population), nrow(population)),
-      dimnames = list(population$group, population$group)
-    )
+      # Determine reachable connections
+      i_accepted <- i_sampled |>
+        dplyr::filter(.data$any_j_reachable)
+
+      # Re-sample unreachable from reachable
+      i_resampled <- i_sampled |>
+        dplyr::filter(!.data$any_j_reachable) |>
+        dplyr::count(.data$i_age_group, .data$j_age_group) |>
+        purrr::pmap(
+          \(i_age_group, j_age_group, n) {
+            i_accepted |>
+              dplyr::filter(
+                .data$i_age_group == {{ i_age_group }},
+                .data$j_age_group == {{ j_age_group }}
+              ) |>
+              dplyr::slice_sample(n = {{ n }})
+          }
+        ) |>
+        purrr::list_rbind()
+
+      return(dplyr::select(rbind(i_accepted, i_resampled), !"i_age_group"))
+    }
   )
 
-  adjacency_silo <- (adjacency_silo + t(adjacency_silo)) / 2
+# Randomly draw j indices (to nodes) within the same region
+one_way_links <- one_way_links |>
+  dplyr::group_by(.data$i, .data$j_age_group, .data$i_region) |>
+  dplyr::group_modify(
+    ~ .x |>
+      dplyr::mutate(
+        "j" = sample(
+          x = which(
+            stringr::str_detect(
+              population$group,
+              stringr::str_replace(
+                .y$j_age_group,
+                stringr::fixed("*"),
+                .y$i_region
+              )
+            ) & seq_along(population$group) != .y$i
+          ),
+          size = dplyr::n(),
+          replace = TRUE
+        ),
+        "j_lab" = population$group[.data$j],
+        "j_region" = stringr::str_extract(.data$j_lab, "[a-z]")
+      )
+  )
 
-  print_truncated(adjacency_silo)
-  ```
+# Finalise
+one_way_links <- one_way_links |>
+  dplyr::mutate( # Make lower
+    "i_u" = pmax(.data$i, .data$j),
+    "j_u" = pmin(.data$i, .data$j)
+  ) |>
+  dplyr::group_by(.data$i_u, .data$j_u) |>
+  dplyr::summarise("n" = dplyr::n(), .groups = "drop") # Count connections
+
+# Convert to adjacency matrix with 2-way interactions
+adjacency_silo <- as.matrix(
+  Matrix::sparseMatrix(
+    i = one_way_links$i_u,
+    j = one_way_links$j_u,
+    x = one_way_links$n,
+    dims = c(nrow(population), nrow(population)),
+    dimnames = list(population$group, population$group)
+  )
+)
+
+adjacency_silo <- (adjacency_silo + t(adjacency_silo)) / 2
+
+print_truncated(adjacency_silo)
+```
 </details>
 
 ```{r, eval = rlang::is_installed("igraph")}
@@ -717,7 +728,10 @@ theta_norm <- theta / drop(t(n_region) %*% theta %*% n_region)
 k <- N_age %*% t(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
 c_matrix_full_silo <- kronecker(theta_norm, c_matrix * k)
-dimnames(c_matrix_full_silo) <- list(unique(population$group), unique(population$group))
+dimnames(c_matrix_full_silo) <- list(
+  unique(population$group),
+  unique(population$group)
+)
 print_truncated(round(c_matrix_full_silo, digits = 1))
 ```
 
@@ -769,7 +783,10 @@ theta_norm <- theta / drop(t(n_region) %*% theta %*% n_region)
 k <- N_age %*% t(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
 c_matrix_full_mix <- kronecker(theta_norm, c_matrix * k)
-dimnames(c_matrix_full_mix) <- list(unique(population$group), unique(population$group))
+dimnames(c_matrix_full_mix) <- list(
+  unique(population$group),
+  unique(population$group)
+)
 print_truncated(round(c_matrix_full_mix, digits = 1))
 ```
 

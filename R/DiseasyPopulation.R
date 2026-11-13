@@ -222,14 +222,14 @@ DiseasyPopulation <- R6::R6Class(                                               
       theta <- self %.% regions %.% infection_flow_matrix
 
       # Count population in regions
-      N_region <- full_population |>                                                                                   # nolint: object_name_linter
+      N_region <- full_population |>                                                                                    # nolint: object_name_linter
         dplyr::summarise(
           "population" = sum(.data$population),
           .by = "region"
         ) |>
         tibble::deframe()
 
-      N_region <- matrix(                                                                                              # nolint: object_name_linter
+      N_region <- matrix(                                                                                               # nolint: object_name_linter
         N_region[colnames(theta)],
         ncol = 1,
         dimnames = list(colnames(theta), "N")
