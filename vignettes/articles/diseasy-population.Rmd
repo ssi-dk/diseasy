@@ -810,6 +810,147 @@ print(t_matrix)
 cat("Total contacts: ", sum(t_matrix))
 ```
 
+## Implementing the examples in diseasy
+The above examples show how `diseasy` handles the contact matrices internally.
+We can implement the "mixture" example in `diseasy` to see the outputs
+directly from `diseasy`.
+
+First we configure a `?DiseasyRegions` module with the population and
+connectedness.
+```{r diseasy-implementation regions}
+# Load the example population
+regions <- DiseasyRegions$new()
+regions$set_area(area = c("x", "y", "z", "w"))
+regions$set_demography(
+  demography = dplyr::summarise(
+    population,
+    "region" = as.character(.data$region[[1]]),
+    "age_group" = c("00-29", "30-59", "60+")[
+      which(.data$age_group[1] == age_groups)
+    ],
+    "population" = dplyr::n(),
+    .by = c("age_group", "region")
+  )
+)
+
+# Use the "mixing" scenario as the adjacency
+regions$set_adjacency(
+  adjacency = reshape2::melt(
+    mixing_mix,
+    varnames = c("from", "to"),
+    value.name = "adjacency"
+  ) |>
+    dplyr::mutate(
+      "from" = as.character(.data$from),
+      "to" = as.character(.data$to)
+    ),
+  adjacency_type = "infection-flow"
+)
+
+print(regions$infection_flow_matrix)
+
+# Reference
+print(mixing_mix)
+```
+
+
+Then we implement a `?DiseasyActivity` module with the contacts
+(which requires some finessing)
+
+```{r diseasy-implementation activity}
+mean_contacts_per_person <- matrix(
+  m_matrix,
+  nrow = length(age_groups),
+  dimnames = list(c("00-29", "30-59", "60+"), c("00-29", "30-59", "60+"))
+)
+
+activity <- DiseasyActivity$new(
+  contact_basis = list(
+    "mean_contacts_per_person" = list(
+      "home" = mean_contacts_per_person / 4,
+      "school" = mean_contacts_per_person / 4,
+      "work" = mean_contacts_per_person / 4,
+      "other" = mean_contacts_per_person / 4
+    ),
+    "description" = "Example contact rates"
+  )
+)
+
+activity$set_activity_units(
+  list(
+    "baseline" = list(
+      "label" = "baseline",
+      "home" = 1, "work" = 1, "school" = 1, "other" = 1, "risk" = 1
+    )
+  )
+)
+
+activity$change_activity(
+  date = as.Date("1970-01-01"),
+  opening = "baseline"
+)
+
+print(activity$get_scenario_contacts(weights = c(1, 1, 1, 1)))
+
+# Reference
+print(m_matrix)
+```
+
+With those two modules configured, we can combine into different `?DiseasyPopulation`
+modules with different stratification of the population:
+
+```{r diseasy-implementation population}
+population_no_stratification <- DiseasyPopulation$new(
+  activity = activity,
+  regions = regions
+)
+
+population_age_stratified <- DiseasyPopulation$new(
+  activity = activity,
+  regions = regions,
+  age_cuts_lower = c(30, 60)
+)
+
+population_region_stratified <- DiseasyPopulation$new(
+  activity = activity,
+  regions = regions,
+  regional_stratification = "region"
+)
+
+population_fully_stratified <- DiseasyPopulation$new(
+  activity = activity,
+  regions = regions,
+  regional_stratification = "region",
+  age_cuts_lower = c(30, 60)
+)
+
+number_of_contacts <- list(
+  "no_stratification" = population_no_stratification,
+  "age_stratified"    = population_age_stratified,
+  "region_stratified" = population_region_stratified,
+  "fully_stratified"  = population_fully_stratified
+) |>
+  purrr::map_dbl(\(population) {
+    N <- population %.% model_population |>                                                                             # nolint: object_name_linter
+      dplyr::select(
+        dplyr::all_of(c(colnames(population %.% groups), "population"))
+      ) |>
+      tidyr::unite("label", !"population", sep = "/") |>
+      tibble::deframe()
+
+    m_matrix <- population %.% mean_contact_rates()[[1]]
+
+    t_matrix <- m_matrix * outer(N, rep(1, length(N)))
+
+    sum(t_matrix)
+  })
+
+print(number_of_contacts)
+
+# Reference
+cat("Total contacts: ", sum(t_matrix))
+```
+
 ```{r cleanup, include = FALSE}
 rm(
   regions,
