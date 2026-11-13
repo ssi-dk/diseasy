@@ -261,13 +261,13 @@ print(t_matrix)
 
 ... and age-specific mean contact rates ("M" domain) of:
 ```{r}
-m_matrix <- t_matrix / outer(rep(1, length(N_age)), N_age)
+m_matrix <- t_matrix / outer(N_age, rep(1, length(N_age)))
 print(round(m_matrix, digits = 2))
 ```
 
 .. and corresponding per-capita contact rates ("C" domain) of:
 ```{r}
-c_matrix <- t_matrix / N_age %*% t(N_age)
+c_matrix <- t_matrix / outer(N_age, N_age)
 print(round(c_matrix, digits = 2))
 ```
 
