@@ -99,7 +99,7 @@ To stratify by age, we use the `?DiseasyPopulation$stratify_age()` method:
 population$stratify_age(age_cuts_lower = c(0, 20, 40, 60, 80))
 
 # and we can inspect the defined demographic groups
-population$groups
+population$model_population
 ```
 
 To stratify by region, we use the `?DiseasyPopulation$stratify_regions()` method:
@@ -107,7 +107,7 @@ To stratify by region, we use the `?DiseasyPopulation$stratify_regions()` method
 population$stratify_regions(regional_stratification = "NUTS 2")
 
 # .. and we can inspect the updated demographic groups
-population$groups
+population$model_population
 ```
 
 # Populations outside the Nordics
