@@ -413,21 +413,23 @@ and a regional mixing matrix connecting regions $x$ and $y$.
 The population is therefore currently identified by the simultaneous indices ($i, x$),
 which we combine to form a linear "demography group" index connecting individuals
 from demographic groups $q$ and $p$.
+So that $p$ and $q$ enumerate all combinations of age and region ($i, x$).
 
 The models population is expressed in this linear index and, therefore, we aim to
 combine the regional mixing and age-specific matrices into a single representation
 in the linear demography group indices. A "full" rather than "marginal" contact
 matrix.
 
-We can compute the "full" per-capita contact matrix, $\overline{\overline{C}}$,
-from the age-specific contact matrix, $\overline{\overline{C}}_{i, j}$,
-the mixing matrix, $\overline{\overline{\Theta}}_{x, y}$,
-and the population vector, $\overline{N}_{p = (i, x)}$: via the relation:
+We can compute the "full" per-capita contact matrix, $\overline{\overline{C}}^{\textrm{full}}$,
+from the age-specific contact matrix, $\overline{\overline{C}}$,
+the regional mixing matrix, $\overline{\overline{\Theta}}$,
+and the population vector, $\overline{N}$ with indices $p = (i, x)$: via the elementwise relation:
 $$
-\overline{\overline{C}}^{\textrm{full}}_{p = (i, x), q = (j, y)} = k_{i, j} \overline{\overline{\Theta^\ast}}_{x, y} \overline{\overline{C}}_{i, j}
+C^{\textrm{full}}_{p = (i, x), q = (j, y)} = k_{i, j} C_{i, j} \Theta^\ast_{x, y}
 $$
 
-Where $\overline{\overline{\Theta^\ast}}$ is a normalised mixing matrix:
+Where $k_{i,j}$ is a age-group normalisation (see below) and $\overline{\overline{\Theta^\ast}}$
+is a normalised mixing matrix between regions:
 $$
 \overline{\overline{\Theta^\ast}} = \frac{\overline{\overline{\Theta}}}{\overline{n}^T\overline{\overline{\Theta}}\overline{n}}
 $$
@@ -436,32 +438,20 @@ with $\overline{n}$ being the population fraction:
 $$
 \overline{n} = \frac{\overline{N}}{\overline{1}^T\overline{N}}
 $$
-The normalizing constant is:
-$$
-\overline{n}^T\overline{\overline{\Theta}}\overline{n}
-$$
-This is the *population-pair-weighted* average of the entries of $\Theta$.
 
-Consider a case where P and Q are the mixing-group labels of two independently selected people.
-In this case,
-$$
-\overline{n}^T\overline{\overline{\Theta}}\overline{n} = \mathbb{E}[\Theta_{P,Q}].
-$$
-Therefore,
-$$
-\sum_{i,j} n_i n_j \Theta_{p,q}^\ast = 1.
-$$
-So the normalized mixing matrix has population-weighted mean equal to one.
+The normalisation $\overline{n}^T\overline{\overline{\Theta}}\overline{n}$ is the *population-pair-weighted* average
+of the entries of $\Theta$.
+
 
 
 The normalized entry $\Theta^{\ast}_{ij}$ is a relative contact multiplier:
 For example,
 
 $$
-\Theta^\ast_{p,q} = 1.4
+\Theta^\ast_{x,y} = 1.4
 $$
 
-means that contacts between mixing groups p and q are multiplied by 1.4, relative to the average mixing effect.
+means that contacts between regions $x$ and $y$ are multiplied by 1.4, relative to the average mixing effect.
 
 Note that the normalization preserves the population-pair-weighted regional mixing intensity.
 Consequently, the total number of contacts is invariant only when regional age compositions are identical.
@@ -471,7 +461,7 @@ This is where the additional normalisation constants $k_{i, j}$ comes in.
 We first define mixing-weighted population-pair volume $D_{i,j}$ as:
 
 $$
-D_{x,y} = \sum_{x,y} \Theta^\ast_{x,y} N_{i,x} N_{j,y}.
+D_{i,j} = \sum_{x,y} \Theta^\ast_{x,y} N_{i,x} N_{j,y}.
 $$
 
 That is, the number of potential population pairs between age groups $i$ and $j$
@@ -500,13 +490,12 @@ print(n_region)
 ```
 
 ```{r}
-tm <- mixing_sw
-cm <- c_matrix
+theta <- mixing_sw
 
-tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
-k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
+theta_norm <- theta / drop(t(n_region) %*% theta %*% n_region)
+k <- N_age %*% t(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
-c_matrix_full_sw <- kronecker(tm_norm, cm * k)
+c_matrix_full_sw <- kronecker(theta_norm, c_matrix * k)
 dimnames(c_matrix_full_sw) <- list(unique(population$group), unique(population$group))
 print_truncated(round(c_matrix_full_sw, digits = 1))
 ```
@@ -518,6 +507,7 @@ N <- as.matrix(table(population$group))
 t_matrix_full_sw <- c_matrix_full_sw * tcrossprod(N)
 print_truncated(round(t_matrix_full_sw, digits = 1))
 ```
+
 Finally, we can aggregate the raw contact matrix in the same groups as the original reference (i.e. age groups only) and compare with that reference.
 ```{r}
 T_age_indirect <- aggregate_contacts(
@@ -721,13 +711,12 @@ print(mixing_silo)
 
 
 ```{r}
-tm <- mixing_silo
-cm <- c_matrix
+theta <- mixing_silo
 
-tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
-k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
+theta_norm <- theta / drop(t(n_region) %*% theta %*% n_region)
+k <- N_age %*% t(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
-c_matrix_full_silo <- kronecker(tm_norm, cm * k)
+c_matrix_full_silo <- kronecker(theta_norm, c_matrix * k)
 dimnames(c_matrix_full_silo) <- list(unique(population$group), unique(population$group))
 print_truncated(round(c_matrix_full_silo, digits = 1))
 ```
@@ -774,13 +763,12 @@ print(mixing_mix)
 
 
 ```{r}
-tm <- mixing_mix
-cm <- c_matrix
+theta <- mixing_mix
 
-tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
-k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
+theta_norm <- theta / drop(t(n_region) %*% theta %*% n_region)
+k <- N_age %*% t(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
-c_matrix_full_mix <- kronecker(tm_norm, cm * k)
+c_matrix_full_mix <- kronecker(theta_norm, c_matrix * k)
 dimnames(c_matrix_full_mix) <- list(unique(population$group), unique(population$group))
 print_truncated(round(c_matrix_full_mix, digits = 1))
 ```
