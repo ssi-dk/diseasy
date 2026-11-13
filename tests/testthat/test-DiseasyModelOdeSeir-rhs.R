@@ -33,11 +33,13 @@ test_that("RHS does not leak and solution is non-negative (SEIR single variant /
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
@@ -85,11 +87,13 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
@@ -124,11 +128,13 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
@@ -178,11 +184,13 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
   # Generate a uniform initial state_vector that sums to 1
-  y0 <- rep(1, private %.% n_age_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
+  y0 <- rep(1, private %.% n_population_groups * (private %.% n_variants * private %.% n_EIR_states + 1)) |>
     (\(.) . / sum(.))()
   expect_identical(sum(y0), 1)
 
@@ -214,6 +222,8 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / singl
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -247,6 +257,8 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
       "disease_progression_rates" = c("E" = rI, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -284,6 +296,8 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
       "disease_progression_rates" = c("E" = rE, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -325,6 +339,8 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
       "disease_progression_rates" = c("E" = rI, "I" = rI)
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -369,6 +385,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -404,7 +422,6 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
@@ -412,6 +429,8 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -458,6 +477,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -506,6 +527,8 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -540,7 +563,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
-  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
+  basis$mean_contacts_per_person <- purrr::map( # Create "unit" contact matrices
+    basis$mean_contacts_per_person,
+    ~ 0.25 / 16 + 0 * .
+  )
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
@@ -566,8 +592,14 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
+
+  # Ensure we have unit activity matrices
+  expect_identical(as.numeric(m$population$mean_contact_rates()[[1]]), 1)
+  expect_identical(as.numeric(m$population$mean_contact_rates()[[2]]), 0.5)
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
@@ -594,11 +626,10 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
-  basis$contacts <- purrr::map(basis$contacts, ~ 0.25 / 16 + 0 * .) # Create "unit" contact matrices
-  basis$proportion <- stats::setNames(rep(1 / 16, 16), names(basis$proportion)) # And "unit" population
-  basis$population <- basis$proportion * sum(basis$population)
-  basis$demography$proportion <- c(rep(1 / 80, 80), rep(0, 21))
-  basis$demography$population <- basis$demography$proportion * sum(basis$demography$population)
+  basis$mean_contacts_per_person <- purrr::map( # Create "unit" contact matrices
+    basis$mean_contacts_per_person,
+    ~ 0.25 / 16 + 0 * .
+  )
   act <- DiseasyActivity$new(contact_basis = basis, activity_units = dk_activity_units)
   act$change_activity(Sys.Date() - 1, opening = "baseline")
   act$change_risk(Sys.Date(), type = "home",   risk = 0.5)
@@ -617,7 +648,6 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
       last_queryable_date = Sys.Date() - 1
     ),
     population = DiseasyPopulation$new(age_cuts_lower = c(0, 40)),
-    regions = DiseasyRegions$new(area = "DK", demography = demography_nordic),
     variant = var,
     parameters = list(
       "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
@@ -626,8 +656,20 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
+
+  # Ensure we have unit activity matrices
+  expect_identical(
+    unique(as.numeric(m$population$mean_contact_rates()[[1]])),
+    1 / length(m %.% population %.% age_cuts_lower)
+  )
+  expect_identical(
+    unique(as.numeric(m$population$mean_contact_rates()[[2]])),
+    0.5 / length(m %.% population %.% age_cuts_lower)
+  )
 
   # The contact matrix scaling works as expected.
   # In the activity scenario, the risk is halved after 1 day
@@ -677,6 +719,8 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
       "malthusian_matching" = FALSE
     )
   )
+
+  expect_no_error(m$prepare_rhs())
 
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
@@ -738,6 +782,8 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
     )
   )
 
+  expect_no_error(m$prepare_rhs())
+
   # Get a reference to the private environment
   private <- m$.__enclos_env__$private
 
@@ -774,4 +820,529 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
 
   rm(m)
 
+})
+
+
+test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+
+  regions <- DiseasyRegions$new(
+    area = c("A", "B")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "B", "B"),
+      to        = c("A", "B", "A", "B"),
+      adjacency = c(1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(1, nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(
+      1,
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
+  )
+
+  # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
+  y0 <- rep(0, private$n_states)
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[[2]])] <- 0.05 / 2
+  y0[private$s_state_indices] <- 0.95 / 2
+
+
+  expect_identical(sum(y0), 1)
+  expect_identical(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(                                                                                                                  # nolint start: commented_code_linter
+      (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_A
+      - (0.05 / 2) * rI,         # - I_A * rI
+      (0.05 / 2) * rI,           # I_A * rI
+      (0.05 / 2) * (0.95 / 2),   # beta * I_A * S_B
+      0,                         # - I_B * rI = 0
+      0,                         # I_B * rI = 0
+      - (0.05 / 2) * (0.95 / 2), # - beta * I_A * S_A
+      - (0.05 / 2) * (0.95 / 2)  # - beta * I_A * S_B
+    )                                                                                                                   # nolint end: commented_code_linter
+  )
+
+  rm(model)
+})
+
+test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+
+  regions <- DiseasyRegions$new(
+    area = c("A", "B", "C")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "A", "B", "B", "B", "C", "C", "C"),
+      to        = c("A", "B", "C", "A", "B", "C", "A", "B", "C"),
+      adjacency = c(1,   1,   1,   1,   1,   1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(1, nrow = 3, ncol = 3, dimnames = list(c("A", "B", "C"), c("A", "B", "C")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_equal(
+    private$contact_matrix(0),
+    matrix(
+      1,
+      nrow = 3,
+      ncol = 3,
+      dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))
+    ),
+    tolerance = 1e-14 # Some numerical error has been introduced
+  )
+
+  # We start with I_A = R_B = R_C = 0.05 / 2, S_A = S_B = S_C = 0.95 / 3
+  y0 <- rep(0, private$n_states)
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[2:3])] <- 0.05 / 3
+  y0[private$s_state_indices] <- 0.95 / 3
+
+
+  expect_identical(sum(y0), 1)
+  expect_equal(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * rI,
+      (0.05 / 3) * rI,
+      (0.05 / 3) * (0.95 / 3),
+      0,
+      0,
+      (0.05 / 3) * (0.95 / 3),
+      0,
+      0,
+      - (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * (0.95 / 3)
+    ),
+    tolerance = 1e-14 # Some numerical error has been introduced
+  )
+
+  rm(model)
+})
+
+
+test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+
+  regions <- DiseasyRegions$new(
+    area = c("A", "B")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "B", "B"),
+      to        = c("A", "B", "A", "B"),
+      adjacency = c(1,   0,   0,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(
+      c(1, 0, 0, 1) * 2, # A factor of 2 from per-capita scaling
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
+  )
+
+  # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
+  y0 <- rep(0, private$n_states)
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[[2]])] <- 0.05 / 2
+  y0[private$s_state_indices] <- 0.95 / 2
+
+  expect_identical(sum(y0), 1)
+  expect_identical(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      2 * (0.05 / 2) * (0.95 / 2),
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      0,
+      0,
+      0,
+      - 2 * (0.05 / 2) * (0.95 / 2),
+      0
+    )
+  )
+
+  rm(model)
+})
+
+test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+
+  regions <- DiseasyRegions$new(
+    area = c("A", "B", "C")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "A", "B", "B", "B", "C", "C", "C"),
+      to        = c("A", "B", "C", "A", "B", "C", "A", "B", "C"),
+      adjacency = c(1,   0,   0,   0,   1,   0,   0,   0,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(
+      as.vector(diag(1, nrow = 3)),
+      nrow = 3,
+      ncol = 3,
+      dimnames = list(c("A", "B", "C"), c("A", "B", "C"))
+    )
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(
+      as.vector(diag(1, nrow = 3)) * 3,  # A factor of 3 from per-capita scaling
+      nrow = 3,
+      ncol = 3,
+      dimnames = list(c("0+/A", "0+/B", "0+/C"), c("0+/A", "0+/B", "0+/C"))
+    )
+  )
+
+  # We start with I_A = R_B = R_C = 0.05 / 3, S_A = S_B = S_C = 0.95 / 3
+  y0 <- rep(0, private$n_states)
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[2:3])] <- 0.05 / 3
+  y0[private$s_state_indices] <- 0.95 / 3
+
+  expect_identical(sum(y0), 1)
+  expect_identical(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      3 * (0.05 / 3) * (0.95 / 3),
+      - (0.05 / 3) * rI,
+      (0.05 / 3) * rI,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      - 3 * (0.05 / 3) * (0.95 / 3),
+      0,
+      0
+    )
+  )
+
+  rm(model)
+})
+
+
+test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+
+  regions <- DiseasyRegions$new(
+    area = c("A", "B")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "B", "B"),
+      to        = c("A", "B", "A", "B"),
+      adjacency = c(0,   1,   1,   0)
+    ),
+    adjacency_type = "infection-flow"
+  )
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(c(0, 1, 1, 0), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(
+      c(0, 1, 1, 0) * 2, # A factor of 2 from per-capita scaling
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
+  )
+
+  # We start with I_A = R_B = 0.05 / 2, S_A = S_B = 0.95 / 2
+  y0 <- rep(0, private$n_states)
+  y0[c(private$i1_state_indices[1], private$r1_state_indices[[2]])] <- 0.05 / 2
+  y0[private$s_state_indices] <- 0.95 / 2
+
+  expect_identical(sum(y0), 1)
+
+  expect_identical(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      0,
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      2 * (0.05 / 2) * (0.95 / 2),
+      0,
+      0,
+      0,
+      - 2 * (0.05 / 2) * (0.95 / 2)
+    )
+  )
+
+  rm(model)
+})
+
+
+test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mixed, 2 regions)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("deSolve")
+
+  regions <- DiseasyRegions$new(
+    area = c("A", "B")
+  )
+  regions$set_adjacency(
+    adjacency = data.frame(
+      from      = c("A", "A", "B", "B"),
+      to        = c("A", "B", "A", "B"),
+      adjacency = c(1,   1,   1,   1)
+    ),
+    adjacency_type = "infection-flow"
+  )
+  regions$set_regional_risks(c("A" = 1, "B" = 2))
+
+
+  population <- DiseasyPopulation$new(
+    regional_stratification = "region",
+    regions = regions
+  )
+
+  model <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    regions = regions,
+    population = population,
+    parameters = list(
+      "compartment_structure" = c("E" = 1L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("E" = rI, "I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  expect_no_error(model$prepare_rhs())
+
+  # Get a reference to the private environment
+  private <- model$.__enclos_env__$private
+
+  # Ensure demography is as expected
+  expect_identical(purrr::pluck(model$population$map_population(), "population", sum), 1)
+
+  # Ensure regional mixing is as expected
+  expect_identical(
+    model$regions$infection_flow_matrix,
+    matrix(c(1, sqrt(2), sqrt(2), 2), nrow = 2, ncol = 2, dimnames = list(c("A", "B"), c("A", "B")))
+  )
+
+  # Ensure contact matrix is as expected
+  expect_identical(
+    private$contact_matrix(0),
+    matrix(
+      c(1, sqrt(2), sqrt(2), 2) *
+        2 / (1 + 2 * sqrt(2) + 2) * # A factor from per-capita contact matrix normalisation
+        2, # A factor of 2 ODE scaling
+      nrow = 2,
+      ncol = 2,
+      dimnames = list(c("0+/A", "0+/B"), c("0+/A", "0+/B"))
+    )
+  )
+
+  # We start with I_A = I_B = 0.05 / 2, S_A = S_B = 0.95 / 2
+  y0 <- rep(0, private$n_states)
+  y0[private$i1_state_indices[1:2]] <- 0.05 / 2
+  y0[private$s_state_indices] <- 0.95 / 2
+  expect_identical(sum(y0), 1)
+
+  expect_equal(
+    unname(model %.% rhs(0, y0)[[1]]),
+    c(
+      4 / (1 + 2 * sqrt(2) + 2) * (1 + sqrt(2)) * (0.05 / 2) * (0.95 / 2),
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      4 / (1 + 2 * sqrt(2) + 2) * (sqrt(2) + 2) * (0.05 / 2) * (0.95 / 2),
+      - (0.05 / 2) * rI,
+      (0.05 / 2) * rI,
+      - 4 / (1 + 2 * sqrt(2) + 2) * (1 + sqrt(2)) * (0.05 / 2) * (0.95 / 2),
+      - 4 / (1 + 2 * sqrt(2) + 2) * (sqrt(2) + 2) * (0.05 / 2) * (0.95 / 2)
+    ),
+    tolerance = 1e-14 # Some numerical error has been introduced
+  )
+
+  rm(model)
 })
