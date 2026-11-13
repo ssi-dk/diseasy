@@ -222,21 +222,23 @@ DiseasyPopulation <- R6::R6Class(                                               
       theta <- self %.% regions %.% infection_flow_matrix
 
       # Count population in regions
-      N_regions <- full_population |>                                                                                   # nolint: object_name_linter
+      N_region <- full_population |>                                                                                   # nolint: object_name_linter
         dplyr::summarise(
           "population" = sum(.data$population),
           .by = "region"
         ) |>
         tibble::deframe()
 
-      N_regions <- matrix(                                                                                              # nolint: object_name_linter
-        N_regions[colnames(theta)],
+      N_region <- matrix(                                                                                              # nolint: object_name_linter
+        N_region[colnames(theta)],
         ncol = 1,
         dimnames = list(colnames(theta), "N")
       )
 
+      n_region <- N_region / sum(N_region)
+
       # Construct the population-pair normalised mixing matrices
-      theta_norm <- theta * sum(N_regions)^2 / drop(t(N_regions) %*% theta %*% N_regions)
+      theta_norm <- theta / drop(t(n_region) %*% theta %*% n_region)
 
       # Additionally normalise total contact volume between age groups
       # Population by age group and region
@@ -248,7 +250,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       k <- tcrossprod(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
       # Use normalised mixing matrices to "fold" age-specific contact matrices to the full contact matrices
-      c_matrices_full <- purrr::map(c_matrices_age, ~ kronecker(theta_norm, k * .))
+      c_matrices_full <- purrr::map(c_matrices_age, \(c_matrix) kronecker(theta_norm, c_matrix * k))
 
       # Grab the model population
       N_full <- full_population |>                                                                                      # nolint: object_name_linter
