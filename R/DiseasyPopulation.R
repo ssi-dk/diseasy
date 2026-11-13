@@ -324,7 +324,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       # Map to the model groups and convert back from "T" domain to "M" domain
       m_matrices_model <- purrr::map(
         t_matrices_full,
-        ~ (p_reduce %*% . %*% t(p_reduce)) / outer(N_model, rep(1, length(N_model)))
+        ~ (p_reduce %*% . %*% t(p_reduce)) / outer(rep(1, length(N_model)), N_model)
       )
 
       return(m_matrices_model)
