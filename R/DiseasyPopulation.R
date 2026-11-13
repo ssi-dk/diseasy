@@ -250,7 +250,7 @@ DiseasyPopulation <- R6::R6Class(                                               
       k <- tcrossprod(N_age) / (N_age_region %*% theta_norm %*% t(N_age_region))
 
       # Use normalised mixing matrices to "fold" age-specific contact matrices to the full contact matrices
-      c_matrices_full <- purrr::map(c_matrices_age, \(c_matrix) kronecker(theta_norm, c_matrix * k))
+      c_matrices_full <- purrr::map(c_matrices_age, \(c_matrix) kronecker(c_matrix * k, theta_norm))
 
       # Grab the model population
       N_full <- full_population |>                                                                                      # nolint: object_name_linter
