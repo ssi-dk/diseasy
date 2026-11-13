@@ -268,10 +268,6 @@ spatial locations are equally likely to be connected.
 
 We can draw a realisation of such a network from our contact matrices
 ```{r}
-# First we need a implementation of `sample` which does what is says on the tin:
-# - I.e. "sample" from the vector and instead of just "permutating and truncating"
-sample_with_replacement <- \(x, size) x[sample.int(length(x), size, replace = TRUE)]
-
 # Convert T-matrix to long-form data.frame
 one_way_links <- tidyr::expand_grid(
   i_age_group = age_groups,
@@ -289,11 +285,12 @@ one_way_links <- one_way_links |>
   dplyr::group_modify(
     ~ .x |>
       dplyr::mutate(
-        "i" = sample_with_replacement(
+        "i" = sample(
           x = which(
             stringr::str_starts(population, .y$i_age_group)
           ),
-          size = dplyr::n()
+          size = dplyr::n(),
+          replace = TRUE
         )
       )
   )
@@ -304,12 +301,13 @@ one_way_links <- one_way_links |>
   dplyr::group_modify(
     ~ .x |>
       dplyr::mutate(
-        "j" = sample_with_replacement(
+        "j" = sample(
           x = which(
             stringr::str_starts(population, .y$j_age_group) &
               seq_along(population) != .y$i
           ),
-          size = dplyr::n()
+          size = dplyr::n(),
+          replace = TRUE
         )
       )
   )
@@ -568,11 +566,12 @@ one_way_links <- one_way_links |>
       i_sampled <- .x |>
         dplyr::mutate(
           "i_age_group" = .y$i_age_group,
-          "i" = sample_with_replacement(
+          "i" = sample(
             x = which(
               stringr::str_detect(population, .y$i_age_group)
             ),
-            size = dplyr::n()
+            size = dplyr::n(),
+            replace = TRUE
           ),
           "i_lab" = population[.data$i],
           "i_region" = stringr::str_extract(.data$i_lab, "[a-z]")
@@ -624,14 +623,15 @@ one_way_links <- one_way_links |>
   dplyr::group_modify(
     ~ .x |>
       dplyr::mutate(
-        "j" = sample_with_replacement(
+        "j" = sample(
           x = which(
             stringr::str_detect(
               population,
               stringr::str_replace(.y$j_age_group, stringr::fixed("*"), .y$i_region)
             ) & seq_along(population) != .y$i
           ),
-          size = dplyr::n()
+          size = dplyr::n(),
+          replace = TRUE
         ),
         "j_lab" = population[.data$j],
         "j_region" = stringr::str_extract(.data$j_lab, "[a-z]")
