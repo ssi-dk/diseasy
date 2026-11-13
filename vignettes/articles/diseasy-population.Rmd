@@ -188,7 +188,7 @@ aggregate_contacts <- function(adjacency, population, groups) {
 }
 
 # A printing function which uses dots (...) to print wide and long matrices
-print_truncated <- function(x, n = 4) {
+print_truncated <- function(x, n = 3) {
   nr <- nrow(x)
   nc <- ncol(x)
 
@@ -526,7 +526,7 @@ T_age_indirect <- aggregate_contacts(
   groups = unique(population$age_group)
 )
 
-print(round(T_age_indirect, digits = 1))
+print_truncated(round(T_age_indirect, digits = 1))
 cat("Total contacts: ", sum(T_age_indirect))
 
 # Reference
@@ -744,7 +744,7 @@ T_age_indirect <- aggregate_contacts(
   groups = unique(population$age_group)
 )
 
-print(round(T_age_indirect, digits = 1))
+print_truncated(round(T_age_indirect, digits = 1))
 cat("Total contacts: ", sum(T_age_indirect))
 
 # Reference
@@ -797,8 +797,9 @@ T_age_indirect <- aggregate_contacts(
   groups = unique(population$group)
 )
 
-print(round(T_age_indirect, digits = 1))
+print_truncated(round(T_age_indirect, digits = 1))
 cat("Total contacts: ", sum(T_age_indirect))
+
 # Reference
 print(t_matrix)
 cat("Total contacts: ", sum(t_matrix))
