@@ -233,14 +233,7 @@ age_groups <- unique(stringr::str_replace(population, "[a-z]", "*"))
 print(lengths(split(population, factor(population))[unique(population)]))
 ```
 
-with age-specific per-capita contact rates ("C" domain) of:
-```{r}
-c_matrix <- outer(1 / seq_along(age_groups), 1 / seq_along(age_groups))^2
-dimnames(c_matrix) <- list(age_groups, age_groups)
-print(round(c_matrix, digits = 2))
-```
-
-... and age-specific mean contact rates ("M" domain) of:
+Assuming age-specific total contacts ("T" domain - see `vignette("diseasy-activity")` for more details):
 ```{r}
 N_age <- lengths(
   split(
@@ -249,14 +242,23 @@ N_age <- lengths(
   )
 )
 
-m_matrix <- c_matrix * outer(N_age, rep(1, length(N_age)))
-print(m_matrix)
+t_matrix <- round(
+ outer(1.5 / seq_along(age_groups), 1.5 / seq_along(age_groups))^1.25 * N_age %*% t(N_age)
+)
+
+print(t_matrix)
 ```
 
-.. and corresponding total contacts ("T" domain):
+... and age-specific mean contact rates ("M" domain) of:
 ```{r}
-t_matrix <- round(c_matrix * tcrossprod(N_age))
-print(t_matrix)
+m_matrix <- t_matrix / outer(rep(1, length(N_age)), N_age)
+print(round(m_matrix, digits = 2))
+```
+
+.. and corresponding per-capita contact rates ("C" domain) of:
+```{r}
+c_matrix <- t_matrix / N_age %*% t(N_age)
+print(round(c_matrix, digits = 2))
 ```
 
 ## A well-mixed example
@@ -381,6 +383,7 @@ cat("Total contacts: ", sum(T_age))
 
 # Reference
 print(t_matrix)
+cat("Total contacts: ", sum(t_matrix))
 ```
 
 Let's see if we can achieve these same contacts without explicitly generating the network.
@@ -531,10 +534,11 @@ T_age_indirect <- aggregate_contacts(
 )
 
 print(round(T_age_indirect, digits = 1))
-cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
+cat("Total contacts: ", sum(T_age_indirect))
 
 # Reference
 print(t_matrix)
+cat("Total contacts: ", sum(t_matrix))
 ```
 
 ## A silo example
@@ -701,6 +705,7 @@ cat("Total contacts: ", sum(T_age))
 
 # Reference
 print(t_matrix)
+cat("Total contacts: ", sum(t_matrix))
 ```
 
 
@@ -742,10 +747,11 @@ T_age_indirect <- aggregate_contacts(
 )
 
 print(round(T_age_indirect, digits = 1))
-cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
+cat("Total contacts: ", sum(T_age_indirect))
 
 # Reference
 print(t_matrix)
+cat("Total contacts: ", sum(t_matrix))
 ```
 
 ## A mixture example
@@ -794,10 +800,10 @@ T_age_indirect <- aggregate_contacts(
 )
 
 print(round(T_age_indirect, digits = 1))
-cat("Total contacts: ", round(sum(T_age_indirect), digits = 1))
-
+cat("Total contacts: ", sum(T_age_indirect))
 # Reference
 print(t_matrix)
+cat("Total contacts: ", sum(t_matrix))
 ```
 
 ```{r cleanup, include = FALSE}
