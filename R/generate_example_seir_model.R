@@ -11,6 +11,8 @@
 #'   model_modified <- generate_example_seir_model(
 #'     parameter_overrides = list("season.scale" = 0.25)
 #'   )
+#'
+#'   model_modified$parameters
 #' @export
 generate_example_seir_model <- function(
   module_overrides = list(),
@@ -73,7 +75,7 @@ generate_example_seir_model <- function(
   }
 
 
-  parameters <- utils::modifyList(
+  parameters <- implicit_nested_list(
     list(
       "compartment_structure" = c(
         "E" = 2L,
@@ -84,10 +86,16 @@ generate_example_seir_model <- function(
       "disease_progression_rates" = c(
         "E" = 1 / 2.1,
         "I" = 1 / 4.5
-      )
-    ),
-    parameter_overrides
-  )
+      ),
+      "season.scale" = NULL,
+      "season.peak" = NULL
+    )
+  ) |>
+    unclass() |>
+    utils::modifyList(
+      unclass(implicit_nested_list(parameter_overrides)),
+      keep.null = TRUE
+    )
 
   model <- DiseasyModelOdeSeir$new(
     activity = modules$activity,
@@ -96,7 +104,7 @@ generate_example_seir_model <- function(
     season = modules$season,
     observables = modules$observables,
     population = modules$population,
-    parameters = parameters
+    parameters = implicit_nested_list(parameters)
   )
 
   return(model)

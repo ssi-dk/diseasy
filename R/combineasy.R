@@ -113,8 +113,7 @@ combineasy <- function(model_templates, modules = NULL, parameters = NULL) {
             model <- model$clone()
 
             # Then load each module in turn
-            params <- parameters[parameter_combination, ]
-            purrr::walk2(params, names(params), \(p, np) model$.__enclos_env__$private$.parameters[np] <- p)
+            model$update_parameters(purrr::map(parameters[parameter_combination, ], \(value) value[[1]]))
 
             # Then return the model
             model

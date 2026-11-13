@@ -79,7 +79,7 @@ model <- DiseasyModelG0$new(
   parameters = list("season.scale" = 0.5)
 )
 print(model$parameters) # "peak" value is still copied
-print(attr(model$season$model, "dots"))
+print(attr(model$season$model_t, "dots"))
 ```
 
 # Marking parameters for optimisation
@@ -96,7 +96,7 @@ model <- DiseasyModelG0$new(
   season = season,
   parameters = list("season.scale" = NA) # Mark for optimisation
 )
-print(model$parameters[["season.scale"]])
+print(model$parameters$season$scale)
 ```
 
 The starting point for optimisation and the parameter range of optimisation can
@@ -118,7 +118,7 @@ model <- DiseasyModelG0$new(
     )
   )
 )
-print(model$parameters[["season.scale"]])
+print(model$parameters$season$scale)
 ```
 
 # Updating parameters
@@ -131,7 +131,7 @@ model <- DiseasyModelG0$new(
   season = season,
   parameters = list("season.scale" = 0.25)
 )
-print(model$parameters["season.scale"])
+print(model$parameters$season)
 ```
 
 But the parameters can also be modified after initialisation via the
@@ -139,7 +139,7 @@ But the parameters can also be modified after initialisation via the
 
 ```{r DiseasyModelG0 - parameters in update_parameters}
 model$update_parameters(list("season.scale" = 0.7))
-print(model$parameters["season.scale"])
+print(model$parameters$season)
 ```
 
 
@@ -212,40 +212,63 @@ observables$define_synthetic_observable("incidence", mapping)
 
 # Generate a modified model of the "true" generating model
 # with a specified "testing" window
-model <- generate_example_seir_model(
+model_baseline <- generate_example_seir_model(
   module_overrides = list(
     "observables" = observables
   ),
   parameter_overrides = list(
-    "training_length" = c("training" = 21, "testing" = 7, "validation" = 0)
+    "training_length" = c("training" = Inf, "testing" = 7, "validation" = 0)
   )
 )
+
+# The default model does not currently include the scoring module, so we
+# manually load
+model_baseline$load_module(scoring)
+
+model_1 <- model_baseline$clone()
+model_2 <- model_baseline$clone()
 ```
 
 We can see the prediction using the default parameters
 ```{r plot before fitting}
-model$plot(observable = "n_infected", prediction_length = 14)
+model_1$plot(observable = "n_infected", prediction_length = 14)
 ```
 
-```{r fitting}
-# The default model does not currently include the scoring module, so we
-# manually load
-model$load_module(scoring)
-
+```{r fitting - overall_infection_risk}
 # Mark the overall infection risk for fitting
-model$update_parameters(list("overall_infection_risk" = NA))
+model_1$update_parameters(
+  list("overall_infection_risk" = set_attributes(NA, list("default" = 0.025)))
+)
 
 # Estimate free parameters
-model$fit(observable = "n_infected")
+model_1$fit(observable = "n_infected")
 
 # Show estimated parameters
-model$parameters["overall_infection_risk"]
+model_1$parameters["overall_infection_risk"]
 ```
 
-```{r plot after fitting}
-model$plot(observable = "n_infected", prediction_length = 14)
+```{r plot after fitting - overall_infection_risk}
+model_1$plot(observable = "n_infected", prediction_length = 14)
+```
+
+```{r fitting - disease_progression_rates}
+# Mark the overall infection risk for fitting
+model_2$update_parameters(
+  list("disease_progression_rates.E" = set_attributes(NA, list("default" = 1 / 2.1)))
+)
+
+# Estimate free parameters
+model_2$fit(observable = "n_infected")
+
+# Show estimated parameters
+model_2$parameters["disease_progression_rates"]
+```
+
+```{r plot after fitting - disease_progression_rates}
+model_2$plot(observable = "n_infected", prediction_length = 14)
 ```
 
 ```{r cleanup, include = FALSE}
+rm(model_baseline, model_1, model_2)
 gc()
 ```
