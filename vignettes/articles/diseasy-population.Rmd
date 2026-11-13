@@ -140,8 +140,8 @@ adjacency_graph <- function(adjacency) {
     diag = FALSE
   )
 
-  region <- stringr::str_extract(population, r"{\w+$}")
-  age <- stringr::str_extract(population, r"{^\w+}")
+  region <- stringr::str_extract(population$group, r"{\w+$}")
+  age <- stringr::str_extract(population$group, r"{^\w+}")
 
   layout <- cbind(
     x = as.numeric(factor(region)),
@@ -159,7 +159,7 @@ adjacency_graph <- function(adjacency) {
     layout = layout,
     vertex.color = factor(region),
     vertex.shape = "circle",
-    vertex.label = population,
+    vertex.label = population$group,
     vertex.size = 30
   )
 }
@@ -221,26 +221,33 @@ begin by considering some toy-examples with a toy population of age groups ("A",
 regions ("x", "y", "z", "w").
 
 ```{r}
-population <- c(
-  rep("A/x", 3), rep("B/x", 2), rep("C/x", 1),
-  rep("A/y", 1), rep("B/y", 2), rep("C/y", 3),
-  rep("A/z", 1), rep("B/z", 1), rep("C/z", 1),
-  rep("A/w", 1), rep("B/w", 2), rep("C/w", 1)
+population <- tibble::tibble(
+  "group" = c(
+    rep("A/x", 3), rep("B/x", 2), rep("C/x", 1),
+    rep("A/y", 1), rep("B/y", 2), rep("C/y", 3),
+    rep("A/z", 1), rep("B/z", 1), rep("C/z", 1),
+    rep("A/w", 1), rep("B/w", 2), rep("C/w", 1)
+  )
+) |> tidyr::separate_wider_delim(
+  cols = "group", delim = "/", names = c("age_group", "region"), cols_remove = FALSE
 )
-regions <- unique(stringr::str_replace(population, "[A-Z]", "*"))
-age_groups <- unique(stringr::str_replace(population, "[a-z]", "*"))
+age_groups <- unique(population$age_group)
+regions <- unique(population$region)
 
-print(lengths(split(population, factor(population))[unique(population)]))
+# Store as factors
+population <- population |>
+  dplyr::mutate(
+    "age_group" = factor(.data$age_group, levels = age_groups),
+    "region" = factor(.data$region, levels = regions),
+    "group" = factor(.data$group, levels = unique(.data$group))
+  )
+
+table(population$group)
 ```
 
 Assuming age-specific total contacts ("T" domain - see `vignette("diseasy-activity")` for more details):
 ```{r}
-N_age <- lengths(
-  split(
-    stringr::str_extract(population, "[A-Z]"),
-    factor(stringr::str_extract(population, "[A-Z]"))
-  )
-)
+N_age <- stats::xtabs(~ age_group, data = population)
 
 t_matrix <- round(
  outer(1.5 / seq_along(age_groups), 1.5 / seq_along(age_groups))^1.25 * N_age %*% t(N_age)
@@ -290,7 +297,7 @@ We can draw a realisation of such a network from our contact matrices
         dplyr::mutate(
           "i" = sample(
             x = which(
-              stringr::str_starts(population, .y$i_age_group)
+              stringr::str_starts(population$group, .y$i_age_group)
             ),
             size = dplyr::n(),
             replace = TRUE
@@ -306,8 +313,8 @@ We can draw a realisation of such a network from our contact matrices
         dplyr::mutate(
           "j" = sample(
             x = which(
-              stringr::str_starts(population, .y$j_age_group) &
-                seq_along(population) != .y$i
+              stringr::str_starts(population$group, .y$j_age_group) &
+                seq_along(population$group) != .y$i
             ),
             size = dplyr::n(),
             replace = TRUE
@@ -330,8 +337,8 @@ We can draw a realisation of such a network from our contact matrices
       i = one_way_links$i_u,
       j = one_way_links$j_u,
       x = one_way_links$n,
-      dims = c(length(population), length(population)),
-      dimnames = list(population, population)
+      dims = c(nrow(population), nrow(population)),
+      dimnames = list(population$group, population$group)
     )
   )
 
@@ -352,8 +359,8 @@ Number of contacts stratified by age group and region (with population size in p
 ```{r}
 T_age_region <- aggregate_contacts(
   adjacency = adjacency_sw,
-  population = population,
-  groups = population # No aggregation
+  population = population$group,
+  groups = population$group # No aggregation
 )
 
 print_truncated(T_age_region)
@@ -364,8 +371,8 @@ Stratify only by region:
 ```{r}
 T_region <- aggregate_contacts(
   adjacency = adjacency_sw,
-  population = population,
-  groups = stringr::str_replace(population, r"{[A-Z]}", "*")
+  population = population$group,
+  groups = population$region
 )
 
 print(T_region)
@@ -376,8 +383,8 @@ Stratify only by age group (and compare with input used to generate the adjacenc
 ```{r}
 T_age <- aggregate_contacts(
   adjacency = adjacency_sw,
-  population = population,
-  groups = stringr::str_replace(population, r"{[a-z]}", "*")
+  population = population$group,
+  groups = population$age_group
 )
 
 print(T_age)
@@ -480,26 +487,13 @@ which preserves the age-specific contact volume when aggregating across the regi
 
 Let's see that computation in practice:
 ```{r}
-N_age_region <- matrix(
-  lengths(split(population, factor(population)))[unique(population)],
-  ncol = length(regions),
-  dimnames = list(unique(stringr::str_replace(population, "[a-z]", "*")), regions)
-)
+N_age_region <- stats::xtabs(~ age_group + region, data = population)
 
 print(N_age_region)
 ```
 
 ```{r}
-N_region <- matrix(
-  lengths(
-    split(
-      stringr::str_replace(population, "[A-Z]", "*"),
-      factor(stringr::str_replace(population, "[A-Z]", "*"))
-    )[unique(stringr::str_replace(population, "[A-Z]", "*"))]
-  ),
-  ncol = 1,
-  dimnames = list(regions, "n")
-)
+N_region <- stats::xtabs(~ region, data = population)
 n_region <- N_region / sum(N_region)
 
 print(n_region)
@@ -513,16 +507,13 @@ tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
 k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
 
 c_matrix_full_sw <- kronecker(tm_norm, cm * k)
-dimnames(c_matrix_full_sw) <- list(unique(population), unique(population))
+dimnames(c_matrix_full_sw) <- list(unique(population$group), unique(population$group))
 print_truncated(round(c_matrix_full_sw, digits = 1))
 ```
 
 The per-capita contact matrix can then be cast to the number of contacts ("T" domain).
 ```{r}
-N <- matrix(
-  lengths(split(population, factor(population))[unique(population)]),
-  ncol = 1
-)
+N <- as.matrix(table(population$group))
 
 t_matrix_full_sw <- c_matrix_full_sw * tcrossprod(N)
 print_truncated(round(t_matrix_full_sw, digits = 1))
@@ -531,8 +522,8 @@ Finally, we can aggregate the raw contact matrix in the same groups as the origi
 ```{r}
 T_age_indirect <- aggregate_contacts(
   t_matrix_full_sw,
-  population = unique(population),
-  groups = stringr::str_replace(unique(population), r"{[a-z]}", "*")
+  population = unique(population$group),
+  groups = unique(population$age_group)
 )
 
 print(round(T_age_indirect, digits = 1))
@@ -574,12 +565,12 @@ We can draw a realisation of such a network from our contact matrices
             "i_age_group" = .y$i_age_group,
             "i" = sample(
               x = which(
-                stringr::str_detect(population, .y$i_age_group)
+                stringr::str_detect(population$group, .y$i_age_group)
               ),
               size = dplyr::n(),
               replace = TRUE
             ),
-            "i_lab" = population[.data$i],
+            "i_lab" = population$group[.data$i],
             "i_region" = stringr::str_extract(.data$i_lab, "[a-z]")
           )
 
@@ -591,9 +582,9 @@ We can draw a realisation of such a network from our contact matrices
               \(j_age_group, i_region, i) {
                 any(
                   stringr::str_detect(
-                    population,
+                    population$group,
                     stringr::str_replace(j_age_group, stringr::fixed("*"), i_region)
-                  ) & seq_along(population) != i
+                  ) & seq_along(population$group) != i
                 )
               }
             )
@@ -632,14 +623,14 @@ We can draw a realisation of such a network from our contact matrices
           "j" = sample(
             x = which(
               stringr::str_detect(
-                population,
+                population$group,
                 stringr::str_replace(.y$j_age_group, stringr::fixed("*"), .y$i_region)
-              ) & seq_along(population) != .y$i
+              ) & seq_along(population$group) != .y$i
             ),
             size = dplyr::n(),
             replace = TRUE
           ),
-          "j_lab" = population[.data$j],
+          "j_lab" = population$group[.data$j],
           "j_region" = stringr::str_extract(.data$j_lab, "[a-z]")
         )
     )
@@ -659,8 +650,8 @@ We can draw a realisation of such a network from our contact matrices
       i = one_way_links$i_u,
       j = one_way_links$j_u,
       x = one_way_links$n,
-      dims = c(length(population), length(population)),
-      dimnames = list(population, population)
+      dims = c(nrow(population), nrow(population)),
+      dimnames = list(population$group, population$group)
     )
   )
 
@@ -679,8 +670,8 @@ Number of contacts stratified by age group and region
 ```{r}
 T_age_region <- aggregate_contacts(
   adjacency = adjacency_silo,
-  population = population,
-  groups = population # No aggregation
+  population = population$group,
+  groups = population$group # No aggregation
 )
 
 print_truncated(T_age_region)
@@ -691,8 +682,8 @@ Stratify only by region
 ```{r}
 T_region <- aggregate_contacts(
   adjacency = adjacency_silo,
-  population = population,
-  groups = stringr::str_replace(population, r"{[A-Z]}", "*")
+  population = population$group,
+  groups = stringr::str_replace(population$group, r"{[A-Z]}", "*")
 )
 
 print(T_region)
@@ -703,8 +694,8 @@ Stratify only by age group
 ```{r}
 T_age <- aggregate_contacts(
   adjacency = adjacency_silo,
-  population = population,
-  groups = stringr::str_replace(population, r"{[a-z]}", "*")
+  population = population$group,
+  groups = stringr::str_replace(population$group, r"{[a-z]}", "*")
 )
 
 print(T_age)
@@ -737,7 +728,7 @@ tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
 k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
 
 c_matrix_full_silo <- kronecker(tm_norm, cm * k)
-dimnames(c_matrix_full_silo) <- list(unique(population), unique(population))
+dimnames(c_matrix_full_silo) <- list(unique(population$group), unique(population$group))
 print_truncated(round(c_matrix_full_silo, digits = 1))
 ```
 
@@ -749,8 +740,8 @@ print_truncated(round(t_matrix_full_silo, digits = 1))
 ```{r}
 T_age_indirect <- aggregate_contacts(
   t_matrix_full_silo,
-  population = unique(population),
-  groups = stringr::str_replace(unique(population), r"{[a-z]}", "*")
+  population = unique(population$group),
+  groups = unique(population$age_group)
 )
 
 print(round(T_age_indirect, digits = 1))
@@ -790,7 +781,7 @@ tm_norm <- tm / drop(t(n_region) %*% tm %*% n_region)
 k <- tcrossprod(N_age) / (N_age_region %*% tm_norm %*% t(N_age_region))
 
 c_matrix_full_mix <- kronecker(tm_norm, cm * k)
-dimnames(c_matrix_full_mix) <- list(unique(population), unique(population))
+dimnames(c_matrix_full_mix) <- list(unique(population$group), unique(population$group))
 print_truncated(round(c_matrix_full_mix, digits = 1))
 ```
 
@@ -802,8 +793,8 @@ print_truncated(round(t_matrix_full_mix, digits = 1))
 ```{r}
 T_age_indirect <- aggregate_contacts(
   t_matrix_full_mix,
-  population = unique(population),
-  groups = stringr::str_replace(unique(population), r"{[a-z]}", "*")
+  population = unique(population$group),
+  groups = unique(population$group)
 )
 
 print(round(T_age_indirect, digits = 1))
