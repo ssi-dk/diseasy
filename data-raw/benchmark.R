@@ -171,49 +171,49 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
           output_dir <- file.path(root, "inst", "extdata")
           dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-          # for (combination in combinations) {
-          #   combination_label <- paste(combination, collapse = "+")
+          for (combination in combinations) {
+            combination_label <- paste(combination, collapse = "+")
 
-          #   message("Benchmarking ", version_label, ": ", combination_label)
+            message("Benchmarking ", version_label, ": ", combination_label)
 
-          #   timing <- microbenchmark::microbenchmark(
-          #     res <- model$fit(observable = "n_infected"),                                                              # nolint: implicit_assignment_linter
-          #     times = 5,
-          #     setup = {
-          #       model <- make_model(combination)
-          #     }
-          #   ) |>
-          #     add_metadata(
-          #       benchmark_function = "DiseasyModelOdeSeir$fit()",
-          #       combination_label = combination_label,
-          #       optimiser_output = res
-          #     )
+            timing <- microbenchmark::microbenchmark(
+              res <- model$fit(observable = "n_infected"),                                                              # nolint: implicit_assignment_linter
+              times = 5,
+              setup = {
+                model <- make_model(combination)
+              }
+            ) |>
+              add_metadata(
+                benchmark_function = "DiseasyModelOdeSeir$fit()",
+                combination_label = combination_label,
+                optimiser_output = res
+              )
 
-          #   saveRDS(
-          #     timing,
-          #     file.path(
-          #       output_dir,
-          #       paste0("benchmark-DiseasyModelOdeSeir_",  combination_label, "_", backend, "_", version, ".rds")
-          #     )
-          #   )
+            saveRDS(
+              timing,
+              file.path(
+                output_dir,
+                paste0("benchmark-DiseasyModelOdeSeir_",  combination_label, "_", backend, "_", version, ".rds")
+              )
+            )
 
-          #   DBI::dbDisconnect(conn)
-          #   message("  Completed benchmark")
-          # }
+            DBI::dbDisconnect(conn)
+            message("  Completed benchmark")
+          }
 
           # Profiling is done for the max number of free parameters
           combination <- combinations[[which.max(lengths(combinations))]]
           message("Profiling ", version_label, ": ", paste(combination, collapse = "+"))
           conns <- suppressMessages(get_test_conns())
           conn <- conns[[1]]
-          # model <- make_model(combination)
+          model <- make_model(combination)
 
-          # prefix <- paste0("fit_", combination_label, "_", backend, "_", version)
-          # rprof_file <- file.path(output_dir, paste0(prefix, ".Rprof"))
+          prefix <- paste0("fit_", combination_label, "_", backend, "_", version)
+          rprof_file <- file.path(output_dir, paste0(prefix, ".Rprof"))
 
-          # utils::Rprof(filename = rprof_file, interval = 0.01)
-          # model$fit(observable = "n_infected")
-          # utils::Rprof(NULL)
+          utils::Rprof(filename = rprof_file, interval = 0.01)
+          model$fit(observable = "n_infected")
+          utils::Rprof(NULL)
 
           # Also do detailed profiling of time spent.
           model <- make_model(combination)
