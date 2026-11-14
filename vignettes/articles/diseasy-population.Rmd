@@ -855,7 +855,7 @@ print(mixing_mix)
 
 
 Then we implement a `?DiseasyActivity` module with the contacts
-(which requires some finessing)
+(which requires some additional configuration).
 
 ```{r diseasy-implementation activity}
 mean_contacts_per_person <- matrix(
