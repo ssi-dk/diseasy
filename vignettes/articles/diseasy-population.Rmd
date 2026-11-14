@@ -951,6 +951,18 @@ print(number_of_contacts)
 cat("Total contacts: ", sum(t_matrix))
 ```
 
+```{r configuration test, include = FALSE}
+# This code block is used as a sanity check that the matrix transformations
+# work as expected. When the transformations works, we should be able to
+# exactly match the example.
+# - when not, we get informed by an error
+stopifnot(
+  "`DiseasyPopulation` output did not match the example" = {
+    purrr::every(number_of_contacts, ~ abs(. - sum(t_matrix)) < 1e-6)
+  }
+)
+```
+
 ```{r cleanup, include = FALSE}
 rm(
   regions,
