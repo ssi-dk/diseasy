@@ -1657,7 +1657,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_names(
         names(parameters %.% disease_progression_rates),
         subset.of = c("E", "I"),
-        must.include = "I",
+        must.include = names(purrr::keep(purrr::keep_at(parameters %.% compartment_structure, c("E", "I")), ~ . > 0L)),
         add = coll
       )
 
@@ -1689,6 +1689,53 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::reportAssertions(coll)
 
       super$validate_parameters(parameters) # Validate inherited parameters
+    },
+
+    # @description
+    #  Impute partial input parameters with the current parameters where needed
+    # @param parameters (`named list()`)\cr
+    #   The (potential) partial set of parameters to impute.
+    # @param current_parameters (`named list()`)\cr
+    #   The complete set of current parameters
+    impute_inpute_parameters = function(parameters, current_parameters) {
+
+      # First, we do basic parameter imputing
+      imputed_parameters <- super$impute_inpute_parameters(parameters, current_parameters) |>
+        explicit_nested_list()
+
+      # For `DiseasyModelOdeSeir` we need special handling of some parameters when imputing
+
+      # First we cast the input parameters as a nested list
+      parameters <- explicit_nested_list(parameters)
+
+      # We need special handling of the compartment structure to just copy the user input
+      # instead of imputing.
+      # If the user specifies `compartment_structure = c("I" = I, "R" = R)`, then
+      # we need to make sure we DO NOT impute the default value for "E" = 1.
+      # Basic parameter imputing has given us: `compartment_structure = c("E" = 1, "I" = I, "R" = R)`
+      # so we overwrite the current impute with the user supplied values
+      if ("compartment_structure" %in% names(parameters)) {
+        imputed_parameters$compartment_structure <- parameters %.% compartment_structure
+      }
+
+      # We need special handling of disease_progression_rates where rates should
+      # be dropped the compartment_structure is configured to have zero elements
+      # Basic imputing will insert values for "E" or "I" even
+      # if `compartment_structure = c("E" = 0L, "I" = 0L)`
+      # so we remove progression rates that can never be reached.
+      if ("disease_progression_rates" %in% names(parameters)) {
+        non_zero_compartments <- imputed_parameters$compartment_structure |>
+          purrr::pluck(.default = current_parameters %.% compartment_structure) |>
+          purrr::keep(~ . > 0L) |>
+          names()
+
+        imputed_parameters$disease_progression_rates <- purrr::keep_at(
+          imputed_parameters %.% disease_progression_rates,
+          non_zero_compartments
+        )
+      }
+
+      return(imputed_parameters)
     },
 
     progression_flow_rates = NULL,

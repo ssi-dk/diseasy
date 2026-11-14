@@ -29,5 +29,7 @@ Generate variants of the example model (used to create data for \code{?Diseasyst
   model_modified <- generate_example_seir_model(
     parameter_overrides = list("season.scale" = 0.25)
   )
+
+  model_modified$parameters
 \dontshow{\}) # examplesIf}
 }

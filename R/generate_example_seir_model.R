@@ -11,6 +11,8 @@
 #'   model_modified <- generate_example_seir_model(
 #'     parameter_overrides = list("season.scale" = 0.25)
 #'   )
+#'
+#'   model_modified$parameters
 #' @export
 generate_example_seir_model <- function(
   module_overrides = list(),

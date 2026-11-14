@@ -186,16 +186,7 @@ DiseasyModel <- R6::R6Class(                                                    
       current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters())
 
       # If the incomming parameters are partial, impute with all parameters at given levels
-      imputed_parameters <- current_parameters |>
-        purrr::keep_at(stringr::str_remove(names(parameters), r"{[.]\w+$}")) |>  # Get current parameters at given level
-        implicit_nested_list() |> # Convert to 1D representation
-        unclass() |> # Unclass to remove virtualisation temporarily
-        utils::modifyList(
-          purrr::pluck(
-            unclass(implicit_nested_list(parameters)), # Insert new values
-            .default = list() # Default to list() if no parameters are given
-          )
-        )
+      imputed_parameters <- private$impute_inpute_parameters(parameters, current_parameters)
 
       # Ensure parameters are an implicit nested list
       current_parameters <- implicit_nested_list(current_parameters)
@@ -416,7 +407,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #'   }
     #'
     #'   # Show estimated parameters
-    #'   model$parameters$season.scale
+    #'   model$parameters$season
     #' @return `r rd_side_effects`
     fit = function(observable, stratification = NULL, ...) {
       checkmate::assert_number(self %.% parameters %.% training_length %.% testing, lower = 1)
@@ -768,6 +759,36 @@ DiseasyModel <- R6::R6Class(                                                    
         add = coll
       )
       checkmate::reportAssertions(coll)
+    },
+
+    # @description
+    #  Impute partial input parameters with the current parameters where needed
+    # @param parameters (`named list()`)\cr
+    #   The (potential) partial set of parameters to impute.
+    # @param current_parameters (`named list()`)\cr
+    #   The complete set of current parameters
+    impute_inpute_parameters = function(parameters, current_parameters) {
+
+      # Say a model takes a vectorised parameter "season" = list("scale" = 1, "peak" = 1)
+      # then the user may end up providing a parameter update for "season.scale" which
+      # should modify "scale" but keep "peak" untouched.
+      # Therefore we need to "impute" the given parameters to contain the existing "peak"
+      # value before updating the parameters.
+      # Otherwise we end up deleting the "peak" argument
+
+      imputed_parameters <- current_parameters |>
+        purrr::keep_at(stringr::str_remove(names(parameters), r"{[.]\w+$}")) |>  # Get current parameters at given level
+        implicit_nested_list() |> # Convert to 1D representation
+        unclass() |> # Unclass to remove virtualisation temporarily
+        utils::modifyList(
+          purrr::pluck(
+            unclass(implicit_nested_list(parameters)), # Insert new values
+            .default = list() # Default to list() if no parameters are given
+          ),
+          keep.null = TRUE
+        )
+
+      return(imputed_parameters)
     },
 
     # @param label (`character`)\cr

@@ -254,7 +254,7 @@ model_1$plot(observable = "n_infected", prediction_length = 14)
 ```{r fitting - disease_progression_rates}
 # Mark the overall infection risk for fitting
 model_2$update_parameters(
-  list("disease_progression_rates.E" = set_attributes(NA, list("default" = 1/2.1)))
+  list("disease_progression_rates.E" = set_attributes(NA, list("default" = 1 / 2.1)))
 )
 
 # Estimate free parameters
