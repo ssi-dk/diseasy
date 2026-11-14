@@ -249,11 +249,9 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Detect changed dependencies
       dependency_hashes <- purrr::map_chr(private$get_loaded_modules(), ~ .x$hash)
       changed_dependencies <- changed_list_elements(
-        previous = private$prepared_dependencies,
+        previous = private %.% prepared_dependencies,
         current = as.list(dependency_hashes)
       )
-      changed_dependencies <- changed_list_elements(dependency_hashes, prepared_dependencies)
-
 
       # Determine whether the structure needs rebuilding
       structure_changed <- any("compartment_structure" %in% changed_parameters) ||
@@ -525,7 +523,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
             )
           }
         ) |>
-        purrr::reduce(c, .init = c(immunity_rates, 0), .dir = "backward") # Last R state is absorbing
+        purrr::reduce(c, .init = c(private %.% immunity_rates, 0), .dir = "backward") # Last R state is absorbing
 
 
       # Above, we have the progression rate for each "track" in the model
@@ -1581,7 +1579,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # Store the configuration in `prepare_rhs()`
     prepared_parameters = NULL,
-    prepared_dependencies = NULL,
+    prepared_dependencies = list(),
     immunity_rates = NULL,
 
 
