@@ -488,7 +488,7 @@ test_that("`mean_contact_rates()` preserves the total number of contacts", {
   expect_equal(
     sd(number_of_contacts) / mean(number_of_contacts),
     0,
-    tolerance = 5e-3
+    tolerance = 5e-8
   )
 
 })
