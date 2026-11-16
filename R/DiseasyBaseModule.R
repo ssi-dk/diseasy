@@ -160,30 +160,12 @@ DiseasyBaseModule <- R6::R6Class(                                               
       .f = active_binding,
       name = "hash",
       expr = {
-        # Capture module environment (parent of this environment)
-        public_names <- ls(self) # public (fields and functions)
-        public_names <- public_names[public_names != "hash"] # avoid recursion
-        public_env <- public_names |>
-          purrr::map(~ {
-            # Some of the active bindings return informative errors when a module is
-            # not fully configured. This should not stop the hashing process, so we capture the
-            # errors and hash these instead
-            tryCatch(purrr::pluck(self, .), error = function(e) e)
-          })
-        names(public_env) <- public_names
-
-        # Iteratively map the public environment to hashes
-        hash_list <- hash_environment(public_env)
-
-        # Add the class name to "salt" the hashes
-        hash_list <- c(hash_list, class = class(self)[1])
-
-        # Reduce to single hash and return
-        hash <- withr::with_locale(
-          new = c("LC_COLLATE" = "C"), # Ensure consistent hashing
-          rlang::hash(hash_list[order(names(hash_list))])
+        result <- private$get_module_hash(
+          module = self,
+          seen = new_hash_seen()
         )
-        return(hash)
+
+        return(result$hash)
       }
     )
   ),
@@ -333,6 +315,90 @@ DiseasyBaseModule <- R6::R6Class(                                               
         rlang::hash(hash_list[order(names(hash_list))])
       )
       return(substring(hash, 1, 10))
+    },
+
+
+    get_module_hash = function(module, seen) {
+
+      # Check whether this exact module instance has already been encountered
+      index <- which(vapply(
+        seen$modules,
+        identical,
+        FUN.VALUE = logical(1),
+        y = module
+      ))
+
+      if (length(index) > 0L) {
+
+        index <- index[[1]]
+
+        # Handle circular references
+        if (seen$status[[index]] == "visiting") {
+          return(list(
+            "seen" = seen,
+            "hash" = rlang::hash(list(
+              "cycle" = index,
+              "class" = class(module)
+            ))
+          ))
+        }
+
+        # Reuse the previously calculated hash
+        return(list(
+          "seen" = seen,
+          "hash" = seen$hashes[[index]]
+        ))
+      }
+
+      # Register the module before traversing its contents
+      # This prevents infinite recursion through circular references
+      index <- length(seen$modules) + 1L
+
+      seen$modules[[index]] <- module
+      seen$hashes[[index]] <- NA_character_
+      seen$status[[index]] <- "visiting"
+
+      # Retrieve public fields and methods
+      public_names <- setdiff(ls(module), "hash")
+
+      public_state <- purrr::map(
+        public_names,
+        \(field) {
+          tryCatch(
+            purrr::pluck(module, field),
+            error = function(e) e
+          )
+        }
+      )
+
+      names(public_state) <- public_names
+
+      # Recursively hash the public state, passing the same registry
+      result <- hash_environment(
+        public_state,
+        seen = seen,
+        get_module_hash = private$get_module_hash
+      )
+
+      seen <- result$seen
+
+      # Include the class to distinguish different module types
+      hash <- withr::with_locale(
+        new = c("LC_COLLATE" = "C"),
+        rlang::hash(list(
+          "class" = class(module)[[1]],
+          "state" = result$hash
+        ))
+      )
+
+      # Store the completed hash
+      seen$hashes[[index]] <- hash
+      seen$status[[index]] <- "complete"
+
+      return(list(
+        "seen" = seen,
+        "hash" = hash
+      ))
     },
 
 

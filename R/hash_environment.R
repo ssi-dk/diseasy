@@ -10,9 +10,17 @@
 #'   hash_environment(list(DiseasyActivity))
 #'   hash_environment(list(mtcars, iris))
 #' @export
-hash_environment <- function(environment) {
+hash_environment <- function(
+  environment,
+  seen = NULL,
+  get_module_hash = NULL
+) {
 
   if (checkmate::test_environment(environment)) environment <- as.list(environment)
+
+  if (is.null(seen)) {
+    seen <- new_hash_seen()
+  }
 
   # Helper function to handle calls (e.g. from errors)
   deparse_call <- function(call) {
@@ -28,23 +36,8 @@ hash_environment <- function(environment) {
     return(out)
   }
 
-  # Helper to hash conditions
-  hash_condition <- function(obj) {
-    out <- list(
-      "condition_class" = class(obj),
-      "condition_message" = conditionMessage(obj),
-      "condition_call" = deparse_call(conditionCall(obj)),
-      "condition_fields" = hash_nested_list(purrr::discard_at(unclass(obj), c("message", "call", "trace", "parent")))
-    )
-
-    if (inherits(unclass(obj)$parent, "condition")) {
-      out[["condition_parent"]] <- hash_condition(unclass(obj)$parent)
-    }
-  }
-
-
-  # Create helper function to recursively dive into a list and hash function elements
-  hash_nested_list <- function(obj) {
+  # Helper to hash atomic elements
+  hash_nested_leaf <- function(obj) {
 
     # By default we strip attributes
     copy_attributes <- FALSE
@@ -53,12 +46,28 @@ hash_environment <- function(environment) {
 
       # Conditions are list-like, but their call, trace and parent can carry
       # unstable state. Hash a normalized representation instead.
-      out <- hash_condition(obj)
+      if (inherits(obj, "condition")) {
 
-    } else if (checkmate::test_list(obj)) {
+        condition_fields <- purrr::discard_at(
+          unclass(obj),
+          c("message", "call", "trace")
+        )
 
-      # If it's a list, recursively hash
-      out <- purrr::map(obj, hash_nested_list)
+        result <- hash_nested_list(
+          condition_fields,
+          seen
+        )
+
+        return(list(
+          "seen" = result$seen,
+          "value" = list(
+            "condition_class" = class(obj),
+            "condition_message" = conditionMessage(obj),
+            "condition_call" = deparse_call(conditionCall(obj)),
+            "condition_fields" = result$value
+          )
+        ))
+      }
 
     } else if (checkmate::test_function(obj)) {
 
@@ -104,10 +113,75 @@ hash_environment <- function(environment) {
     return(out)
   }
 
-  hash_list <- environment |>
-    purrr::map_if(checkmate::test_r6, ~ .$hash) |> # All modules call their hash routines
-    hash_nested_list() |>
-    purrr::map_chr(rlang::hash)
 
-  return(hash_list)
+  # Create helper function to recursively dive into a list and hash function elements
+  hash_nested_list <- function(obj, seen) {
+
+    # Handle R6 modules before handling lists
+    if (checkmate::test_r6(obj)) {
+
+      if (!is.function(get_module_hash)) {
+        stop("`get_module_hash` must be supplied when hashing R6 modules.")
+      }
+
+      result <- get_module_hash(obj, seen)
+
+      return(list(
+        "seen" = result$seen,
+        "value" = list(".module_hash" = result$hash)
+      ))
+    }
+
+    # By default we strip attributes
+    copy_attributes <- FALSE
+
+    if (checkmate::test_list(obj)) {
+
+      out <- vector("list", length(obj))
+      names(out) <- names(obj)
+
+      for (i in seq_along(obj)) {
+
+        result <- hash_nested_list(obj[[i]], seen)
+
+        seen <- result$seen
+        out[[i]] <- result$value
+      }
+
+      return(list(
+        "seen" = seen,
+        "value" = out
+      ))
+    }
+
+    return(list(
+      "seen" = seen,
+      "value" = hash_nested_leaf(obj)
+    ))
+  }
+
+  result <- hash_nested_list(
+    obj = environment,
+    seen = seen
+  )
+
+  seen <- result$seen
+  normalised_environment <- result$value
+
+  return(list(
+    "seen" = seen,
+    "hash" = rlang::hash(normalised_environment)
+  ))
+}
+
+
+new_hash_seen <- function() {
+
+  seen <- new.env(parent = emptyenv())
+
+  seen$modules <- list()
+  seen$hashes <- character()
+  seen$status <- character()
+
+  return(seen)
 }
