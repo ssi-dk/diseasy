@@ -4,7 +4,7 @@
 \alias{hash_environment}
 \title{Holistic hashing of an environment}
 \usage{
-hash_environment(environment)
+hash_environment(environment, seen = NULL, get_module_hash = NULL)
 }
 \arguments{
 \item{environment}{(\code{environment} or \code{list})\cr
