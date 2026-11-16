@@ -908,7 +908,7 @@ population_no_stratification <- DiseasyPopulation$new(
 population_age_stratified <- DiseasyPopulation$new(
   activity = activity,
   regions = regions,
-  age_cuts_lower = c(30, 60)
+  age_cuts_lower = c(0, 30, 60)
 )
 
 population_region_stratified <- DiseasyPopulation$new(
@@ -921,7 +921,7 @@ population_fully_stratified <- DiseasyPopulation$new(
   activity = activity,
   regions = regions,
   regional_stratification = "region",
-  age_cuts_lower = c(30, 60)
+  age_cuts_lower = c(0, 30, 60)
 )
 
 number_of_contacts <- list(
