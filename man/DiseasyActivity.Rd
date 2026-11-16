@@ -87,8 +87,6 @@ A reduced view of the internal state of overall risk multipliers. Read-only.}
     \item \href{#method-DiseasyActivity-get_scenario_activities}{\code{DiseasyActivity$get_scenario_activities()}}
     \item \href{#method-DiseasyActivity-get_scenario_openness}{\code{DiseasyActivity$get_scenario_openness()}}
     \item \href{#method-DiseasyActivity-get_scenario_contacts}{\code{DiseasyActivity$get_scenario_contacts()}}
-    \item \href{#method-DiseasyActivity-map_population}{\code{DiseasyActivity$map_population()}}
-    \item \href{#method-DiseasyActivity-rescale_contacts_to_rates}{\code{DiseasyActivity$rescale_contacts_to_rates()}}
     \item \href{#method-DiseasyActivity-reset_scenario}{\code{DiseasyActivity$reset_scenario()}}
     \item \href{#method-DiseasyActivity-plot}{\code{DiseasyActivity$plot()}}
     \item \href{#method-DiseasyActivity-describe}{\code{DiseasyActivity$describe()}}
@@ -296,13 +294,12 @@ The activity units active in the scenario.
   Return openness [0 ; 1] for all age groups and activities on all dates.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$get_scenario_openness(age_cuts_lower = NULL, weights = NULL)}
+    \preformatted{DiseasyActivity$get_scenario_openness(weights = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done. The weights are normalized before applying.}
     }
     \if{html}{\out{</div>}}
@@ -320,83 +317,18 @@ Returns a list with depth of two: value[[date]][[type]]
   Return contacts across age groups and activities on all dates.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$get_scenario_contacts(age_cuts_lower = NULL, weights = NULL)}
+    \preformatted{DiseasyActivity$get_scenario_contacts(weights = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
     }
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
     If no weights are supplied, a \code{list()} of depth of two: value[[date]][[type]] is returned.
-Map population between age groups
-  }
-}
-
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-map_population"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-map_population}{}}}
-\subsection{\code{DiseasyActivity$map_population()}}{
-  The function computes the proportion of population in the new and old age groups.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$map_population(
-  age_cuts_lower,
-  age_groups_reference = names(self$contact_basis$proportion),
-  demography = self$contact_basis$demography
-)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
-      \item{\code{age_groups_reference}}{(\code{character()})\cr
-Age labels (created by \code{diseasystore::age_labels()} of reference data.}
-      \item{\code{demography}}{(\code{data.frame})\cr
-"A \code{data.frame} with the columns\\cr",
-"  * \code{age} (\code{integer()}) 1-year age groups or \code{age_group} (\code{integer()}) dynamic age groups\\cr",
-"  * \code{population} (\code{numeric()}) size of population in age group\\cr"}
-    }
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Returns}{
-    A \code{data.frame} which maps the age groups from their reference in \code{contact_basis} to
-those supplied to the function.
-Rescale contact matrices to population contact rates
-  }
-}
-
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasyActivity-rescale_contacts_to_rates"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasyActivity-rescale_contacts_to_rates}{}}}
-\subsection{\code{DiseasyActivity$rescale_contacts_to_rates()}}{
-  Re-scale from contacts to rates per individual to fractional population.
-@details
-If the contact matrix is \eqn{\beta_{i,j}} and the population is \eqn{N_j}, then
-this function returns the rescaled elements \eqn{\left(sum_j N_j\right)  \beta_{i,j} / N_j}.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$rescale_contacts_to_rates(input, population)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{input}}{(\verb{matrix array} or \code{list}(\verb{matrix array}))\cr
-Contacts to be re-scaled.}
-      \item{\code{population}}{(\code{numeric})\cr
-Population vector to weight contacts by.
-Must use same age_groups as the contact matrix input.}
-    }
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Returns}{
-    Returns an object with the same structure as the input
   }
 }
 
@@ -423,17 +355,12 @@ NOTE: Called automatically when setting/changing activity units.
   Plot the first set of contact matrices of the scenario as well as the "openness" over time.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{DiseasyActivity$plot(
-  age_cuts_lower = NULL,
-  weights = rep(1, 4),
-  contacts_date = NULL
-)}
+    \preformatted{DiseasyActivity$plot(weights = rep(1, 4), contacts_date = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{age_cuts_lower}}{(\code{integer()})\cr vector of ages defining the lower bound for each age group. If \code{NULL}, age groups of contact_basis is used.}
       \item{\code{weights}}{(\code{numeric(4)})\cr vector of weights for the four types of contacts. If \code{NULL}, no weighting is done.}
       \item{\code{contacts_date}}{(\code{Date(1)})\cr
 The date to plot contact matrix for (default is earliest contact matrix).}
