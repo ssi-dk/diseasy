@@ -11,15 +11,35 @@
 #'   Generate adjacency data between NUTS 3 regions from Meta Social Connectedness
 #'   Index.
 #' @param area `r rd_area("generators")`
+#' @param url (`character(1)`)\cr
+#'   The location of the Meta Social Connectedness Index dataset (zip file).
 #' @return
 #'   `r rd_adjacency("return")`
+#' @details
+#'   The Social Connectedness Index is a relative (symmetric) measure related to
+#'   the likelihood of being friends on Facebook.
+#'   We first normalise per region to determine the geographical distributions
+#'   of Facebook friends for each region (identified by the "from" column)
+#'   If the only activity in the world was visiting (Facebook) friends, which
+#'   would be nice, these probabilities could be interpreted as movement
+#'   adjacency. However, since work and school are still a thing (boo!), we
+#'   will instead impose a infection-flow adjacency by computing
+#'   the quantity: adjacency * t(adjacency). This can be interpreted roughly
+#'   as the probability that a randomly selected friend will also select you back
+#'   in a game of dice.
 #' @examples
 #' \dontrun{
 #' adjacency_meta_nordic <- generate_adjacency_meta(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
 #' @keywords data-generators
 #' @export
-generate_adjacency_meta <- function(area = NULL) {
+generate_adjacency_meta <- function(
+  area = NULL,
+  url = paste0(
+    "https://data.humdata.org/dataset/e9988552-74e4-4ff4-943f-c782ac8bca87/",
+    "resource/b691d1d1-b286-456d-9a23-16e2f2d463cc/download/nuts_2024.zip"
+  )
+) {
   checkmate::assert_character(area, any.missing = FALSE, unique = TRUE, null.ok = TRUE, pattern = r"{[A-Z]{2}}")
 
   missing_packages <- purrr::discard(c("countrycode", "countrycode", "tibble"), rlang::is_installed)
@@ -30,16 +50,7 @@ generate_adjacency_meta <- function(area = NULL) {
     ))
   }
 
-  meta_social_connectedness_zip <- paste0(
-    "https://data.humdata.org/dataset/e9988552-74e4-4ff4-943f-c782ac8bca87/",
-    "resource/b691d1d1-b286-456d-9a23-16e2f2d463cc/download/nuts_2024.zip"
-  )
-
-
-  curl::curl_fetch_disk(
-    meta_social_connectedness_zip,
-    file.path(tempdir(), "meta_social_connectedness.zip")
-  )
+  curl::curl_fetch_disk(url, file.path(tempdir(), "meta_social_connectedness.zip"))
 
   adjacency_meta <- readr::read_csv(
     unz(file.path(tempdir(), "meta_social_connectedness.zip"), "nuts3_2024.csv"),
@@ -80,6 +91,34 @@ generate_adjacency_meta <- function(area = NULL) {
 
   }
 
+  # The Social Connectedness Index is a relative (symmetric) measure related to
+  # the likelihood of being friends on Facebook.
+  # We first normalise per region to determine the geographical distributions
+  # of Facebook friends for each region (identified by the "from" column)
+  # If the only activity in the world was visiting (Facebook) friends, which
+  # would be nice, these probabilities could be interpreted as movement
+  # adjacency. However, since work and school are still a thing (boo!), we
+  # will instead impose a infection-flow adjacency by computing
+  # the quantity: adjacency * t(adjacency). This can be interpreted roughly
+  # as the probability that a randomly selected friend will also select you back
+  # in a game of dice.
+  adjacency_meta <- dplyr::mutate(
+    adjacency_meta,
+    "adjacency" = .data$adjacency / sum(.data$adjacency),
+    .by = "from"
+  )
+
+  adjacency_meta <- dplyr::left_join(
+    adjacency_meta,
+    adjacency_meta,
+    by = c("from" = "to", "to" = "from"),
+    suffix = c("_from", "_to")
+  ) |>
+    dplyr::transmute(
+      .data$from,
+      .data$to,
+      "adjacency" = .data$adjacency_from * .data$adjacency_to
+    )
 
   attr(adjacency_meta, "type") <- "infection-flow"
 
