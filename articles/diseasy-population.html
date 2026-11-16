@@ -131,10 +131,9 @@ model population stratified both spatially and by age groups.</p>
 <p>The first step of defining the model population is to define a
 population of interest.</p>
 <p>For <code>DiseasyPopulation</code>, this is done via
-<code>DiseasyRegions</code>[^1] which handles demography data (see
+<code>DiseasyRegions</code><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Or, as in this case, &lt;code&gt;DiseasyRegionsNuts&lt;/code&gt;
+which is a generalisation of &lt;code&gt;DiseasyRegions&lt;/code&gt;.&lt;/p&gt;"><sup>1</sup></a> which handles demography data (see
 <code>vignette(diseasy-regions)</code> for more details).</p>
-<p>[^1] Or, as in this case, <code>DiseasyRegionsNuts</code> which is a
-generalisation of <code>DiseasyRegions</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regions</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyRegions.html">DiseasyRegionsNuts</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  demography <span class="op">=</span> <span class="va">demography_nordic_nuts3</span>, <span class="co"># Use demography data from EUROSTAT</span></span>
@@ -168,7 +167,7 @@ to configure the age-specific interactions between age groups (contact
 matrices). In <code>diseasy</code>, this is done via the
 <code>DiseasyActivity</code><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;&lt;code&gt;DiseasyActivity&lt;/code&gt; also defines (age-specific)
 changes in societal restrictions if needed for the model – but this is
-not done for this example.&lt;/p&gt;"><sup>1</sup></a>.</p>
+not done for this example.&lt;/p&gt;"><sup>2</sup></a>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">activity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  contact_basis <span class="op">=</span> <span class="va">contact_basis_nordic</span> <span class="op"><a href="https://ssi-dk.github.io/diseasystore/reference/grapes-.-grapes.html">%.%</a></span> <span class="va">DK</span></span>
@@ -203,16 +202,31 @@ at various resolutions to before being passed to the models.</p>
 <code class="sourceCode R"><span><span class="va">population</span><span class="op">$</span><span class="fu">stratify_age</span><span class="op">(</span>age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># and we can inspect the defined demographic groups</span></span>
-<span><span class="va">population</span><span class="op">$</span><span class="va">group</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
+<span><span class="va">population</span><span class="op">$</span><span class="va">model_population</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
+<span><span class="co">#&gt;   age_group region population proportion</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 00-19     All       1<span style="text-decoration: underline;">283</span>332     0.214 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-39     All       1<span style="text-decoration: underline;">568</span>839     0.262 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 40-59     All       1<span style="text-decoration: underline;">510</span>193     0.252 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 60-79     All       1<span style="text-decoration: underline;">291</span>033     0.215 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 80+       All        <span style="text-decoration: underline;">339</span>337     0.056<span style="text-decoration: underline;">6</span></span></span></code></pre></div>
 <p>To stratify by region, we use the
 <code><a href=".{2}/reference/DiseasyPopulation.html#method-DiseasyPopulation-stratify_regions">$stratify_regions()</a></code> method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">population</span><span class="op">$</span><span class="fu">stratify_regions</span><span class="op">(</span>regional_stratification <span class="op">=</span> <span class="st">"NUTS 2"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># .. and we can inspect the updated demographic groups</span></span>
-<span><span class="va">population</span><span class="op">$</span><span class="va">group</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
+<span><span class="va">population</span><span class="op">$</span><span class="va">model_population</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 25 × 4</span></span></span>
+<span><span class="co">#&gt;   age_group region population proportion</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 00-19     DK01       <span style="text-decoration: underline;">410</span>266     0.068<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 00-19     DK02       <span style="text-decoration: underline;">180</span>030     0.030<span style="text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 00-19     DK03       <span style="text-decoration: underline;">266</span>347     0.044<span style="text-decoration: underline;">4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 00-19     DK04       <span style="text-decoration: underline;">303</span>358     0.050<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 00-19     DK05       <span style="text-decoration: underline;">123</span>331     0.020<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 20 more rows</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="populations-outside-the-nordics">Populations outside the Nordics<a class="anchor" aria-label="anchor" href="#populations-outside-the-nordics"></a>
@@ -222,6 +236,940 @@ bundle population data for the Nordic countries.</p>
 <p>To generate data for other regions, see the data generating
 functions: <code><a href="../reference/generate_demography.html">generate_demography()</a></code>,
 <code><a href="../reference/generate_contact_basis.html">generate_contact_basis()</a></code>, etc.</p>
+</div>
+<div class="section level2">
+<h2 id="notes-regional-aggregation-of-contact-matrices">Notes: Regional aggregation of contact matrices<a class="anchor" aria-label="anchor" href="#notes-regional-aggregation-of-contact-matrices"></a>
+</h2>
+<p>The source data for the contact matrices we use in
+<code>diseasy</code> is typically collections of survey data where
+participants have been instructed to count contacts with other
+individuals along with the approximate age of these individuals. These
+survey data are then corrected for differences in demography of the
+participants and the group they are meant to represent (e.g. a given
+country) to form a “full” contact matrix for the target population.</p>
+<p>To gain some intuition on the how these contact matrices can be
+interpreted and manipulated we will begin by considering some
+toy-examples with a toy population of age groups (“A”, “B”, “C”) and
+spatial regions (“x”, “y”, “z”, “w”).</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  <span class="st">"group"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"A/x"</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"B/x"</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"C/x"</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"A/y"</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"B/y"</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"C/y"</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"A/z"</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"B/z"</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"C/z"</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"A/w"</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"B/w"</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"C/w"</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/separate_wider_delim.html" class="external-link">separate_wider_delim</a></span><span class="op">(</span></span>
+<span>  cols <span class="op">=</span> <span class="st">"group"</span>, delim <span class="op">=</span> <span class="st">"/"</span>, names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age_group"</span>, <span class="st">"region"</span><span class="op">)</span>, cols_remove <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">age_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">age_group</span><span class="op">)</span></span>
+<span><span class="va">regions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">region</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Store as factors</span></span>
+<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="va">population</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    <span class="st">"age_group"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">age_group</span>, levels <span class="op">=</span> <span class="va">age_groups</span><span class="op">)</span>,</span>
+<span>    <span class="st">"region"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">region</span>, levels <span class="op">=</span> <span class="va">regions</span><span class="op">)</span>,</span>
+<span>    <span class="st">"group"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">group</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">group</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; A/x B/x C/x A/y B/y C/y A/z B/z C/z A/w B/w C/w </span></span>
+<span><span class="co">#&gt;   3   2   1   1   2   3   1   1   1   1   2   1</span></span></code></pre></div>
+<p>Assuming age-specific total contacts (“T” domain - see
+<code>vignette("diseasy-activity")</code> for more details):</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">N_age</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">age_group</span>, data <span class="op">=</span> <span class="va">population</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">t_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span></span>
+<span>    <span class="fl">1.5</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">age_groups</span><span class="op">)</span>,</span>
+<span>    <span class="fl">1.5</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">age_groups</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">^</span><span class="fl">1.25</span> <span class="op">*</span> <span class="va">N_age</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">N_age</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group  A  B  C</span></span>
+<span><span class="co">#&gt;         A 99 49 25</span></span>
+<span><span class="co">#&gt;         B 49 24 12</span></span>
+<span><span class="co">#&gt;         C 25 12  6</span></span></code></pre></div>
+<p>… and age-specific mean contact rates (“M” domain) of:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m_matrix</span> <span class="op">&lt;-</span> <span class="va">t_matrix</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span><span class="va">N_age</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">N_age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">m_matrix</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group     A    B    C</span></span>
+<span><span class="co">#&gt;         A 16.50 8.17 4.17</span></span>
+<span><span class="co">#&gt;         B  7.00 3.43 1.71</span></span>
+<span><span class="co">#&gt;         C  4.17 2.00 1.00</span></span></code></pre></div>
+<p>.. and corresponding per-capita contact rates (“C” domain) of:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">c_matrix</span> <span class="op">&lt;-</span> <span class="va">t_matrix</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span><span class="va">N_age</span>, <span class="va">N_age</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">c_matrix</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group    A    B    C</span></span>
+<span><span class="co">#&gt;         A 2.75 1.17 0.69</span></span>
+<span><span class="co">#&gt;         B 1.17 0.49 0.29</span></span>
+<span><span class="co">#&gt;         C 0.69 0.29 0.17</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="a-well-mixed-example">A well-mixed example<a class="anchor" aria-label="anchor" href="#a-well-mixed-example"></a>
+</h3>
+<p>Consider the well-mixed case where a population of individuals across
+different age groups and spatial locations are equally likely to be
+connected.</p>
+We can draw a realisation of such a network from our contact matrices
+<details><summary>
+See implementation
+</summary><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Convert T-matrix to long-form data.frame</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">expand_grid</a></span><span class="op">(</span></span>
+<span>  i_age_group <span class="op">=</span> <span class="va">age_groups</span>,</span>
+<span>  j_age_group <span class="op">=</span> <span class="va">age_groups</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    <span class="st">"n_contacts"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/uncount.html" class="external-link">uncount</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">n_contacts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="st">"n_contacts"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Randomly draw i indices (from nodes)</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="va">one_way_links</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i_age_group</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_map.html" class="external-link">group_modify</a></span><span class="op">(</span></span>
+<span>    <span class="op">~</span> <span class="va">.x</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        <span class="st">"i"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span></span>
+<span>          x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span></span>
+<span>            <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_starts.html" class="external-link">str_starts</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span>, <span class="va">.y</span><span class="op">$</span><span class="va">i_age_group</span><span class="op">)</span></span>
+<span>          <span class="op">)</span>,</span>
+<span>          size <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>          replace <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Randomly draw j indices (to nodes)</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="va">one_way_links</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j_age_group</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_map.html" class="external-link">group_modify</a></span><span class="op">(</span></span>
+<span>    <span class="op">~</span> <span class="va">.x</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        <span class="st">"j"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span></span>
+<span>          x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span></span>
+<span>            <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_starts.html" class="external-link">str_starts</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span>, <span class="va">.y</span><span class="op">$</span><span class="va">j_age_group</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span> <span class="op">!=</span> <span class="va">.y</span><span class="op">$</span><span class="va">i</span></span>
+<span>          <span class="op">)</span>,</span>
+<span>          size <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>          replace <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Finalise</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="va">one_way_links</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> <span class="co"># Make lower</span></span>
+<span>    <span class="st">"i_u"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j</span><span class="op">)</span>,</span>
+<span>    <span class="st">"j_u"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i_u</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j_u</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="st">"n"</span> <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="co"># Count connections</span></span>
+<span></span>
+<span><span class="co"># Convert to adjacency matrix with 2-way interactions</span></span>
+<span><span class="va">adjacency_sw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span></span>
+<span>  <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparseMatrix.html" class="external-link">sparseMatrix</a></span><span class="op">(</span></span>
+<span>    i <span class="op">=</span> <span class="va">one_way_links</span><span class="op">$</span><span class="va">i_u</span>,</span>
+<span>    j <span class="op">=</span> <span class="va">one_way_links</span><span class="op">$</span><span class="va">j_u</span>,</span>
+<span>    x <span class="op">=</span> <span class="va">one_way_links</span><span class="op">$</span><span class="va">n</span>,</span>
+<span>    dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">population</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span>, <span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Make symmetric</span></span>
+<span><span class="va">adjacency_sw</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">adjacency_sw</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">adjacency_sw</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="va">adjacency_sw</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x A/x A/x     B/w B/w C/w</span></span>
+<span><span class="co">#&gt; A/x 0.0 2.0 3.0 ... 0.0 3.0 1.0</span></span>
+<span><span class="co">#&gt; A/x 2.0 0.0 4.0 ... 1.0 0.0 0.0</span></span>
+<span><span class="co">#&gt; A/x 3.0 4.0 0.0 ... 0.5 2.5 0.5</span></span>
+<span><span class="co">#&gt;     ... ... ... ... ... ... ...</span></span>
+<span><span class="co">#&gt; B/w 0.0 1.0 0.5 ... 0.0 2.5 0.0</span></span>
+<span><span class="co">#&gt; B/w 3.0 0.0 2.5 ... 2.5 0.0 0.5</span></span>
+<span><span class="co">#&gt; C/w 1.0 0.0 0.5 ... 0.0 0.5 0.0</span></span></code></pre></div>
+</details><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">adjacency_graph</span><span class="op">(</span><span class="va">adjacency_sw</span><span class="op">)</span></span></code></pre></div>
+<p><img src="diseasy-population_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
+<p>From this full adjacency graph, we can project the contacts (“T”
+domain) into contact matrices in different stratifications.</p>
+<p>Number of contacts stratified by age group and region (with
+population size in parentheses):</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_age_region</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  adjacency <span class="op">=</span> <span class="va">adjacency_sw</span>,</span>
+<span>  population <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>  groups <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span> <span class="co"># No aggregation</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="va">T_age_region</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         A/x (3) B/x (2) C/x (1)     A/w (1) B/w (2) C/w (1)</span></span>
+<span><span class="co">#&gt; A/x (3) 18.0    11.0     3.5    ... 12.0     7.0     1.5   </span></span>
+<span><span class="co">#&gt; B/x (2) 11.0     2.0     0.0    ...  1.5     3.0     0.0   </span></span>
+<span><span class="co">#&gt; C/x (1)  3.5     0.0     0.0    ...  0.5     0.5     0.0   </span></span>
+<span><span class="co">#&gt;         ...     ...     ...     ... ...     ...     ...    </span></span>
+<span><span class="co">#&gt; A/w (1) 12.0     1.5     0.5    ...  0.0     0.5     0.0   </span></span>
+<span><span class="co">#&gt; B/w (2)  7.0     3.0     0.5    ...  0.5     5.0     0.5   </span></span>
+<span><span class="co">#&gt; C/w (1)  1.5     0.0     0.0    ...  0.0     0.5     0.0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_age_region</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+<p>Stratify only by region:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_region</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  adjacency <span class="op">=</span> <span class="va">adjacency_sw</span>,</span>
+<span>  population <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>  groups <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">region</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">T_region</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       x (6) y (6) z (3) w (4)</span></span>
+<span><span class="co">#&gt; x (6)  49.0  31.5  17.5  26.0</span></span>
+<span><span class="co">#&gt; y (6)  31.5  10.0  15.0  15.0</span></span>
+<span><span class="co">#&gt; z (3)  17.5  15.0   4.0  10.5</span></span>
+<span><span class="co">#&gt; w (4)  26.0  15.0  10.5   7.0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_region</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+<p>Stratify only by age group (and compare with input used to generate
+the adjacency graph)</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_age</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  adjacency <span class="op">=</span> <span class="va">adjacency_sw</span>,</span>
+<span>  population <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>  groups <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">age_group</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">T_age</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       A (6) B (7) C (6)</span></span>
+<span><span class="co">#&gt; A (6)    99    49    25</span></span>
+<span><span class="co">#&gt; B (7)    49    24    12</span></span>
+<span><span class="co">#&gt; C (6)    25    12     6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_age</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group  A  B  C</span></span>
+<span><span class="co">#&gt;         A 99 49 25</span></span>
+<span><span class="co">#&gt;         B 49 24 12</span></span>
+<span><span class="co">#&gt;         C 25 12  6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+<p>Let’s see if we can achieve these same contacts without explicitly
+generating the network.</p>
+<p>First, the mixing matrix for well-mixed scenario is:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mixing_sw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span>,</span>
+<span>  dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">regions</span>, <span class="va">regions</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">mixing_sw</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   x y z w</span></span>
+<span><span class="co">#&gt; x 1 1 1 1</span></span>
+<span><span class="co">#&gt; y 1 1 1 1</span></span>
+<span><span class="co">#&gt; z 1 1 1 1</span></span>
+<span><span class="co">#&gt; w 1 1 1 1</span></span></code></pre></div>
+<p>Notice that we now have a population stratified by age in age groups
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>,
+and a regional mixing matrix connecting regions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>.
+The population is therefore currently identified by the simultaneous
+indices
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>,</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">i, x</annotation></semantics></math>),
+which we combine to form a linear “demography group” index connecting
+individuals from demographic groups
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>.
+So that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math>
+enumerate all combinations of age and region
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>,</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">i, x</annotation></semantics></math>).</p>
+<p>The models population is expressed in this linear index and,
+therefore, we aim to combine the regional mixing and age-specific
+matrices into a single representation in the linear demography group
+indices. A “full” rather than “marginal” contact matrix.</p>
+<p>We can compute the “full” per-capita contact matrix,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mover><mover><mi>C</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mtext mathvariant="normal">full</mtext></msup><annotation encoding="application/x-tex">\overline{\overline{C}}^{\textrm{full}}</annotation></semantics></math>,
+from the age-specific contact matrix,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi>C</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{C}}</annotation></semantics></math>,
+the regional mixing matrix,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><mi mathvariant="normal">Θ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{\Theta}}</annotation></semantics></math>,
+and the population vector,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>N</mi><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{N}</annotation></semantics></math>
+with indices
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p = (i, x)</annotation></semantics></math>:
+via the elementwise relation:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>C</mi><mrow><mi>p</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>q</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>j</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><mtext mathvariant="normal">full</mtext></msubsup><mo>=</mo><msub><mi>k</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><msub><mi>C</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><msubsup><mi mathvariant="normal">Θ</mi><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>*</mo></msubsup></mrow><annotation encoding="application/x-tex">
+C^{\textrm{full}}_{p = (i, x), q = (j, y)} = k_{i, j} C_{i, j} \Theta^\ast_{x, y}
+</annotation></semantics></math></p>
+<p>Where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>k</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">k_{i,j}</annotation></semantics></math>
+is a age-group normalisation (see below) and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mover><msup><mi mathvariant="normal">Θ</mi><mo>*</mo></msup><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{\overline{\Theta^\ast}}</annotation></semantics></math>
+is a normalised mixing matrix between regions:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mover><msup><mi mathvariant="normal">Θ</mi><mo>*</mo></msup><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mo>=</mo><mfrac><mover><mover><mi mathvariant="normal">Θ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mrow><msup><mover><mi>n</mi><mo accent="true">¯</mo></mover><mi>T</mi></msup><mover><mover><mi mathvariant="normal">Θ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mover><mi>n</mi><mo accent="true">¯</mo></mover></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+\overline{\overline{\Theta^\ast}} = \frac{\overline{\overline{\Theta}}}{\overline{n}^T\overline{\overline{\Theta}}\overline{n}}
+</annotation></semantics></math></p>
+<p>with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>n</mi><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{n}</annotation></semantics></math>
+being the population fraction:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>n</mi><mo accent="true">¯</mo></mover><mo>=</mo><mfrac><mover><mi>N</mi><mo accent="true">¯</mo></mover><mrow><msup><mover><mn>1</mn><mo accent="true">¯</mo></mover><mi>T</mi></msup><mover><mi>N</mi><mo accent="true">¯</mo></mover></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+\overline{n} = \frac{\overline{N}}{\overline{1}^T\overline{N}}
+</annotation></semantics></math></p>
+<p>The normalisation
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mover><mi>n</mi><mo accent="true">¯</mo></mover><mi>T</mi></msup><mover><mover><mi mathvariant="normal">Θ</mi><mo accent="true">¯</mo></mover><mo accent="true">¯</mo></mover><mover><mi>n</mi><mo accent="true">¯</mo></mover></mrow><annotation encoding="application/x-tex">\overline{n}^T\overline{\overline{\Theta}}\overline{n}</annotation></semantics></math>
+is the <em>population-pair-weighted</em> average of the entries of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">Θ</mi><annotation encoding="application/x-tex">\Theta</annotation></semantics></math>.</p>
+<p>The normalized entry
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi mathvariant="normal">Θ</mi><mrow><mi>i</mi><mi>j</mi></mrow><mo>*</mo></msubsup><annotation encoding="application/x-tex">\Theta^{\ast}_{ij}</annotation></semantics></math>
+is a relative contact multiplier: For example,</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi mathvariant="normal">Θ</mi><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>*</mo></msubsup><mo>=</mo><mn>1.4</mn></mrow><annotation encoding="application/x-tex">
+\Theta^\ast_{x,y} = 1.4
+</annotation></semantics></math></p>
+<p>means that contacts between regions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+are multiplied by 1.4, relative to the average mixing effect.</p>
+<p>Note that the normalization preserves the population-pair-weighted
+regional mixing intensity. Consequently, the total number of contacts is
+invariant only when regional age compositions are identical.</p>
+<p>This is where the additional normalisation constants
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>k</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">k_{i, j}</annotation></semantics></math>
+comes in.</p>
+<p>We first define mixing-weighted population-pair volume
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>D</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">D_{i,j}</annotation></semantics></math>
+as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow></munder><msubsup><mi mathvariant="normal">Θ</mi><mrow><mi>x</mi><mo>,</mo><mi>y</mi></mrow><mo>*</mo></msubsup><msub><mi>N</mi><mrow><mi>i</mi><mo>,</mo><mi>x</mi></mrow></msub><msub><mi>N</mi><mrow><mi>j</mi><mo>,</mo><mi>y</mi></mrow></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+D_{i,j} = \sum_{x,y} \Theta^\ast_{x,y} N_{i,x} N_{j,y}.
+</annotation></semantics></math></p>
+<p>That is, the number of potential population pairs between age groups
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+when accounting for the mixing between regions.</p>
+<p>The additional normalisation then becomes:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>x</mi></munder><msub><mi>N</mi><mrow><mi>i</mi><mo>,</mo><mi>x</mi></mrow></msub><munder><mo>∑</mo><mi>x</mi></munder><msub><mi>N</mi><mrow><mi>j</mi><mo>,</mo><mi>x</mi></mrow></msub></mrow><msub><mi>D</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub></mfrac></mrow><annotation encoding="application/x-tex">
+k_{i, j} = \frac{ \sum_x N_{i,x} \sum_x N_{j,x}}{D_{i,j}}
+</annotation></semantics></math></p>
+<p>which preserves the age-specific contact volume when aggregating
+across the regions.</p>
+<p>Let’s see that computation in practice:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">N_age_region</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">age_group</span> <span class="op">+</span> <span class="va">region</span>, data <span class="op">=</span> <span class="va">population</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">N_age_region</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          region</span></span>
+<span><span class="co">#&gt; age_group x y z w</span></span>
+<span><span class="co">#&gt;         A 3 1 1 1</span></span>
+<span><span class="co">#&gt;         B 2 2 1 2</span></span>
+<span><span class="co">#&gt;         C 1 3 1 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">N_region</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">region</span>, data <span class="op">=</span> <span class="va">population</span><span class="op">)</span></span>
+<span><span class="va">n_region</span> <span class="op">&lt;-</span> <span class="va">N_region</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">N_region</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">n_region</span><span class="op">)</span></span>
+<span><span class="co">#&gt; region</span></span>
+<span><span class="co">#&gt;         x         y         z         w </span></span>
+<span><span class="co">#&gt; 0.3157895 0.3157895 0.1578947 0.2105263</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="va">mixing_sw</span></span>
+<span></span>
+<span><span class="va">theta_norm</span> <span class="op">&lt;-</span> <span class="va">theta</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">n_region</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">n_region</span><span class="op">)</span></span>
+<span><span class="va">k</span> <span class="op">&lt;-</span> <span class="va">N_age</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">N_age</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">N_age_region</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_norm</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">N_age_region</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">c_matrix_full_sw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/kronecker.html" class="external-link">kronecker</a></span><span class="op">(</span><span class="va">theta_norm</span>, <span class="va">c_matrix</span> <span class="op">*</span> <span class="va">k</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">c_matrix_full_sw</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">c_matrix_full_sw</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x B/x C/x     A/w B/w C/w</span></span>
+<span><span class="co">#&gt; A/x 2.8 1.2 0.7 ... 2.8 1.2 0.7</span></span>
+<span><span class="co">#&gt; B/x 1.2 0.5 0.3 ... 1.2 0.5 0.3</span></span>
+<span><span class="co">#&gt; C/x 0.7 0.3 0.2 ... 0.7 0.3 0.2</span></span>
+<span><span class="co">#&gt;     ... ... ... ... ... ... ...</span></span>
+<span><span class="co">#&gt; A/w 2.8 1.2 0.7 ... 2.8 1.2 0.7</span></span>
+<span><span class="co">#&gt; B/w 1.2 0.5 0.3 ... 1.2 0.5 0.3</span></span>
+<span><span class="co">#&gt; C/w 0.7 0.3 0.2 ... 0.7 0.3 0.2</span></span></code></pre></div>
+<p>The per-capita contact matrix can then be cast to the number of
+contacts (“T” domain).</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">t_matrix_full_sw</span> <span class="op">&lt;-</span> <span class="va">c_matrix_full_sw</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">tcrossprod</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">t_matrix_full_sw</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x  B/x  C/x      A/w  B/w  C/w </span></span>
+<span><span class="co">#&gt; A/x 24.8  7.0  2.1 ...  8.2  7.0  2.1</span></span>
+<span><span class="co">#&gt; B/x  7.0  2.0  0.6 ...  2.3  2.0  0.6</span></span>
+<span><span class="co">#&gt; C/x  2.1  0.6  0.2 ...  0.7  0.6  0.2</span></span>
+<span><span class="co">#&gt;     ...  ...  ...  ... ...  ...  ... </span></span>
+<span><span class="co">#&gt; A/w  8.2  2.3  0.7 ...  2.8  2.3  0.7</span></span>
+<span><span class="co">#&gt; B/w  7.0  2.0  0.6 ...  2.3  2.0  0.6</span></span>
+<span><span class="co">#&gt; C/w  2.1  0.6  0.2 ...  0.7  0.6  0.2</span></span></code></pre></div>
+<p>Finally, we can aggregate the raw contact matrix in the same groups
+as the original reference (i.e. age groups only) and compare with that
+reference.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_age_indirect</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  <span class="va">t_matrix_full_sw</span>,</span>
+<span>  population <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span>,</span>
+<span>  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">age_group</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">T_age_indirect</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       A (1) B (1) C (1)</span></span>
+<span><span class="co">#&gt; A (1) 99    49    25   </span></span>
+<span><span class="co">#&gt; B (1) 49    24    12   </span></span>
+<span><span class="co">#&gt; C (1) 25    12     6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_age_indirect</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group  A  B  C</span></span>
+<span><span class="co">#&gt;         A 99 49 25</span></span>
+<span><span class="co">#&gt;         B 49 24 12</span></span>
+<span><span class="co">#&gt;         C 25 12  6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="a-silo-example">A silo example<a class="anchor" aria-label="anchor" href="#a-silo-example"></a>
+</h3>
+<p>Consider a complementary network where a population of individuals
+across different age groups and spatial locations are well-mixed only
+within their spatial region (an extremely “siloed” network).</p>
+We can draw a realisation of such a network from our contact matrices
+<details><summary>
+See implementation
+</summary><div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Convert T matrix to long-form data.frame</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">expand_grid</a></span><span class="op">(</span></span>
+<span>  i_age_group <span class="op">=</span> <span class="va">age_groups</span>,</span>
+<span>  j_age_group <span class="op">=</span> <span class="va">age_groups</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    <span class="st">"n_contacts"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/uncount.html" class="external-link">uncount</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">n_contacts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="st">"n_contacts"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Randomly draw i indices (from nodes)</span></span>
+<span><span class="co"># verify they connect to j nodes in the region</span></span>
+<span><span class="co"># -- else re-draw from accepted samples</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="va">one_way_links</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i_age_group</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_map.html" class="external-link">group_modify</a></span><span class="op">(</span></span>
+<span>    <span class="op">~</span> <span class="op">{</span></span>
+<span>      <span class="va">i_sampled</span> <span class="op">&lt;-</span> <span class="va">.x</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>          <span class="st">"i_age_group"</span> <span class="op">=</span> <span class="va">.y</span><span class="op">$</span><span class="va">i_age_group</span>,</span>
+<span>          <span class="st">"i"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span></span>
+<span>            x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span></span>
+<span>              <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span>, <span class="va">.y</span><span class="op">$</span><span class="va">i_age_group</span><span class="op">)</span></span>
+<span>            <span class="op">)</span>,</span>
+<span>            size <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>            replace <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>          <span class="op">)</span>,</span>
+<span>          <span class="st">"i_lab"</span> <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">[</span><span class="va">.data</span><span class="op">$</span><span class="va">i</span><span class="op">]</span>,</span>
+<span>          <span class="st">"i_region"</span> <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i_lab</span>, <span class="st">"[a-z]"</span><span class="op">)</span></span>
+<span>        <span class="op">)</span></span>
+<span></span>
+<span>      <span class="co"># Determine reachable connections</span></span>
+<span>      <span class="va">i_sampled</span> <span class="op">&lt;-</span> <span class="va">i_sampled</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>          <span class="st">"any_j_reachable"</span> <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">pmap_lgl</a></span><span class="op">(</span></span>
+<span>            <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">i_sampled</span>, <span class="st">"j_age_group"</span>, <span class="st">"i_region"</span>, <span class="st">"i"</span><span class="op">)</span>,</span>
+<span>            \<span class="op">(</span><span class="va">j_age_group</span>, <span class="va">i_region</span>, <span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span></span>
+<span>                <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span></span>
+<span>                  <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>                  <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_replace.html" class="external-link">str_replace</a></span><span class="op">(</span><span class="va">j_age_group</span>, <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/modifiers.html" class="external-link">fixed</a></span><span class="op">(</span><span class="st">"*"</span><span class="op">)</span>, <span class="va">i_region</span><span class="op">)</span></span>
+<span>                <span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span> <span class="op">!=</span> <span class="va">i</span></span>
+<span>              <span class="op">)</span></span>
+<span>            <span class="op">}</span></span>
+<span>          <span class="op">)</span></span>
+<span>        <span class="op">)</span></span>
+<span></span>
+<span>      <span class="co"># Determine reachable connections</span></span>
+<span>      <span class="va">i_accepted</span> <span class="op">&lt;-</span> <span class="va">i_sampled</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">any_j_reachable</span><span class="op">)</span></span>
+<span></span>
+<span>      <span class="co"># Re-sample unreachable from reachable</span></span>
+<span>      <span class="va">i_resampled</span> <span class="op">&lt;-</span> <span class="va">i_sampled</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">.data</span><span class="op">$</span><span class="va">any_j_reachable</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i_age_group</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j_age_group</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">pmap</a></span><span class="op">(</span></span>
+<span>          \<span class="op">(</span><span class="va">i_age_group</span>, <span class="va">j_age_group</span>, <span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
+<span>            <span class="va">i_accepted</span> <span class="op">|&gt;</span></span>
+<span>              <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>                <span class="va">.data</span><span class="op">$</span><span class="va">i_age_group</span> <span class="op">==</span> <span class="op">{</span><span class="op">{</span> <span class="va">i_age_group</span> <span class="op">}</span><span class="op">}</span>,</span>
+<span>                <span class="va">.data</span><span class="op">$</span><span class="va">j_age_group</span> <span class="op">==</span> <span class="op">{</span><span class="op">{</span> <span class="va">j_age_group</span> <span class="op">}</span><span class="op">}</span></span>
+<span>              <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>              <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="op">{</span><span class="op">{</span> <span class="va">n</span> <span class="op">}</span><span class="op">}</span><span class="op">)</span></span>
+<span>          <span class="op">}</span></span>
+<span>        <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/list_c.html" class="external-link">list_rbind</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">i_accepted</span>, <span class="va">i_resampled</span><span class="op">)</span>, <span class="op">!</span><span class="st">"i_age_group"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Randomly draw j indices (to nodes) within the same region</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="va">one_way_links</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j_age_group</span>, <span class="va">.data</span><span class="op">$</span><span class="va">i_region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_map.html" class="external-link">group_modify</a></span><span class="op">(</span></span>
+<span>    <span class="op">~</span> <span class="va">.x</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        <span class="st">"j"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span></span>
+<span>          x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span></span>
+<span>            <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span></span>
+<span>              <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>              <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_replace.html" class="external-link">str_replace</a></span><span class="op">(</span></span>
+<span>                <span class="va">.y</span><span class="op">$</span><span class="va">j_age_group</span>,</span>
+<span>                <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/modifiers.html" class="external-link">fixed</a></span><span class="op">(</span><span class="st">"*"</span><span class="op">)</span>,</span>
+<span>                <span class="va">.y</span><span class="op">$</span><span class="va">i_region</span></span>
+<span>              <span class="op">)</span></span>
+<span>            <span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span> <span class="op">!=</span> <span class="va">.y</span><span class="op">$</span><span class="va">i</span></span>
+<span>          <span class="op">)</span>,</span>
+<span>          size <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>          replace <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>        <span class="op">)</span>,</span>
+<span>        <span class="st">"j_lab"</span> <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">[</span><span class="va">.data</span><span class="op">$</span><span class="va">j</span><span class="op">]</span>,</span>
+<span>        <span class="st">"j_region"</span> <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">j_lab</span>, <span class="st">"[a-z]"</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Finalise</span></span>
+<span><span class="va">one_way_links</span> <span class="op">&lt;-</span> <span class="va">one_way_links</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> <span class="co"># Make lower</span></span>
+<span>    <span class="st">"i_u"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j</span><span class="op">)</span>,</span>
+<span>    <span class="st">"j_u"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">i_u</span>, <span class="va">.data</span><span class="op">$</span><span class="va">j_u</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="st">"n"</span> <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="co"># Count connections</span></span>
+<span></span>
+<span><span class="co"># Convert to adjacency matrix with 2-way interactions</span></span>
+<span><span class="va">adjacency_silo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span></span>
+<span>  <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparseMatrix.html" class="external-link">sparseMatrix</a></span><span class="op">(</span></span>
+<span>    i <span class="op">=</span> <span class="va">one_way_links</span><span class="op">$</span><span class="va">i_u</span>,</span>
+<span>    j <span class="op">=</span> <span class="va">one_way_links</span><span class="op">$</span><span class="va">j_u</span>,</span>
+<span>    x <span class="op">=</span> <span class="va">one_way_links</span><span class="op">$</span><span class="va">n</span>,</span>
+<span>    dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">population</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span>, <span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">adjacency_silo</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">adjacency_silo</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">adjacency_silo</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="va">adjacency_silo</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x A/x A/x     B/w B/w C/w</span></span>
+<span><span class="co">#&gt; A/x 0.0 2.5 3.5 ... 1.5 1.5 0.0</span></span>
+<span><span class="co">#&gt; A/x 2.5 0.0 4.0 ... 1.0 1.0 1.0</span></span>
+<span><span class="co">#&gt; A/x 3.5 4.0 0.0 ... 1.0 1.5 1.0</span></span>
+<span><span class="co">#&gt;     ... ... ... ... ... ... ...</span></span>
+<span><span class="co">#&gt; B/w 1.5 1.0 1.0 ... 0.0 0.0 0.5</span></span>
+<span><span class="co">#&gt; B/w 1.5 1.0 1.5 ... 0.0 0.0 0.5</span></span>
+<span><span class="co">#&gt; C/w 0.0 1.0 1.0 ... 0.5 0.5 0.0</span></span></code></pre></div>
+</details><div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">adjacency_graph</span><span class="op">(</span><span class="va">adjacency_silo</span><span class="op">)</span></span></code></pre></div>
+<p><img src="diseasy-population_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="700"></p>
+<p>Number of contacts stratified by age group and region</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_age_region</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  adjacency <span class="op">=</span> <span class="va">adjacency_silo</span>,</span>
+<span>  population <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>  groups <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span> <span class="co"># No aggregation</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="va">T_age_region</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         A/x (3) B/x (2) C/x (1)     A/w (1) B/w (2) C/w (1)</span></span>
+<span><span class="co">#&gt; A/x (3) 20.0     7.5     2.5    ...  9.5     7.5     2.0   </span></span>
+<span><span class="co">#&gt; B/x (2)  7.5     0.0     0.0    ...  2.0     2.5     1.0   </span></span>
+<span><span class="co">#&gt; C/x (1)  2.5     0.0     0.0    ...  1.0     1.5     0.0   </span></span>
+<span><span class="co">#&gt;         ...     ...     ...     ... ...     ...     ...    </span></span>
+<span><span class="co">#&gt; A/w (1)  9.5     2.0     1.0    ...  0.0     2.0     0.0   </span></span>
+<span><span class="co">#&gt; B/w (2)  7.5     2.5     1.5    ...  2.0     0.0     1.0   </span></span>
+<span><span class="co">#&gt; C/w (1)  2.0     1.0     0.0    ...  0.0     1.0     0.0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_age_region</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+<p>Stratify only by region</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_region</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  adjacency <span class="op">=</span> <span class="va">adjacency_silo</span>,</span>
+<span>  population <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>  groups <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_replace.html" class="external-link">str_replace</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span>, <span class="st">r"{[A-Z]}"</span>, <span class="st">"*"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">T_region</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         */x (6) */y (6) */z (3) */w (4)</span></span>
+<span><span class="co">#&gt; */x (6)    40.0    32.5    21.5    27.0</span></span>
+<span><span class="co">#&gt; */y (6)    32.5    13.0    10.0    17.5</span></span>
+<span><span class="co">#&gt; */z (3)    21.5    10.0     7.0     9.0</span></span>
+<span><span class="co">#&gt; */w (4)    27.0    17.5     9.0     6.0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_region</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+<p>Stratify only by age group</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_age</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  adjacency <span class="op">=</span> <span class="va">adjacency_silo</span>,</span>
+<span>  population <span class="op">=</span> <span class="va">population</span><span class="op">$</span><span class="va">group</span>,</span>
+<span>  groups <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_replace.html" class="external-link">str_replace</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span>, <span class="st">r"{[a-z]}"</span>, <span class="st">"*"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">T_age</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         A/* (6) B/* (7) C/* (6)</span></span>
+<span><span class="co">#&gt; A/* (6)      99      49      25</span></span>
+<span><span class="co">#&gt; B/* (7)      49      24      12</span></span>
+<span><span class="co">#&gt; C/* (6)      25      12       6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_age</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group  A  B  C</span></span>
+<span><span class="co">#&gt;         A 99 49 25</span></span>
+<span><span class="co">#&gt;         B 49 24 12</span></span>
+<span><span class="co">#&gt;         C 25 12  6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+<p>Again, Let’s see if we can achieve these same contacts without
+generating the network.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mixing_silo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">mixing_silo</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">regions</span>, <span class="va">regions</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">mixing_silo</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   x y z w</span></span>
+<span><span class="co">#&gt; x 1 0 0 0</span></span>
+<span><span class="co">#&gt; y 0 1 0 0</span></span>
+<span><span class="co">#&gt; z 0 0 1 0</span></span>
+<span><span class="co">#&gt; w 0 0 0 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="va">mixing_silo</span></span>
+<span></span>
+<span><span class="va">theta_norm</span> <span class="op">&lt;-</span> <span class="va">theta</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">n_region</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">n_region</span><span class="op">)</span></span>
+<span><span class="va">k</span> <span class="op">&lt;-</span> <span class="va">N_age</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">N_age</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">N_age_region</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_norm</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">N_age_region</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">c_matrix_full_silo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/kronecker.html" class="external-link">kronecker</a></span><span class="op">(</span><span class="va">theta_norm</span>, <span class="va">c_matrix</span> <span class="op">*</span> <span class="va">k</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">c_matrix_full_silo</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">c_matrix_full_silo</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x B/x C/x     A/w B/w C/w</span></span>
+<span><span class="co">#&gt; A/x 8.3 4.5 3.1 ... 0.0 0.0 0.0</span></span>
+<span><span class="co">#&gt; B/x 4.5 1.8 1.1 ... 0.0 0.0 0.0</span></span>
+<span><span class="co">#&gt; C/x 3.1 1.1 0.5 ... 0.0 0.0 0.0</span></span>
+<span><span class="co">#&gt;     ... ... ... ... ... ... ...</span></span>
+<span><span class="co">#&gt; A/w 0.0 0.0 0.0 ... 8.3 4.5 3.1</span></span>
+<span><span class="co">#&gt; B/w 0.0 0.0 0.0 ... 4.5 1.8 1.1</span></span>
+<span><span class="co">#&gt; C/w 0.0 0.0 0.0 ... 3.1 1.1 0.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">t_matrix_full_silo</span> <span class="op">&lt;-</span> <span class="va">c_matrix_full_silo</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">tcrossprod</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">t_matrix_full_silo</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x  B/x  C/x      A/w  B/w  C/w </span></span>
+<span><span class="co">#&gt; A/x 74.3 26.7  9.4 ...  0.0  0.0  0.0</span></span>
+<span><span class="co">#&gt; B/x 26.7  7.4  2.2 ...  0.0  0.0  0.0</span></span>
+<span><span class="co">#&gt; C/x  9.4  2.2  0.5 ...  0.0  0.0  0.0</span></span>
+<span><span class="co">#&gt;     ...  ...  ...  ... ...  ...  ... </span></span>
+<span><span class="co">#&gt; A/w  0.0  0.0  0.0 ...  8.3  8.9  3.1</span></span>
+<span><span class="co">#&gt; B/w  0.0  0.0  0.0 ...  8.9  7.4  2.2</span></span>
+<span><span class="co">#&gt; C/w  0.0  0.0  0.0 ...  3.1  2.2  0.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_age_indirect</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  <span class="va">t_matrix_full_silo</span>,</span>
+<span>  population <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span>,</span>
+<span>  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">age_group</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">T_age_indirect</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       A (1) B (1) C (1)</span></span>
+<span><span class="co">#&gt; A (1) 99    49    25   </span></span>
+<span><span class="co">#&gt; B (1) 49    24    12   </span></span>
+<span><span class="co">#&gt; C (1) 25    12     6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_age_indirect</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group  A  B  C</span></span>
+<span><span class="co">#&gt;         A 99 49 25</span></span>
+<span><span class="co">#&gt;         B 49 24 12</span></span>
+<span><span class="co">#&gt;         C 25 12  6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="a-mixture-example">A mixture example<a class="anchor" aria-label="anchor" href="#a-mixture-example"></a>
+</h3>
+<p>Finally, Let’s test the indirect method on a mixture of the two
+examples:</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mixing_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>    nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span>,</span>
+<span>    ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regions</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">mixing_mix</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">regions</span>, <span class="va">regions</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">mixing_mix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     x   y   z   w</span></span>
+<span><span class="co">#&gt; x 1.0 0.2 0.2 0.2</span></span>
+<span><span class="co">#&gt; y 0.2 1.0 0.2 0.2</span></span>
+<span><span class="co">#&gt; z 0.2 0.2 1.0 0.2</span></span>
+<span><span class="co">#&gt; w 0.2 0.2 0.2 1.0</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">theta</span> <span class="op">&lt;-</span> <span class="va">mixing_mix</span></span>
+<span></span>
+<span><span class="va">theta_norm</span> <span class="op">&lt;-</span> <span class="va">theta</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">n_region</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">n_region</span><span class="op">)</span></span>
+<span><span class="va">k</span> <span class="op">&lt;-</span> <span class="va">N_age</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">N_age</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">N_age_region</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">theta_norm</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">N_age_region</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">c_matrix_full_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/kronecker.html" class="external-link">kronecker</a></span><span class="op">(</span><span class="va">theta_norm</span>, <span class="va">c_matrix</span> <span class="op">*</span> <span class="va">k</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">c_matrix_full_mix</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">c_matrix_full_mix</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x B/x C/x     A/w B/w C/w</span></span>
+<span><span class="co">#&gt; A/x 5.9 2.8 1.8 ... 1.2 0.6 0.4</span></span>
+<span><span class="co">#&gt; B/x 2.8 1.2 0.7 ... 0.6 0.2 0.1</span></span>
+<span><span class="co">#&gt; C/x 1.8 0.7 0.4 ... 0.4 0.1 0.1</span></span>
+<span><span class="co">#&gt;     ... ... ... ... ... ... ...</span></span>
+<span><span class="co">#&gt; A/w 1.2 0.6 0.4 ... 5.9 2.8 1.8</span></span>
+<span><span class="co">#&gt; B/w 0.6 0.2 0.1 ... 2.8 1.2 0.7</span></span>
+<span><span class="co">#&gt; C/w 0.4 0.1 0.1 ... 1.8 0.7 0.4</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">t_matrix_full_mix</span> <span class="op">&lt;-</span> <span class="va">c_matrix_full_mix</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">tcrossprod</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">t_matrix_full_mix</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     A/x  B/x  C/x      A/w  B/w  C/w </span></span>
+<span><span class="co">#&gt; A/x 53.0 17.1  5.5 ...  3.5  3.4  1.1</span></span>
+<span><span class="co">#&gt; B/x 17.1  4.8  1.4 ...  1.1  1.0  0.3</span></span>
+<span><span class="co">#&gt; C/x  5.5  1.4  0.4 ...  0.4  0.3  0.1</span></span>
+<span><span class="co">#&gt;     ...  ...  ...  ... ...  ...  ... </span></span>
+<span><span class="co">#&gt; A/w  3.5  1.1  0.4 ...  5.9  5.7  1.8</span></span>
+<span><span class="co">#&gt; B/w  3.4  1.0  0.3 ...  5.7  4.8  1.4</span></span>
+<span><span class="co">#&gt; C/w  1.1  0.3  0.1 ...  1.8  1.4  0.4</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">T_age_indirect</span> <span class="op">&lt;-</span> <span class="fu">aggregate_contacts</span><span class="op">(</span></span>
+<span>  <span class="va">t_matrix_full_mix</span>,</span>
+<span>  population <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span>,</span>
+<span>  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">population</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">print_truncated</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">T_age_indirect</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         A/x (1) B/x (1) C/x (1)     A/w (1) B/w (1) C/w (1)</span></span>
+<span><span class="co">#&gt; A/x (1) 53.0    17.1     5.5    ...  3.5     3.4     1.1   </span></span>
+<span><span class="co">#&gt; B/x (1) 17.1     4.8     1.4    ...  1.1     1.0     0.3   </span></span>
+<span><span class="co">#&gt; C/x (1)  5.5     1.4     0.4    ...  0.4     0.3     0.1   </span></span>
+<span><span class="co">#&gt;         ...     ...     ...     ... ...     ...     ...    </span></span>
+<span><span class="co">#&gt; A/w (1)  3.5     1.1     0.4    ...  5.9     5.7     1.8   </span></span>
+<span><span class="co">#&gt; B/w (1)  3.4     1.0     0.3    ...  5.7     4.8     1.4   </span></span>
+<span><span class="co">#&gt; C/w (1)  1.1     0.3     0.1    ...  1.8     1.4     0.4</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">T_age_indirect</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group  A  B  C</span></span>
+<span><span class="co">#&gt;         A 99 49 25</span></span>
+<span><span class="co">#&gt;         B 49 24 12</span></span>
+<span><span class="co">#&gt;         C 25 12  6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="implementing-the-examples-in-diseasy">Implementing the examples in diseasy<a class="anchor" aria-label="anchor" href="#implementing-the-examples-in-diseasy"></a>
+</h3>
+<p>The above examples show how <code>diseasy</code> handles the contact
+matrices internally. We can implement the “mixture” example in
+<code>diseasy</code> to see the outputs directly from
+<code>diseasy</code>.</p>
+<p>First we configure a <code><a href="../reference/DiseasyRegions.html">?DiseasyRegions</a></code> module with the
+population and connectedness.</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Load the example population</span></span>
+<span><span class="va">regions</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyRegions.html">DiseasyRegions</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">regions</span><span class="op">$</span><span class="fu">set_area</span><span class="op">(</span>area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"z"</span>, <span class="st">"w"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">regions</span><span class="op">$</span><span class="fu">set_demography</span><span class="op">(</span></span>
+<span>  demography <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>    <span class="va">population</span>,</span>
+<span>    <span class="st">"region"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">region</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="st">"age_group"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"00-29"</span>, <span class="st">"30-59"</span>, <span class="st">"60+"</span><span class="op">)</span><span class="op">[</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">age_group</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">==</span> <span class="va">age_groups</span><span class="op">)</span></span>
+<span>    <span class="op">]</span>,</span>
+<span>    <span class="st">"population"</span> <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age_group"</span>, <span class="st">"region"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use the "mixing" scenario as the adjacency</span></span>
+<span><span class="va">regions</span><span class="op">$</span><span class="fu">set_adjacency</span><span class="op">(</span></span>
+<span>  adjacency <span class="op">=</span> <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html" class="external-link">melt</a></span><span class="op">(</span></span>
+<span>    <span class="va">mixing_mix</span>,</span>
+<span>    varnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"from"</span>, <span class="st">"to"</span><span class="op">)</span>,</span>
+<span>    value.name <span class="op">=</span> <span class="st">"adjacency"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>      <span class="st">"from"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">from</span><span class="op">)</span>,</span>
+<span>      <span class="st">"to"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">to</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>  adjacency_type <span class="op">=</span> <span class="st">"infection-flow"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">regions</span><span class="op">$</span><span class="va">infection_flow_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     w   x   y   z</span></span>
+<span><span class="co">#&gt; w 1.0 0.2 0.2 0.2</span></span>
+<span><span class="co">#&gt; x 0.2 1.0 0.2 0.2</span></span>
+<span><span class="co">#&gt; y 0.2 0.2 1.0 0.2</span></span>
+<span><span class="co">#&gt; z 0.2 0.2 0.2 1.0</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">mixing_mix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     x   y   z   w</span></span>
+<span><span class="co">#&gt; x 1.0 0.2 0.2 0.2</span></span>
+<span><span class="co">#&gt; y 0.2 1.0 0.2 0.2</span></span>
+<span><span class="co">#&gt; z 0.2 0.2 1.0 0.2</span></span>
+<span><span class="co">#&gt; w 0.2 0.2 0.2 1.0</span></span></code></pre></div>
+<p>Then we implement a <code><a href="../reference/DiseasyActivity.html">?DiseasyActivity</a></code> module with the
+contacts (which requires some additional configuration).</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mean_contacts_per_person</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
+<span>  <span class="va">m_matrix</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">age_groups</span><span class="op">)</span>,</span>
+<span>  dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"00-29"</span>, <span class="st">"30-59"</span>, <span class="st">"60+"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"00-29"</span>, <span class="st">"30-59"</span>, <span class="st">"60+"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">activity</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyActivity.html">DiseasyActivity</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  contact_basis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"mean_contacts_per_person"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="st">"home"</span> <span class="op">=</span> <span class="va">mean_contacts_per_person</span> <span class="op">/</span> <span class="fl">4</span>,</span>
+<span>      <span class="st">"school"</span> <span class="op">=</span> <span class="va">mean_contacts_per_person</span> <span class="op">/</span> <span class="fl">4</span>,</span>
+<span>      <span class="st">"work"</span> <span class="op">=</span> <span class="va">mean_contacts_per_person</span> <span class="op">/</span> <span class="fl">4</span>,</span>
+<span>      <span class="st">"other"</span> <span class="op">=</span> <span class="va">mean_contacts_per_person</span> <span class="op">/</span> <span class="fl">4</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="st">"description"</span> <span class="op">=</span> <span class="st">"Example contact rates"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">activity</span><span class="op">$</span><span class="fu">set_activity_units</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"baseline"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="st">"label"</span> <span class="op">=</span> <span class="st">"baseline"</span>,</span>
+<span>      <span class="st">"home"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"work"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"school"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"other"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"risk"</span> <span class="op">=</span> <span class="fl">1</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">activity</span><span class="op">$</span><span class="fu">change_activity</span><span class="op">(</span></span>
+<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1970-01-01"</span><span class="op">)</span>,</span>
+<span>  opening <span class="op">=</span> <span class="st">"baseline"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">activity</span><span class="op">$</span><span class="fu">get_scenario_contacts</span><span class="op">(</span>weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`1970-01-01`</span></span>
+<span><span class="co">#&gt;           00-29    30-59      60+</span></span>
+<span><span class="co">#&gt; 00-29 16.500000 8.166667 4.166667</span></span>
+<span><span class="co">#&gt; 30-59  7.000000 3.428571 1.714286</span></span>
+<span><span class="co">#&gt; 60+    4.166667 2.000000 1.000000</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">m_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          age_group</span></span>
+<span><span class="co">#&gt; age_group         A        B        C</span></span>
+<span><span class="co">#&gt;         A 16.500000 8.166667 4.166667</span></span>
+<span><span class="co">#&gt;         B  7.000000 3.428571 1.714286</span></span>
+<span><span class="co">#&gt;         C  4.166667 2.000000 1.000000</span></span></code></pre></div>
+<p>With those two modules configured, we can combine into different
+<code><a href="../reference/DiseasyPopulation.html">?DiseasyPopulation</a></code> modules with different stratification of
+the population:</p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">population_no_stratification</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  activity <span class="op">=</span> <span class="va">activity</span>,</span>
+<span>  regions <span class="op">=</span> <span class="va">regions</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">population_age_stratified</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  activity <span class="op">=</span> <span class="va">activity</span>,</span>
+<span>  regions <span class="op">=</span> <span class="va">regions</span>,</span>
+<span>  age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">population_region_stratified</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  activity <span class="op">=</span> <span class="va">activity</span>,</span>
+<span>  regions <span class="op">=</span> <span class="va">regions</span>,</span>
+<span>  regional_stratification <span class="op">=</span> <span class="st">"region"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">population_fully_stratified</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasyPopulation.html">DiseasyPopulation</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  activity <span class="op">=</span> <span class="va">activity</span>,</span>
+<span>  regions <span class="op">=</span> <span class="va">regions</span>,</span>
+<span>  regional_stratification <span class="op">=</span> <span class="st">"region"</span>,</span>
+<span>  age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">number_of_contacts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="st">"no_stratification"</span> <span class="op">=</span> <span class="va">population_no_stratification</span>,</span>
+<span>  <span class="st">"age_stratified"</span>    <span class="op">=</span> <span class="va">population_age_stratified</span>,</span>
+<span>  <span class="st">"region_stratified"</span> <span class="op">=</span> <span class="va">population_region_stratified</span>,</span>
+<span>  <span class="st">"fully_stratified"</span>  <span class="op">=</span> <span class="va">population_fully_stratified</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_dbl</a></span><span class="op">(</span>\<span class="op">(</span><span class="va">population</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">N</span> <span class="op">&lt;-</span> <span class="va">population</span> <span class="op"><a href="https://ssi-dk.github.io/diseasystore/reference/grapes-.-grapes.html">%.%</a></span> <span class="va">model_population</span> <span class="op">|&gt;</span>                                                                             <span class="co"># nolint: object_name_linter</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">population</span> <span class="op"><a href="https://ssi-dk.github.io/diseasystore/reference/grapes-.-grapes.html">%.%</a></span> <span class="va">groups</span><span class="op">)</span>, <span class="st">"population"</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unite.html" class="external-link">unite</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="op">!</span><span class="st">"population"</span>, sep <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/enframe.html" class="external-link">deframe</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="va">m_matrix</span> <span class="op">&lt;-</span> <span class="va">population</span> <span class="op"><a href="https://ssi-dk.github.io/diseasystore/reference/grapes-.-grapes.html">%.%</a></span> <span class="fu">mean_contact_rates</span><span class="op">(</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span>    <span class="va">t_matrix</span> <span class="op">&lt;-</span> <span class="va">m_matrix</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span><span class="va">N</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">number_of_contacts</span><span class="op">)</span></span>
+<span><span class="co">#&gt; no_stratification    age_stratified region_stratified  fully_stratified </span></span>
+<span><span class="co">#&gt;               301               301               301               301</span></span>
+<span></span>
+<span><span class="co"># Reference</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total contacts: "</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">t_matrix</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Total contacts:  301</span></span></code></pre></div>
+</div>
 </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -127,20 +127,28 @@ interfacing section</a> for ways to get metrics from the module)</p>
 <code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">get_scenario_openness</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $`1970-01-01`</span></span>
 <span><span class="co">#&gt; $`1970-01-01`$home</span></span>
-<span><span class="co">#&gt; 0+ </span></span>
-<span><span class="co">#&gt;  1 </span></span>
+<span><span class="co">#&gt; 00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59 60-64 </span></span>
+<span><span class="co">#&gt;     1     1     1     1     1     1     1     1     1     1     1     1     1 </span></span>
+<span><span class="co">#&gt; 65-69 70-74   75+ </span></span>
+<span><span class="co">#&gt;     1     1     1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`1970-01-01`$work</span></span>
-<span><span class="co">#&gt; 0+ </span></span>
-<span><span class="co">#&gt;  1 </span></span>
+<span><span class="co">#&gt; 00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59 60-64 </span></span>
+<span><span class="co">#&gt;     1     1     1     1     1     1     1     1     1     1     1     1     1 </span></span>
+<span><span class="co">#&gt; 65-69 70-74   75+ </span></span>
+<span><span class="co">#&gt;     1     1     1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`1970-01-01`$school</span></span>
-<span><span class="co">#&gt; 0+ </span></span>
-<span><span class="co">#&gt;  1 </span></span>
+<span><span class="co">#&gt; 00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59 60-64 </span></span>
+<span><span class="co">#&gt;     1     1     1     1     1     1     1     1     1     1     1     1     1 </span></span>
+<span><span class="co">#&gt; 65-69 70-74   75+ </span></span>
+<span><span class="co">#&gt;     1     1     1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`1970-01-01`$other</span></span>
-<span><span class="co">#&gt; 0+ </span></span>
-<span><span class="co">#&gt;  1</span></span></code></pre></div>
+<span><span class="co">#&gt; 00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59 60-64 </span></span>
+<span><span class="co">#&gt;     1     1     1     1     1     1     1     1     1     1     1     1     1 </span></span>
+<span><span class="co">#&gt; 65-69 70-74   75+ </span></span>
+<span><span class="co">#&gt;     1     1     1</span></span></code></pre></div>
 <p>To use the module, we must define the activity scenario. In the
 example below, we configure the module to use Danish activity units and
 the “contact basis” for Denmark (i.e basic contact matrices and
@@ -348,45 +356,192 @@ with elements
 from the module, we use the <code>$get_scenario_contacts()</code>
 method:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># We can project the matrices into custom age-groups by providing the</span></span>
-<span><span class="co"># "age_cuts_lower" argument</span></span>
-<span><span class="va">act</span><span class="op">$</span><span class="fu">get_scenario_contacts</span><span class="op">(</span>age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">get_scenario_contacts</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $`2020-03-11`</span></span>
 <span><span class="co">#&gt; $`2020-03-11`$home</span></span>
-<span><span class="co">#&gt;       00-59 60+</span></span>
-<span><span class="co">#&gt; 00-59   4.4 0.9</span></span>
-<span><span class="co">#&gt; 60+     2.6 1.3</span></span>
+<span><span class="co">#&gt;       00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59</span></span>
+<span><span class="co">#&gt; 00-04  0.69  0.46  0.34  0.24  0.32  0.52  0.62  0.58  0.38  0.25  0.30  0.30</span></span>
+<span><span class="co">#&gt; 05-09  0.47  0.82  0.55  0.29  0.22  0.33  0.56  0.65  0.60  0.36  0.27  0.29</span></span>
+<span><span class="co">#&gt; 10-14  0.31  0.50  1.30  0.52  0.23  0.20  0.32  0.51  0.67  0.46  0.34  0.23</span></span>
+<span><span class="co">#&gt; 15-19  0.21  0.25  0.51  1.12  0.45  0.24  0.18  0.29  0.49  0.63  0.47  0.29</span></span>
+<span><span class="co">#&gt; 20-24  0.26  0.18  0.21  0.41  1.13  0.42  0.19  0.15  0.24  0.47  0.47  0.32</span></span>
+<span><span class="co">#&gt; 25-29  0.40  0.25  0.17  0.20  0.39  1.01  0.33  0.16  0.15  0.22  0.37  0.36</span></span>
+<span><span class="co">#&gt; 30-34  0.53  0.47  0.30  0.17  0.20  0.36  0.82  0.28  0.21  0.17  0.22  0.30</span></span>
+<span><span class="co">#&gt; 35-39  0.53  0.59  0.52  0.30  0.17  0.19  0.31  0.76  0.30  0.21  0.19  0.20</span></span>
+<span><span class="co">#&gt; 40-44  0.33  0.50  0.63  0.47  0.25  0.17  0.21  0.28  0.75  0.30  0.22  0.16</span></span>
+<span><span class="co">#&gt; 45-49  0.19  0.28  0.40  0.55  0.44  0.22  0.15  0.17  0.27  0.73  0.32  0.22</span></span>
+<span><span class="co">#&gt; 50-54  0.22  0.20  0.28  0.40  0.43  0.36  0.19  0.16  0.19  0.31  0.73  0.34</span></span>
+<span><span class="co">#&gt; 55-59  0.23  0.23  0.20  0.25  0.30  0.36  0.28  0.16  0.15  0.22  0.35  0.72</span></span>
+<span><span class="co">#&gt; 60-64  0.25  0.23  0.20  0.21  0.21  0.28  0.32  0.24  0.20  0.18  0.23  0.35</span></span>
+<span><span class="co">#&gt; 65-69  0.20  0.22  0.23  0.20  0.19  0.22  0.25  0.26  0.27  0.19  0.21  0.26</span></span>
+<span><span class="co">#&gt; 70-74  0.17  0.21  0.24  0.22  0.17  0.19  0.20  0.23  0.26  0.24  0.24  0.19</span></span>
+<span><span class="co">#&gt; 75+    0.15  0.15  0.19  0.18  0.14  0.15  0.15  0.17  0.22  0.25  0.31  0.20</span></span>
+<span><span class="co">#&gt;       60-64 65-69 70-74  75+</span></span>
+<span><span class="co">#&gt; 00-04  0.29  0.21  0.17 0.26</span></span>
+<span><span class="co">#&gt; 05-09  0.26  0.23  0.22 0.26</span></span>
+<span><span class="co">#&gt; 10-14  0.21  0.21  0.23 0.30</span></span>
+<span><span class="co">#&gt; 15-19  0.21  0.18  0.20 0.28</span></span>
+<span><span class="co">#&gt; 20-24  0.20  0.16  0.15 0.19</span></span>
+<span><span class="co">#&gt; 25-29  0.25  0.17  0.16 0.19</span></span>
+<span><span class="co">#&gt; 30-34  0.31  0.22  0.17 0.22</span></span>
+<span><span class="co">#&gt; 35-39  0.25  0.25  0.22 0.27</span></span>
+<span><span class="co">#&gt; 40-44  0.20  0.24  0.23 0.31</span></span>
+<span><span class="co">#&gt; 45-49  0.16  0.16  0.20 0.33</span></span>
+<span><span class="co">#&gt; 50-54  0.20  0.16  0.19 0.40</span></span>
+<span><span class="co">#&gt; 55-59  0.31  0.21  0.16 0.27</span></span>
+<span><span class="co">#&gt; 60-64  0.71  0.28  0.22 0.23</span></span>
+<span><span class="co">#&gt; 65-69  0.30  0.68  0.29 0.29</span></span>
+<span><span class="co">#&gt; 70-74  0.24  0.29  0.66 0.35</span></span>
+<span><span class="co">#&gt; 75+    0.15  0.17  0.21 0.28</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`2020-03-11`$work</span></span>
-<span><span class="co">#&gt;       00-59   60+</span></span>
-<span><span class="co">#&gt; 00-59  1.97 0.096</span></span>
-<span><span class="co">#&gt; 60+    0.27 0.020</span></span>
+<span><span class="co">#&gt;         00-04   05-09   10-14   15-19  20-24  25-29  30-34  35-39 40-44  45-49</span></span>
+<span><span class="co">#&gt; 00-04 0.0e+00 0.00000 0.0e+00 0.00562 0.0065 0.0341 0.0208 0.0262 0.036 0.0431</span></span>
+<span><span class="co">#&gt; 05-09 0.0e+00 0.00000 0.0e+00 0.00472 0.0209 0.0427 0.0643 0.0461 0.028 0.0202</span></span>
+<span><span class="co">#&gt; 10-14 0.0e+00 0.00000 0.0e+00 0.00226 0.0155 0.0356 0.0382 0.0246 0.030 0.0510</span></span>
+<span><span class="co">#&gt; 15-19 5.0e-03 0.00415 2.2e-03 0.04039 0.0731 0.0995 0.0543 0.1043 0.075 0.1106</span></span>
+<span><span class="co">#&gt; 20-24 5.4e-03 0.01698 1.4e-02 0.06756 0.1949 0.2569 0.1843 0.1780 0.185 0.1564</span></span>
+<span><span class="co">#&gt; 25-29 2.6e-02 0.03266 3.0e-02 0.08652 0.2417 0.5133 0.3470 0.3398 0.341 0.2862</span></span>
+<span><span class="co">#&gt; 30-34 1.8e-02 0.05383 3.6e-02 0.05165 0.1898 0.3799 0.4690 0.3937 0.411 0.3879</span></span>
+<span><span class="co">#&gt; 35-39 2.4e-02 0.04191 2.5e-02 0.10774 0.1991 0.4038 0.4274 0.5657 0.539 0.4747</span></span>
+<span><span class="co">#&gt; 40-44 3.1e-02 0.02388 2.8e-02 0.07117 0.1913 0.3744 0.4122 0.4976 0.596 0.5146</span></span>
+<span><span class="co">#&gt; 45-49 3.3e-02 0.01545 4.4e-02 0.09630 0.1474 0.2868 0.3550 0.4002 0.470 0.4913</span></span>
+<span><span class="co">#&gt; 50-54 3.6e-06 0.00205 4.3e-02 0.06649 0.1173 0.2642 0.2750 0.3210 0.434 0.4291</span></span>
+<span><span class="co">#&gt; 55-59 1.4e-02 0.02297 6.7e-02 0.04442 0.0761 0.1580 0.1999 0.1896 0.235 0.2425</span></span>
+<span><span class="co">#&gt; 60-64 1.4e-03 0.00296 2.4e-02 0.00774 0.0448 0.0928 0.0905 0.0853 0.112 0.1124</span></span>
+<span><span class="co">#&gt; 65-69 2.9e-04 0.00013 2.9e-04 0.00226 0.0107 0.0311 0.0300 0.0223 0.030 0.0392</span></span>
+<span><span class="co">#&gt; 70-74 0.0e+00 0.00000 1.1e-05 0.00059 0.0127 0.0176 0.0069 0.0158 0.020 0.0244</span></span>
+<span><span class="co">#&gt; 75+   0.0e+00 0.00000 0.0e+00 0.00000 0.0023 0.0033 0.0037 0.0065 0.015 0.0084</span></span>
+<span><span class="co">#&gt;         50-54  55-59  60-64   65-69   70-74     75+</span></span>
+<span><span class="co">#&gt; 00-04 4.8e-06 0.0174 0.0015 0.00030 0.0e+00 0.00000</span></span>
+<span><span class="co">#&gt; 05-09 2.8e-03 0.0299 0.0034 0.00013 0.0e+00 0.00000</span></span>
+<span><span class="co">#&gt; 10-14 5.2e-02 0.0781 0.0251 0.00027 1.0e-05 0.00000</span></span>
+<span><span class="co">#&gt; 15-19 7.9e-02 0.0509 0.0078 0.00209 5.5e-04 0.00000</span></span>
+<span><span class="co">#&gt; 20-24 1.3e-01 0.0806 0.0417 0.00917 1.1e-02 0.00321</span></span>
+<span><span class="co">#&gt; 25-29 2.7e-01 0.1574 0.0812 0.02503 1.4e-02 0.00442</span></span>
+<span><span class="co">#&gt; 30-34 3.1e-01 0.2180 0.0867 0.02646 6.1e-03 0.00530</span></span>
+<span><span class="co">#&gt; 35-39 3.9e-01 0.2244 0.0887 0.02137 1.5e-02 0.01027</span></span>
+<span><span class="co">#&gt; 40-44 4.9e-01 0.2574 0.1072 0.02619 1.7e-02 0.02180</span></span>
+<span><span class="co">#&gt; 45-49 4.4e-01 0.2420 0.0985 0.03162 2.0e-02 0.01115</span></span>
+<span><span class="co">#&gt; 50-54 4.4e-01 0.2637 0.0963 0.02034 1.8e-02 0.01556</span></span>
+<span><span class="co">#&gt; 55-59 2.7e-01 0.2114 0.0938 0.01733 7.8e-03 0.00769</span></span>
+<span><span class="co">#&gt; 60-64 1.1e-01 0.1068 0.0393 0.01156 4.1e-03 0.00725</span></span>
+<span><span class="co">#&gt; 65-69 2.6e-02 0.0214 0.0125 0.00107 1.0e-03 0.00049</span></span>
+<span><span class="co">#&gt; 70-74 2.3e-02 0.0096 0.0045 0.00101 1.4e-04 0.00010</span></span>
+<span><span class="co">#&gt; 75+   1.2e-02 0.0058 0.0048 0.00030 6.3e-05 0.00000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`2020-03-11`$school</span></span>
-<span><span class="co">#&gt;       00-59     60+</span></span>
-<span><span class="co">#&gt; 00-59 1.497 4.0e-03</span></span>
-<span><span class="co">#&gt; 60+   0.011 9.6e-05</span></span>
+<span><span class="co">#&gt;        00-04  05-09   10-14  15-19   20-24   25-29   30-34   35-39   40-44</span></span>
+<span><span class="co">#&gt; 00-04 1.0101 0.2777 0.01465 0.0254 0.01459 3.4e-02 6.3e-02 4.7e-02 2.2e-02</span></span>
+<span><span class="co">#&gt; 05-09 0.2813 2.9450 0.51497 0.0256 0.02557 5.6e-02 7.7e-02 7.3e-02 7.1e-02</span></span>
+<span><span class="co">#&gt; 10-14 0.0133 0.4617 4.56662 0.7117 0.01845 5.3e-02 5.7e-02 9.1e-02 9.5e-02</span></span>
+<span><span class="co">#&gt; 15-19 0.0227 0.0225 0.69785 4.0944 0.17158 5.4e-02 6.2e-02 8.8e-02 7.6e-02</span></span>
+<span><span class="co">#&gt; 20-24 0.0120 0.0208 0.01672 0.1585 0.21979 1.3e-02 8.7e-03 1.0e-02 6.8e-03</span></span>
+<span><span class="co">#&gt; 25-29 0.0264 0.0429 0.04543 0.0469 0.01183 4.4e-04 6.2e-04 4.1e-04 2.8e-04</span></span>
+<span><span class="co">#&gt; 30-34 0.0536 0.0641 0.05285 0.0591 0.00894 6.8e-04 1.2e-03 9.6e-04 7.0e-04</span></span>
+<span><span class="co">#&gt; 35-39 0.0435 0.0665 0.09176 0.0914 0.01172 4.9e-04 1.0e-03 9.1e-04 8.8e-04</span></span>
+<span><span class="co">#&gt; 40-44 0.0189 0.0598 0.08885 0.0730 0.00702 3.1e-04 7.0e-04 8.1e-04 1.4e-03</span></span>
+<span><span class="co">#&gt; 45-49 0.0217 0.0396 0.06383 0.0790 0.00789 3.6e-04 8.1e-04 7.2e-04 7.3e-04</span></span>
+<span><span class="co">#&gt; 50-54 0.0114 0.0356 0.04863 0.0463 0.00431 1.4e-04 5.5e-04 4.0e-04 7.4e-04</span></span>
+<span><span class="co">#&gt; 55-59 0.0100 0.0146 0.03021 0.0340 0.00361 5.1e-04 2.3e-04 4.1e-04 5.1e-04</span></span>
+<span><span class="co">#&gt; 60-64 0.0020 0.0082 0.01159 0.0120 0.00044 1.9e-05 1.6e-04 2.3e-04 1.5e-04</span></span>
+<span><span class="co">#&gt; 65-69 0.0012 0.0039 0.00274 0.0038 0.00093 8.9e-06 8.1e-06 4.1e-05 1.2e-05</span></span>
+<span><span class="co">#&gt; 70-74 0.0000 0.0013 0.00000 0.0000 0.00015 4.4e-06 0.0e+00 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 75+   0.0000 0.0000 0.00056 0.0000 0.00000 2.7e-06 0.0e+00 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt;         45-49   50-54   55-59   60-64   65-69   70-74     75+</span></span>
+<span><span class="co">#&gt; 00-04 2.8e-02 0.01519 1.3e-02 2.3e-03 1.2e-03 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 05-09 5.2e-02 0.04803 1.9e-02 9.4e-03 4.2e-03 1.4e-03 0.0e+00</span></span>
+<span><span class="co">#&gt; 10-14 7.5e-02 0.05877 3.5e-02 1.2e-02 2.6e-03 0.0e+00 8.7e-04</span></span>
+<span><span class="co">#&gt; 15-19 9.1e-02 0.05482 3.9e-02 1.2e-02 3.5e-03 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 20-24 8.4e-03 0.00472 3.8e-03 4.1e-04 8.0e-04 1.3e-04 0.0e+00</span></span>
+<span><span class="co">#&gt; 25-29 3.6e-04 0.00015 5.1e-04 1.7e-05 7.1e-06 3.6e-06 3.6e-06</span></span>
+<span><span class="co">#&gt; 30-34 8.8e-04 0.00063 2.5e-04 1.5e-04 7.1e-06 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 35-39 8.6e-04 0.00049 4.9e-04 2.4e-04 3.9e-05 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 40-44 8.0e-04 0.00084 5.5e-04 1.5e-04 1.1e-05 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 45-49 6.0e-04 0.00106 5.1e-04 1.3e-04 3.6e-05 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 50-54 1.0e-03 0.00070 4.8e-04 1.3e-04 0.0e+00 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 55-59 5.1e-04 0.00050 6.9e-04 1.5e-04 0.0e+00 1.1e-05 1.1e-05</span></span>
+<span><span class="co">#&gt; 60-64 1.5e-04 0.00015 1.7e-04 2.6e-04 7.5e-05 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 65-69 4.4e-05 0.00000 0.0e+00 8.1e-05 7.1e-06 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 70-74 0.0e+00 0.00000 1.3e-05 0.0e+00 0.0e+00 0.0e+00 0.0e+00</span></span>
+<span><span class="co">#&gt; 75+   0.0e+00 0.00000 8.0e-06 0.0e+00 0.0e+00 0.0e+00 0.0e+00</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`2020-03-11`$other</span></span>
-<span><span class="co">#&gt;       00-59  60+</span></span>
-<span><span class="co">#&gt; 00-59   4.4 0.67</span></span>
-<span><span class="co">#&gt; 60+     1.9 1.40</span></span></code></pre></div>
+<span><span class="co">#&gt;       00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59</span></span>
+<span><span class="co">#&gt; 00-04 0.629 0.278 0.131 0.092 0.157 0.270  0.27 0.218  0.18  0.11  0.15  0.15</span></span>
+<span><span class="co">#&gt; 05-09 0.282 1.070 0.503 0.164 0.122 0.173  0.20 0.229  0.23  0.11  0.13  0.11</span></span>
+<span><span class="co">#&gt; 10-14 0.119 0.451 2.029 0.634 0.214 0.148  0.21 0.189  0.31  0.16  0.16  0.10</span></span>
+<span><span class="co">#&gt; 15-19 0.082 0.144 0.622 2.925 1.018 0.371  0.19 0.166  0.24  0.24  0.19  0.10</span></span>
+<span><span class="co">#&gt; 20-24 0.129 0.099 0.194 0.940 2.032 0.929  0.44 0.265  0.29  0.30  0.34  0.23</span></span>
+<span><span class="co">#&gt; 25-29 0.209 0.132 0.126 0.323 0.874 1.280  0.65 0.426  0.35  0.32  0.43  0.35</span></span>
+<span><span class="co">#&gt; 30-34 0.230 0.167 0.196 0.180 0.458 0.708  0.79 0.533  0.46  0.36  0.38  0.40</span></span>
+<span><span class="co">#&gt; 35-39 0.201 0.208 0.191 0.172 0.297 0.506  0.58 0.665  0.56  0.41  0.34  0.34</span></span>
+<span><span class="co">#&gt; 40-44 0.157 0.191 0.286 0.225 0.303 0.390  0.46 0.522  0.69  0.46  0.42  0.33</span></span>
+<span><span class="co">#&gt; 45-49 0.086 0.084 0.139 0.206 0.280 0.323  0.33 0.349  0.42  0.48  0.47  0.26</span></span>
+<span><span class="co">#&gt; 50-54 0.112 0.099 0.135 0.164 0.307 0.420  0.34 0.277  0.37  0.46  0.45  0.44</span></span>
+<span><span class="co">#&gt; 55-59 0.116 0.087 0.089 0.088 0.221 0.351  0.37 0.284  0.30  0.27  0.45  0.51</span></span>
+<span><span class="co">#&gt; 60-64 0.098 0.096 0.072 0.087 0.168 0.253  0.27 0.319  0.32  0.28  0.34  0.45</span></span>
+<span><span class="co">#&gt; 65-69 0.090 0.089 0.074 0.061 0.132 0.200  0.24 0.234  0.25  0.22  0.27  0.33</span></span>
+<span><span class="co">#&gt; 70-74 0.066 0.062 0.092 0.112 0.133 0.167  0.16 0.225  0.30  0.26  0.24  0.26</span></span>
+<span><span class="co">#&gt; 75+   0.037 0.034 0.054 0.030 0.074 0.077  0.13 0.099  0.12  0.17  0.14  0.13</span></span>
+<span><span class="co">#&gt;       60-64 65-69 70-74   75+</span></span>
+<span><span class="co">#&gt; 00-04 0.111 0.094 0.069 0.064</span></span>
+<span><span class="co">#&gt; 05-09 0.109 0.094 0.066 0.060</span></span>
+<span><span class="co">#&gt; 10-14 0.074 0.070 0.087 0.084</span></span>
+<span><span class="co">#&gt; 15-19 0.088 0.057 0.105 0.046</span></span>
+<span><span class="co">#&gt; 20-24 0.156 0.113 0.115 0.104</span></span>
+<span><span class="co">#&gt; 25-29 0.221 0.161 0.135 0.101</span></span>
+<span><span class="co">#&gt; 30-34 0.254 0.214 0.146 0.195</span></span>
+<span><span class="co">#&gt; 35-39 0.332 0.225 0.217 0.156</span></span>
+<span><span class="co">#&gt; 40-44 0.303 0.222 0.269 0.170</span></span>
+<span><span class="co">#&gt; 45-49 0.247 0.174 0.214 0.223</span></span>
+<span><span class="co">#&gt; 50-54 0.284 0.210 0.189 0.175</span></span>
+<span><span class="co">#&gt; 55-59 0.395 0.267 0.214 0.173</span></span>
+<span><span class="co">#&gt; 60-64 0.467 0.371 0.456 0.226</span></span>
+<span><span class="co">#&gt; 65-69 0.403 0.379 0.424 0.318</span></span>
+<span><span class="co">#&gt; 70-74 0.493 0.422 0.735 0.428</span></span>
+<span><span class="co">#&gt; 75+   0.149 0.193 0.261 0.230</span></span></code></pre></div>
 <p>The <code>DiseasyActivity</code> module provides separate matrices
 for the four arenas: “home”, “school”, “work”, and “other”. These
 matrices can be combined by supplying a <code>weights</code> argument to
 the <code>$get_scenario_contacts()</code> method.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">get_scenario_contacts</span><span class="op">(</span></span>
-<span>  age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span><span class="op">)</span>,</span>
-<span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">get_scenario_contacts</span><span class="op">(</span>weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $`2020-03-11`</span></span>
-<span><span class="co">#&gt;       00-19 20-39 40-59 60-79  80+</span></span>
-<span><span class="co">#&gt; 00-19  8.76   3.0   2.7   1.1 0.18</span></span>
-<span><span class="co">#&gt; 20-39  2.66   6.0   3.7   1.5 0.19</span></span>
-<span><span class="co">#&gt; 40-59  2.20   3.5   4.7   1.7 0.28</span></span>
-<span><span class="co">#&gt; 60-79  1.14   1.7   2.2   2.6 0.31</span></span>
-<span><span class="co">#&gt; 80+    0.83   1.0   1.6   1.4 0.27</span></span></code></pre></div>
+<span><span class="co">#&gt;       00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59</span></span>
+<span><span class="co">#&gt; 00-04  2.33  1.02  0.48  0.36  0.49  0.86  0.98  0.87  0.63  0.43  0.46  0.48</span></span>
+<span><span class="co">#&gt; 05-09  1.03  4.83  1.57  0.48  0.39  0.60  0.90  1.00  0.93  0.54  0.46  0.46</span></span>
+<span><span class="co">#&gt; 10-14  0.44  1.41  7.90  1.86  0.48  0.44  0.62  0.82  1.10  0.75  0.61  0.45</span></span>
+<span><span class="co">#&gt; 15-19  0.32  0.43  1.83  8.18  1.71  0.76  0.48  0.65  0.88  1.07  0.80  0.48</span></span>
+<span><span class="co">#&gt; 20-24  0.41  0.32  0.43  1.58  3.57  1.61  0.83  0.60  0.73  0.93  0.94  0.64</span></span>
+<span><span class="co">#&gt; 25-29  0.66  0.46  0.38  0.66  1.52  2.80  1.32  0.92  0.85  0.83  1.08  0.87</span></span>
+<span><span class="co">#&gt; 30-34  0.83  0.76  0.58  0.46  0.85  1.45  2.08  1.21  1.08  0.91  0.91  0.92</span></span>
+<span><span class="co">#&gt; 35-39  0.80  0.90  0.83  0.68  0.68  1.10  1.31  1.99  1.41  1.10  0.92  0.76</span></span>
+<span><span class="co">#&gt; 40-44  0.53  0.78  1.03  0.84  0.75  0.93  1.08  1.30  2.03  1.27  1.13  0.75</span></span>
+<span><span class="co">#&gt; 45-49  0.33  0.41  0.64  0.93  0.88  0.83  0.84  0.92  1.16  1.70  1.24  0.72</span></span>
+<span><span class="co">#&gt; 50-54  0.35  0.34  0.51  0.68  0.86  1.04  0.81  0.75  1.00  1.20  1.62  1.04</span></span>
+<span><span class="co">#&gt; 55-59  0.37  0.35  0.38  0.42  0.61  0.87  0.85  0.64  0.69  0.72  1.07  1.44</span></span>
+<span><span class="co">#&gt; 60-64  0.35  0.34  0.31  0.32  0.43  0.63  0.68  0.65  0.63  0.57  0.68  0.90</span></span>
+<span><span class="co">#&gt; 65-69  0.30  0.31  0.30  0.26  0.33  0.45  0.52  0.51  0.56  0.45  0.50  0.61</span></span>
+<span><span class="co">#&gt; 70-74  0.23  0.27  0.34  0.33  0.31  0.38  0.37  0.47  0.58  0.53  0.50  0.47</span></span>
+<span><span class="co">#&gt; 75+    0.19  0.18  0.24  0.21  0.21  0.23  0.29  0.28  0.35  0.42  0.46  0.34</span></span>
+<span><span class="co">#&gt;       60-64 65-69 70-74  75+</span></span>
+<span><span class="co">#&gt; 00-04  0.40  0.31  0.24 0.32</span></span>
+<span><span class="co">#&gt; 05-09  0.39  0.33  0.29 0.32</span></span>
+<span><span class="co">#&gt; 10-14  0.32  0.29  0.32 0.38</span></span>
+<span><span class="co">#&gt; 15-19  0.32  0.24  0.31 0.33</span></span>
+<span><span class="co">#&gt; 20-24  0.40  0.28  0.27 0.30</span></span>
+<span><span class="co">#&gt; 25-29  0.55  0.36  0.31 0.30</span></span>
+<span><span class="co">#&gt; 30-34  0.65  0.46  0.33 0.42</span></span>
+<span><span class="co">#&gt; 35-39  0.67  0.49  0.46 0.44</span></span>
+<span><span class="co">#&gt; 40-44  0.61  0.49  0.52 0.51</span></span>
+<span><span class="co">#&gt; 45-49  0.50  0.36  0.43 0.56</span></span>
+<span><span class="co">#&gt; 50-54  0.58  0.39  0.39 0.59</span></span>
+<span><span class="co">#&gt; 55-59  0.79  0.50  0.38 0.45</span></span>
+<span><span class="co">#&gt; 60-64  1.22  0.66  0.68 0.46</span></span>
+<span><span class="co">#&gt; 65-69  0.72  1.06  0.72 0.61</span></span>
+<span><span class="co">#&gt; 70-74  0.74  0.72  1.40 0.78</span></span>
+<span><span class="co">#&gt; 75+    0.30  0.37  0.48 0.51</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="societal-openness">Societal openness<a class="anchor" aria-label="anchor" href="#societal-openness"></a>
@@ -424,13 +579,12 @@ society.</p>
 <p>The degree of openness can be queried similarly to the contact
 matrices:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">get_scenario_openness</span><span class="op">(</span></span>
-<span>  age_cuts_lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span><span class="op">)</span>,</span>
-<span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">act</span><span class="op">$</span><span class="fu">get_scenario_openness</span><span class="op">(</span>weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $`2020-03-11`</span></span>
-<span><span class="co">#&gt; 00-19 20-39 40-59 60-79   80+ </span></span>
-<span><span class="co">#&gt;     1     1     1     1     1</span></span></code></pre></div>
+<span><span class="co">#&gt; 00-04 05-09 10-14 15-19 20-24 25-29 30-34 35-39 40-44 45-49 50-54 55-59 60-64 </span></span>
+<span><span class="co">#&gt;     1     1     1     1     1     1     1     1     1     1     1     1     1 </span></span>
+<span><span class="co">#&gt; 65-69 70-74   75+ </span></span>
+<span><span class="co">#&gt;     1     1     1</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

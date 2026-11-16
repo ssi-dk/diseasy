@@ -484,7 +484,7 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 <span class="r-in"><span>  <span class="co"># with the package.</span></span></span>
 <span class="r-in"><span>  <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> duckdb keeps downloaded extensions and secrets in a temporary directory:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> /tmp/RtmpJnXGEZ/duckdb</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> /tmp/Rtmpu3VuQW/duckdb</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> This is removed when the R session ends.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Secrets are lost.</span>
@@ -543,11 +543,11 @@ of the infection matrix defines the flow (row-sums correspond to new infections)
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   date       incidence realisation_id weight</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 2020-03-01   0.003<span style="text-decoration: underline;">71</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2020-03-02   0.003<span style="text-decoration: underline;">87</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 2020-03-03   0.004<span style="text-decoration: underline;">04</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 2020-03-04   0.004<span style="text-decoration: underline;">22</span>              1      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 2020-03-05   0.004<span style="text-decoration: underline;">41</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 2020-03-01   0.009<span style="text-decoration: underline;">37</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2020-03-02   0.009<span style="text-decoration: underline;">81</span>              1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 2020-03-03   0.010<span style="text-decoration: underline;">3</span>               1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 2020-03-04   0.010<span style="text-decoration: underline;">8</span>               1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 2020-03-05   0.011<span style="text-decoration: underline;">3</span>               1      1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Plot the results</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">m</span>, observable <span class="op">=</span> <span class="st">"incidence"</span>, prediction_length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>

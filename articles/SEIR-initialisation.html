@@ -389,7 +389,7 @@ and to use all available data.</p>
 <code class="sourceCode R"><span><span class="co"># Connect to a database</span></span>
 <span><span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; duckdb keeps downloaded extensions and secrets in a temporary directory:</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/RtmpkWmEai/duckdb</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/RtmptW3FAg/duckdb</span></span>
 <span><span class="co">#&gt; This is removed when the R session ends.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Secrets are lost.</span></span>
@@ -434,16 +434,16 @@ a reduced probability of testing during weekends.</li>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,500 × 6</span></span></span>
 <span><span class="co">#&gt;    date       age_group variant n_infected n_positive_simple n_positive</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            17.2                 7          7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            36.8                25         22</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            49.1                26         18</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            57.3                37         41</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            64.3                48         49</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            71.5                43         47</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT            79.1                55         60</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT            87.1                64         68</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT            95.7                66         53</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           105.                 74         56</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-01-03 60+       WT            28.1                16         16</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-01-04 60+       WT            59.4                41         33</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-01-05 60+       WT            77.1                44         31</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-01-06 60+       WT            86.2                55         60</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-01-07 60+       WT            92.4                66         66</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-01-08 60+       WT            98.3                59         61</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-01-09 60+       WT           105.                 63         69</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-01-10 60+       WT           113.                 73         77</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-01-11 60+       WT           122.                 78         59</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-01-12 60+       WT           133.                 83         64</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,490 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualise the example data</span></span>
@@ -612,7 +612,7 @@ we here visualise this fitting.</p>
 <span>    <span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">age_group</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 1261 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; Warning: Removed 1239 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
 <p><img src="SEIR-initialisation_files/figure-html/incidence%20fitting-1.png" class="r-plt" alt="Fitting a polynomial to the incidence data to estimate derivatives." width="700"></p>
 <p>We can now use the
@@ -625,16 +625,16 @@ infer the initial state vector.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 168 × 6</span></span></span>
 <span><span class="co">#&gt;     time variant age_group region state    value</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0 All     00-29     All    E1    0.001<span style="text-decoration: underline;">39</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     0 All     00-29     All    E2    0.001<span style="text-decoration: underline;">38</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0 All     00-29     All    I1    0.005<span style="text-decoration: underline;">22</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     0 All     00-29     All    R1    0.001<span style="text-decoration: underline;">30</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     0 All     00-29     All    R2    0.001<span style="text-decoration: underline;">06</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     0 All     30-59     All    E1    0.001<span style="text-decoration: underline;">23</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0 All     30-59     All    E2    0.001<span style="text-decoration: underline;">21</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     0 All     30-59     All    I1    0.004<span style="text-decoration: underline;">56</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     0 All     30-59     All    R1    0.001<span style="text-decoration: underline;">22</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     0 All     30-59     All    R2    0.000<span style="text-decoration: underline;">390</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0 All     00-29     All    E1    0.003<span style="text-decoration: underline;">63</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     0 All     00-29     All    E2    0.003<span style="text-decoration: underline;">56</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0 All     00-29     All    I1    0.013<span style="text-decoration: underline;">0</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     0 All     00-29     All    R1    0.003<span style="text-decoration: underline;">20</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     0 All     00-29     All    R2    0.002<span style="text-decoration: underline;">62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     0 All     30-59     All    E1    0.003<span style="text-decoration: underline;">31</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0 All     30-59     All    E2    0.003<span style="text-decoration: underline;">21</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     0 All     30-59     All    I1    0.011<span style="text-decoration: underline;">5</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     0 All     30-59     All    R1    0.003<span style="text-decoration: underline;">00</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     0 All     30-59     All    R2    0.000<span style="text-decoration: underline;">996</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 158 more rows</span></span></span></code></pre></div>
 <p>And we now test the initial conditions by solving the model using
 these starting conditions.</p>
@@ -656,16 +656,16 @@ these starting conditions.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 7</span></span></span>
 <span><span class="co">#&gt;    date       variant age_group incidence realisation_id weight</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-02-23 All     00-29       0.003<span style="text-decoration: underline;">39</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-02-24 All     00-29       0.003<span style="text-decoration: underline;">57</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-02-25 All     00-29       0.003<span style="text-decoration: underline;">81</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-02-26 All     00-29       0.004<span style="text-decoration: underline;">07</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-02-27 All     00-29       0.004<span style="text-decoration: underline;">35</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-02-28 All     00-29       0.004<span style="text-decoration: underline;">65</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-02-29 All     00-29       0.004<span style="text-decoration: underline;">95</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-03-01 All     00-29       0.005<span style="text-decoration: underline;">26</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-03-02 All     00-29       0.005<span style="text-decoration: underline;">59</span>              1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-03-03 All     00-29       0.005<span style="text-decoration: underline;">92</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2020-02-23 All     00-29       0.008<span style="text-decoration: underline;">54</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2020-02-24 All     00-29       0.009<span style="text-decoration: underline;">11</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2020-02-25 All     00-29       0.009<span style="text-decoration: underline;">82</span>              1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2020-02-26 All     00-29       0.010<span style="text-decoration: underline;">6</span>               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2020-02-27 All     00-29       0.011<span style="text-decoration: underline;">4</span>               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2020-02-28 All     00-29       0.012<span style="text-decoration: underline;">3</span>               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2020-02-29 All     00-29       0.013<span style="text-decoration: underline;">1</span>               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2020-03-01 All     00-29       0.014<span style="text-decoration: underline;">0</span>               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2020-03-02 All     00-29       0.014<span style="text-decoration: underline;">8</span>               1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2020-03-03 All     00-29       0.015<span style="text-decoration: underline;">7</span>               1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 290 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: model_configuration &lt;chr&gt;</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
