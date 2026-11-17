@@ -70,7 +70,7 @@ tidyr::expand_grid(
           "compartment_structure" = c("E" = K, "I" = L, "R" = M)
         )
       )
-      rE <- model %.% parameters %.% disease_progression_rates %.% E                                                    # nolint: object_name_linter
+      rE <- purrr::pluck(model %.% parameters %.% disease_progression_rates, "E", .default = 1)                         # nolint: object_name_linter
       rI <- model %.% parameters %.% disease_progression_rates %.% I                                                    # nolint: object_name_linter
 
       # Compute n_infected observable before configuring observables

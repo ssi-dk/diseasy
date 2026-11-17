@@ -69,7 +69,7 @@ These functions define the "API" of the models and ensure the models can take pa
   }
 
   # Show estimated parameters
-  model$parameters$season.scale
+  model$parameters$season
 \dontshow{\}) # examplesIf}
 }
 \seealso{

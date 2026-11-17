@@ -102,9 +102,9 @@ test_that("`combineasy()` can create a model ensembles using parameters", {
 
   # Parameters to load
   parameters <- tidyr::expand_grid(
+    logical = c(TRUE, FALSE),
     number = c(1, 2),
-    string = c("hello", "world"),
-    logical = c(TRUE, FALSE)
+    string = c("hello", "world")
   )
 
   # Create ensemble from a parameter set

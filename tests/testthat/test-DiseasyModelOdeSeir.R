@@ -152,7 +152,7 @@ test_that("NA parameters (marked for optimisation) allowed", {
   # Parameters should be NA after initialisation
   expect_identical(
     model %.% parameters %.% disease_progression_rates %.% E,
-    NA_real_
+    structure(NA_real_, "default" = 1)
   )
 
   # ... but we should not be able to prepare the right hand side

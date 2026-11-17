@@ -212,7 +212,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       }
 
       # Check for non-initialised parameters
-      na_parameters <- purrr::keep(self %.% parameters, ~ anyNA(unlist(.)))
+      na_parameters <- purrr::keep(self %.% parameters, ~ (is.atomic(.x) || is.list(.x)) && anyNA(.x))
       if (length(na_parameters) > 0) {
         stop(
           glue::glue(
@@ -230,13 +230,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # Store a short hand for the number of groups
       private$n_population_groups <- nrow(self %.% population %.% groups)
       private$n_variants   <- max(length(self %.% variant %.% variants), 1)
-      private$n_EIR_states <- sum(self %.% parameters %.% compartment_structure)
+      private$n_EIR_states <- sum(compartment_structure)
       private$n_states     <- private %.% n_population_groups * (private %.% n_EIR_states * private %.% n_variants + 1)
 
       # We retrieve normalised matrices
       private$set_contact_matrix(
         mean_contact_rates = self %.% population %.% mean_contact_rates(
-          weights = self %.% parameters %.% activity.weights
+          weights = self %.% parameters %.% activity %.% weights
         )
       )
 
@@ -315,7 +315,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       immunity_approx <- do.call(
         what = self %.% immunity %.% approximate_compartmental,
         args = modifyList(
-          self %.% parameters %.% immunity.approximate_compartmental_args,
+          self %.% parameters %.% immunity %.% approximate_compartmental_args,
           list(M = compartment_structure[["R"]])
         )
       )
@@ -490,7 +490,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
         private$.malthusian_scaling_factor <- private$compute_malthusian_scaling_factor()
         private$set_contact_matrix(
           mean_contact_rates = self %.% population %.% mean_contact_rates(
-            weights = self %.% parameters %.% activity.weights
+            weights = self %.% parameters %.% activity %.% weights
           ),
           scaling_factor = self$malthusian_scaling_factor
         )
@@ -1525,8 +1525,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
           # Models determinable by initialisation routines
           "overall_infection_risk" = 1,
           "disease_progression_rates" = c("E" = 1, "I" = 1),
-          "season.scale" = NULL, # Use default values from season module
-          "season.peak" = NULL, # Use default values from season module
+          "season" = list("scale" = NULL, "peak" = NULL), # Use default values from season module
 
           # Parameters for fitting polynomials to the incidence curves
           "incidence_polynomial_order" = 3,
@@ -1575,7 +1574,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       checkmate::assert_numeric(
-        parameters %.% disease_progression_rates,
+        unlist(parameters %.% disease_progression_rates),
         lower = 0,
         any.missing = TRUE, # Optimisable
         add = coll
@@ -1583,12 +1582,12 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_names(
         names(parameters %.% disease_progression_rates),
         subset.of = c("E", "I"),
-        must.include = "I",
+        must.include = names(purrr::keep(purrr::keep_at(parameters %.% compartment_structure, c("E", "I")), ~ . > 0L)),
         add = coll
       )
 
       checkmate::assert_number(
-        parameters %.% season.scale,
+        parameters %.% season %.% scale,
         lower = 0,
         upper = 1,
         na.ok = TRUE, # Can be optimised
@@ -1597,7 +1596,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       )
 
       checkmate::assert_number(
-        parameters %.% season.peak,
+        parameters %.% season %.% peak,
         na.ok = TRUE, # Can be optimised
         null.ok = TRUE, # Can use default value from module
         add = coll
@@ -1609,12 +1608,59 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_integerish(parameters %.% incidence_max_order_derivatives, lower = 0, add = coll)
 
       # Validate the functional modules parameters
-      checkmate::assert_numeric(parameters %.% activity.weights, lower = 0, len = 4, add = coll)
+      checkmate::assert_numeric(parameters %.% activity %.% weights, lower = 0, len = 4, add = coll)
 
 
       checkmate::reportAssertions(coll)
 
       super$validate_parameters(parameters) # Validate inherited parameters
+    },
+
+    # @description
+    #   Complete partial input parameters with the current parameters where needed
+    # @param parameters (`named list()`)\cr
+    #   The (potential) partial set of parameters to complete.
+    # @param current_parameters (`named list()`)\cr
+    #   The current set of parameters
+    complete_inpute_parameters = function(parameters, current_parameters) {
+
+      # First, we do basic parameter imputing
+      imputed_parameters <- super$complete_inpute_parameters(parameters, current_parameters) |>
+        explicit_nested_list()
+
+      # For `DiseasyModelOdeSeir` we need special handling of some parameters when imputing
+
+      # First we cast the input parameters as a nested list
+      parameters <- explicit_nested_list(parameters)
+
+      # We need special handling of the compartment structure to just copy the user input
+      # instead of imputing.
+      # If the user specifies `compartment_structure = c("I" = I, "R" = R)`, then
+      # we need to make sure we DO NOT impute the default value for "E" = 1.
+      # Basic parameter imputing has given us: `compartment_structure = c("E" = 1, "I" = I, "R" = R)`
+      # so we overwrite the current impute with the user supplied values
+      if ("compartment_structure" %in% names(parameters)) {
+        imputed_parameters$compartment_structure <- parameters %.% compartment_structure
+      }
+
+      # We need special handling of disease_progression_rates where rates should
+      # be dropped the compartment_structure is configured to have zero elements
+      # Basic imputing will insert values for "E" or "I" even
+      # if `compartment_structure = c("E" = 0L, "I" = 0L)`
+      # so we remove progression rates that can never be reached.
+      if ("disease_progression_rates" %in% names(parameters)) {
+        non_zero_compartments <- imputed_parameters$compartment_structure |>
+          purrr::pluck(.default = current_parameters %.% compartment_structure) |>
+          purrr::keep(~ . > 0L) |>
+          names()
+
+        imputed_parameters$disease_progression_rates <- purrr::keep_at(
+          imputed_parameters %.% disease_progression_rates,
+          non_zero_compartments
+        )
+      }
+
+      return(imputed_parameters)
     },
 
     progression_flow_rates = NULL,

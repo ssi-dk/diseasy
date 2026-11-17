@@ -102,7 +102,7 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
           # Numeric vector parameters contribute one optimisation coordinate per NA element.
           benchmark_parameters <- c(
             "overall_infection_risk",
-            #"disease_progression_rates",
+            "disease_progression_rates.E",
             "season.scale"
           )
 
@@ -161,7 +161,7 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
             diseasy::generate_example_seir_model(
               module_overrides = list("observables" = observables),
               parameter_overrides = c(
-                as.list(stats::setNames(rep(NA, length(combination)), combination)),
+                as.list(stats::setNames(rep(NA_real_, length(combination)), combination)),
                 list("training_length" = c("training" = Inf, "testing" = 21, "validation" = 0))
               )
             )

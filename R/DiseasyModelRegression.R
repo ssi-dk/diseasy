@@ -382,7 +382,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
       modifyList(
         super$default_parameters(), # Obtain parameters from the superclasses
         # Overwrite with model-specific parameters
-        list("season.scale" = NULL, "season.peak" = NULL), # Use default values from season module
+        list("season" = list("scale" = NULL, "peak" = NULL)), # Use default values from season module
         keep.null = TRUE
       )
     },
@@ -396,7 +396,7 @@ DiseasyModelRegression <- R6::R6Class(                                          
       coll <- checkmate::makeAssertCollection()
 
       checkmate::assert_number(
-        parameters %.% season.scale,
+        parameters %.% season %.% scale,
         lower = 0,
         upper = 1,
         na.ok = TRUE, # Can be optimised
@@ -404,12 +404,12 @@ DiseasyModelRegression <- R6::R6Class(                                          
         add = coll
       )
       checkmate::assert_number(
-        parameters %.% season.peak,
+        parameters %.% season %.% peak,
         na.ok = TRUE, # Can be optimised
         null.ok = TRUE, # Can use default value from module
         add = coll
       )
-      if (!is.null(parameters %.% season.scale)) {
+      if (!is.null(parameters %.% season %.% scale)) {
         checkmate::assert_class(self %.% season, "DiseasySeason", add = coll)
       }
 
