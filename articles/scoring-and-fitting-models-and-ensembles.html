@@ -123,21 +123,23 @@ functional modules passed to the model
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span></span>
-<span><span class="co">#&gt; $training_length</span></span>
-<span><span class="co">#&gt;   training    testing validation </span></span>
-<span><span class="co">#&gt;          7          0          0 </span></span>
+<span><span class="co">#&gt; $n_realisations</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.scale</span></span>
+<span><span class="co">#&gt; $season</span></span>
+<span><span class="co">#&gt; $season$peak</span></span>
 <span><span class="co">#&gt; NULL</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.peak</span></span>
+<span><span class="co">#&gt; $season$scale</span></span>
 <span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $seed</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $n_realisations</span></span>
-<span><span class="co">#&gt; [1] 100</span></span></code></pre></div>
+<span><span class="co">#&gt; $training_length</span></span>
+<span><span class="co">#&gt;    testing   training validation </span></span>
+<span><span class="co">#&gt;          0          7          0</span></span></code></pre></div>
 <p>This model has parameters inherent to the model and parameters
 related to the season module. This latter type of parameters, parameters
 that should modify the internal modules are treated specially: If these
@@ -152,21 +154,23 @@ be applied to the module.</p>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>season <span class="op">=</span> <span class="va">season</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $training_length</span></span>
-<span><span class="co">#&gt;   training    testing validation </span></span>
-<span><span class="co">#&gt;          7          0          0 </span></span>
+<span><span class="co">#&gt; $n_realisations</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.scale</span></span>
+<span><span class="co">#&gt; $season</span></span>
+<span><span class="co">#&gt; $season$peak</span></span>
 <span><span class="co">#&gt; NULL</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.peak</span></span>
+<span><span class="co">#&gt; $season$scale</span></span>
 <span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $seed</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $n_realisations</span></span>
-<span><span class="co">#&gt; [1] 100</span></span>
+<span><span class="co">#&gt; $training_length</span></span>
+<span><span class="co">#&gt;    testing   training validation </span></span>
+<span><span class="co">#&gt;          0          7          0</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># If we change to the "covid_season_v1" season model, we have a single "scale"</span></span>
@@ -175,21 +179,23 @@ be applied to the module.</p>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>season <span class="op">=</span> <span class="va">season</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span> <span class="co"># ... and this scale is copied to the model</span></span>
-<span><span class="co">#&gt; $training_length</span></span>
-<span><span class="co">#&gt;   training    testing validation </span></span>
-<span><span class="co">#&gt;          7          0          0 </span></span>
+<span><span class="co">#&gt; $n_realisations</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.scale</span></span>
+<span><span class="co">#&gt; $season</span></span>
+<span><span class="co">#&gt; $season$peak</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $season$scale</span></span>
 <span><span class="co">#&gt; [1] 0.4825524</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.peak</span></span>
-<span><span class="co">#&gt; NULL</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $seed</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $n_realisations</span></span>
-<span><span class="co">#&gt; [1] 100</span></span>
+<span><span class="co">#&gt; $training_length</span></span>
+<span><span class="co">#&gt;    testing   training validation </span></span>
+<span><span class="co">#&gt;          0          7          0</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># If we change to the "cosine_Season" season model, we have both a "scale"</span></span>
@@ -198,21 +204,19 @@ be applied to the module.</p>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Diseasy-GLM-models.html">DiseasyModelG0</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>season <span class="op">=</span> <span class="va">season</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span> <span class="co"># ... and these are copied to the model</span></span>
-<span><span class="co">#&gt; $training_length</span></span>
-<span><span class="co">#&gt;   training    testing validation </span></span>
-<span><span class="co">#&gt;          7          0          0 </span></span>
+<span><span class="co">#&gt; $n_realisations</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.scale</span></span>
-<span><span class="co">#&gt; [1] 0.5726693</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.peak</span></span>
-<span><span class="co">#&gt; [1] 20.09946</span></span>
+<span><span class="co">#&gt; $season</span></span>
+<span><span class="co">#&gt;       peak      scale </span></span>
+<span><span class="co">#&gt; 20.0994600  0.5726693 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $seed</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $n_realisations</span></span>
-<span><span class="co">#&gt; [1] 100</span></span>
+<span><span class="co">#&gt; $training_length</span></span>
+<span><span class="co">#&gt;    testing   training validation </span></span>
+<span><span class="co">#&gt;          0          7          0</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># If we provide specific values to the model, then these values are</span></span>
@@ -222,23 +226,25 @@ be applied to the module.</p>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"season.scale"</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span> <span class="co"># "peak" value is still copied</span></span>
-<span><span class="co">#&gt; $training_length</span></span>
-<span><span class="co">#&gt;   training    testing validation </span></span>
-<span><span class="co">#&gt;          7          0          0 </span></span>
+<span><span class="co">#&gt; $n_realisations</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.scale</span></span>
-<span><span class="co">#&gt; [1] 0.5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $season.peak</span></span>
-<span><span class="co">#&gt; [1] 20.09946</span></span>
+<span><span class="co">#&gt; $season</span></span>
+<span><span class="co">#&gt;     peak    scale </span></span>
+<span><span class="co">#&gt; 20.09946  0.50000 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $seed</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $n_realisations</span></span>
-<span><span class="co">#&gt; [1] 100</span></span>
-<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">season</span><span class="op">$</span><span class="va">model</span>, <span class="st">"dots"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
+<span><span class="co">#&gt; $training_length</span></span>
+<span><span class="co">#&gt;    testing   training validation </span></span>
+<span><span class="co">#&gt;          0          7          0</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">season</span><span class="op">$</span><span class="va">model_t</span>, <span class="st">"dots"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $scale</span></span>
+<span><span class="co">#&gt; [1] 0.5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $peak</span></span>
+<span><span class="co">#&gt; [1] 20.09946</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="marking-parameters-for-optimisation">Marking parameters for optimisation<a class="anchor" aria-label="anchor" href="#marking-parameters-for-optimisation"></a>
@@ -254,7 +260,7 @@ optimisation.</p>
 <span>  season <span class="op">=</span> <span class="va">season</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"season.scale"</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="co"># Mark for optimisation</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">[[</span><span class="st">"season.scale"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">season</span><span class="op">$</span><span class="va">scale</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] NA</span></span>
 <span><span class="co">#&gt; attr(,"default")</span></span>
 <span><span class="co">#&gt; [1] 0.5726693</span></span></code></pre></div>
@@ -276,7 +282,7 @@ or <code>c(NA, max_value)</code> - bounded from both directions
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">[[</span><span class="st">"season.scale"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">season</span><span class="op">$</span><span class="va">scale</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] NA</span></span>
 <span><span class="co">#&gt; attr(,"default")</span></span>
 <span><span class="co">#&gt; [1] 0.25</span></span>
@@ -293,16 +299,16 @@ model as we have seen above:</p>
 <span>  season <span class="op">=</span> <span class="va">season</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"season.scale"</span> <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">[</span><span class="st">"season.scale"</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $season.scale</span></span>
-<span><span class="co">#&gt; [1] 0.25</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">season</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     peak    scale </span></span>
+<span><span class="co">#&gt; 20.09946  0.25000</span></span></code></pre></div>
 <p>But the parameters can also be modified after initialisation via the
 <code><a href=".{2}/reference/DiseasyModel.html#method-DiseasyModel-update_parameters">$update_parameters()</a></code> method:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">update_parameters</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"season.scale"</span> <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">[</span><span class="st">"season.scale"</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $season.scale</span></span>
-<span><span class="co">#&gt; [1] 0.7</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/print.html">print</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">season</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     peak    scale </span></span>
+<span><span class="co">#&gt; 20.09946  0.70000</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="the-scoring-metric">The scoring metric<a class="anchor" aria-label="anchor" href="#the-scoring-metric"></a>
@@ -342,7 +348,7 @@ set of model trajectories with
 <span>  conn <span class="op">=</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; duckdb keeps downloaded extensions and secrets in a temporary directory:</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/Rtmpf00Zge/duckdb</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/Rtmpr6C2jr/duckdb</span></span>
 <span><span class="co">#&gt; This is removed when the R session ends.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Secrets are lost.</span></span>
@@ -387,7 +393,7 @@ free parameters using the “testing” data window.</p>
 <span>  conn <span class="op">=</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; duckdb keeps downloaded extensions and secrets in a temporary directory:</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/Rtmpf00Zge/duckdb</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/Rtmpr6C2jr/duckdb</span></span>
 <span><span class="co">#&gt; This is removed when the R session ends.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Secrets are lost.</span></span>
@@ -402,36 +408,58 @@ free parameters using the “testing” data window.</p>
 <span></span>
 <span><span class="co"># Generate a modified model of the "true" generating model</span></span>
 <span><span class="co"># with a specified "testing" window</span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_example_seir_model.html">generate_example_seir_model</a></span><span class="op">(</span></span>
+<span><span class="va">model_baseline</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_example_seir_model.html">generate_example_seir_model</a></span><span class="op">(</span></span>
 <span>  module_overrides <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="st">"observables"</span> <span class="op">=</span> <span class="va">observables</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  parameter_overrides <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="st">"training_length"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"training"</span> <span class="op">=</span> <span class="fl">21</span>, <span class="st">"testing"</span> <span class="op">=</span> <span class="fl">7</span>, <span class="st">"validation"</span> <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>    <span class="st">"training_length"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"training"</span> <span class="op">=</span> <span class="cn">Inf</span>, <span class="st">"testing"</span> <span class="op">=</span> <span class="fl">7</span>, <span class="st">"validation"</span> <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># The default model does not currently include the scoring module, so we</span></span>
+<span><span class="co"># manually load</span></span>
+<span><span class="va">model_baseline</span><span class="op">$</span><span class="fu">load_module</span><span class="op">(</span><span class="va">scoring</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model_1</span> <span class="op">&lt;-</span> <span class="va">model_baseline</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">model_2</span> <span class="op">&lt;-</span> <span class="va">model_baseline</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>We can see the prediction using the default parameters</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span>, prediction_length <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model_1</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span>, prediction_length <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span></code></pre></div>
 <p><img src="scoring-and-fitting-models-and-ensembles_files/figure-html/plot%20before%20fitting-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># The default model does not currently include the scoring module, so we</span></span>
-<span><span class="co"># manually load</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">load_module</span><span class="op">(</span><span class="va">scoring</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Mark the overall infection risk for fitting</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">update_parameters</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"overall_infection_risk"</span> <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Mark the overall infection risk for fitting</span></span>
+<span><span class="va">model_1</span><span class="op">$</span><span class="fu">update_parameters</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"overall_infection_risk"</span> <span class="op">=</span> <span class="fu"><a href="../reference/set_attributes.html">set_attributes</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"default"</span> <span class="op">=</span> <span class="fl">0.025</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Estimate free parameters</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">fit</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span><span class="op">)</span></span>
+<span><span class="va">model_1</span><span class="op">$</span><span class="fu">fit</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Show estimated parameters</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="va">parameters</span><span class="op">[</span><span class="st">"overall_infection_risk"</span><span class="op">]</span></span>
+<span><span class="va">model_1</span><span class="op">$</span><span class="va">parameters</span><span class="op">[</span><span class="st">"overall_infection_risk"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $overall_infection_risk</span></span>
-<span><span class="co">#&gt; [1] 0.02245831</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.02248305</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span>, prediction_length <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span></code></pre></div>
-<p><img src="scoring-and-fitting-models-and-ensembles_files/figure-html/plot%20after%20fitting-1.png" class="r-plt" alt="" width="700"></p>
+<code class="sourceCode R"><span><span class="va">model_1</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span>, prediction_length <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scoring-and-fitting-models-and-ensembles_files/figure-html/plot%20after%20fitting%20-%20overall_infection_risk-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Mark the overall infection risk for fitting</span></span>
+<span><span class="va">model_2</span><span class="op">$</span><span class="fu">update_parameters</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"disease_progression_rates.E"</span> <span class="op">=</span> <span class="fu"><a href="../reference/set_attributes.html">set_attributes</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"default"</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2.1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Estimate free parameters</span></span>
+<span><span class="va">model_2</span><span class="op">$</span><span class="fu">fit</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Show estimated parameters</span></span>
+<span><span class="va">model_2</span><span class="op">$</span><span class="va">parameters</span><span class="op">[</span><span class="st">"disease_progression_rates"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; $disease_progression_rates</span></span>
+<span><span class="co">#&gt;         E         I </span></span>
+<span><span class="co">#&gt; 6.5772410 0.2222222</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model_2</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_infected"</span>, prediction_length <span class="op">=</span> <span class="fl">14</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scoring-and-fitting-models-and-ensembles_files/figure-html/plot%20after%20fitting%20-%20disease_progression_rates-1.png" class="r-plt" alt="" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
