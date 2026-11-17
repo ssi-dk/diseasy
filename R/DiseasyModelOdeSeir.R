@@ -1622,10 +1622,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     #   The (potential) partial set of parameters to impute.
     # @param current_parameters (`named list()`)\cr
     #   The complete set of current parameters
-    impute_inpute_parameters = function(parameters, current_parameters) {
+    complete_inpute_parameters = function(parameters, current_parameters) {
 
       # First, we do basic parameter imputing
-      imputed_parameters <- super$impute_inpute_parameters(parameters, current_parameters) |>
+      imputed_parameters <- super$complete_inpute_parameters(parameters, current_parameters) |>
         explicit_nested_list()
 
       # For `DiseasyModelOdeSeir` we need special handling of some parameters when imputing

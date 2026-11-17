@@ -186,7 +186,7 @@ DiseasyModel <- R6::R6Class(                                                    
       current_parameters <- purrr::pluck(self$parameters, .default = private %.% default_parameters())
 
       # If the incomming parameters are partial, impute with all parameters at given levels
-      imputed_parameters <- private$impute_inpute_parameters(parameters, current_parameters)
+      imputed_parameters <- private$complete_inpute_parameters(parameters, current_parameters)
 
       # Ensure parameters are an implicit nested list
       current_parameters <- implicit_nested_list(current_parameters)
@@ -767,7 +767,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #   The (potential) partial set of parameters to impute.
     # @param current_parameters (`named list()`)\cr
     #   The complete set of current parameters
-    impute_inpute_parameters = function(parameters, current_parameters) {
+    complete_inpute_parameters = function(parameters, current_parameters) {
 
       # Say a model takes a vectorised parameter "season" = list("scale" = 1, "peak" = 1)
       # then the user may end up providing a parameter update for "season.scale" which
