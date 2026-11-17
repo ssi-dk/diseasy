@@ -1617,11 +1617,11 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     },
 
     # @description
-    #  Impute partial input parameters with the current parameters where needed
+    #   Complete partial input parameters with the current parameters where needed
     # @param parameters (`named list()`)\cr
-    #   The (potential) partial set of parameters to impute.
+    #   The (potential) partial set of parameters to complete.
     # @param current_parameters (`named list()`)\cr
-    #   The complete set of current parameters
+    #   The current set of parameters
     complete_inpute_parameters = function(parameters, current_parameters) {
 
       # First, we do basic parameter imputing
