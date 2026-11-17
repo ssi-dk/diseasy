@@ -46,15 +46,13 @@
 #'   Prem K, Cook AR, Jit M (2017). "Projecting social contact
 #'   matrices in 152 countries using contact surveys and demographic
 #'   data." _PLoS Computational Biology_, *13*(9), e1005697.
-#'   doi:10.1371/journal.pcbi.1005697
-#'   <https://doi.org/10.1371/journal.pcbi.1005697>.
+#'   \doi{10.1371/journal.pcbi.1005697}.
 #' @source
 #'   Prem K, van Zandvoort K, Klepac P, Eggo RM, Davies NG, Group
 #'   CCW, Cook AR, Jit M (2021). "Projecting contact matrices in 177
 #'   geographical regions: An update and comparison with empirical
 #'   data for the COVID-19 era." _PLoS Computational Biology_,
-#'   *17*(7), e1009098. doi:10.1371/journal.pcbi.1009098
-#'   <https://doi.org/10.1371/journal.pcbi.1009098>.
+#'   *17*(7), e1009098. \doi{10.1371/journal.pcbi.1009098}.
 #' @keywords data
 NULL
 
