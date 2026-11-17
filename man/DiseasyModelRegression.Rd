@@ -22,7 +22,7 @@ In the case of a GLM model, this would be a call to \code{stats::predict}.
 
 The \verb{$update_formula()} method should update the formula based on the stratifications.
 If the model should flexibly adapt to different stratifications, this method should be implemented.
-See \code{?DiseasyModelGLM} and \code{?DiseasyModelBRM} for examples of how this can be done.
+See \code{?DiseasyModelGlm} and \code{?DiseasyModelBrm} for examples of how this can be done.
 }
 \examples{
   # This module cannot be constructed directly but should instead be used to
