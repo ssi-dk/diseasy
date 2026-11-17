@@ -4,11 +4,11 @@
 \name{diseasy-package}
 \alias{diseasy}
 \alias{diseasy-package}
-\title{diseasy: Disease Ensemble Modelling Made Easy}
+\title{diseasy: Ensemble Disease Modelling Made Easy}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package facilitates creation of an ensemble of models through modular construction and combinatorics.
+Modules, models and tools to create ensembles of disease models through modular construction and combinatorics. Using the data pipeline provided by the 'diseasystore' package, 'diseasy' enables ensembles of disease models to be run across multiple diseases and under multiple scenarios.
 }
 \seealso{
 Useful links:
@@ -32,7 +32,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID}) [reviewer]
+  \item Marcus Munch Grünewald (\href{https://orcid.org/0009-0006-8090-406X}{ORCID}) [reviewer]
   \item Statens Serum Institut (https://www.ssi.dk) [copyright holder, funder]
   \item EU [funder]
 }
