@@ -252,12 +252,12 @@
     },
     {
       "package": "diseasy",
-      "version": "0.0.0.9001",
+      "version": "0.1",
       "_row": "diseasy"
     },
     {
       "package": "diseasystore",
-      "version": "0.4.1.9000",
+      "version": "0.4.1",
       "_row": "diseasystore"
     },
     {
