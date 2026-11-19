@@ -11,7 +11,7 @@
 #' @return
 #'   A named list with elements `demography_nuts3` and `nuts`.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' nuts_data <- generate_demography_nuts3(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
 #' @keywords data-generators

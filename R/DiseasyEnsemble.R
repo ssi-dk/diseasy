@@ -11,6 +11,7 @@
 #' @param width (`integer(1)`)\cr
 #'   The maximum number of characters to print.
 #' @examplesIf rlang::is_installed("duckdb")
+#'   \donttest{
 #'   conn <- DBI::dbConnect(duckdb::duckdb())
 #'
 #'   observables <- DiseasyObservables$new(
@@ -39,6 +40,7 @@
 #'
 #'   rm(ensemble, observables)
 #'   DBI::dbDisconnect(conn)
+#'   }
 #' @return `r rd_side_effects`
 #' @export
 print.DiseasyEnsemble <- function(x, n = 5, width = 200, ...) {

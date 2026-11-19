@@ -12,6 +12,7 @@ with model trajectories.
 }
 \examples{
 \dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
+  \donttest{
   # Create a scoring module
   scoring <- DiseasyScoring$new()
 
@@ -40,6 +41,7 @@ with model trajectories.
 
   DBI::dbDisconnect(conn)
   rm(scoring, conn)
+  }
 \dontshow{\}) # examplesIf}
 }
 \seealso{

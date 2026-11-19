@@ -23,7 +23,7 @@ Generate NUTS3 demography data and the corresponding NUTS region lookup
 from Eurostat dataset \code{demo_r_pjangrp3}.
 }
 \examples{
-\dontrun{
+\donttest{
 nuts_data <- generate_demography_nuts3(area = c("DK", "FI", "IS", "NO", "SE"))
 }
 }

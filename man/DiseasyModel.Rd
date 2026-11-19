@@ -64,7 +64,7 @@ These functions define the "API" of the models and ensure the models can take pa
     )
   )
 
-  \dontrun{
+  \donttest{
   model$fit(observable = "n_infected")
   }
 

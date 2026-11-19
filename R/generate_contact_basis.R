@@ -8,7 +8,7 @@
 #'   A named list of contact-basis objects, using the current package data
 #'   structure.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' contact_basis <- generate_contact_basis()
 #' }
 #' @keywords data-generators

@@ -18,7 +18,7 @@ Generate the contact-basis object used by \code{diseasy} from \code{contactdata}
 contact matrices and country-level demography.
 }
 \examples{
-\dontrun{
+\donttest{
 contact_basis <- generate_contact_basis()
 }
 }
