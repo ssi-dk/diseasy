@@ -247,8 +247,7 @@ NULL
 #' @source
 #'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
 #'   Retrieved `r format(attr(adjacency_meta_nordic_nuts3, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
-#'   See <https://data.humdata.org/dataset/social-connectedness-index> and
-#'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
+#'   See <https://data.humdata.org/dataset/social-connectedness-index>.
 #' @keywords data
 NULL
 
@@ -269,7 +268,6 @@ NULL
 #' @source
 #'   Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
 #'   Retrieved `r format(attr(adjacency_meta_nordic, "creation_date"), "%B %d, %Y", tz = "Europe/Copenhagen")`.
-#'   See <https://data.humdata.org/dataset/social-connectedness-index> and
-#'   <https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/>.
+#'   See <https://data.humdata.org/dataset/social-connectedness-index>.
 #' @keywords data
 NULL

@@ -7,8 +7,7 @@
 \source{
 Meta Social Connectedness Index. Data accessed from the Humanitarian Data Exchange.
 Retrieved August 11, 2026.
-See \url{https://data.humdata.org/dataset/social-connectedness-index} and
-\url{https://ai.meta.com/ai-for-good/docs/methodology-social-connectedness-index/}.
+See \url{https://data.humdata.org/dataset/social-connectedness-index}.
 }
 \description{
 This data set contains a long-form adjacency object derived from the Meta Social Connectedness Index
