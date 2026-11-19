@@ -37,8 +37,10 @@ as the probability that a randomly selected friend will also select you back
 in a game of dice.
 }
 \examples{
+\dontshow{if (rlang::is_installed("countrycode")) withAutoprint(\{ # examplesIf}
 \donttest{
 adjacency_meta_nordic <- generate_adjacency_meta(area = c("DK", "FI", "IS", "NO", "SE"))
 }
+\dontshow{\}) # examplesIf}
 }
 \keyword{data-generators}
