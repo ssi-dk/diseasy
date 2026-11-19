@@ -20,7 +20,7 @@ Authors@R:
     person(
       given ="Kaare",
       family = "Gr\u00E6sb\u00F8ll",
-      email = "kagr@ssi.dk",
+      email = "kgrb@ssi.dk",
       role = "aut",
       comment = c("ORCID" = "0000-0002-6258-8212")
     ),
@@ -30,12 +30,6 @@ Authors@R:
       email ="smot@ssi.dk",
       role = "aut",
       comment = c("ORCID" = "0009-0006-4953-614X")
-    ),
-    person(
-      given ="Marcus Munch",
-      family = "Gr\u00FCnewald",
-      role = "rev",
-      comment = c("ORCID" = "0009-0006-8090-406X")
     ),
     person(given = "Statens Serum Institut", role = c("cph", "fnd"), comment = "https://www.ssi.dk"),
     person(given = "EU", role = "fnd")
