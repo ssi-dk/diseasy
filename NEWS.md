@@ -13,7 +13,7 @@
 
   A functional module to provide data by interfacing with the {diseasystore}-package.
 
-  * Observables: provides time-versioned data to the models in supported stratfications.
+  * Observables: provides time-versioned data to the models in supported stratifications.
   * Synthetic observables: define model inputs derived from actual observations.
 
   * `DiseasystoreSeirExample`:
@@ -40,7 +40,7 @@
 
   * `contact_basis_nordic`:
 
-    A data set containing contact information for the nordic geographical areas:
+    A data set containing contact information for the Nordic geographical areas:
 
     * Contact matrices.
     * Demographic information (2020).
@@ -59,13 +59,13 @@
 
   * `demography_nordic` / `demography_nordic_nuts3`:
 
-    Data sets containing demography information for the nordic geographical areas:
+    Data sets containing demography information for the Nordic geographical areas:
 
     * Demography information for other geographical areas can be generated with `generate_demography()` and `generate_demography_nuts3()`.
 
   * `adjacency_meta_nordic` / `adjacency_meta_nordic_nuts3`:
 
-    Data sets containing adjacency information for the nordic geographical areas
+    Data sets containing adjacency information for the Nordic geographical areas
     based on Facebook connections.
 
     * Adjacency information for other geographical areas can be generated with `generate_adjacency_meta()`.
