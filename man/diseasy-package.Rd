@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Modules, models and tools to create ensembles of disease models through modular construction and combinatorics. Using the data pipeline provided by the 'diseasystore' package, 'diseasy' enables ensembles of disease models to be run across multiple diseases and under multiple scenarios.
+A modular framework for constructing, fitting and evaluating ensembles of infectious disease models. Supports combining model components and configurations to explore different diseases and scenarios. Integrates with the data pipeline provided by the 'diseasystore' package to automate much of the process of running model ensembles.
 }
 \seealso{
 Useful links:
@@ -33,7 +33,7 @@ Authors:
 Other contributors:
 \itemize{
   \item Statens Serum Institut (https://www.ssi.dk) [copyright holder, funder]
-  \item EU [funder]
+  \item European Union [funder]
 }
 
 }

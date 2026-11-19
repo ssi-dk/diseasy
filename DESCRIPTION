@@ -1,6 +1,6 @@
 Package: diseasy
 Title: Ensemble Disease Modelling Made Easy
-Version: 0.1
+Version: 0.1.0
 Authors@R:
   c(
     person(
@@ -32,20 +32,22 @@ Authors@R:
       comment = c("ORCID" = "0009-0006-4953-614X")
     ),
     person(given = "Statens Serum Institut", role = c("cph", "fnd"), comment = "https://www.ssi.dk"),
-    person(given = "EU", role = "fnd")
+    person(given = "European Union", role = "fnd")
   )
-Description:
-  Modules, models and tools to create ensembles of disease models through modular construction and combinatorics.
-  Using the data pipeline provided by the 'diseasystore' package, 'diseasy' enables ensembles of disease models to
-  be run across multiple diseases and under multiple scenarios.
+Description: A modular framework for constructing, fitting and
+  evaluating ensembles of infectious disease models. Supports combining
+  model components and configurations to explore different diseases and
+  scenarios.
+  Integrates with the data pipeline provided by the 'diseasystore' package to
+  automate much of the process of running model ensembles.
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Language: en-GB
 LazyData: TRUE
 Depends:
-  diseasystore (>= 0.4.1),
-  R (>= 4.3.0)
+  R (>= 4.3.0),
+  diseasystore (>= 0.4.1)
 Imports:
   cachem,
   checkmate,
@@ -109,7 +111,7 @@ Suggests:
   tibble,
   ucminf,
   usethis
-VignetteBuilder: knitr,
+VignetteBuilder: knitr
 URL: https://github.com/ssi-dk/diseasy, https://ssi-dk.github.io/diseasy/
 BugReports: https://github.com/ssi-dk/diseasy/issues
 Config/roxygen2/version: 8.1.1
