@@ -123,7 +123,7 @@ explicit_nested_list <- function(flat) {
   return(.explicitly_nest_list(flat))
 }
 
-#' @export
+#' @noRd
 .explicitly_nest_list <- function(flat, level = 0) {
   keys <- names(flat)
   roots <- unique(sub("\\..*$", "", keys))

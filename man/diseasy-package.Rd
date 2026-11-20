@@ -4,11 +4,11 @@
 \name{diseasy-package}
 \alias{diseasy}
 \alias{diseasy-package}
-\title{diseasy: Disease Ensemble Modelling Made Easy}
+\title{diseasy: Ensemble Disease Modelling Made Easy}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package facilitates creation of an ensemble of models through modular construction and combinatorics.
+A modular framework for constructing, fitting and evaluating ensembles of infectious disease models. Supports combining model components and configurations to explore different diseases and scenarios. Integrates with the data pipeline provided by the 'diseasystore' package to automate much of the process of running model ensembles.
 }
 \seealso{
 Useful links:
@@ -26,15 +26,14 @@ Authors:
 \itemize{
   \item Rasmus Skytte Randløv \email{rske@ssi.dk} (\href{https://orcid.org/0000-0002-5860-3838}{ORCID})
   \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID})
-  \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID})
+  \item Kaare Græsbøll \email{kgrb@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID})
   \item Sofia Myrup Otero \email{smot@ssi.dk} (\href{https://orcid.org/0009-0006-4953-614X}{ORCID})
 }
 
 Other contributors:
 \itemize{
-  \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID}) [reviewer]
   \item Statens Serum Institut (https://www.ssi.dk) [copyright holder, funder]
-  \item EU [funder]
+  \item European Union [funder]
 }
 
 }

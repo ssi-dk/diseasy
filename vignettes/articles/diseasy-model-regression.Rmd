@@ -31,12 +31,12 @@ Structurally, R6 classes we provide are as follows:
 |------------------------- | --------------------------------------------------------------------- |
 |`?DiseasyModel`           | All model templates initially inherit from this module (see `vignette("creating-a-model")`). |
 |`?DiseasyModelRegression` | Defines the structure of regression model templates (i.e. must implement `$fit_regression()`, `$get_prediction()`, and `$update_formula()`). |
-|`?DiseasyModelGLM`        | Implements `$fit_regression()` and `$get_prediction()` using `stats::glm` |
-|`?DiseasyModelBRM`        | Implements `$fit_regression()` and `$get_prediction()` using `brms::brm`  |
-|`?DiseasyModelG0`         | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelGLM`) |
-|`?DiseasyModelG1`         | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelGLM`) |
-|`?DiseasyModelB0`         | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelBRM`) |
-|`?DiseasyModelB1`         | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelBRM`) |
+|`?DiseasyModelGlm`        | Implements `$fit_regression()` and `$get_prediction()` using `stats::glm` |
+|`?DiseasyModelBrm`        | Implements `$fit_regression()` and `$get_prediction()` using `brms::brm`  |
+|`?DiseasyModelG0`         | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelGlm`) |
+|`?DiseasyModelG1`         | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelGlm`) |
+|`?DiseasyModelB0`         | Implements `$update_formula()` to create a constant predictor model (from `?DiseasyModelBrm`) |
+|`?DiseasyModelB1`         | Implements `$update_formula()` to create a exponential growth predictor model (from `?DiseasyModelBrm`) |
 
 # Examples
 Here we show how to use the simple regression model templates in `diseasy`.

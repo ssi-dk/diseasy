@@ -18,8 +18,10 @@ Generate the contact-basis object used by \code{diseasy} from \code{contactdata}
 contact matrices and country-level demography.
 }
 \examples{
-\dontrun{
+\dontshow{if (rlang::is_installed("countrycode")) withAutoprint(\{ # examplesIf}
+\donttest{
 contact_basis <- generate_contact_basis()
 }
+\dontshow{\}) # examplesIf}
 }
 \keyword{data-generators}

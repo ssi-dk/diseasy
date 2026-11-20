@@ -6,6 +6,7 @@
 #' @return
 #'   A configured `DiseasyModelOdeSeir`.
 #' @examplesIf rlang::is_installed("RSQLite")
+#'   \donttest{
 #'   model <- generate_example_seir_model()
 #'
 #'   model_modified <- generate_example_seir_model(
@@ -13,6 +14,7 @@
 #'   )
 #'
 #'   model_modified$parameters
+#'   }
 #' @export
 generate_example_seir_model <- function(
   module_overrides = list(),

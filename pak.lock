@@ -32,7 +32,7 @@
     },
     {
       "package": "bayesplot",
-      "version": "1.16.0",
+      "version": "1.17.0",
       "_row": "bayesplot"
     },
     {
@@ -252,12 +252,12 @@
     },
     {
       "package": "diseasy",
-      "version": "0.0.0.9001",
+      "version": "0.1.0",
       "_row": "diseasy"
     },
     {
       "package": "diseasystore",
-      "version": "0.4.1.9000",
+      "version": "0.4.1",
       "_row": "diseasystore"
     },
     {
@@ -722,7 +722,7 @@
     },
     {
       "package": "openssl",
-      "version": "2.5.0",
+      "version": "2.6.0",
       "_row": "openssl"
     },
     {
@@ -787,7 +787,7 @@
     },
     {
       "package": "posterior",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "_row": "posterior"
     },
     {
@@ -807,7 +807,7 @@
     },
     {
       "package": "processx",
-      "version": "3.9.0",
+      "version": "3.10.0",
       "_row": "processx"
     },
     {
@@ -1047,7 +1047,7 @@
     },
     {
       "package": "S7",
-      "version": "0.2.2",
+      "version": "1.0.0",
       "_row": "S7"
     },
     {

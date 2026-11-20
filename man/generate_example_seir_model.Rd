@@ -24,6 +24,7 @@ Generate variants of the example model (used to create data for \code{?Diseasyst
 }
 \examples{
 \dontshow{if (rlang::is_installed("RSQLite")) withAutoprint(\{ # examplesIf}
+  \donttest{
   model <- generate_example_seir_model()
 
   model_modified <- generate_example_seir_model(
@@ -31,5 +32,6 @@ Generate variants of the example model (used to create data for \code{?Diseasyst
   )
 
   model_modified$parameters
+  }
 \dontshow{\}) # examplesIf}
 }

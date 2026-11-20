@@ -27,8 +27,8 @@
 #'   the quantity: adjacency * t(adjacency). This can be interpreted roughly
 #'   as the probability that a randomly selected friend will also select you back
 #'   in a game of dice.
-#' @examples
-#' \dontrun{
+#' @examplesIf rlang::is_installed("countrycode")
+#' \donttest{
 #' adjacency_meta_nordic <- generate_adjacency_meta(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
 #' @keywords data-generators

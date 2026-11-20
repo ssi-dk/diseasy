@@ -402,7 +402,7 @@ DiseasyModel <- R6::R6Class(                                                    
     #'     )
     #'   )
     #'
-    #'   \dontrun{
+    #'   \donttest{
     #'   model$fit(observable = "n_infected")
     #'   }
     #'

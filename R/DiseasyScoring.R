@@ -4,6 +4,7 @@
 #'   The `DiseasyScoring` module is responsible for defining the scoring rules (metrics) for comparing observations
 #'   with model trajectories.
 #' @examplesIf rlang::is_installed("duckdb")
+#'   \donttest{
 #'   # Create a scoring module
 #'   scoring <- DiseasyScoring$new()
 #'
@@ -32,6 +33,7 @@
 #'
 #'   DBI::dbDisconnect(conn)
 #'   rm(scoring, conn)
+#'   }
 #' @return
 #'   A new instance of the `DiseasyScoring` [R6][R6::R6Class] class.
 #' @keywords ensemble-module

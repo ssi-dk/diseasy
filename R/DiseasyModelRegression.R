@@ -16,7 +16,7 @@
 #'
 #'   The `$update_formula()` method should update the formula based on the stratifications.
 #'   If the model should flexibly adapt to different stratifications, this method should be implemented.
-#'   See `?DiseasyModelGLM` and `?DiseasyModelBRM` for examples of how this can be done.
+#'   See `?DiseasyModelGlm` and `?DiseasyModelBrm` for examples of how this can be done.
 #' @examples
 #'   # This module cannot be constructed directly but should instead be used to
 #'   # inherit from when creating a new model class.

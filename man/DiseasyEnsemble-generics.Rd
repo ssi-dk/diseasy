@@ -68,6 +68,7 @@ Standard generics for \code{DiseasyEnsemble} objects
 }
 \examples{
 \dontshow{if (rlang::is_installed("duckdb")) withAutoprint(\{ # examplesIf}
+  \donttest{
   conn <- DBI::dbConnect(duckdb::duckdb())
 
   observables <- DiseasyObservables$new(
@@ -96,5 +97,6 @@ Standard generics for \code{DiseasyEnsemble} objects
 
   rm(ensemble, observables)
   DBI::dbDisconnect(conn)
+  }
 \dontshow{\}) # examplesIf}
 }
