@@ -10,7 +10,7 @@
 #'   Should we also return the list of NUTS3 codes?
 #' @return
 #'   A named list with elements `demography_nuts3` and `nuts`.
-#' @examples
+#' @examplesIf rlang::is_installed(c("countrycode", "eurostat"))
 #' \donttest{
 #' nuts_data <- generate_demography_nuts3(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
