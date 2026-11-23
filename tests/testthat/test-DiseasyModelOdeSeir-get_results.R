@@ -91,6 +91,7 @@ tidyr::expand_grid(
     )
 
     test_that(test_label, {
+      skip_on_cran() # CRAN has limited test time
 
       # Estimate the initial state vector but suppress messages about negative states being set to zero
       prediction_length <- 30
@@ -140,6 +141,7 @@ rm(model)
 
 # We should also be able to run the model with a no age groups
 test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: NULL)", {
+  skip_on_cran() # CRAN has limited test time
 
   # Modify the example model with no age stratification
   model <- generate_example_seir_model(
@@ -194,6 +196,7 @@ test_that("$get_results() (SEEIR, no age groups - n_infected - stratification: N
 
 # We should also be able to run the model with sub sets of the data age groups groups
 test_that("$get_results() (SEEIR, subset age groups - n_infected - stratification: NULL)", {
+  skip_on_cran() # CRAN has limited test time
 
   # Modify the example model with fewer age groups
   model <- generate_example_seir_model(

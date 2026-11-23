@@ -59,6 +59,7 @@ tidyr::expand_grid(
     age_group_string <- ifelse(length(age_cuts_lower) == 0, "single", "multiple")
 
     test_that(glue::glue("$configure_output() ({model_string} single variant / {age_group_string} age group)"), {
+      skip_on_cran() # CRAN has limited test time
 
       # Modify the example model for our test
       model <- generate_example_seir_model(

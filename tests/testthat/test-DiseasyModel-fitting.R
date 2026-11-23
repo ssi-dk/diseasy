@@ -93,6 +93,7 @@ test_that("parameter_inverse handles values at and outside boundaries", {
 for (fit_parameter in c("overall_infection_risk", "disease_progression_rates.E", "season.scale")) {
   test_that(glue::glue("fitting routine seems to work for {fit_parameter}"), {
     skip_if_not_installed("duckdb")
+    skip_on_cran() # CRAN has limited test time
 
     # Generate model to fit
     observables <- DiseasyObservables$new(

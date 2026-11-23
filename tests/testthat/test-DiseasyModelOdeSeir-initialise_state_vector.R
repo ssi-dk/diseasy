@@ -50,6 +50,7 @@ tidyr::expand_grid(
       paste(collapse = "")
 
     test_that(glue::glue("$initialise_state_vector() ({model_string} single variant / single age group)"), {
+      skip_on_cran() # CRAN has limited test time
 
       # Modify the example model with different compartments and no age groups
       model <- generate_example_seir_model(
