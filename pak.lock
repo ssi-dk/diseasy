@@ -202,7 +202,7 @@
     },
     {
       "package": "curl",
-      "version": "8.1.0",
+      "version": "8.2.0",
       "_row": "curl"
     },
     {
@@ -292,7 +292,7 @@
     },
     {
       "package": "duckdb",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "_row": "duckdb"
     },
     {
