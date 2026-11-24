@@ -230,6 +230,7 @@ test_that("Consecutive `$prepare_rhs()` calls works without error", {
 
 
 test_that("waning immunity targets other than 'infection' configures outputs", {
+  skip_on_cran()
 
   m <- DiseasyModelOdeSeir$new(
     activity = model$activity,

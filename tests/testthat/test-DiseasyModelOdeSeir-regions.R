@@ -1,5 +1,6 @@
 test_that("`DiseasyModelOdeSeir` with different regional stratifications and mixing produces similar results", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   # We create a few helpers to create models from an adjacency
   # matrix and create a non-stratified and a  region-stratified model

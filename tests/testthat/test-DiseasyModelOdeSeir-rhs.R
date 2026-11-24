@@ -7,6 +7,7 @@ fv <- 0.01 # Whenever two variants are in use, the second has a relative infecti
 test_that("RHS does not leak and solution is non-negative (SEIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
@@ -60,6 +61,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR single varian
   skip_if_not_installed("deSolve")
   skip_if_not_installed("optimx")
   skip_if_not_installed("ucminf")
+  skip_on_cran() # CRAN has limited test time
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
@@ -114,6 +116,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   skip_if_not_installed("deSolve")
   skip_if_not_installed("optimx")
   skip_if_not_installed("ucminf")
+  skip_on_cran() # CRAN has limited test time
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -155,6 +158,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
   skip_if_not_installed("deSolve")
   skip_if_not_installed("optimx")
   skip_if_not_installed("ucminf")
+  skip_on_cran() # CRAN has limited test time
 
   # Define an activity scenario
   act <- DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK)
@@ -211,6 +215,7 @@ test_that("RHS does not leak and solution is non-negative (SEEIIRR double varian
 test_that("RHS sanity check 1: Disease progression flows (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   m <- DiseasyModelOdeSeir$new(
     observables = DiseasyObservables$new(
@@ -280,6 +285,7 @@ test_that("RHS sanity check 1: Disease progression flows (double variant / doubl
 test_that("RHS sanity check 2: Only infected (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -321,6 +327,7 @@ test_that("RHS sanity check 2: Only infected (double variant / single age group)
 test_that("RHS sanity check 2: Only infected (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -367,6 +374,7 @@ test_that("RHS sanity check 2: Only infected (double variant / double age group)
 test_that("RHS sanity check 3: Infected and susceptible (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -411,6 +419,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / single
 test_that("RHS sanity check 3: Infected and susceptible (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -460,6 +469,7 @@ test_that("RHS sanity check 3: Infected and susceptible (double variant / double
 test_that("RHS sanity check 4: Re-infections (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -507,6 +517,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / single age group)
 test_that("RHS sanity check 4: Re-infections (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -560,6 +571,7 @@ test_that("RHS sanity check 4: Re-infections (double variant / double age group)
 test_that("RHS sanity check 5: Activity changes (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
@@ -623,6 +635,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / single age gro
 test_that("RHS sanity check 5: Activity changes (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   # Create a activity scenario for the tests
   basis <- contact_basis_nordic %.% DK
@@ -696,6 +709,7 @@ test_that("RHS sanity check 5: Activity changes (double variant / double age gro
 test_that("RHS sanity check 6: Cross-immunity (double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant(
@@ -756,6 +770,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / single age group
 test_that("RHS sanity check 6: Cross-immunity (double variant / double age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant(
@@ -826,6 +841,7 @@ test_that("RHS sanity check 6: Cross-immunity (double variant / double age group
 test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegions$new(
     area = c("A", "B")
@@ -910,6 +926,7 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 2 regions)", {
 test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegions$new(
     area = c("A", "B", "C")
@@ -1001,6 +1018,7 @@ test_that("RHS sanity check 7: Regional-mixing (well-mixed, 3 regions)", {
 test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegions$new(
     area = c("A", "B")
@@ -1084,6 +1102,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 2 regions)", {
 test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegions$new(
     area = c("A", "B", "C")
@@ -1177,6 +1196,7 @@ test_that("RHS sanity check 7: Regional-mixing (no-mixing, 3 regions)", {
 test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegions$new(
     area = c("A", "B")
@@ -1262,6 +1282,7 @@ test_that("RHS sanity check 7: Regional-mixing (only cross-mixing, 2 regions)", 
 test_that("RHS sanity check 8: Regional-mixing with regional modifiers (well-mixed, 2 regions)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("deSolve")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegions$new(
     area = c("A", "B")

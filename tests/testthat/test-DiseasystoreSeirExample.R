@@ -1,3 +1,7 @@
+if (!identical(tolower(Sys.getenv("NOT_CRAN")), "true")) {
+  return(NULL) # CRAN has limited test time
+}
+
 # Call the testing suite
 diseasystore::test_diseasystore(
   diseasystore_generator = DiseasystoreSeirExample,

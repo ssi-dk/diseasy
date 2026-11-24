@@ -67,6 +67,7 @@ test_that("initialize works with custom mappings", {
 
 test_that("$hash works", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   # Identical model instances should have the same hash
   m1 <- DiseasyModelOde$new()

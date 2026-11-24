@@ -5,6 +5,7 @@ rI <- 1 / 4 # Overall disease progression rate from I to R                      
 
 test_that("helpers works (SR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   # This may seem a weird test case, but in some of the initialisation code, we run a model with
   # one less I states, and we need to ensure the index helpers still works in this case
@@ -62,6 +63,7 @@ test_that("helpers works (SR single variant / single age group)", {
 
 test_that("helpers works (SIR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   m <- DiseasyModelOdeSeir$new(
     activity = DiseasyActivity$new(contact_basis = contact_basis_nordic %.% DK),
@@ -115,6 +117,7 @@ test_that("helpers works (SIR single variant / single age group)", {
 
 test_that("helpers works (SIR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -246,6 +249,7 @@ test_that("helpers works (SEEIIRR single variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("optimx")
   skip_if_not_installed("ucminf")
+  skip_on_cran() # CRAN has limited test time
 
   # Creating an empty model module
   m <- DiseasyModelOdeSeir$new(
@@ -308,6 +312,7 @@ test_that("helpers works (SEEIIRR double variant / single age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("optimx")
   skip_if_not_installed("ucminf")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
@@ -388,6 +393,7 @@ test_that("helpers works (SEEIIRR double variant / double age group)", {
   skip_if_not_installed("RSQLite")
   skip_if_not_installed("optimx")
   skip_if_not_installed("ucminf")
+  skip_on_cran() # CRAN has limited test time
 
   var <- DiseasyVariant$new()
   var$add_variant("Variant 1")
