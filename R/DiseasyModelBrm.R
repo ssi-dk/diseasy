@@ -9,13 +9,13 @@
 #' @return `r rd_diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export
-DiseasyModelBRM <- R6::R6Class(                                                                                         # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
-  classname = "DiseasyModelBRM",
+DiseasyModelBrm <- R6::R6Class(                                                                                         # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+  classname = "DiseasyModelBrm",
   inherit = DiseasyModelRegression,
 
   public = list(
     #' @description
-    #'   Creates a new instance of the `DiseasyModelBRM` [R6][R6::R6Class] class.
+    #'   Creates a new instance of the `DiseasyModelBrm` [R6][R6::R6Class] class.
     #'   This module is typically not constructed directly but rather through `DiseasyModelB*` classes,
     #'   such as [DiseasyModelB0] and [DiseasyModelB1].
     #' @param ...
@@ -24,7 +24,7 @@ DiseasyModelBRM <- R6::R6Class(                                                 
     #'   Helper class for the the `DiseasyModelB*` [R6][R6::R6Class] classes.
     #' @seealso [stats::family], [stats::as.formula]
     #' @return
-    #'   A new instance of the `DiseasyModelBRM` [R6][R6::R6Class] class.
+    #'   A new instance of the `DiseasyModelBrm` [R6][R6::R6Class] class.
     initialize = function(...) {
       missing_packages <- "brms" |>
         purrr::discard(rlang::is_installed) |>
@@ -134,7 +134,7 @@ DiseasyModelBRM <- R6::R6Class(                                                 
 #' @noRd
 DiseasyModelB_ <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelB_",
-  inherit = DiseasyModelBRM,
+  inherit = DiseasyModelBrm,
   public = list(
 
     #' @description
@@ -142,7 +142,7 @@ DiseasyModelB_ <- R6::R6Class(                                                  
     #'   This module is typically not constructed directly but rather through `DiseasyModelB*` classes,
     #'   such as [DiseasyModelB0] and [DiseasyModelB1].
     #' @param ...
-    #'   parameters sent to `DiseasyModelBRM` [R6][R6::R6Class] constructor.
+    #'   parameters sent to `DiseasyModelBrm` [R6][R6::R6Class] constructor.
     #' @details
     #'   Helper class for the the `DiseasyModelB*` [R6][R6::R6Class] classes.
     #' @seealso [stats::family], [stats::as.formula]

@@ -7,6 +7,7 @@ for (noise_model in c("poisson", "negative binomial")) {
       ),
       {
         skip_if_not_installed("duckdb")
+        skip_on_cran() # CRAN has limited test time
 
         # Create a scoring module
         scoring <- DiseasyScoring$new()

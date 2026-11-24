@@ -32,6 +32,7 @@ test_that("$set_moduleowner() works", {
 
 
 test_that("$hash works", {
+  skip_on_cran() # CRAN has limited test time
 
   # Creating an empty module
   m <- DiseasyBaseModule$new()

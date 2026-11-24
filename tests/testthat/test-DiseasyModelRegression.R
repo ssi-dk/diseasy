@@ -228,6 +228,7 @@ test_that("`DiseasyModelG0` can control `DiseasySeason`", {
 
 test_that("`plot()` produces no errors", {
   skip_if_not_installed("duckdb")
+  skip_on_cran() # CRAN has limited test time
 
   conn <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
   observables <- DiseasyObservables$new(

@@ -9,8 +9,8 @@
 #' @return `r rd_diseasymodel_glm_brm_return("GLM")`
 #' @keywords model-template
 #' @export
-DiseasyModelGLM <- R6::R6Class(                                                                                         # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
-  classname = "DiseasyModelGLM",
+DiseasyModelGlm <- R6::R6Class(                                                                                         # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
+  classname = "DiseasyModelGlm",
   inherit = DiseasyModelRegression,
 
   private = list(
@@ -93,7 +93,7 @@ DiseasyModelGLM <- R6::R6Class(                                                 
 #' @noRd
 DiseasyModelG_ <- R6::R6Class(                                                                                          # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
   classname = "DiseasyModelB_",
-  inherit = DiseasyModelGLM,
+  inherit = DiseasyModelGlm,
   public = list(
 
     #' @description
@@ -101,7 +101,7 @@ DiseasyModelG_ <- R6::R6Class(                                                  
     #'   This module is typically not constructed directly but rather through `DiseasyModelG*` classes,
     #'   such as [DiseasyModelG0] and [DiseasyModelG1].
     #' @param ...
-    #'   parameters sent to `DiseasyModelGLM` [R6][R6::R6Class] constructor.
+    #'   parameters sent to `DiseasyModelGlm` [R6][R6::R6Class] constructor.
     #' @details
     #'   Helper class for the the `DiseasyModelG*` [R6][R6::R6Class] classes.
     #' @seealso [stats::family], [stats::as.formula]

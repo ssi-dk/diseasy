@@ -32,7 +32,7 @@
     },
     {
       "package": "bayesplot",
-      "version": "1.16.0",
+      "version": "1.17.0",
       "_row": "bayesplot"
     },
     {
@@ -202,7 +202,7 @@
     },
     {
       "package": "curl",
-      "version": "8.1.0",
+      "version": "8.2.0",
       "_row": "curl"
     },
     {
@@ -252,12 +252,12 @@
     },
     {
       "package": "diseasy",
-      "version": "0.0.0.9001",
+      "version": "0.1.0",
       "_row": "diseasy"
     },
     {
       "package": "diseasystore",
-      "version": "0.4.1.9000",
+      "version": "0.4.1",
       "_row": "diseasystore"
     },
     {
@@ -292,7 +292,7 @@
     },
     {
       "package": "duckdb",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "_row": "duckdb"
     },
     {
@@ -722,7 +722,7 @@
     },
     {
       "package": "openssl",
-      "version": "2.5.0",
+      "version": "2.6.0",
       "_row": "openssl"
     },
     {
@@ -787,7 +787,7 @@
     },
     {
       "package": "posterior",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "_row": "posterior"
     },
     {
@@ -807,7 +807,7 @@
     },
     {
       "package": "processx",
-      "version": "3.9.0",
+      "version": "3.10.0",
       "_row": "processx"
     },
     {
@@ -1047,12 +1047,12 @@
     },
     {
       "package": "S7",
-      "version": "0.2.2",
+      "version": "1.0.0",
       "_row": "S7"
     },
     {
       "package": "sass",
-      "version": "0.4.10",
+      "version": "0.5.0",
       "_row": "sass"
     },
     {
@@ -1082,7 +1082,7 @@
     },
     {
       "package": "shiny",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "_row": "shiny"
     },
     {
@@ -1127,7 +1127,7 @@
     },
     {
       "package": "systemfonts",
-      "version": "1.3.3",
+      "version": "1.3.4",
       "_row": "systemfonts"
     },
     {
@@ -1137,7 +1137,7 @@
     },
     {
       "package": "terra",
-      "version": "1.9-50",
+      "version": "1.9-60",
       "_row": "terra"
     },
     {
@@ -1147,7 +1147,7 @@
     },
     {
       "package": "textshaping",
-      "version": "1.0.5",
+      "version": "1.1.0",
       "_row": "textshaping"
     },
     {
@@ -1222,7 +1222,7 @@
     },
     {
       "package": "V8",
-      "version": "8.2.1",
+      "version": "8.3.0",
       "_row": "V8"
     },
     {
@@ -1244,6 +1244,11 @@
       "package": "waldo",
       "version": "0.6.2",
       "_row": "waldo"
+    },
+    {
+      "package": "watcher",
+      "version": "0.2.2",
+      "_row": "watcher"
     },
     {
       "package": "whisker",

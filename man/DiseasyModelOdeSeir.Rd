@@ -25,6 +25,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 }
 \examples{
 \dontshow{if (rlang::is_installed(c("duckdb", "deSolve")) && (Sys.info()["sysname"] != "Darwin")) withAutoprint(\{ # examplesIf}
+  \donttest{
   # The model can be instantiated almost without arguments, but
   # to illustrate its use, we configure a simple model:
 
@@ -86,6 +87,7 @@ See \code{vignette(diseasy-model-ode-seir)} for a detailed examples of how to us
 
   rm(m, activity, observables, population)
   DBI::dbDisconnect(conn)
+  }
 \dontshow{\}) # examplesIf}
 }
 \seealso{

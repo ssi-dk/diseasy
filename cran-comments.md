@@ -3,3 +3,9 @@
 0 errors | 0 warnings | 1 note
 
 * This is a new release.
+
+* We are not explicitly implementing any methods which have references that should be mentioned in the Description.
+
+* Some examples are wrapped with \donttest due to long execution time (> 5s)
+
+* Some tests are run only locally to keep test time below 10 minutes on CRAN

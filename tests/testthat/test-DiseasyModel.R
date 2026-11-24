@@ -368,6 +368,7 @@ test_that("$load_module() works", {
 
 test_that("$hash works", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   # Test hash generation works as expected
 
@@ -633,6 +634,7 @@ test_that("$get_results() gives error", {
 
 test_that("$get_data() works", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   # Use a random diseasystore for the tests
   obs <- DiseasyObservables$new(diseasystore = case_defs[[1]])

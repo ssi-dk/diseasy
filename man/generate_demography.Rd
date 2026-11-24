@@ -27,7 +27,7 @@ Generate the country-level demography data used by \code{diseasy} from the
 U.S. Census Bureau International Database.
 }
 \examples{
-\dontrun{
+\donttest{
 demography <- generate_demography(area = c("DK", "FI", "IS", "NO", "SE"))
 }
 }

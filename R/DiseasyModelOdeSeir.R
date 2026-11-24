@@ -15,6 +15,7 @@
 #'
 #'   See `vignette(diseasy-model-ode-seir)` for a detailed examples of how to use this model.
 #' @examplesIf rlang::is_installed(c("duckdb", "deSolve")) && (Sys.info()["sysname"] != "Darwin")
+#'   \donttest{
 #'   # The model can be instantiated almost without arguments, but
 #'   # to illustrate its use, we configure a simple model:
 #'
@@ -76,6 +77,7 @@
 #'
 #'   rm(m, activity, observables, population)
 #'   DBI::dbDisconnect(conn)
+#'   }
 #' @return
 #'   A new instance of the `DiseasyModelOdeSeir` [R6][R6::R6Class] class.
 #' @keywords model-template

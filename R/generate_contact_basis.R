@@ -7,8 +7,8 @@
 #' @return
 #'   A named list of contact-basis objects, using the current package data
 #'   structure.
-#' @examples
-#' \dontrun{
+#' @examplesIf rlang::is_installed("countrycode")
+#' \donttest{
 #' contact_basis <- generate_contact_basis()
 #' }
 #' @keywords data-generators

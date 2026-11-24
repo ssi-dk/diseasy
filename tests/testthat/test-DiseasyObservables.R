@@ -256,6 +256,7 @@ test_that("$set_slice_ts() works", {
 
 test_that("$define_synthetic_observable() works", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   obs <- DiseasyObservables$new()
 
@@ -447,6 +448,7 @@ test_that("$define_synthetic_observable() works", {
 
 test_that("$get_observation() works", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   for (case_def in case_defs) {
 
@@ -522,6 +524,7 @@ test_that("$get_observation() works", {
 
 test_that("$get_observation() works -- test 2", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   for (case_def in case_defs) {
 
@@ -545,6 +548,7 @@ test_that("$get_observation() works -- test 2", {
 
 test_that("$hash works", {
   skip_if_not_installed("RSQLite")
+  skip_on_cran() # CRAN has limited test time
 
   # Create a observables instance using example data
   observables <- DiseasyObservables$new(

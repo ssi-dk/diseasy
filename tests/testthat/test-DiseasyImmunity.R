@@ -509,6 +509,7 @@ test_that("`$approximate_compartmental()` works for exponential_waning", {
   skip_if_not_installed("nloptr")
   skip_if_not_installed("ucminf")
   skip_if_not_installed("subplex")
+  skip_on_cran() # CRAN has limited test time
 
   # Initialize the DiseasyImmunity instance
   im <- DiseasyImmunity$new()
@@ -568,6 +569,7 @@ test_that("`$approximate_compartmental()` uses cache optimally", {
   skip_if_not_installed("nloptr")
   skip_if_not_installed("ucminf")
   skip_if_not_installed("subplex")
+  skip_on_cran() # CRAN has limited test time
 
   # In this test, we check that the "recursive" and "combination" strategies
   # uses the cache optimally by checking that we have the cache hits we expect.

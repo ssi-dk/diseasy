@@ -7,8 +7,6 @@ authors:
     href: https://www.ssi.dk/
   EU: {}
 
-llm-docs: false
-
 navbar:
   structure:
     left: [intro, reference, articles, funding, news]

@@ -298,6 +298,7 @@ test_that("$set_scale() works", {
 
 
 test_that("$hash works", {
+  skip_on_cran() # CRAN has limited test time
 
   # Check the hash in a couple of cases
   s1 <- DiseasySeason$new(reference_date = as.Date("2022-01-01"))

@@ -441,6 +441,7 @@ test_that("$regions_at_stratification() tries to guess regions even if `regions`
 test_that("`plot()` produces no errors with defaults", {
   skip_if_not_installed("giscoR")
   skip_if_not_installed("lwgeom")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegionsNuts$new(
     area = "DK",
@@ -460,6 +461,7 @@ test_that("`plot()` produces no errors with defaults", {
 test_that("`plot()` produces no errors with given data", {
   skip_if_not_installed("giscoR")
   skip_if_not_installed("lwgeom")
+  skip_on_cran() # CRAN has limited test time
 
   regions <- DiseasyRegionsNuts$new(
     area = "DK"

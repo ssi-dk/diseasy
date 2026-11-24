@@ -11,7 +11,7 @@
 #' @return
 #'   A `data.frame` with columns `region`, `age`, and `population`.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' demography <- generate_demography(area = c("DK", "FI", "IS", "NO", "SE"))
 #' }
 #' @keywords data-generators
