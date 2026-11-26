@@ -41,6 +41,90 @@ test_that("$generator_matrix() (SIR single variant / single age group)", {
   rm(m)
 })
 
+test_that("$compute_malthusian_scaling_factor() (single age-group SIR)", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
+
+  m <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    parameters = list(
+      "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  private <- m$.__enclos_env__$private
+
+  # An SIR model with one age group is already the reference configuration
+  expect_equal(private$compute_malthusian_scaling_factor(), 1, tolerance = 1e-8)
+
+  rm(m)
+})
+
+test_that("$compute_malthusian_scaling_factor() projects multiple age groups", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
+
+  m <- DiseasyModelOdeSeir$new(
+    population = DiseasyPopulation$new(age_cuts_lower = c(0, 60)),
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    parameters = list(
+      "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  private <- m$.__enclos_env__$private
+  expect_true(is.finite(private$compute_malthusian_scaling_factor()))
+
+  rm(m)
+})
+
+
+test_that("$compute_malthusian_scaling_factor() handles multiple variants", {
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("optimx")
+  skip_if_not_installed("ucminf")
+
+  variant <- DiseasyVariant$new()
+  variant$add_variant("Variant 1")
+  variant$add_variant(
+    "Variant 2",
+    characteristics = list(
+      "relative_infection_risk" = 1.5,
+      "cross_immunity" = c("Variant 1" = 0.5)
+    )
+  )
+
+  m <- DiseasyModelOdeSeir$new(
+    observables = DiseasyObservables$new(
+      conn = \() DBI::dbConnect(RSQLite::SQLite()),
+      last_queryable_date = Sys.Date() - 1
+    ),
+    variant = variant,
+    parameters = list(
+      "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
+      "disease_progression_rates" = c("I" = rI),
+      "malthusian_matching" = FALSE
+    )
+  )
+
+  private <- m$.__enclos_env__$private
+  expect_true(is.finite(private$compute_malthusian_scaling_factor()))
+
+  rm(m)
+})
+
 test_that("$generator_matrix() (SIR multiple variants / double age group)", {
   skip_if_not_installed("RSQLite")
 

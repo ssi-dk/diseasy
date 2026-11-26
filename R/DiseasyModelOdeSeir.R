@@ -1745,7 +1745,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
     # @description
-    #   This function computes the generator matrix for the current model configuration.
+    #   This function computes the generator matrix from the supplied configuration.
+    #   Defaults adapt it to the current model.
     # @details
     #   This section follows the method outlined in doi: 10.1098/rsif.2009.0386
     # @params t (`numeric(1)`)\cr
@@ -1760,17 +1761,32 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
     generator_matrix = function(
       t = 0,
       overall_infection_risk = self %.% parameters %.% overall_infection_risk,
-      RS_states = c(                                                                                                    # nolint: object_name_linter
+      compartment_structure = self %.% parameters %.% compartment_structure,
+      disease_progression_rates = self %.% parameters %.% disease_progression_rates,
+      n_population_groups = private %.% n_population_groups,
+      n_variants = private %.% n_variants,
+      population_proportion = self %.% population %.% model_population %.% proportion,
+      RS_states = c(
         rep(
           0,
-          private %.% n_population_groups * private %.% n_variants * self %.% parameters %.% compartment_structure %.% R
+          n_population_groups * n_variants * purrr::pluck(compartment_structure, "R", .default = 0)
         ),
-        self %.% population %.% model_population %.% proportion
-      )
+        population_proportion
+      ),
+      contact_matrix = private %.% contact_matrix(t),
+      relative_infection_risk = purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
+        purrr::map_dbl(\(variant) purrr::pluck(variant, "relative_infection_risk", .default = 1)),
+      immunity_matrix = private %.% immunity_matrix,
+      infection_matrix_to_rs_indices = private %.% infection_matrix_to_rs_indices,
+      seasonal_multiplier = self %.% season %.% model_t(t),
+      active_variants = purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
+        purrr::map(~ purrr::pluck(.x, "introduction_date", .default = as.Date("1970-01-01"))) |>
+        purrr::map_lgl(~ .x - (self %.% training_period %.% end + t) <= 0)
     ) {
 
-      K <- purrr::pluck(self %.% parameters %.% compartment_structure, "E", .default = 0)                               # nolint: object_name_linter
-      L <- purrr::pluck(self %.% parameters %.% compartment_structure, "I", .default = 0)                               # nolint: object_name_linter
+      # Retrieve the number of exposed and infectious compartments
+      K <- purrr::pluck(compartment_structure, "E", .default = 0)                                                 # nolint: object_name_linter
+      L <- purrr::pluck(compartment_structure, "I", .default = 0)                                                 # nolint: object_name_linter
 
       # Early return if no disease compartments
       if (K + L == 0) {
@@ -1782,18 +1798,22 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       checkmate::assert_number(t, add = coll)
       checkmate::assert_numeric(RS_states, lower = 0, upper = 1, add = coll)
       checkmate::assert_number(overall_infection_risk, lower = 0, add = coll)
+      checkmate::assert_integerish(n_population_groups, lower = 1, len = 1, add = coll)
+      checkmate::assert_integerish(n_variants, lower = 1, len = 1, add = coll)
+      checkmate::assert_numeric(relative_infection_risk, len = n_variants, add = coll)
+      checkmate::assert_logical(active_variants, len = n_variants, add = coll)
       checkmate::reportAssertions(coll)
 
       ## Compute the transition rate component
 
       # The diagonal elements of the transition matrix is just (minus) the progression flow rates
       progression_flow_rates <- c(
-        rep(K * purrr::pluck(self %.% parameters %.% disease_progression_rates, "E", .default = 0), K),
-        rep(L * purrr::pluck(self %.% parameters %.% disease_progression_rates, "I", .default = 0), L)
+        rep(K * purrr::pluck(disease_progression_rates, "E", .default = 0), K),
+        rep(L * purrr::pluck(disease_progression_rates, "I", .default = 0), L)
       )
       transition_matrix <- diag(
-        - rep(progression_flow_rates, private %.% n_population_groups * private %.% n_variants),
-        nrow = private %.% n_population_groups * private %.% n_variants * (K + L)
+        - rep(progression_flow_rates, n_population_groups * n_variants),
+        nrow = n_population_groups * n_variants * (K + L)
       )
 
 
@@ -1802,7 +1822,7 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       # which requires a little more attention when computing
       offdiagonal_elements <- rep(
         c(head(progression_flow_rates, -1), 0),
-        private %.% n_population_groups * private %.% n_variants
+        n_population_groups * n_variants
       ) |>
         head(-1)
 
@@ -1820,31 +1840,22 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       ## Compute the transmissions component
 
-      # Retrieve the active contact matrix
-      contact_matrix <- private %.% contact_matrix(t)
-
       # If the contact matrix is 1 x 1, convert to scalar since R wont multiply otherwise
       if (length(contact_matrix) == 1) contact_matrix <- as.numeric(contact_matrix)
-
-
-      # Get the relative infection risk of the variants
-      epsilon <- purrr::pluck(self %.% variant %.% variants, .default = list(1)) |>
-        purrr::map_dbl(\(variant) purrr::pluck(variant, "relative_infection_risk", .default = 1))
-
 
       # Compute the "cross-section" of the contacts
       # The pre-computed "immunity_matrix" contains what we need.
       # However, we need to ensure the RS_states sums to 1
-      rho <- private %.% immunity_matrix * (RS_states / sum(RS_states))
-      rho <- purrr::map_dbl(private %.% infection_matrix_to_rs_indices, ~ sum(rho[.])) |>
-        matrix(nrow = private %.% n_population_groups, ncol = private %.% n_variants)
+      rho <- immunity_matrix * (RS_states / sum(RS_states))
+      rho <- purrr::map_dbl(infection_matrix_to_rs_indices, ~ sum(rho[.])) |>
+        matrix(nrow = n_population_groups, ncol = n_variants)
 
       # Compute the scaling of the contact rates
-      beta_0 <- overall_infection_risk * self %.% season %.% model_t(t)
+      beta_0 <- overall_infection_risk * seasonal_multiplier
 
       # Combine the components to get what we need for each diagonal block of the generator matrix
       transmission_matrix_components <- purrr::map2(
-        epsilon,
+        relative_infection_risk,
         asplit(rho, MARGIN = 2), # Split by column (i.e. variant)
         \(e, r) beta_0 * e * matrix(rep(r, length(r)), nrow = length(r)) * contact_matrix
       )
@@ -1853,13 +1864,13 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
       transmission_matrix <- 0 * transition_matrix
 
       # Then fill in with beta elements
-      for (a in seq_len(private %.% n_variants)) { # This has to be a nested for loop for the referencing to work
-        for (i in seq_len(private %.% n_population_groups)) {
-          for (j in seq_len(private %.% n_population_groups)) {
+      for (a in seq_len(n_variants)) { # This has to be a nested for loop for the referencing to work
+        for (i in seq_len(n_population_groups)) {
+          for (j in seq_len(n_population_groups)) {
             transmission_matrix[
               #                                   Block offset
-              1 + (i - 1) * (K + L)               + (a - 1) * (K + L) * private %.% n_population_groups,
-              (K + 1):(K + L) + (j - 1) * (K + L) + (a - 1) * (K + L) * private %.% n_population_groups
+              1 + (i - 1) * (K + L)               + (a - 1) * (K + L) * n_population_groups,
+              (K + 1):(K + L) + (j - 1) * (K + L) + (a - 1) * (K + L) * n_population_groups
             ] <- transmission_matrix_components[[a]][i, j]
           }
         }
@@ -1870,12 +1881,8 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
 
       # We need to remove the effect from "in-active" variants since they are not yet introduced to the system
-      active_variants <- self %.% variant %.% variants |>
-        purrr::map(~ purrr::pluck(.x, "introduction_date", .default = as.Date("1970-01-01"))) |>
-        purrr::map_lgl(~ .x - (self %.% training_period %.% end + t) <= 0)
-
-      inactive_idx <- seq_len((K + L) * private %.% n_population_groups) +
-        (K + L) * private %.% n_population_groups * (which(!active_variants) - 1)
+      inactive_idx <- seq_len((K + L) * n_population_groups) +
+        (K + L) * n_population_groups * (which(!active_variants) - 1)
 
       generator_matrix[inactive_idx, ] <- 0
       generator_matrix[, inactive_idx] <- 0
@@ -1886,8 +1893,10 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
     # @description
     #   This function computes the relative difference in growth rates between the current model and the SIR model.
+    # @param t (`numeric(1)`)\cr
+    #   The time at which to compute the growth rates.
     # @params ... Parameters passed to `$generator_matrix()`.
-    compute_malthusian_scaling_factor = function(...) {
+    compute_malthusian_scaling_factor = function(t = 0, ...) {
 
       if (self %.% parameters %.% overall_infection_risk == 0) {
         stop(
@@ -1898,42 +1907,37 @@ DiseasyModelOdeSeir <- R6::R6Class(                                             
 
       # The reference model is an SIR model with the same parameters as the current model
       # except that it uses only a single age group
-
-      # Define a modified list of model parameters
-      parameters <- modifyList(
-        self %.% parameters,
-        list(
-          "compartment_structure" = c("E" = 0L, "I" = 1L, "R" = 1L),
-          "disease_progression_rates" = purrr::discard_at(
-            self %.% parameters %.% disease_progression_rates,
-            ~ . == "E"
-          ),
-          "malthusian_matching" = FALSE
-        ),
-        keep.null = TRUE
+      population_proportion <- self %.% population %.% model_population %.% proportion
+      contact_matrix <- private %.% contact_matrix(t)
+      reference_contact_matrix <- sum( # Single age group
+        contact_matrix * outer(population_proportion, population_proportion)
       )
 
-      # Remove the outputs generated from `$configure_output()`
-      parameters[["model_output_to_observable"]] <- purrr::pluck(
-        private %.% default_parameters(),
-        "model_output_to_observable"
+      # The reference model has one recovered compartment per variant
+      n_variants <- private %.% n_variants
+      reference_compartment_structure <- c("E" = 0L, "I" = 1L, "R" = 1L)
+      reference_progression_rates <- purrr::discard_at(self %.% parameters %.% disease_progression_rates, "E")
+
+      # The reference population is entirely susceptible, so the recovered-state risks are immaterial
+      reference_immunity_matrix <- matrix(1, nrow = n_variants + 1L, ncol = n_variants)
+
+      # Map each infection variant to the R/S rows in its risk-matrix column
+      reference_infection_matrix_to_rs_indices <- purrr::map(
+        seq_len(n_variants),
+        \(variant) seq_len(n_variants + 1L) + (variant - 1L) * (n_variants + 1L)
       )
 
-      reference_model <- DiseasyModelOdeSeir$new(
-        observables = self %.% observables,
-        population = self %.% population,
-        activity = self %.% activity,
-        regions = self %.% regions,
-        season = self %.% season,
-        variant = self %.% variant,
-        immunity = self %.% immunity,
-        parameters = parameters
+      # Evaluate the same generator-matrix calculation with the reference SIR inputs
+      reference_growth_rate <- self$malthusian_growth_rate(
+        compartment_structure = reference_compartment_structure,
+        disease_progression_rates = reference_progression_rates,
+        n_population_groups = 1L,
+        population_proportion = 1,
+        RS_states = c(rep(0, n_variants), 1),
+        contact_matrix = reference_contact_matrix,
+        infection_matrix_to_rs_indices = reference_infection_matrix_to_rs_indices,
+        ...
       )
-
-      # Ensure RHS is initialised
-      reference_model %.% prepare_rhs()
-
-      reference_growth_rate <- reference_model$malthusian_growth_rate(...)
 
       # Define objective function for root finding
       f <- \(scaling_factor) {
